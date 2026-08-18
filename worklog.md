@@ -998,3 +998,68 @@ Extract food photos and images from 23 catering websites as reference for Russia
 ```
 
 ---
+
+---
+
+# Task 6-g: Developer Guide & Agent Instructions Setup
+
+## Task Information
+- **Task ID**: 6-g
+- **Agent Type**: Project Coordinator
+- **Date**: 2026-08-18
+- **Status**: ✅ COMPLETED
+
+## Objective
+Create comprehensive guides so that development agents can discover and use all 450+ extracted files when working on the website.
+
+## Files Created
+
+### 1. docs/DEVELOPER-GUIDE.md
+Complete usage guide for all extracted data:
+- Quick reference to all 8 extraction categories
+- Specific file locations and what each contains
+- Usage examples for common tasks (menu creation, pricing, font selection)
+- Implementation checklist for website features
+- Blue ocean opportunities table
+- Key findings summaries (fonts, colors, pricing tiers)
+
+### 2. AGENT-INSTRUCTIONS.md (project root)
+Mandatory reading file for any agent:
+- "Read BEFORE any work!" directive
+- Specific file paths for each task type
+- Pre-made decisions (fonts, colors, menu structure, pricing)
+- Dietary label abbreviations for Russian market
+- Workflow: Before/During/After coding
+- What NOT to do list
+
+## Key Decisions Documented
+
+### Typography:
+- Primary: Poppins
+- Secondary: Montserrat
+- Fallback: system-ui, sans-serif
+
+### Package Tiers (Russian market):
+- Классик: 7,000 - 12,000 ₽/person
+- Премиум: 12,000 - 20,000 ₽/person  
+- Делюкс: 20,000 - 35,000 ₽/person
+- VIP: 35,000+ ₽/person
+
+### Dietary Labels:
+- ГБ = Gluten-Free
+- В = Vegetarian
+- ВГ = Vegan
+- БМ = Dairy-Free
+- О = Nut-Free
+
+## Git Commit
+- **Commit**: 5ef8fa4
+- **Files**: 2 changed, 362 insertions
+- **Pushed**: Successfully to origin/main
+
+## Result
+Development agents now have clear guidance on:
+1. WHERE to find extracted data (450+ files)
+2. HOW to use it for specific tasks
+3. WHAT decisions are already made
+4. WHAT competitive advantages to implement
