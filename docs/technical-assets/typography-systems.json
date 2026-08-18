@@ -1,0 +1,231 @@
+{
+  "analysis_date": "2026-08-18T22:59:40.710192",
+  "summary": {
+    "total_sites": 21,
+    "most_popular_fonts": [
+      [
+        "Not detected",
+        7
+      ],
+      [
+        "inherit",
+        4
+      ],
+      [
+        "Poppins",
+        2
+      ],
+      [
+        "Arial",
+        1
+      ],
+      [
+        "system-ui",
+        1
+      ],
+      [
+        "Montserrat",
+        1
+      ],
+      [
+        "Nunito Sans",
+        1
+      ],
+      [
+        "Rubik",
+        1
+      ],
+      [
+        "-apple-system",
+        1
+      ],
+      [
+        "PP Neue Montreal",
+        1
+      ]
+    ],
+    "google_fonts_vs_custom": {
+      "google_fonts": 2,
+      "custom_only": 19
+    }
+  },
+  "typography_by_site": {
+    "concordecatering.ca": {
+      "primary_font": "Poppins",
+      "font_stack": [
+        "Poppins"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "myradish.com": {
+      "primary_font": "Poppins",
+      "font_stack": [
+        "Poppins"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "ridgewells.com": {
+      "primary_font": "Arial",
+      "font_stack": [
+        "Arial",
+        "Helvetica",
+        "Helvetica-bold",
+        "HelveticaNeueW01-45Ligh"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "sopranoscatering.com": {
+      "primary_font": "Not detected",
+      "font_stack": [],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "concept-catering.de": {
+      "primary_font": "Not detected",
+      "font_stack": [],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "talkofthetownatlanta.com": {
+      "primary_font": "inherit",
+      "font_stack": [
+        "inherit",
+        "Menlo",
+        "var(--h2_typography-font-family)"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "queenofheartscatering.com": {
+      "primary_font": "inherit",
+      "font_stack": [
+        "inherit"
+      ],
+      "google_fonts_used": [
+        "Lato"
+      ],
+      "has_google_fonts": true
+    },
+    "chicchefcatering.com": {
+      "primary_font": "Not detected",
+      "font_stack": [],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "relishcaterers.com": {
+      "primary_font": "sans-serif",
+      "font_stack": [
+        "sans-serif",
+        "inherit",
+        "swiper-icons",
+        "Arial"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "sterlingcateringmn.com": {
+      "primary_font": "system-ui",
+      "font_stack": [
+        "system-ui"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "tallguyandagrill.com": {
+      "primary_font": "Montserrat",
+      "font_stack": [
+        "Montserrat",
+        "Roboto Condensed"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "ggcatering.com": {
+      "primary_font": "Not detected",
+      "font_stack": [],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "mculinary.com": {
+      "primary_font": "Not detected",
+      "font_stack": [],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "saltblockhospitality.com": {
+      "primary_font": "Not detected",
+      "font_stack": [],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "thejdkgroup.com": {
+      "primary_font": "inherit",
+      "font_stack": [
+        "inherit",
+        "Roboto",
+        "Roboto Slab",
+        "Raleway"
+      ],
+      "google_fonts_used": [
+        "Raleway",
+        "Roboto",
+        "Roboto Slab"
+      ],
+      "has_google_fonts": true
+    },
+    "bywordofmouth.co.uk": {
+      "primary_font": "inherit",
+      "font_stack": [
+        "inherit"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "creativeedgeparties.com": {
+      "primary_font": "Nunito Sans",
+      "font_stack": [
+        "Nunito Sans",
+        "Manrope"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "cutandtastelv.com": {
+      "primary_font": "Rubik",
+      "font_stack": [
+        "Rubik"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "elegantaffairscaterers.com": {
+      "primary_font": "-apple-system",
+      "font_stack": [
+        "-apple-system",
+        "inherit",
+        "Astra"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "gammacatering.com/en/": {
+      "primary_font": "PP Neue Montreal",
+      "font_stack": [
+        "PP Neue Montreal",
+        "var(--font-handwritten",
+        "inherit"
+      ],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    },
+    "wolfgangpuckcatering.com": {
+      "primary_font": "Not detected",
+      "font_stack": [],
+      "google_fonts_used": [],
+      "has_google_fonts": false
+    }
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "analysis_date": "2026-08-18T22:59:40.710192",
+  "summary": {
+    "total_sites": 21,
+    "sites_with_favicon": 18,
+    "favicon_formats": {
+      "ico": 7,
+      "png": 6,
+      "svg": 0,
+      "other": 5
+    },
+    "sites_with_touch_icons": 8
+  },
+  "icons_by_site": {
+    "concordecatering.ca": {
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/36f4b7de-1b8a-453c-95ea-b999839c29b4/favicon.ico?format=100w",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "myradish.com": {
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/8c637677-ab8f-4854-8f7f-e34c24ad98e3/favicon.ico",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "ridgewells.com": {
+      "favicon": {
+        "url": "https://static.wixstatic.com/media/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png/v1/fill/w_192%2Ch_192%2Clg_1%2Cusm_0.66_1.00_0.01/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png",
+        "type": "image/png"
+      },
+      "touch_icon_count": 1,
+      "touch_icons": [
+        "https://static.wixstatic.com/media/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png/v1/fill/w_180%2Ch_180%2Clg_1%2Cusm_0.66_1.00_0.01/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png"
+      ]
+    },
+    "sopranoscatering.com": {
+      "favicon": {
+        "url": null,
+        "type": null
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "concept-catering.de": {
+      "favicon": {
+        "url": null,
+        "type": null
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "talkofthetownatlanta.com": {
+      "favicon": {
+        "url": "https://talkofthetownatlanta.com/wp-content/uploads/2020/01/cropped-email-signature-logo-32x32.jpg",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 1,
+      "touch_icons": [
+        "https://talkofthetownatlanta.com/wp-content/uploads/2020/01/cropped-email-signature-logo-180x180.jpg"
+      ]
+    },
+    "queenofheartscatering.com": {
+      "favicon": {
+        "url": "https://queenofheartscatering.com/wp-content/uploads/2016/10/cropped-favicon-32x32.png",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 1,
+      "touch_icons": [
+        "https://queenofheartscatering.com/wp-content/uploads/2016/10/cropped-favicon-180x180.png"
+      ]
+    },
+    "chicchefcatering.com": {
+      "favicon": {
+        "url": "data:;",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "relishcaterers.com": {
+      "favicon": {
+        "url": "https://ik.imagekit.io/m71vz3hnv/relish//2021/03/cropped-Relish_favicon-32x32.png",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 1,
+      "touch_icons": [
+        "https://ik.imagekit.io/m71vz3hnv/relish//2021/03/cropped-Relish_favicon-180x180.png"
+      ]
+    },
+    "sterlingcateringmn.com": {
+      "favicon": {
+        "url": null,
+        "type": null
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "tallguyandagrill.com": {
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/e3764139-d39e-4efa-9996-84ef4b9710e9/favicon.ico?format=100w",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "ggcatering.com": {
+      "favicon": {
+        "url": "/dist/img/meta/favicon.ico",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 1,
+      "touch_icons": [
+        "/dist/img/meta/logo-mark-180x180.png"
+      ]
+    },
+    "mculinary.com": {
+      "favicon": {
+        "url": "data:;",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "saltblockhospitality.com": {
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/39a54e78-b49d-4e0c-bd4c-361a068cee94/favicon.ico?format=100w",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "thejdkgroup.com": {
+      "favicon": {
+        "url": "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "bywordofmouth.co.uk": {
+      "favicon": {
+        "url": "https://bywordofmouth.co.uk/wp-content/uploads/2022/08/cropped-Badge-blue-on-white.webp",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 1,
+      "touch_icons": [
+        "https://bywordofmouth.co.uk/wp-content/uploads/2022/08/cropped-Badge-blue-on-white.webp"
+      ]
+    },
+    "creativeedgeparties.com": {
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/3180f709-04fe-4b4d-ac3c-872eaa665b20/favicon.ico?format=100w",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "cutandtastelv.com": {
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1550796939463-NDV5YI4D2L2XYEKCAYXK/favicon.ico",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    },
+    "elegantaffairscaterers.com": {
+      "favicon": {
+        "url": "https://elegantaffairscaterers.com/wp-content/uploads/2021/04/favicon.png",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 1,
+      "touch_icons": [
+        "https://elegantaffairscaterers.com/wp-content/uploads/2021/04/favicon.png"
+      ]
+    },
+    "gammacatering.com/en/": {
+      "favicon": {
+        "url": "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/cropped-favicon-32x32.webp",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 1,
+      "touch_icons": [
+        "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/cropped-favicon-180x180.webp"
+      ]
+    },
+    "wolfgangpuckcatering.com": {
+      "favicon": {
+        "url": "https://wolfgangpuckcatering.com/hubfs/website/favicon%2048x48.png",
+        "type": "image/x-icon"
+      },
+      "touch_icon_count": 0,
+      "touch_icons": []
+    }
+  }
+}

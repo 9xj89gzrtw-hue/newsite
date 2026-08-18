@@ -1,0 +1,309 @@
+{
+  "analysis_date": "2026-08-18T22:59:40.710192",
+  "summary": {
+    "total_sites": 21,
+    "sites_with_external_css": 17,
+    "framework_usage": {
+      "bootstrap": 3,
+      "tailwind": 0,
+      "font_awesome": 10,
+      "animate_css": 0,
+      "carousel_css": 4
+    }
+  },
+  "sites": {
+    "concordecatering.ca": {
+      "css_file_count": 8,
+      "css_files": [
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/c2406d2e-d5f7-4858-8ff5-84fc6297f94e_834/website.components.html.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/website.components.imageFluid.styles.css",
+        "//assets.squarespace.com/universal/styles-compressed/commerce-d50e5960dc9fd059-min.en-US.css",
+        "https://static1.squarespace.com/static/versioned-site-css/5fc91625d98c1a7115f1f7ed/210/5c5a519771c10ba3470d8101/5fc91626d98c1a7115f1f80a/1816/site.css?nocustom=true",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/bdd42134-dc10-4a4a-b9ed-e3f056d30f81_612/website.components.socialLinks.styles.css",
+        "https://static1.squarespace.com/static/custom-css/5fc91625d98c1a7115f1f7ed/5fc91626d98c1a7115f1f80a/1/custom.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/a450410a-eb75-44fd-bffb-83094a5561ea_1004/website.components.button.styles.css"
+      ],
+      "frameworks_detected": {},
+      "css_variables_count": 30
+    },
+    "myradish.com": {
+      "css_file_count": 9,
+      "css_files": [
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/448100ec-c31e-4478-9192-1585b2070971_1003/website.components.button.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/f2924efa-d9b5-4360-b517-1ac77066b1fb_833/website.components.html.styles.css",
+        "https://static1.squarespace.com/static/custom-css/63dbd0b3982ede266f73e878/63dbd0b3982ede266f73e89b/29/custom.css",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css",
+        "https://static1.squarespace.com/static/versioned-site-css/63dbd0b3982ede266f73e878/134/5c5a519771c10ba3470d8101/63dbd0b3982ede266f73e89b/1816/site.css?nocustom=true",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/a7ae81a3-9f65-4453-bbfb-5cef4944f617_611/website.components.socialLinks.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.scrolling/531b4cc7-6a56-4bf1-b7c8-3c158db89de5_605/website.components.scrolling.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.form/67ecd413-209b-4513-9bb4-1b4ab5c08f94_1005/website.components.form.styles.css"
+      ],
+      "frameworks_detected": {
+        "font_awesome": "detected"
+      },
+      "css_variables_count": 30
+    },
+    "ridgewells.com": {
+      "css_file_count": 25,
+      "css_files": [
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[VerticalLine_VerticalSolidLine].db07b0f7.min.css",
+        "https://p.visitorqueue.com/styles/80a1ca15-46ce-4e69-8db7-4b845ef8d9fa.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[FiveGridLine_SolidLine].97d9e2df.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt_bootstrap-responsive.854946ef.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[StylableButton_Default].b3558850.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[ImageX].1f944037.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[StylableButton_Button].114a979e.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[SiteButton_WrappingButton].93fee114.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[Container_ResponsiveBox].e36e2e15.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[LinkBar_Responsive].e175f21e.min.css"
+      ],
+      "frameworks_detected": {
+        "bootstrap": "vNone",
+        "font_awesome": "detected",
+        "carousel_css": "swiper detected"
+      },
+      "css_variables_count": 30
+    },
+    "sopranoscatering.com": {
+      "css_file_count": 1,
+      "css_files": [
+        "https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/css/sopranosdev.webflow.shared.30f94c736.css"
+      ],
+      "frameworks_detected": {
+        "font_awesome": "detected"
+      },
+      "css_variables_count": 0
+    },
+    "concept-catering.de": {
+      "css_file_count": 1,
+      "css_files": [
+        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/css/concept-catering-crew.webflow.shared.569b63847.css"
+      ],
+      "frameworks_detected": {},
+      "css_variables_count": 0
+    },
+    "talkofthetownatlanta.com": {
+      "css_file_count": 3,
+      "css_files": [
+        "//talkofthetownatlanta.com/wp-content/plugins/revslider/public/css/sr7.css?ver=6.7.58",
+        "https://talkofthetownatlanta.com/wp-content/themes/Avada-Child-Theme/style.css?ver=7.0.4",
+        "https://talkofthetownatlanta.com/wp-content/uploads/fusion-styles/0d905e679a0f3adbd0c44e83237f3eb3.min.css?ver=3.16"
+      ],
+      "frameworks_detected": {
+        "font_awesome": "detected"
+      },
+      "css_variables_count": 30
+    },
+    "queenofheartscatering.com": {
+      "css_file_count": 4,
+      "css_files": [
+        "https://queenofheartscatering.com/wp-content/plugins/instagram-feed/css/sbi-styles.min.css?ver=6.12.0",
+        "https://queenofheartscatering.com/wp-content/themes/queen-hearts/style.css?ver=1.0",
+        "https://queenofheartscatering.com/wp-content/plugins/instagram-feed/assets/tokens/sb-tokens-local.css?ver=6.12.0",
+        "https://queenofheartscatering.com/wp-content/themes/queen-hearts/css/flexslider.css?ver=1983201120"
+      ],
+      "frameworks_detected": {
+        "font_awesome": "detected"
+      },
+      "css_variables_count": 30
+    },
+    "chicchefcatering.com": {
+      "css_file_count": 0,
+      "css_files": [],
+      "frameworks_detected": {},
+      "css_variables_count": 0
+    },
+    "relishcaterers.com": {
+      "css_file_count": 0,
+      "css_files": [],
+      "frameworks_detected": {
+        "carousel_css": "swiper detected"
+      },
+      "css_variables_count": 30
+    },
+    "sterlingcateringmn.com": {
+      "css_file_count": 0,
+      "css_files": [],
+      "frameworks_detected": {},
+      "css_variables_count": 0
+    },
+    "tallguyandagrill.com": {
+      "css_file_count": 6,
+      "css_files": [
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.styles.css",
+        "https://static1.squarespace.com/static/versioned-site-css/613f95fa3c025158dc158b69/118/5c5a519771c10ba3470d8101/613f95fa3c025158dc158b83/1816/site.css?nocustom=true",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/f2924efa-d9b5-4360-b517-1ac77066b1fb_833/website.components.html.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.styles.css",
+        "https://static1.squarespace.com/static/custom-css/613f95fa3c025158dc158b69/613f95fa3c025158dc158b83/2/custom.css",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css"
+      ],
+      "frameworks_detected": {
+        "font_awesome": "detected"
+      },
+      "css_variables_count": 28
+    },
+    "ggcatering.com": {
+      "css_file_count": 2,
+      "css_files": [
+        "https://www.ggcatering.com/cpresources/102024ac/css/front-end/plugin/freeform.css?v=1773761912",
+        "/dist/main.min.css?b=69dbefe6a5be87820d13d96e5f98c68e64db414a"
+      ],
+      "frameworks_detected": {},
+      "css_variables_count": 0
+    },
+    "mculinary.com": {
+      "css_file_count": 0,
+      "css_files": [],
+      "frameworks_detected": {},
+      "css_variables_count": 0
+    },
+    "saltblockhospitality.com": {
+      "css_file_count": 15,
+      "css_files": [
+        "https://static1.squarespace.com/static/custom-css/628635115ffed10e289ac115/628635115ffed10e289ac132/363/custom.css",
+        "//assets.squarespace.com/universal/styles-compressed/user-account-core-433d5f055f1af432-min.en-US.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/c2406d2e-d5f7-4858-8ff5-84fc6297f94e_834/website.components.html.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/website.components.imageFluid.styles.css",
+        "//assets.squarespace.com/universal/styles-compressed/commerce-d50e5960dc9fd059-min.en-US.css",
+        "https://static1.squarespace.com/static/versioned-site-css/628635115ffed10e289ac115/901/5c5a519771c10ba3470d8101/628635115ffed10e289ac132/1816/site.css?nocustom=true",
+        "https://www.ghostplugins.dev/assets/helpers/swiper/swiper.css",
+        "https://cdn6.localdatacdn.com/badges/restaurantji/css/circle_v5.css?v=11217",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.video/6a963ec3-6a86-4089-9d99-1101d1ed1119_579/website.components.video.styles.css",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css"
+      ],
+      "frameworks_detected": {
+        "carousel_css": "swiper detected"
+      },
+      "css_variables_count": 30
+    },
+    "thejdkgroup.com": {
+      "css_file_count": 13,
+      "css_files": [
+        "https://thejdkgroup.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+        "https://thejdkgroup.com/wp-content/plugins/responsive-accordion-and-collapse/css/font-awesome/css/font-awesome.min.css?ver=7.0.4",
+        "https://thejdkgroup.com/wp-content/plugins/wpcf7-redirect/build/assets/frontend-script.css?ver=2c532d7e2be36f6af233",
+        "https://thejdkgroup.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=4.2.2",
+        "https://thejdkgroup.com/wp-content/themes/fuse/library/css/style.css?ver=201505271601",
+        "https://thejdkgroup.com/wp-content/themes/fuse/library/css/custom.css?ver=7.0.4",
+        "https://thejdkgroup.com/wp-content/plugins/master-slider/public/assets/css/masterslider.main.css?ver=3.11.2",
+        "https://thejdkgroup.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/all.min.css?ver=4.2.2",
+        "https://thejdkgroup.com/wp-content/plugins/responsive-accordion-and-collapse/css/bootstrap-front.css?ver=7.0.4",
+        "https://thejdkgroup.com/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.53.0"
+      ],
+      "frameworks_detected": {
+        "bootstrap": "vNone",
+        "font_awesome": "font-awesome-front-css"
+      },
+      "css_variables_count": 30
+    },
+    "bywordofmouth.co.uk": {
+      "css_file_count": 8,
+      "css_files": [
+        "https://bywordofmouth.co.uk/wp-content/plugins/wp-gdpr-compliance/Assets/css/front.css?ver=1706539784",
+        "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css",
+        "https://bywordofmouth.co.uk/wp-content/plugins/easy-fancybox/fancybox/1.5.4/jquery.fancybox.min.css?ver=274b5c2d830af33b7cd3c7b895521a3f",
+        "https://bywordofmouth.co.uk/wp-content/tablepress-combined.min.css?ver=41",
+        "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/style.css?v11",
+        "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/ie.css",
+        "https://bywordofmouth.co.uk/wp-content/plugins/instagram-feed/assets/tokens/sb-tokens-local.css?ver=6.12.0",
+        "https://bywordofmouth.co.uk/wp-content/plugins/instagram-feed/css/sbi-styles.min.css?ver=6.12.0"
+      ],
+      "frameworks_detected": {
+        "font_awesome": "fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --"
+      },
+      "css_variables_count": 30
+    },
+    "creativeedgeparties.com": {
+      "css_file_count": 9,
+      "css_files": [
+        "https://static1.squarespace.com/static/versioned-site-css/6840be6bc300d63ad7f66f2f/33/5c5a519771c10ba3470d8101/6840be6cc300d63ad7f66f37/1816/site.css?nocustom=true",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.styles.css",
+        "//assets.squarespace.com/universal/styles-compressed/user-account-core-433d5f055f1af432-min.en-US.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/f2924efa-d9b5-4360-b517-1ac77066b1fb_833/website.components.html.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.styles.css",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css",
+        "https://static1.squarespace.com/static/custom-css/6840be6bc300d63ad7f66f2f/6840be6cc300d63ad7f66f37/1/custom.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/a7ae81a3-9f65-4453-bbfb-5cef4944f617_611/website.components.socialLinks.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.scrolling/531b4cc7-6a56-4bf1-b7c8-3c158db89de5_605/website.components.scrolling.styles.css"
+      ],
+      "frameworks_detected": {
+        "font_awesome": "detected"
+      },
+      "css_variables_count": 30
+    },
+    "cutandtastelv.com": {
+      "css_file_count": 9,
+      "css_files": [
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/448100ec-c31e-4478-9192-1585b2070971_1003/website.components.button.styles.css",
+        "https://static1.squarespace.com/static/custom-css/5c1584394611a0d7e1311ce4/5c1586480e2e72b11852abe3/0/custom.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.code/96ee2daf-dfe7-4ad1-8082-29be26314ad0_878/website.components.code.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/website.components.summary.styles.css",
+        "https://static1.squarespace.com/static/sitecss/5c1584394611a0d7e1311ce4/143/55f0aac0e4b0f0a5b7e0b22e/5c1586480e2e72b11852abe3/359/site.css?nocustom=true",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.spacer/035a76fb-6d18-44eb-b588-c9985345d5bf_1156/website.components.spacer.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.video/df4e2f60-e0da-46f6-85d5-170a8cdab242_578/website.components.video.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/a7ae81a3-9f65-4453-bbfb-5cef4944f617_611/website.components.socialLinks.styles.css"
+      ],
+      "frameworks_detected": {
+        "bootstrap": "vNone"
+      },
+      "css_variables_count": 30
+    },
+    "elegantaffairscaterers.com": {
+      "css_file_count": 25,
+      "css_files": [
+        "https://elegantaffairscaterers.com/wp-content/cache/background-css/elegantaffairscaterers.com/wp-content/themes/elegant-affairs/css/owl.carousel.min.css?ver=6.1.1&wpr_t=1787034783",
+        "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/css/widget-spacer.min.css?ver=4.2.0",
+        "https://elegantaffairscaterers.com/wp-content/plugins/youtube-embed-plus/styles/ytprefs.min.css?ver=14.2.6",
+        "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/plugins/elementor/assets/lib/font-awesome/css/fontawesome.css?ver=1786562871",
+        "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/css/widget-image-carousel.min.css?ver=4.2.0",
+        "//elegantaffairscaterers.com/wp-content/plugins/ultimate-elementor/assets/min-css/uael-frontend.min.css?ver=1.36.13",
+        "https://elegantaffairscaterers.com/wp-content/plugins/gravityforms/legacy/css/browsers.min.css?ver=2.6.8",
+        "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/uploads/elementor/google-fonts/css/roboto.css?ver=1786562872",
+        "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=1786563059",
+        "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/uploads/elementor/google-fonts/css/domine.css?ver=1786562872"
+      ],
+      "frameworks_detected": {
+        "font_awesome": "font-awesome/css/brands.css?ver=1786562871",
+        "carousel_css": "slick detected"
+      },
+      "css_variables_count": 30
+    },
+    "gammacatering.com/en/": {
+      "css_file_count": 16,
+      "css_files": [
+        "https://www.gammacatering.com/v4/wp-content/mu-plugins/gamma-cpt-styles.css?ver=1784822337",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/g5njvc7w/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/esclp6ls/aadsc.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/76qh53iu/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/f4ory5rq/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/g0hybt85/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/surervy/a8cbw.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/6yolzzyl/a8cbw.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/dfi7qxux/a8cbw.css",
+        "https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css"
+      ],
+      "frameworks_detected": {},
+      "css_variables_count": 30
+    },
+    "wolfgangpuckcatering.com": {
+      "css_file_count": 14,
+      "css_files": [
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867470/1775745261614/module_menu.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867458/1786080348123/module_header_btn_groups.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867464/1777260949950/module_hospitality_services.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867474/1777261379671/module_seasonal_inspiration.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/template_assets/1/192106867345/1778851141334/template_theme-overrides.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867478/1751507689968/module_social_follow.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/template_assets/1/192105070138/1787045014762/template_main.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192105070206/1776910547509/module_hero_banner.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867384/1751507684350/module_button_group.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/template_assets/1/192106867339/1778851143076/template_home.min.css"
+      ],
+      "frameworks_detected": {},
+      "css_variables_count": 0
+    }
+  }
+}

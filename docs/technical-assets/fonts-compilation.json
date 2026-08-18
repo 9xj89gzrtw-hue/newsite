@@ -1,0 +1,214 @@
+{
+  "analysis_date": "2026-08-18T22:59:40.710192",
+  "summary": {
+    "total_sites": 21,
+    "google_fonts_users": 2,
+    "unique_google_fonts": [
+      "Lato",
+      "Raleway",
+      "Roboto",
+      "Roboto Slab"
+    ],
+    "most_common_font_families": [
+      [
+        "Poppins",
+        2
+      ],
+      [
+        "Arial",
+        1
+      ],
+      [
+        "Helvetica",
+        1
+      ],
+      [
+        "Helvetica-bold",
+        1
+      ],
+      [
+        "Menlo",
+        1
+      ],
+      [
+        "var(--h2_typography-font-family)",
+        1
+      ],
+      [
+        "swiper-icons",
+        1
+      ],
+      [
+        "system-ui",
+        1
+      ],
+      [
+        "Montserrat",
+        1
+      ],
+      [
+        "Roboto Condensed",
+        1
+      ],
+      [
+        "Roboto",
+        1
+      ],
+      [
+        "Roboto Slab",
+        1
+      ],
+      [
+        "Nunito Sans",
+        1
+      ],
+      [
+        "Manrope",
+        1
+      ],
+      [
+        "Rubik",
+        1
+      ]
+    ]
+  },
+  "fonts_by_site": {
+    "concordecatering.ca": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "Poppins"
+      ]
+    },
+    "myradish.com": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "Poppins"
+      ]
+    },
+    "ridgewells.com": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "Arial",
+        "Helvetica",
+        "Helvetica-bold",
+        "HelveticaNeueW01-45Ligh",
+        "Consolas"
+      ]
+    },
+    "sopranoscatering.com": {
+      "google_fonts": [],
+      "primary_font_families": []
+    },
+    "concept-catering.de": {
+      "google_fonts": [],
+      "primary_font_families": []
+    },
+    "talkofthetownatlanta.com": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "inherit",
+        "Menlo",
+        "var(--h2_typography-font-family)"
+      ]
+    },
+    "queenofheartscatering.com": {
+      "google_fonts": [
+        "Lato"
+      ],
+      "primary_font_families": [
+        "inherit"
+      ]
+    },
+    "chicchefcatering.com": {
+      "google_fonts": [],
+      "primary_font_families": []
+    },
+    "relishcaterers.com": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "sans-serif",
+        "inherit",
+        "swiper-icons",
+        "Arial",
+        "Josefin Sans"
+      ]
+    },
+    "sterlingcateringmn.com": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "system-ui"
+      ]
+    },
+    "tallguyandagrill.com": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "Montserrat",
+        "Roboto Condensed"
+      ]
+    },
+    "ggcatering.com": {
+      "google_fonts": [],
+      "primary_font_families": []
+    },
+    "mculinary.com": {
+      "google_fonts": [],
+      "primary_font_families": []
+    },
+    "saltblockhospitality.com": {
+      "google_fonts": [],
+      "primary_font_families": []
+    },
+    "thejdkgroup.com": {
+      "google_fonts": [
+        "Raleway",
+        "Roboto",
+        "Roboto Slab"
+      ],
+      "primary_font_families": [
+        "inherit",
+        "Roboto",
+        "Roboto Slab",
+        "Raleway"
+      ]
+    },
+    "bywordofmouth.co.uk": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "inherit"
+      ]
+    },
+    "creativeedgeparties.com": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "Nunito Sans",
+        "Manrope"
+      ]
+    },
+    "cutandtastelv.com": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "Rubik"
+      ]
+    },
+    "elegantaffairscaterers.com": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "-apple-system",
+        "inherit",
+        "Astra"
+      ]
+    },
+    "gammacatering.com/en/": {
+      "google_fonts": [],
+      "primary_font_families": [
+        "PP Neue Montreal",
+        "var(--font-handwritten",
+        "inherit"
+      ]
+    },
+    "wolfgangpuckcatering.com": {
+      "google_fonts": [],
+      "primary_font_families": []
+    }
+  }
+}

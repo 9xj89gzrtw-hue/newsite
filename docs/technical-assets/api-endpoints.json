@@ -1,0 +1,39 @@
+{
+  "analysis_date": "2026-08-18T22:59:40.710192",
+  "note": "API endpoints are inferred from CMS detection. Actual endpoints require JS analysis.",
+  "cms_based_apis": {
+    "Squarespace": {
+      "sites_using": [
+        "concordecatering.ca",
+        "myradish.com",
+        "tallguyandagrill.com",
+        "saltblockhospitality.com",
+        "creativeedgeparties.com",
+        "cutandtastelv.com"
+      ],
+      "potential_api_endpoints": [
+        "/api/1/",
+        "/api/form/*",
+        "/squarespace API"
+      ]
+    },
+    "WordPress": {
+      "sites_using": [
+        "ridgewells.com",
+        "talkofthetownatlanta.com",
+        "queenofheartscatering.com",
+        "relishcaterers.com",
+        "thejdkgroup.com",
+        "bywordofmouth.co.uk",
+        "elegantaffairscaterers.com",
+        "gammacatering.com/en/"
+      ],
+      "potential_api_endpoints": [
+        "/wp-json/wp/v2/*",
+        "/wp-admin/admin-ajax.php",
+        "/wp-json/contact-form-7/v1/*"
+      ]
+    }
+  },
+  "form_endpoints_potential": []
+}

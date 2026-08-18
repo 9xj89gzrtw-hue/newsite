@@ -1,0 +1,2303 @@
+{
+  "analysis_date": "2026-08-18T22:59:40.710192",
+  "sites": {
+    "concordecatering.ca": {
+      "css_files": [
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/c2406d2e-d5f7-4858-8ff5-84fc6297f94e_834/website.components.html.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/website.components.imageFluid.styles.css",
+        "//assets.squarespace.com/universal/styles-compressed/commerce-d50e5960dc9fd059-min.en-US.css",
+        "https://static1.squarespace.com/static/versioned-site-css/5fc91625d98c1a7115f1f7ed/210/5c5a519771c10ba3470d8101/5fc91626d98c1a7115f1f80a/1816/site.css?nocustom=true",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/bdd42134-dc10-4a4a-b9ed-e3f056d30f81_612/website.components.socialLinks.styles.css",
+        "https://static1.squarespace.com/static/custom-css/5fc91625d98c1a7115f1f7ed/5fc91626d98c1a7115f1f80a/1/custom.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/a450410a-eb75-44fd-bffb-83094a5561ea_1004/website.components.button.styles.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "Poppins"
+        ],
+        "@font_face": [
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/1e5ca8c8-e239-4a8d-9415-517c411c1f25/devanagari.woff2') format('woff2');\n  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;\n}",
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/00d1a230-e215-4217-b1cf-31145362801e/latin.woff2') format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}",
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: normal;\n  font-weight: 300;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/e7e7e312-9961-4208-abdd-6ed469c34828/latin-ext.woff2') format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}",
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: italic;\n  font-weight: 700;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/e5441b3f-475c-4dd0-815e-d1493a6eef24/latin-ext.woff2') format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}",
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: italic;\n  font-weight: 700;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/e364ec28-4783-442b-b46f-59d33a99dd2c/devanagari.woff2') format('woff2');\n  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;\n}"
+        ]
+      },
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/36f4b7de-1b8a-453c-95ea-b999839c29b4/favicon.ico?format=100w",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/website.components.imageFluid.shared.constants.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/2513.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-2279d62a6d037cb6-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/image-effect-refracted-circles.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/2452.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/image-effect-film-grain.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/modern.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/a450410a-eb75-44fd-bffb-83094a5561ea_1004/website.components.button.visitor.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-runtime-311052ce582f12a8-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/8018.js",
+          "//assets.squarespace.com/universal/scripts-compressed/visitor-site-error-reporter-976d22448e700b77-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/image-effect-refracted-lines.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/legacy.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/image-effect-liquid.js",
+          "//assets.squarespace.com/universal/scripts-compressed/cldr-resource-pack-22bdf933fb74be0d-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/9882.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/9188.js",
+          "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/scripts/site-bundle.e78707115212d93cd1dcda5bd7e39dce.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/website.components.imageFluid.visitor.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-d121d5c2e821db1f-min.en-US.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-stable-784b947826b4c445-min.en-US.js",
+          "//assets.squarespace.com/universal/scripts-compressed/commerce-d7fd56afd1cba011-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/image-effect-parallax.js",
+          "//use.typekit.net/ik/-kc7Rd_oiwUZd2x0XymcWWkfvshSEwMKPRYrtWnzE9jfec3JXnX1IyvhF2jtFRZLFAZR5QIhwRmq5QyRwAIawQIuZRBcFhmqe6MKIeBqdh48OAFyShUzdKu3Scv7fbKKbyMMeMb6MKG4fHsfIMMjgkMfH6qJGXJbMg65JMJ7fbK8byMMegI6MTMgDTpACMj.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/c2406d2e-d5f7-4858-8ff5-84fc6297f94e_834/website.components.html.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/bdd42134-dc10-4a4a-b9ed-e3f056d30f81_612/website.components.socialLinks.visitor.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-moment-js-vendor-a5cfdec1ae227f33-min.en-US.js",
+          "//assets.squarespace.com/universal/scripts-compressed/performance-27f582ca2cd8a09c-min.en-US.js"
+        ],
+        "libraries": {
+          "jquery": null,
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": "detected",
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--image-component-native-aspect-ratio: 800/450",
+        "--gradientHeaderNavigationColor: hsla(var(--black-hsl), 1)",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--mask ",
+        "--list:hover .sqs-svg-icon--wrapper:hover ",
+        "--stroke-style: none",
+        "--image-component-object-fit: cover",
+        "--image-component-focal-point: 50% 50%",
+        "--image-component-native-aspect-ratio: 1500/1124",
+        "--image-component-native-aspect-ratio: 901/1041",
+        "--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (0.0px * (24 - 1)) ) / 24 )",
+        "--inset-padding: 0vw",
+        "--si-scale: 2",
+        "--si-fill-mask: transparent",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--icon ",
+        "--blur-value: blur(15px)",
+        "--image-component-focal-point: 50% 77.60485030314395%",
+        "--solidHeaderBackgroundColor: hsla(var(--white-hsl), 1)",
+        "--si-bg-fade: transparent",
+        "--grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 0.0px)",
+        "--image-component-focal-point: 50% 84.8053003312707%",
+        "--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (0.0px * (8 - 1)) ) / 8 )",
+        "--si-bg-hover: transparent",
+        "--list:hover .sqs-svg-icon--wrapper .sqs-use--mask ",
+        "--tweak-text-block-padding: initial",
+        "--si-fill-icon-hover: var(--si-primary)",
+        "--image-component-native-aspect-ratio: 1333/1794",
+        "--si-fill-icon: var(--si-primary)",
+        "--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 )",
+        "--solidHeaderNavigationColor: hsla(var(--black-hsl), 1)",
+        "--image-component-object-fit: contain"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "Concorde Catering is brought to you by the culinary team behind your favourite Calgary restaurants. From holiday parties and weddings to special events and corporate gatherings, we work with budgets big and small to bring any event to life.",
+        "generator": null
+      },
+      "platform": {
+        "cms": "Squarespace"
+      },
+      "html_size_bytes": 281330
+    },
+    "myradish.com": {
+      "css_files": [
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/448100ec-c31e-4478-9192-1585b2070971_1003/website.components.button.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/f2924efa-d9b5-4360-b517-1ac77066b1fb_833/website.components.html.styles.css",
+        "https://static1.squarespace.com/static/custom-css/63dbd0b3982ede266f73e878/63dbd0b3982ede266f73e89b/29/custom.css",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css",
+        "https://static1.squarespace.com/static/versioned-site-css/63dbd0b3982ede266f73e878/134/5c5a519771c10ba3470d8101/63dbd0b3982ede266f73e89b/1816/site.css?nocustom=true",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/a7ae81a3-9f65-4453-bbfb-5cef4944f617_611/website.components.socialLinks.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.scrolling/531b4cc7-6a56-4bf1-b7c8-3c158db89de5_605/website.components.scrolling.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.form/67ecd413-209b-4513-9bb4-1b4ab5c08f94_1005/website.components.form.styles.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": "detected",
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "Poppins"
+        ],
+        "@font_face": [
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/d03c0883-8248-47bf-9fa3-437f8474b0b7/latin-ext.woff2') format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}",
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/da0c3c0d-458f-46e2-9c64-bac004d4e8c1/latin.woff2') format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}",
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/7050a57e-968a-4317-a487-11e4374878d9/devanagari.woff2') format('woff2');\n  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;\n}",
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/106cf02d-1fea-47b3-beaa-607012f765b3/latin-ext.woff2') format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}",
+          "@font-face {\n  font-family: 'Poppins';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/2200ecd2-8cab-4e5f-98a1-74a7a1427ea4/devanagari.woff2') format('woff2');\n  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;\n}"
+        ]
+      },
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/8c637677-ab8f-4854-8f7f-e34c24ad98e3/favicon.ico",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "//assets.squarespace.com/universal/scripts-compressed/performance-d0deb0beb0a13a35-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-liquid.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-2279d62a6d037cb6-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-film-grain.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-runtime-01da72f42419da58-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-refracted-lines.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/9188.js",
+          "//assets.squarespace.com/universal/scripts-compressed/visitor-site-error-reporter-976d22448e700b77-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-refracted-circles.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/8018.js",
+          "https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.visitor.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/legacy.js",
+          "//assets.squarespace.com/universal/scripts-compressed/cldr-resource-pack-22bdf933fb74be0d-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/9882.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.scrolling/531b4cc7-6a56-4bf1-b7c8-3c158db89de5_605/website.components.scrolling.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.shared.constants.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-moment-js-vendor-a5cfdec1ae227f33-min.en-US.js",
+          "https://smi.squarespace.com/assets/sm-show-id/show-id.js?password=demo&ver=1.0.1",
+          "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/scripts/site-bundle.e78707115212d93cd1dcda5bd7e39dce.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.form/67ecd413-209b-4513-9bb4-1b4ab5c08f94_1005/website.components.form.visitor.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-d121d5c2e821db1f-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/2452.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-stable-784b947826b4c445-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/448100ec-c31e-4478-9192-1585b2070971_1003/website.components.button.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-parallax.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/a7ae81a3-9f65-4453-bbfb-5cef4944f617_611/website.components.socialLinks.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/f2924efa-d9b5-4360-b517-1ac77066b1fb_833/website.components.html.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/2513.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/modern.js"
+        ],
+        "libraries": {
+          "jquery": "jquery",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--tweak-marquee-block-padding: 3% 0% 3% 0%",
+        "--image-component-focal-point: 50% 50%",
+        "--tweak-marquee-block-padding: initial",
+        "--si-fill-icon: var(--si-contrast)",
+        "--stroke-linecap: square",
+        "--image-component-native-aspect-ratio: 2272/1196",
+        "--si-bg-hover: var(--si-primary)",
+        "--tweak-text-block-padding: initial",
+        "--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 )",
+        "--list:hover .sqs-svg-icon--wrapper ",
+        "--sqs-block-content-flex: 1",
+        "--section-divider-stroke-color: hsla(var(--black-hsl), 1)",
+        "--stroke-dasharray: 0",
+        "--tweak-text-block-blend\n  : normal",
+        "--inset:not(.content-collection):not(.gallery-section):not(.user-items-list-section) ",
+        "--image-component-native-aspect-ratio: 2328/572",
+        "--social-icons-gap: 12px",
+        "--stroke-thickness: 1.5px",
+        "--image-component-native-aspect-ratio: 1904/572",
+        "--si-fill-mask: transparent",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--icon ",
+        "--blur-value: blur(15px)",
+        "--image-component-focal-point: 53.20652771771665% 1.6028948305054747%",
+        "--marquee-font-size-value: 1.5",
+        "--grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 4.0px)",
+        "--inset-padding: calc(var(--sqs-site-gutter) * 2)",
+        "--si-fill-mask-hover: transparent",
+        "--stroke-thickness: 6px",
+        "--si-fill-mask-fade: transparent",
+        "--grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px)"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "",
+        "generator": null
+      },
+      "platform": {
+        "cms": "Squarespace"
+      },
+      "html_size_bytes": 408554
+    },
+    "ridgewells.com": {
+      "css_files": [
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[VerticalLine_VerticalSolidLine].db07b0f7.min.css",
+        "https://p.visitorqueue.com/styles/80a1ca15-46ce-4e69-8db7-4b845ef8d9fa.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[FiveGridLine_SolidLine].97d9e2df.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt_bootstrap-responsive.854946ef.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[StylableButton_Default].b3558850.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[ImageX].1f944037.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[StylableButton_Button].114a979e.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[SiteButton_WrappingButton].93fee114.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[Container_ResponsiveBox].e36e2e15.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[LinkBar_Responsive].e175f21e.min.css",
+        "https://static.parastorage.com/services/wix-thunderbolt/dist/TPABaseComponent.88cd9698.chunk.min.css",
+        "https://static.parastorage.com/services/communities-blog-ooi/1.3285.0/PostListViewerWidget.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[FormContainer_ResponsiveSkin].061a7446.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[SkipToContentButton].c9649c22.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[HeaderSection].5e49cc46.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[AppWidget_Responsive].00874df4.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[PageSections].7dbf3cd4.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[Repeater_Responsive].1fe98faa.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[RefComponent].98cd6e5f.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[VectorImage_VectorButton].8d19a428.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[FooterSection].abc8b9be.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt_bootstrap.41d0ffd5.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[Section].abc8b9be.min.css",
+        "https://static.parastorage.com/services/editor-elements-library/dist/thunderbolt/rb_wixui.thunderbolt[MenuContainer_Responsive].bf8eadd6.min.css",
+        "https://static.parastorage.com/services/wix-thunderbolt/dist/group_7.c472a333.chunk.min.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": "vNone",
+        "tailwind": null,
+        "font_awesome": "detected",
+        "animate_css": null,
+        "carousel_css": "swiper detected"
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "Arial",
+          "Helvetica",
+          "Helvetica-bold",
+          "HelveticaNeueW01-45Ligh",
+          "Consolas",
+          "system-ui",
+          "inherit",
+          "wf_4e262af14d284a60a4de0ebf8",
+          "wf_7cde8084f99f4ae9b21eaa120",
+          "wf_d6c9922761624d12813a60448",
+          "wf_d700d85c41a34849aabbb321c",
+          "din-next-w01-light",
+          "wf_7ec3b15907d7448eba6767dc0",
+          "avenir-lt-w01_35-light1475496",
+          "avenir-lt-w01_85-heavy1475544",
+          "helvetica-w01-bold",
+          "helvetica-w01-light",
+          "helvetica-w01-roman",
+          "helveticaneuew01-45ligh",
+          "helveticaneuew02-45ligh",
+          "helveticaneuew10-45ligh",
+          "madefor-text",
+          "poppins",
+          "poppins-extralight",
+          "proxima-n-w01-reg",
+          "wfont_2cbb79_7cde8084f99f4ae9b21eaa1206770c46",
+          "wfont_2cbb79_7ec3b15907d7448eba6767dc06abef08",
+          "wfont_2cbb79_d6c9922761624d12813a60448b4b6cf2",
+          "wfont_b616b1_d700d85c41a34849aabbb321cda873a6",
+          "HelveticaNeueW01-Thin",
+          "HelveticaNeueW01-UltLt",
+          "HelveticaNeueW01-55Roma"
+        ],
+        "@font_face": [
+          "@font-face {\nfont-display: swap;\nfont-family: wf_4e262af14d284a60a4de0ebf8;\nsrc: url(\"https://static.wixstatic.com/ufonts/a3d6d4_4e262af14d284a60a4de0ebf8651cde6/woff2/file.woff2\") format(\"woff2\"),\nurl(\"https://static.wixstatic.com/ufonts/a3d6d4_4e262af14d284a60a4de0ebf8651cde6/woff/file.woff\") format(\"woff\"),\nurl(\"https://static.wixstatic.com/ufonts/a3d6d4_4e262af14d284a60a4de0ebf8651cde6/ttf/file.ttf\") format(\"ttf\");\n}",
+          "@font-face {\nfont-display: swap;\nfont-family: wf_7cde8084f99f4ae9b21eaa120;\nsrc: url(\"https://static.wixstatic.com/ufonts/2cbb79_7cde8084f99f4ae9b21eaa1206770c46/woff2/file.woff2\") format(\"woff2\"),\nurl(\"https://static.wixstatic.com/ufonts/2cbb79_7cde8084f99f4ae9b21eaa1206770c46/woff/file.woff\") format(\"woff\"),\nurl(\"https://static.wixstatic.com/ufonts/2cbb79_7cde8084f99f4ae9b21eaa1206770c46/ttf/file.ttf\") format(\"ttf\");\n}",
+          "@font-face {\nfont-display: swap;\nfont-family: wf_d6c9922761624d12813a60448;\nsrc: url(\"https://static.wixstatic.com/ufonts/2cbb79_d6c9922761624d12813a60448b4b6cf2/woff2/file.woff2\") format(\"woff2\"),\nurl(\"https://static.wixstatic.com/ufonts/2cbb79_d6c9922761624d12813a60448b4b6cf2/woff/file.woff\") format(\"woff\"),\nurl(\"https://static.wixstatic.com/ufonts/2cbb79_d6c9922761624d12813a60448b4b6cf2/ttf/file.ttf\") format(\"ttf\");\n}",
+          "@font-face {\nfont-display: swap;\nfont-family: wf_d700d85c41a34849aabbb321c;\nsrc: url(\"https://static.wixstatic.com/ufonts/b616b1_d700d85c41a34849aabbb321cda873a6/woff2/file.woff2\") format(\"woff2\"),\nurl(\"https://static.wixstatic.com/ufonts/b616b1_d700d85c41a34849aabbb321cda873a6/woff/file.woff\") format(\"woff\"),\nurl(\"https://static.wixstatic.com/ufonts/b616b1_d700d85c41a34849aabbb321cda873a6/ttf/file.ttf\") format(\"ttf\");\n}",
+          "@font-face {font-family: 'din-next-w01-light'; font-style: normal; font-weight: 400; src: url('//static.parastorage.com/fonts/v2/eca8b0cd-45d8-43cf-aee7-ca462bc5497c/v1/din-next-w10-light.woff2') format('woff2'); unicode-range: U+0401-040C, U+040E-044F, U+0451-045C, U+045E-045F, U+0490-0491, U+2116;font-display: swap;\n}"
+        ]
+      },
+      "favicon": {
+        "url": "https://static.wixstatic.com/media/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png/v1/fill/w_192%2Ch_192%2Clg_1%2Cusm_0.66_1.00_0.01/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png",
+        "type": "image/png"
+      },
+      "touch_icons": [
+        "https://static.wixstatic.com/media/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png/v1/fill/w_180%2Ch_180%2Clg_1%2Cusm_0.66_1.00_0.01/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png"
+      ],
+      "javascript": {
+        "external_scripts": [
+          "https://static.parastorage.com/unpkg/lodash@4.17.23/lodash.min.js",
+          "https://static.parastorage.com/services/wix-thunderbolt/dist/main.e8c14858.bundle.min.js",
+          "https://static.parastorage.com/unpkg/react@18.3.1/umd/react.production.min.js",
+          "https://static.parastorage.com/unpkg/focus-within-polyfill@5.0.9/dist/focus-within-polyfill.js",
+          "https://static.parastorage.com/services/wix-thunderbolt/dist/thunderbolt-commons.598a690b.bundle.min.js",
+          "https://static.parastorage.com/services/wix-thunderbolt/dist/browser-deprecation.bundle.es5.js",
+          "https://static.parastorage.com/unpkg/core-js-bundle@3.2.1/minified.js",
+          "https://static.parastorage.com/unpkg/react-dom@18.3.1/umd/react-dom.production.min.js",
+          "https://static.parastorage.com/services/wix-thunderbolt/dist/main.renderer.99fa8096.bundle.min.js",
+          "https://static.parastorage.com/services/tag-manager-client/1.1075.0/siteTags.bundle.min.js",
+          "https://browser.sentry-cdn.com/7.120.3/modulemetadata.es5.min.js"
+        ],
+        "libraries": {
+          "jquery": null,
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": "LightBoxOpen%2C.EnableCustomCSSVarsForLoginSocialBar%2C.FreemiumBannerOdeditor%2C.LoginBarEnableLoggingInStateInSSR%2C.TextInputAutoFillFix%2C.UseLoginSocialBarCustomMenu%2C.UseNestedLoginSocialBarMenuItems%2C.UseNewLoginBarDropdownMenuAlignment%2C.UseNewLoginSocialBarElementStructure%2C.UseNewLoginSocialBarMemberInitialsAvatar%2C.WixFreeSiteBannerDesktop%2C.WixFreeSiteBannerMobile%2C.a11yContrast%2C.addIdAsClassName%2C.allowWebpAvifTransforms%2C.builderBoxSizingBorderBox%2C.buttonUdp%2C.calculateCollapsibleTextLineHeightByFont%2C.dom_store%2C.dontApplyDacOverridesOnBoBApps%2C.dynamicPageLinkTarget%2C.dynamicSlots%2C.fiveGridLineStudioSkins%2C.fixFirefoxLinkBarIntrinsicSizing%2C.fixRemappedFullNameCompType%2C.imageEncodingAVIF%2C.isClassNameToRootEnabled%2C.logVsmFeaturesModuleDiff%2C.motionTimeAnimationsCSS%2C.responsiveContainerRoleGroup%2C.sectionA11yProps%2C.shouldIgnoreWidgetsPageData%2C.shouldUseResponsiveImages%2C.splitSlotSelectors%2C.svgResolver_2%2C.updateRichTextSemanticClassNamesOnCorvid%2C.useClassnameInResponsiveAppWidget%2C.useFragmentHrefForTopBottomAnchor%2C.useImageAvifFormatInNativeProGallery%2C.useResponsiveImgClassicFixed%2C.useSvgLoaderFeature%2C.useSvgLoaderFeatureOnBuilderComps%2C.useWowImageInFastGallery%2C.vsmFeaturesModule&blocksBuilderManifestGeneratorVersion=1.129.0&contentType=application%2Fjson&deviceType=Desktop&dfCk=6&dfVersion=1.5507.0&disableStaticPagesUrlHierarchy=false&editorName=Studio&experiments=dm_bgScrubToMotionFixer%2Cdm_masterPageVariablesQueryFixer%2Cdm_migrateOldHoverBoxToNewFixer&externalBaseUrl=https%3A%2F%2Fwww.ridgewells.com&fileId=fe2a0085.bundle.min&formFactor=desktop&hasTPAWorkerOnSite=false&hasUserDomainMedia=false&isBuilderComponentModel=false&isHttps=true&isInSeo=false&isMultilingualEnabled=false&isPremiumDomain=true&isResponsive=true&isTrackClicksAnalyticsEnabled=true&isUrlMigrated=true&isWixCodeOnPage=false&isWixCodeOnSite=true&language=en&languageResolutionMethod=QueryParam&metaSiteId=76d43fc8-4d03-4867-a64a-d5970b8d4ceb&module=thunderbolt-features&originalLanguage=en&pageId=313fa1_9945e24494d92e5aa85092d552852562_2548.js",
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": "detected",
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": true,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--rd:0px",
+        "--m_itemOpacity-rgb: 79,79,79",
+        "--post-pg-text-on-image-large-post-list-titleFont: normal normal normal 28px/35px wfont_b616b1_d700d85c41a34849aabbb321cda873a6,wf_d700d85c41a34849aabbb321c,orig_scotch_display_semibold",
+        "--stroke-width:0",
+        "--wix-font-STRONG-style: normal",
+        "--itemShadowOpacityAndColor-rgb: 0,0,0",
+        "--post-text-on-image-medium-post-list-titleFont-text-decoration: none",
+        "--group-right:auto\" aria-hidden=\"false\"><div data-id=\"e4e06fe0-a97f-453f-aad2-8de5f28d09d4\" class=\"item-link-wrapper\" data-idx=\"9\" data-hook=\"item-link-wrapper\" tabindex=\"-1\"><div class=\"gallery-item-container item-container-regular has-custom-focus visible\" id=\"pgie4e06fe0a97f453faad28de5f28d09d4_9\" data-hash=\"e4e06fe0-a97f-453f-aad2-8de5f28d09d4\" data-id=\"e4e06fe0-a97f-453f-aad2-8de5f28d09d4\" data-idx=\"9\" data-hook=\"item-container\" style=\"overflow-y:hidden",
+        "--post-post-list-descriptionFont-variant: normal",
+        "--rd:0px 0px max(0.5px, 0.0106242 * (var(--scaling-factor) - var(--scrollbar-width))) 0px",
+        "--svg-color-1:var(--separatorFillColor,#000)",
+        "--post-pg-grid-large-post-list-ratingFont-text-decoration: none",
+        "--comp-rotate-z:180deg",
+        "--layout-post-list-list-contentHeightType: 0",
+        "--post-post-list-titleFont: normal normal normal 20px/25px wfont_2cbb79_7cde8084f99f4ae9b21eaa1206770c46,wf_7cde8084f99f4ae9b21eaa120,orig_gotham_book",
+        "--te-background-color-picker-rgb: 0,0,0",
+        "--category-label-button-horizontalPadding: 12",
+        "--layout-mobile-post-list-list-imageCropType: 0",
+        "--post-slider-post-list-titleFont-line-height: 25px",
+        "--wbu-color-black-600:#F1F0EF",
+        "--alpha-txtlblrq:1",
+        "--boxShadow:0px 1px 4px 0px rgba(0,0,0,0.6)",
+        "--aspect-ratio:0.29312802965497575",
+        "--itemFontColorSlideshow: 0,0,0",
+        "--customButtonFontForHover-text-decoration: none",
+        "--post-pg-side-by-side-right-post-list-titleFont-line-height: 35px",
+        "--layout-mobile-post-list-pg-grid-imageCropType: 0",
+        "--wbu-color-yellow-300:#fcd29d",
+        "--wbu-color-purple-400:#D7B7FB",
+        "--wix-font-Menu-variant: normal"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "Ridgewells Catering has been the go-to choice for catering in Washington, D.C. for more than 95 years. Corporate Events, Weddings, Social Events, Major Sporting Events, and all-around Impeccable Hospitality. Award winning culinary team and voted best caterer in Washington DC.",
+        "generator": "Wix.com Website Builder"
+      },
+      "platform": {
+        "cms": "WordPress"
+      },
+      "html_size_bytes": 2181366
+    },
+    "sopranoscatering.com": {
+      "css_files": [
+        "https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/css/sopranosdev.webflow.shared.30f94c736.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": "detected",
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": null,
+        "type": null
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/js/webflow.56a219bd.34f7c92eb3e8b1e1.js",
+          "https://www.google.com/recaptcha/api.js",
+          "https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/js/webflow.schunk.36b8fb49256177c8.js",
+          "https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/js/webflow.schunk.4eace7c192b0599d.js",
+          "//cdn.callrail.com/companies/644269930/93dbba4374c7a5ba02fa/12/swap.js",
+          "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js",
+          "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=62829164e1b0c6edc08a3f44"
+        ],
+        "libraries": {
+          "jquery": "jquery-3.5.1.min.dc5e7f18c8.js",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [],
+      "meta": {
+        "viewport": null,
+        "description": null,
+        "generator": null
+      },
+      "platform": {
+        "cms": "unknown"
+      },
+      "html_size_bytes": 34018
+    },
+    "concept-catering.de": {
+      "css_files": [
+        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/css/concept-catering-crew.webflow.shared.569b63847.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": null,
+        "type": null
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/js/webflow.583af229.270a65d40dc6e4bf.js",
+          "//cdn.cookie-script.com/s/b56e40a6c286f9df310a7676fd3e6a45.js",
+          "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66ff9e3caacf2e7208b65684_Animation%20-%201728028174620.json",
+          "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/js/webflow.schunk.3ab8cec9af2bafdd.js",
+          "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/js/webflow.schunk.a3fc7ee0431d3d74.js",
+          "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/js/webflow.schunk.6339de70282819bd.js",
+          "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/js/webflow.schunk.1a807f015b216e46.js",
+          "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js",
+          "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=66ced54b353d5079c3f5b4d7",
+          "https://use.typekit.net/wdg5rje.js"
+        ],
+        "libraries": {
+          "jquery": "jquery-3.5.1.min.dc5e7f18c8.js",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": null,
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [],
+      "meta": {
+        "viewport": null,
+        "description": null,
+        "generator": null
+      },
+      "platform": {
+        "cms": "unknown"
+      },
+      "html_size_bytes": 62764
+    },
+    "talkofthetownatlanta.com": {
+      "css_files": [
+        "//talkofthetownatlanta.com/wp-content/plugins/revslider/public/css/sr7.css?ver=6.7.58",
+        "https://talkofthetownatlanta.com/wp-content/themes/Avada-Child-Theme/style.css?ver=7.0.4",
+        "https://talkofthetownatlanta.com/wp-content/uploads/fusion-styles/0d905e679a0f3adbd0c44e83237f3eb3.min.css?ver=3.16"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": "detected",
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "inherit",
+          "Menlo",
+          "var(--h2_typography-font-family)"
+        ],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "https://talkofthetownatlanta.com/wp-content/uploads/2020/01/cropped-email-signature-logo-32x32.jpg",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [
+        "https://talkofthetownatlanta.com/wp-content/uploads/2020/01/cropped-email-signature-logo-180x180.jpg"
+      ],
+      "javascript": {
+        "external_scripts": [
+          "https://talkofthetownatlanta.com/wp-content/plugins/contact-form-7/modules/recaptcha/index.js?ver=6.1.6",
+          "https://talkofthetownatlanta.com/wp-content/uploads/fusion-scripts/d781cddfba19f7b54cd5d87753b334c9.min.js?ver=3.16",
+          "https://talkofthetownatlanta.com/wp-includes/js/dist/i18n.min.js?ver=781d11515ad3d91786ec",
+          "https://www.google.com/recaptcha/api.js?render=6Le-WxYrAAAAAKuT2PxXYBepbCapMG9VGchqlBUH&#038;ver=3.0",
+          "https://talkofthetownatlanta.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+          "//talkofthetownatlanta.com/wp-content/plugins/revslider/public/js/libs/tptools.js?ver=6.7.58",
+          "//talkofthetownatlanta.com/wp-content/plugins/revslider/public/js/sr7.js?ver=6.7.58",
+          "https://talkofthetownatlanta.com/wp-includes/js/dist/hooks.min.js?ver=7496969728ca0f95732d",
+          "https://talkofthetownatlanta.com/wp-content/plugins/contact-form-7/includes/swv/js/index.js?ver=6.1.6",
+          "https://talkofthetownatlanta.com/wp-includes/js/dist/vendor/wp-polyfill.min.js?ver=3.15.0",
+          "/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+          "https://talkofthetownatlanta.com/wp-content/plugins/contact-form-7/includes/js/index.js?ver=6.1.6",
+          "https://talkofthetownatlanta.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"
+        ],
+        "libraries": {
+          "jquery": "jquery-",
+          "gsap": "gsap",
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": "detected"
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--button_gradient_top_color:#8b0b04",
+        "--awb-width-large:50%",
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)",
+        "--wp--preset--color--awb-color-4: rgba(160,206,78,1)",
+        "--wp--preset--color--awb-color-5: rgba(116,116,116,1)",
+        "--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)",
+        "--awb-spacing-left-large:7.68%",
+        "--awb-padding-bottom-small:0px",
+        "--wp--preset--aspect-ratio--square: 1",
+        "--awb-width-small:100%",
+        "--awb-spacing-right-small:1.92%",
+        "--awb-padding-top:0px",
+        "--button_border_width-right:0",
+        "--awb-margin-top:10%",
+        "--awb-border-size:1px",
+        "--wp--preset--aspect-ratio--4-3: 4/3",
+        "--awb-padding-top:4%",
+        "--wp--preset--spacing--80: 5.06rem",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp-admin-border-width-focus:2px",
+        "--awb-padding-top-small:0px",
+        "--wp--preset--color--awb-color-3: rgba(224,222,222,1)",
+        "--wp--preset--spacing--70: 3.38rem",
+        "--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0)",
+        "--awb-padding-top:50px",
+        "--awb-spacing-left-large:1.92%",
+        "--wp-admin--admin-bar--position-offset:0px",
+        "--awb-padding-top:120px",
+        "--wp--preset--font-size--large: 22.5px"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "atlanta&#039;s best catering company     \natlanta&#039;s best catering company     \nATLANTA\nCATERERS THAT CARE \ndecadent dishes\nflawless presentation \n\nTalk of the Town creates memorable, distinctive dishes to suit the taste &amp; tone of your event.\n\nWe hand-pick the finest ingredients.",
+        "generator": "Powered by Slider Revolution 6.7.58 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface."
+      },
+      "platform": {
+        "cms": "WordPress"
+      },
+      "html_size_bytes": 428566
+    },
+    "queenofheartscatering.com": {
+      "css_files": [
+        "https://queenofheartscatering.com/wp-content/plugins/instagram-feed/css/sbi-styles.min.css?ver=6.12.0",
+        "https://queenofheartscatering.com/wp-content/themes/queen-hearts/style.css?ver=1.0",
+        "https://queenofheartscatering.com/wp-content/plugins/instagram-feed/assets/tokens/sb-tokens-local.css?ver=6.12.0",
+        "https://queenofheartscatering.com/wp-content/themes/queen-hearts/css/flexslider.css?ver=1983201120"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": "detected",
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [
+          "Lato"
+        ],
+        "font_family_declarations": [
+          "inherit"
+        ],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "https://queenofheartscatering.com/wp-content/uploads/2016/10/cropped-favicon-32x32.png",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [
+        "https://queenofheartscatering.com/wp-content/uploads/2016/10/cropped-favicon-180x180.png"
+      ],
+      "javascript": {
+        "external_scripts": [
+          "//assets.pinterest.com/js/pinit.js",
+          "https://queenofheartscatering.com/wp-content/plugins/instagram-feed/js/sbi-scripts.min.js?ver=6.12.0",
+          "https://queenofheartscatering.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+          "https://queenofheartscatering.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+          "https://queenofheartscatering.com/wp-content/themes/queen-hearts/js/gs_global.js?ver=1.0.0",
+          "https://my.hellobar.com/328ebcecf5972428ce5ed4fde06c1371b90a70f7.js",
+          "https://queenofheartscatering.com/wp-content/themes/queen-hearts/js/jquery.flexslider-min.js?ver=323922854"
+        ],
+        "libraries": {
+          "jquery": "jquery-",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%)",
+        "--wp--preset--aspect-ratio--2-3: 2/3",
+        "--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)",
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4)",
+        "--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)",
+        "--wp--preset--spacing--30: 0.67rem",
+        "--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)",
+        "--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)",
+        "--wp--preset--aspect-ratio--square: 1",
+        "--wp--preset--font-size--huge:42px",
+        "--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0)",
+        "--wp--preset--color--light-green-cyan: #7bdcb5",
+        "--wp--preset--color--vivid-purple: #9b51e0",
+        "--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%)",
+        "--wp--preset--aspect-ratio--4-3: 4/3",
+        "--wp-admin-theme-color--rgb:0,124,186",
+        "--wp--preset--color--vivid-red: #cf2e2e",
+        "--wp--preset--color--luminous-vivid-amber: #fcb900",
+        "--wp--preset--spacing--40: 1rem",
+        "--wp--preset--spacing--80: 5.06rem",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2)",
+        "--wp-admin-theme-color-darker-10--rgb:0,107,160.5",
+        "--wp-admin-border-width-focus:2px",
+        "--wp--preset--font-size--normal:16px",
+        "--wp--preset--aspect-ratio--3-4: 3/4",
+        "--wp--preset--spacing--70: 3.38rem",
+        "--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0)",
+        "--wp--preset--color--black: #000000"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "Easy planning, peace of mind and delicious catering for events &amp; weddings across the Philadelphia area. See why Queen of Hearts is the perfect match for you!",
+        "generator": null
+      },
+      "platform": {
+        "cms": "WordPress"
+      },
+      "html_size_bytes": 94349
+    },
+    "chicchefcatering.com": {
+      "css_files": [],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "data:;",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [],
+        "libraries": {
+          "jquery": null,
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": null,
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [],
+      "meta": {
+        "viewport": null,
+        "description": null,
+        "generator": null
+      },
+      "platform": {
+        "cms": "unknown"
+      },
+      "html_size_bytes": 167
+    },
+    "relishcaterers.com": {
+      "css_files": [],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": "swiper detected"
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "sans-serif",
+          "inherit",
+          "swiper-icons",
+          "Arial",
+          "Josefin Sans",
+          "Canela"
+        ],
+        "@font_face": [
+          "@font-face{font-family:\"Josefin Sans\";src:url(\"https://relishcaterers.com/wp-content/themes/relish-custom/font/josefinsans_regular.woff2\") format(\"woff2\"),url(\"https://relishcaterers.com/wp-content/themes/relish-custom/font/josefinsans_regular.woff\") format(\"woff\");font-weight:400;font-style:normal;font-display:swap}",
+          "@font-face{font-family:\"Josefin Sans\";src:url(\"https://relishcaterers.com/wp-content/themes/relish-custom/font/josefinsans_semi_bold.woff2\") format(\"woff2\"),url(\"https://relishcaterers.com/wp-content/themes/relish-custom/font/josefinsans_semi_bold.woff\") format(\"woff\");font-weight:700;font-style:normal;font-display:swap}",
+          "@font-face{font-family:Canela;src:url(\"https://relishcaterers.com/wp-content/themes/relish-custom/font/canela_light.woff2\") format(\"woff2\"),url(\"https://relishcaterers.com/wp-content/themes/relish-custom/font/canela_light.woff\") format(\"woff\");font-weight:400;font-style:normal;font-display:swap}"
+        ]
+      },
+      "favicon": {
+        "url": "https://ik.imagekit.io/m71vz3hnv/relish//2021/03/cropped-Relish_favicon-32x32.png",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [
+        "https://ik.imagekit.io/m71vz3hnv/relish//2021/03/cropped-Relish_favicon-180x180.png"
+      ],
+      "javascript": {
+        "external_scripts": [
+          "https://relishcaterers.com/wp-content/cache/min/1/154102.js?ver=1786571302",
+          "https://relishcaterers.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+          "https://relishcaterers.com/wp-content/themes/relish-custom/js/jquery.cycle2.swipe.min.js?ver=1548950798",
+          "https://relishcaterers.com/wp-content/cache/min/1/npm/swiper@11/swiper-bundle.min.js?ver=1786571302",
+          "https://relishcaterers.com/wp-includes/js/dist/hooks.min.js?ver=7496969728ca0f95732d",
+          "https://relishcaterers.com/wp-content/cache/min/1/wp-content/themes/relish-custom/js/magnific.js?ver=1786571302",
+          "https://cdn.trustindex.io/loader.js?wp-widget",
+          "https://relishcaterers.com/wp-content/cache/min/1/wp-content/themes/relish-custom/js/custom.js?ver=1786571302",
+          "https://relishcaterers.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+          "https://relishcaterers.com/wp-content/plugins/wp-rocket/assets/js/lazyload/17.8.3/lazyload.min.js",
+          "https://relishcaterers.com/wp-includes/js/dist/i18n.min.js?ver=781d11515ad3d91786ec",
+          "https://relishcaterers.com/wp-content/cache/min/1/wp-content/plugins/meow-lightbox/app/lightbox.js?ver=1786571302",
+          "https://cdn.trustindex.io/loader.js?ver=1",
+          "https://relishcaterers.com/wp-content/themes/relish-custom/js/jquery.cycle2.min.js?ver=1461171046"
+        ],
+        "libraries": {
+          "jquery": "jquery-",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": "lightbox/app/lightbox.js",
+          "lazy_load": "lazyload/17.8.3/lazyload.min.js"
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": "detected",
+          "hotjar": null,
+          "google_tag_manager": "detected"
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--wp--preset--spacing--50:1.5rem",
+        "--wp--preset--color--cyan-bluish-gray:#abb8c3",
+        "--wp--preset--spacing--40:1rem",
+        "--wp--preset--font-size--x-large:42px",
+        "--wp--preset--gradient--luminous-vivid-orange-to-vivid-red:linear-gradient(135deg,rgb(255, 105, 0) 0%,rgb(207, 46, 46) 100%)",
+        "--wp--preset--gradient--luminous-dusk:linear-gradient(135deg,rgb(255, 203, 112) 0%,rgb(199, 81, 192) 50%,rgb(65, 88, 208) 100%)",
+        "--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)",
+        "--wp--preset--font-size--huge:42px",
+        "--wp--preset--shadow--deep:12px 12px 50px rgba(0, 0, 0, .4)",
+        "--wp-admin-theme-color--rgb:0,124,186",
+        "--wp--preset--aspect-ratio--16-9:16/9",
+        "--wp--preset--shadow--outlined:6px 6px 0px -3px rgb(255, 255, 255),6px 6px rgb(0, 0, 0)",
+        "--wp--preset--aspect-ratio--3-4:3/4",
+        "--wp--preset--gradient--blush-bordeaux:linear-gradient(135deg,rgb(254, 205, 165) 0%,rgb(254, 45, 45) 50%,rgb(107, 0, 62) 100%)",
+        "--wp--preset--shadow--natural:6px 6px 9px rgba(0, 0, 0, .2)",
+        "--wp--preset--aspect-ratio--square:1",
+        "--wp-admin-theme-color-darker-10--rgb:0,107,160.5",
+        "--wp-admin-border-width-focus:2px",
+        "--wp--preset--color--pale-cyan-blue:#8ed1fc",
+        "--wp--preset--color--black:#000000",
+        "--wp--preset--font-size--normal:16px",
+        "--wp--preset--color--light-green-cyan:#7bdcb5",
+        "--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan:linear-gradient(135deg,rgb(122, 220, 180) 0%,rgb(0, 208, 130) 100%)",
+        "--wp--preset--spacing--60:2.25rem",
+        "--wp-admin--admin-bar--position-offset:0px",
+        "--wp--preset--aspect-ratio--2-3:2/3",
+        "--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange:linear-gradient(135deg,rgb(252, 185, 0) 0%,rgb(255, 105, 0) 100%)",
+        "--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray:linear-gradient(135deg,rgb(238, 238, 238) 0%,rgb(169, 184, 195) 100%)",
+        "--arrow--next:hover,.mwl .pswp__button--arrow--prev:hover",
+        "--wp-admin-theme-color-darker-20:#005a87"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "Top NYC caterers for corporate events, weddings, and workplace dining, offering fresh, locally sourced cuisine with full-service catering.",
+        "generator": "WordPress 7.0.4"
+      },
+      "platform": {
+        "cms": "WordPress"
+      },
+      "html_size_bytes": 177365
+    },
+    "sterlingcateringmn.com": {
+      "css_files": [],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "system-ui"
+        ],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": null,
+        "type": null
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [],
+        "libraries": {
+          "jquery": null,
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": null,
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [],
+      "meta": {
+        "viewport": "width=device-width,initial-scale=1",
+        "description": null,
+        "generator": null
+      },
+      "platform": {
+        "cms": "unknown"
+      },
+      "html_size_bytes": 5413
+    },
+    "tallguyandagrill.com": {
+      "css_files": [
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.styles.css",
+        "https://static1.squarespace.com/static/versioned-site-css/613f95fa3c025158dc158b69/118/5c5a519771c10ba3470d8101/613f95fa3c025158dc158b83/1816/site.css?nocustom=true",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/f2924efa-d9b5-4360-b517-1ac77066b1fb_833/website.components.html.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.styles.css",
+        "https://static1.squarespace.com/static/custom-css/613f95fa3c025158dc158b69/613f95fa3c025158dc158b83/2/custom.css",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": "detected",
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "Montserrat",
+          "Roboto Condensed"
+        ],
+        "@font_face": [
+          "@font-face {\n  font-family: 'Montserrat';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/873cd19c-3343-4ffb-89c3-2ab2d92b1296/cyrillic.woff2') format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}",
+          "@font-face {\n  font-family: 'Montserrat';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/603a5589-40e2-4bd3-a765-093a165a2675/vietnamese.woff2') format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}",
+          "@font-face {\n  font-family: 'Montserrat';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/7d9a9068-9e57-4acd-ac1e-d003f99f1db0/latin-ext.woff2') format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}",
+          "@font-face {\n  font-family: 'Montserrat';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/c75b841e-b0aa-4aaa-93bb-f55e1fea152e/latin.woff2') format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}",
+          "@font-face {\n  font-family: 'Montserrat';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/c3e83461-6de3-499d-944f-ad109d70f496/cyrillic-ext.woff2') format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}"
+        ]
+      },
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/e3764139-d39e-4efa-9996-84ef4b9710e9/favicon.ico?format=100w",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "//assets.squarespace.com/universal/scripts-compressed/performance-d0deb0beb0a13a35-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-liquid.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-2279d62a6d037cb6-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-film-grain.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-runtime-01da72f42419da58-min.en-US.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/modern.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-refracted-lines.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/9188.js",
+          "//assets.squarespace.com/universal/scripts-compressed/visitor-site-error-reporter-976d22448e700b77-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-refracted-circles.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/8018.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.visitor.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/legacy.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.visitor.js",
+          "//assets.squarespace.com/universal/scripts-compressed/cldr-resource-pack-22bdf933fb74be0d-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/9882.js",
+          "https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js",
+          "//use.typekit.net/ik/LBG98CQW1kdkq07ZpqECYvoL_4dq66q3KjjrzwQJe1JfeTqgfFHN4UJLFRbh52jhWDjUwhjoFAZywhw3wR9UFQyqjDIu5eJh5sGMJy4yZeNKZPu1jW4ydAN0Zfu3ScvKecBqZY48SawlShB0Sku3ScvljhN0Zem0ShmqH6qJN2bbMg6eJMJ7f6RrXbJbMs6IJMJ7f6KfX6JbMs6YJMJ7f6RxXbJbMs65JMJ7f6K2X6JbMs6sJMHbM-pphSMe.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.shared.constants.js",
+          "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/scripts/site-bundle.e78707115212d93cd1dcda5bd7e39dce.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-d121d5c2e821db1f-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/2452.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-stable-784b947826b4c445-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-parallax.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/f2924efa-d9b5-4360-b517-1ac77066b1fb_833/website.components.html.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/2513.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-moment-js-vendor-a5cfdec1ae227f33-min.en-US.js"
+        ],
+        "libraries": {
+          "jquery": "jquery",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--image-component-native-aspect-ratio: 1301/201",
+        "--gradientHeaderNavigationColor: hsla(var(--black-hsl), 1)",
+        "--stroke-style: none",
+        "--image-component-object-fit: cover",
+        "--image-component-focal-point: 50% 50%",
+        "--tweak-text-block-background-color: hsla(var(--accent-hsl), 1)\n",
+        "--inset-padding: 0vw",
+        "--blur-value: blur(15px)",
+        "--solidHeaderBackgroundColor: hsla(var(--white-hsl), 1)",
+        "--image-component-native-aspect-ratio: 940/788",
+        "--tweak-text-block-padding: initial",
+        "--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 )",
+        "--solidHeaderNavigationColor: hsla(var(--black-hsl), 1)",
+        "--image-component-object-fit: contain",
+        "--tweak-text-block-radius: 0px 0px 0px 0px",
+        "--inset-padding: calc(var(--sqs-site-gutter) * 2)",
+        "--tweak-text-block-blend\n  : normal",
+        "--stroke-thickness: 6px",
+        "--grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px)",
+        "--grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 11.0px)",
+        "--image-component-focal-point: 43.29859110668831% 36.802300143758984%",
+        "--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (24 - 1)) ) / 24 )",
+        "--row-height-scaling-factor: 0.0215",
+        "--image-component-overlay-blend-mode: normal",
+        "--container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) ))",
+        "--tweak-text-block-padding: 6% 6% 6% 6%",
+        "--image-component-overlay-opacity: 0",
+        "--gradientHeaderBackgroundColor: hsla(var(--white-hsl), 1)"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "Tall Guy and a Grill is a farm-to-fork catering company serving the Milwaukee area and is the only certified green caterer in Wisconsin.",
+        "generator": null
+      },
+      "platform": {
+        "cms": "Squarespace"
+      },
+      "html_size_bytes": 280460
+    },
+    "ggcatering.com": {
+      "css_files": [
+        "https://www.ggcatering.com/cpresources/102024ac/css/front-end/plugin/freeform.css?v=1773761912",
+        "/dist/main.min.css?b=69dbefe6a5be87820d13d96e5f98c68e64db414a"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "/dist/img/meta/favicon.ico",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [
+        "/dist/img/meta/logo-mark-180x180.png"
+      ],
+      "javascript": {
+        "external_scripts": [
+          "https://www.ggcatering.com/cpresources/102024ac/js/scripts/front-end/captchas/recaptcha/v3.js?v=1773761912",
+          "/dist/scripts.min.js?b=69dbefe6a5be87820d13d96e5f98c68e64db414a",
+          "https://www.ggcatering.com/cpresources/102024ac/js/scripts/front-end/plugin/freeform.js?v=1773761912"
+        ],
+        "libraries": {
+          "jquery": null,
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": null,
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
+        "description": "Stellar food. Seamless service. Sustainably produced. Celebrate with the Bay Area&#039;s leading full-service catering company, Global Gourmet Catering.",
+        "generator": "SEOmatic"
+      },
+      "platform": {
+        "cms": "unknown"
+      },
+      "html_size_bytes": 141495
+    },
+    "mculinary.com": {
+      "css_files": [],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "data:;",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [],
+        "libraries": {
+          "jquery": null,
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": null,
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [],
+      "meta": {
+        "viewport": null,
+        "description": null,
+        "generator": null
+      },
+      "platform": {
+        "cms": "unknown"
+      },
+      "html_size_bytes": 168
+    },
+    "saltblockhospitality.com": {
+      "css_files": [
+        "https://static1.squarespace.com/static/custom-css/628635115ffed10e289ac115/628635115ffed10e289ac132/363/custom.css",
+        "//assets.squarespace.com/universal/styles-compressed/user-account-core-433d5f055f1af432-min.en-US.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/c2406d2e-d5f7-4858-8ff5-84fc6297f94e_834/website.components.html.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/website.components.imageFluid.styles.css",
+        "//assets.squarespace.com/universal/styles-compressed/commerce-d50e5960dc9fd059-min.en-US.css",
+        "https://static1.squarespace.com/static/versioned-site-css/628635115ffed10e289ac115/901/5c5a519771c10ba3470d8101/628635115ffed10e289ac132/1816/site.css?nocustom=true",
+        "https://www.ghostplugins.dev/assets/helpers/swiper/swiper.css",
+        "https://cdn6.localdatacdn.com/badges/restaurantji/css/circle_v5.css?v=11217",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.video/6a963ec3-6a86-4089-9d99-1101d1ed1119_579/website.components.video.styles.css",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.scrolling/983de04b-2ca6-4b47-88ce-4243724e6a48_606/website.components.scrolling.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.spacer/c119b1aa-c517-4b07-a591-e189e969c61c_1157/website.components.spacer.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/eb26eb73-bf5b-4626-b710-ef74b43055dc_201/website.components.horizontalrule.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.code/07b6590f-180a-4427-a51f-7847def620cb_879/website.components.code.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/a450410a-eb75-44fd-bffb-83094a5561ea_1004/website.components.button.styles.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": "swiper detected"
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/39a54e78-b49d-4e0c-bd4c-361a068cee94/favicon.ico?format=100w",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/website.components.imageFluid.shared.constants.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/2513.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-2279d62a6d037cb6-min.en-US.js",
+          "//assets.squarespace.com/universal/scripts-compressed/performance-5e9b4a25245e9ff9-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/image-effect-refracted-circles.js",
+          "https://unpkg.com/@lottiefiles/lottie-player@1.5.7/dist/lottie-player.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/2452.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/image-effect-film-grain.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/modern.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/a450410a-eb75-44fd-bffb-83094a5561ea_1004/website.components.button.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/8018.js",
+          "//assets.squarespace.com/universal/scripts-compressed/visitor-site-error-reporter-976d22448e700b77-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/image-effect-refracted-lines.js",
+          "//assets.squarespace.com/universal/scripts-compressed/user-account-core-e3f360d3dfe5b810-min.en-US.js",
+          "https://assets8.lottiefiles.com/packages/lf20_qp3veqc0.json",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.code/07b6590f-180a-4427-a51f-7847def620cb_879/website.components.code.visitor.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/legacy.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/image-effect-liquid.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/eb26eb73-bf5b-4626-b710-ef74b43055dc_201/website.components.horizontalrule.visitor.js",
+          "//assets.squarespace.com/universal/scripts-compressed/cldr-resource-pack-22bdf933fb74be0d-min.en-US.js",
+          "https://www.ghostplugins.dev/assets/helpers/swiper/swiper.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/9882.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/4d3c84c8-9c02-49e3-85d0-69c841c8e11e_821/9188.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.video/6a963ec3-6a86-4089-9d99-1101d1ed1119_579/website.components.video.visitor.js",
+          "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-runtime-61c3d5de9eeaab3b-min.en-US.js",
+          "//use.typekit.net/ik/QxikUCqXzagTlf7rOhKyEq_Jac0VzC596GIW5drNNHqfe7SIfFHN4UJLFRbh52jhWDjk52jDFQIUFAZcZAbUwe9k528yjDIUFs7VMkG0jAFu-WsoShFGZAsude80ZkoRdhXCHKoyjamTiY8Djhy8ZYmC-Ao1Oco8if37OcBDOcu8OfG0Sh4GOW48Z148Sh60SaBujW48Sagyjh90jhNlOfG0SaBujW48SagyjhmDjhy8ZYmC-Ao1OcFzdPUyjamTiY8Djhy8ZYmC-Ao1OcFzdPUyjamTiY8Djhy8ZYmC-Ao1Oco8ifUySkolZPUCdhFydeyzSabCShBCie4CdhFn-eNDSe8XjAUTiYq0jhNlOYFK-fukZAZkZWFGO1FUiABkZWF3jAF8OcFzdPUDSWmyScmDSeBRZWFR-emqiAUTdcS0jhNlOYiaikoyjamTiY8Djhy8ZYmC-Ao1OcFzdPUaiaS0jAFu-WsoShFGZAsude80Zko0ZWbCiaiaOcBDOcu8OYiaikoDjAUXjcUzjhlGdaF3-Wsyde8XpPoRdhXCiaiaO1FK-fukZAZkZWFGO1FUiABkZWF3jAF8OcFzdPUaiaS0SaBujW48SagyjhmDjhy8ZYmC-Ao1OcFzdPJ5dA80ZW4hjPuldhs8SctKghB0pc8ydcv7fbKuHUMMeMb6MKG4fOJnIMMjgkMfH6qJlfCbMg65JMJ7fbKDHUMMegI6MKGHfOEOMyMgeMb6MKGHfOrOMyMgeMS6MKGHfOhOMyMgeMt6MTMgKFKb86j.js",
+          "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/scripts/site-bundle.e78707115212d93cd1dcda5bd7e39dce.js",
+          "https://assets.squarewebsites.org/lazy-summaries/lazy-summaries.min.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.scrolling/983de04b-2ca6-4b47-88ce-4243724e6a48_606/website.components.scrolling.visitor.js"
+        ],
+        "libraries": {
+          "jquery": "jquery",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": "detected"
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": true,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--opacity: 100%",
+        "--gradientHeaderNavigationColor: hsla(var(--black-hsl), 1)",
+        "--origin-y: 50%",
+        "--tweak-marquee-block-padding: 3% 0% 3% 0%",
+        "--marquee-fade-mask: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
+        "--stroke-style: none",
+        "--image-component-focal-point: 50% 50%",
+        "--image-component-object-fit: cover",
+        "--image-component-native-aspect-ratio: 982/320",
+        "--image-component-native-aspect-ratio: 186/363",
+        "--tweak-marquee-block-padding: initial",
+        "--marquee-font-size-value: 4",
+        "--tweak-text-block-stroke-color: hsla(var(--black-hsl), 1)\n",
+        "--inset-padding: 0vw",
+        "--scale-y: 100%",
+        "--stroke-thickness: 2px",
+        "--tweak-marquee-block-radius: 0px 0px 0px 0px",
+        "--image-component-native-aspect-ratio: 1724/1072",
+        "--image-component-native-aspect-ratio: 1724/1420",
+        "--translate-x: 0px",
+        "--blur-value: blur(15px)",
+        "--solidHeaderBackgroundColor: hsla(var(--white-hsl), 1)",
+        "--marquee-item-spacing: 2.3em",
+        "--scale-x: 100%",
+        "--translate-y: 0px",
+        "--tweak-text-block-padding: initial",
+        "--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 )",
+        "--solidHeaderNavigationColor: hsla(var(--black-hsl), 1)",
+        "--skew-y: 0deg",
+        "--image-component-object-fit: contain"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "Elevate your event with SaltBlock Hospitality's  food and beverage experiences at exclusive Tampa venues and farm-fresh ingredients. Plan with confidence!",
+        "generator": null
+      },
+      "platform": {
+        "cms": "Squarespace"
+      },
+      "html_size_bytes": 914187
+    },
+    "thejdkgroup.com": {
+      "css_files": [
+        "https://thejdkgroup.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=6.1.7",
+        "https://thejdkgroup.com/wp-content/plugins/responsive-accordion-and-collapse/css/font-awesome/css/font-awesome.min.css?ver=7.0.4",
+        "https://thejdkgroup.com/wp-content/plugins/wpcf7-redirect/build/assets/frontend-script.css?ver=2c532d7e2be36f6af233",
+        "https://thejdkgroup.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=4.2.2",
+        "https://thejdkgroup.com/wp-content/themes/fuse/library/css/style.css?ver=201505271601",
+        "https://thejdkgroup.com/wp-content/themes/fuse/library/css/custom.css?ver=7.0.4",
+        "https://thejdkgroup.com/wp-content/plugins/master-slider/public/assets/css/masterslider.main.css?ver=3.11.2",
+        "https://thejdkgroup.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/all.min.css?ver=4.2.2",
+        "https://thejdkgroup.com/wp-content/plugins/responsive-accordion-and-collapse/css/bootstrap-front.css?ver=7.0.4",
+        "https://thejdkgroup.com/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.53.0",
+        "https://thejdkgroup.com/wp-content/uploads/master-slider/custom.css?ver=6.6",
+        "https://thejdkgroup.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/v4-shims.min.css?ver=4.2.2",
+        "https://thejdkgroup.com/wp-content/plugins/formcraft3/assets/css/form.min.css?ver=3.2.24"
+      ],
+      "css_frameworks": {
+        "bootstrap": "vNone",
+        "tailwind": null,
+        "font_awesome": "font-awesome-front-css",
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [
+          "Raleway",
+          "Roboto",
+          "Roboto Slab"
+        ],
+        "font_family_declarations": [
+          "inherit",
+          "Roboto",
+          "Roboto Slab",
+          "Raleway"
+        ],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/plugins/jquery.fitvids.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/plugins/elementor/assets/lib/font-awesome/js/v4-shims.min.js?ver=4.2.2",
+          "https://thejdkgroup.com/wp-includes/js/comment-reply.min.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/plugins/responsive-accordion-and-collapse/js/accordion.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/plugins/mediaelement-and-player.min.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/plugins/responsive-accordion-and-collapse/js/accordion-custom.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/scripts.js?ver=201505271600",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/scroll-monitor.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/plugins/wpcf7-redirect/build/assets/frontend-script.js?ver=2c532d7e2be36f6af233",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/plugins/jquery.infinitescroll.min.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/plugins/pixelyoursite/dist/scripts/public.js?ver=11.3.0.1",
+          "https://thejdkgroup.com/wp-content/plugins/wpconsent-cookies-banner-privacy-suite/build/frontend.js?ver=313b46ff51c6a5f3c9dc",
+          "https://thejdkgroup.com/wp-content/plugins/pixelyoursite/dist/scripts/tld.min.js?ver=2.3.1",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/plugins/bootstrap-tab.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/plugins/jquery.magnific-popup.min.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-includes/js/dist/hooks.min.js?ver=7496969728ca0f95732d",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/plugins/flexslider.js?ver=201505271600",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/plugins/jquery.isotope.min.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/plugins/jquery.nicescroll.min.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-includes/js/dist/i18n.min.js?ver=781d11515ad3d91786ec",
+          "https://thejdkgroup.com/wp-content/plugins/pixelyoursite/dist/scripts/js.cookie-2.1.3.min.js?ver=2.1.3",
+          "https://thejdkgroup.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+          "https://thejdkgroup.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+          "https://thejdkgroup.com/wp-content/plugins/pixelyoursite/dist/scripts/jquery.bind-first-0.2.3.min.js?ver=0.2.3",
+          "https://thejdkgroup.com/wp-content/themes/fuse/library/js/plugins/froogaloop.min.js?ver=7.0.4",
+          "https://thejdkgroup.com/wp-content/plugins/contact-form-7/includes/js/index.js?ver=6.1.7",
+          "https://thejdkgroup.com/wp-content/plugins/contact-form-7/includes/swv/js/index.js?ver=6.1.7"
+        ],
+        "libraries": {
+          "jquery": "jquery-",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": "magnific-popup.min.js",
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": "detected",
+          "hotjar": null,
+          "google_tag_manager": "detected"
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)",
+        "--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)",
+        "--wpconsent-cancel-color: #000000",
+        "--wp--preset--aspect-ratio--square: 1",
+        "--e-global-typography-secondary-font-weight:400",
+        "--wp--preset--aspect-ratio--4-3: 4/3",
+        "--wp--preset--spacing--80: 5.06rem",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp--preset--spacing--70: 3.38rem",
+        "--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0)",
+        "--e-global-color-secondary:#54595F",
+        "--wpconsent-font-size: 16px",
+        "--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%)",
+        "--wp--preset--spacing--50: 1.5rem",
+        "--wp--preset--color--luminous-vivid-orange: #ff6900",
+        "--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%)",
+        "--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%)",
+        "--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%)",
+        "--wp--preset--color--cyan-bluish-gray: #abb8c3",
+        "--e-global-color-0cb3b70:#323E6D",
+        "--wp--preset--spacing--30: 0.67rem",
+        "--e-global-typography-secondary-font-family:\"Roboto Slab\"",
+        "--wp--preset--color--light-green-cyan: #7bdcb5",
+        "--wp--preset--color--vivid-purple: #9b51e0",
+        "--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%)",
+        "--wp--preset--spacing--40: 1rem",
+        "--wpconsent-preferences-color: #000000",
+        "--dsgo-text-color:var(--wp--preset--color--contrast-3)",
+        "--wp--preset--font-size--large: 36px"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no",
+        "description": "Serving Harrisburg, Lancaster, and York, the JDK Group is the region&#039;s premier full-service catering and event planning company",
+        "generator": "Site Kit by Google 1.185.0"
+      },
+      "platform": {
+        "cms": "WordPress"
+      },
+      "html_size_bytes": 150412
+    },
+    "bywordofmouth.co.uk": {
+      "css_files": [
+        "https://bywordofmouth.co.uk/wp-content/plugins/wp-gdpr-compliance/Assets/css/front.css?ver=1706539784",
+        "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css",
+        "https://bywordofmouth.co.uk/wp-content/plugins/easy-fancybox/fancybox/1.5.4/jquery.fancybox.min.css?ver=274b5c2d830af33b7cd3c7b895521a3f",
+        "https://bywordofmouth.co.uk/wp-content/tablepress-combined.min.css?ver=41",
+        "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/style.css?v11",
+        "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/ie.css",
+        "https://bywordofmouth.co.uk/wp-content/plugins/instagram-feed/assets/tokens/sb-tokens-local.css?ver=6.12.0",
+        "https://bywordofmouth.co.uk/wp-content/plugins/instagram-feed/css/sbi-styles.min.css?ver=6.12.0"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": "fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --",
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "inherit"
+        ],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "https://bywordofmouth.co.uk/wp-content/uploads/2022/08/cropped-Badge-blue-on-white.webp",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [
+        "https://bywordofmouth.co.uk/wp-content/uploads/2022/08/cropped-Badge-blue-on-white.webp"
+      ],
+      "javascript": {
+        "external_scripts": [
+          "https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js?ver=274b5c2d830af33b7cd3c7b895521a3f",
+          "https://use.typekit.net/dfe0vow.js",
+          "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js?ver=274b5c2d830af33b7cd3c7b895521a3f",
+          "https://bywordofmouth.co.uk/wp-content/plugins/instagram-feed/js/sbi-scripts.min.js?ver=6.12.0",
+          "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/js/modernizr.js?ver=2.7.1",
+          "https://bywordofmouth.co.uk/wp-content/plugins/easy-fancybox/vendor/jquery.mousewheel.min.js?ver=3.1.13",
+          "http://html5shiv.googlecode.com/svn/trunk/html5.js",
+          "/cdn-cgi/challenge-platform/scripts/jsd/main.js",
+          "https://bywordofmouth.co.uk/wp-content/plugins/wp-gdpr-compliance/Assets/js/front.min.js?ver=1706539784",
+          "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/js/skrollr.min.js?ver=0.6.30",
+          "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js?ver=1.10.2",
+          "https://bywordofmouth.co.uk/wp-content/plugins/easy-fancybox/fancybox/1.5.4/jquery.fancybox.min.js?ver=274b5c2d830af33b7cd3c7b895521a3f",
+          "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/js/venues.js?ver=274b5c2d830af33b7cd3c7b895521a3f",
+          "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/js/jquery.matchHeight-min.js?ver=0.7.0",
+          "https://bywordofmouth.co.uk/wp-content/plugins/easy-fancybox/vendor/purify.min.js?ver=274b5c2d830af33b7cd3c7b895521a3f",
+          "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/js/news-pagination.js?ver=1.0.0",
+          "https://bywordofmouth.co.uk/wp-content/plugins/easy-fancybox/vendor/jquery.easing.min.js?ver=1.4.1",
+          "https://bywordofmouth.co.uk/wp-content/themes/bywordofmouth/js/scripts.js?ver=1.0.0",
+          "/wp-content/themes/bwom/js/isotope.pkgd.min.js"
+        ],
+        "libraries": {
+          "jquery": "jquery.",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": "fancybox/vendor/purify.min.js",
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": "detected",
+          "google_tag_manager": "detected"
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%)",
+        "--wp--preset--aspect-ratio--2-3: 2/3",
+        "--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)",
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4)",
+        "--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)",
+        "--wp--preset--spacing--30: 0.67rem",
+        "--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)",
+        "--wp-gdpr--button--color: #ffffff",
+        "--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)",
+        "--wp--preset--aspect-ratio--square: 1",
+        "--wp--preset--font-size--huge:42px",
+        "--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0)",
+        "--wp--preset--color--light-green-cyan: #7bdcb5",
+        "--wp--preset--color--vivid-purple: #9b51e0",
+        "--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%)",
+        "--wp--preset--aspect-ratio--4-3: 4/3",
+        "--wp-admin-theme-color--rgb:0,124,186",
+        "--wp--preset--color--vivid-red: #cf2e2e",
+        "--wp--preset--color--luminous-vivid-amber: #fcb900",
+        "--wp--preset--spacing--40: 1rem",
+        "--wp--preset--spacing--80: 5.06rem",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp-gdpr--bar--background-color: #000000",
+        "--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2)",
+        "--wp-admin-theme-color-darker-10--rgb:0,107,160.5",
+        "--wp-admin-border-width-focus:2px",
+        "--wp-gdpr--button--background-color: #000000",
+        "--wp--preset--font-size--normal:16px",
+        "--wp--preset--aspect-ratio--3-4: 3/4"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "By Word of Mouth is a caterer and luxury events specialist based in London, creating spectacular events throughout the UK and beyond.",
+        "generator": null
+      },
+      "platform": {
+        "cms": "WordPress"
+      },
+      "html_size_bytes": 105524
+    },
+    "creativeedgeparties.com": {
+      "css_files": [
+        "https://static1.squarespace.com/static/versioned-site-css/6840be6bc300d63ad7f66f2f/33/5c5a519771c10ba3470d8101/6840be6cc300d63ad7f66f37/1816/site.css?nocustom=true",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.styles.css",
+        "//assets.squarespace.com/universal/styles-compressed/user-account-core-433d5f055f1af432-min.en-US.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/f2924efa-d9b5-4360-b517-1ac77066b1fb_833/website.components.html.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.styles.css",
+        "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1786731263525-36JJDFB14HC1BE313AOI/static.css",
+        "https://static1.squarespace.com/static/custom-css/6840be6bc300d63ad7f66f2f/6840be6cc300d63ad7f66f37/1/custom.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/a7ae81a3-9f65-4453-bbfb-5cef4944f617_611/website.components.socialLinks.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.scrolling/531b4cc7-6a56-4bf1-b7c8-3c158db89de5_605/website.components.scrolling.styles.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": "detected",
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "Nunito Sans",
+          "Manrope"
+        ],
+        "@font_face": [
+          "@font-face {\n  font-family: 'Nunito Sans';\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/579bf29a-4da0-49bb-be1c-e859bc2fd8bb/cyrillic.woff2') format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}",
+          "@font-face {\n  font-family: 'Nunito Sans';\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/6f018d4b-6e26-4595-b338-7aae84a53373/cyrillic-ext.woff2') format('woff2');\n  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;\n}",
+          "@font-face {\n  font-family: 'Nunito Sans';\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/e0e4673f-f704-4429-9596-37d786e27a55/vietnamese.woff2') format('woff2');\n  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;\n}",
+          "@font-face {\n  font-family: 'Nunito Sans';\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/35ecdce1-b97a-45f1-a9cb-2b71ef197243/latin-ext.woff2') format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}",
+          "@font-face {\n  font-family: 'Nunito Sans';\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/0ba8d383-b036-406f-913c-77027b6df7e1/latin.woff2') format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}"
+        ]
+      },
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/3180f709-04fe-4b4d-ac3c-872eaa665b20/favicon.ico?format=100w",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-liquid.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-2279d62a6d037cb6-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-film-grain.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-refracted-lines.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-runtime-ed1dc0df5968e326-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/9188.js",
+          "//assets.squarespace.com/universal/scripts-compressed/visitor-site-error-reporter-976d22448e700b77-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-refracted-circles.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/8018.js",
+          "//assets.squarespace.com/universal/scripts-compressed/user-account-core-e3f360d3dfe5b810-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.visitor.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/legacy.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.visitor.js",
+          "//assets.squarespace.com/universal/scripts-compressed/cldr-resource-pack-22bdf933fb74be0d-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/9882.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.scrolling/531b4cc7-6a56-4bf1-b7c8-3c158db89de5_605/website.components.scrolling.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/website.components.imageFluid.shared.constants.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-moment-js-vendor-a5cfdec1ae227f33-min.en-US.js",
+          "//assets.squarespace.com/universal/scripts-compressed/performance-3a9f251dd03cffbf-min.en-US.js",
+          "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/scripts/site-bundle.e78707115212d93cd1dcda5bd7e39dce.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-d121d5c2e821db1f-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/2452.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-stable-784b947826b4c445-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/image-effect-parallax.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/a7ae81a3-9f65-4453-bbfb-5cef4944f617_611/website.components.socialLinks.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/f2924efa-d9b5-4360-b517-1ac77066b1fb_833/website.components.html.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/876dda92-7e91-4447-96ab-339885553be5_820/2513.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/modern.js"
+        ],
+        "libraries": {
+          "jquery": null,
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": "detected"
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--tweak-marquee-block-padding: 3% 0% 3% 0%",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--mask ",
+        "--marquee-fade-mask: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
+        "--social-icons-gap: 14px",
+        "--stroke-style: none",
+        "--image-component-focal-point: 50% 50%",
+        "--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (0.0px * (24 - 1)) ) / 24 )",
+        "--tweak-marquee-block-padding: initial",
+        "--inset-padding: 0vw",
+        "--image-component-native-aspect-ratio: 3314/252",
+        "--tweak-marquee-block-radius: 0px 0px 0px 0px",
+        "--si-scale: 2",
+        "--si-fill-mask: transparent",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--icon ",
+        "--blur-value: blur(15px)",
+        "--tweak-social-links-block-padding: initial",
+        "--si-bg-fade: transparent",
+        "--grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 0.0px)",
+        "--cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (0.0px * (8 - 1)) ) / 8 )",
+        "--title-font-size-value: 1.7",
+        "--tweak-marquee-block-blend: normal",
+        "--si-bg-hover: transparent",
+        "--body-font-size-value: 1.1",
+        "--image-component-native-aspect-ratio: 1314/833",
+        "--list:hover .sqs-svg-icon--wrapper .sqs-use--mask ",
+        "--tweak-text-block-padding: initial",
+        "--marquee-font-size-value: 1",
+        "--button-font-size-value: 1",
+        "--si-fill-icon-hover: var(--si-primary)",
+        "--si-fill-icon: var(--si-primary)"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "We delivers high end catering in Miami and Palm Beach, offering luxury wedding, corporate, and small-party catering with unique culinary experiences. Book Now!",
+        "generator": null
+      },
+      "platform": {
+        "cms": "Squarespace"
+      },
+      "html_size_bytes": 1167545
+    },
+    "cutandtastelv.com": {
+      "css_files": [
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/448100ec-c31e-4478-9192-1585b2070971_1003/website.components.button.styles.css",
+        "https://static1.squarespace.com/static/custom-css/5c1584394611a0d7e1311ce4/5c1586480e2e72b11852abe3/0/custom.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.code/96ee2daf-dfe7-4ad1-8082-29be26314ad0_878/website.components.code.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/website.components.summary.styles.css",
+        "https://static1.squarespace.com/static/sitecss/5c1584394611a0d7e1311ce4/143/55f0aac0e4b0f0a5b7e0b22e/5c1586480e2e72b11852abe3/359/site.css?nocustom=true",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.spacer/035a76fb-6d18-44eb-b588-c9985345d5bf_1156/website.components.spacer.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.video/df4e2f60-e0da-46f6-85d5-170a8cdab242_578/website.components.video.styles.css",
+        "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/a7ae81a3-9f65-4453-bbfb-5cef4944f617_611/website.components.socialLinks.styles.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": "vNone",
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "Rubik"
+        ],
+        "@font_face": [
+          "@font-face {\n  font-family: 'Rubik';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/6a29169b-5482-4b76-b573-f5de95403f31/cyrillic.woff2') format('woff2');\n  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;\n}",
+          "@font-face {\n  font-family: 'Rubik';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/12005fbf-2502-4f8e-bb1e-0842b5ee2875/arabic.woff2') format('woff2');\n  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;\n}",
+          "@font-face {\n  font-family: 'Rubik';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/8dcfaf79-e0ff-4ae7-8da3-a472418f92e2/latin-ext.woff2') format('woff2');\n  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;\n}",
+          "@font-face {\n  font-family: 'Rubik';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/ee1ac061-270e-417c-8ee3-e79a3a1b61c6/latin.woff2') format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;\n}",
+          "@font-face {\n  font-family: 'Rubik';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url('https://file.squarespace-cdn.com/content/v2/namespaces/fonts/libraries/sqsp/assets/9870a7ef-f4ac-4930-9764-8ced5a4ab6f0/hebrew.woff2') format('woff2');\n  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;\n}"
+        ]
+      },
+      "favicon": {
+        "url": "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1550796939463-NDV5YI4D2L2XYEKCAYXK/favicon.ico",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "//assets.squarespace.com/universal/scripts-compressed/common-2279d62a6d037cb6-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/gallery-layout-list.js",
+          "//use.typekit.net/ik/0BQqNnrzvPNiGJFqCT71fYSSEw4UqJyv0kLw88psOB9fe0G2fFHN4UJLFRbh52jhWDmRwQ9tF2woF2jUwAI3Z2i8wQwUwAF8Fg7QMkG0jAFu-WsoShFGZAsude80ZkoRdhXCHKoyjamTiY8Djhy8ZYmC-Ao1Oco8if37OcBDOcu8OfG0jamXOAB0ZfuXjWFXZPuqZWj0SaBujW48Sagyjh90jhNlOfG0SaBujW48SagyjhmDjhy8ZYmC-Ao1OcFzdPUyjamTiY8Djhy8ZYmC-Ao1OcFzdPUyjamTiY8Djhy8ZYmC-Ao1Oco8ifUySkolZPURiWbljAoqOWsySas8OAs8iKoDSWmyScmDSeBRZPoRdhXCjamXjAoqieBDiemCiKoRdhXCdeNRjAUGdaFXOYFUiABkZWF3jAF8ShFGZAsude80ZkoRdhXCiaiaOcBRiA8XpWFR-emqiAUTdcS0jhNlOYiaikoyjamTiY8Djhy8ZYmC-Ao1Oco8ifUaiaS0jWw0dA9CiaiaOcFuifuydcblieBDie9lZemhO1FUiABkZWF3jAF8OcFzdPUaiaS0jamXjAoqieBDiemCiKoRdhXCiaiaO1FUiABkZWF3jAF8ShFGZAsude80ZkoRdhXK2cZuiYmkjPu3ifuKdhUqH6GJEGMfIMMjgkMfH6GJEtMfIMMjIPMfqMYIad71g6.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/modern.js",
+          "//assets.squarespace.com/universal/scripts-compressed/extract-css-runtime-ed1dc0df5968e326-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/gallery-layout-strip.js",
+          "//assets.squarespace.com/universal/scripts-compressed/visitor-site-error-reporter-976d22448e700b77-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/embed-video-player.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/gallery-layout-autocolumns.js",
+          "//assets.squarespace.com/@sqs/polyfiller/1.6/legacy.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.video/df4e2f60-e0da-46f6-85d5-170a8cdab242_578/website.components.video.visitor.js",
+          "//assets.squarespace.com/universal/scripts-compressed/cldr-resource-pack-22bdf933fb74be0d-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/gallery-layout-stacked.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/gallery-layout-carousel.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/gallery-layout-grid.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.code/96ee2daf-dfe7-4ad1-8082-29be26314ad0_878/website.components.code.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.spacer/035a76fb-6d18-44eb-b588-c9985345d5bf_1156/website.components.spacer.visitor.js",
+          "//assets.squarespace.com/universal/scripts-compressed/performance-3a9f251dd03cffbf-min.en-US.js",
+          "https://static1.squarespace.com/static/ta/55f0a9b0e4b0f3eb70352f6d/359/scripts/site-bundle.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/8018.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/gallery-layout-autogrid.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.video/df4e2f60-e0da-46f6-85d5-170a8cdab242_578/4032.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-d121d5c2e821db1f-min.en-US.js",
+          "//assets.squarespace.com/universal/scripts-compressed/common-vendors-stable-784b947826b4c445-min.en-US.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/gallery-layout-slideshow.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/gallery-manager.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/448100ec-c31e-4478-9192-1585b2070971_1003/website.components.button.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.summary/b755ff32-b89e-4d86-aa11-35fa6f30386b_551/website.components.summary.visitor.js",
+          "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/a7ae81a3-9f65-4453-bbfb-5cef4944f617_611/website.components.socialLinks.visitor.js"
+        ],
+        "libraries": {
+          "jquery": null,
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": "detected"
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--summary-list-image-float: left",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--mask ",
+        "--summary-list-thumbnail-padding-left: 0",
+        "--summary-show-title: none",
+        "--summary-meta-below-content-display: block",
+        "--tweak-summary-block-padding: 6% 6% 6% 6%",
+        "--summary-show-thumbnail: block",
+        "--summary-show-excerpt-clamped: -webkit-box",
+        "--summary-meta-above-display: none",
+        "--si-scale: 2",
+        "--si-fill-mask: transparent",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--icon ",
+        "--summary-meta-below-title-display: none",
+        "--summary-list-thumbnail-padding-right: 20px",
+        "--summary-show-price: block",
+        "--si-bg-fade: transparent",
+        "--si-bg-hover: transparent",
+        "--summary-excerpt-font-size: 14px",
+        "--list:hover .sqs-svg-icon--wrapper .sqs-use--mask ",
+        "--si-fill-icon-hover: var(--si-primary)",
+        "--social-icons-justify-content: center",
+        "--summary-list-qv-padding-right: 20px",
+        "--si-fill-icon: var(--si-primary)",
+        "--list:hover .sqs-svg-icon--wrapper:hover ",
+        "--summary-content-spacing: 10px",
+        "--social-icons-dimension: 20px",
+        "--si-box-shadow: none",
+        "--list:hover .sqs-svg-icon--wrapper ",
+        "--sqs-block-content-flex: 0",
+        "--summary-text-align: left"
+      ],
+      "meta": {
+        "viewport": "initial-scale=1",
+        "description": "Cut and Taste provides high-end catering Las Vegas events are known for, perfect for any occasion - large or small. From corporate catering to small party catering services, our team can create the most unique and memorable event at the venue of your choice.",
+        "generator": null
+      },
+      "platform": {
+        "cms": "Squarespace"
+      },
+      "html_size_bytes": 445905
+    },
+    "elegantaffairscaterers.com": {
+      "css_files": [
+        "https://elegantaffairscaterers.com/wp-content/cache/background-css/elegantaffairscaterers.com/wp-content/themes/elegant-affairs/css/owl.carousel.min.css?ver=6.1.1&wpr_t=1787034783",
+        "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/css/widget-spacer.min.css?ver=4.2.0",
+        "https://elegantaffairscaterers.com/wp-content/plugins/youtube-embed-plus/styles/ytprefs.min.css?ver=14.2.6",
+        "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/plugins/elementor/assets/lib/font-awesome/css/fontawesome.css?ver=1786562871",
+        "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/css/widget-image-carousel.min.css?ver=4.2.0",
+        "//elegantaffairscaterers.com/wp-content/plugins/ultimate-elementor/assets/min-css/uael-frontend.min.css?ver=1.36.13",
+        "https://elegantaffairscaterers.com/wp-content/plugins/gravityforms/legacy/css/browsers.min.css?ver=2.6.8",
+        "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/uploads/elementor/google-fonts/css/roboto.css?ver=1786562872",
+        "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=1786563059",
+        "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/uploads/elementor/google-fonts/css/domine.css?ver=1786562872",
+        "https://elegantaffairscaterers.com/wp-content/uploads/elementor/css/post-207.css?ver=1786562871",
+        "https://elegantaffairscaterers.com/wp-content/cache/background-css/elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/themes/elegant-affairs/style.css?ver=1786562871&wpr_t=1787034783",
+        "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/css/widget-social-icons.min.css?ver=4.2.0",
+        "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/plugins/elementor/assets/lib/font-awesome/css/solid.css?ver=1786562871",
+        "https://elegantaffairscaterers.com/wp-content/themes/astra/assets/css/minified/compatibility/gravity-forms.min.css?ver=3.9.2",
+        "//elegantaffairscaterers.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.9.2",
+        "//elegantaffairscaterers.com/wp-content/uploads/elementor/css/post-207.css?ver=1666849256",
+        "https://elegantaffairscaterers.com/wp-content/cache/background-css/elegantaffairscaterers.com/wp-content/plugins/gravityforms/legacy/css/formsmain.min.css?ver=2.6.8&wpr_t=1787034783",
+        "//elegantaffairscaterers.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/fontawesome.min.css?ver=5.15.3",
+        "//elegantaffairscaterers.com/wp-content/uploads/elementor/css/global.css?ver=1666849256",
+        "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/css/conditionals/apple-webkit.min.css?ver=4.2.0",
+        "//elegantaffairscaterers.com/wp-content/themes/elegant-affairs/css/owl.theme.default.min.css?ver=6.1.1",
+        "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=4.2.0",
+        "//elegantaffairscaterers.com/wp-content/themes/astra/assets/css/minified/frontend.min.css?ver=3.9.2",
+        "https://elegantaffairscaterers.com/wp-content/cache/background-css/elegantaffairscaterers.com/wp-content/plugins/instagram-feed/css/sbi-styles.min.css?ver=6.11.4&wpr_t=1787034783"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": "font-awesome/css/brands.css?ver=1786562871",
+        "animate_css": null,
+        "carousel_css": "slick detected"
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "-apple-system",
+          "inherit",
+          "Astra"
+        ],
+        "@font_face": [
+          "@font-face {font-family: \"Astra\";src: url(https://elegantaffairscaterers.com/wp-content/themes/astra/assets/fonts/astra.woff) format(\"woff\"),url(https://elegantaffairscaterers.com/wp-content/themes/astra/assets/fonts/astra.ttf) format(\"truetype\"),url(https://elegantaffairscaterers.com/wp-content/themes/astra/assets/fonts/astra.svg#astra) format(\"svg\");font-weight: normal;font-style: normal;font-display: swap;}"
+        ]
+      },
+      "favicon": {
+        "url": "https://elegantaffairscaterers.com/wp-content/uploads/2021/04/favicon.png",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [
+        "https://elegantaffairscaterers.com/wp-content/uploads/2021/04/favicon.png"
+      ],
+      "javascript": {
+        "external_scripts": [
+          "https://elegantaffairscaterers.com/wp-content/plugins/astra-addon/assets/js/minified/purify.min.js?ver=4.13.7",
+          "https://elegantaffairscaterers.com/wp-content/plugins/instagram-feed/js/sbi-scripts.min.js?ver=6.11.4",
+          "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/plugins/wonderplugin-slider-lite/engine/wonderpluginsliderskins.js?ver=1784839180",
+          "https://elegantaffairscaterers.com/wp-content/plugins/youtube-embed-plus/scripts/fitvids.min.js?ver=14.2.6",
+          "https://elegantaffairscaterers.com/wp-content/themes/elegant-affairs/js/masonry.pkgd.min.js?ver=7.0.4",
+          "https://elegantaffairscaterers.com/wp-includes/js/dist/hooks.min.js?ver=7496969728ca0f95732d",
+          "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/uploads/astra-addon/astra-addon-6a7ad0c362e035-41632776.js?ver=1786433732",
+          "https://elegantaffairscaterers.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+          "https://elegantaffairscaterers.com/wp-content/themes/elegant-affairs/js/owl.carousel.min.js?ver=7.0.4",
+          "https://elegantaffairscaterers.com/wp-content/plugins/elementor-pro/assets/js/elements-handlers.min.js?ver=4.2.0",
+          "https://elegantaffairscaterers.com/wp-content/themes/elegant-affairs/js/imagesloaded.pkgd.min.js?ver=7.0.4",
+          "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=4.2.0",
+          "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=4.2.0",
+          "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=4.2.0",
+          "https://elegantaffairscaterers.com/wp-content/plugins/youtube-embed-plus/scripts/ytprefs.min.js?ver=14.2.6",
+          "https://elegantaffairscaterers.com/wp-includes/js/dist/a11y.min.js?ver=af934e5259bc51b8718e",
+          "https://elegantaffairscaterers.com/wp-includes/js/dist/i18n.min.js?ver=781d11515ad3d91786ec",
+          "https://elegantaffairscaterers.com/wp-content/plugins/elementor-pro/assets/js/webpack-pro.runtime.min.js?ver=4.2.0",
+          "https://elegantaffairscaterers.com/wp-content/plugins/elementor-pro/assets/lib/smartmenus/jquery.smartmenus.min.js?ver=1.2.1",
+          "https://elegantaffairscaterers.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.3",
+          "https://elegantaffairscaterers.com/wp-content/plugins/gravityforms/assets/js/dist/scripts-theme.min.js?ver=301fdc9aa6144168f3b854c4c2c8f6d3",
+          "https://elegantaffairscaterers.com/wp-includes/js/dist/dom-ready.min.js?ver=a06281ae5cf5500e9317",
+          "https://elegantaffairscaterers.com/wp-content/plugins/ultimate-elementor/assets/min-js/uael-frontend.min.js?ver=1.45.3",
+          "//cdn.callrail.com/companies/682571599/wp-0-5-3/swap.js?ver=7.0.4",
+          "//cdn.calltrk.com/companies/682571599/704370a2c06fe41c0d5f/12/swap.js",
+          "https://elegantaffairscaterers.com/wp-content/themes/astra/assets/js/minified/frontend.min.js?ver=4.13.6",
+          "https://elegantaffairscaterers.com/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5",
+          "https://elegantaffairscaterers.com/wp-content/cache/min/1/wp-content/plugins/wonderplugin-slider-lite/engine/wonderpluginslider.js?ver=1784839180",
+          "https://elegantaffairscaterers.com/wp-content/plugins/gravityforms/assets/js/dist/utils.min.js?ver=3f278756f0a3032bed328ff6a9f6c01d",
+          "https://elegantaffairscaterers.com/wp-content/plugins/gravityforms/js/jquery.json.min.js?ver=2.10.5"
+        ],
+        "libraries": {
+          "jquery": "jquery-",
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": "owl.carousel.min.js",
+          "lightbox": null,
+          "lazy_load": "lazyload-css.min.js"
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": "detected"
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--color--ast-global-color-5: var(--ast-global-color-5)",
+        "--ast-normal-container-width:1200px",
+        "--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)",
+        "--wp--preset--color--ast-global-color-0: var(--ast-global-color-0)",
+        "--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)",
+        "--e-global-color-astglobalcolor5:#FFFFFF",
+        "--wp--preset--aspect-ratio--square: 1",
+        "--wpr-bg-35423147-9183-4ca6-b0f0-0e3672b05648: url('https:\\/\\/elegantaffairscaterers.com\\/wp-content\\/plugins\\/gravityforms\\/images\\/gf-creditcards.svg')",
+        "--wp--preset--color--ast-global-color-4: var(--ast-global-color-4)",
+        "--ast-post-nav-space:0",
+        "--wpr-bg-57964ef5-a329-43b5-b474-c503b6874aea: url('https://elegantaffairscaterers.com/wp-content/plugins/instagram-feed/img/sbi-sprite.png')",
+        "--wp--preset--aspect-ratio--4-3: 4/3",
+        "--wpr-bg-cfdcdf31-3a0f-487f-82c2-3ba46a3dc3cf: url('https:\\/\\/elegantaffairscaterers.com\\/wp-content\\/themes\\/elegant-affairs\\/css\\/owl.video.play.png')",
+        "--ast-container-default-sm-padding:6.67em",
+        "--wp--preset--spacing--80: 5.06rem",
+        "--wpr-bg-5e589397-f5ef-4ee3-885e-d417093ae35f: url('https://elegantaffairscaterers.com/wp-content/plugins/gravityforms/legacy/css/chosen-sprite@2x.png')",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--ast-widget-bg-color:#fafafa",
+        "--wp--preset--color--ast-global-color-8: var(--ast-global-color-8)",
+        "--ast-title-layout-bg:#eeeeee",
+        "--ast-global-color-7:#424242",
+        "--srfm-color-input-label:var(--ast-global-color-2)",
+        "--wpr-bg-57964ef5-a329-43b5-b474-c503b6874aea: url('https:\\/\\/elegantaffairscaterers.com\\/wp-content\\/plugins\\/instagram-feed\\/img\\/sbi-sprite.png')",
+        "--wp--preset--spacing--70: 3.38rem",
+        "--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0)",
+        "--wpr-bg-e1bdbfac-dfad-4037-a081-374fc8200046: url('https://elegantaffairscaterers.com/wp-content/plugins/gravityforms/legacy/css/chosen-sprite.png')",
+        "--wpr-bg-f17e2524-6b59-4d72-98c4-14c7f72f221b: url('https:\\/\\/elegantaffairscaterers.com\\/wp-content\\/uploads\\/2021\\/07\\/right-min.jpeg')",
+        "--wpr-bg-ee1828eb-55e8-4e51-b197-ff8ddfb52d8b: url('https://elegantaffairscaterers.com/wp-content/plugins/gravityforms/legacy/css/chosen-sprite.png')",
+        "--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%)"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "Top Quality Full Service Off-Premise Catering With Elegant Affairs. We Cater Weddings, Corporate Events, and Private Parties in NYC, and Hamptons.",
+        "generator": "WordPress 7.0.4"
+      },
+      "platform": {
+        "cms": "WordPress"
+      },
+      "html_size_bytes": 314233
+    },
+    "gammacatering.com/en/": {
+      "css_files": [
+        "https://www.gammacatering.com/v4/wp-content/mu-plugins/gamma-cpt-styles.css?ver=1784822337",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/g5njvc7w/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/esclp6ls/aadsc.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/76qh53iu/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/f4ory5rq/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/g0hybt85/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/surervy/a8cbw.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/6yolzzyl/a8cbw.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/dfi7qxux/a8cbw.css",
+        "https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/f5ygholv/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/jn1ierhg/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/e1v098wl/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/mk2ihlur/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/78mj55me/a8cbt.css",
+        "//www.gammacatering.com/v4/wp-content/cache/wpfc-minified/23v0osgo/a8cbt.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [
+          "PP Neue Montreal",
+          "var(--font-handwritten",
+          "inherit"
+        ],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/cropped-favicon-32x32.webp",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [
+        "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/cropped-favicon-180x180.webp"
+      ],
+      "javascript": {
+        "external_scripts": [
+          "https://www.gammacatering.com/v4/wp-content/plugins/oxygen/plugin/animations/entrance/js/entrance.js?bd_ver=6.0.0-rc.1",
+          "https://www.gammacatering.com/v4/wp-content/plugins/borlabs-cookie/assets/javascript/borlabs-cookie.min.js?ver=3.4.2.2",
+          "https://unpkg.com/gsap@3.12.2/dist/gsap.min.js",
+          "https://www.gammacatering.com/v4/wp-content/plugins/borlabs-cookie/assets/javascript/borlabs-cookie-prioritize.min.js",
+          "https://www.gammacatering.com/v4/wp-content/plugins/oxygen/subplugins/breakdance-elements/dependencies-files/imagesloaded@4/imagesloaded.pkgd.min.js?bd_ver=6.0.0-rc.1",
+          "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js",
+          "https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js",
+          "https://www.gammacatering.com/v4/wp-content/plugins/oxygen/plugin/global-scripts/oxygen-utils.js?bd_ver=6.0.0-rc.1",
+          "https://www.gammacatering.com/v4/wp-content/plugins/translatepress-multilingual/assets/js/trp-frontend-language-switcher.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js",
+          "https://www.gammacatering.com/v4/wp-content/plugins/translatepress-multilingual/assets/js/trp-translate-dom-changes.js",
+          "https://www.gammacatering.com/v4/wp-content/mu-plugins/gamma-nav.js",
+          "https://www.gammacatering.com/v4/wp-content/cache/borlabs-cookie/1/borlabs-cookie-config-en.json.js",
+          "https://unpkg.com/gsap@3.12.2/dist/ScrollTrigger.min.js",
+          "https://www.gammacatering.com/v4/wp-includes/js/jquery/jquery.min.js",
+          "https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js",
+          "https://www.gammacatering.com/v4/wp-content/mu-plugins/gamma-accordion.js",
+          "https://www.gammacatering.com/v4/wp-includes/js/jquery/jquery-migrate.min.js",
+          "https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js"
+        ],
+        "libraries": {
+          "jquery": "jquery-",
+          "gsap": "gsap",
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": null
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": true,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [
+        "--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%)",
+        "--wp--preset--aspect-ratio--2-3: 2/3",
+        "--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)",
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4)",
+        "--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)",
+        "--wp--preset--spacing--30: 0.67rem",
+        "--gh-red:#4C0C14",
+        "--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)",
+        "--wp--preset--aspect-ratio--square: 1",
+        "--wp-internal-comment: \"Placeholder for wp_hoist_late_printed_styles() to replace with the global-styles printed at wp_footer.\" ",
+        "--secondary:hover",
+        "--wp--preset--color--light-green-cyan: #7bdcb5",
+        "--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0)",
+        "--wp--preset--color--vivid-purple: #9b51e0",
+        "--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%)",
+        "--wp--preset--aspect-ratio--4-3: 4/3",
+        "--wp--preset--color--vivid-red: #cf2e2e",
+        "--wp--preset--color--luminous-vivid-amber: #fcb900",
+        "--outline:hover",
+        "--wp--preset--spacing--40: 1rem",
+        "--wp--preset--spacing--80: 5.06rem",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2)",
+        "--wp--preset--aspect-ratio--3-4: 3/4",
+        "--wp--preset--spacing--70: 3.38rem",
+        "--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0)",
+        "--wp--preset--color--black: #000000",
+        "--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)",
+        "--wp--preset--font-size--large: 36px"
+      ],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "Premium Catering Switzerland &amp; Event Design since 1986. Personally accompanied, holistically conceived, uncompromising in quality.",
+        "generator": null
+      },
+      "platform": {
+        "cms": "WordPress"
+      },
+      "html_size_bytes": 423866
+    },
+    "wolfgangpuckcatering.com": {
+      "css_files": [
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867470/1775745261614/module_menu.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867458/1786080348123/module_header_btn_groups.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867464/1777260949950/module_hospitality_services.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867474/1777261379671/module_seasonal_inspiration.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/template_assets/1/192106867345/1778851141334/template_theme-overrides.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867478/1751507689968/module_social_follow.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/template_assets/1/192105070138/1787045014762/template_main.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192105070206/1776910547509/module_hero_banner.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867384/1751507684350/module_button_group.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/template_assets/1/192106867339/1778851143076/template_home.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867374/1773713470837/module_alternating_cta.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192105070219/1777014884944/module_testimonials_slider.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867456/1752634599599/module_custom_logo.min.css",
+        "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/204731134124/1785830100316/module_right_side_icons.min.css"
+      ],
+      "css_frameworks": {
+        "bootstrap": null,
+        "tailwind": null,
+        "font_awesome": null,
+        "animate_css": null,
+        "carousel_css": null
+      },
+      "fonts": {
+        "google_fonts": [],
+        "font_family_declarations": [],
+        "@font_face": []
+      },
+      "favicon": {
+        "url": "https://wolfgangpuckcatering.com/hubfs/website/favicon%2048x48.png",
+        "type": "image/x-icon"
+      },
+      "touch_icons": [],
+      "javascript": {
+        "external_scripts": [
+          "/hs/hsstatic/content-cwv-embed/static-1.1293/embed.js",
+          "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867470/1775745261614/module_menu.min.js",
+          "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867474/1777261379671/module_seasonal_inspiration.min.js",
+          "/hs/hsstatic/HubspotToolsMenu/static-1.640/js/index.js",
+          "https://cdn.userway.org/widget.js",
+          "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192106867464/1777260949950/module_hospitality_services.min.js",
+          "/hs/scriptloader/42502924.js",
+          "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192105070206/1776910547509/module_hero_banner.min.js",
+          "https://js.hsforms.net/forms/v2-legacy.js",
+          "https://wolfgangpuckcatering.com/hubfs/hub_generated/template_assets/1/192106867372/1778851140290/template_main.min.js",
+          "/_hcms/forms/v2.js",
+          "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/204731134124/1785830100316/module_right_side_icons.min.js",
+          "https://wolfgangpuckcatering.com/hubfs/js/van11y-accessible-tab-panel-aria.min.js",
+          "/hs/hsstatic/cos-i18n/static-1.53/bundles/project.js",
+          "https://wolfgangpuckcatering.com/hubfs/hub_generated/module_assets/1/192105070219/1777014884944/module_testimonials_slider.min.js"
+        ],
+        "libraries": {
+          "jquery": null,
+          "gsap": null,
+          "wow_js": null,
+          "aos": null,
+          "carousel": null,
+          "lightbox": null,
+          "lazy_load": null
+        },
+        "analytics": {
+          "google_analytics": "detected",
+          "facebook_pixel": null,
+          "hotjar": null,
+          "google_tag_manager": "detected"
+        },
+        "chat_widgets": {
+          "tidio": false,
+          "intercom": false,
+          "crisp": false,
+          "zendesk": false,
+          "tawkto": false,
+          "drift": false
+        }
+      },
+      "css_variables_sample": [],
+      "meta": {
+        "viewport": "width=device-width, initial-scale=1",
+        "description": "Wolfgang Puck Catering offers nationwide event catering services. Our offerings range from social and corporate events to workplace food services.",
+        "generator": "HubSpot"
+      },
+      "platform": {
+        "cms": "CraftCMS"
+      },
+      "html_size_bytes": 97572
+    }
+  }
+}

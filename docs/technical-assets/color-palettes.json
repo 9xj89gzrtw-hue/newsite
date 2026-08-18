@@ -1,0 +1,265 @@
+{
+  "analysis_date": "2026-08-18T22:59:40.710192",
+  "summary": {
+    "total_sites": 21,
+    "sites_with_css_variables": 8,
+    "common_color_names": [
+      [
+        "color",
+        37
+      ],
+      [
+        "background",
+        2
+      ],
+      [
+        "accent",
+        1
+      ],
+      [
+        "secondary",
+        1
+      ]
+    ]
+  },
+  "palettes_by_site": {
+    "concordecatering.ca": {
+      "total_variables": 30,
+      "color_related_variables": [],
+      "all_variables_sample": [
+        "--image-component-native-aspect-ratio: 800/450",
+        "--gradientHeaderNavigationColor: hsla(var(--black-hsl), 1)",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--mask ",
+        "--list:hover .sqs-svg-icon--wrapper:hover ",
+        "--stroke-style: none"
+      ]
+    },
+    "myradish.com": {
+      "total_variables": 30,
+      "color_related_variables": [],
+      "all_variables_sample": [
+        "--tweak-marquee-block-padding: 3% 0% 3% 0%",
+        "--image-component-focal-point: 50% 50%",
+        "--tweak-marquee-block-padding: initial",
+        "--si-fill-icon: var(--si-contrast)",
+        "--stroke-linecap: square"
+      ]
+    },
+    "ridgewells.com": {
+      "total_variables": 30,
+      "color_related_variables": [],
+      "all_variables_sample": [
+        "--rd:0px",
+        "--m_itemOpacity-rgb: 79,79,79",
+        "--post-pg-text-on-image-large-post-list-titleFont: normal normal normal 28px/35px wfont_b616b1_d700d85c41a34849aabbb321cda873a6,wf_d700d85c41a34849aabbb321c,orig_scotch_display_semibold",
+        "--stroke-width:0",
+        "--wix-font-STRONG-style: normal"
+      ]
+    },
+    "sopranoscatering.com": {
+      "total_variables": 0,
+      "color_related_variables": [],
+      "all_variables_sample": []
+    },
+    "concept-catering.de": {
+      "total_variables": 0,
+      "color_related_variables": [],
+      "all_variables_sample": []
+    },
+    "talkofthetownatlanta.com": {
+      "total_variables": 30,
+      "color_related_variables": [
+        "--wp--preset--color--awb-color-4: rgba(160,206,78,1)",
+        "--wp--preset--color--awb-color-5: rgba(116,116,116,1)",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp--preset--color--awb-color-3: rgba(224,222,222,1)"
+      ],
+      "all_variables_sample": [
+        "--button_gradient_top_color:#8b0b04",
+        "--awb-width-large:50%",
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)",
+        "--wp--preset--color--awb-color-4: rgba(160,206,78,1)"
+      ]
+    },
+    "queenofheartscatering.com": {
+      "total_variables": 30,
+      "color_related_variables": [
+        "--wp--preset--color--light-green-cyan: #7bdcb5",
+        "--wp--preset--color--vivid-purple: #9b51e0",
+        "--wp--preset--color--vivid-red: #cf2e2e",
+        "--wp--preset--color--luminous-vivid-amber: #fcb900",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp--preset--color--black: #000000"
+      ],
+      "all_variables_sample": [
+        "--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%)",
+        "--wp--preset--aspect-ratio--2-3: 2/3",
+        "--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)",
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4)"
+      ]
+    },
+    "chicchefcatering.com": {
+      "total_variables": 0,
+      "color_related_variables": [],
+      "all_variables_sample": []
+    },
+    "relishcaterers.com": {
+      "total_variables": 30,
+      "color_related_variables": [
+        "--wp--preset--color--cyan-bluish-gray:#abb8c3",
+        "--wp--preset--color--pale-cyan-blue:#8ed1fc",
+        "--wp--preset--color--black:#000000",
+        "--wp--preset--color--light-green-cyan:#7bdcb5"
+      ],
+      "all_variables_sample": [
+        "--wp--preset--spacing--50:1.5rem",
+        "--wp--preset--color--cyan-bluish-gray:#abb8c3",
+        "--wp--preset--spacing--40:1rem",
+        "--wp--preset--font-size--x-large:42px",
+        "--wp--preset--gradient--luminous-vivid-orange-to-vivid-red:linear-gradient(135deg,rgb(255, 105, 0) 0%,rgb(207, 46, 46) 100%)"
+      ]
+    },
+    "sterlingcateringmn.com": {
+      "total_variables": 0,
+      "color_related_variables": [],
+      "all_variables_sample": []
+    },
+    "tallguyandagrill.com": {
+      "total_variables": 28,
+      "color_related_variables": [
+        "--tweak-text-block-background-color: hsla(var(--accent-hsl), 1)\n"
+      ],
+      "all_variables_sample": [
+        "--image-component-native-aspect-ratio: 1301/201",
+        "--gradientHeaderNavigationColor: hsla(var(--black-hsl), 1)",
+        "--stroke-style: none",
+        "--image-component-object-fit: cover",
+        "--image-component-focal-point: 50% 50%"
+      ]
+    },
+    "ggcatering.com": {
+      "total_variables": 0,
+      "color_related_variables": [],
+      "all_variables_sample": []
+    },
+    "mculinary.com": {
+      "total_variables": 0,
+      "color_related_variables": [],
+      "all_variables_sample": []
+    },
+    "saltblockhospitality.com": {
+      "total_variables": 30,
+      "color_related_variables": [],
+      "all_variables_sample": [
+        "--opacity: 100%",
+        "--gradientHeaderNavigationColor: hsla(var(--black-hsl), 1)",
+        "--origin-y: 50%",
+        "--tweak-marquee-block-padding: 3% 0% 3% 0%",
+        "--marquee-fade-mask: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)"
+      ]
+    },
+    "thejdkgroup.com": {
+      "total_variables": 30,
+      "color_related_variables": [
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp--preset--color--luminous-vivid-orange: #ff6900",
+        "--wp--preset--color--cyan-bluish-gray: #abb8c3",
+        "--wp--preset--color--light-green-cyan: #7bdcb5",
+        "--wp--preset--color--vivid-purple: #9b51e0",
+        "--dsgo-text-color:var(--wp--preset--color--contrast-3)"
+      ],
+      "all_variables_sample": [
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)",
+        "--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)",
+        "--wpconsent-cancel-color: #000000",
+        "--wp--preset--aspect-ratio--square: 1"
+      ]
+    },
+    "bywordofmouth.co.uk": {
+      "total_variables": 30,
+      "color_related_variables": [
+        "--wp-gdpr--button--color: #ffffff",
+        "--wp--preset--color--light-green-cyan: #7bdcb5",
+        "--wp--preset--color--vivid-purple: #9b51e0",
+        "--wp--preset--color--vivid-red: #cf2e2e",
+        "--wp--preset--color--luminous-vivid-amber: #fcb900",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp-gdpr--bar--background-color: #000000",
+        "--wp-gdpr--button--background-color: #000000"
+      ],
+      "all_variables_sample": [
+        "--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%)",
+        "--wp--preset--aspect-ratio--2-3: 2/3",
+        "--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)",
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4)"
+      ]
+    },
+    "creativeedgeparties.com": {
+      "total_variables": 30,
+      "color_related_variables": [],
+      "all_variables_sample": [
+        "--tweak-marquee-block-padding: 3% 0% 3% 0%",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--mask ",
+        "--marquee-fade-mask: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)",
+        "--social-icons-gap: 14px",
+        "--stroke-style: none"
+      ]
+    },
+    "cutandtastelv.com": {
+      "total_variables": 30,
+      "color_related_variables": [],
+      "all_variables_sample": [
+        "--summary-list-image-float: left",
+        "--list:hover .sqs-svg-icon--wrapper:hover .sqs-use--mask ",
+        "--summary-list-thumbnail-padding-left: 0",
+        "--summary-show-title: none",
+        "--summary-meta-below-content-display: block"
+      ]
+    },
+    "elegantaffairscaterers.com": {
+      "total_variables": 30,
+      "color_related_variables": [
+        "--wp--preset--color--ast-global-color-5: var(--ast-global-color-5)",
+        "--wp--preset--color--ast-global-color-0: var(--ast-global-color-0)",
+        "--wp--preset--color--ast-global-color-4: var(--ast-global-color-4)",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp--preset--color--ast-global-color-8: var(--ast-global-color-8)"
+      ],
+      "all_variables_sample": [
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--color--ast-global-color-5: var(--ast-global-color-5)",
+        "--ast-normal-container-width:1200px",
+        "--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)",
+        "--wp--preset--color--ast-global-color-0: var(--ast-global-color-0)"
+      ]
+    },
+    "gammacatering.com/en/": {
+      "total_variables": 30,
+      "color_related_variables": [
+        "--secondary:hover",
+        "--wp--preset--color--light-green-cyan: #7bdcb5",
+        "--wp--preset--color--vivid-purple: #9b51e0",
+        "--wp--preset--color--vivid-red: #cf2e2e",
+        "--wp--preset--color--luminous-vivid-amber: #fcb900",
+        "--wp--preset--color--vivid-green-cyan: #00d084",
+        "--wp--preset--color--black: #000000"
+      ],
+      "all_variables_sample": [
+        "--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%)",
+        "--wp--preset--aspect-ratio--2-3: 2/3",
+        "--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)",
+        "--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)",
+        "--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4)"
+      ]
+    },
+    "wolfgangpuckcatering.com": {
+      "total_variables": 0,
+      "color_related_variables": [],
+      "all_variables_sample": []
+    }
+  }
+}
