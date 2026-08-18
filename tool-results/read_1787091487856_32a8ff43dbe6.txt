@@ -1,0 +1,2002 @@
+     1→[
+     2→  {
+     3→    "site_name": "concept-catering",
+     4→    "url": null,
+     5→    "metadata": {
+     6→      "title": "Concept Catering Crew",
+     7→      "meta_description": "ÜBERTRIEBEN&nbsp;GUTES&nbsp;CATERING. Film, Crew, Event, und Delivery Catering.",
+     8→      "meta_keywords": null,
+     9→      "canonical_url": null,
+    10→      "hreflang": null,
+    11→      "og_tags": {
+    12→        "og:type": "website"
+    13→      },
+    14→      "twitter_tags": {}
+    15→    },
+    16→    "headings": {
+    17→      "h1": [],
+    18→      "h2": [
+    19→        "Event Catering",
+    20→        "Film Catering",
+    21→        "Delivery Catering",
+    22→        "Rauschende Feste",
+    23→        "Übertrieben gut",
+    24→        "Friends &amp; Family",
+    25→        "Film Catering",
+    26→        "&nbsp;Event Catering",
+    27→        "Crew Catering",
+    28→        "Film Catering",
+    29→        "Delivery Catering",
+    30→        "Friends &amp; Family",
+    31→        "Rauschende Feste",
+    32→        "Everyday Cheatday",
+    33→        "Übertrieben gutes Catering",
+    34→        "Unser Angebot",
+    35→        "Film &amp; Crew Catering",
+    36→        "Film &amp; Crew Catering",
+    37→        "Film &amp; Crew Catering",
+    38→        "Film &amp; Crew Catering",
+    39→        "Film &amp; Crew Catering",
+    40→        "Film &amp; Crew Catering",
+    41→        "Film &amp; Crew Catering",
+    42→        "Film &amp; Crew Catering",
+    43→        "Event &amp; Experience Catering",
+    44→        "Event &amp; Experience Catering",
+    45→        "Event &amp; Experience Catering",
+    46→        "Event &amp; Experience Catering",
+    47→        "Event &amp; Experience Catering",
+    48→        "Event &amp; Experience Catering",
+    49→        "Event &amp; Experience Catering",
+    50→        "Event &amp; Experience Catering",
+    51→        "Delivery Catering",
+    52→        "Delivery Catering",
+    53→        "Delivery Catering",
+    54→        "Delivery Catering",
+    55→        "Delivery Catering",
+    56→        "Delivery Catering",
+    57→        "Delivery Catering",
+    58→        "Delivery Catering",
+    59→        "GET IN TOUCH",
+    60→        "GET IN TOUCH",
+    61→        "GET IN TOUCH",
+    62→        "GET IN TOUCH",
+    63→        "GET IN TOUCH",
+    64→        "GET IN TOUCH",
+    65→        "GET IN TOUCH",
+    66→        "GET IN TOUCH",
+    67→        "GET IN TOUCH",
+    68→        "GET IN TOUCH",
+    69→        "GET IN TOUCH",
+    70→        "GET IN TOUCH",
+    71→        "GET IN TOUCH",
+    72→        "GET IN TOUCH",
+    73→        "GET IN TOUCH",
+    74→        "GET IN TOUCH",
+    75→        "GET IN TOUCH",
+    76→        "GET IN TOUCH",
+    77→        "GET IN TOUCH",
+    78→        "GET IN TOUCH",
+    79→        "GET IN TOUCH",
+    80→        "GET IN TOUCH",
+    81→        "GET IN TOUCH",
+    82→        "GET IN TOUCH",
+    83→        "GET IN TOUCH",
+    84→        "GET IN TOUCH",
+    85→        "GET IN TOUCH",
+    86→        "GET IN TOUCH"
+    87→      ],
+    88→      "h3": [],
+    89→      "h4": [],
+    90→      "h5": [],
+    91→      "h6": []
+    92→    },
+    93→    "structured_data": [],
+    94→    "images": {
+    95→      "alt_texts": [
+    96→        "event catering",
+    97→        "crew catering",
+    98→        "event catering eine lange tafel mit leckerem essen vollen tellern und gläsern und glücklichen gesichtern",
+    99→        "film und crew catering",
+   100→        "event und experience catering",
+   101→        "delivery catering"
+   102→      ],
+   103→      "sample_images": [
+   104→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66ceeb4fe5aab3b0fc000df2_CCC_Logo_weiss.png",
+   105→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66cf04b45da08341ed453e61_12%20-%20Lolas%20documentaries%20of%20life-Catering-25.jpg",
+   106→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66cf097c35787716010bb9e2_Gef%EF%BF%BDhlsrausch_022.jpg",
+   107→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/670d43b2a0c284b54a623f39_image001.jpg",
+   108→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/670d47656d8546cc50e47e58_CCC-43.JPG",
+   109→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/67bf39e36b05330958d574c8_IMG_1884_HEIC%203.JPG",
+   110→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/670d430502bc62ddc06352a0_Gef%EF%BF%BDhlsrausch_206.jpg",
+   111→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66ceeb4fe5aab3b0fc000df2_CCC_Logo_weiss.png",
+   112→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66cf04b45da08341ed453e61_12%20-%20Lolas%20documentaries%20of%20life-Catering-25.jpg",
+   113→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66fa665fc4f726ec193dc568_ccc-Champagin-Guy-mit-Kontur-web.png",
+   114→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66ceda23e5aab3b0fcef60e6_CCC-66.JPG",
+   115→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66cf0904205bfe1b74e3f9e2_Gef%EF%BF%BDhlsrausch_050.jpg",
+   116→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66f14534bec8873b75273e86_3%20-%20Lolas%20documentaries%20of%20life-Catering-6.jpg",
+   117→        "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/67ced8c826b2d2e1a8bde6ab_IMG_1664_HEIC%205.JPG"
+   118→      ]
+   119→    },
+   120→    "technical": {
+   121→      "has_canonical": false,
+   122→      "has_hreflang": false,
+   123→      "has_og_tags": true,
+   124→      "has_twitter_tags": false,
+   125→      "has_json_ld": false,
+   126→      "heading_count": {
+   127→        "h1": 0,
+   128→        "h2": 68,
+   129→        "h3": 0
+   130→      }
+   131→    }
+   132→  },
+   133→  {
+   134→    "site_name": "concordecatering",
+   135→    "url": "https://concordecatering.ca/",
+   136→    "metadata": {
+   137→      "title": "Concorde Catering",
+   138→      "meta_description": "Concorde Catering is brought to you by the culinary team behind your favourite Calgary restaurants. From holiday parties and weddings to special events and corporate gatherings, we work with budgets big and small to bring any event to life.",
+   139→      "meta_keywords": null,
+   140→      "canonical_url": "https://concordecatering.ca/",
+   141→      "hreflang": null,
+   142→      "og_tags": {
+   143→        "og:title": "Concorde Catering",
+   144→        "og:description": "Concorde Catering is brought to you by the culinary team behind your favourite Calgary restaurants. From holiday parties and weddings to special events and corporate gatherings, we work with budgets big and small to bring any event to life.",
+   145→        "og:image": "http://static1.squarespace.com/static/5fc91625d98c1a7115f1f7ed/t/61b1495bcd313b11bbac01fb/1639008603700/SocialSharing.png?format=1500w",
+   146→        "og:type": "website",
+   147→        "og:url": "https://concordecatering.ca",
+   148→        "og:site_name": "Concorde Catering"
+   149→      },
+   150→      "twitter_tags": {
+   151→        "twitter:card": "summary",
+   152→        "twitter:title": "Concorde Catering",
+   153→        "twitter:description": "Concorde Catering is brought to you by the culinary team behind your favourite Calgary restaurants. From holiday parties and weddings to special events and corporate gatherings, we work with budgets big and small to bring any event to life.",
+   154→        "twitter:image": "http://static1.squarespace.com/static/5fc91625d98c1a7115f1f7ed/t/61b1495bcd313b11bbac01fb/1639008603700/SocialSharing.png?format=1500w"
+   155→      }
+   156→    },
+   157→    "headings": {
+   158→      "h1": [
+   159→        "Fresh Flavours. Creative Catering.",
+   160→        "Chef-Driven. Original. Concorde Favourites.",
+   161→        "Events We Cater"
+   162→      ],
+   163→      "h2": [
+   164→        "Now Booking!&nbsp;",
+   165→        "Subscribe To Our Newsletter"
+   166→      ],
+   167→      "h3": [],
+   168→      "h4": [
+   169→        "Weddings",
+   170→        "Holiday Parties",
+   171→        "Special Events",
+   172→        "Corporate Gatherings&nbsp;"
+   173→      ],
+   174→      "h5": [],
+   175→      "h6": []
+   176→    },
+   177→    "structured_data": [
+   178→      {
+   179→        "url": "https://concordecatering.ca",
+   180→        "name": "Concorde Catering",
+   181→        "description": "",
+   182→        "image": "//images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/aa330096-e214-49c3-a227-cb59fbdc8e00/CC-Logo-Blue.png",
+   183→        "@context": "http://schema.org",
+   184→        "@type": "WebSite"
+   185→      },
+   186→      {
+   187→        "image": "https://static1.squarespace.com/static/5fc91625d98c1a7115f1f7ed/t/6297cbc9f934f42d6540f0bf/1785357126424/",
+   188→        "openingHours": "",
+   189→        "@context": "http://schema.org",
+   190→        "@type": "LocalBusiness"
+   191→      }
+   192→    ],
+   193→    "images": {
+   194→      "alt_texts": [
+   195→        "Concorde Catering",
+   196→        "Concorde Catering"
+   197→      ],
+   198→      "sample_images": [
+   199→        "//images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/aa330096-e214-49c3-a227-cb59fbdc8e00/CC-Logo-Blue.png?format=1500w",
+   200→        "//images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/aa330096-e214-49c3-a227-cb59fbdc8e00/CC-Logo-Blue.png?format=1500w",
+   201→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/a413f573-03e7-4212-a816-85f94357e6a2/x.Header.jpg",
+   202→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/deb5b5ee-b79c-4c51-b425-c3be8fdf3c6b/DESSERT_GROUP_0061.jpg",
+   203→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/d82cae70-b1c7-4691-88ad-270ee7d91cb3/HANDHELDS_GROUP_B.jpg",
+   204→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/1f252c25-32f1-4276-92e2-a942afd4f47e/PLATED_ENTREE_GROUP_A_0831.jpg",
+   205→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/0ae60101-58b5-4816-9092-0ba290131014/AVO_TOAST_0503.jpg",
+   206→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/3e61f638-2330-48ce-b67e-8c5613349028/CC-Brandmark-B.png",
+   207→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/803ef8c3-f8a8-4e6b-a088-4ca6195b6978/Concorde_Icons_Wedding.png",
+   208→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/6a7b32e8-c419-41be-a1f1-18e4055c4c05/Concorde_Icons_Holiday.png",
+   209→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/895c8fc7-f968-4379-8af1-4789c37822d3/Concorde_Icons_Parties.png",
+   210→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/9aa94e1d-6fb4-4d00-977e-024aa09f1866/Concorde_Icons_Corporate.png",
+   211→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/8e199726-b39f-464d-890b-39f68611a253/Boardroom_Long__Yellow-Green.png",
+   212→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/3323116f-53d4-4e80-8de8-8024a957a41a/BoardroomTableTop.jpg",
+   213→        "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/27ce3058-bc2e-4b15-944d-0e39f6b8a9c4/CG_PrimaryLogo_White.png"
+   214→      ]
+   215→    },
+   216→    "technical": {
+   217→      "has_canonical": true,
+   218→      "has_hreflang": false,
+   219→      "has_og_tags": true,
+   220→      "has_twitter_tags": true,
+   221→      "has_json_ld": true,
+   222→      "heading_count": {
+   223→        "h1": 3,
+   224→        "h2": 2,
+   225→        "h3": 0
+   226→      }
+   227→    }
+   228→  },
+   229→  {
+   230→    "site_name": "creativeedge",
+   231→    "url": "https://www.creativeedgeparties.com/",
+   232→    "metadata": {
+   233→      "title": "Luxury Catering in Miami &amp; Palm Beach | Creative Edge Parties",
+   234→      "meta_description": "We delivers high end catering in Miami and Palm Beach, offering luxury wedding, corporate, and small-party catering with unique culinary experiences. Book Now!",
+   235→      "meta_keywords": null,
+   236→      "canonical_url": "https://www.creativeedgeparties.com/",
+   237→      "hreflang": null,
+   238→      "og_tags": {
+   239→        "og:title": "Luxury Catering in Miami &amp; Palm Beach | Creative Edge Parties",
+   240→        "og:description": "We delivers high end catering in Miami and Palm Beach, offering luxury wedding, corporate, and small-party catering with unique culinary experiences. Book Now!",
+   241→        "og:image": "http://static1.squarespace.com/static/6840be6bc300d63ad7f66f2f/t/68486d14cc6de75b44ddd9ce/1749576980930/SOCIAL+BANNER_CEP.png?format=1500w",
+   242→        "og:type": "website",
+   243→        "og:url": "https://www.creativeedgeparties.com",
+   244→        "og:site_name": "Creative Edge Parties"
+   245→      },
+   246→      "twitter_tags": {
+   247→        "twitter:card": "summary",
+   248→        "twitter:title": "Luxury Catering in Miami &amp; Palm Beach | Creative Edge Parties",
+   249→        "twitter:description": "We delivers high end catering in Miami and Palm Beach, offering luxury wedding, corporate, and small-party catering with unique culinary experiences. Book Now!",
+   250→        "twitter:image": "http://static1.squarespace.com/static/6840be6bc300d63ad7f66f2f/t/68486d14cc6de75b44ddd9ce/1749576980930/SOCIAL+BANNER_CEP.png?format=1500w"
+   251→      }
+   252→    },
+   253→    "headings": {
+   254→      "h1": [
+   255→        "THE EGG"
+   256→      ],
+   257→      "h2": [
+   258→        "CAME FIRST.",
+   259→        "SIMPLE &amp;",
+   260→        "BRILLIANT",
+   261→        "30+",
+   262→        "40,000+",
+   263→        "5,000,000+",
+   264→        "WHY US?",
+   265→        "TESTIMONIALS",
+   266→        "CORPORATE EVENT",
+   267→        "USET Gala",
+   268→        "NYC Wedding",
+   269→        "WEDDING PLANNER",
+   270→        "PRIVATE PARTY",
+   271→        "THECREATIVE EDGE",
+   272→        "01",
+   273→        "02",
+   274→        "03",
+   275→        "NEW YORK | MIAMI | PALM BEACH | WORLDWIDE",
+   276→        "FOLLOW ALONG",
+   277→        "CONTACT"
+   278→      ],
+   279→      "h3": [
+   280→        "LIMITLESS CREAtIVITY",
+   281→        "IMMERSIVE EXPERIENCES",
+   282→        "EXquISItE FOOD &amp; DRINK",
+   283→        "FLAWLESS EXECUTION",
+   284→        "DREAM",
+   285→        "BUILD",
+   286→        "SAVOR"
+   287→      ],
+   288→      "h4": [
+   289→        "SELECT CLIENTS",
+   290→        "NEW YORK",
+   291→        "MIAMI",
+   292→        "PALM BEACH",
+   293→        "&amp; WORLDWIDE",
+   294→        "Follow us"
+   295→      ],
+   296→      "h5": [],
+   297→      "h6": []
+   298→    },
+   299→    "structured_data": [
+   300→      {
+   301→        "url": "https://www.creativeedgeparties.com",
+   302→        "name": "Creative Edge Parties",
+   303→        "description": "",
+   304→        "image": "//images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/43366d3b-fae5-4659-8e50-2a3e75b20bd8/CEP_LOGO_Egg_White.png",
+   305→        "@context": "http://schema.org",
+   306→        "@type": "WebSite"
+   307→      },
+   308→      {
+   309→        "address": "",
+   310→        "image": "https://static1.squarespace.com/static/6840be6bc300d63ad7f66f2f/t/68434ef6a3b0c728cb1a2ab2/1779913725666/",
+   311→        "@context": "http://schema.org",
+   312→        "@type": "LocalBusiness"
+   313→      },
+   314→      {
+   315→        "@context": "https://schema.org",
+   316→        "@type": "Corporation",
+   317→        "name": "Creative Edge Parties",
+   318→        "url": "https://www.creativeedgeparties.com/",
+   319→        "logo": "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/43366d3b-fae5-4659-8e50-2a3e75b20bd8/CEP_LOGO_Egg_White.png?format=1500w",
+   320→        "contactPoint": {
+   321→          "@type": "ContactPoint",
+   322→          "telephone": "+13056975200",
+   323→          "contactType": "customer service",
+   324→          "areaServed": "US",
+   325→          "availableLanguage": "en"
+   326→        },
+   327→        "sameAs": [
+   328→          "https://www.instagram.com/creativeedgeparties/?hl=en#",
+   329→          "https://www.facebook.com/CreativeEdgeParties/"
+   330→        ]
+   331→      },
+   332→      {
+   333→        "@context": "https://schema.org/",
+   334→        "@type": "BreadcrumbList",
+   335→        "itemListElement": [
+   336→          {
+   337→            "@type": "ListItem",
+   338→            "position": 1,
+   339→            "name": "Parties",
+   340→            "item": "https://www.creativeedgeparties.com/"
+   341→          },
+   342→          {
+   343→            "@type": "ListItem",
+   344→            "position": 2,
+   345→            "name": "kosher k",
+   346→            "item": "https://www.creativeedgeparties.com/kosher-k"
+   347→          },
+   348→          {
+   349→            "@type": "ListItem",
+   350→            "position": 3,
+   351→            "name": "West Edge Parties",
+   352→            "item": "https://www.creativeedgeparties.com/west-edge-parties"
+   353→          },
+   354→          {
+   355→            "@type": "ListItem",
+   356→            "position": 4,
+   357→            "name": "On the Road",
+   358→            "item": "https://www.creativeedgeparties.com/on-the-road"
+   359→          }
+   360→        ]
+   361→      }
+   362→    ],
+   363→    "images": {
+   364→      "alt_texts": [
+   365→        "Creative Edge Parties",
+   366→        "Creative Edge Parties",
+   367→        "Close-up of white text on a black background reading ",
+   368→        "Stylized text that reads ",
+   369→        "Our team celebrated alongside some of our favorite people in the industry for @wipanyc&amp;rsquo;s white party at our venue, West Edge, where we created an all-white food and beverage menu. From &amp;ldquo;clear&amp;rdquo; espresso martinis to a cheese tower gra",
+   370→        "Our team celebrated alongside some of our favorite people in the industry for @wipanyc&amp;rsquo;s white party at our venue, West Edge, where we created an all-white food and beverage menu. From &amp;ldquo;clear&amp;rdquo; espresso martinis to a cheese tower gra",
+   371→        "Matcha, fresh-pressed juices, and oat bites for the launch of the @realeactives x @csb collaboration with @wellupcollective. \n\nInside Miami&amp;rsquo;s historic @dupontbuilding, founders @alixearle and @racheljdillon hosted a morning centered around well",
+   372→        "Matcha, fresh-pressed juices, and oat bites for the launch of the @realeactives x @csb collaboration with @wellupcollective. \n\nInside Miami&amp;rsquo;s historic @dupontbuilding, founders @alixearle and @racheljdillon hosted a morning centered around well",
+   373→        "Behind the scenes of our Spring 2026 editorial.\n\nOur editorial studies always begin with a question: what happens when the language of fashion is translated into food.\n\nAdornment has always shaped how we move through social spaces, from jewelry worn ",
+   374→        "Behind the scenes of our Spring 2026 editorial.\n\nOur editorial studies always begin with a question: what happens when the language of fashion is translated into food.\n\nAdornment has always shaped how we move through social spaces, from jewelry worn ",
+   375→        "Our spring issue was all about playing with sugar. From cocktail rings to transparent bangles, we turned our attention to the lollipop and viewed it as a design object. \n\nReimagined in fluid, organic forms that mirror the sculptural silhouettes defin",
+   376→        "Our spring issue was all about playing with sugar. From cocktail rings to transparent bangles, we turned our attention to the lollipop and viewed it as a design object. \n\nReimagined in fluid, organic forms that mirror the sculptural silhouettes defin",
+   377→        "The finest things are meant to be consumed. A collection designed to be worn and enjoyed&amp;hellip; thoroughly.",
+   378→        "The finest things are meant to be consumed. A collection designed to be worn and enjoyed&amp;hellip; thoroughly.",
+   379→        "Unlike traditional jewelry, these pieces are designed to disappear. In hospitality, that fleeting quality is often the point.",
+   380→        "Unlike traditional jewelry, these pieces are designed to disappear. In hospitality, that fleeting quality is often the point."
+   381→      ],
+   382→      "sample_images": [
+   383→        "//images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/43366d3b-fae5-4659-8e50-2a3e75b20bd8/CEP_LOGO_Egg_White.png?format=1500w",
+   384→        "//images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/43366d3b-fae5-4659-8e50-2a3e75b20bd8/CEP_LOGO_Egg_White.png?format=1500w",
+   385→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/77146ae1-ea62-40da-bc78-df464f601be4/EGG_SQ.png",
+   386→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/cbc267dc-de70-4db2-9502-3414bd453f40/CEP_Wordmark_Book+Weight+White.png",
+   387→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/0dc83114-57a7-4ec9-83ea-a25af6203809/1C6CC613-CC75-4734-9A5F-9C96CC830139+1.png",
+   388→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1749073531672-B7KNXHZRJO7CCRF5BJ1D/DSC_9610+%28Custom%29.jpg",
+   389→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/f5f14022-c951-4df3-9ab6-2753b95670b9/CEP_Logo_Left+Light+Lt+Beige.png",
+   390→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1779824744252-HPKTWBSX6M3BIIKC5AAO/image-asset.jpeg",
+   391→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1779824744252-HPKTWBSX6M3BIIKC5AAO/image-asset.jpeg",
+   392→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1779130603875-UI7FYR5Z7W5LW5EUQSN0/image-asset.jpeg",
+   393→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1778613458230-D18OV6LGK7LKT6V43U7S/image-asset.jpeg",
+   394→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1778527083247-TC852VWQMB2WU55V6KMN/image-asset.jpeg",
+   395→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1778527083247-TC852VWQMB2WU55V6KMN/image-asset.jpeg",
+   396→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1779211368459-U2K0YO9CRYPKF7M4IUNT/image-asset.jpeg",
+   397→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1777482298384-N3JH1HONULO4QQMZJZZ3/image-asset.jpeg",
+   398→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1777482298384-N3JH1HONULO4QQMZJZZ3/image-asset.jpeg",
+   399→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1777122389593-OVICKELAJK1WUNZH846D/image-asset.jpeg",
+   400→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1777122389593-OVICKELAJK1WUNZH846D/image-asset.jpeg",
+   401→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1777040888182-G9I2O4IR5PRTWTYAXX8I/image-asset.jpeg",
+   402→        "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/1777040888182-G9I2O4IR5PRTWTYAXX8I/image-asset.jpeg"
+   403→      ]
+   404→    },
+   405→    "technical": {
+   406→      "has_canonical": true,
+   407→      "has_hreflang": false,
+   408→      "has_og_tags": true,
+   409→      "has_twitter_tags": true,
+   410→      "has_json_ld": true,
+   411→      "heading_count": {
+   412→        "h1": 1,
+   413→        "h2": 20,
+   414→        "h3": 7
+   415→      }
+   416→    }
+   417→  },
+   418→  {
+   419→    "site_name": "cutandtaste",
+   420→    "url": "https://www.cutandtastelv.com/",
+   421→    "metadata": {
+   422→      "title": "Cut and Taste — Catering Las Vegas",
+   423→      "meta_description": "Cut and Taste provides high-end catering Las Vegas events are known for, perfect for any occasion - large or small. From corporate catering to small party catering services, our team can create the most unique and memorable event at the venue of your choice. ",
+   424→      "meta_keywords": null,
+   425→      "canonical_url": "https://www.cutandtastelv.com/",
+   426→      "hreflang": null,
+   427→      "og_tags": {
+   428→        "og:title": "Cut and Taste — Catering Las Vegas",
+   429→        "og:description": "Cut and Taste provides high-end catering Las Vegas events are known for, perfect for any occasion - large or small. From corporate catering to small party catering services, our team can create the most unique and memorable event at the venue of your choice.",
+   430→        "og:image": "http://static1.squarespace.com/static/5c1584394611a0d7e1311ce4/t/5c3647f540ec9a23cddf22e3/1547061241540/cut-and-taste-las-vegas-catering.jpg?format=1500w",
+   431→        "og:type": "website",
+   432→        "og:url": "https://www.cutandtastelv.com",
+   433→        "og:site_name": "Cut and Taste"
+   434→      },
+   435→      "twitter_tags": {
+   436→        "twitter:card": "summary",
+   437→        "twitter:title": "Cut and Taste — Catering Las Vegas",
+   438→        "twitter:description": "Cut and Taste provides high-end catering Las Vegas events are known for, perfect for any occasion - large or small. From corporate catering to small party catering services, our team can create the most unique and memorable event at the venue of your choice.",
+   439→        "twitter:image": "http://static1.squarespace.com/static/5c1584394611a0d7e1311ce4/t/5c3647f540ec9a23cddf22e3/1547061241540/cut-and-taste-las-vegas-catering.jpg?format=1500w"
+   440→      }
+   441→    },
+   442→    "headings": {
+   443→      "h1": [
+   444→        "Catering Services"
+   445→      ],
+   446→      "h2": [
+   447→        "What We Do",
+   448→        "Custom Event Stations",
+   449→        "Event Spaces",
+   450→        "Clients",
+   451→        "FEEDBACK",
+   452→        "Events by Cut &amp; Taste",
+   453→        "1st Birthday Party",
+   454→        "Convention Center Reception",
+   455→        "Pop-Up Restaurant Night",
+   456→        "R+D Photo Shoot",
+   457→        "Stations Wedding Catering",
+   458→        "&nbsp;Latest Article",
+   459→        "Follow Cut &amp; Taste"
+   460→      ],
+   461→      "h3": [
+   462→        "“CUT AND TASTE IS AN ABSOLUTE CUT ABOVE!!!! YOU CAN HAVE COMPLETE CONFIDENCE IN THEIR COOKING AND CATERING SERVICES.\"",
+   463→        "\"IT WAS EFFORTLESS ON OUR END; THEY CAME PREPARED WITH A VISION AND A PLAN TO ASSURE WE COULD RELAX.\""
+   464→      ],
+   465→      "h4": [],
+   466→      "h5": [],
+   467→      "h6": []
+   468→    },
+   469→    "structured_data": [
+   470→      {
+   471→        "url": "https://www.cutandtastelv.com",
+   472→        "name": "Cut and Taste",
+   473→        "description": "",
+   474→        "image": "//images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1545075970785-M1QGFBFDD9QXIH5PX02R/cut-and-taste-las-vegas-catering.png",
+   475→        "@context": "http://schema.org",
+   476→        "@type": "WebSite"
+   477→      },
+   478→      {
+   479→        "legalName": "Cut and Taste",
+   480→        "address": "2053 East Pama Lane\nLas Vegas, NV, 89119\nUnited States",
+   481→        "email": "info@cutandtastelv.com",
+   482→        "telephone": "702-443-1839",
+   483→        "sameAs": [
+   484→          "http://www.facebook.com/cutandtastefood",
+   485→          "mailto:info@cutandtastelv.com"
+   486→        ],
+   487→        "@context": "http://schema.org",
+   488→        "@type": "Organization"
+   489→      },
+   490→      {
+   491→        "address": "2053 East Pama Lane\nLas Vegas, NV, 89119\nUnited States",
+   492→        "image": "https://static1.squarespace.com/static/5c1584394611a0d7e1311ce4/t/5c17fd020ebbe8efe833e780/1780338735067/",
+   493→        "name": "Cut and Taste",
+   494→        "openingHours": ", , , , , , ",
+   495→        "@context": "http://schema.org",
+   496→        "@type": "LocalBusiness"
+   497→      }
+   498→    ],
+   499→    "images": {
+   500→      "alt_texts": [
+   501→        "Cut and Taste",
+   502→        "erinmariephotos-9.jpg",
+   503→        "red-cabbage-bg-dark_1.jpg",
+   504→        "cutout-background-artichoke.jpg",
+   505→        "fresh-herbs.jpg",
+   506→        "bg-gray_1.jpg",
+   507→        "dark-bg-red-lettuce_1.jpg",
+   508→        "organic-blackberries.jpg",
+   509→        "fruits-and-vegetables.jpg",
+   510→        "Cut and Taste",
+   511→        "las-vegas-premium-catering_1.png",
+   512→        "wedding catering services Las Vegas",
+   513→        "destination catering services Las Vegas",
+   514→        "convention catering services in Las Vegas",
+   515→        "corporate catering services Las Vegas",
+   516→        "boxed lunch catering services Las Vegas",
+   517→        "offsite small party catering Las Vegas",
+   518→        "Reverse Photobooth Station",
+   519→        "Reverse Photobooth Station",
+   520→        "Monolith Catering Station",
+   521→        "Monolith Catering Station",
+   522→        "Tree of Life Catering Station",
+   523→        "Tree of Life Catering Station",
+   524→        "Milk &amp;amp; Cookies Catering Station",
+   525→        "Milk &amp;amp; Cookies Catering Station",
+   526→        "Chef Demo Station",
+   527→        "Chef Demo Station",
+   528→        "Composed Entree Station",
+   529→        "Composed Entree Station",
+   530→        "Donut Wall"
+   531→      ],
+   532→      "sample_images": [
+   533→        "//images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1545075970785-M1QGFBFDD9QXIH5PX02R/cut-and-taste-las-vegas-catering.png",
+   534→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1697504120387-BRKGL5D09K6ZTZRI80PB/erinmariephotos-9.jpg?format=2500w",
+   535→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1550793487500-69RQIW77ZBL23S46I03U/red-cabbage-bg-dark_1.jpg?format=1500w",
+   536→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1561064160494-0PR41K69G4PDEJ1J3R7E/cutout-background-artichoke.jpg?format=2500w",
+   537→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1544915169952-9IR9Z1D88D27M1EOOC22/fresh-herbs.jpg?format=2500w",
+   538→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1550794512525-DE6ASYF2H5S8MGV5AGNV/bg-gray_1.jpg?format=1500w",
+   539→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1550793830638-NZU1ZWDI0OHKOGX11TOF/dark-bg-red-lettuce_1.jpg?format=1500w",
+   540→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1544915768441-4XT0LAI8KC4U6CAQTGDJ/organic-blackberries.jpg?format=1500w",
+   541→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1546638633005-OTXEABD9UY7G0RAE327V/fruits-and-vegetables.jpg?format=1500w",
+   542→        "//images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1545075970785-M1QGFBFDD9QXIH5PX02R/cut-and-taste-las-vegas-catering.png",
+   543→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1609992223355-DY97CL8TRWHS5HTBA9MX/las-vegas-premium-catering_1.png",
+   544→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1555022900690-CVDZVAMLBKMMA18EG2HZ/category-wedding-catering-services.png",
+   545→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1546556746393-KMDEW4ZG25P60ZOYHSMK/category-destination-catering-services.png",
+   546→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1555022909230-SYMQKVYWRNTJA33W972A/category-convention-catering-services.png",
+   547→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1546556812797-3L8NEMW7191P8YFV9DQX/category-corporate-catering.png",
+   548→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1555023040121-A4JQ8P0EXSX7C5Z8YIJ4/image-asset.png",
+   549→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1546556896095-8UC3H0RSBJCE8TUSU8TL/image-asset.png",
+   550→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1693343090211-1W8NEUQK2FJ67UTGO21D/reverse-photo-booth-station-thumb.jpg",
+   551→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1693343090211-1W8NEUQK2FJ67UTGO21D/reverse-photo-booth-station-thumb.jpg?format=1000w",
+   552→        "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1611696176739-RY218TFS89NOGLYNSVHA/monolith-station-thumb.jpg"
+   553→      ]
+   554→    },
+   555→    "technical": {
+   556→      "has_canonical": true,
+   557→      "has_hreflang": false,
+   558→      "has_og_tags": true,
+   559→      "has_twitter_tags": true,
+   560→      "has_json_ld": true,
+   561→      "heading_count": {
+   562→        "h1": 1,
+   563→        "h2": 13,
+   564→        "h3": 2
+   565→      }
+   566→    }
+   567→  },
+   568→  {
+   569→    "site_name": "elegantaffairs",
+   570→    "url": "https://elegantaffairscaterers.com/",
+   571→    "metadata": {
+   572→      "title": "Full Service Off Premise Catering| Elegant Affairs| New York",
+   573→      "meta_description": "Top Quality Full Service Off-Premise Catering With Elegant Affairs. We Cater Weddings, Corporate Events, and Private Parties in NYC, and Hamptons.",
+   574→      "meta_keywords": null,
+   575→      "canonical_url": "https://elegantaffairscaterers.com/",
+   576→      "hreflang": null,
+   577→      "og_tags": {
+   578→        "og:title": "Full Service Off Premise Catering| Elegant Affairs| New York",
+   579→        "og:description": "Top Quality Full Service Off-Premise Catering With Elegant Affairs. We Cater Weddings, Corporate Events, and Private Parties in NYC, and Hamptons.",
+   580→        "og:image": "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg",
+   581→        "og:type": "website",
+   582→        "og:url": "https://elegantaffairscaterers.com/",
+   583→        "og:site_name": "Elegant Affairs"
+   584→      },
+   585→      "twitter_tags": {
+   586→        "twitter:card": "summary_large_image"
+   587→      }
+   588→    },
+   589→    "headings": {
+   590→      "h1": [
+   591→        "We Offer Full Service Off Premise Catering"
+   592→      ],
+   593→      "h2": [
+   594→        "Cooking is love\nmade visible.",
+   595→        "We're yoursecret ingredient.",
+   596→        "TwoFortyThirty",
+   597→        "Let’s Party",
+   598→        "Our Events",
+   599→        "Bar/Bat Mitzvah’s with Elegant Affairs: Unforgettable Off-Premise Catering Services",
+   600→        "Unwrap the Joy of Stress-Free Holidays: Elevate Your Celebrations with EA Catering To-Go!",
+   601→        "Press",
+   602→        "Andrea Correale Shares Holiday Hosting Ideas on Good Day New York",
+   603→        "Inside Polo in the Hamptons",
+   604→        "How To Pick the Perfect Grill This Summer",
+   605→        "A Very Social Life",
+   606→        "It's party time"
+   607→      ],
+   608→      "h3": [
+   609→        "Parties are\nour passion."
+   610→      ],
+   611→      "h4": [
+   612→        "New york city",
+   613→        "Long Island",
+   614→        "Hamptons",
+   615→        "weddings",
+   616→        "CORPORATE",
+   617→        "PRIVATE PARTIES",
+   618→        "CONTACT US",
+   619→        "SUBSCRIBE TO OUR NEWSLETTER"
+   620→      ],
+   621→      "h5": [
+   622→        "OUR FOOD",
+   623→        "Our New headquarters"
+   624→      ],
+   625→      "h6": []
+   626→    },
+   627→    "structured_data": [
+   628→      {
+   629→        "@context": "https://schema.org",
+   630→        "@graph": [
+   631→          {
+   632→            "@type": "WebPage",
+   633→            "@id": "https://elegantaffairscaterers.com/",
+   634→            "url": "https://elegantaffairscaterers.com/",
+   635→            "name": "Full Service Off Premise Catering| Elegant Affairs| New York",
+   636→            "isPartOf": {
+   637→              "@id": "https://elegantaffairscaterers.com/#website"
+   638→            },
+   639→            "about": {
+   640→              "@id": "https://elegantaffairscaterers.com/#organization"
+   641→            },
+   642→            "primaryImageOfPage": {
+   643→              "@id": "https://elegantaffairscaterers.com/#primaryimage"
+   644→            },
+   645→            "image": {
+   646→              "@id": "https://elegantaffairscaterers.com/#primaryimage"
+   647→            },
+   648→            "thumbnailUrl": "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg",
+   649→            "datePublished": "2021-03-20T09:55:02+00:00",
+   650→            "dateModified": "2025-05-23T11:45:30+00:00",
+   651→            "description": "Top Quality Full Service Off-Premise Catering With Elegant Affairs. We Cater Weddings, Corporate Events, and Private Parties in NYC, and Hamptons.",
+   652→            "breadcrumb": {
+   653→              "@id": "https://elegantaffairscaterers.com/#breadcrumb"
+   654→            },
+   655→            "inLanguage": "en-US",
+   656→            "potentialAction": [
+   657→              {
+   658→                "@type": "ReadAction",
+   659→                "target": [
+   660→                  "https://elegantaffairscaterers.com/"
+   661→                ]
+   662→              }
+   663→            ]
+   664→          },
+   665→          {
+   666→            "@type": "ImageObject",
+   667→            "inLanguage": "en-US",
+   668→            "@id": "https://elegantaffairscaterers.com/#primaryimage",
+   669→            "url": "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg",
+   670→            "contentUrl": "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg",
+   671→            "width": 1465,
+   672→            "height": 502,
+   673→            "caption": "Catering Servics"
+   674→          },
+   675→          {
+   676→            "@type": "BreadcrumbList",
+   677→            "@id": "https://elegantaffairscaterers.com/#breadcrumb",
+   678→            "itemListElement": [
+   679→              {
+   680→                "@type": "ListItem",
+   681→                "position": 1,
+   682→                "name": "Home"
+   683→              }
+   684→            ]
+   685→          },
+   686→          {
+   687→            "@type": "WebSite",
+   688→            "@id": "https://elegantaffairscaterers.com/#website",
+   689→            "url": "https://elegantaffairscaterers.com/",
+   690→            "name": "Elegant Affairs",
+   691→            "description": "",
+   692→            "publisher": {
+   693→              "@id": "https://elegantaffairscaterers.com/#organization"
+   694→            },
+   695→            "potentialAction": [
+   696→              {
+   697→                "@type": "SearchAction",
+   698→                "target": {
+   699→                  "@type": "EntryPoint",
+   700→                  "urlTemplate": "https://elegantaffairscaterers.com/?s={search_term_string}"
+   701→                },
+   702→                "query-input": {
+   703→                  "@type": "PropertyValueSpecification",
+   704→                  "valueRequired": true,
+   705→                  "valueName": "search_term_string"
+   706→                }
+   707→              }
+   708→            ],
+   709→            "inLanguage": "en-US"
+   710→          },
+   711→          {
+   712→            "@type": "Organization",
+   713→            "@id": "https://elegantaffairscaterers.com/#organization",
+   714→            "name": "Elegant Affairs Caterers",
+   715→            "url": "https://elegantaffairscaterers.com/",
+   716→            "logo": {
+   717→              "@type": "ImageObject",
+   718→              "inLanguage": "en-US",
+   719→              "@id": "https://elegantaffairscaterers.com/#/schema/logo/image/",
+   720→              "url": "https://elegantaffairscaterers.com/wp-content/uploads/2021/06/ea-logo.svg",
+   721→              "contentUrl": "https://elegantaffairscaterers.com/wp-content/uploads/2021/06/ea-logo.svg",
+   722→              "width": 538,
+   723→              "height": 162,
+   724→              "caption": "Elegant Affairs Caterers"
+   725→            },
+   726→            "image": {
+   727→              "@id": "https://elegantaffairscaterers.com/#/schema/logo/image/"
+   728→            },
+   729→            "sameAs": [
+   730→              "https://www.facebook.com/elegantaffairscaterers/",
+   731→              "https://www.instagram.com/elegantaffairs1/",
+   732→              "https://www.youtube.com/channel/UChYm7vFNRGVf1iPiiZ7Em_Q"
+   733→            ]
+   734→          }
+   735→        ]
+   736→      }
+   737→    ],
+   738→    "images": {
+   739→      "alt_texts": [
+   740→        "EACateringLogo",
+   741→        "EACateringLogo",
+   742→        "Catering Servics",
+   743→        "Catering Servics",
+   744→        "Catering Services NYC",
+   745→        "Catering Services NYC",
+   746→        "fine dining plate",
+   747→        "fine dining plate",
+   748→        "Best Elegant Affairs caterers",
+   749→        "Best Elegant Affairs caterers",
+   750→        "Best maternity event caterer",
+   751→        "Best maternity event caterer",
+   752→        "Best maternity event caterer",
+   753→        "Best maternity event caterer",
+   754→        "Plate up of first course appetizer. #burrata #partyfood #appetizers #catering #eventplanner #foodie #foodporn #foodstagram #foodblogger #foodgasm #foodpics #offpremisecatering #firstcourse",
+   755→        "Plate up of first course appetizer. #burrata #partyfood #appetizers #catering #eventplanner #foodie #foodporn #foodstagram #foodblogger #foodgasm #foodpics #offpremisecatering #firstcourse",
+   756→        "Elegant Affairs presents an Asian inspired Hot Rocks Bar. Delicious shrimp,steak,chicken, and mushroom skewers with yummy dipping sauces. This station also includes shishito peppers,soba noodles, pickled vegetables, and cucumber salad. #catering #foodie #foodstation #skewers #foodstagram #foodporn #foodgasm #foodpics #foodstyling #foodphotography #foodlover #partyfood #eventplanner #asianfood #foodblogger",
+   757→        "Elegant Affairs presents an Asian inspired Hot Rocks Bar. Delicious shrimp,steak,chicken, and mushroom skewers with yummy dipping sauces. This station also includes shishito peppers,soba noodles, pickled vegetables, and cucumber salad. #catering #foodie #foodstation #skewers #foodstagram #foodporn #foodgasm #foodpics #foodstyling #foodphotography #foodlover #partyfood #eventplanner #asianfood #foodblogger",
+   758→        "Healthy Food Station with Free Range Chicken carved to order, roasted rainbow carrots, arugula salad, Queen corn, Heirloom tomato salad, and Orecchiette Pesto. #holidayfood #catering #foodstagram #foodporn #foodie #foodgasm #foodpic #foodstyling #instafood #foodgram #eventplanner",
+   759→        "Healthy Food Station with Free Range Chicken carved to order, roasted rainbow carrots, arugula salad, Queen corn, Heirloom tomato salad, and Orecchiette Pesto. #holidayfood #catering #foodstagram #foodporn #foodie #foodgasm #foodpic #foodstyling #instafood #foodgram #eventplanner",
+   760→        "This is no ordinary Halloween party 💀\n.\n@invisioneventsny \n.\n.\n.\n#halloweenparty #halloweenfood #halloweendecor #partyfood #foodstagram #caterer #eventplanner #halloweenpartyfood #partyinspiration",
+   761→        "This is no ordinary Halloween party 💀\n.\n@invisioneventsny \n.\n.\n.\n#halloweenparty #halloweenfood #halloweendecor #partyfood #foodstagram #caterer #eventplanner #halloweenpartyfood #partyinspiration",
+   762→        "Another fabulous fall wedding @parrishartmuseum\n.\n@nweiss\n@greenbizzle\n@flowersbyford\n@ambientevents\n@forlifeseventures\n@blackdogwoodworksny\n@dartcollective \n@bobbo.haye \n.\n.\n.\n#wedding #fallwedding #falllongisland #fallnewyork #nyc #newyorkcaterer #longislandcaterer #hamptonscaterer #hamptons #hamptonsny #hamptonsfall",
+   763→        "Another fabulous fall wedding @parrishartmuseum\n.\n@nweiss\n@greenbizzle\n@flowersbyford\n@ambientevents\n@forlifeseventures\n@blackdogwoodworksny\n@dartcollective \n@bobbo.haye \n.\n.\n.\n#wedding #fallwedding #falllongisland #fallnewyork #nyc #newyorkcaterer #longislandcaterer #hamptonscaterer #hamptons #hamptonsny #hamptonsfall",
+   764→        "Featuring Halloween treats. Festive dishes that put you into a spooky mood. #halloweenfood #halloween #foodie #foodporn #foodblogger #foodstagram #foodgasm #food #caterer #eventplanner #candyapples",
+   765→        "Featuring Halloween treats. Festive dishes that put you into a spooky mood. #halloweenfood #halloween #foodie #foodporn #foodblogger #foodstagram #foodgasm #food #caterer #eventplanner #candyapples"
+   766→      ],
+   767→      "sample_images": [
+   768→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/03/EACateringLogo.svg",
+   769→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/03/EACateringLogo.svg",
+   770→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg",
+   771→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg",
+   772→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/image4-min-1.jpeg",
+   773→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/image4-min-1.jpeg",
+   774→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-7-min-1.jpeg",
+   775→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-7-min-1.jpeg",
+   776→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/09/p1.jpg",
+   777→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/09/p1.jpg",
+   778→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/09/p1-2.jpg",
+   779→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/09/p1-2.jpg",
+   780→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/09/p1-1.jpg",
+   781→        "https://elegantaffairscaterers.com/wp-content/uploads/2021/09/p1-1.jpg",
+   782→        "https://elegantaffairscaterers.com/wp-content/uploads/2023/12/mitzvahthumbnail1-516x335.jpg",
+   783→        "https://elegantaffairscaterers.com/wp-content/uploads/2023/12/mitzvahthumbnail1-516x335.jpg",
+   784→        "https://elegantaffairscaterers.com/wp-content/uploads/2023/12/PennealaVodka_1512x.jpg-516x360.webp",
+   785→        "https://elegantaffairscaterers.com/wp-content/uploads/2023/12/PennealaVodka_1512x.jpg-516x360.webp",
+   786→        "https://elegantaffairscaterers.com/wp-content/themes/elegant-affairs/images/badge-logo.png",
+   787→        "https://elegantaffairscaterers.com/wp-content/themes/elegant-affairs/images/badge-logo.png"
+   788→      ]
+   789→    },
+   790→    "technical": {
+   791→      "has_canonical": true,
+   792→      "has_hreflang": false,
+   793→      "has_og_tags": true,
+   794→      "has_twitter_tags": true,
+   795→      "has_json_ld": true,
+   796→      "heading_count": {
+   797→        "h1": 1,
+   798→        "h2": 13,
+   799→        "h3": 1
+   800→      }
+   801→    }
+   802→  },
+   803→  {
+   804→    "site_name": "gammacatering",
+   805→    "url": "https://www.gammacatering.com/en/",
+   806→    "metadata": {
+   807→      "title": "GAMMACATERING | Premium Catering &amp; Event Experiences",
+   808→      "meta_description": "Premium Catering Switzerland &amp; Event Design since 1986. Personally accompanied, holistically conceived, uncompromising in quality.",
+   809→      "meta_keywords": null,
+   810→      "canonical_url": "https://www.gammacatering.com/en/",
+   811→      "hreflang": {
+   812→        "de": "https://www.gammacatering.com/",
+   813→        "en": "https://www.gammacatering.com/en/"
+   814→      },
+   815→      "og_tags": {
+   816→        "og:title": "GAMMACATERING | Premium Catering &amp; Event Experiences",
+   817→        "og:description": "Premium Catering Switzerland &amp; Event Design since 1986. Personally accompanied, holistically conceived, uncompromising in quality.",
+   818→        "og:type": "website",
+   819→        "og:url": "https://www.gammacatering.com/en/",
+   820→        "og:site_name": "GAMMACATERING"
+   821→      },
+   822→      "twitter_tags": {
+   823→        "twitter:card": "summary_large_image"
+   824→      }
+   825→    },
+   826→    "headings": {
+   827→      "h1": [
+   828→        "Switzerland's leading provider of premium catering and experience design."
+   829→      ],
+   830→      "h2": [
+   831→        "SERVICES",
+   832→        "Locations",
+   833→        "Privacy Preferences"
+   834→      ],
+   835→      "h3": [
+   836→        "Concept",
+   837→        "Design",
+   838→        "Implementation",
+   839→        "Events"
+   840→      ],
+   841→      "h4": [],
+   842→      "h5": [],
+   843→      "h6": []
+   844→    },
+   845→    "structured_data": [
+   846→      {
+   847→        "@context": "https://schema.org",
+   848→        "@graph": [
+   849→          {
+   850→            "@type": "WebPage",
+   851→            "@id": "https://www.gammacatering.com/",
+   852→            "url": "https://www.gammacatering.com/",
+   853→            "name": "GAMMACATERING | Premium Catering &amp; Event Experiences",
+   854→            "isPartOf": {
+   855→              "@id": "https://www.gammacatering.com/en/#website"
+   856→            },
+   857→            "about": {
+   858→              "@id": "https://www.gammacatering.com/en/#organization"
+   859→            },
+   860→            "datePublished": "2026-06-22T18:57:19+00:00",
+   861→            "dateModified": "2026-08-11T15:42:45+00:00",
+   862→            "description": "Premium Catering Switzerland &amp; Event Design since 1986. Personally accompanied, holistically conceived, uncompromising in quality.",
+   863→            "breadcrumb": {
+   864→              "@id": "https://www.gammacatering.com/#breadcrumb"
+   865→            },
+   866→            "inLanguage": "en-GB",
+   867→            "potentialAction": [
+   868→              {
+   869→                "@type": "ReadAction",
+   870→                "target": [
+   871→                  "https://www.gammacatering.com/"
+   872→                ]
+   873→              }
+   874→            ]
+   875→          },
+   876→          {
+   877→            "@type": "BreadcrumbList",
+   878→            "@id": "https://www.gammacatering.com/#breadcrumb",
+   879→            "itemListElement": [
+   880→              {
+   881→                "@type": "ListItem",
+   882→                "position": 1,
+   883→                "name": "Begin"
+   884→              }
+   885→            ]
+   886→          },
+   887→          {
+   888→            "@type": "WebSite",
+   889→            "@id": "https://www.gammacatering.com/en/#website",
+   890→            "url": "https://www.gammacatering.com/en/",
+   891→            "name": "GAMMACATERING",
+   892→            "description": "",
+   893→            "publisher": {
+   894→              "@id": "https://www.gammacatering.com/en/#organization"
+   895→            },
+   896→            "potentialAction": [
+   897→              {
+   898→                "@type": "SearchAction",
+   899→                "target": {
+   900→                  "@type": "EntryPoint",
+   901→                  "urlTemplate": "https://www.gammacatering.com/en/?s={search_term_string}"
+   902→                },
+   903→                "query-input": {
+   904→                  "@type": "PropertyValueSpecification",
+   905→                  "valueRequired": true,
+   906→                  "valueName": "search_term_string"
+   907→                }
+   908→              }
+   909→            ],
+   910→            "inLanguage": "en-GB"
+   911→          },
+   912→          {
+   913→            "@type": "Organization",
+   914→            "@id": "https://www.gammacatering.com/en/#organization",
+   915→            "name": "GAMMACATERING",
+   916→            "url": "https://www.gammacatering.com/en/",
+   917→            "logo": {
+   918→              "@type": "ImageObject",
+   919→              "inLanguage": "en-GB",
+   920→              "@id": "https://www.gammacatering.com/en/#/schema/logo/image/",
+   921→              "url": "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/Gamma-40-Jahre-Icon-L-schwarz.svg",
+   922→              "contentUrl": "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/Gamma-40-Jahre-Icon-L-schwarz.svg",
+   923→              "width": 102,
+   924→              "height": 108,
+   925→              "caption": "GAMMACATERING"
+   926→            },
+   927→            "image": {
+   928→              "@id": "https://www.gammacatering.com/en/#/schema/logo/image/"
+   929→            },
+   930→            "sameAs": [
+   931→              "https://www.facebook.com/gammacatering/photos/",
+   932→              "https://www.instagram.com/gamma_catering/",
+   933→              "https://www.linkedin.com/company/gamma-catering-ag?originalSubdomain=ch"
+   934→            ]
+   935→          }
+   936→        ]
+   937→      }
+   938→    ],
+   939→    "images": {
+   940→      "alt_texts": [
+   941→        "Gammacatering Logo",
+   942→        "Gamma Catering Logo White",
+   943→        "Gamma Catering Logo",
+   944→        "Hero Service – Gamma Catering",
+   945→        "Hero Story – Gamma Catering",
+   946→        "GAMMACATERING",
+   947→        "Waiter",
+   948→        "Ice cream cart lake",
+   949→        "Ballroom chandelier banquet",
+   950→        "Catering Snack Pieces",
+   951→        "Fine dining caviar",
+   952→        "Wedding Table Decoration Lemon Place Setting – Gamma Catering",
+   953→        "Event Service Table Setting Gala – Gamma Catering",
+   954→        "Wedding Venue Orangery Flowers Chandeliers – Gamma Catering",
+   955→        "Show Kitchen Live Cooking Chefs – Gamma Catering",
+   956→        "Flying Buffet Mini Quiches Summer Party – Gamma Catering",
+   957→        "Floral Decoration Test Tube Vases Event – Gamma Catering",
+   958→        "Career – Gamma Catering",
+   959→        "Company Event Exhibition Gala Banquet – Gamma Catering",
+   960→        "Sommelier Uniform Wine Service – Gamma Catering",
+   961→        "Waiter",
+   962→        "Ice cream cart lake",
+   963→        "Ballroom chandelier banquet",
+   964→        "Catering Snack Pieces",
+   965→        "Fine dining caviar",
+   966→        "Wedding Table Decoration Lemon Place Setting – Gamma Catering",
+   967→        "Event Service Table Setting Gala – Gamma Catering",
+   968→        "Wedding Venue Orangery Flowers Chandeliers – Gamma Catering",
+   969→        "Show Kitchen Live Cooking Chefs – Gamma Catering",
+   970→        "Flying Buffet Mini Quiches Summer Party – Gamma Catering"
+   971→      ],
+   972→      "sample_images": [
+   973→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/02/gamma-catering-logo-mobile.svg",
+   974→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/02/gamma-catering-logo-white.svg",
+   975→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/02/gamma-catering-logo.svg",
+   976→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammacatering-hero-service.jpg",
+   977→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammacatering-hero-geschichte.jpg",
+   978→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammacatering-hero-service-2_neu.jpg",
+   979→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/gamma-catering-waiter-canapes-trolley.jpg",
+   980→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/gamma-catering-ice-cream-cart-lake.jpg",
+   981→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/gamma-catering-ballroom-chandelier-banquet.jpg",
+   982→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gamma-catering-buffet.jpg",
+   983→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/gamma-catering-caviar-fine-dining.jpg",
+   984→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/hochzeit-tischdekoration-zitronen-gedeck-gammacatering.jpg",
+   985→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/event-service-tischeindeckung-gala-gammacatering.jpg",
+   986→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/hochzeitslocation-orangerie-blumen-kronleuchter-gammacatering.jpg",
+   987→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/showkueche-live-cooking-koeche-gammacatering.jpg",
+   988→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/flying-buffet-mini-quiche-sommerfest-gammacatering.jpg",
+   989→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/blumendekoration-reagenzglas-vasen-event-gammacatering.jpg",
+   990→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammcatering_karriere_004.jpg",
+   991→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/firmenevent-messe-gala-bankett-gammacatering.jpg",
+   992→        "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/sommelier-uniform-weinservice-gammacatering.jpg"
+   993→      ]
+   994→    },
+   995→    "technical": {
+   996→      "has_canonical": true,
+   997→      "has_hreflang": true,
+   998→      "has_og_tags": true,
+   999→      "has_twitter_tags": true,
+  1000→      "has_json_ld": true,
+  1001→      "heading_count": {
+  1002→        "h1": 1,
+  1003→        "h2": 3,
+  1004→        "h3": 4
+  1005→      }
+  1006→    }
+  1007→  },
+  1008→  {
+  1009→    "site_name": "ggcatering",
+  1010→    "url": "https://www.ggcatering.com/",
+  1011→    "metadata": {
+  1012→      "title": "Home | Global Gourmet",
+  1013→      "meta_description": "Stellar food. Seamless service. Sustainably produced. Celebrate with the Bay Area",
+  1014→      "meta_keywords": null,
+  1015→      "canonical_url": "https://www.ggcatering.com/",
+  1016→      "hreflang": null,
+  1017→      "og_tags": {},
+  1018→      "twitter_tags": {
+  1019→        "twitter:card": "summary_large_image",
+  1020→        "twitter:title": "Home",
+  1021→        "twitter:description": "Stellar food. Seamless service. Sustainably produced. Celebrate with the Bay Area",
+  1022→        "twitter:image": "https://gg-web.transforms.svdcdn.com/production/default/SEO-image.jpg?w=1200&amp;h=630&amp;q=82&amp;auto=format&amp;fit=crop&amp;dm=1727805006&amp;s=d2a4d6788128860bb1f558fb707cef12"
+  1023→      }
+  1024→    },
+  1025→    "headings": {
+  1026→      "h1": [
+  1027→        "Global Gourmet Home"
+  1028→      ],
+  1029→      "h2": [
+  1030→        "Catering\n\t\t\t\t\twith a\n\t\t\t\t\t\n\t\t\t\t\t\tTwist",
+  1031→        "Who we are",
+  1032→        "When Food and Immersive Experiences Combine",
+  1033→        "After 25 years of business, we've got it down",
+  1034→        "Our food and drinks are good—like REALLY good",
+  1035→        "Let’s create something EPIC!",
+  1036→        "Fun. Fresh. Unexpected.",
+  1037→        "Your future&nbsp;eventstarts here!"
+  1038→      ],
+  1039→      "h3": [],
+  1040→      "h4": [],
+  1041→      "h5": [],
+  1042→      "h6": []
+  1043→    },
+  1044→    "structured_data": [
+  1045→      {
+  1046→        "@context": "https://schema.org",
+  1047→        "@graph": [
+  1048→          {
+  1049→            "@type": "WebSite",
+  1050→            "author": {
+  1051→              "@id": "https://www.ggcatering.com/#identity"
+  1052→            },
+  1053→            "copyrightHolder": {
+  1054→              "@id": "https://www.ggcatering.com/#identity"
+  1055→            },
+  1056→            "copyrightYear": "2024",
+  1057→            "creator": {
+  1058→              "@id": "https://turnstyle.studio/#creator"
+  1059→            },
+  1060→            "dateCreated": "2024-06-18T11:34:38-07:00",
+  1061→            "dateModified": "2026-02-04T21:08:03-08:00",
+  1062→            "datePublished": "2024-06-18T11:34:00-07:00",
+  1063→            "description": "Stellar food. Seamless service. Sustainably produced. Celebrate with the Bay Area's leading full-service catering company, Global Gourmet Catering.",
+  1064→            "headline": "Home",
+  1065→            "image": {
+  1066→              "@type": "ImageObject",
+  1067→              "url": "https://gg-web.transforms.svdcdn.com/production/default/SEO-image.jpg?w=1200&h=630&q=82&auto=format&fit=crop&dm=1727805006&s=d2a4d6788128860bb1f558fb707cef12"
+  1068→            },
+  1069→            "inLanguage": "en-us",
+  1070→            "mainEntityOfPage": "https://www.ggcatering.com/",
+  1071→            "name": "Global Gourmet",
+  1072→            "publisher": {
+  1073→              "@id": "https://turnstyle.studio/#creator"
+  1074→            },
+  1075→            "url": "https://www.ggcatering.com/"
+  1076→          },
+  1077→          {
+  1078→            "@id": "https://www.ggcatering.com/#identity",
+  1079→            "@type": "LocalBusiness",
+  1080→            "address": {
+  1081→              "@type": "PostalAddress",
+  1082→              "addressCountry": "US",
+  1083→              "addressLocality": "San Francisco",
+  1084→              "addressRegion": "CA",
+  1085→              "postalCode": "94107",
+  1086→              "streetAddress": "1030 Illinois Street"
+  1087→            },
+  1088→            "description": "Stellar food. Seamless service. Sustainably produced. Celebrate with the Bay Area's leading full-service catering company, Global Gourmet Catering.",
+  1089→            "name": "Global Gourmet Catering",
+  1090→            "priceRange": "$",
+  1091→            "sameAs": [
+  1092→              "https://www.instagram.com/globalgourmetcatering/",
+  1093→              "https://www.linkedin.com/company/global-gourmet-catering/"
+  1094→            ],
+  1095→            "telephone": "415.701.0001",
+  1096→            "url": "https://www.ggcatering.com/"
+  1097→          },
+  1098→          {
+  1099→            "@id": "https://turnstyle.studio/#creator",
+  1100→            "@type": "LocalBusiness",
+  1101→            "description": "Turnstyle is a full-service creative agency with a dedicated team of designers, strategists, developers, and account specialists.",
+  1102→            "name": "Turnstyle",
+  1103→            "priceRange": "$",
+  1104→            "url": "https://turnstyle.studio/"
+  1105→          },
+  1106→          {
+  1107→            "@type": "BreadcrumbList",
+  1108→            "description": "Breadcrumbs list",
+  1109→            "itemListElement": [
+  1110→              {
+  1111→                "@type": "ListItem",
+  1112→                "item": "https://www.ggcatering.com/",
+  1113→                "name": "Home",
+  1114→                "position": 1
+  1115→              }
+  1116→            ],
+  1117→            "name": "Breadcrumbs"
+  1118→          }
+  1119→        ]
+  1120→      }
+  1121→    ],
+  1122→    "images": {
+  1123→      "alt_texts": [
+  1124→        "Summer event with carnival tents.",
+  1125→        "Summer event with carnival tents.",
+  1126→        "Animated collection of corporate conference imagery.",
+  1127→        "Animated collection of corporate conference imagery.",
+  1128→        "Animated collection of marketing event imagery.",
+  1129→        "Animated collection of marketing event imagery.",
+  1130→        "Animated collection of IPO party imagery.",
+  1131→        "Animated collection of IPO party imagery.",
+  1132→        "Animated collection of reception imagery.",
+  1133→        "Animated collection of reception imagery.",
+  1134→        "Animated collection of company celebration imagery.",
+  1135→        "Animated collection of company celebration imagery."
+  1136→      ],
+  1137→      "sample_images": [
+  1138→        "https://gg-web.transforms.svdcdn.com/production/default/Buffalo-Chicken-and-Waffle-Cone-2.jpg?w=4000&amp;h=2414&amp;auto=compress%2Cformat&amp;fit=crop&amp;dm=1734039988&amp;s=cc99d41f6219ab219001b811f67d0f84",
+  1139→        "https://gg-web.transforms.svdcdn.com/staging/default/Buffalo-Chicken-and-Waffle-Cone-2.jpg?w=640&amp;h=386&amp;q=82&amp;auto=format&amp;fit=crop&amp;dm=1734039988&amp;s=737419074d47f1405a4c536d30c501b4",
+  1140→        "https://gg-web.transforms.svdcdn.com/production/default/Intro-to-Aperol-3-1.jpg?w=4000&amp;h=2667&amp;auto=compress%2Cformat&amp;fit=crop&amp;dm=1737090112&amp;s=8efcdd2068eede903c48ca40617a51d8",
+  1141→        "https://gg-web.transforms.svdcdn.com/staging/default/Intro-to-Aperol-3-1.jpg?w=640&amp;h=426&amp;q=82&amp;auto=format&amp;fit=crop&amp;dm=1737090112&amp;s=5ea62d34d25e83f6a2a920b8b5808734",
+  1142→        "https://gg-web.transforms.svdcdn.com/production/default/d53d7e068df24dfe82c1893a8f3167f3-1.jpg?w=600&amp;h=900&amp;auto=compress%2Cformat&amp;fit=crop&amp;dm=1737089973&amp;s=0a91c41a3a161382ccb1a7fbab1843e8",
+  1143→        "https://gg-web.transforms.svdcdn.com/staging/default/d53d7e068df24dfe82c1893a8f3167f3-1.jpg?w=600&amp;h=900&amp;fm=jpg&amp;auto=compress&amp;fit=crop&amp;dm=1737089973&amp;s=9a586c540549b9950ec8242908b7bf24",
+  1144→        "https://gg-web.transforms.svdcdn.com/production/default/Summer-Peach-and-Charred-Corn-Salad_6-1-3.jpg?w=500&amp;h=750&amp;auto=compress%2Cformat&amp;fit=crop&amp;dm=1737090310&amp;s=d643bd703b5b4a500e34d062899429cd",
+  1145→        "https://gg-web.transforms.svdcdn.com/staging/default/Summer-Peach-and-Charred-Corn-Salad_6-1-3.jpg?w=500&amp;h=750&amp;fm=jpg&amp;auto=compress&amp;fit=crop&amp;dm=1737090310&amp;s=b1d9d8919e04697850cf335250c8563b",
+  1146→        "https://gg-web.transforms.svdcdn.com/production/default/Strawberry-Ice-Cream-13-3.jpg?w=680&amp;h=1019&amp;auto=compress%2Cformat&amp;fit=crop&amp;dm=1737751521&amp;s=60e6e45825fba9f88442041299cce34c",
+  1147→        "https://gg-web.transforms.svdcdn.com/staging/default/Strawberry-Ice-Cream-13-3.jpg?w=640&amp;h=959&amp;q=82&amp;auto=format&amp;fit=crop&amp;dm=1737751521&amp;s=e267a9346aef5f33faad40c4eff65478",
+  1148→        "https://gg-web.transforms.svdcdn.com/production/default/882ED3B4-D489-4A9D-A826-80A7B8030F88.jpeg?w=2304&amp;h=2467&amp;auto=compress%2Cformat&amp;fit=crop&amp;dm=1737508040&amp;s=9c24a6f09c8a7b0e0049106ad69a84f9",
+  1149→        "https://gg-web.transforms.svdcdn.com/staging/default/882ED3B4-D489-4A9D-A826-80A7B8030F88.jpeg?w=640&amp;h=685&amp;q=82&amp;auto=format&amp;fit=crop&amp;dm=1737508040&amp;s=b861edfa8a6d913363cbc2a10b6bd6d1",
+  1150→        "https://gg-web.transforms.svdcdn.com/production/default/3E6D3E45-5EB2-45D7-9E07-CD40B410BEF2.jpeg?w=4000&amp;h=2667&amp;auto=compress%2Cformat&amp;fit=crop&amp;dm=1737505169&amp;s=ae47c4a6919fd0c5fef9962efa577235",
+  1151→        "https://gg-web.transforms.svdcdn.com/staging/default/3E6D3E45-5EB2-45D7-9E07-CD40B410BEF2.jpeg?w=640&amp;h=426&amp;q=82&amp;auto=format&amp;fit=crop&amp;dm=1737505169&amp;s=7bd5a8bb71683a0b96e99b90e20c8db0",
+  1152→        "https://gg-web.transforms.svdcdn.com/production/default/G_Pattern_2000px.jpg?w=2000&amp;h=1123&amp;auto=compress%2Cformat&amp;fit=crop&amp;dm=1738099598&amp;s=9259a8dd48d9efcdbd08c34001172baa",
+  1153→        "data:image/jpeg;base64,%2F9j%2F4AAQSkZJRgABAQAAAQABAAD%2F2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P%2F2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P%2FwAARCAAIABADAREAAhEBAxEB%2F8QAFQABAQAAAAAAAAAAAAAAAAAAAAb%2FxAAfEAACAQQCAwAAAAAAAAAAAAABAgMAERNBEiExUpH%2FxAAWAQEBAQAAAAAAAAAAAAAAAAACAAH%2FxAAaEQEAAgMBAAAAAAAAAAAAAAABABECIUFh%2F9oADAMBAAIRAxEAPwCqjbLGsbMAygEX9vuqKvCYauoysCsijiWazk7I6t5o4hadlSns%2F9k%3D",
+  1154→        "data:image/jpeg;base64,%2F9j%2F4AAQSkZJRgABAQAAAQABAAD%2F2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P%2F2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P%2FwAARCAAIABADAREAAhEBAxEB%2F8QAFQABAQAAAAAAAAAAAAAAAAAAAAb%2FxAAfEAACAQQCAwAAAAAAAAAAAAABAgMAERNBEiExUpH%2FxAAWAQEBAQAAAAAAAAAAAAAAAAACAAH%2FxAAaEQEAAgMBAAAAAAAAAAAAAAABABECIUFh%2F9oADAMBAAIRAxEAPwCqjbLGsbMAygEX9vuqKvCYauoysCsijiWazk7I6t5o4hadlSns%2F9k%3D",
+  1155→        "https://gg-web.transforms.svdcdn.com/production/default/Tuite_GlobalCrystalCavern_CityViewSF_111325-158-1.jpg?w=500&amp;h=750&amp;auto=compress%2Cformat&amp;fit=crop&amp;crop=focalpoint&amp;fp-x=0.4513&amp;fp-y=0.8163&amp;dm=1770267837&amp;s=285e6634d3be7bceb144cbe3ef843aff",
+  1156→        "data:image/jpeg;base64,%2F9j%2F4AAQSkZJRgABAQAAAQABAAD%2F2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P%2F2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P%2FwAARCAAYABADAREAAhEBAxEB%2F8QAFwAAAwEAAAAAAAAAAAAAAAAAAgMFBP%2FEACMQAAIBBAEDBQAAAAAAAAAAAAECAwAEBRESEyExFDJBQlH%2FxAAZAQACAwEAAAAAAAAAAAAAAAABAwACBQT%2FxAAgEQACAgICAgMAAAAAAAAAAAABAgADERIEISIjMUFR%2F9oADAMBAAIRAxEAPwCx1Asb3JRWkB0NjYrS%2FEHxG8kileoN7dxWwSSSIqGTkemNGjWjPlQZWsBiBEyziDFhnUnk5Haow9kPMqNo1EVk19TawPEzDlF4PmmcY6scznHqYE%2FUm3mV3AsH1U7Ovk0m0hXJmpaBnqaMfkJJIDBIFCL7GYdwPymVLt5YlFrUkbT%2F2Q%3D%3D",
+  1157→        "data:image/jpeg;base64,%2F9j%2F4AAQSkZJRgABAQAAAQABAAD%2F2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P%2F2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P%2FwAARCAAYABADAREAAhEBAxEB%2F8QAFwAAAwEAAAAAAAAAAAAAAAAAAgMFBP%2FEACMQAAIBBAEDBQAAAAAAAAAAAAECAwAEBRESEyExFDJBQlH%2FxAAZAQACAwEAAAAAAAAAAAAAAAABAwACBQT%2FxAAgEQACAgICAgMAAAAAAAAAAAABAgADERIEISIjMUFR%2F9oADAMBAAIRAxEAPwCx1Asb3JRWkB0NjYrS%2FEHxG8kileoN7dxWwSSSIqGTkemNGjWjPlQZWsBiBEyziDFhnUnk5Haow9kPMqNo1EVk19TawPEzDlF4PmmcY6scznHqYE%2FUm3mV3AsH1U7Ovk0m0hXJmpaBnqaMfkJJIDBIFCL7GYdwPymVLt5YlFrUkbT%2F2Q%3D%3D"
+  1158→      ]
+  1159→    },
+  1160→    "technical": {
+  1161→      "has_canonical": true,
+  1162→      "has_hreflang": false,
+  1163→      "has_og_tags": false,
+  1164→      "has_twitter_tags": true,
+  1165→      "has_json_ld": true,
+  1166→      "heading_count": {
+  1167→        "h1": 1,
+  1168→        "h2": 8,
+  1169→        "h3": 0
+  1170→      }
+  1171→    }
+  1172→  },
+  1173→  {
+  1174→    "site_name": "jdkgroup",
+  1175→    "url": "https://thejdkgroup.com/",
+  1176→    "metadata": {
+  1177→      "title": "Harrisburg Catering and Event Planning |&nbsp;The JDK Group",
+  1178→      "meta_description": "Serving Harrisburg, Lancaster, and York, the JDK Group is the region",
+  1179→      "meta_keywords": null,
+  1180→      "canonical_url": "https://thejdkgroup.com/",
+  1181→      "hreflang": null,
+  1182→      "og_tags": {
+  1183→        "og:title": "Harrisburg Catering and Event Planning |&nbsp;",
+  1184→        "og:description": "Serving Harrisburg, Lancaster, and York, the JDK Group is the region",
+  1185→        "og:image": "https://thejdkgroup.com/wp-content/themes/fuse/library/images/nothumb.gif",
+  1186→        "og:type": "website",
+  1187→        "og:url": "https://thejdkgroup.com/",
+  1188→        "og:site_name": "The JDK Group"
+  1189→      },
+  1190→      "twitter_tags": {
+  1191→        "twitter:card": "summary",
+  1192→        "twitter:title": "Harrisburg Catering and Event Planning |&nbsp;The JDK Group"
+  1193→      }
+  1194→    },
+  1195→    "headings": {
+  1196→      "h1": [
+  1197→        "Summer Catering",
+  1198→        "Let us help you\ndream a little.",
+  1199→        "Our mission is celebrating you.",
+  1200→        "We Produce Events Worth Celebrating.",
+  1201→        "Locally focused, internationally accredited.",
+  1202→        "",
+  1203→        ""
+  1204→      ],
+  1205→      "h2": [
+  1206→        "The JDK Group Catering &amp; Events",
+  1207→        "Connect with us!",
+  1208→        "From the blog",
+  1209→        "Cookie Consent",
+  1210→        "Cookie Preferences"
+  1211→      ],
+  1212→      "h3": [
+  1213→        "717-730-4661",
+  1214→        "RELATIONSHIPS FIRST",
+  1215→        "WORKING FOR YOU",
+  1216→        "PASSION DRIVES US",
+  1217→        "CREDIBILITY YOU DESERVE",
+  1218→        "Harrisburg Headquarters:"
+  1219→      ],
+  1220→      "h4": [
+  1221→        "What We Bring to The Table",
+  1222→        "Who We Are",
+  1223→        "VENUES",
+  1224→        "Holiday Cocktails &amp; Mocktails to Make Spirits Bright",
+  1225→        "How to Survive the Holiday Party Season with JDK",
+  1226→        "Make the Holidays Unforgettable at our Exclusive Holiday Party Venues",
+  1227→        "Get In Touch With Us!"
+  1228→      ],
+  1229→      "h5": [],
+  1230→      "h6": [
+  1231→        "Main navigation",
+  1232→        "Main navigation"
+  1233→      ]
+  1234→    },
+  1235→    "structured_data": [
+  1236→      {
+  1237→        "@context": "https://schema.org",
+  1238→        "@graph": [
+  1239→          {
+  1240→            "@type": "WebPage",
+  1241→            "@id": "https://thejdkgroup.com/",
+  1242→            "url": "https://thejdkgroup.com/",
+  1243→            "name": "Harrisburg Catering and Event Planning | ",
+  1244→            "isPartOf": {
+  1245→              "@id": "https://thejdkgroup.com/#website"
+  1246→            },
+  1247→            "about": {
+  1248→              "@id": "https://thejdkgroup.com/#organization"
+  1249→            },
+  1250→            "datePublished": "2013-06-13T11:07:02+00:00",
+  1251→            "dateModified": "2024-02-25T14:44:56+00:00",
+  1252→            "description": "Serving Harrisburg, Lancaster, and York, the JDK Group is the region's premier full-service catering and event planning company",
+  1253→            "breadcrumb": {
+  1254→              "@id": "https://thejdkgroup.com/#breadcrumb"
+  1255→            },
+  1256→            "inLanguage": "en-US",
+  1257→            "potentialAction": [
+  1258→              {
+  1259→                "@type": "ReadAction",
+  1260→                "target": [
+  1261→                  "https://thejdkgroup.com/"
+  1262→                ]
+  1263→              }
+  1264→            ]
+  1265→          },
+  1266→          {
+  1267→            "@type": "BreadcrumbList",
+  1268→            "@id": "https://thejdkgroup.com/#breadcrumb",
+  1269→            "itemListElement": [
+  1270→              {
+  1271→                "@type": "ListItem",
+  1272→                "position": 1,
+  1273→                "name": "Home"
+  1274→              }
+  1275→            ]
+  1276→          },
+  1277→          {
+  1278→            "@type": "WebSite",
+  1279→            "@id": "https://thejdkgroup.com/#website",
+  1280→            "url": "https://thejdkgroup.com/",
+  1281→            "name": "The JDK Group",
+  1282→            "description": "We Produce Events Worth Celebrating!",
+  1283→            "publisher": {
+  1284→              "@id": "https://thejdkgroup.com/#organization"
+  1285→            },
+  1286→            "potentialAction": [
+  1287→              {
+  1288→                "@type": "SearchAction",
+  1289→                "target": {
+  1290→                  "@type": "EntryPoint",
+  1291→                  "urlTemplate": "https://thejdkgroup.com/?s={search_term_string}"
+  1292→                },
+  1293→                "query-input": {
+  1294→                  "@type": "PropertyValueSpecification",
+  1295→                  "valueRequired": true,
+  1296→                  "valueName": "search_term_string"
+  1297→                }
+  1298→              }
+  1299→            ],
+  1300→            "inLanguage": "en-US"
+  1301→          },
+  1302→          {
+  1303→            "@type": "Organization",
+  1304→            "@id": "https://thejdkgroup.com/#organization",
+  1305→            "name": "The JDK Group",
+  1306→            "url": "https://thejdkgroup.com/",
+  1307→            "logo": {
+  1308→              "@type": "ImageObject",
+  1309→              "inLanguage": "en-US",
+  1310→              "@id": "https://thejdkgroup.com/#/schema/logo/image/",
+  1311→              "url": "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png",
+  1312→              "contentUrl": "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png",
+  1313→              "width": 80,
+  1314→              "height": 80,
+  1315→              "caption": "The JDK Group"
+  1316→            },
+  1317→            "image": {
+  1318→              "@id": "https://thejdkgroup.com/#/schema/logo/image/"
+  1319→            },
+  1320→            "sameAs": [
+  1321→              "https://www.facebook.com/thejdkgroup/",
+  1322→              "https://x.com/thejdkgroup"
+  1323→            ]
+  1324→          }
+  1325→        ]
+  1326→      }
+  1327→    ],
+  1328→    "images": {
+  1329→      "alt_texts": [
+  1330→        "The JDK Group",
+  1331→        "The JDK Group",
+  1332→        "corporate catering options near harrisburg",
+  1333→        "catering and events in york harrisburg lancaster and carlisle",
+  1334→        "gala catering and planning",
+  1335→        "wedding catering and design",
+  1336→        "Holiday Cocktails &amp; Mocktails to Make Spirits Bright",
+  1337→        "How to Survive the Holiday Party Season with JDK",
+  1338→        "Make the Holidays Unforgettable at our Exclusive Holiday Party Venues"
+  1339→      ],
+  1340→      "sample_images": [
+  1341→        "https://www.facebook.com/tr?id=1954664268193278&ev=PageView&noscript=1",
+  1342→        "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png",
+  1343→        "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png",
+  1344→        "https://thejdkgroup.com/wp-content/uploads/Summer-Party-1800x800.png",
+  1345→        "https://thejdkgroup.com/wp-content/uploads/2025-Weddings--1800x800.png",
+  1346→        "https://thejdkgroup.com/wp-content/uploads/JDK-Website-Home-Page-Slider-Size-1876-x-830-1800x800.jpg",
+  1347→        "https://thejdkgroup.com/wp-content/uploads/the-jdk-group-corporate-catering-and-event-design-1800x800.jpg",
+  1348→        "https://thejdkgroup.com/wp-content/uploads/JDK-Website-Home-Page-Slider-Size-1876-x-830-3-1800x800.jpg",
+  1349→        "https://thejdkgroup.com/wp-content/uploads/corporate-catering-options.jpg",
+  1350→        "https://thejdkgroup.com/wp-content/uploads/catering-and-events-in-york-harrisburg-lancaster-carlisle.jpg",
+  1351→        "https://thejdkgroup.com/wp-content/uploads/what-we-bring-to-the-table.jpg",
+  1352→        "https://thejdkgroup.com/wp-content/uploads/who-we-are_left.jpg",
+  1353→        "https://thejdkgroup.com/wp-content/uploads/top-wedding-and-event-caterer-near-harrisburg.jpg",
+  1354→        "https://thejdkgroup.com/wp-content/uploads/best-wedding-and-event-venues-central-pa.jpg",
+  1355→        "https://thejdkgroup.com/wp-content/uploads/venues_small.jpg",
+  1356→        "https://thejdkgroup.com/wp-content/uploads/JDK-Blog-Post-Header-Image-3-1-1200x500.jpg",
+  1357→        "https://thejdkgroup.com/wp-content/uploads/JDK-Blog-Post-Header-Image-12-1200x500.jpg",
+  1358→        "https://thejdkgroup.com/wp-content/uploads/JDK-Blog-Post-Header-Image-10-1200x500.jpg",
+  1359→        "https://thejdkgroup.com/wp-content/uploads/2015/03/footer-CTA.png",
+  1360→        "https://www.facebook.com/tr?id=1406622499871633&ev=PageView&noscript=1&cd%5Bpage_title%5D=Harrisburg+Catering+and+Events&cd%5Bpost_type%5D=page&cd%5Bpost_id%5D=502&cd%5Bplugin%5D=PixelYourSite&cd%5Buser_role%5D=guest&cd%5Bevent_url%5D=thejdkgroup.com%2F"
+  1361→      ]
+  1362→    },
+  1363→    "technical": {
+  1364→      "has_canonical": true,
+  1365→      "has_hreflang": false,
+  1366→      "has_og_tags": true,
+  1367→      "has_twitter_tags": true,
+  1368→      "has_json_ld": true,
+  1369→      "heading_count": {
+  1370→        "h1": 7,
+  1371→        "h2": 5,
+  1372→        "h3": 6
+  1373→      }
+  1374→    }
+  1375→  },
+  1376→  {
+  1377→    "site_name": "myradish",
+  1378→    "url": "https://www.myradish.com/",
+  1379→    "metadata": {
+  1380→      "title": "Radish",
+  1381→      "meta_description": null,
+  1382→      "meta_keywords": null,
+  1383→      "canonical_url": "https://www.myradish.com/",
+  1384→      "hreflang": null,
+  1385→      "og_tags": {
+  1386→        "og:title": "Radish",
+  1387→        "og:image": "http://static1.squarespace.com/static/63dbd0b3982ede266f73e878/t/6439b65d6a582118c36c2d39/1681503837183/Social+Image.png?format=1500w",
+  1388→        "og:type": "website",
+  1389→        "og:url": "https://www.myradish.com",
+  1390→        "og:site_name": "Radish"
+  1391→      },
+  1392→      "twitter_tags": {
+  1393→        "twitter:card": "summary",
+  1394→        "twitter:title": "Radish",
+  1395→        "twitter:image": "http://static1.squarespace.com/static/63dbd0b3982ede266f73e878/t/6439b65d6a582118c36c2d39/1681503837183/Social+Image.png?format=1500w"
+  1396→      }
+  1397→    },
+  1398→    "headings": {
+  1399→      "h1": [],
+  1400→      "h2": [
+  1401→        "' + $(this).html() + '"
+  1402→      ],
+  1403→      "h3": [],
+  1404→      "h4": [],
+  1405→      "h5": [],
+  1406→      "h6": []
+  1407→    },
+  1408→    "structured_data": [
+  1409→      {
+  1410→        "url": "https://www.myradish.com",
+  1411→        "name": "Radish",
+  1412→        "image": "//images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/c45589f3-5f91-4d04-8dc5-df17730e9941/Radish_Poblano.png",
+  1413→        "@context": "http://schema.org",
+  1414→        "@type": "WebSite"
+  1415→      }
+  1416→    ],
+  1417→    "images": {
+  1418→      "alt_texts": [
+  1419→        "Radish",
+  1420→        "Radish"
+  1421→      ],
+  1422→      "sample_images": [
+  1423→        "//images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/c45589f3-5f91-4d04-8dc5-df17730e9941/Radish_Poblano.png?format=1500w",
+  1424→        "//images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/c45589f3-5f91-4d04-8dc5-df17730e9941/Radish_Poblano.png?format=1500w",
+  1425→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/4a74e5b2-9182-4044-9a44-75813f8a0497/studio-shot-of-radish-meal-kit-angela-decenzo-20220222_41A2313+%283%29.jpg",
+  1426→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/cf511546-723b-4801-9ab5-267882a47979/Food+for+the+Future+of+work.png",
+  1427→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/ba447dbb-400f-4821-8256-e5d078083bb9/decenzo-angela-san-francisco-photographer-radish-cafe-20230206_41A9979.jpg",
+  1428→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/99e2dc11-919f-4eba-8514-c913b822e1c3/Workplace.png",
+  1429→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/555bc422-1123-4a3e-b9b2-0363457c8de3/chef-kitya-ditpa-radish-catering-angela-decenzo-20220630_41A3760.jpg",
+  1430→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/ae1dd8aa-cae1-40c5-a62c-ede3479288ea/Radish+Events.png",
+  1431→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/31c194e0-7aab-4a8d-a401-84d31a702761/chef-tu-david-phu-for-radish-catering-angela-decenzo-20220630_41A4597.jpg",
+  1432→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/84075506-3ab3-4423-a1b9-289cb4436d6c/Our+Approach+%281%29.png",
+  1433→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/48838565-b4c8-48d9-a2fb-4fdb0df965b5/radish-catering-angela-decenzo-20220630_41A4302+2+%281%29.png",
+  1434→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/7c2d89f7-4f19-4fa1-9590-5999198a7723/Cuttind-edge.png",
+  1435→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/f3efee71-3495-48cc-adf7-f7aed0211094/6.6.18+Instagram+Dinner+.+interactive+dessert+1+%281%29.JPG",
+  1436→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/1c477947-0566-40ad-b0f4-906303000ac8/Elevated%2C+Turnkey+%26+Affordable+Events.png",
+  1437→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/b1534d4c-584c-44e3-89b7-e97663eb8fe6/Rooted+in+the+local+food+community.png",
+  1438→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/5c10a52d-e725-4257-a15d-1247ace924b7/Unmatched+Culinary+Talent+Website.png",
+  1439→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/edfe2128-5e0b-4c3b-bad4-c98e0209f006/chef-tu-david-phu-for-radish-catering-angela-decenzo-20220630_41A4573.jpg",
+  1440→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/e7a79d0f-9f6e-4323-a367-160723c97dac/sustainabiity.png",
+  1441→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/65c35544-54ec-48b8-acd5-8efb3e95c9ff/our+clients.png",
+  1442→        "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/5a79244d-4618-441a-8e4e-51c2c24a5bfd/Radish+Clients_2024.png"
+  1443→      ]
+  1444→    },
+  1445→    "technical": {
+  1446→      "has_canonical": true,
+  1447→      "has_hreflang": false,
+  1448→      "has_og_tags": true,
+  1449→      "has_twitter_tags": true,
+  1450→      "has_json_ld": true,
+  1451→      "heading_count": {
+  1452→        "h1": 0,
+  1453→        "h2": 1,
+  1454→        "h3": 0
+  1455→      }
+  1456→    }
+  1457→  },
+  1458→  {
+  1459→    "site_name": "queenofhearts",
+  1460→    "url": "https://queenofheartscatering.com/",
+  1461→    "metadata": {
+  1462→      "title": "Queen of Hearts Catering | Philadelphia Wedding Caterer",
+  1463→      "meta_description": "Easy planning, peace of mind and delicious catering for events &amp; weddings across the Philadelphia area. See why Queen of Hearts is the perfect match for you!",
+  1464→      "meta_keywords": null,
+  1465→      "canonical_url": "https://queenofheartscatering.com/",
+  1466→      "hreflang": null,
+  1467→      "og_tags": {},
+  1468→      "twitter_tags": {}
+  1469→    },
+  1470→    "headings": {
+  1471→      "h1": [
+  1472→        "",
+  1473→        "EXPERT CATERING. EFFORTLESS EVENTS."
+  1474→      ],
+  1475→      "h2": [
+  1476→        "SIMPLE PLANNING,  DREAM WEDDINGS.",
+  1477→        "PERFECT BACKYARD WEDDINGS",
+  1478→        "Venues",
+  1479→        "Venues",
+  1480→        "Latest Events",
+  1481→        "GET IN TOUCH"
+  1482→      ],
+  1483→      "h3": [
+  1484→        "Ariana &amp; Constantine’s Timeless Romantic Wedding at Old Mill",
+  1485→        "Angela and Andrew’s Scenic “I Do” Views at Springton Manor Farm",
+  1486→        "Fall (and Love) Were in the Air at Paula &amp; Justin’s Springton Manor Farm Wedding"
+  1487→      ],
+  1488→      "h4": [],
+  1489→      "h5": [],
+  1490→      "h6": []
+  1491→    },
+  1492→    "structured_data": [],
+  1493→    "images": {
+  1494→      "alt_texts": [
+  1495→        "Spinner: Black decorative",
+  1496→        "Spinner: Black decorative",
+  1497→        "Queen of Hearts",
+  1498→        "Thai shrimp cocktail, maple dijon chicken, mini crab cakes and scallops wrapped in bacon were the delicious passed hors d",
+  1499→        "Don",
+  1500→        "Egg rolls so crispy we can hear the crunch! These are sure to fly off the platter at any event.\n.\n📸@the.real.m2photo\n.\n.\n.\n#weddingfood #weddingcatering #pawedding #philadelphia #philadelphiawedding #paevent #philadelphiacatering #weddingcatering #catering #cateringservice",
+  1501→        "From the first bite to the last, every course is crafted to delight. 🥗 \n.\n📸@the.real.m2photo\n.\n.\n.\n#weddingfood #weddingcatering #pawedding #philadelphia #philadelphiawedding #paevent #philadelphiacatering #weddingcatering #catering #cateringservice",
+  1502→        "Nothing beats gathering around the table with the ones you love! And we",
+  1503→        "A memorable culinary experience isn",
+  1504→        "From the first course to the last, you can rest assured that your event menu is in good hands with our experienced team.❤️🍽️\n.\n📸@the.real.m2photo\n.\n.\n.\n#weddingfood #weddingcatering #pawedding #philadelphia #philadelphiawedding #paevent #philadelphiacatering #weddingcatering #catering #cateringservice",
+  1505→        "Avocado BLT but make it bite-size! 🥑🥓🍅\n.\n📸@the.real.m2photo\n.\n.\n.\n#weddingfood #weddingcatering #pawedding #philadelphia #philadelphiawedding #paevent #philadelphiacatering #weddingcatering #catering #cateringservice",
+  1506→        "Angela and Andrew’s Scenic “I Do” Views at Springton Manor Farm",
+  1507→        "Fall (and Love) Were in the Air at Paula &amp; Justin’s Springton Manor Farm Wedding",
+  1508→        "The Knot Best of Weddings 2025 award",
+  1509→        "The Knot Best of Weddings 2020 award",
+  1510→        "Wedding Wire Couple",
+  1511→        "PVG",
+  1512→        "J Scott Catering logo",
+  1513→        "Phoenixville Foundry logo",
+  1514→        "The Manor House at Springton Manor Farm logo",
+  1515→        "Common Good logo",
+  1516→        "The Lost Cow logo",
+  1517→        "Queen of Hearts logo",
+  1518→        "The Old Mill logo",
+  1519→        "Columbia Grand logo"
+  1520→      ],
+  1521→      "sample_images": [
+  1522→        "https://cdn.userway.org/widgetapp/images/spin_bl.svg",
+  1523→        "https://cdn.userway.org/widgetapp/images/body_bl.svg",
+  1524→        "https://cdn.userway.org/widgetapp/images/spin_bl.svg",
+  1525→        "https://queenofheartscatering.com/wp-content/themes/queen-hearts/images/logo.png",
+  1526→        "https://queenofheartscatering.com/wp-content/uploads/sb-instagram-feed-images/772611403_18616944013014552_7195514037556453152_nlow.webp",
+  1527→        "https://queenofheartscatering.com/wp-content/uploads/sb-instagram-feed-images/771998498_18616238131014552_4135062920954269534_nlow.webp",
+  1528→        "https://queenofheartscatering.com/wp-content/uploads/sb-instagram-feed-images/767524769_18614880766014552_1919006951893860023_nlow.webp",
+  1529→        "https://queenofheartscatering.com/wp-content/uploads/sb-instagram-feed-images/765929785_18614241964014552_1374869609580146973_nlow.webp",
+  1530→        "https://queenofheartscatering.com/wp-content/uploads/sb-instagram-feed-images/758501722_18612223543014552_1791344629950164389_nlow.webp",
+  1531→        "https://queenofheartscatering.com/wp-content/uploads/sb-instagram-feed-images/759281649_18611595748014552_4786716867189219238_nlow.webp",
+  1532→        "https://queenofheartscatering.com/wp-content/uploads/sb-instagram-feed-images/755195077_18610281580014552_2553425203727134914_nlow.webp",
+  1533→        "https://s.w.org/images/core/emoji/17.0.2/svg/1f951.svg",
+  1534→        "https://s.w.org/images/core/emoji/17.0.2/svg/1f953.svg",
+  1535→        "https://s.w.org/images/core/emoji/17.0.2/svg/1f345.svg",
+  1536→        "https://s.w.org/images/core/emoji/17.0.2/svg/1f4f8.svg",
+  1537→        "https://queenofheartscatering.com/wp-content/uploads/sb-instagram-feed-images/754068756_18609667105014552_4967009154792667291_nlow.webp",
+  1538→        "https://queenofheartscatering.com/wp-content/uploads/2025/09/Lewisburg-Studio-e1758079475191.jpg",
+  1539→        "https://queenofheartscatering.com/wp-content/uploads/2025/09/Sharyn-Frenkel-Photography-e1758080018329.jpg",
+  1540→        "https://queenofheartscatering.com/wp-content/uploads/2025/11/QOH-Diamond-Images-review-TCG.png",
+  1541→        "https://queenofheartscatering.com/wp-content/uploads/2025/11/QOH-Diamond-Images-review-food.png"
+  1542→      ]
+  1543→    },
+  1544→    "technical": {
+  1545→      "has_canonical": true,
+  1546→      "has_hreflang": false,
+  1547→      "has_og_tags": false,
+  1548→      "has_twitter_tags": false,
+  1549→      "has_json_ld": false,
+  1550→      "heading_count": {
+  1551→        "h1": 2,
+  1552→        "h2": 6,
+  1553→        "h3": 3
+  1554→      }
+  1555→    }
+  1556→  },
+  1557→  {
+  1558→    "site_name": "ridgewells",
+  1559→    "url": "https://www.ridgewells.com/",
+  1560→    "metadata": {
+  1561→      "title": "Ridgewells Catering | Washington DC Best Caterer",
+  1562→      "meta_description": "Ridgewells Catering has been the go-to choice for catering in Washington, D.C. for more than 95 years. Corporate Events, Weddings, Social Events, Major Sporting Events, and all-around Impeccable Hospitality. Award winning culinary team and voted best caterer in Washington DC.",
+  1563→      "meta_keywords": null,
+  1564→      "canonical_url": "https://www.ridgewells.com/",
+  1565→      "hreflang": null,
+  1566→      "og_tags": {
+  1567→        "og:title": "Ridgewells Catering | Washington DC Best Caterer",
+  1568→        "og:description": "Ridgewells Catering has been the go-to choice for catering in Washington, D.C. for more than 95 years. Corporate Events, Weddings, Social Events, Major Sporting Events, and all-around Impeccable Hospitality. Award winning culinary team and voted best caterer in Washington DC.",
+  1569→        "og:type": "website",
+  1570→        "og:url": "https://www.ridgewells.com",
+  1571→        "og:site_name": "Ridgewells Catering"
+  1572→      },
+  1573→      "twitter_tags": {
+  1574→        "twitter:card": "summary_large_image",
+  1575→        "twitter:title": "Ridgewells Catering | Washington DC Best Caterer",
+  1576→        "twitter:description": "Ridgewells Catering has been the go-to choice for catering in Washington, D.C. for more than 95 years. Corporate Events, Weddings, Social Events, Major Sporting Events, and all-around Impeccable Hospitality. Award winning culinary team and voted best caterer in Washington DC."
+  1577→      }
+  1578→    },
+  1579→    "headings": {
+  1580→      "h1": [
+  1581→        "Ridgewells'\nHoliday Menu is here!",
+  1582→        "Staffing"
+  1583→      ],
+  1584→      "h2": [
+  1585→        "Every event has a\nstory to tell.",
+  1586→        "Every event has a\nstory to tell.",
+  1587→        "Corporate Events",
+  1588→        "Weddings",
+  1589→        "Social Events",
+  1590→        "Major Events",
+  1591→        "A Legacy Like No Other",
+  1592→        "Passion for Celebration.",
+  1593→        "What Our Clients\nSay About Us",
+  1594→        "Parties &amp;",
+  1595→        "Social Events",
+  1596→        "Weddings",
+  1597→        "Corporate",
+  1598→        "Events",
+  1599→        "Major Events",
+  1600→        "There's No Party Like a Ridgewells Party&nbsp; &nbsp; There's No Party Like a Ridgewells Party &nbsp; &nbsp;There's No Party Like a Ridgewells Party &nbsp; &nbsp;There's No Party Like a Ridgewells Party",
+  1601→        "There's No Party Like a Ridgewells Party&nbsp; &nbsp; There's No Party Like a Ridgewells Party &nbsp; &nbsp;There's No Party Like a Ridgewells Party &nbsp; &nbsp;There's No Party Like a Ridgewells Party",
+  1602→        "OUR 2024 HOLIDAY MENU IS HERE!",
+  1603→        "Catering Cultural Cuisine with Integrity",
+  1604→        "Questions Every Couple Should Ask Their Caterer",
+  1605→        "When a Menu Tells a Story: Celebrating the 2026 Rolex National Geographic Explorer of the Year",
+  1606→        "Championship Hospitality at the 2026 U.S. Open",
+  1607→        "Erin Go Glam 2026: At the Edge of Elsewhere",
+  1608→        "Featured in ECEP Trend Report",
+  1609→        "LATEST NEWS &amp; BLOG",
+  1610→        "The Dish",
+  1611→        "Catering Cultural Cuisine with Integrity",
+  1612→        "Questions Every Couple Should Ask Their Caterer",
+  1613→        "When a Menu Tells a Story: Celebrating the 2026 Rolex National Geographic Explorer of the Year",
+  1614→        "Championship Hospitality at the 2026 U.S. Open",
+  1615→        "LATEST NEWS &amp; BLOG",
+  1616→        "The Dish",
+  1617→        "New Seasonal Menus",
+  1618→        "FOLLOW US",
+  1619→        "@RidgewellsDC",
+  1620→        "PROUD MEMBER",
+  1621→        "Curious what we've got cooking up next?\nJoin our mailing list."
+  1622→      ],
+  1623→      "h3": [
+  1624→        "5522 Dorsey Ln, Bethesda, MD 20816\ninfo@ridgewells.com\n301.652.1515"
+  1625→      ],
+  1626→      "h4": [
+  1627→        "This is where&nbsp;",
+  1628→        "the magic happens.",
+  1629→        "This is where&nbsp;",
+  1630→        "the magic happens."
+  1631→      ],
+  1632→      "h5": [],
+  1633→      "h6": []
+  1634→    },
+  1635→    "structured_data": [
+  1636→      {
+  1637→        "@context": "https://schema.org/",
+  1638→        "@type": "WebSite",
+  1639→        "url": "https://www.ridgewells.com/",
+  1640→        "potentialAction": {
+  1641→          "@type": "SearchAction",
+  1642→          "target": {
+  1643→            "@type": "EntryPoint",
+  1644→            "urlTemplate": "https://www.ridgewells.com/search?q={search_term}"
+  1645→          },
+  1646→          "query-input": "required name=search_term"
+  1647→        }
+  1648→      },
+  1649→      {
+  1650→        "@context": "https://schema.org/",
+  1651→        "@type": "WebSite",
+  1652→        "name": "Ridgewells Catering",
+  1653→        "url": "https://www.ridgewells.com"
+  1654→      }
+  1655→    ],
+  1656→    "images": {
+  1657→      "alt_texts": [
+  1658→        "RIdgewells Catering Logo",
+  1659→        "Facebook",
+  1660→        "Instagram",
+  1661→        "Pinterest",
+  1662→        "LinkedIn",
+  1663→        "TikTok",
+  1664→        "Beautiful sunset over an al-fresco dinner table at a dock  on the water",
+  1665→        "Bride and groom on the dance floor at their wedding reception surrounded by friends and family members ",
+  1666→        "2025_RIDGEWELLS_HOLIDAYS12238.jpg",
+  1667→        "Top Caterer Washington DC",
+  1668→        "Top Caterer Washington DC",
+  1669→        "Black tie corporate gala at Mellon Auditorium",
+  1670→        "Bride and groom cutting their wedding cake at their reception, Ridgewells Catering",
+  1671→        "Dinner party with beautiful tablescape and delicious food from Ridgewells Catering",
+  1672→        "U.S. Open",
+  1673→        "Best Caterer Washington DC",
+  1674→        "Best Caterer Washington DC",
+  1675→        "Ridgewells Catering Washington DC legacy history best caterer",
+  1676→        "Beautiful Stylized Plated Salad",
+  1677→        "Rdgewells Catering Goumet Food",
+  1678→        "Ridgewells Catering Creative Corporate Event &amp; Wedding Caterer Washington DC",
+  1679→        "Gold Star.png",
+  1680→        "Gold Star.png",
+  1681→        "Gold Star.png",
+  1682→        "American Express logo",
+  1683→        "Rolex logo",
+  1684→        "Samsung logo",
+  1685→        "United Therapeutics logo",
+  1686→        "Harbinger logo",
+  1687→        "George Washington University logo"
+  1688→      ],
+  1689→      "sample_images": [
+  1690→        "https://static.wixstatic.com/media/313fa1_b99ef3d3eaff40af80240787770599ee~mv2.png/v1/fill/w_111,h_33,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/313fa1_b99ef3d3eaff40af80240787770599ee~mv2.png",
+  1691→        "https://static.wixstatic.com/media/11062b_ef6a6ac194704911951645990055c2ce~mv2.png/v1/fill/w_20,h_20,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_ef6a6ac194704911951645990055c2ce~mv2.png",
+  1692→        "https://static.wixstatic.com/media/11062b_cef3b719166a4815b446d4dcfcb6120d~mv2.png/v1/fill/w_20,h_20,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_cef3b719166a4815b446d4dcfcb6120d~mv2.png",
+  1693→        "https://static.wixstatic.com/media/11062b_79e4793290f44db59b5c826bb4c78d2b~mv2.png/v1/fill/w_20,h_20,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_79e4793290f44db59b5c826bb4c78d2b~mv2.png",
+  1694→        "https://static.wixstatic.com/media/11062b_b5690303a8ff470e9b1c03a24aff140b~mv2.png/v1/fill/w_20,h_20,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_b5690303a8ff470e9b1c03a24aff140b~mv2.png",
+  1695→        "https://static.wixstatic.com/media/11062b_3a1a34a22c10436caac05a4e0f6a876e~mv2.png/v1/fill/w_20,h_20,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_3a1a34a22c10436caac05a4e0f6a876e~mv2.png",
+  1696→        "https://static.wixstatic.com/media/93242c_411ad45d6077481bb04a66b44cbc0535~mv2.jpg/v1/fill/w_1920,h_1080,fp_0.5_0.63,q_90,enc_avif,quality_auto/93242c_411ad45d6077481bb04a66b44cbc0535~mv2.jpg",
+  1697→        "https://static.wixstatic.com/media/93242c_6cf4ae3fb1c74ea9a5d6935fccb6d858~mv2.webp/v1/fill/w_1920,h_1080,fp_0.51_0.71,q_90,enc_avif,quality_auto/93242c_6cf4ae3fb1c74ea9a5d6935fccb6d858~mv2.webp",
+  1698→        "https://static.wixstatic.com/media/93242c_7b9bb339d4284fa8806defeced87b624~mv2.webp/v1/fill/w_640,h_640,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/030326_MellonAuditorium_MSIAmericanDynamism-41.webp",
+  1699→        "https://static.wixstatic.com/media/93242c_bca1db99d6844462a21d8e46ae87d26e~mv2.jpg/v1/fill/w_640,h_640,fp_0.55_0.35,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/1697-LauraGordon%C2%A9_sophiaandnick.jpg",
+  1700→        "https://static.wixstatic.com/media/313fa1_fd858fc4b3f84db88aa868af051ad3ce~mv2.jpg/v1/fill/w_640,h_610,fp_0.46_0.71,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/_GE_2047.jpg",
+  1701→        "https://static.wixstatic.com/media/313fa1_c3f0f20a9dd34233bbeaba5cda9af892~mv2.jpg/v1/fill/w_640,h_610,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DSC09277.jpg",
+  1702→        "https://static.wixstatic.com/media/313fa1_89475d6577844a22a28b4ebdc9506fa8~mv2.png/v1/fill/w_14,h_14,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/313fa1_89475d6577844a22a28b4ebdc9506fa8~mv2.png",
+  1703→        "https://static.wixstatic.com/media/313fa1_89475d6577844a22a28b4ebdc9506fa8~mv2.png/v1/fill/w_30,h_30,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/313fa1_89475d6577844a22a28b4ebdc9506fa8~mv2.png",
+  1704→        "https://static.wixstatic.com/media/313fa1_52a46ca6fae446dd8408ef861807adc0~mv2.png/v1/crop/x_0,y_0,w_17067,h_2731/fill/w_1288,h_206,fp_0.50_0.50,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/313fa1_52a46ca6fae446dd8408ef861807adc0~mv2.png",
+  1705→        "https://static.wixstatic.com/media/313fa1_5818f372b0c6422a989ea72fdba24693~mv2.jpg/v1/fill/w_1280,h_485,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/313fa1_5818f372b0c6422a989ea72fdba24693~mv2.jpg",
+  1706→        "https://static.wixstatic.com/media/313fa1_018a4c7fc2d2442bbcd7ede73d5607ed~mv2.png/v1/fill/w_221,h_231,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/313fa1_018a4c7fc2d2442bbcd7ede73d5607ed~mv2.png",
+  1707→        "https://static.wixstatic.com/media/313fa1_89475d6577844a22a28b4ebdc9506fa8~mv2.png/v1/fill/w_49,h_49,al_c,q_85,usm_0.66_1.00_0.01,blur_2,enc_avif,quality_auto/Gold%20Star.png",
+  1708→        "https://static.wixstatic.com/media/313fa1_89475d6577844a22a28b4ebdc9506fa8~mv2.png/v1/fill/w_49,h_49,al_c,q_85,usm_0.66_1.00_0.01,blur_2,enc_avif,quality_auto/Gold%20Star.png",
+  1709→        "https://static.wixstatic.com/media/313fa1_89475d6577844a22a28b4ebdc9506fa8~mv2.png/v1/fill/w_49,h_49,al_c,q_85,usm_0.66_1.00_0.01,blur_2,enc_avif,quality_auto/Gold%20Star.png"
+  1710→      ]
+  1711→    },
+  1712→    "technical": {
+  1713→      "has_canonical": true,
+  1714→      "has_hreflang": false,
+  1715→      "has_og_tags": true,
+  1716→      "has_twitter_tags": true,
+  1717→      "has_json_ld": true,
+  1718→      "heading_count": {
+  1719→        "h1": 2,
+  1720→        "h2": 37,
+  1721→        "h3": 1
+  1722→      }
+  1723→    }
+  1724→  },
+  1725→  {
+  1726→    "site_name": "saltblock",
+  1727→    "url": "https://saltblockhospitality.com/",
+  1728→    "metadata": {
+  1729→      "title": "Elevate Your Event Experience with SaltBlock Hospitality",
+  1730→      "meta_description": "Elevate your event with SaltBlock Hospitality",
+  1731→      "meta_keywords": null,
+  1732→      "canonical_url": "https://saltblockhospitality.com/",
+  1733→      "hreflang": null,
+  1734→      "og_tags": {
+  1735→        "og:title": "Elevate Your Event Experience with SaltBlock Hospitality",
+  1736→        "og:description": "Elevate your event with SaltBlock Hospitality",
+  1737→        "og:image": "http://static1.squarespace.com/static/628635115ffed10e289ac115/t/62ac3fe2545417200c47f77e/1655455714968/sbh_social_banner.png?format=1500w",
+  1738→        "og:type": "website",
+  1739→        "og:url": "https://saltblockhospitality.com",
+  1740→        "og:site_name": "Saltblock Hospitality"
+  1741→      },
+  1742→      "twitter_tags": {
+  1743→        "twitter:card": "summary",
+  1744→        "twitter:title": "Elevate Your Event Experience with SaltBlock Hospitality",
+  1745→        "twitter:description": "Elevate your event with SaltBlock Hospitality",
+  1746→        "twitter:image": "http://static1.squarespace.com/static/628635115ffed10e289ac115/t/62ac3fe2545417200c47f77e/1655455714968/sbh_social_banner.png?format=1500w"
+  1747→      }
+  1748→    },
+  1749→    "headings": {
+  1750→      "h1": [
+  1751→        "RAISE THE BAR",
+  1752→        "Looking For The Perfect Venue?"
+  1753→      ],
+  1754→      "h2": [
+  1755→        "VENUES",
+  1756→        "Events",
+  1757→        "IMPRESSIVE Hospitality Experiences",
+  1758→        "EXCLUSIVE VENUES",
+  1759→        "CHEFCRAFTED",
+  1760→        "FARM FRESH",
+  1761→        "WHAT PEOPLE ARE SAYING",
+  1762→        "GET STARTED",
+  1763→        "WHAT PEOPLE ARE SAYING",
+  1764→        "“it may be impossible to top it next year.”",
+  1765→        "WHAT PEOPLE ARE SAYING",
+  1766→        "“it may be impossible to top it next year.”",
+  1767→        "READY TO PLAN YOUR EVENT?"
+  1768→      ],
+  1769→      "h3": [
+  1770→        "We understand the pressure to deliver next-level experiences for your guests",
+  1771→        "1 — DISCOVER OUR BRANDS",
+  1772→        "2 — SHARE THE DETAILS",
+  1773→        "3 — RAISE THE BAR",
+  1774→        "Looking for the perfect venue?",
+  1775→        "Catering",
+  1776→        "Venues",
+  1777→        "The Farm",
+  1778→        "Company",
+  1779→        "Contact",
+  1780→        "FOLLOW US",
+  1781→        "${getItemTitle}"
+  1782→      ],
+  1783→      "h4": [
+  1784→        "impressive FOOD &amp; BEVERAGE EXPERIENCES",
+  1785→        "Get Started"
+  1786→      ],
+  1787→      "h5": [],
+  1788→      "h6": []
+  1789→    },
+  1790→    "structured_data": [
+  1791→      {
+  1792→        "url": "https://saltblockhospitality.com",
+  1793→        "name": "Saltblock Hospitality",
+  1794→        "description": "",
+  1795→        "image": "//images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/38705ff8-cf19-47d2-abf4-7f0ec7bcafb5/Logo.png",
+  1796→        "@context": "http://schema.org",
+  1797→        "@type": "WebSite"
+  1798→      },
+  1799→      {
+  1800→        "legalName": "SaltBlock Hospitality",
+  1801→        "address": "8414 Camden Street\nTampa, FL, 33614\nUnited States",
+  1802→        "email": "Contact@Saltblockhospitality.com",
+  1803→        "telephone": "877.793.7526",
+  1804→        "sameAs": [
+  1805→          "https://www.instagram.com/saltblockhospitality/",
+  1806→          "https://www.facebook.com/SaltBlockHospitality/"
+  1807→        ],
+  1808→        "@context": "http://schema.org",
+  1809→        "@type": "Organization"
+  1810→      },
+  1811→      {
+  1812→        "address": "8414 Camden Street\nTampa, FL, 33614\nUnited States",
+  1813→        "image": "https://static1.squarespace.com/static/628635115ffed10e289ac115/t/6286402ed3772a5abfeb6042/1786468104721/",
+  1814→        "name": "SaltBlock Hospitality",
+  1815→        "openingHours": "Mo 09:00-17:00, Tu 09:00-17:00, We 09:00-17:00, Th 09:00-17:00, Fr 09:00-17:00, , ",
+  1816→        "@context": "http://schema.org",
+  1817→        "@type": "LocalBusiness"
+  1818→      },
+  1819→      {
+  1820→        "@context": "https://schema.org",
+  1821→        "@type": "CateringService",
+  1822→        "@id": "https://saltblockhospitality.com/#organization",
+  1823→        "name": "SaltBlock Hospitality",
+  1824→        "url": "https://saltblockhospitality.com",
+  1825→        "logo": "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/38705ff8-cf19-47d2-abf4-7f0ec7bcafb5/Logo.png",
+  1826→        "image": "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/38705ff8-cf19-47d2-abf4-7f0ec7bcafb5/Logo.png",
+  1827→        "description": "SaltBlock Hospitality delivers chef-driven, seed-oil-free menus with a modern approach to luxury catering in Tampa. Full-service catering, curated bar experiences, and event execution for weddings, corporate events, galas, and private celebrations.",
+  1828→        "slogan": "Raise the Bar",
+  1829→        "address": {
+  1830→          "@type": "PostalAddress",
+  1831→          "streetAddress": "8414 Camden St",
+  1832→          "addressLocality": "Tampa",
+  1833→          "addressRegion": "FL",
+  1834→          "postalCode": "33614",
+  1835→          "addressCountry": "US"
+  1836→        },
+  1837→        "telephone": "+1-877-793-7526",
+  1838→        "contactPoint": [
+  1839→          {
+  1840→            "@type": "ContactPoint",
+  1841→            "telephone": "+1-877-793-7526",
+  1842→            "email": "Contact@SaltBlockHospitality.com",
+  1843→            "contactType": "Customer Service",
+  1844→            "availableLanguage": "en"
+  1845→          }
+  1846→        ],
+  1847→        "openingHoursSpecification": [
+  1848→          {
+  1849→            "@type": "OpeningHoursSpecification",
+  1850→            "dayOfWeek": [
+  1851→              "Monday"
+  1852→            ],
+  1853→            "opens": "09:00",
+  1854→            "closes": "17:00"
+  1855→          },
+  1856→          {
+  1857→            "@type": "OpeningHoursSpecification",
+  1858→            "dayOfWeek": [
+  1859→              "Tuesday"
+  1860→            ],
+  1861→            "opens": "09:00",
+  1862→            "closes": "17:00"
+  1863→          },
+  1864→          {
+  1865→            "@type": "OpeningHoursSpecification",
+  1866→            "dayOfWeek": [
+  1867→              "Wednesday"
+  1868→            ],
+  1869→            "opens": "09:00",
+  1870→            "closes": "17:00"
+  1871→          },
+  1872→          {
+  1873→            "@type": "OpeningHoursSpecification",
+  1874→            "dayOfWeek": [
+  1875→              "Thursday"
+  1876→            ],
+  1877→            "opens": "09:00",
+  1878→            "closes": "17:00"
+  1879→          },
+  1880→          {
+  1881→            "@type": "OpeningHoursSpecification",
+  1882→            "dayOfWeek": [
+  1883→              "Friday"
+  1884→            ],
+  1885→            "opens": "09:00",
+  1886→            "closes": "17:00"
+  1887→          }
+  1888→        ],
+  1889→        "areaServed": {
+  1890→          "@type": "City",
+  1891→          "name": "Tampa",
+  1892→          "address": {
+  1893→            "@type": "PostalAddress",
+  1894→            "addressRegion": "FL",
+  1895→            "addressCountry": "US"
+  1896→          }
+  1897→        },
+  1898→        "serviceType": [
+  1899→          "Full-Service Catering",
+  1900→          "Drop-Off Catering",
+  1901→          "Bar Service",
+  1902→          "Event Catering",
+  1903→          "Wedding Catering",
+  1904→          "Corporate Catering"
+  1905→        ],
+  1906→        "hasPart": [
+  1907→          {
+  1908→            "@type": "WebPage",
+  1909→            "name": "Privacy Policy",
+  1910→            "url": "https://saltblockhospitality.com/privacy-policy"
+  1911→          },
+  1912→          {
+  1913→            "@type": "WebPage",
+  1914→            "name": "Terms of Service",
+  1915→            "url": "https://saltblockhospitality.com/terms-of-service"
+  1916→          }
+  1917→        ],
+  1918→        "sameAs": [
+  1919→          "https://www.instagram.com/saltblockhospitality/",
+  1920→          "https://www.facebook.com/SaltBlockHospitality/"
+  1921→        ]
+  1922→      },
+  1923→      {
+  1924→        "@context": "https://schema.org",
+  1925→        "@type": "WebSite",
+  1926→        "url": "https://saltblockhospitality.com",
+  1927→        "name": "SaltBlock Hospitality",
+  1928→        "potentialAction": {
+  1929→          "@type": "SearchAction",
+  1930→          "target": "https://saltblockhospitality.com/search?query={search_term_string}",
+  1931→          "query-input": "required name=search_term_string"
+  1932→        }
+  1933→      },
+  1934→      {
+  1935→        "@context": "https://schema.org",
+  1936→        "@type": "Product",
+  1937→        "name": "Elevate Your Event Experience with SaltBlock Hospitality",
+  1938→        "url": "https://saltblockhospitality.com/",
+  1939→        "brand": {
+  1940→          "@type": "Brand",
+  1941→          "name": "Elevate Your Event Experience with SaltBlock Hospitality"
+  1942→        },
+  1943→        "description": "Elevate your event with SaltBlock Hospitality&apos;s  food and beverage experiences at exclusive Tampa venues and farm-fresh ingredients. Plan with confidence!",
+  1944→        "image": [
+  1945→          "http://static1.squarespace.com/static/628635115ffed10e289ac115/t/62ac3fe2545417200c47f77e/1655455714968/sbh_social_banner.png?format=1500w"
+  1946→        ],
+  1947→        "mpn": "115971",
+  1948→        "sku": "1159710",
+  1949→        "aggregateRating": {
+  1950→          "@type": "AggregateRating",
+  1951→          "ratingValue": 4.8,
+  1952→          "reviewCount": 156,
+  1953→          "bestRating": 5,
+  1954→          "worstRating": 1
+  1955→        },
+  1956→        "review": {
+  1957→          "@type": "Review",
+  1958→          "reviewBody": "Saltblock catered our summer party in Tampa this month and they did an exceptional job! From start to finish - the quality of both the food and the service were extraordinary.\nParker Skornschek made our event easy and fun. He is an excellent communicator and gave us the party we envisioned. We live in San Francisco and Parker made planning our party &quot;long distance&quot; a delightful experience. His preparation was awesome - he visited the house / location ahead of our arrival and made suggestions that we followed for the food layout. We asked for “California cuisine” and he created a menu that exceeded our expectations. Every dish was tasty, lovely and plentiful. Our guests complimented the delicious food, beautiful display and professional service.\nStaff Chef Grace, Lead assistant Akima, Kelly and Yoandra arrived early, prepped, prepared, arranged and served in the most subtle seamless way. Clean-up was fast and impeccable.\nWe HIGHLY recommend Parker, his team and SaltBlock Hospitality, and we hope to work with them again.",
+  1959→          "datePublished": "2026-07-25",
+  1960→          "author": {
+  1961→            "@type": "Person",
+  1962→            "name": "Donna Epstein"
+  1963→          },
+  1964→          "reviewRating": {
+  1965→            "@type": "Rating",
+  1966→            "ratingValue": 5
+  1967→          }
+  1968→        }
+  1969→      }
+  1970→    ],
+  1971→    "images": {
+  1972→      "alt_texts": [
+  1973→        "Saltblock Hospitality",
+  1974→        "Saltblock Hospitality",
+  1975→        "Our Catering Brands",
+  1976→        "The Saltblock Difference",
+  1977→        "Menus",
+  1978→        "Saltblock Exclusives",
+  1979→        "All Venues",
+  1980→        "Values",
+  1981→        "About",
+  1982→        "Blog",
+  1983→        "Section background",
+  1984→        "The Scout Guide",
+  1985→        "Catersource",
+  1986→        "Tampa Bay Times",
+  1987→        "The Honorable Life",
+  1988→        "Exclusive Venues",
+  1989→        "Chef Crafted",
+  1990→        "Farm Fresh",
+  1991→        "Murph",
+  1992→        "Murph",
+  1993→        "Saltblock.png",
+  1994→        "Saltblock.png",
+  1995→        "Screen%2BShot%2B2022-06-13%2Bat%2B12.55.40%2BPM.png",
+  1996→        "Screen%2BShot%2B2022-06-13%2Bat%2B12.55.40%2BPM.png",
+  1997→        "Screen Shot 2022-06-13 at 12.50.13 PM copy.png",
+  1998→        "Screen Shot 2022-06-13 at 12.50.13 PM copy.png",
+  1999→        "ssr.png",
+  2000→        "ssr.png",
+
+[showing lines 1-2000 of 2401; use offset=2001 with limit to continue reading]
