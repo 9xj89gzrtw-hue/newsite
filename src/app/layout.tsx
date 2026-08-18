@@ -1,52 +1,160 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
+import { LenisProvider } from "@/components/catering/lenis-provider";
+import { CustomCursor } from "@/components/catering/cursor";
+import { Preloader } from "@/components/catering/preloader";
+import { CookieConsent } from "@/components/catering/cookie-consent";
+import { GrainOverlay } from "@/components/catering/grain";
+import { ChapterNav } from "@/components/catering/chapter-nav";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: "--font-sans",
+  subsets: ["latin", "cyrillic"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-serif",
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const siteUrl = SITE_CONFIG.url;
+
 export const metadata: Metadata = {
-  title: "Z.ai Code Scaffold - AI-Powered Development",
-  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
-  authors: [{ name: "Z.ai Team" }],
+  metadataBase: new URL(siteUrl),
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
+  title: {
+    default: "Interfood Catering — Кейтеринг в Санкт-Петербурге от 2450₽/чел",
+    template: "%s | Interfood Catering",
+  },
+  description:
+    "«Еда как искусство» — выездной кейтеринг полного цикла в СПб. Фуршет, банкет, кофе-брейк, барбекю от 2450₽/чел. Рассчитайте стоимость онлайн за 30 секунд.",
+  keywords: [
+    "кейтеринг",
+    "кейтеринг СПб",
+    "кейтеринг Санкт-Петербург",
+    "фуршет",
+    "банкет",
+    "выездной ресторан",
+    "Interfood",
+    "nilov catering",
+  ],
+  authors: [{ name: "Interfood Catering" }],
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
-    url: "https://chat.z.ai",
-    siteName: "Z.ai",
+    title: "Interfood Catering — Кейтеринг в Санкт-Петербурге",
+    description:
+      "Выездной кейтеринг полного цикла. Видео, фото, интерактивный калькулятор стоимости.",
     type: "website",
+    locale: "ru_RU",
+    url: siteUrl,
+    siteName: "Interfood Catering",
+    images: [{ url: "/media/about-aman-venice.webp", width: 1600, height: 1166, alt: "Interfood Catering — банкет" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "Interfood Catering — Кейтеринг в Санкт-Петербурге",
+    description: "Выездной кейтеринг полного цикла. Рассчитайте стоимость онлайн.",
+    images: ["/media/about-aman-venice.webp"],
   },
+  manifest: "/manifest.json",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fcfbf8" },
+    { media: "(prefers-color-scheme: dark)", color: "#101010" },
+  ],
+};
+
+/** JSON-LD structured data for Yandex/Google (LocalBusiness + Restaurant) */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CateringService",
+  name: "Interfood Catering",
+  alternateName: "NILOV CATERING",
+  description: SITE_CONFIG.slogan + " — выездной кейтеринг полного цикла в Санкт-Петербурге.",
+  url: siteUrl,
+  telephone: CONTACTS.phone,
+  email: CONTACTS.email,
+  image: siteUrl + "/media/about-aman-venice.webp",
+  priceRange: "₽₽₽",
+  address: {
+    "@type": "PostalAddress",
+    addressCountry: "RU",
+    addressRegion: "Санкт-Петербург",
+    addressLocality: "Санкт-Петербург",
+    postalCode: "197198",
+    streetAddress: "ул. Большая Морская, д. 18, офис 33",
+  },
+  geo: { "@type": "GeoCoordinates", latitude: 59.939495, longitude: 30.315785 },
+  openingHoursSpecification: [{
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+    opens: "09:00", closes: "21:00",
+  }],
+  founder: { "@type": "Person", name: "Нилов Дмитрий Игоревич" },
+  foundingDate: "2014-04-14",
+  areaServed: { "@type": "City", name: "Санкт-Петербург" },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ru" suppressHydrationWarning>
+      <head>
+        {/* Preconnect hints for external domains */}
+        <link rel="preconnect" href="https://www.instagram.com" />
+        <link rel="preconnect" href="https://yandex.ru" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased bg-background text-foreground`}
       >
-        {children}
+        <a href="#main-content" className="skip-link">
+          Перейти к содержанию
+        </a>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <Preloader />
+        <CustomCursor />
+        <GrainOverlay />
+        <ChapterNav />
+        <NuqsAdapter>
+          <LenisProvider>{children}</LenisProvider>
+        </NuqsAdapter>
+        <CookieConsent />
         <Toaster />
+        <noscript>
+          <div style={{ padding: '2rem', fontFamily: 'sans-serif', textAlign: 'center' }}>
+            <h1>Interfood Catering</h1>
+            <p>Для работы сайта необходимо включить JavaScript.</p>
+            <p style={{ marginTop: '1rem' }}>Позвоните: <a href="tel:+78129195911">+7 (812) 919-59-11</a></p>
+          </div>
+        </noscript>
       </body>
     </html>
   );

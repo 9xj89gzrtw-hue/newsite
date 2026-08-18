@@ -1,0 +1,180 @@
+/**
+ * Media registry — central place for all imagery used on the site.
+ *
+ * Photos are REAL, scraped from the original interfood-catering.ru and stored
+ * locally in /public/media (no hot-linking, no external dependency at runtime).
+ * Hero uses a Ken Burns image; when MUX_TOKEN_* env vars are set, the Hero can
+ * swap to a Mux video background via <VideoPlayer> (see Hero component).
+ */
+
+export const MEDIA = {
+  hero: {
+    // Premium AI-generated hero image — luxury banquet with golden ambiance
+    src: "/media/hero-premium.png",
+    alt: "Элегантный банкетный стол с золотым свечением — Interfood Catering",
+    // Optional Mux playback ID for video hero (when MUX_TOKEN_* are set).
+    // Set this to a real playback ID to switch hero from image to autoplay video.
+    muxPlaybackId: "",
+  },
+  about: {
+    // Premium AI-generated about image — elegant wedding reception hall
+    src: "/media/about-premium.webp",
+    alt: "Люкс-банкет в светлом зале — Interfood Catering",
+  },
+  about2: {
+    src: "/media/event-11.jpg",
+    alt: "Оформление банкета Interfood Catering",
+  },
+  menu: {
+    buffet: "/media/menu-buffet.jpg",
+    banquet: "/media/menu-banquet.jpg",
+    "coffee-break": "/media/menu-coffee-break.jpg",
+    "snack-box": "/media/menu-snack-box.jpg",
+    vegetarian: "/media/menu-vegetarian.jpg",
+    bbq: "/media/menu-bbq.jpg",
+    "office-lunch": "/media/menu-office-lunch.jpg",
+  } as Record<string, string>,
+  // Real event photos from interfood-catering.ru gallery
+  events: [
+    { src: "/media/event-01.png", caption: "Свадебный фуршет на крыше" },
+    { src: "/media/event-02.jpg", caption: "Корпоратив в офисе" },
+    { src: "/media/event-03.jpg", caption: "Банкет на корабле" },
+    { src: "/media/event-04.jpg", caption: "Выездная регистрация" },
+    { src: "/media/event-05.jpg", caption: "Мотофестиваль Harley Days" },
+    { src: "/media/event-06.jpg", caption: "Скандинавское барбекю" },
+    { src: "/media/event-07.jpg", caption: "Кофе-брейк на конференции" },
+    { src: "/media/event-09.jpg", caption: "Новогодний корпоратив" },
+    { src: "/media/event-10.jpg", caption: "Сезонный банкет" },
+    { src: "/media/event-11.jpg", caption: "Фуршет для гостей" },
+    { src: "/media/event-12.jpg", caption: "Праздничная сервировка" },
+    { src: "/media/event-02.jpg", caption: "Торжественный приём" },
+  ],
+};
+
+// Contacts — re-exported from config.ts (single source of truth).
+// Original source: interfood-catering.ru/kontakty
+export { CONTACTS } from "@/lib/config";
+
+export const SERVICES = [
+  {
+    icon: "Heart",
+    title: "Свадебный банкет",
+    short: "Торжество под ключ",
+    desc: "Полное сопровождение свадебного торжества: индивидуальное меню, сервировка, подача, официанты. Welcome-зона с канапе и игристым, банкетные столы, сезонные блюда. При заказе — флористическое сопровождение в подарок.",
+    features: ["Индивидуальное меню", "Welcome-зона", "Сервировка под концепцию", "Официанты и сомелье"],
+  },
+  {
+    icon: "Gem",
+    title: "Выездная регистрация",
+    short: "Церемония на любой площадке",
+    desc: "Оформление зоны выездной регистрации: арка, флористика, текстиль. Угощения для гостей после церемонии — канапе, фуршетные закуски, игристое. Проведение на любой площадке: от загородного отеля до крыши в центре Петербурга.",
+    features: ["Оформление зоны церемонии", "Флористика и декор", "Фуршет для гостей", "Игристое"],
+  },
+  {
+    icon: "Truck",
+    title: "Аренда оборудования",
+    short: "Мебель, посуда, текстиль",
+    desc: "Полный комплект оборудования для мероприятия: столы и стулья, скатерти и салфетки, фарфор и стекло, столовые приборы, кухонная техника, грили и мармиты. Доставка, монтаж и демонтаж по СПб и области.",
+    features: ["Мебель и текстиль", "Фарфор и стекло", "Приборы и техника", "Доставка и монтаж"],
+  },
+  {
+    icon: "UtensilsCrossed",
+    title: "Выездной банкет",
+    short: "Ресторан на любой площадке",
+    desc: "Полноценный банкет с обслуживанием на выбранной вами площадке: в лофте, на теплоходе, в загородном доме или галерее. Закуски, горячее, десерты, напитки — ресторанный уровень на любой локации.",
+    features: ["Любая площадка", "Полное обслуживание", "Горячее на месте", "Ресторанный уровень"],
+  },
+  {
+    icon: "ChefHat",
+    title: "Выездной ресторан",
+    short: "Шеф-повар на месте",
+    desc: "Команда профессионалов: шеф-повар, официанты, сомелье. Открытая кухня с приготовлением блюд на глазах у гостей. Полный цикл — от закупки продуктов до уборки после мероприятия.",
+    features: ["Шеф-повар", "Официанты и сомелье", "Открытая кухня", "Полный цикл"],
+  },
+  {
+    icon: "Flower2",
+    title: "Оформление зала",
+    short: "Флористика и декор",
+    desc: "Оформление зала под концепцию мероприятия: цветочные композиции, текстиль, освещение, декор. Свадебный декор, корпоративный брендинг, тематические вечеринки. При заказе свадебного банкета — до 4 композиций в подарок.",
+    features: ["Флористика", "Текстиль и декор", "Освещение", "Брендинг"],
+  },
+  {
+    icon: "Cake",
+    title: "Торты на заказ",
+    short: "Авторские десерты",
+    desc: "Изготовление тортов и десертов по индивидуальному заказу: свадебные многоярусные, тематические, торты с индивидуальным дизайном. Капкейки, макаруны, пирожные. Натуральные ингредиенты, ручная работа.",
+    features: ["Свадебные торты", "Индивидуальный дизайн", "Капкейки и макаруны", "Натуральные ингредиенты"],
+  },
+  {
+    icon: "Wine",
+    title: "Пирамиды из шампанского",
+    short: "Каскад игристого",
+    desc: "Эффектная подача игристого каскадом — пирамида из бокалов с шампанским. Зрелищный момент для торжества: свадьба, юбилей, корпоратив. Подача под музыку и освещение, фуршетные закуски рядом.",
+    features: ["Пирамида бокалов", "Подача каскадом", "Игристое премиум", "Зрелищный момент"],
+  },
+  {
+    icon: "PartyPopper",
+    title: "Новогодний корпоратив",
+    short: "Праздник для команды",
+    desc: "Организация новогоднего корпоратива: в офисе, на площадке или в ресторане. Фуршет или банкет, барная станция, музыкальное сопровождение. Привозим всё — от мебели до уборки после. Бронируйте заранее — сезон декабрь-январь.",
+    features: ["В офисе или на площадке", "Фуршет или банкет", "Барная станция", "Сезон: декабрь-январь"],
+  },
+  {
+    icon: "Droplets",
+    title: "Шоколадный фонтан",
+    short: "Фондю-станция",
+    desc: "Аренда шоколадного фонтана с ассортиментом фруктов и выпечки: клубника, бананы, ананас, маршмеллоу, профитроли. Белый, молочный или тёмный шоколад. Эффектная станция для детского праздника, свадьбы или корпоратива.",
+    features: ["Аренда фонтана", "Фрукты и выпечка", "3 вида шоколада", "Для любого праздника"],
+  },
+  {
+    icon: "Flame",
+    title: "Выездное барбекю",
+    short: "Гриль на свежем воздухе",
+    desc: "Выездное барбекю в скандинавском стиле: шашлычки из свинины, лосося, морепродуктов, овощи-гриль. Открытый огонь, мангал и гриль на месте. Для летних и загородных мероприятий, пикников и дней рождения на природе.",
+    features: ["Мангал и гриль", "Шашлычки из лосося", "Овощи-гриль", "Загородные мероприятия"],
+  },
+];
+
+/**
+ * Доставка закусок — отдельная услуга (мобильный фуршет в коробках).
+ * Реальные позиции и цены с interfood-catering.ru/mobilnyj-furshet.
+ */
+export const SNACK_BOX_ITEMS = [
+  { name: "Канапе с лососем и сливочным сыром", price: 660, unit: "шт" },
+  { name: "Канапе с бужениной в беконе", price: 660, unit: "шт" },
+  { name: "Брускетта с палтусом", price: 690, unit: "шт" },
+  { name: "Брускетта с говяжьей вырезкой и овощами-гриль", price: 690, unit: "шт" },
+  { name: "Брускетта с томатами и моцареллой", price: 660, unit: "шт" },
+  { name: "Салаты (порционные)", price: 650, unit: "шт" },
+  { name: "Горячие закуски", price: 1950, unit: "порция" },
+  { name: "Шашлычок из свинины", price: 580, unit: "шт" },
+  { name: "Шашлычок из морепродуктов", price: 880, unit: "шт" },
+  { name: "Шашлычок из лосося", price: 780, unit: "шт" },
+];
+
+/**
+ * Instagram reel — embedded via official Instagram embed (blockquote + embed.js).
+ * Replace `reelUrl` with any post/reel from @nilov_catering (copy the URL from
+ * the Instagram app: Share → Copy Link). The embed auto-loads the video.
+ */
+export const INSTAGRAM = {
+  handle: "@nilov_catering",
+  href: "https://www.instagram.com/nilov_catering",
+  // Real @nilov_catering reel (provided by client)
+  reelUrl: "https://www.instagram.com/reel/DayA3bKME0j/",
+};
+
+/**
+ * Yandex Maps embed — office location.
+ * Replace with the client's actual address on Yandex Maps.
+ */
+export const YANDEX_MAPS = {
+  // Embed URL for iframe (Yandex Maps → Share → HTML code)
+  embedSrc:
+    "https://yandex.ru/map-widget/v1/?ll=30.315785%2C59.939495&z=11&pt=30.315785,59.939495,pm2rdm",
+  // Direct link for "open in maps" button
+  href: "https://yandex.ru/maps/-/CTgzMJKL",
+  // Address (display)
+  address: "Санкт-Петербург",
+};
+
