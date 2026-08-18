@@ -1,0 +1,313 @@
+{
+  "myradish": {
+    "testimonials": [
+      "\"//assets.squarespace.com/universal/scripts-compressed/search-preview-d64b2fb30d3da89f-min.en-US.js\"",
+      "\"Country code should have an optional plus and up to 4 digits.\"",
+      "\"https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/cf511546-723b-4801-9ab5-267882a47979/Food+for+the+Future+of+work.png\"",
+      "\"https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/ba447dbb-400f-4821-8256-e5d078083bb9/decenzo-angela-san-francisco-photographer-radish-cafe-20230206_41A9979.jpg\"",
+      "\"https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/99e2dc11-919f-4eba-8514-c913b822e1c3/Workplace.png\""
+    ],
+    "about_story": [
+      "Value\":\"US\",\"billToShippingDefaultValue\":false,\"showShippingPhoneNumber\":true,\"isShippingPhoneRequired\":false,\"showBillingPhoneNumber\":true,\"isBillingPhoneRequired\":false,\"currenciesSupported\":[\"USD\",\"CAD\",\"GBP\",\"AUD\",\"EUR\",\"CHF\",\"NOK\",\"SEK\",\"DKK\",\"NZD\",\"SGD\",\"MXN\",\"HKD\",\"CZK\",\"ILS\",\"MYR\",\"RUB\",\"PHP\",\"PLN\"",
+      "value\":\"0.00\"},\"addToCartConfirmationType\":2,\"isLive\":false,\"multipleQuantityAllowedForServices\":true},\"useEscapeKeyToLogin\":false,\"ssBadgeType\":1,\"ssBadgePosition\":4,\"ssBadgeVisibility\":1,\"ssBadgeDevices\":1,\"pinterestOverlayOptions\":{\"mode\":\"disabled\"},\"userAccountsSettings\":{\"loginAllowed\":false,\"signupA",
+      "missionType\":1},\"subscribed\":false,\"appDomain\":\"squarespace.com\",\"templateTweakable\":true,\"tweakJSON\":{\"form-use-theme-colors\":\"true\",\"header-logo-height\":\"50px\",\"header-mobile-logo-max-height\":\"40px\",\"header-vert-padding\":\"1vw\",\"header-width\":\"Full\",\"maxPageWidth\":\"1200px\",\"mobile-header-vert-padding\":\"6vw\",\"pa",
+      "valueOutsideRange\":\"Value must be in the range {0} to {1}.\",\"invalidPassword\":\"Passwords should not contain whitespace.\",\"missingRequiredSubfields\":\"{0} is missing required subfields: {1}\",\"invalidCurrency\":\"Currency value should be formatted like 1234 or 123.99.\",\"invalidMapSize\":\"Value should contain exactly {0} ele",
+      "missionFailed\":\"Form submission failed. Review the following information: {0}.\",\"invalidCountryCode\":\"Country code should have an optional plus and up to 4 digits.\",\"invalidDate\":\"This is not a real date.\",\"required\":\"{0} is required.\",\"invalidStringLength\":\"Value should be {0} characters long.\",\"invalidEmail\":\"Em"
+    ],
+    "awards": [
+      "licensed-asset-preview=\"false\" data-load=\"false\" elementtiming=\"system-image-block\" src=\"https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e87"
+    ],
+    "trust_signals": [
+      "licensed-asset-preview=\"false\" data-load=\"false\" elementtiming=\"system-image-block\" src=\"https://images.squa",
+      "payment_plan_editing\",\"marketing_automations\",\"enable_modernized_pdp_m3_layout_ux\",\"output_template_css_ass",
+      "sslSetting\":3,\"timeZone\":\"America/New_York\",\"translationLocale\":\"en-US\",\"typekitId\":\"\",\"websiteType\":1,"
+    ]
+  },
+  "jdkgroup": {
+    "testimonials": [
+      "2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--",
+      "1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}\n:where(.wp-block-term-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-term-template.is-layout-grid){gap: 1.25em;}\n:where(.wp-blo",
+      "0.75;} body .wp-site-blocks [data-dsgo-inline-bg] h1:not(.has-text-color):where(:not(.elementor *):not([data-elementor-type] *)),body .wp-site-blocks [data-dsgo-inline-bg] h2:not(.has-text-color):where(:n",
+      "3.558-.003-.002a.34.34 0 0 0 .034-.145h.002Z\">",
+      "8.053-.274.157-.378a.518.518 0 0 1 .38-.155c.136 0 .247.038.334.114.087.077.144.161.17.253l1.065 3.843 1.041-3.825a.48.48 0 0 1 .188-.28.516.516 0 0 1 .627.002c.096.072.16.167.188.285l1.041 3.825 1.076-3."
+    ],
+    "about_story": [
+      "ValueSpecification\",\"valueRequired\":true,\"valueName\":\"search_term_string\"}}],\"inLanguage\":\"en-US\"},{\"@type\":\"Organization\",\"@id\":\"https:\\/\\/thejdkgroup.com\\/#organization\",\"name\":\"The JDK Group\",\"url\":\"https:\\/\\/thejdkgroup.com\\/\",\"logo\":{\"@type\":\"ImageObject\",\"inLanguage\":\"en-US\",\"@id\":\"https:\\/\\/thejdkgroup.com\\/#\\/schema\\/logo\\/ima",
+      "value\":\"granted\",\"filter\":false},\"ad_storage\":{\"enabled\":true,\"value\":\"granted\",\"filter\":false},\"ad_user_data\":{\"enabled\":true,\"value\":\"granted\",\"filter\":false},\"ad_personalization\":{\"enabled\":true,\"value\":\"granted\",\"filter\":false}},\"cookie\":{\"disabled_all_cookie\":false,\"disabled_start_session_cookie\":fals",
+      "We believe that no matter the size or function -- from a small",
+      "We believe that our responsibility is to provide people with a vision of what an event can be"
+    ],
+    "awards": [
+      "award-winning talent, received local and international accolades, and produced over 20,000 events.",
+      "accredited and award-winning talent, received local and international accolades, and produced over 20,000 events."
+    ],
+    "stats_numbers": [
+      "20,000"
+    ],
+    "trust_signals": [
+      "promise our service standards.",
+      "Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(s));if(\"object\"==typeof e&&\"number\"==typeof e.timestamp&&(new Date).valueOf()",
+      "ssList.add( 'e-lazyloaded' );\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\tlazyloadBackgroundObserver.unobserve( entry.target );"
+    ]
+  },
+  "saltblock": {
+    "testimonials": [
+      "\"//assets.squarespace.com/universal/scripts-compressed/search-preview-d64b2fb30d3da89f-min.en-US.js\"",
+      "\"Country code should have an optional plus and up to 4 digits.\"",
+      "\"sha384-bMmfBOGTSpTqO8FeaNWaTHtV0cAVoJT7/X2dfdrtHN/h/VgCsKN3euVgqdOeQv6v\"",
+      "3.7526\",\"businessHours\":{\"monday\":{\"text\":\"9am - 5pm\",\"ranges\":[{\"from\":540,\"to\":1020}]},\"tuesday\":{\"text\":\"9am - 5pm \",\"ranges\":[{\"from\":540,\"to\":1020}]},\"wednesday\":{\"text\":\"9am - 5pm\",\"ranges\":[{\"from\"",
+      "3.7526\",\"sameAs\":[\"https://www.instagram.com/saltblockhospitality/\",\"https://www.facebook.com/SaltBlockHospitality/\"],\"@context\":\"http://schema.org\",\"@type\":\"Organization\"}"
+    ],
+    "about_story": [
+      "Value\":\"US\",\"billToShippingDefaultValue\":false,\"showShippingPhoneNumber\":true,\"isShippingPhoneRequired\":false,\"showBillingPhoneNumber\":true,\"isBillingPhoneRequired\":false,\"currenciesSupported\":[\"USD\",\"CAD\",\"GBP\",\"AUD\",\"EUR\",\"CHF\",\"NOK\",\"SEK\",\"DKK\",\"NZD\",\"SGD\",\"MXN\",\"HKD\",\"CZK\",\"ILS\",\"MYR\",\"RUB\",\"PHP\",\"PLN\"",
+      "value\":\"0.00\"},\"addToCartConfirmationType\":2,\"isLive\":false,\"multipleQuantityAllowedForServices\":true},\"useEscapeKeyToLogin\":true,\"ssBadgeType\":1,\"ssBadgePosition\":4,\"ssBadgeVisibility\":1,\"ssBadgeDevices\":1,\"pinterestOverlayOptions\":{\"mode\":\"disabled\",\"size\":\"small\",\"shape\":\"rect\"},\"userAccountsSettings\":{",
+      "missionType\":1},\"subscribed\":false,\"appDomain\":\"squarespace.com\",\"templateTweakable\":true,\"tweakJSON\":{\"form-use-theme-colors\":\"true\",\"header-logo-height\":\"64px\",\"header-mobile-logo-max-height\":\"42px\",\"header-vert-padding\":\"2vw\",\"header-width\":\"Inset\",\"maxPageWidth\":\"1440px\",\"mobile-header-vert-padding\":\"6vw\",\"p",
+      "valueOutsideRange\":\"Value must be in the range {0} to {1}.\",\"invalidPassword\":\"Passwords should not contain whitespace.\",\"missingRequiredSubfields\":\"{0} is missing required subfields: {1}\",\"invalidCurrency\":\"Currency value should be formatted like 1234 or 123.99.\",\"invalidMapSize\":\"Value should contain exactly {0} ele",
+      "missionFailed\":\"Form submission failed. Review the following information: {0}.\",\"invalidCountryCode\":\"Country code should have an optional plus and up to 4 digits.\",\"invalidDate\":\"This is not a real date.\",\"required\":\"{0} is required.\",\"invalidStringLength\":\"Value should be {0} characters long.\",\"invalidEmail\":\"Em"
+    ],
+    "trust_signals": [
+      "ssList.remove('wf-loading');\">",
+      "ssList.add('wf-loading')",
+      "payment_plan_editing\",\"new_stacked_index\",\"enable_modernized_standalone_pages\",\"i18n_beta_website_locales\",",
+      "ssLine1\":\"8414 Camden Street\",\"addressLine2\":\"Tampa, FL, 33614\",\"addressCountry\":\"United States\"},\"logo",
+      "sslSetting\":3,\"timeZone\":\"America/New_York\",\"translationLocale\":\"en-US\",\"typekitId\":\"\",\"websiteType\":1,"
+    ]
+  },
+  "ridgewells": {
+    "testimonials": [
+      "1.15444.0\"},{\"artifactId\":\"editor-elements\",\"namespace\":\"dsgnsys\",\"url\":\"https:\\/\\/static.parastorage.com\\/services\\/editor-elements\\/1.15444.0\"}],\"siteFeaturesConfigs\":{\"sessionManager\":{\"isRunningInDiff"
+    ],
+    "about_story": [
+      "vision\":\"2548\",\"renderingFlow\":\"NONE\",\"language\":\"en\",\"locale\":\"en-us\"},\"interactionSampleRatio\":0.01,\"accessTokensUrl\":\"https:\\/\\/www.ridgewells.com\\/_api\\/v1\\/access-tokens\",\"experiments\":{\"specs.thunderbolt.hardenFetchAndXHR\":true,\"specs.thunderbolt.securityExperiments\":true,\"specs.thunderbolt.allowWebpA",
+      "value:o,enumerable:n=!0}=e,i=e.get,l=e.set;if(!r||void 0===o&&!i&&!l)return Error(\"property and value are required\");let a=t||globalThis,s=a?.[r],u={};if(void 0!==o)u.value=o;else{if(i){let e=c(i);e&&(u.get=e)}if(l){let e=c(l);e&&(u.set=e)}}let p={...u,enumerable:n||!1,configurable:!1};void 0!==o&&(p.writ",
+      "value:a})}catch{}try{a({property:\"defineStrictObject\",value:function e(t){let{context:r,property:o,propertiesToExclude:n=[],skipPrototype:i=!1,hardenPrototypePropertiesToExclude:l=[]}=t;if(!o)return Error(\"property is required\");let c=(r||globalThis)[o],p={},f=u(r,o);c&&(\"object\"==typeof c||\"function\"==ty",
+      "value:r,get:o,set:n,enumerable:i=!1}=t,l={};void 0!==r?l.value=r:o?l.get=o:n&&(l.set=n);try{let t=a({context:c,property:e,...l,enumerable:i});p[e]=t}catch(r){if(r instanceof TypeError)try{p[e]=t.value||t.get||t.set}catch{}else throw r}}}});let d={originalObject:c,originalProperties:p};if(!i&&c?.prototype!",
+      "value:c,enumerable:f?.enumerable}),d}})}catch{}try{a({property:\"defineStrictMethod\",value:function(e,t){let r=(t||globalThis)[e],o=u(t||globalThis,e);return r&&o&&(o.writable||o.configurable)?(Object.freeze(r),a({context:globalThis,property:e,value:r})):r}})}catch{}var s=[\"toString\",\"toLocaleString\",\"valu"
+    ],
+    "awards": [
+      "Award winning culinary team and voted best caterer in Washington DC.\">",
+      "best caterer in Washington DC.\">"
+    ],
+    "trust_signals": [
+      "Promise.resolve({}):fetch((()=>{try{let e=\"undefined\"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope,t=globalThis?.parent!==globalThis,r=new UR",
+      "Promise=window.fetchDynamicModel())})();\n//# sourceMappingURL=https://static.parastorage.com/services/wix-thunderbolt/dist/handleAccessTokens.inline.3250797b",
+      "Promise((e,t)=>{let o=Error(r||`Request not allowed for path ${arguments[0]}`);t(o)})},enumerable:!0}),o({property:\"XMLHttpRequest\",value:a,enumerable:!0}),O",
+      "Promise = new Promise(function(resolve) {\n                window.addEventListener('pagereveal', resolve, { once: true });\n            });\n        } else {",
+      "Promise = Promise.resolve();\n        }\n    })();"
+    ]
+  },
+  "gammacatering": {
+    "testimonials": [
+      "\">\n \n GAMMACATERING | Premium Catering &amp; Event Experiences \n<meta name=\"",
+      "8.75rem, -1.25rem) rotate(-15deg); opacity: 1;\">",
+      "0.25px, 0px) rotate(15deg); opacity: 1;\">",
+      "0.25px, 2rem); opacity: 1;\">",
+      "0.8553; translate: none; rotate: none; scale: none; transform: translate3d(0px, 1.3566px, 0px);\">\nSwitzerland's leading provider of premium catering and experience design."
+    ],
+    "about_story": [
+      "About Us \u2013 Gamma Catering\" loading=\"lazy\" srcset=\"https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammacatering-ueber-uns-1-scaled.jpg 2560w, https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammacatering-ueber-uns-1-300x230.jpg 300w, https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammacatering-ueber-uns-1-1024x787.jpg 1024w, https://www.gammacatering.com/v4/wp-",
+      "About Us Cocktail - Gamma Catering\" loading=\"lazy\" srcset=\"https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammacatering-ueber-uns-cocktail-1.jpg 2000w, https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammacatering-ueber-uns-cocktail-1-300x291.jpg 300w, https://www.gammacatering.com/v4/wp-content/uploads/2026/07/gammacatering-ueber-uns-cocktail-1-1024x993.jpg 1024w, https:/",
+      "ValueSpecification\",\n\"valueRequired\": true,\n\"valueName\": \"search_term_string\"\n}\n}\n],\n\"inLanguage\": \"en-GB\"\n},\n{\n\"@type\": \"Organization\",\n\"@id\": \"https:\\/\\/www.gammacatering.com\\/en\\/#organization\",\n\"name\": \"GAMMACATERING\",\n\"url\": \"https:\\/\\/www.gammacatering.com\\/en\\/\",\n\"logo\": {\n\"@type\": \"ImageObject\",\n\"inLanguage\": \"en-GB\",\n\"@id\": \"ht",
+      "Value));\n}\nlet defaultValues = {\n'ad_storage': 'denied',\n'ad_user_data': 'denied',\n'ad_personalization': 'denied',\n'analytics_storage': 'denied',\n'functionality_storage': 'denied',\n'personalization_storage': 'denied',\n'security_storage': 'denied',\n'wait_for_update': 500,\n};\ngtag('consent', 'default', { ...defaultValues, ...consentsFromCookie });",
+      "value ? '' : BorlabsCookie.Settings.cookieDomain.value,\nBorlabsCookie.Settings.cookiePath.value,\nBorlabsCookie.Cookie.getPluginCookie().expires,\nBorlabsCookie.Settings.cookieSecure.value,\nBorlabsCookie.Settings.cookieSameSite.value\n);\n}\ndocument.addEventListener('borlabs-cookie-consent-saved', borlabsCookieConse"
+    ],
+    "trust_signals": [
+      "Secure.value,\nBorlabsCookie.Settings.cookieSameSite.value\n);\n}\ndocument.addEventListener('borlabs-cookie-c",
+      "ssli Utenberg \u2013 Show details\">",
+      "ssli-utenberg-gammacatering-1024x768.jpg.webp\" class=\"loc-card__img\" alt=\"Schl\u00f6ssli Utenberg \u2013 Gamma Ca",
+      "ssli-utenberg-gammacatering-1024x768.jpg.webp 1024w, https://www.gammacatering.com/v4/wp-content/upload",
+      "ssli-utenberg-gammacatering-300x225.jpg.webp 300w, https://www.gammacatering.com/v4/wp-content/uploads/"
+    ]
+  },
+  "concept-catering": {
+    "testimonials": [
+      "0.35);\n    color: #FFFFFF;\n    box-sizing: border-box;\n}\n.cookiescript_checkbox_label {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    padding:0 4px;\n    line-height: 1.5;\n    margin",
+      "0.85;\n    z-index: 999999;\n    position: relative;\n    top: -1px;\n}\n\n#cookiescript_buttons {\n    display: flex;\n    flex-direction: row;\n    font-weight: 700;\n}\n#cookiescript_manage_wrap {\n    text-transf",
+      "0.85;\n    margin-left:-15px;\n}\n#cookiescript_manage #cookiescript_manageicon .cookiescript_gear {\n    fill: #FFFFFF;\n}\n#cookiescript_manage:hover #cookiescript_manageicon .cookiescript_gear {\n    fill: #0",
+      "0.25s ease 0s;\n    background-color: #000000;\n    color: #FFFFFF;\n    text-transform: uppercase;\n    font-size: 12px;\n    text-align: center;\n    line-height: 3.2;\n    letter-spacing: 0.4px;\n}\n/*IE 9 fixe",
+      "0.25s ease 0s;\n\ttext-transform: uppercase;\n\tfont-size: 12px;\n\ttext-align: center;\n\tletter-spacing: 0.4px;\n\tborder: 0;\n\tbackground-color: #000000;\n\tcolor: #FFFFFF;\n\tline-height: 3.2;\n}\n\n#cookiescript_accep"
+    ]
+  },
+  "sopranos": {
+    "about_story": [
+      "About Us?\" placeholder=\"How did you hear about us\" type=\"text\" id=\"How-Did-You-Hear-About-Us\" required=\"\">",
+      "We are committed to building long term relationships based on personal service and exceptional quality"
+    ],
+    "awards": [
+      "Best Voted Best Caterer\" class=\"footer-badge\">",
+      "Best Caterer in Detroit 2019\" class=\"footer-badge\">",
+      "The Knot Best of Weddings Award 2022\" class=\"footer-badge\">"
+    ],
+    "trust_signals": [
+      "guarantee you will love our excellent food, professional service, and competitive prices."
+    ]
+  },
+  "creativeedge": {
+    "testimonials": [
+      "\"//assets.squarespace.com/universal/scripts-compressed/search-preview-d64b2fb30d3da89f-min.en-US.js\"",
+      "\"Country code should have an optional plus and up to 4 digits.\"",
+      "8.8567 47.8378 46.5654 67.089L39.4737 84.129C38.8799 85.5493 39.0464 87.2634 39.905 88.5418C40.7622 89.8216 42.2856 90.6283 43.8271 90.6232H122.088C124.568 90.658 126.85 88.4129 126.85 85.9359C126.85 83.4",
+      "6.0522L30.9654 2.92939C30.2682 1.21146 28.4698 0 26.612 0L4.69551 0.000432948ZM39.8152 24.9999H133.385L126.097 56.5426L54.7339 62.2067L39.8152 24.9999ZM59.4777 93.75C50.8885 93.75 43.8252 100.801 43.8252",
+      "3.75 59.4777 93.75ZM106.433 93.75C97.8436 93.75 90.7803 100.801 90.7803 109.375C90.7803 117.949 97.8436 125 106.433 125C115.022 125 122.085 117.949 122.085 109.375C122.085 100.801 115.022 93.75 106.433 93"
+    ],
+    "about_story": [
+      "Value\":\"US\",\"billToShippingDefaultValue\":false,\"showShippingPhoneNumber\":true,\"isShippingPhoneRequired\":false,\"showBillingPhoneNumber\":true,\"isBillingPhoneRequired\":false,\"currenciesSupported\":[\"USD\",\"CAD\",\"GBP\",\"AUD\",\"EUR\",\"CHF\",\"NOK\",\"SEK\",\"DKK\",\"NZD\",\"SGD\",\"MXN\",\"HKD\",\"CZK\",\"ILS\",\"MYR\",\"RUB\",\"PHP\",\"PLN\"",
+      "value\":\"0.00\"},\"addToCartConfirmationType\":2,\"isLive\":false,\"multipleQuantityAllowedForServices\":true},\"useEscapeKeyToLogin\":false,\"ssBadgeType\":1,\"ssBadgePosition\":4,\"ssBadgeVisibility\":1,\"ssBadgeDevices\":1,\"pinterestOverlayOptions\":{\"mode\":\"disabled\"},\"userAccountsSettings\":{\"loginAllowed\":true,\"signupAl",
+      "missionType\":1},\"subscribed\":false,\"appDomain\":\"squarespace.com\",\"templateTweakable\":true,\"tweakJSON\":{\"form-use-theme-colors\":\"true\",\"header-logo-height\":\"30px\",\"header-mobile-logo-max-height\":\"30px\",\"header-vert-padding\":\"1.4vw\",\"header-width\":\"Full\",\"maxPageWidth\":\"1420px\",\"mobile-header-vert-padding\":\"4.0vw\"",
+      "valueOutsideRange\":\"Value must be in the range {0} to {1}.\",\"invalidPassword\":\"Passwords should not contain whitespace.\",\"missingRequiredSubfields\":\"{0} is missing required subfields: {1}\",\"invalidCurrency\":\"Currency value should be formatted like 1234 or 123.99.\",\"invalidMapSize\":\"Value should contain exactly {0} ele",
+      "missionFailed\":\"Form submission failed. Review the following information: {0}.\",\"invalidCountryCode\":\"Country code should have an optional plus and up to 4 digits.\",\"invalidDate\":\"This is not a real date.\",\"required\":\"{0} is required.\",\"invalidStringLength\":\"Value should be {0} characters long.\",\"invalidEmail\":\"Em"
+    ],
+    "trust_signals": [
+      "payment_plan_editing\",\"scripts_defer\",\"campaigns_discount_section_in_blasts\",\"enable_modernized_pdp_m3_layo",
+      "sslSetting\":3,\"timeZone\":\"America/New_York\",\"translationLocale\":\"en-US\",\"typekitId\":\"\",\"websiteType\":4,"
+    ]
+  },
+  "cutandtaste": {
+    "testimonials": [
+      "\"//assets.squarespace.com/universal/scripts-compressed/search-preview-d64b2fb30d3da89f-min.en-US.js\"",
+      "\"hasOptedToCollectNativeReviews\"",
+      "\"Country code should have an optional plus and up to 4 digits.\"",
+      "5.25px; top: 0px; width: 1510.5px; height: 954px; position: relative;\">",
+      "0.25px; height: 888px; position: relative;\">"
+    ],
+    "about_story": [
+      "Value\":\"US\",\"billToShippingDefaultValue\":false,\"showShippingPhoneNumber\":true,\"isShippingPhoneRequired\":false,\"showBillingPhoneNumber\":true,\"isBillingPhoneRequired\":false,\"currenciesSupported\":[\"CHF\",\"HKD\",\"MXN\",\"EUR\",\"DKK\",\"USD\",\"CAD\",\"MYR\",\"NOK\",\"THB\",\"AUD\",\"SGD\",\"ILS\",\"PLN\",\"GBP\",\"CZK\",\"SEK\",\"NZD\",\"PHP\"",
+      "value\":\"0.00\"},\"addToCartConfirmationType\":2,\"isLive\":false,\"multipleQuantityAllowedForServices\":true},\"useEscapeKeyToLogin\":true,\"ssBadgeType\":1,\"ssBadgePosition\":4,\"ssBadgeVisibility\":1,\"ssBadgeDevices\":1,\"pinterestOverlayOptions\":{\"mode\":\"disabled\"},\"userAccountsSettings\":{\"loginAllowed\":false,\"signupAl",
+      "missionType\":1},\"subscribed\":false,\"appDomain\":\"squarespace.com\",\"templateTweakable\":true,\"tweakJSON\":{\"aspect-ratio\":\"Auto\",\"gallery-arrow-style\":\"No Background\",\"gallery-aspect-ratio\":\"3:2 Standard\",\"gallery-auto-crop\":\"true\",\"gallery-autoplay\":\"false\",\"gallery-design\":\"Grid\",\"gallery-info-overlay\":\"Show on Ho",
+      "valueOutsideRange\":\"Value must be in the range {0} to {1}.\",\"invalidPassword\":\"Passwords should not contain whitespace.\",\"missingRequiredSubfields\":\"{0} is missing required subfields: {1}\",\"invalidCurrency\":\"Currency value should be formatted like 1234 or 123.99.\",\"invalidMapSize\":\"Value should contain exactly {0} ele",
+      "missionFailed\":\"Form submission failed. Review the following information: {0}.\",\"invalidCountryCode\":\"Country code should have an optional plus and up to 4 digits.\",\"invalidDate\":\"This is not a real date.\",\"required\":\"{0} is required.\",\"invalidStringLength\":\"Value should be {0} characters long.\",\"invalidEmail\":\"Em"
+    ],
+    "trust_signals": [
+      "ssList.remove('wf-loading');\">",
+      "ssList.add('wf-loading')",
+      "payment_plan_editing\",\"campaigns_discount_section_in_blasts\",\"enable_modernized_pdp_m3_layout_ux\",\"campaign",
+      "ssLine1\":\"2053 East Pama Lane\",\"addressLine2\":\"Las Vegas, NV, 89119\",\"addressCountry\":\"United States\"},",
+      "sslSetting\":3,\"timeZone\":\"America/Los_Angeles\",\"translationLocale\":\"en-US\",\"typekitId\":\"\",\"websiteType\""
+    ]
+  },
+  "concordecatering": {
+    "testimonials": [
+      "\"//assets.squarespace.com/universal/scripts-compressed/search-preview-d64b2fb30d3da89f-min.en-US.js\"",
+      "\"hasOptedToCollectNativeReviews\"",
+      "\"Country code should have an optional plus and up to 4 digits.\"",
+      "\"https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/deb5b5ee-b79c-4c51-b425-c3be8fdf3c6b/DESSERT_GROUP_0061.jpg\"",
+      "\"https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/d82cae70-b1c7-4691-88ad-270ee7d91cb3/HANDHELDS_GROUP_B.jpg\""
+    ],
+    "about_story": [
+      "Value\":\"US\",\"billToShippingDefaultValue\":false,\"showShippingPhoneNumber\":true,\"isShippingPhoneRequired\":false,\"showBillingPhoneNumber\":true,\"isBillingPhoneRequired\":false,\"currenciesSupported\":[\"USD\",\"CAD\",\"GBP\",\"AUD\",\"EUR\",\"CHF\",\"NOK\",\"SEK\",\"DKK\",\"NZD\",\"SGD\",\"MXN\",\"HKD\",\"CZK\",\"ILS\",\"MYR\",\"RUB\",\"PHP\",\"PLN\"",
+      "missionType\":1},\"subscribed\":false,\"appDomain\":\"squarespace.com\",\"templateTweakable\":true,\"tweakJSON\":{\"form-use-theme-colors\":\"true\",\"header-logo-height\":\"60px\",\"header-mobile-logo-max-height\":\"44px\",\"header-vert-padding\":\"1.6vw\",\"header-width\":\"Inset\",\"maxPageWidth\":\"1900px\",\"mobile-header-vert-padding\":\"6vw\",",
+      "valueOutsideRange\":\"Value must be in the range {0} to {1}.\",\"invalidPassword\":\"Passwords should not contain whitespace.\",\"missingRequiredSubfields\":\"{0} is missing required subfields: {1}\",\"invalidCurrency\":\"Currency value should be formatted like 1234 or 123.99.\",\"invalidMapSize\":\"Value should contain exactly {0} ele",
+      "missionFailed\":\"Form submission failed. Review the following information: {0}.\",\"invalidCountryCode\":\"Country code should have an optional plus and up to 4 digits.\",\"invalidDate\":\"This is not a real date.\",\"required\":\"{0} is required.\",\"invalidStringLength\":\"Value should be {0} characters long.\",\"invalidEmail\":\"Em",
+      "Value should be {0} elements long.\",\"allEmpty\":\"Please fill out at least one form field.\",\"missingRequiredQuestion\":\"Missing a required question.\",\"invalidQuestion\":\"Contained an invalid question.\",\"captchaFailure\":\"Captcha validation failed. Please try again.\",\"stringTooShort\":\"Value should have a length of at least {0}.\",\"invalid\":\"{0} is not"
+    ],
+    "awards": [
+      "licensed-asset-preview=\"false\" data-load=\"false\" elementtiming=\"system-image-block\" src=\"https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7e"
+    ],
+    "trust_signals": [
+      "licensed-asset-preview=\"false\" data-load=\"false\" elementtiming=\"system-image-block\" src=\"https://images.squa",
+      "ssList.remove('wf-loading');\">",
+      "ssList.add('wf-loading')",
+      "payment_plan_editing\",\"member_areas_feature\",\"enable_modernized_pdp_m3_layout_ux\",\"nested_categories\",\"camp",
+      "sslSetting\":3,\"timeZone\":\"America/Edmonton\",\"translationLocale\":\"en-US\",\"typekitId\":\"\",\"websiteType\":1,"
+    ]
+  },
+  "elegantaffairs": {
+    "testimonials": [
+      "\">\n\n\t Full Service Off Premise Catering| Elegant Affairs| New York \n\t<meta name=\"",
+      "\">Reviews &amp; Recognition  \n \n \n<li class=\"",
+      "3.75%;}a,.page-title{color:#e71d3a;}a:hover,a:focus{color:var(--ast-global-color-1);}body,button,input,select,textarea,.ast-button,.ast-custom-button{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,",
+      "1.65em);}blockquote{color:#000000;}.ast-site-identity .site-title a{color:var(--ast-global-color-2);}.site-title{font-size:35px;font-size:2.3333333333333rem;display:none;}header .custom-logo-link img{max-",
+      "1.25em;}::selection{background-color:#e71d3a;color:#ffffff;}body,h1,h2,h3,h4,h5,h6,.entry-title a,.entry-content :where(h1,h2,h3,h4,h5,h6){color:#000000;}.tagcloud a:hover,.tagcloud a:focus,.tagcloud a.cu"
+    ],
+    "about_story": [
+      "ValueSpecification\",\"valueRequired\":true,\"valueName\":\"search_term_string\"}}],\"inLanguage\":\"en-US\"},{\"@type\":\"Organization\",\"@id\":\"https:\\/\\/elegantaffairscaterers.com\\/#organization\",\"name\":\"Elegant Affairs Caterers\",\"url\":\"https:\\/\\/elegantaffairscaterers.com\\/\",\"logo\":{\"@type\":\"ImageObject\",\"inLanguage\":\"en-US\",\"@id\":\"https:\\/\\/eleg",
+      "value\":\"1234\"};\n//# sourceURL=custom-js-js-extra",
+      "value&quot;:&quot;&quot;,&quot;library&quot;:&quot;&quot;},&quot;layout&quot;:&quot;horizontal&quot;,&quot;toggle&quot;:&quot;burger&quot;}\" data-widget_type=\"nav-menu.default\">"
+    ],
+    "trust_signals": [
+      "Promise((t=>{this.T?this.O=t:t()}))}C(){this.T=!0}O(){this.T=!1}M(t,e,i){t.hasAttribute&&t.hasAttribute(e)&&(event.target.setAttribute(i,event.target.getAttr",
+      "Promise((e=>{let i;function o(){(i||t).setAttribute(\"data-rocket-status\",\"executed\"),e()}try{if(navigator.userAgent.indexOf(\"Firefox/\")>0||\"\"===navigator.ven",
+      "Promise.resolve()}I(){this.j([...this.delayedScripts.normal,...this.delayedScripts.defer,...this.delayedScripts.async],\"preload\")}j(t,e){var i=document.creat",
+      "Promise((t=>{e.addEventListener(\"load\",t),e.addEventListener(\"error\",t)}))}(),await t.K(),await t.H(t))}async W(){this.domReadyFired=!0,await this.G(),docume",
+      "Promise((t=>setTimeout(t))):new Promise((t=>requestAnimationFrame(t)))}N(){this.trash.forEach((t=>t.remove()))}static run(){const t=new RocketLazyLoadScripts"
+    ]
+  },
+  "tallguy": {
+    "testimonials": [
+      "\"//assets.squarespace.com/universal/scripts-compressed/search-preview-d64b2fb30d3da89f-min.en-US.js\"",
+      "\"hasOptedToCollectNativeReviews\"",
+      "\"Country code should have an optional plus and up to 4 digits.\"",
+      "\"https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/a8584470-6e17-4aa4-9055-d42d35f0a9e2/Tall+Guy+%26+a+Grill%2BLocally+Sourced.png\"",
+      "\"https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/d54c51b7-bfcd-4ffe-9a48-6705877bf00a/Tall+Guy+%26+a+Grill%2BLocally+Sourced+%281%29.png\""
+    ],
+    "about_story": [
+      "Value\":\"US\",\"billToShippingDefaultValue\":false,\"showShippingPhoneNumber\":true,\"isShippingPhoneRequired\":false,\"showBillingPhoneNumber\":true,\"isBillingPhoneRequired\":false,\"currenciesSupported\":[\"USD\",\"CAD\",\"GBP\",\"AUD\",\"EUR\",\"CHF\",\"NOK\",\"SEK\",\"DKK\",\"NZD\",\"SGD\",\"MXN\",\"HKD\",\"CZK\",\"ILS\",\"MYR\",\"RUB\",\"PHP\",\"PLN\"",
+      "value\":\"0.00\"},\"addToCartConfirmationType\":2,\"isLive\":false,\"multipleQuantityAllowedForServices\":true},\"useEscapeKeyToLogin\":false,\"ssBadgeType\":1,\"ssBadgePosition\":4,\"ssBadgeVisibility\":1,\"ssBadgeDevices\":1,\"pinterestOverlayOptions\":{\"mode\":\"disabled\"},\"userAccountsSettings\":{\"loginAllowed\":false,\"signupA",
+      "missionType\":1},\"subscribed\":false,\"appDomain\":\"squarespace.com\",\"templateTweakable\":true,\"tweakJSON\":{\"form-use-theme-colors\":\"true\",\"header-logo-height\":\"104px\",\"header-mobile-logo-max-height\":\"81px\",\"header-vert-padding\":\"1vw\",\"header-width\":\"Full\",\"maxPageWidth\":\"1200px\",\"mobile-header-vert-padding\":\"6vw\",\"p",
+      "valueOutsideRange\":\"Value must be in the range {0} to {1}.\",\"invalidPassword\":\"Passwords should not contain whitespace.\",\"missingRequiredSubfields\":\"{0} is missing required subfields: {1}\",\"invalidCurrency\":\"Currency value should be formatted like 1234 or 123.99.\",\"invalidMapSize\":\"Value should contain exactly {0} ele",
+      "missionFailed\":\"Form submission failed. Review the following information: {0}.\",\"invalidCountryCode\":\"Country code should have an optional plus and up to 4 digits.\",\"invalidDate\":\"This is not a real date.\",\"required\":\"{0} is required.\",\"invalidStringLength\":\"Value should be {0} characters long.\",\"invalidEmail\":\"Em"
+    ],
+    "awards": [
+      "Member of Brazen Standard Hospitality",
+      "Member of Brazen Standard Hospitality\">",
+      "certified green caterer in Wisconsin.\">",
+      "Member of Brazen Standard Hospitality\",\"identifier\":\"tall-guy-and-a-grill\",\"imageMetadataProcessingEnabled\":false,\"isHstsEnabled\":true,\"language\":\"en-US\",\"loca",
+      "licensed-asset-preview=\"false\" data-load=\"false\" elementtiming=\"system-image-block\" src=\"https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b6"
+    ],
+    "trust_signals": [
+      "licensed-asset-preview=\"false\" data-load=\"false\" elementtiming=\"system-image-block\" src=\"https://images.squa",
+      "ssList.remove('wf-loading');\">",
+      "ssList.add('wf-loading')",
+      "payment_plan_editing\",\"override_block_styles\",\"campaigns_discount_section_in_blasts\",\"nested_categories\",\"m",
+      "ssLine1\":\"\",\"addressLine2\":\"\",\"addressCountry\":\"\"},\"logoImageId\":\"6418759530249c645a257b37\",\"mobileLogo"
+    ]
+  },
+  "ggcatering": {
+    "testimonials": [
+      "1.35 17.49V64.29h31.68v154.27c0 13.95-2.94 26.4-8.82 37.33-5.88 10.93-14.37 19.51-25.48 25.76-11.12 6.24-24.38 9.37-39.81 9.37-20.57 0-37.65-4.82-51.24-14.46-13.59-9.64-21.31-22.73-23.14-39.26h31.13c2.39",
+      "9.15 7.8 4.87 17.12 7.3 27.96 7.3 12.67 0 22.91-3.86 30.72-11.57 7.81-7.71 11.71-18.92 11.71-33.61v-25.35c-5.33 7.16-12.53 13.18-21.63 18.04-9.09 4.86-19.42 7.3-30.99 7.3-13.22 0-25.3-3.35-36.23-10.06-10.",
+      "1.75 14.97-20.89 25.9-27.41 10.92-6.52 23-9.78 36.23-9.78 11.75 0 22.17 2.34 31.27 7.02Zm14.88 43.94c-4.32-7.71-9.96-13.59-16.94-17.63-6.98-4.04-14.51-6.06-22.59-6.06s-15.61 1.98-22.59 5.92c-6.98 3.95-12.",
+      "9.65 6.47 27.55c4.31 7.9 10.01 13.91 17.08 18.04 7.07 4.13 14.55 6.2 22.45 6.2s15.61-2.02 22.59-6.06c6.98-4.04 12.62-9.96 16.94-17.77 4.31-7.8 6.47-16.94 6.47-27.41s-2.16-19.56-6.47-27.27ZM243.03 12.23v20",
+      "6.85 208.79c-11.57-6.52-20.66-15.7-27.27-27.55-6.61-11.85-9.92-25.57-9.92-41.19s3.4-29.11 10.19-41.05c6.79-11.94 16.07-21.12 27.82-27.55s24.88-9.64 39.4-9.64 27.64 3.21 39.4 9.64c11.75 6.43 21.03 15.61 27"
+    ],
+    "trust_signals": [
+      "ssLocality\":\"San Francisco\",\"addressRegion\":\"CA\",\"postalCode\":\"94107\",\"streetAddress\":\"1030 Illinois St",
+      "bbb7922762b848bcc7a2c3\"\n\t\t\t\twidth=\"500\"\n\t\t\t\theight=\"333\"\n\t\t\t\talt=\"\"\n\t\t\t\ttitle=\"\"\n\t\t\t\t\t\t\t\t\tstyle=\"object"
+    ]
+  },
+  "queenofhearts": {
+    "testimonials": [
+      "img:is([sizes=auto i],[sizes^=\"auto,\" i]){contain-intrinsic-size:3000px 1500px}\n/*# sourceURL=wp-img-auto-sizes-contain-inline-css */\n \n<link rel=\"",
+      "\">\n\t\t\t\t\t\t\t\t \n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"",
+      "\">\n\t\t\t\t\t\t\t\t\t \u201cQueen of Hearts Catering exceeded our expectations! The staff were attentive to my gluten preferences (they even made a special gluten-free bruschetta just for me!), attentive to our needs throughout the entire event, prompt to respond to emails, quick to answer my many questions, and ",
+      "\">\n\t\t\t\t\t\t\t\t\t \u201cWe were told several times by our guests that this was easily the best food they\u2019ve ever had at a wedding. From the menu options, to the tasting experience, to the wonderful staff, we knew our day was in good hands with QoH.\u201d \n\t\t\t\t\t\t\t\t \n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"",
+      "\">\n\t\t\t\t\t\t\t\t\t \u201cThe wedding reception was spectacular ! The Old Mill is terrific venue for special occasions. The staff and catering were at the top of there game. The food was excellent and large open spaces were very impressive. Thank you Old Mill for making our daughters reception a night to rememb"
+    ],
+    "awards": [
+      "The Knot Best of Weddings 2025 award\" size=\"80px\" decoding=\"async\" loading=\"lazy\">",
+      "The Knot Best of Weddings 2020 award\" size=\"80px\" decoding=\"async\" loading=\"lazy\" srcset=\"https://queenofhea",
+      "weddingwire.com/biz/queen-of-hearts-signature-catering-malvern/adc37a412ba61cad.html\" target=\"_blank\">"
+    ],
+    "trust_signals": [
+      "Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(s));if(\"object\"==typeof e&&\"number\"==typeof e.timestamp&&(new Date).valueOf()"
+    ]
+  },
+  "wolfgangpuck": {
+    "testimonials": [
+      "\"> \n\n     \n    <script charset=\"",
+      "3.955zm1.909 0v-3.695L9.183 24.3h.95v-5.256h-.95v3.695l-2.776-3.695H5.45V24.3h.957zm7.21 0v-4.383h1.682v-.873h-4.314v.873h1.683V24.3h.948zm6.421 0v-.872H17.04v-1.37h2.716v-.872H17.04v-1.27h3v-.872h-3.956V",
+      "3.955zm1.84 0v-1.767h1.017l1.24 1.767h1.086l-1.316-1.867c.757-.237 1.27-.849 1.27-1.644 0-1.025-.842-1.745-1.966-1.745H20.92V24.3h.957zm1.224-2.647h-1.224v-1.729h1.224c.65 0 1.101.33 1.101.865 0 .535-.451",
+      "4.951 7.625 8.129 12.808 8.129s9.797-3.178 12.807-8.129c-3.01-4.951-7.624-8.13-12.807-8.13\" stroke=\"#000\" class=\"no-fill\" stroke-width=\"1.5\" fill=\"none\">",
+      "3.055 0 1.688-1.382 3.055-3.086 3.055s-3.086-1.367-3.086-3.055c0-1.687 1.382-3.055 3.086-3.055m0-3.055c-3.408 0-6.172 2.735-6.172 6.11 0 3.375 2.764 6.11 6.172 6.11s6.172-2.735 6.172-6.11c0-3.375-2.764-6."
+    ],
+    "about_story": [
+      "Who We Are\" loading=\"lazy\" width=\"738\" height=\"488\" srcset=\"https://wolfgangpuckcatering.com/hs-fs/hubfs/Rectangle-51.jpg?width=369&amp;height=244&amp;name=Rectangle-51.jpg 369w, https://wolfgangpuckcatering.com/hs-fs/hubfs/Rectangle-51.jpg?width=738&amp;height=488&amp;name=Rectangle-51.jpg 738w, https://wolfgangpuckcatering.com/hs-fs/hubfs/Rectangle-51.jpg?width=1107&amp;height=732&amp;name=Recta",
+      "value=\"{&quot;embedAtTimestamp&quot;:&quot;1787083269859&quot;,&quot;formDefinitionUpdatedAt&quot;:&quot;1762465141066&quot;,&quot;disableCookieSubmission&quot;:&quot;true&quot;,&quot;clonedFromForm&quot;:&quot;876c46bd-056c-4d30-a61b-773551371425&quot;,&quot;renderRawHtml&quot;:&quot;true&quot;,&quot;userAgent&quot;:&quot;Mozilla/5.0",
+      "values which may be overriden by the embed context: {\\&quot;pageTitle\\&quot;:\\&quot;Wolfgang Puck Catering | The Standard for Culinary Excellence\\&quot;,\\&quot;pageUrl\\&quot;:\\&quot;https://wolfgangpuckcatering.com/\\&quot;,\\&quot;userAgent\\&quot;:\\&quot;Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537",
+      "mission\",formID:a})})});"
+    ],
+    "trust_signals": [
+      "bbb;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;*zoom:1}.fn-date-picker.pika-single.is-hidden"
+    ]
+  }
+}
