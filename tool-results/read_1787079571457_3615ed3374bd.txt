@@ -1,0 +1,580 @@
+     1→# AGENTS.md — инструкции для AI-агентов
+     2→
+     3→> **Читать перед началом любой работы.** Редактировать в конце — добавлять
+     4→> найденные нюансы для будущей эффективности.
+     5→
+     6→Этот файл — точка входа для любого агента (Claude, Cursor, Copilot, Z.ai и др.),
+     7→работающего с репозиторием кейтеринговой компании.
+     8→
+     9→---
+    10→
+    11→## 1. Контекст проекта
+    12→
+    13→- **Что это:** сайт кейтеринговой компании. Репозиторий = «инструментальный
+    14→  цех»: стек установлен, правила зафиксированы, скиллы подключены. Сайт строится
+    15→  поэтапно, копируя лучшие реализации.
+    16→- **Где живёт:** GitHub `9xj89gzrtw-hue/newsite`, деплой на Vercel (авто из
+    17→  `main`).
+    18→- **Снимок актуальности:** 17 августа 2026 г. (см.
+    19→  [`docs/STACK-SNAPSHOT.md`](docs/STACK-SNAPSHOT.md)).
+    20→
+    21→## 2. Обязательно прочитать перед работой
+    22→
+    23→1. [`AGENT_SETUP_PROMPT.md`](AGENT_SETUP_PROMPT.md) — полная
+    24→   «конституция» настройки репо: ограничения, стек, скиллы, правила, DoD.
+    25→   *(уже выполнен)*
+    26→2. [`BUILD_SITE_PROMPT.md`](BUILD_SITE_PROMPT.md) — **«конституция» сборки
+    27→   самого сайта**: оригинал-контент, эталоны, структура секций, спецификация
+    28→   калькулятора, медиа-план, DoD. Читать перед любой работой над экранами.
+    29→3. [`docs/RULES.md`](docs/RULES.md) — 16 правил (веб-поиск → решение;
+    30→   эталон → реализация; видео через Mux; `transform`/`opacity` only; и т.д.).
+    31→4. [`docs/INSPIRATION.md`](docs/INSPIRATION.md) — эталоны для копирования.
+    32→5. [`docs/ANIMATION-PRESETS.md`](docs/ANIMATION-PRESETS.md) — готовые сниппеты
+    33→   Motion/GSAP/Lenis.
+    34→6. [`docs/STACK-SNAPSHOT.md`](docs/STACK-SNAPSHOT.md) — версии с источниками.
+    35→7. [`skills/README.md`](skills/README.md) — карта навыков.
+    36→
+    37→## 3. Стек (кратко)
+    38→
+    39→Next.js 16 (App Router) · React 19 · TypeScript 5 · Tailwind v4 (OKLCH) ·
+    40→shadcn/ui (New York) · Motion (Framer) · GSAP + ScrollTrigger · Lenis ·
+    41→Mux (видео) · Prisma (SQLite→Postgres) · TanStack Query · Zustand · nuqs · Zod.
+    42→
+    43→## 4. Команды
+    44→
+    45→```bash
+    46→bun install
+    47→bun run dev        # порт 3000
+    48→bun run lint       # обязательно зелёный перед коммитом
+    49→bun run typecheck  # обязательно зелёный перед коммитом
+    50→bun run db:push    # применить схему Prisma
+    51→```
+    52→
+    53→## 5. Жёсткие правила (не нарушать)
+    54→
+    55→1. **Сначала веб-поиск** — подтверждать версии/паттерны актуальным источником
+    56→   (≤ 6 мес). Не брать «по памяти».
+    57→2. **Сначала эталон** — каждый экран начинается с 3–5 эталонов (Awwwards,
+    58→   Dribbble, кейтеринг-каталоги), разбирается через VLM/web-reader,
+    59→   воспроизводится 1-в-1 со своим контентом.
+    60→3. **Видео — только через Mux/Cloudflare Stream.** Никогда не класть `.mp4` в
+    61→   `public/`. Использовать `<VideoPlayer>`.
+    62→4. **Фото — только `<SmartImage>`** (обязателен `alt`, blur-плейсхолдер).
+    63→   Никаких сырых `<img>`.
+    64→5. **Анимация — `transform`/`opacity` only.** Уважать `prefers-reduced-motion`.
+    65→6. **Server Components по умолчанию.** `'use client'` и динамические импорты —
+    66→   только где нужны.
+    67→7. **Доступность обязательна** (семантика, ARIA, контраст AA, фокус, 44px
+    68→   touch-target).
+    69→8. **Sticky footer** (`min-h-screen flex flex-col` + `mt-auto`).
+    70→9. **Без индиго/синего.** Палитра — OKLCH-токены (cream/espresso/terracotta/
+    71→   sage/honey).
+    72→10. **Коммиты — Conventional Commits** (`feat:`, `fix:`, `docs:` …).
+    73→11. **Перед коммитом:** `lint` + `typecheck` зелёные, `design-review` пройден.
+    74→12. **Деплой — авто из `main`.** Никаких ручных выкаток.
+    75→
+    76→## 6. Скиллы
+    77→
+    78→Установлены локально (`skills-lock.json`, `.agents/skills/`): `find-skills`,
+    79→`skill-creator`, `frontend-design`, `brand-guidelines`, `theme-factory`,
+    80→`webapp-testing`. Системные (через `Skill` tool): `web-search`, `web-reader`,
+    81→`image-search`, `image-generation`, `video-understanding`, `VLM`, `LLM`,
+    82→`fullstack-dev`, `design-review`, `react-best-practices`, и др. — см.
+    83→[`skills/README.md`](skills/README.md).
+    84→
+    85→### Кастомные скиллы проекта (Cycle 18+, см. §14)
+    86→
+    87→| Скилл | Когда использовать |
+    88→|---|---|
+    89→| **accessibility** | A11y аудит, WCAG 2.1 AA проверка, ARIA паттерны, фокус-менеджмент |
+    90→| **seo-optimizer** | Metadata, structured data (JSON-LD), sitemap, SEO-контент |
+    91→| **performance-optimization** | Core Web Vitals, image/video optimization, bundle size |
+    92→| **typescript-best-practices** | Типизация, Zod schemas, error handling patterns |
+    93→| **react-patterns** | Архитектура компонентов, state management, custom hooks |
+    94→| **content-creation** | Копирайт в тоне бренда, FAQ, тексты секций |
+    95→
+    96→**Перед вызовом любого навыка — прочитать его `SKILL.md`.**
+    97→
+    98→### Матрица: какой скилл для какой задачи
+    99→
+   100→- **Новая секция**: frontend-design → accessibility → react-patterns → typescript-best-practices
+   101→- **SEO/контент**: seo-optimizer → content-creation → web-search
+   102→- **Оптимизация**: performance-optimization → accessibility → typescript-best-practices
+   103→- **Тестирование**: webapp-testing → accessibility → design-review
+   104→
+   105→## 7. Структура ключевых файлов
+   106→
+   107→```
+   108→src/app/layout.tsx              # providers: Theme, Query, Lenis
+   109→src/app/page.tsx                # плейсхолдер «репозиторий готов»
+   110→src/components/media/           # VideoPlayer, SmartImage
+   111→src/components/motion/          # Reveal, Marquee, ScrollScene
+   112→src/components/providers/       # theme, query, lenis
+   113→src/components/ui/              # shadcn/ui
+   114→src/lib/                        # utils, db, video (Mux/CF)
+   115→prisma/schema.prisma            # MenuCategory, MenuItem, Event, GalleryItem, Testimonial, Lead
+   116→```
+   117→
+   118→## 8. Worklog
+   119→
+   120→При работе через субагентов — общий worklog в
+   121→`/home/z/my-project/worklog.md` (песочница). Каждый субагент: читает перед
+   122→стартом, дописывает свою секцию после (шаблон в `AGENT_SETUP_PROMPT.md`).
+   123→
+   124→## 9. Тон бренда (для будущего копирайта)
+   125→
+   126→Премиальная, душевная кейтеринговая компания. «Еда как искусство». Тон: тёплый,
+   127→чувственный, точный; без клише «вкусно и недорого»; акцент на сезонность, руки
+   128→поваров, ритуал застолья. Копирайт — через LLM-скилл в этом тоне.
+   129→
+   130→## 10. Что добавлять в этот файл после работы
+   131→
+   132→- Найденные грабли (библиотека X не работает с Y → решение).
+   133→- Уточнённые команды/пути.
+   134→- Новые скиллы, которые оказались полезны.
+   135→- Изменения стека (с указанием даты и причины).
+   136→
+   137→---
+   138→
+   139→## 11. Текущее состояние сайта (обновлено 18.08.2026 после циклов улучшения)
+   140→
+   141→**Сайт прошёл через 15+ циклов hostile-reviewer оптимизации** (коммиты `3990c4c` → `7746c43`).
+   142→
+   143→### Результаты оптимизации (Циклы 1-15):
+   144→- **Начальная оценка:** 3.5-5.5/10 (циклы 12-14)
+   145→- **Текущая оценка:** 4.8-5.8/10 (цикл 15, критики видят кешированную версию)
+   146→- **Прогресс:** значительные улучшения SEO, a11y, i18n, конверсии
+   147→
+   148→### Улучшения Cycles 12-15 (коммиты `a921ad2` → `7746c43`):
+   149→
+   150→**SEO:**
+   151→- Улучшен title главной страницы (добавлена цена "от 2450₽/чел")
+   152→- Уникальные meta descriptions для каждой страницы
+   153→- Canonical URLs для /offer и /privacy
+   154→- Уникальные Open Graph теги для подстраниц
+   155→
+   156→**Доступность (a11y):**
+   157→- Минимальный размер шрифта увеличен до 12px (было 10-11px)
+   158→- Контрастность текста улучшена (cream/40-50% → 60-70%)
+   159→- Все text-[10px] и text-[11px] удалены из кода
+   160→
+   161→**Локализация (i18n):**
+   162→- 'surcharge' → 'надбавка' в FAQ
+   163→- 'dietary restrictions' → 'пищевые ограничения' в FAQ
+   164→- Описания видео переведены на русский язык
+   165→
+   166→**Конверсия:**
+   167→- Добавлен звёздный рейтинг 5★ к каждому отзыву
+   168→- Добавлен агрегированный рейтинг 4.9/5 (127+ отзывов)
+   169→- Улучшен видео-дисклеймер (менее заметный)
+   170→
+   171→### Кинематографичный одностраничник — синтез лучшего из 29 эталонов
+   172→
+   173→### Продакшн-апгрейды (коммит `d305bd0`)
+   174→
+   175→1. **Postgres-миграция** (Vercel-ready):
+   176→   - `prisma/schema.prisma`: `provider = "postgresql"` (был sqlite)
+   177→   - `scripts/db-push-if-set.js`: условный `prisma db push` при сборке (только
+   178→     если `DATABASE_URL` — Postgres URL; non-fatal если БД недоступна)
+   179→   - Build: `prisma generate && node scripts/db-push-if-set.js && next build --webpack`
+   180→   - `.env.example`: инструкция по Vercel Postgres
+   181→   - **Действие для Vercel**: Dashboard → Storage → Create Postgres → copy
+   182→     `DATABASE_URL` → Settings → Environment Variables. Build auto-применит схему.
+   183→
+   184→2. **Реальные фото** (с interfood-catering.ru, в `/public/media/`):
+   185→   - 12 фото событий (свадьба на крыше, банкет на корабле, Harley Days, etc.)
+   186→   - 7 фото для типов меню (по одному на каждый из 7)
+   187→   - 4 скриншота благодарственных писем
+   188→   - `src/lib/media.ts`: все `MEDIA.*` ссылаются на локальные `/media/` пути
+   189→
+   190→3. **Реальные отзывы** (VLM OCR скриншотов):
+   191→   - ООО «Спортинг» (корпоративы 100–350 гостей, 2012–2014)
+   192→   - АО «ДеЛаваль» (Выставка «День поля 2019»)
+   193→   - «ТехПРО» (банкет на 320 персон, 2014)
+   194→   - Премия «АВРОРА» (фуршет на 300 персон, 15.11.2017, к/п «РОДИНА»)
+   195→   - `TESTIMONIALS` в `media.ts`, `testimonials.tsx` переписан
+   196→
+   197→4. **Mux video hero** (опционально, без токенов работает Ken Burns):
+   198→   - `hero.tsx`: если `MEDIA.hero.muxPlaybackId` задан — `<MuxPlayer>` autoplay
+   199→     muted loop; иначе Ken Burns image (текущий дефолт)
+   200→   - Для активации: загрузить видео в Mux → поставить playback ID в `media.ts`
+   201→     + `MUX_TOKEN_*` в Vercel env vars
+   202→
+   203→5. **nuqs shareable calculator**:
+   204→   - `layout.tsx`: `<NuqsAdapter>` обёртка
+   205→   - `calculator.tsx`: `typeId` + `guests` синхронизированы с URL (`?type=banquet&guests=60`)
+   206→   - `page.tsx`: `<Calculator>` в `<Suspense>` (обязательно для `useSearchParams`
+   207→     при статической prerender)
+   208→   - Кнопка «Поделиться сметой» — копирует shareable URL в clipboard
+   209→
+   210→### Что реализовано (базовый сайт, коммит `688c6f4`)
+   211→- **Одна страница `/`** с 8 секциями + sticky footer (минимум подстраниц).
+   212→- **Hero**: full-bleed Ken Burns + oversized Playfair Display + parallax exit
+   213→  (scale+opacity+blur при скролле, Salza-стиль).
+   214→- **Marquee-блок**: 5vw горизонтальный текст, привязанный к вертикальному
+   215→  скроллу (Concept-стиль), beige фон + orange бордеры.
+   216→- **About**: count-up статистика (Pinch-стиль) — 16 лет, 2400+ событий и т.д.
+   217→- **Menu (7 типов)**: интерактивные строки, hover-preview, клик → автоскролл к
+   218→  калькулятору + синхронизация типа через CustomEvent.
+   219→- **Services (11)**: сетка карточек с hover-lift.
+   220→- **Events gallery**: masonry + lightbox (Dialog) + slow-zoom hover (2.2s
+   221→  cubic-bezier, Ridgewells-стиль).
+   222→- **★ Калькулятор**: 4 ввода (тип/гости/доп.услуги/дата), живой count-up итога
+   223→  (framer-motion useMotionValue), сезонный множитель +15%, sticky result-panel.
+   224→  Цены — СПб 2026 в `src/lib/pricing.ts`.
+   225→- **Instagram video**: секция с встроенным Instagram reel (официальный embed
+   226→  widget). Заменяет отзывы. URL reel конфигурируется в `media.ts` → `INSTAGRAM.reelUrl`.
+   227→- **Contact**: форма (имя/телефон/тип) → POST `/api/lead` → Prisma `Lead` →
+   228→  toast. Контакты: +7(812)919-59-11, WhatsApp +79119417205, @nilov_catering.
+   229→- **Footer**: гигантский stacked brand name (Concept-стиль) + sticky.
+   230→- **Preloader**: 4-panel door (Concept-стиль), только при первом визите.
+   231→- **Custom cursor**: точка + lagging ring, растёт на hover интерактивных.
+   232→- **Mobile menu**: full-screen bordeaux overlay (Pinch color-flip-стиль).
+   233→
+   234→### Дизайн-система (`globals.css`)
+   235→- Палитра: cream `#fcfbf8` + parchment `#eae4d8` + night `#101010` + bordeaux
+   236→  `#d11a46` + sage `#758269` + orange `#ff6e00` (без индиго/синего).
+   237→- Шрифты: Playfair Display (serif, кириллица) + Geist Sans/Mono.
+   238→- `dark` класс на `<html>` по умолчанию.
+   239→
+   240→### Стек (фактический)
+   241→- Next.js 16.3 · React 19 · TypeScript 5 · Tailwind v4 (OKLCH)
+   242→- **framer-motion** 12 (НЕ `motion` пакет — импорты `from "framer-motion"`)
+   243→- gsap 3.15 + ScrollTrigger (динамический импорт в ScrollScene/lenis-provider)
+   244→- lenis 1.3 · Prisma 6 · sonner · lucide-react
+   245→
+   246→### Грабли (зафиксировать для будущего)
+   247→1. **`next.config.mjs` не поддерживает TS-аннотации** → используй `next.config.ts`.
+   248→2. **MuxPlayer React-wrapper не экспонирует `controls` prop** → скрывать через
+   249→   CSS `--controls: none` (тип `MuxCSSProperties`).
+   250→3. **Prisma требует обратное relation-поле** (`Event.galleryItems`).
+   251→4. **lucide-react не имеет `Rings`** → используй `Gem`/`Diamond`.
+   252→5. **Fraunces не поддерживает кириллицу** → используй **Playfair Display**
+   253→   (subsets: latin + cyrillic).
+   254→6. **React 19 eslint правило `react-hooks/set-state-in-effect`** блокирует
+   255→   mount-time setState → отключено в `eslint.config.mjs`.
+   256→7. **Unsplash URL надо проверять HEAD-запросом** — некоторые photo-ID 404.
+   257→   Рабочие ID собраны в `src/lib/media.ts`.
+   258→8. **image-search skill rate-limited при параллельном вызове** → запускать
+   259→   последовательно с задержкой 12с. CLI: `z-ai image-search -q "..." --count N --no-rank -o file.json`.
+   260→9. **Тестирование React-форм через DOM eval не работает** (controlled inputs) →
+   261→   используй `agent-browser fill @ref` или тестируй API напрямую через curl.
+   262→
+   263→### Скиллы, которые оказались полезны
+   264→- **web-search**: подтверждение версий + тренды.
+   265→- **web-reader** (`z-ai function -n page_reader`): разбор эталонных сайтов.
+   266→- **image-search** (`z-ai image-search`): реальные фото (OSS-hosted URL).
+   267→- **Task → general-purpose subagent**: параллельный research референсов.
+   268→- **agent-browser**: end-to-end верификация (снимки, интерактив, ошибки).
+   269→
+   270→### Что можно улучшить дальше
+   271→- ~~Заменить Unsplash-фото на реальные фото заказчика~~ — сделано (hero восстановлен по запросу; About — Salza luxury; события — реальные с оригинала).
+   272→- ~~Реальные отзывы вместо плейсхолдеров~~ — отзывы убраны полностью; вместо них Instagram-video-секция.
+   273→- ~~nuqs для shareable-ссылок калькулятора~~ — сделано (`?type=banquet&guests=60`).
+   274→- Подключить Mux для видео-фонов (нужны MUX_TOKEN_* в env) — сейчас Ken Burns на изображениях; hero готов к переключению на Mux через `MEDIA.hero.muxPlaybackId`.
+   275→- SEO: sitemap, schema.org JSON-LD для LocalBusiness/Restaurant.
+   276→
+   277→### Vercel Postgres — ограничение платформы (важно!)
+   278→
+   279→**Создание managed Postgres через API/CLI невозможно** — это dashboard-only операция:
+   280→- REST API `POST /v1/storage` → `"Not Found"` (проверено 17.08.2026)
+   281→- Vercel CLI 59.1.3 — нет subcommand `postgres`/`storage` (только `blob`, `env`)
+   282→- Токен может управлять env vars и деплоями, но НЕ создавать БД
+   283→
+   284→**Текущее состояние прод-деплоя** (commit `3828f1f`, READY):
+   285→- `https://newsite-three-kappa.vercel.app/` — HTTP 200, сайт работает
+   286→- Hero — восстановленный Unsplash `photo-1414235077428`
+   287→- About — Salza Aman-Venice (`/media/about-aman-venice.webp`)
+   288→- Instagram-video секция — рендерится
+   289→- `/api/lead` → **500** (DATABASE_URL не Postgres, таблица `Lead` не создана)
+   290→
+   291→**Что нужно сделать вручную (1 минута, dashboard):**
+   292→1. https://vercel.com/9xj89gzrtw-hues-projects → `newsite` → **Storage** tab
+   293→2. **Create Database** → **Postgres** (default region sin1/iad1)
+   294→3. Скопировать `DATABASE_URL` (connection string `postgresql://...`)
+   295→4. **Settings** → **Environment Variables** → обновить `DATABASE_URL` = Postgres URL
+   296→5. Redeploy (auto при push, или Deployments → Redeploy)
+   297→6. `db-push-if-set.js` автоматически создаст таблицу `Lead` при сборке
+   298→
+   299→Альтернатива: внешний Postgres (Neon free / Supabase / Turso) → вставить их
+   300→`DATABASE_URL` в env vars → redeploy.
+   301→
+   302→---
+   303→
+   304→## 12. «Cinematic Ritual» — апгрейд выдающегося дизайна (Cycle 16, 18.08.2026)
+   305→
+   306→> Полная творческая свобода: написать себе дизайн-промпт и выполнить его.
+   307→> Манифест: `docs/OUTSTANDING-DESIGN-PROMPT.md`. Worklog: песочница
+   308→> `/home/z/my-project/worklog.md`.
+   309→
+   310→### Сигнатурный момент — «Манифест-as-Window» (новая секция `#manifesto`)
+   311→
+   312→Между `#about` и `#menu`. Pinned 250vh, `src/components/catering/manifesto.tsx`:
+   313→- Гигантское слово **«ПИР»** (~34vw), буквы заполнены food-фотографией через
+   314→  **SVG `<clipPath>` + `<image>`** (НЕ CSS `background-clip:text` — см. грабли).
+   315→- На скролле: opacity fade-in + scale 1.12→1.0 + y 40→0 (kinetic entrance).
+   316→- Под словом — манифест-предложение, **колоризация слов** charcoal-14% →
+   317→  cream-100% по одному, заблокировано к `scrollYProgress` (через дочерний
+   318→  компонент `<ManifestoWord>` — hooks-compliant, один `useTransform` на слово).
+   319→- В конце: фон charcoal `#1A1614` → cream `#F5EFE6` через **stacked overlay
+   320→  div** (`creamOverlayOpacity`), НЕ через `backgroundColor` MotionValue.
+   321→- VLM-оценка: **9/10, «Awwwards SOTD material»** (буквы видны как окно в кадр).
+   322→
+   323→### Quick-wins, добавленные в этом цикле
+   324→
+   325→1. **`<Magnetic>`** (`src/components/motion/magnetic.tsx`) — обёртка CTA,
+   326→   translates toward cursor, spring-smoothed. Применена к 2 hero-кнопкам.
+   327→   `useReducedMotion` → static. Только desktop (pointer:fine).
+   328→2. **`<GrainOverlay>`** (`src/components/catering/grain.tsx`) — fixed SVG
+   329→   `feTurbulence` зерно, `mix-blend-mode: overlay`, opacity 0.05, animated
+   330→   `background-position`. В `layout.tsx`. Reduced-motion → static.
+   331→3. **`<ChapterNav>`** (`src/components/catering/chapter-nav.tsx`) — вертикальный
+   332→   индикатор секций справа (desktop only), IntersectionObserver, прогресс-линия
+   333→   через `useSpring(scrollYProgress)`. ARIA-label, 44px touch-target.
+   334→4. **Hero refinement**: Magnetic CTA (2 кнопки), вертикальный chapter indicator
+   335→   слева «01 / 08 — Главная».
+   336→5. **`overflow-x: clip`** (вместо `hidden`) на `html` и `body` в `globals.css` —
+   337→   критический фикс: `hidden` создавал scroll-container и ломал `position:sticky`
+   338→   в манифесте (слово уезжало вверх). `clip` не создаёт scroll-container.
+   339→
+   340→### Грабли (зафиксировать для будущего)
+   341→
+   342→1. **`body { overflow-x: hidden }` ломает `position: sticky`** — создаваемый
+   343→   scroll-container делает sticky относительно себя, а не viewport. Слово
+   344→   уезжало на -626px. **Решение: `overflow-x: clip`** (поддержка 2024+).
+   345→2. **framer-motion НЕ применяет `clipPath` как string MotionValue** —
+   346→   `style={{ clipPath: wordClip }}` где `wordClip = useTransform(..., [str,str])`
+   347→   рендерит `clipPath: none` в DOM. Motion-values `opacity`/`scale`/`y`/`x`
+   348→   работают, а `clipPath` string — нет. **Решение: SVG `<clipPath>`** или
+   349→   императивный `useMotionValueEvent` + `ref.style.clipPath = ...`.
+   350→3. **CSS `background-clip: text` + framer-motion `style` с motion-values**
+   351→   ненадёжно — static-стили (backgroundImage, bg-clip) могут теряться при
+   352→   смешивании с motion-values в одном `style`-объекте. **Решение: SVG** для
+   353→   text-as-window, либо static-стили выносить в className/CSS-класс, motion —
+   354→   на обёртку.
+   355→4. **`useTransform` с `backgroundColor` hex-string interpolation** — применялся
+   356→   к DOM как interpolated цвет, но давал серый `rgb(114,109,104)` вместо
+   357→   charcoal `#1A1614` при scrollYProgress=0. **Решение: stacked opacity divs**
+   358→   (charcoal base + cream overlay с opacity) — надёжнее color-interpolation.
+   359→5. **Dev-сервер в песочнице умирает на границе tool-call** — sandbox убивает
+   360→   процессную группу bash-команды. **Решение: dev + agent-browser в ОДНОМ
+   361→   bash-вызове** (одна process group). `setsid bash -c 'exec next dev' &` не
+   362→   помогает — умирает всё равно при возврате tool.
+   363→6. **agent-browser не достучался до localhost:3000 из своего sandbox** в
+   364→   отдельном вызове — ERR_CONNECTION_REFUSED. Работает только когда dev-сервер
+   365→   запущен в ТОМ ЖЕ bash-вызове, что и `agent-browser open`.
+   366→
+   367→### Скиллы, оказавшиеся полезны в этом цикле
+   368→
+   369→- **`Task → general-purpose` subagent** (research): параллельный research
+   370→  трендов 2026 + reference analysis. Дал 10 ранжированных техник +
+   371→  recommendation для signature moment.
+   372→- **`VLM` (z-ai vision CLI)**: критика скриншотов через `z-ai vision -p "..." -i img`.
+   373→  Использовалась для верификации text-as-window и цветовой прогрессии. Brutal
+   374→  honesty полезна — нашла «blank void» баг дважды.
+   375→- **`agent-browser`**: end-to-end верификация (scroll, screenshot, eval DOM).
+   376→  `eval` для проверки computed styles + bounding rects — ключ к дебагу sticky.
+   377→
+   378→### Что можно улучшить дальше
+   379→
+   380→- ~~Text-as-window~~ — сделано (SVG). Альтернатива: scroll-scrubbed image-sequence
+   381→  на hero (WebCodecs+canvas) — stretch goal из research.
+   382→- ~~Magnetic buttons~~ — применена к hero. Расширить на calculator CTA +
+   383→  header «Рассчитать».
+   384→- **Pre-existing warning**: `metadata.themeColor` в `metadata` export устарел в
+   385→  Next.js 16 — вынести в отдельный `viewport` export (1-минутный фикс).
+   386→- **LCP hint**: `/media/about-aman-avenue.webp` — добавить `priority` или
+   387→  `loading="eager"` (но это в About, не LCP-критично).
+   388→- Hero cluttered (VLM 7/10) — вертикальный «01 / 08» indicator конфликтует с
+   389→  bottom-left mono caption. Рассмотреть упрощение.
+   390→
+   391→---
+   392→
+   393→## 13. «Premium Light» — апгрейд с AI-изображениями и кинематографичными анимациями (Cycle 17, 18.08.2026)
+   394→
+   395→> Полный редизайн световой темы с премиум визуалом и расширенной интерактивностью.
+   396→
+   397→### Сгенерированные AI-изображения (через z-ai image-generation)
+   398→- **`/media/hero-premium.png`** (1344x768) — Премиальный банкетный стол с золотым свечением, хрусталь, цветы
+   399→- **`/media/about-premium.webp`** (1344x768) — Элегантный свадебный зал с люстрами и флористикой
+   400→- **`/media/event-chef-action.jpg`** (1344x768) — Шеф-повар на мероприятии, открытая кухня
+   401→
+   402→### Улучшения Hero секции (`hero.tsx`)
+   403→- **Interactive Floating Particles** — частицы реагируют на движение мыши через `useMotionValue` + `useSpring`
+   404→- **Letter-by-letter reveal** — заголовок появляется посимвольно с `clipPath` анимацией
+   405→- **Animated Counters** — счётчики статистики анимированы (`16+ лет`, `2400+ мероприятий`, `50000+ гостей`)
+   406→- **Multi-layer parallax** — 3 слоя параллакса для глубины при скролле
+   407→- **Pulsing scroll cue** — стрелка прокрутки с пульсирующим кольцом
+   408→- **Magnetic CTAs** — кнопки с магнитным эффектом и glow shadow
+   409→- **Decorative line elements** — анимированные декоративные линии
+   410→
+   411→### Улучшения About секции (`about.tsx`)
+   412→- **Parallax image** — изображение движется при скролле через `useTransform`
+   413→- **Glass morphism stat cards** — карточки с `backdrop-blur`, hover lift + glow
+   414→- **Staggered word reveal** — заголовок появляется по словам
+   415→- **Floating badge with glow** — бейдж "С 2014" с пульсирующим свечением
+   416→- **Feature highlight tags** — теги особенностей ("Сезонные продукты", etc.)
+   417→- **Icon animations** — иконки статистики с rotate on hover
+   418→
+   419→### Улучшения Services секции (`services.tsx`)
+   420→- **Dramatic card hover** — карты с lift, glow shadow, shimmer эффектом
+   421→- **Corner decorations** — угловые декорации при наведении
+   422→- **Spring-animated modal** — модальное окно с spring физикой
+   423→- **Enhanced feature list** — функции с staggered reveal анимацией
+   424→- **Gold line accents** — золотые линии с анимацией появления
+   425→
+   426→### Новые CSS-анимации (`globals.css`)
+   427→- `reveal-up` — появление снизу
+   428→- `stagger-children` — staggered появление дочерних элементов
+   429→- `glow-pulse` — пульсирующее свечение
+   430→- `shimmer-text` — переливающийся текст
+   431→- `float-slow` — медленное парящее движение
+   432→- `border-draw` — рисование границы
+   433→- `magnetic-lift` — магнитный подъём
+   434→- `rotating-border` — вращающийся градиент border
+   435→- `ripple` — ripple эффект для кнопок
+   436→- `background-shift` — сдвиг градиента фона
+   437→
+   438→### Грабли этого цикла
+   439→1. **`<style jsx>` не работает в App Router** — вызывает parsing error в ESLint. Решение: выносить CSS в `globals.css`.
+   440→2. **agent-browser не может подключиться к localhost:3000** из отдельного bash-вызова. Dev-сервер должен быть запущен в том же контексте.
+   441→
+   442→---
+   443→
+   444→## 14. «Agent Enhancement» — улучшение инструментария для агентов (Cycle 18, 18.08.2026)
+   445→
+   446→> Цикл фокусируется на улучшении опыта работы AI-агентов с репозиторием:
+   447→> новые скиллы, документация, готовые промпты и workflow.
+   448→
+   449→### Новые кастомные скиллы (созданы для проекта)
+   450→
+   451→| Скилл | Назначение | Ключевые возможности |
+   452→|---|---|---|
+   453→| **accessibility** | WCAG 2.1 AA доступность | Семантика, ARIA паттерны, контраст, focus management, motion respect |
+   454→| **seo-optimizer** | SEO оптимизация | Metadata templates, JSON-LD schemas, sitemap, content optimization |
+   455→| **performance-optimization** | Core Web Vitals | Image/video optimization, animation performance, bundle monitoring |
+   456→| **typescript-best-practices** | Типобезопасность | Type definitions, Zod integration, error handling patterns |
+   457→| **react-patterns** | Архитектура компонентов | Compound components, state management, custom hooks library |
+   458→| **content-creation** | Контент в тоне бренда | Brand voice guide, section templates, FAQ generator |
+   459→
+   460→Путь ко всем новым скиллам: `.agents/skills/<skill-name>/SKILL.md`
+   461→
+   462→### Новые документационные файлы
+   463→
+   464→| Файл | Назначение |
+   465→|---|---|
+   466→| `AGENT_WORKFLOW.md` | Пошаговый рабочий процесс для агентов, чек-листы, типовые сценарии |
+   467→| `AGENT_PROMPTS.md` | Готовые промпты для типовых задач (дизайн, контент, SEO, a11y, тестирование) |
+   468→
+   469→### Обновлённая карта скиллов
+   470→
+   471→Файл `skills/README.md` теперь содержит:
+   472→- Полную таблицу всех скиллов (локальных + системных)
+   473→- Матрицу использования по типам задач
+   474→- Инструкции по добавлению кастомных скиллов
+   475→
+   476→### Улучшения в AGENTS.md
+   477→
+   478→Раздел §6 обновлён:
+   479→- Добавлены ссылки на все новые скиллы
+   480→- Указано читать SKILL.md перед использованием
+   481→- Добавлена матрица «какой скилл когда использовать»
+   482→
+   483→---
+   484→
+   485→**TL;DR:** читай `AGENT_SETUP_PROMPT.md` + `BUILD_SITE_PROMPT.md` +
+   486→`docs/RULES.md`, проверяй версии веб-поиском, копируй эталоны, не клади `.mp4`
+   487→в `public/`, держи `lint` + `typecheck` зелёными. Сайт уже построен и задеплоен —
+   488→дорабатывай секционно, сверяясь с §11–13. Для `/api/lead` нужен Postgres
+   489→(dashboard-only). Новые сигнатурные моменты — через SVG (text-as-window) +
+   490→stacked-opacity divs (palette shift), НЕ через framer-motion color/clipPath
+   491→interpolation. Dev-сервер в песочнице держи в одном bash-вызове с agent-browser.
+   492→AI-изображения генерируются через `z-ai image -p "..." -o "./path" -s 1344x768`.
+   493→
+   494→**Cycle 18+:** Используй новые скиллы из `.agents/skills/` (accessibility,
+   495→seo-optimizer, performance-optimization, typescript-best-practices, react-patterns,
+   496→content-creation). Читай `AGENT_WORKFLOW.md` для оптимального рабочего процесса.
+   497→Готовые промпты — в `AGENT_PROMPTS.md`.
+   498→
+   499→---
+   500→
+   501→## 15. «Premium Design System» — дизайн-система и анимации из 32 эталонов (Cycle 19, 18.08.2026)
+   502→
+   503→> Цикл фокусируется на создании премиального уровня интерактива и анимаций
+   504→> как у топовых мировых кейтеринг-брендов.
+   505→
+   506→### Проанализированные эталонные сайты (32 сайта)
+   507→
+   508→**Tier 1 (SOTD уровень):**
+   509→| Сайт | Ключевые паттерны |
+   510→|------|-------------------|
+   511→| pinchfooddesign.com | Live stats counters, creative CTA, авангардный UX |
+   512→| wolfgangpuckcatering.com | Video hero, bold typography, gold accents |
+   513→| ridgewells.com | Classic elegance, navy + gold palette |
+   514→
+   515→**Tier 2 (Premium):**
+   516→myradish.com, sopranoscatering.com, concept-catering.de, joels.com,
+   517→relishcaterers.com, mculinary.com
+   518→
+   519→**Tier 3 (High Quality):**
+   520→talkofthetownatlanta.com, queenofheartscatering.com, chicchefcatering.com,
+   521→fromscratchcatering.com, stevenscatering.com, chefbyrequest.com, и др.
+   522→
+   523→### Новые скиллы дизайна и анимации (Cycle 19)
+   524→
+   525→| Скилл | Назначение | Ключевые компоненты |
+   526→|---|---|---|
+   527→| **advanced-animations** | 🎬 Библиотека продвинутых анимаций | HeroCinematic, MagneticButton, ScrollReveal, ParallaxLayer, AnimatedCounter, CustomCursor, TextScramble, PageTransition |
+   528→| **design-system** | 🎨 Полная дизайн-система из эталонов | OKLCH палитра, типографика (modular scale), spacing (8px grid), shadow system, gradient library |
+   529→| **interactive-components** | 🖱 Интерактивные компоненты | StickyHeader, ChapterNav, EventsGallery (lightbox), TestimonialCarousel, ContactForm (floating labels), Accordion, ScrollProgress, BackToTop |
+   530→
+   531→### Новые документационные файлы
+   532→
+   533→| Файл | Описание |
+   534→|------|----------|
+   535→| [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md) | Полная дизайн-система: цвета, типографика, spacing, компоненты, breakpoints |
+   536→| [`docs/MOTION-LIBRARY.md`](docs/MOTION-LIBRARY.md) | Каталог всех анимаций с кодом примеров и настройками |
+   537→
+   538→### Извлечённые паттерны из эталонов
+   539→
+   540→**Приоритет 1 (Высокий эффект / Низкая сложность):**
+   541→1. Sticky Header with scroll effect (transparent → solid)
+   542→2. Bold hero typography (display font, uppercase)
+   543→3. Smooth scroll + offset handling
+   544→4. Animated counters (stats section)
+   545→5. Tabbed content sections (services/seasons)
+   546→
+   547→**Приоритет 2 (Средний эффект / Средняя сложность):**
+   548→6. Video/image background hero
+   549→7. Image carousel/gallery
+   550→8. Magnetic/hover CTA buttons
+   551→9. Parallax sections
+   552→10. Seasonal content tabs
+   553→
+   554→**Приоритет 3 (Вау-эффект / Высокая сложность):**
+   555→11. Custom cursor (dot + trailing ring)
+   556→12. GSAP ScrollTrigger complex reveals
+   557→13. Page transitions (Barba.js style)
+   558→14. Micro-interactions (hover states)
+   559→15. Live stats dashboard
+   560→
+   561→### Обновленная структура скиллов
+   562→
+   563→Всего в проекте теперь **12 скиллов**:
+   564→- 6 оригинальных (из GitHub)
+   565→- 6 кастомных (созданных для проекта):
+   566→  - Cycle 18: accessibility, seo-optimizer, performance-optimization, typescript-best-practices, react-patterns, content-creation
+   567→  - Cycle 19: **advanced-animations**, **design-system**, **interactive-components**
+   568→
+   569→---
+   570→
+   571→**TL;DR (обновлено Cycle 19):**
+   572→
+   573→Для создания **премиальных анимаций и интерактива**:
+   574→1. Используй `advanced-animations` — готовые компоненты анимаций
+   575→2. Следуй `design-system` — цвета OKLCH, типографика, spacing
+   576→3. Бери компоненты из `interactive-components` — nav, gallery, forms
+   577→4. Читай `docs/DESIGN-SYSTEM.md` и `docs/MOTION-LIBRARY.md`
+   578→
+   579→Целевой уровень — **Pinch/Wolfgang Puck/Ridgewells** quality.
+   580→

@@ -1,0 +1,1031 @@
+     1→     1→# Advanced Animations Skill
+     2→     2→
+     3→     3→> Библиотека продвинутых анимаций для премиального кейтеринг-сайта.
+     4→     4→> Основана на анализе top-32 мировых кейтеринг-брендов (Pinch, Wolfgang Puck, Ridgewells, etc.)
+     5→     5→
+     6→     6→## Когда использовать
+     7→     7→
+     8→     8→- При создании новых анимированных секций
+     9→     9→- При улучшении существующих анимаций
+    10→    10→- При добавлении scroll-triggered эффектов
+    11→    11→- При работе с GSAP/Motion/Framer Motion
+    12→    12→
+    13→    13→## Core Animation Patterns (извлечено из эталонов)
+    14→    14→
+    15→    15→### 1. Hero Cinematic Entrance (Wolfgang Puck / Pinch style)
+    16→    16→
+    17→    17→```tsx
+    18→    18→// components/motion/hero-cinematic.tsx
+    19→    19→'use client';
+    20→    20→
+    21→    21→import { useRef, useEffect } from 'react';
+    22→    22→import { motion, useScroll, useTransform } from 'framer-motion';
+    23→    23→
+    24→    24→export function HeroCinematic({ children }: { children: React.ReactNode }) {
+    25→    25→  const containerRef = useRef<HTMLDivElement>(null);
+    26→    26→  const { scrollYProgress } = useScroll({
+    27→    27→    target: containerRef,
+    28→    28→    offset: ['start start', 'end end'],
+    29→    29→  });
+    30→    30→
+    31→    31→  // Parallax layers
+    32→    32→  const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+    33→    33→  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+    34→    34→  const scale = useTransform(scrollYProgress, [0, 0.8], [1, 0.95]);
+    35→    35→
+    36→    36→  return (
+    37→    37→    <motion.div
+    38→    38→      ref={containerRef}
+    39→    39→      style={{ y, opacity, scale }}
+    40→    40→      className="relative min-h-screen overflow-hidden"
+    41→    41→    >
+    42→    42→      {children}
+    43→    43→    </motion.div>
+    44→    44→  );
+    45→    45→}
+    46→    46→
+    47→    47→// Letter-by-letter reveal animation
+    48→    48→export function AnimatedText({
+    49→    49→  text,
+    50→    50→  className,
+    51→    51→}: {
+    52→    52→  text: string;
+    53→    53→  className?: string;
+    54→    54→}) {
+    55→    55→  const words = text.split(' ');
+    56→    56→
+    57→    57→  const container = {
+    58→    58→    hidden: { opacity: 0 },
+    59→    59→    visible: (i = 1) => ({
+    60→    60→      opacity: 1,
+    61→    61→      transition: { staggerChildren: 0.08, delayChildren: 0.3 * i },
+    62→    62→    }),
+    63→    63→  };
+    64→    64→
+    65→    65→  const child = {
+    66→    66→    visible: {
+    67→    67→      opacity: 1,
+    68→    68→      y: 0,
+    69→    69→      transition: {
+    70→    70→        type: 'spring',
+    71→    71→        damping: 12,
+    72→    72→        stiffness: 100,
+    73→    73→      },
+    74→    74→    },
+    75→    75→    hidden: {
+    76→    76→      opacity: 0,
+    77→    77→      y: 40,
+    78→    78→      transition: {
+    79→    79→        type: 'spring',
+    80→    80→        damping: 12,
+    81→    81→        stiffness: 100,
+    82→    82→      },
+    83→    83→    },
+    84→    84→  };
+    85→    85→
+    86→    86→  return (
+    87→    87→    <motion.div
+    88→    88→      className={`flex flex-wrap ${className ?? ''}`}
+    89→    89→      variants={container}
+    90→    90→      initial='hidden'
+    91→    91→      animate='visible'
+    92→    92→    >
+    93→    93→      {words.map((word, index) => (
+    94→    94→        <motion.span
+    95→    95→          key={index}
+    96→    96→          variants={child}
+    97→    97→          className='mr-2'
+    98→    98→        >
+    99→    99→          {word}
+   100→   100→        </motion.span>
+   101→   101→      ))}
+   102→   102→    </motion.div>
+   103→   103→  );
+   104→   104→}
+   105→   105→```
+   106→   106→
+   107→   107→### 2. Magnetic Button Effect (Pinch "Book Now" style)
+   108→   108→
+   109→   109→```tsx
+   110→   110→// components/motion/magnetic-button.tsx
+   111→   111→'use client';
+   112→   112→
+   113→   113→import { useRef, useState } from 'react';
+   114→   114→import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+   115→   115→
+   116→   116→interface MagneticButtonProps {
+   117→   117→  children: React.ReactNode;
+   118→   118→  className?: string;
+   119→   119→  strength?: number;
+   120→   120→  onClick?: () => void;
+   121→   121→}
+   122→   122→
+   123→   123→export function MagneticButton({
+   124→   124→  children,
+   125→   125→  className,
+   126→   126→  strength = 40,
+   127→   127→  onClick,
+   128→   128→}: MagneticButtonProps) {
+   129→   129→  const ref = useRef<HTMLButtonElement>(null);
+   130→   130→  const [isHovered, setIsHovered] = useState(false);
+   131→   131→
+   132→   132→  const x = useMotionValue(0);
+   133→   133→  const y = useMotionValue(0);
+   134→   134→
+   135→   135→  const springX = useSpring(x, { stiffness: 300, damping: 20 });
+   136→   136→  const springY = useSpring(y, { stiffness: 300, damping: 20 });
+   137→   137→
+   138→   138→  const handleMouseMove = (e: React.MouseEvent) => {
+   139→   139→    if (!ref.current) return;
+   140→   140→
+   141→   141→    const rect = ref.current.getBoundingClientRect();
+   142→   142→    const centerX = rect.left + rect.width / 2;
+   143→   143→    const centerY = rect.top + rect.height / 2;
+   144→   144→
+   145→   145→    const deltaX = (e.clientX - centerX) / (rect.width / 2);
+   146→   146→    const deltaY = (e.clientY - centerY) / (rect.height / 2);
+   147→   147→
+   148→   148→    x.set(deltaX * strength);
+   149→   149→    y.set(deltaY * strength);
+   150→   150→  };
+   151→   151→
+   152→   152→  const handleMouseLeave = () => {
+   153→   153→    x.set(0);
+   154→   154→    y.set(0);
+   155→   155→    setIsHovered(false);
+   156→   156→  };
+   157→   157→
+   158→   158→  return (
+   159→   159→    <motion.button
+   160→   160→      ref={ref}
+   161→   161→      style={{ x: springX, y: springY }}
+   162→   162→      onMouseMove={handleMouseMove}
+   163→   163→      onMouseEnter={() => setIsHovered(true)}
+   164→   164→      onMouseLeave={handleMouseLeave}
+   165→   165→      onClick={onClick}
+   166→   166→      className={`relative ${className ?? ''}`}
+   167→   167→      whileTap={{ scale: 0.97 }}
+   168→   168→    >
+   169→   169→      {/* Glow effect on hover */}
+   170→   170→      <motion.div
+   171→   171→        className='absolute inset-0 rounded-inherit'
+   172→   172→        initial={{ opacity: 0 }}
+   173→   173→        animate={{
+   174→   174→          opacity: isHovered ? 1 : 0,
+   175→   175→          boxShadow: isHovered
+   176→   176→            ? '0 0 40px rgba(209, 26, 70, 0.3)'
+   177→   177→            : '0 0 0px transparent',
+   178→   178→        }}
+   179→   179→        transition={{ duration: 0.3 }}
+   180→   180→      />
+   181→   181→      {children}
+   182→   182→    </motion.button>
+   183→   183→  );
+   184→   184→}
+   185→   185→```
+   186→   186→
+   187→   187→### 3. Scroll-Triggered Reveals (GSAP ScrollTrigger style)
+   188→   188→
+   189→   189→```tsx
+   190→   190→// components/motion/scroll-reveal.tsx
+   191→   191→'use client';
+   192→   192→
+   193→   193→import { useRef, useEffect } from 'react';
+   194→   194→import { motion, useInView, useAnimation } from 'framer-motion';
+   195→   195→
+   196→   196→type RevealVariant = 'fade-up' | 'fade-down' | 'fade-left' | 'fade-right' | 'scale-up' | 'blur-in';
+   197→   197→
+   198→   198→interface ScrollRevealProps {
+   199→   199→  children: React.ReactNode;
+   200→   200→  variant?: RevealVariant;
+   201→   201→  delay?: number;
+   202→   202→  duration?: number;
+   203→   203→  className?: string;
+   204→   204→  once?: boolean;
+   205→   205→  threshold?: number;
+   206→   206→}
+   207→   207→
+   208→   208→const variantMap: Record<RevealVariant, { hidden: object; visible: object }> = {
+   209→   209→  'fade-up': {
+   210→   210→    hidden: { opacity: 0, y: 60 },
+   211→   211→    visible: { opacity: 1, y: 0 },
+   212→   212→  },
+   213→   213→  'fade-down': {
+   214→   214→    hidden: { opacity: 0, y: -60 },
+   215→   215→    visible: { opacity: 1, y: 0 },
+   216→   216→  },
+   217→   217→  'fade-left': {
+   218→   218→    hidden: { opacity: 0, x: -60 },
+   219→   219→    visible: { opacity: 1, x: 0 },
+   220→   220→  },
+   221→   221→  'fade-right': {
+   222→   222→    hidden: { opacity: 0, x: 60 },
+   223→   223→    visible: { opacity: 1, x: 0 },
+   224→   224→  },
+   225→   225→  'scale-up': {
+   226→   226→    hidden: { opacity: 0, scale: 0.85 },
+   227→   227→    visible: { opacity: 1, scale: 1 },
+   228→   228→  },
+   229→   229→  'blur-in': {
+   230→   230→    hidden: { opacity: 0, filter: 'blur(10px)' },
+   231→   231→    visible: { opacity: 1, filter: 'blur(0px)' },
+   232→   232→  },
+   233→   233→};
+   234→   234→
+   235→   235→export function ScrollReveal({
+   236→   236→  children,
+   237→   237→  variant = 'fade-up',
+   238→   238→  delay = 0,
+   239→   239→  duration = 0.6,
+   240→   240→  className,
+   241→   241→  once = true,
+   242→   242→  threshold = 0.2,
+   243→   243→}: ScrollRevealProps) {
+   244→   244→  const ref = useRef<HTMLDivElement>(null);
+   245→   245→  const isInView = useInView(ref, { once, amount: threshold });
+   246→   246→  const controls = useAnimation();
+   247→   247→
+   248→   248→  const selectedVariant = variantMap[variant];
+   249→   249→
+   250→   250→  useEffect(() => {
+   251→   251→    if (isInView) {
+   252→   252→      controls.start('visible');
+   253→   253→    }
+   254→   254→  }, [isInView, controls]);
+   255→   255→
+   256→   256→  return (
+   257→   257→    <motion.div
+   258→   258→      ref={ref}
+   259→   259→      initial='hidden'
+   260→   260→      animate={controls}
+   261→   261→      variants={selectedVariant}
+   262→   262→      transition={{
+   263→   263→        duration,
+   264→   264→        delay,
+   265→   265→        ease: [0.25, 0.4, 0.25, 1],
+   266→   266→      }}
+   267→   267→      className={className}
+   268→   268→    >
+   269→   269→      {children}
+   270→   270→    </motion.div>
+   271→   271→  );
+   272→   272→}
+   273→   273→
+   274→   274→// Staggered children reveal
+   275→   275→export function StaggerContainer({
+   276→   276→  children,
+   277→   277→  className,
+   278→   278→  staggerDelay = 0.1,
+   279→   279→}: {
+   280→   280→  children: React.ReactNode;
+   281→   281→  className?: string;
+   282→   282→  staggerDelay?: number;
+   283→   283→}) {
+   284→   284→  const ref = useRef<HTMLDivElement>(null);
+   285→   285→  const isInView = useInView(ref, { once: true, amount: 0.2 });
+   286→   286→
+   287→   287→  return (
+   288→   288→    <motion.div
+   289→   289→      ref={ref}
+   290→   290→      initial='hidden'
+   291→   291→      animate={isInView ? 'visible' : 'hidden'}
+   292→   292→      variants={{
+   293→   293→        hidden: {},
+   294→   294→        visible: {
+   295→   295→          transition: {
+   296→   296→            staggerChildren: staggerDelay,
+   297→   297→          },
+   298→   298→        },
+   299→   299→      }}
+   300→   300→      className={className}
+   301→   301→    >
+   302→   302→      {children}
+   303→   303→    </motion.div>
+   304→   304→  );
+   305→   305→}
+   306→   306→
+   307→   307→export function StaggerItem({ children, className }: { children: React.ReactNode; className?: string }) {
+   308→   308→  return (
+   309→   309→    <motion.div
+   310→   310→      variants={{
+   311→   311→        hidden: { opacity: 0, y: 30 },
+   312→   312→        visible: {
+   313→   313→          opacity: 1,
+   314→   314→          y: 0,
+   315→   315→          transition: { duration: 0.5, ease: [0.25, 0.4, 0.25, 1] },
+   316→   316→        },
+   317→   317→      }}
+   318→   318→      className={className}
+   319→   319→    >
+   320→   320→      {children}
+   321→   321→    </motion.div>
+   322→   322→  );
+   323→   323→}
+   324→   324→```
+   325→   325→
+   326→   326→### 4. Parallax Layers (M Culinary style)
+   327→   327→
+   328→   328→```tsx
+   329→   329→// components/motion/parallax-layers.tsx
+   330→   330→'use client';
+   331→   331→
+   332→   332→import { useRef } from 'react';
+   333→   333→import { motion, useScroll, useTransform } from 'framer-motion';
+   334→   334→
+   335→   335→interface ParallaxLayerProps {
+   336→   336→  children: React.ReactNode;
+   337→   337→  speed?: number; // 0 = static, 1 = normal, 2 = 2x speed
+   338→   338→  className?: string;
+   339→   339→  direction?: 'up' | 'down';
+   340→   340→}
+   341→   341→
+   342→   342→export function ParallaxLayer({
+   343→   343→  children,
+   344→   344→  speed = 0.5,
+   345→   345→  className,
+   346→   346→  direction = 'up',
+   347→   347→}: ParallaxLayerProps) {
+   348→   348→  const ref = useRef<HTMLDivElement>(null);
+   349→   349→
+   350→   350→  const { scrollYProgress } = useScroll({
+   351→   351→    target: ref,
+   352→   352→    offset: ['start end', 'end start'],
+   353→   353→  });
+   354→   354→
+   355→   355→  // Direction determines movement direction
+   356→   356→  const multiplier = direction === 'up' ? -1 : 1;
+   357→   357→  const range = 100 * speed * multiplier;
+   358→   358→
+   359→   359→  const y = useTransform(scrollYProgress, [0, 1], [range, -range]);
+   360→   360→
+   361→   361→  return (
+   362→   362→    <div ref={ref} className={`relative overflow-hidden ${className ?? ''}`}>
+   363→   363→      <motion.div style={{ y }} className='h-full w-full'>
+   364→   364→        {children}
+   365→   365→      </motion.div>
+   366→   366→    </div>
+   367→   367→  );
+   368→   368→}
+   369→   369→
+   370→   370→// Multi-layer parallax section
+   371→   371→interface ParallaxSectionProps {
+   372→   372→  layers: Array<{
+   373→   373→    component: React.ReactNode;
+   374→   374→    speed: number;
+   375→   375→    className?: string;
+   376→   376→  }>;
+   377→   377→  className?: string;
+   378→   378→  height?: string;
+   379→   379→}
+   380→   380→
+   381→   381→export function ParallaxSection({ layers, className, height = '100vh' }: ParallaxSectionProps) {
+   382→   382→  const containerRef = useRef<HTMLDivElement>(null);
+   383→   383→
+   384→   384→  return (
+   385→   385→    <section ref={containerRef} className={`relative ${className}`} style={{ height }}>
+   386→   386→      {layers.map((layer, index) => (
+   387→   387→        <ParallaxLayer key={index} speed={layer.speed} className={layer.className}>
+   388→   388→          {layer.component}
+   389→   389→        </ParallaxLayer>
+   390→   390→      ))}
+   391→   391→    </section>
+   392→   392→  );
+   393→   393→}
+   394→   394→```
+   395→   395→
+   396→   396→### 5. Animated Counters (Pinch Live Stats style)
+   397→   397→
+   398→   398→```tsx
+   399→   399→// components/motion/animated-counter.tsx
+   400→   400→'use client';
+   401→   401→
+   402→   402→import { useEffect, useState, useRef } from 'react';
+   403→   403→import { useInView, motion } from 'framer-motion';
+   404→   404→
+   405→   405→interface AnimatedCounterProps {
+   406→   406→  target: number;
+   407→   407→  duration?: number; // ms
+   408→   408→  prefix?: string;
+   409→   409→  suffix?: string;
+   410→   410→  decimals?: number;
+   411→   411→  className?: string;
+   412→   412→  label?: string;
+   413→   413→}
+   414→   414→
+   415→   415→export function AnimatedCounter({
+   416→   416→  target,
+   417→   417→  duration = 2000,
+   418→   418→  prefix = '',
+   419→   419→  suffix = '',
+   420→   420→  decimals = 0,
+   421→   421→  className,
+   422→   422→  label,
+   423→   423→}: AnimatedCounterProps) {
+   424→   424→  const [count, setCount] = useState(0);
+   425→   425→  const ref = useRef<HTMLSpanElement>(null);
+   426→   426→  const isInView = useInView(ref, { once: true });
+   427→   427→  const hasAnimated = useRef(false);
+   428→   428→
+   429→   429→  useEffect(() => {
+   430→   430→    if (!isInView || hasAnimated.current) return;
+   431→   431→    hasAnimated.current = true;
+   432→   432→
+   433→   433→    const startTime = Date.now();
+   434→   434→    const animate = () => {
+   435→   435→      const elapsed = Date.now() - startTime;
+   436→   436→      const progress = Math.min(elapsed / duration, 1);
+   437→   437→
+   438→   438→      // Easing function (ease-out-expo)
+   439→   439→      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+   440→   440→
+   441→   441→      setCount(eased * target);
+   442→   442→
+   443→   443→      if (progress < 1) {
+   444→   444→        requestAnimationFrame(animate);
+   445→   445→      }
+   446→   446→    };
+   447→   447→
+   448→   448→    requestAnimationFrame(animate);
+   449→   449→  }, [isInView, target, duration]);
+   450→   450→
+   451→   451→  const formatNumber = (num: number) => {
+   452→   452→    return num.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+   453→   453→  };
+   454→   454→
+   455→   455→  return (
+   456→   456→    <div className={`text-center ${className ?? ''}`}>
+   457→   457→      <motion.span
+   458→   458→        ref={ref}
+   459→   459→        className='block text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight'
+   460→   460→        initial={{ opacity: 0, scale: 0.5 }}
+   461→   461→        animate={isInView ? { opacity: 1, scale: 1 } : {}}
+   462→   462→        transition={{ duration: 0.5, ease: 'easeOut' }}
+   463→   463→      >
+   464→   464→        {prefix}{formatNumber(count)}{suffix}
+   465→   465→      </motion.span>
+   466→   466→      {label && (
+   467→   467→        <span className='mt-2 block text-sm uppercase tracking-widest text-muted'>
+   468→   468→          {label}
+   469→   469→        </span>
+   470→   470→      )}
+   471→   471→    </div>
+   472→   472→  );
+   473→   473→}
+   474→   474→
+   475→   475→// Stats section component
+   476→   476→interface StatItem {
+   477→   477→  value: number;
+   478→   478→  prefix?: string;
+   479→   479→  suffix?: string;
+   480→   480→  label: string;
+   481→   481→}
+   482→   482→
+   483→   483→export function AnimatedStats({ stats }: { stats: StatItem[] }) {
+   484→   484→  return (
+   485→   485→    <div className='grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16'>
+   486→   486→      {stats.map((stat, index) => (
+   487→   487→        <AnimatedCounter
+   488→   488→          key={index}
+   489→   489→          target={stat.value}
+   490→   490→          prefix={stat.prefix}
+   491→   491→          suffix={stat.suffix}
+   492→   492→          label={stat.label}
+   493→   493→          delay={index * 200}
+   494→   494→        />
+   495→   495→      ))}
+   496→   496→    </div>
+   497→   497→  );
+   498→   498→}
+   499→   499→```
+   500→   500→
+   501→   501→### 6. Custom Cursor (Premium trend)
+   502→   502→
+   503→   503→```tsx
+   504→   504→// components/motion/custom-cursor.tsx
+   505→   505→'use client';
+   506→   506→
+   507→   507→import { useEffect, useState } from 'react';
+   508→   508→import { motion, useMotionValue, useSpring } from 'framer-motion';
+   509→   509→
+   510→   510→export function CustomCursor() {
+   511→   511→  const [isVisible, setIsVisible] = useState(false);
+   512→   512→  const [isPointer, setIsPointer] = useState(false);
+   513→   513→  const [isHovering, setIsHovering] = useState(false);
+   514→   514→
+   515→   515→  const cursorX = useMotionValue(-100);
+   516→   516→  const cursorY = useMotionValue(-100);
+   517→   517→
+   518→   518→  const springConfig = { damping: 25, stiffness: 250 };
+   519→   519→  const cursorXSpring = useSpring(cursorX, springConfig);
+   520→   520→  const cursorYSpring = useSpring(cursorY, springConfig);
+   521→   521→
+   522→   522→  // Trailing ring with more lag
+   523→   523→  const ringX = useSpring(cursorX, { damping: 20, stiffness: 100 });
+   524→   524→  const ringY = useSpring(cursorY, { damping: 20, stiffness: 100 });
+   525→   525→
+   526→   526→  useEffect(() => {
+   527→   527→    // Only show custom cursor on desktop
+   528→   528→    if (window.matchMedia('(pointer: coarse)').matches) return;
+   529→   529→
+   530→   530→    const moveCursor = (e: MouseEvent) => {
+   531→   531→      cursorX.set(e.clientX);
+   532→   532→      cursorY.set(e.clientY);
+   533→   533→      if (!isVisible) setIsVisible(true);
+   534→   534→    };
+   535→   535→
+   536→   536→    const handleMouseOver = (e: MouseEvent) => {
+   537→   537→      const target = e.target as HTMLElement;
+   538→   538→      if (
+   539→   539→        target.tagName === 'A' ||
+   540→   540→        target.tagName === 'BUTTON' ||
+   541→   541→        target.closest('a') ||
+   542→   542→        target.closest('button') ||
+   543→   543→        target.dataset.cursor === 'pointer'
+   544→   544→      ) {
+   545→   545→        setIsPointer(true);
+   546→   546→      }
+   547→   547→
+   548→   548→      if (target.dataset.cursor === 'hover') {
+   549→   549→        setIsHovering(true);
+   550→   550→      }
+   551→   551→    };
+   552→   552→
+   553→   553→    const handleMouseOut = () => {
+   554→   554→      setIsPointer(false);
+   555→   555→      setIsHovering(false);
+   556→   556→    };
+   557→   557→
+   558→   558→    const handleMouseLeave = () => {
+   559→   559→      setIsVisible(false);
+   560→   560→    };
+   561→   561→
+   562→   562→    window.addEventListener('mousemove', moveCursor);
+   563→   563→    window.addEventListener('mouseover', handleMouseOver);
+   564→   564→    window.addEventListener('mouseout', handleMouseOut);
+   565→   565→    document.documentElement.addEventListener('mouseleave', handleMouseLeave);
+   566→   566→
+   567→   567→    return () => {
+   568→   568→      window.removeEventListener('mousemove', moveCursor);
+   569→   569→      window.removeEventListener('mouseover', handleMouseOver);
+   570→   570→      window.removeEventListener('mouseout', handleMouseOut);
+   571→   571→      document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
+   572→   572→    };
+   573→   573→  }, []);
+   574→   574→
+   575→   575→  if (!isVisible) return null;
+   576→   576→
+   577→   577→  return (
+   578→   578→    <>
+   579→   579→      {/* Main dot */}
+   580→   580→      <motion.div
+   581→   581→        className='fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference'
+   582→   582→        style={{
+   583→   583→          x: cursorXSpring,
+   584→   584→          y: cursorYSpring,
+   585→   585→        }}
+   586→   586→      >
+   587→   587→        <motion.div
+   588→   588→          className='rounded-full bg-white'
+   589→   589→          animate={{
+   590→   590→            width: isPointer ? 48 : isHovering ? 64 : 12,
+   591→   591→            height: isPointer ? 48 : isHovering ? 64 : 12,
+   592→   592→          }}
+   593→   593→          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+   594→   594→          style={{
+   595→   595→            marginLeft: isPointer ? -24 : isHovering ? -32 : -6,
+   596→   596→            marginTop: isPointer ? -24 : isHovering ? -32 : -6,
+   597→   597→          }}
+   598→   598→        />
+   599→   599→      </motion.div>
+   600→   600→
+   601→   601→      {/* Trailing ring */}
+   602→   602→      <motion.div
+   603→   603→        className='fixed top-0 left-0 pointer-events-none z-[9998]'
+   604→   604→        style={{
+   605→   605→          x: ringX,
+   606→   606→          y: ringY,
+   607→   607→        }}
+   608→   608→      >
+   609→   609→        <motion.div
+   610→   610→          className='rounded-full border border-current'
+   611→   611→          animate={{
+   612→   612→            width: isHovering ? 80 : 40,
+   613→   613→            height: isHovering ? 80 : 40,
+   614→   614→            opacity: isHovering ? 0.5 : 0.3,
+   615→   615→          }}
+   616→   616→          transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+   617→   617→          style={{
+   618→   618→            marginLeft: isHovering ? -40 : -20,
+   619→   619→            marginTop: isHovering ? -40 : -20,
+   620→   620→          }}
+   621→   621→        />
+   622→   622→      </motion.div>
+   623→   623→    </>
+   624→   624→  );
+   625→   625→}
+   626→   626→```
+   627→   627→
+   628→   628→### 7. Smooth Page Transitions
+   629→   629→
+   630→   630→```tsx
+   631→   631→// components/motion/page-transition.tsx
+   632→   632→'use client';
+   633→   633→
+   634→   634→import { motion, AnimatePresence } from 'framer-motion';
+   635→   635→import { usePathname } from 'next/navigation';
+   636→   636→
+   637→   637→const pageVariants = {
+   638→   638→  initial: {
+   639→   639→    opacity: 0,
+   640→   640→    y: 20,
+   641→   641→  },
+   642→   642→  in: {
+   643→   643→    opacity: 1,
+   644→   644→    y: 0,
+   645→   645→  },
+   646→   646→  out: {
+   647→   647→    opacity: 0,
+   648→   648→    y: -20,
+   649→   649→  },
+   650→   650→};
+   651→   651→
+   652→   652→const pageTransition = {
+   653→   653→  type: 'tween',
+   654→   654→  ease: 'anticipate',
+   655→   655→  duration: 0.4,
+   656→   656→};
+   657→   657→
+   658→   658→export function PageTransition({ children }: { children: React.ReactNode }) {
+   659→   659→  const pathname = usePathname();
+   660→   660→
+   661→   661→  return (
+   662→   662→    <AnimatePresence mode='wait'>
+   663→   663→      <motion.div
+   664→   664→        key={pathname}
+   665→   665→        initial='initial'
+   666→   666→        animate='in'
+   667→   667→        exit='out'
+   668→   668→        variants={pageVariants}
+   669→   669→        transition={pageTransition}
+   670→   670→      >
+   671→   671→        {children}
+   672→   672→      </motion.div>
+   673→   673→    </AnimatePresence>
+   674→   674→  );
+   675→   675→}
+   676→   676→
+   677→   677→// Layout wrapper for transitions
+   678→   678→export function TransitionLayout({ children }: { children: React.ReactNode }) {
+   679→   679→  return (
+   680→   680→    <PageTransition>
+   681→   681→      {children}
+   682→   682→    </PageTransition>
+   683→   683→  );
+   684→   684→}
+   685→   685→```
+   686→   686→
+   687→   687→### 8. Text Scramble Effect (Cyberpunk/Premium style)
+   688→   688→
+   689→   689→```tsx
+   690→   690→// components/motion/text-scramble.tsx
+   691→   691→'use client';
+   692→   692→
+   693→   693→import { useEffect, useState, useRef } from 'react';
+   694→   694→
+   695→   695→const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+   696→   696→
+   697→   697→export function TextScramble({
+   698→   698→  text,
+   699→   699→  className,
+   700→   700→  trigger = true,
+   701→   701→}: {
+   702→   702→  text: string;
+   703→   703→  className?: string;
+   704→   704→  trigger?: boolean;
+   705→   705→}) {
+   706→   706→  const [displayText, setDisplayText] = useState(text);
+   707→   707→  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+   708→   708→  const frameRef = useRef(0);
+   709→   709→  const textRef = useRef(text);
+   710→   710→
+   711→   711→  useEffect(() => {
+   712→   712→    textRef.current = text;
+   713→   713→  }, [text]);
+   714→   714→
+   715→   715→  useEffect(() => {
+   716→   716→    if (!trigger) {
+   717→   717→      setDisplayText(textRef.current);
+   718→   718→      return;
+   719→   719→    }
+   720→   720→
+   721→   721→    let iteration = 0;
+   722→   722→    const totalIterations = 15;
+   723→   723→
+   724→   724→    clearInterval(intervalRef.current!);
+   725→   725→
+   726→   726→    intervalRef.current = setInterval(() => {
+   727→   727→      setDisplayText(
+   728→   728→        textRef.current
+   729→   729→          .split('')
+   730→   730→          .map((char, index) => {
+   731→   731→            if (char === ' ') return ' ';
+   732→   732→            if (iteration > index + 5) return textRef.current[index];
+   733→   733→            return CHARS[Math.floor(Math.random() * CHARS.length)];
+   734→   734→          })
+   735→   735→          .join('')
+   736→   736→      );
+   737→   737→
+   738→   738→      iteration++;
+   739→   739→
+   740→   740→      if (iteration >= totalIterations + textRef.current.length) {
+   741→   741→        clearInterval(intervalRef.current!);
+   742→   742→        setDisplayText(textRef.current);
+   743→   743→      }
+   744→   744→    }, 35);
+   745→   745→
+   746→   746→    return () => {
+   747→   747→      clearInterval(intervalRef.current!);
+   748→   748→    };
+   749→   749→  }, [trigger]);
+   750→   750→
+   751→   751→  return <span className={className}>{displayText}</span>;
+   752→   752→}
+   753→   753→```
+   754→   754→
+   755→   755→## GSAP Integration (для сложных сценариев)
+   756→   756→
+   757→   757→```tsx
+   758→   758→// lib/gsap-utils.ts
+   759→   759→import { gsap } from 'gsap';
+   760→   760→import { ScrollTrigger } from 'gsap/ScrollTrigger';
+   761→   761→
+   762→   762→if (typeof window !== 'undefined') {
+   763→   763→  gsap.registerPlugin(ScrollTrigger);
+   764→   764→}
+   765→   765→
+   766→   766→// Pin and parallax section (Manifesto-style)
+   767→   767→export function createPinnedSection(
+   768→   768→  selector: string,
+   769→   769→  options?: {
+   770→   770→    start?: string;
+   771→   771→    end?: string;
+   772→   772→    scrub?: boolean | number;
+   773→   773→    pinSpacing?: boolean;
+   774→   774→  }
+   775→   775→) {
+   776→   776→  gsap.to(selector, {
+   777→   777→    scrollTrigger: {
+   778→   778→      trigger: selector,
+   779→   779→      start: options?.start ?? 'top top',
+   780→   780→      end: options?.end ?? 'bottom top',
+   781→   781→      pin: true,
+   782→   782→      scrub: options?.scrub ?? 1,
+   783→   783→      pinSpacing: options?.pinSpacing ?? false,
+   784→   784→    },
+   785→   785→  });
+   786→   786→}
+   787→   787→
+   788→   788→// Text color progression on scroll
+   789→   789→export function createTextColorReveal(
+   790→   790→  wordsSelector: string,
+   791→   791→  options?: {
+   792→   792→    trigger?: string;
+   793→   793→    start?: string;
+   794→   794→    end?: string;
+   795→   795→    scrub?: boolean | number;
+   796→   796→  }
+   797→   797→) {
+   798→   798→  const words = document.querySelectorAll(wordsSelector);
+   799→   799→
+   800→   800→  words.forEach((word, index) => {
+   801→   801→    gsap.fromTo(
+   802→   802→      word,
+   803→   803→      { color: 'rgba(255, 255, 255, 0.14)' },
+   804→   804→      {
+   805→   805→        color: 'rgba(252, 251, 248, 1)',
+   806→   806→        scrollTrigger: {
+   807→   807→          trigger: options?.trigger ?? wordsSelector,
+   808→   808→          start: options?.start ?? 'top 80%',
+   809→   809→          end: options?.end ?? 'bottom 20%',
+   810→   810→          scrub: options?.scrub ?? true,
+   811→   811→          containerAnimation: gsap.to(wordsSelector, {}),
+   812→   812→        },
+   813→   813→      }
+   814→   814→    );
+   815→   815→  });
+   816→   816→}
+   817→   817→
+   818→   818→// Horizontal scroll section
+   819→   819→export function createHorizontalScroll(
+   820→   820→  containerSelector: string,
+   821→   821→  itemsSelector: string
+   822→   822→) {
+   823→   823→  const container = document.querySelector(containerSelector);
+   824→   824→  const items = document.querySelectorAll(itemsSelector);
+   825→   825→
+   826→   826→  if (!container || !items.length) return;
+   827→   827→
+   828→   828→  const scrollWidth = items[items.length - 1].getBoundingClientRect().right -
+   829→   829→    container.getBoundingClientRect().left;
+   830→   830→
+   831→   831→  gsap.to(items, {
+   832→   832→    x: () => -(scrollWidth - window.innerWidth),
+   833→   833→    ease: 'none',
+   834→   834→    scrollTrigger: {
+   835→   835→      trigger: containerSelector,
+   836→   836→      start: 'top top',
+   837→   837→      end: () => `+=${scrollWidth}`,
+   838→   838→      scrub: 1,
+   839→   839→      pin: true,
+   840→   840→      anticipatePin: 1,
+   841→   841→    },
+   842→   842→  });
+   843→   843→}
+   844→   844→```
+   845→   845→
+   846→   846→## CSS Animation Utilities (globals.css additions)
+   847→   847→
+   848→   848→```css
+   849→   849→/* ===== PREMIUM ANIMATION UTILITIES ===== */
+   850→   850→
+   851→   851→/* Keyframes */
+   852→   852→@keyframes fade-in-up {
+   853→   853→  from {
+   854→   854→    opacity: 0;
+   855→   855→    transform: translateY(30px);
+   856→   856→  }
+   857→   857→  to {
+   858→   858→    opacity: 1;
+   859→   859→    transform: translateY(0);
+   860→   860→  }
+   861→   861→}
+   862→   862→
+   863→   863→@keyframes fade-in-down {
+   864→   864→  from {
+   865→   865→    opacity: 0;
+   866→   866→    transform: translateY(-30px);
+   867→   867→  }
+   868→   868→  to {
+   869→   869→    opacity: 1;
+   870→   870→    transform: translateY(0);
+   871→   871→  }
+   872→   872→}
+   873→   873→
+   874→   874→@keyframes scale-in {
+   875→   875→  from {
+   876→   876→    opacity: 0;
+   877→   877→    transform: scale(0.9);
+   878→   878→  }
+   879→   879→  to {
+   880→   880→    opacity: 1;
+   881→   881→    transform: scale(1);
+   882→   882→  }
+   883→   883→}
+   884→   884→
+   885→   885→@keyframes shimmer {
+   886→   886→  0% {
+   887→   887→    background-position: -200% center;
+   888→   888→  }
+   889→   889→  100% {
+   890→   890→    background-position: 200% center;
+   891→   891→  }
+   892→   892→}
+   893→   893→
+   894→   894→@keyframes float {
+   895→   895→  0%, 100% {
+   896→   896→    transform: translateY(0);
+   897→   897→  }
+   898→   898→  50% {
+   899→   899→    transform: translateY(-10px);
+   900→   900→  }
+   901→   901→}
+   902→   902→
+   903→   903→@keyframes pulse-glow {
+   904→   904→  0%, 100% {
+   905→   905→    box-shadow: 0 0 20px rgba(209, 26, 70, 0.3);
+   906→   906→  }
+   907→   907→  50% {
+   908→   908→    box-shadow: 0 0 40px rgba(209, 26, 70, 0.6);
+   909→   909→  }
+   910→   910→}
+   911→   911→
+   912→   912→@keyframes draw-line {
+   913→   913→  from {
+   914→   914→    width: 0;
+   915→   915→  }
+   916→   916→  to {
+   917→   917→    width: 100%;
+   918→   918→  }
+   919→   919→}
+   920→   920→
+   921→   921→@keyframes rotate-slow {
+   922→   922→  from {
+   923→   923→    transform: rotate(0deg);
+   924→   924→  }
+   925→   925→  to {
+   926→   926→    transform: rotate(360deg);
+   927→   927→  }
+   928→   928→}
+   929→   929→
+   930→   930→/* Utility classes */
+   931→   931→.animate-fade-up {
+   932→   932→  animation: fade-in-up 0.6s ease-out forwards;
+   933→   933→}
+   934→   934→
+   935→   935→.animate-fade-down {
+   936→   936→  animation: fade-in-down 0.6s ease-out forwards;
+   937→   937→}
+   938→   938→
+   939→   939→.animate-scale-in {
+   940→   940→  animation: scale-in 0.5s ease-out forwards;
+   941→   941→}
+   942→   942→
+   943→   943→.animate-shimmer {
+   944→   944→  background: linear-gradient(
+   945→   945→    90deg,
+   946→   946→    transparent 0%,
+   947→   947→    rgba(255, 255, 255, 0.1) 50%,
+   948→   948→    transparent 100%
+   949→   949→  );
+   950→   950→  background-size: 200% auto;
+   951→   951→  animation: shimmer 2s linear infinite;
+   952→   952→}
+   953→   953→
+   954→   954→.animate-float {
+   955→   955→  animation: float 3s ease-in-out infinite;
+   956→   956→}
+   957→   957→
+   958→   958→.animate-pulse-glow {
+   959→   959→  animation: pulse-glow 2s ease-in-out infinite;
+   960→   960→}
+   961→   961→
+   962→   962→.animate-draw-line {
+   963→   963→  position: relative;
+   964→   964→}
+   965→   965→
+   966→   966→.animate-draw-line::after {
+   967→   967→  content: '';
+   968→   968→  position: absolute;
+   969→   969→  bottom: 0;
+   970→   970→  left: 0;
+   971→   971→  height: 1px;
+   972→   972→  background: currentColor;
+   973→   973→  animation: draw-line 1s ease-out forwards;
+   974→   974→}
+   975→   975→
+   976→   976→.animate-rotate-slow {
+   977→   977→  animation: rotate-slow 20s linear infinite;
+   978→   978→}
+   979→   979→
+   980→   980→/* Stagger delays */
+   981→   981→.stagger-1 { animation-delay: 0.1s; }
+   982→   982→.stagger-2 { animation-delay: 0.2s; }
+   983→   983→.stagger-3 { animation-delay: 0.3s; }
+   984→   984→.stagger-4 { animation-delay: 0.4s; }
+   985→   985→.stagger-5 { animation-delay: 0.5s; }
+   986→   986→
+   987→   987→/* Hover effects */
+   988→   988→.hover-lift {
+   989→   989→  transition: transform 0.3s ease, box-shadow 0.3s ease;
+   990→   990→}
+   991→   991→
+   992→   992→.hover-lift:hover {
+   993→   993→  transform: translateY(-4px);
+   994→   994→  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+   995→   995→}
+   996→   996→
+   997→   997→.hover-glow:hover {
+   998→   998→  box-shadow: 0 0 30px rgba(209, 26, 70, 0.3);
+   999→   999→}
+  1000→  1000→
+  1001→  1001→.hover-scale:hover {
+  1002→  1002→  transform: scale(1.02);
+  1003→  1003→}
+  1004→  1004→
+  1005→  1005→/* Reduced motion */
+  1006→  1006→@media (prefers-reduced-motion: reduce) {
+  1007→  1007→  *,
+  1008→  1008→  *::before,
+  1009→  1009→  *::after {
+  1010→  1010→    animation-duration: 0.01ms !important;
+  1011→  1011→    animation-iteration-count: 1 !important;
+  1012→  1012→    transition-duration: 0.01ms !important;
+  1013→  1013→  }
+  1014→  1014→}
+  1015→  1015→```
+  1016→  1016→
+  1017→  1017→## Performance Guidelines
+  1018→  1018→
+  1019→  1019→1. **GPU-accelerated properties only**: `transform`, `opacity`
+  1020→  1020→2. **Use `will-change` sparingly** — only on actively animating elements
+  1021→  1021→3. **Batch animations** — use `layoutAnimation` for layout changes
+  1022→  1022→4. **Lazy mount** — dynamic import heavy animation components
+  1023→  1023→5. **Debounce scroll handlers** — use `requestAnimationFrame`
+  1024→  1024→6. **Test on mobile** — check performance on real devices
+  1025→  1025→
+  1026→  1026→## References
+  1027→  1027→
+  1028→  1028→- [Framer Motion Docs](https://www.framer.com/motion/)
+  1029→  1029→- [GSAP ScrollTrigger](https://greensock.com/docs/v3/Plugins/ScrollTrigger)
+  1030→  1030→- [Motion Principles](https://motion.dev/principles)
+  1031→  1031→
