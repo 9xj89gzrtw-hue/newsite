@@ -1,0 +1,1642 @@
+{
+  "heroHeadlines": [
+    {
+      "site": "concept-catering",
+      "text": "Event & Experience Catering",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 31,
+      "wordCount": 4
+    },
+    {
+      "site": "concordecatering",
+      "text": "Fresh Flavours. Creative Catering.",
+      "level": "h1",
+      "style": "playful_creative",
+      "charCount": 34,
+      "wordCount": 4
+    },
+    {
+      "site": "creativeedge",
+      "text": "IMMERSIVE EXPERIENCES",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 21,
+      "wordCount": 2
+    },
+    {
+      "site": "gammacatering",
+      "text": "Switzerland's leading provider of premium catering and experience design.",
+      "level": "h1",
+      "style": "bold_confident",
+      "charCount": 73,
+      "wordCount": 9
+    },
+    {
+      "site": "ggcatering",
+      "text": "When Food and Immersive Experiences Combine",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 43,
+      "wordCount": 6
+    },
+    {
+      "site": "ggcatering",
+      "text": "Fun. Fresh. Unexpected.",
+      "level": "h2",
+      "style": "playful_creative",
+      "charCount": 23,
+      "wordCount": 3
+    },
+    {
+      "site": "saltblock",
+      "text": "IMPRESSIVE Hospitality Experiences",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 34,
+      "wordCount": 3
+    },
+    {
+      "site": "saltblock",
+      "text": "FARM FRESH",
+      "level": "h2",
+      "style": "playful_creative",
+      "charCount": 10,
+      "wordCount": 2
+    },
+    {
+      "site": "saltblock",
+      "text": "We understand the pressure to deliver next-level experiences for your guests",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 76,
+      "wordCount": 11
+    },
+    {
+      "site": "sopranos",
+      "text": "FRESH & INSPIRED",
+      "level": "h3",
+      "style": "playful_creative",
+      "charCount": 30,
+      "wordCount": 1
+    },
+    {
+      "site": "tallguy",
+      "text": "We serve the heartfelt flavor and hospitality of Wisconsin with a passion for exceptional experiences.",
+      "level": "h1",
+      "style": "warm_friendly",
+      "charCount": 102,
+      "wordCount": 15
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "SETTING THE STANDARD FOR CULINARY EXCELLENCE.",
+      "level": "h1",
+      "style": "bold_confident",
+      "charCount": 45,
+      "wordCount": 6
+    }
+  ],
+  "aboutHeadlines": [
+    {
+      "site": "ggcatering",
+      "text": "Who we are",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 10,
+      "wordCount": 3
+    },
+    {
+      "site": "ridgewells",
+      "text": "What Our Clients Say About Us",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 29,
+      "wordCount": 6
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "WHO WE ARE",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 10,
+      "wordCount": 3
+    }
+  ],
+  "serviceHeadlines": [
+    {
+      "site": "concordecatering",
+      "text": "Events We Cater",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 15,
+      "wordCount": 3
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Catering Services",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 17,
+      "wordCount": 2
+    },
+    {
+      "site": "cutandtaste",
+      "text": "What We Do",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 10,
+      "wordCount": 3
+    },
+    {
+      "site": "cutandtaste",
+      "text": "“CUT AND TASTE IS AN ABSOLUTE CUT ABOVE!!!! YOU CAN HAVE COMPLETE CONFIDENCE IN THEIR COOKING AND CATERING SERVICES.\"",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 117,
+      "wordCount": 19
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "We Offer Full Service Off Premise Catering",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 42,
+      "wordCount": 7
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Bar/Bat Mitzvah’s with Elegant Affairs: Unforgettable Off-Premise Catering Services",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 83,
+      "wordCount": 9
+    },
+    {
+      "site": "gammacatering",
+      "text": "SERVICES",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 8,
+      "wordCount": 1
+    },
+    {
+      "site": "sopranos",
+      "text": "OUR SERVICES",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 17,
+      "wordCount": 1
+    },
+    {
+      "site": "sopranos",
+      "text": "SERVICE STYLES",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 19,
+      "wordCount": 1
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Hospitality Services",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 20,
+      "wordCount": 2
+    }
+  ],
+  "menuHeadlines": [
+    {
+      "site": "creativeedge",
+      "text": "EXquISItE FOOD & DRINK",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 26,
+      "wordCount": 4
+    },
+    {
+      "site": "ggcatering",
+      "text": "Our food and drinks are good—like REALLY good",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 45,
+      "wordCount": 8
+    },
+    {
+      "site": "ridgewells",
+      "text": "Ridgewells' Holiday Menu is here!",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 33,
+      "wordCount": 5
+    },
+    {
+      "site": "ridgewells",
+      "text": "OUR 2024 HOLIDAY MENU IS HERE!",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 30,
+      "wordCount": 6
+    },
+    {
+      "site": "ridgewells",
+      "text": "Catering Cultural Cuisine with Integrity",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 40,
+      "wordCount": 5
+    },
+    {
+      "site": "ridgewells",
+      "text": "When a Menu Tells a Story: Celebrating the 2026 Rolex National Geographic Explorer of the Year",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 94,
+      "wordCount": 16
+    },
+    {
+      "site": "ridgewells",
+      "text": "New Seasonal Menus",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 18,
+      "wordCount": 3
+    }
+  ],
+  "galleryHeadlines": [
+    {
+      "site": "tallguy",
+      "text": "Follow us on social for all the Farm-to-Fork inspiration",
+      "level": "h1",
+      "style": "playful_creative",
+      "charCount": 56,
+      "wordCount": 9
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Seasonal Inspiration",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 20,
+      "wordCount": 2
+    }
+  ],
+  "testimonialHeadlines": [
+    {
+      "site": "creativeedge",
+      "text": "TESTIMONIALS",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 1
+    },
+    {
+      "site": "cutandtaste",
+      "text": "FEEDBACK",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 8,
+      "wordCount": 1
+    }
+  ],
+  "contactHeadlines": [
+    {
+      "site": "concept-catering",
+      "text": "GET IN TOUCH",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 3
+    },
+    {
+      "site": "creativeedge",
+      "text": "CONTACT",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 7,
+      "wordCount": 1
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Connect with us!",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 16,
+      "wordCount": 3
+    },
+    {
+      "site": "queenofhearts",
+      "text": "GET IN TOUCH",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 3
+    },
+    {
+      "site": "saltblock",
+      "text": "GET STARTED",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 11,
+      "wordCount": 2
+    },
+    {
+      "site": "saltblock",
+      "text": "READY TO PLAN YOUR EVENT?",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 25,
+      "wordCount": 5
+    },
+    {
+      "site": "saltblock",
+      "text": "Contact",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 7,
+      "wordCount": 1
+    },
+    {
+      "site": "sopranos",
+      "text": "Contact Info",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 2
+    }
+  ],
+  "otherHeadlines": [
+    {
+      "site": "concept-catering",
+      "text": "Event Catering",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 14,
+      "wordCount": 2
+    },
+    {
+      "site": "concept-catering",
+      "text": "Film Catering",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 2
+    },
+    {
+      "site": "concept-catering",
+      "text": "Delivery Catering",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 17,
+      "wordCount": 2
+    },
+    {
+      "site": "concept-catering",
+      "text": "Rauschende Feste",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 16,
+      "wordCount": 2
+    },
+    {
+      "site": "concept-catering",
+      "text": "Übertrieben gut",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 15,
+      "wordCount": 2
+    },
+    {
+      "site": "concept-catering",
+      "text": "Friends & Family",
+      "level": "h2",
+      "style": "warm_friendly",
+      "charCount": 20,
+      "wordCount": 3
+    },
+    {
+      "site": "concept-catering",
+      "text": "Crew Catering",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 2
+    },
+    {
+      "site": "concept-catering",
+      "text": "Everyday Cheatday",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 17,
+      "wordCount": 2
+    },
+    {
+      "site": "concept-catering",
+      "text": "Übertrieben gutes Catering",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 26,
+      "wordCount": 3
+    },
+    {
+      "site": "concept-catering",
+      "text": "Unser Angebot",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 2
+    },
+    {
+      "site": "concept-catering",
+      "text": "Film & Crew Catering",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 24,
+      "wordCount": 4
+    },
+    {
+      "site": "concordecatering",
+      "text": "Chef-Driven. Original. Concorde Favourites.",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 43,
+      "wordCount": 4
+    },
+    {
+      "site": "concordecatering",
+      "text": "Now Booking!",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 18,
+      "wordCount": 2
+    },
+    {
+      "site": "concordecatering",
+      "text": "Subscribe To Our Newsletter",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 27,
+      "wordCount": 4
+    },
+    {
+      "site": "creativeedge",
+      "text": "THE EGG",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 7,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "CAME FIRST.",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 11,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "SIMPLE &",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "BRILLIANT",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 9,
+      "wordCount": 1
+    },
+    {
+      "site": "creativeedge",
+      "text": "30+",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 3,
+      "wordCount": 1
+    },
+    {
+      "site": "creativeedge",
+      "text": "40,000+",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 7,
+      "wordCount": 1
+    },
+    {
+      "site": "creativeedge",
+      "text": "5,000,000+",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 10,
+      "wordCount": 1
+    },
+    {
+      "site": "creativeedge",
+      "text": "WHY US?",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 7,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "CORPORATE EVENT",
+      "level": "h2",
+      "style": "professional",
+      "charCount": 15,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "USET Gala",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 9,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "NYC Wedding",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 11,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "WEDDING PLANNER",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 15,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "PRIVATE PARTY",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "THECREATIVE EDGE",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 16,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "NEW YORK | MIAMI | PALM BEACH | WORLDWIDE",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 41,
+      "wordCount": 9
+    },
+    {
+      "site": "creativeedge",
+      "text": "FOLLOW ALONG",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "LIMITLESS CREAtIVITY",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 20,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "FLAWLESS EXECUTION",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 18,
+      "wordCount": 2
+    },
+    {
+      "site": "creativeedge",
+      "text": "DREAM",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 5,
+      "wordCount": 1
+    },
+    {
+      "site": "creativeedge",
+      "text": "BUILD",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 5,
+      "wordCount": 1
+    },
+    {
+      "site": "creativeedge",
+      "text": "SAVOR",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 5,
+      "wordCount": 1
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Custom Event Stations",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 21,
+      "wordCount": 3
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Event Spaces",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 2
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Clients",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 7,
+      "wordCount": 1
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Events by Cut & Taste",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 25,
+      "wordCount": 5
+    },
+    {
+      "site": "cutandtaste",
+      "text": "1st Birthday Party",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 18,
+      "wordCount": 3
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Convention Center Reception",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 27,
+      "wordCount": 3
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Pop-Up Restaurant Night",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 23,
+      "wordCount": 3
+    },
+    {
+      "site": "cutandtaste",
+      "text": "R+D Photo Shoot",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 15,
+      "wordCount": 3
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Stations Wedding Catering",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 25,
+      "wordCount": 3
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Latest Article",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 20,
+      "wordCount": 2
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Follow Cut & Taste",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 22,
+      "wordCount": 4
+    },
+    {
+      "site": "cutandtaste",
+      "text": "\"IT WAS EFFORTLESS ON OUR END; THEY CAME PREPARED WITH A VISION AND A PLAN TO ASSURE WE COULD RELAX.\"",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 101,
+      "wordCount": 20
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Cooking is love made visible.",
+      "level": "h2",
+      "style": "warm_friendly",
+      "charCount": 29,
+      "wordCount": 5
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "We're yoursecret ingredient.",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 28,
+      "wordCount": 3
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "TwoFortyThirty",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 14,
+      "wordCount": 1
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Let’s Party",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 11,
+      "wordCount": 2
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Our Events",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 10,
+      "wordCount": 2
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Unwrap the Joy of Stress-Free Holidays: Elevate Your Celebrations with EA Catering To-Go!",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 89,
+      "wordCount": 13
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Press",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 5,
+      "wordCount": 1
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Andrea Correale Shares Holiday Hosting Ideas on Good Day New York",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 65,
+      "wordCount": 11
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Inside Polo in the Hamptons",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 27,
+      "wordCount": 5
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "How To Pick the Perfect Grill This Summer",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 41,
+      "wordCount": 8
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "A Very Social Life",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 18,
+      "wordCount": 4
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "It's party time",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 15,
+      "wordCount": 3
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Parties are our passion.",
+      "level": "h3",
+      "style": "warm_friendly",
+      "charCount": 24,
+      "wordCount": 4
+    },
+    {
+      "site": "gammacatering",
+      "text": "Locations",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 9,
+      "wordCount": 1
+    },
+    {
+      "site": "gammacatering",
+      "text": "Privacy Preferences",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 19,
+      "wordCount": 2
+    },
+    {
+      "site": "gammacatering",
+      "text": "Concept",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 7,
+      "wordCount": 1
+    },
+    {
+      "site": "gammacatering",
+      "text": "Design",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "gammacatering",
+      "text": "Implementation",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 14,
+      "wordCount": 1
+    },
+    {
+      "site": "gammacatering",
+      "text": "Events",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "ggcatering",
+      "text": "Global Gourmet Home",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 19,
+      "wordCount": 3
+    },
+    {
+      "site": "ggcatering",
+      "text": "Catering with a Twist",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 21,
+      "wordCount": 4
+    },
+    {
+      "site": "ggcatering",
+      "text": "After 25 years of business, we've got it down",
+      "level": "h2",
+      "style": "professional",
+      "charCount": 45,
+      "wordCount": 9
+    },
+    {
+      "site": "ggcatering",
+      "text": "Let’s create something EPIC!",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 28,
+      "wordCount": 4
+    },
+    {
+      "site": "ggcatering",
+      "text": "Your future eventstarts here!",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 34,
+      "wordCount": 3
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Summer Catering",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 15,
+      "wordCount": 2
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Let us help you dream a little.",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 31,
+      "wordCount": 7
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Our mission is celebrating you.",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 31,
+      "wordCount": 5
+    },
+    {
+      "site": "jdkgroup",
+      "text": "We Produce Events Worth Celebrating.",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 36,
+      "wordCount": 5
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Locally focused, internationally accredited.",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 44,
+      "wordCount": 4
+    },
+    {
+      "site": "jdkgroup",
+      "text": "The JDK Group Catering & Events",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 35,
+      "wordCount": 6
+    },
+    {
+      "site": "jdkgroup",
+      "text": "From the blog",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 3
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Cookie Consent",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 14,
+      "wordCount": 2
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Cookie Preferences",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 18,
+      "wordCount": 2
+    },
+    {
+      "site": "jdkgroup",
+      "text": "717-730-4661",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 1
+    },
+    {
+      "site": "jdkgroup",
+      "text": "RELATIONSHIPS FIRST",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 19,
+      "wordCount": 2
+    },
+    {
+      "site": "jdkgroup",
+      "text": "WORKING FOR YOU",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 15,
+      "wordCount": 3
+    },
+    {
+      "site": "jdkgroup",
+      "text": "PASSION DRIVES US",
+      "level": "h3",
+      "style": "warm_friendly",
+      "charCount": 17,
+      "wordCount": 3
+    },
+    {
+      "site": "jdkgroup",
+      "text": "CREDIBILITY YOU DESERVE",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 23,
+      "wordCount": 3
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Harrisburg Headquarters:",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 24,
+      "wordCount": 2
+    },
+    {
+      "site": "myradish",
+      "text": "' + $(this).html() + '",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 22,
+      "wordCount": 5
+    },
+    {
+      "site": "queenofhearts",
+      "text": "EXPERT CATERING. EFFORTLESS EVENTS.",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 35,
+      "wordCount": 4
+    },
+    {
+      "site": "queenofhearts",
+      "text": "SIMPLE PLANNING, DREAM WEDDINGS.",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 32,
+      "wordCount": 4
+    },
+    {
+      "site": "queenofhearts",
+      "text": "PERFECT BACKYARD WEDDINGS",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 25,
+      "wordCount": 3
+    },
+    {
+      "site": "queenofhearts",
+      "text": "Venues",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "queenofhearts",
+      "text": "Latest Events",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 2
+    },
+    {
+      "site": "queenofhearts",
+      "text": "Ariana & Constantine’s Timeless Romantic Wedding at Old Mill",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 64,
+      "wordCount": 9
+    },
+    {
+      "site": "queenofhearts",
+      "text": "Angela and Andrew’s Scenic “I Do” Views at Springton Manor Farm",
+      "level": "h3",
+      "style": "playful_creative",
+      "charCount": 63,
+      "wordCount": 11
+    },
+    {
+      "site": "queenofhearts",
+      "text": "Fall (and Love) Were in the Air at Paula & Justin’s Springton Manor Farm Wedding",
+      "level": "h3",
+      "style": "warm_friendly",
+      "charCount": 84,
+      "wordCount": 15
+    },
+    {
+      "site": "ridgewells",
+      "text": "Staffing",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 8,
+      "wordCount": 1
+    },
+    {
+      "site": "ridgewells",
+      "text": "Every event has a story to tell.",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 32,
+      "wordCount": 7
+    },
+    {
+      "site": "ridgewells",
+      "text": "Corporate Events",
+      "level": "h2",
+      "style": "professional",
+      "charCount": 16,
+      "wordCount": 2
+    },
+    {
+      "site": "ridgewells",
+      "text": "Weddings",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 8,
+      "wordCount": 1
+    },
+    {
+      "site": "ridgewells",
+      "text": "Social Events",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 2
+    },
+    {
+      "site": "ridgewells",
+      "text": "Major Events",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 2
+    },
+    {
+      "site": "ridgewells",
+      "text": "A Legacy Like No Other",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 22,
+      "wordCount": 5
+    },
+    {
+      "site": "ridgewells",
+      "text": "Passion for Celebration.",
+      "level": "h2",
+      "style": "warm_friendly",
+      "charCount": 24,
+      "wordCount": 3
+    },
+    {
+      "site": "ridgewells",
+      "text": "Parties &",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 2
+    },
+    {
+      "site": "ridgewells",
+      "text": "Corporate",
+      "level": "h2",
+      "style": "professional",
+      "charCount": 9,
+      "wordCount": 1
+    },
+    {
+      "site": "ridgewells",
+      "text": "Events",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "ridgewells",
+      "text": "There's No Party Like a Ridgewells Party    There's No Party Like a Ridgewells Party    There's No Party Like a Ridgewells Party    There's No Party Like a Ridgewells Party",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 202,
+      "wordCount": 31
+    },
+    {
+      "site": "ridgewells",
+      "text": "Questions Every Couple Should Ask Their Caterer",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 47,
+      "wordCount": 7
+    },
+    {
+      "site": "ridgewells",
+      "text": "Championship Hospitality at the 2026 U.S. Open",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 46,
+      "wordCount": 7
+    },
+    {
+      "site": "ridgewells",
+      "text": "Erin Go Glam 2026: At the Edge of Elsewhere",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 43,
+      "wordCount": 9
+    },
+    {
+      "site": "ridgewells",
+      "text": "Featured in ECEP Trend Report",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 29,
+      "wordCount": 5
+    },
+    {
+      "site": "ridgewells",
+      "text": "LATEST NEWS & BLOG",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 22,
+      "wordCount": 4
+    },
+    {
+      "site": "ridgewells",
+      "text": "The Dish",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 8,
+      "wordCount": 2
+    },
+    {
+      "site": "ridgewells",
+      "text": "FOLLOW US",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 9,
+      "wordCount": 2
+    },
+    {
+      "site": "ridgewells",
+      "text": "@RidgewellsDC",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 1
+    },
+    {
+      "site": "ridgewells",
+      "text": "PROUD MEMBER",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 2
+    },
+    {
+      "site": "ridgewells",
+      "text": "Curious what we've got cooking up next? Join our mailing list.",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 62,
+      "wordCount": 11
+    },
+    {
+      "site": "ridgewells",
+      "text": "5522 Dorsey Ln, Bethesda, MD 20816 info@ridgewells.com 301.652.1515",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 67,
+      "wordCount": 8
+    },
+    {
+      "site": "saltblock",
+      "text": "RAISE THE BAR",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 3
+    },
+    {
+      "site": "saltblock",
+      "text": "Looking For The Perfect Venue?",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 30,
+      "wordCount": 5
+    },
+    {
+      "site": "saltblock",
+      "text": "VENUES",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "saltblock",
+      "text": "Events",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "saltblock",
+      "text": "EXCLUSIVE VENUES",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 16,
+      "wordCount": 2
+    },
+    {
+      "site": "saltblock",
+      "text": "CHEFCRAFTED",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 11,
+      "wordCount": 1
+    },
+    {
+      "site": "saltblock",
+      "text": "WHAT PEOPLE ARE SAYING",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 22,
+      "wordCount": 4
+    },
+    {
+      "site": "saltblock",
+      "text": "“it may be impossible to top it next year.”",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 43,
+      "wordCount": 9
+    },
+    {
+      "site": "saltblock",
+      "text": "1 — DISCOVER OUR BRANDS",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 23,
+      "wordCount": 5
+    },
+    {
+      "site": "saltblock",
+      "text": "2 — SHARE THE DETAILS",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 21,
+      "wordCount": 5
+    },
+    {
+      "site": "saltblock",
+      "text": "3 — RAISE THE BAR",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 17,
+      "wordCount": 5
+    },
+    {
+      "site": "saltblock",
+      "text": "Looking for the perfect venue?",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 30,
+      "wordCount": 5
+    },
+    {
+      "site": "saltblock",
+      "text": "Catering",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 8,
+      "wordCount": 1
+    },
+    {
+      "site": "saltblock",
+      "text": "Venues",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "saltblock",
+      "text": "The Farm",
+      "level": "h3",
+      "style": "playful_creative",
+      "charCount": 8,
+      "wordCount": 2
+    },
+    {
+      "site": "saltblock",
+      "text": "Company",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 7,
+      "wordCount": 1
+    },
+    {
+      "site": "saltblock",
+      "text": "FOLLOW US",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 9,
+      "wordCount": 2
+    },
+    {
+      "site": "saltblock",
+      "text": "${getItemTitle}",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 15,
+      "wordCount": 1
+    },
+    {
+      "site": "sopranos",
+      "text": "SOPRANO'S CATERING",
+      "level": "h1",
+      "style": "neutral",
+      "charCount": 18,
+      "wordCount": 2
+    },
+    {
+      "site": "sopranos",
+      "text": "NEW WINTER SPECIALS",
+      "level": "h2",
+      "style": "warm_friendly",
+      "charCount": 29,
+      "wordCount": 1
+    },
+    {
+      "site": "sopranos",
+      "text": "CHECK YOUR DATE",
+      "level": "h2",
+      "style": "neutral",
+      "charCount": 25,
+      "wordCount": 1
+    },
+    {
+      "site": "sopranos",
+      "text": "Made with Love",
+      "level": "h2",
+      "style": "warm_friendly",
+      "charCount": 14,
+      "wordCount": 3
+    },
+    {
+      "site": "sopranos",
+      "text": "WEDDINGS",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 8,
+      "wordCount": 1
+    },
+    {
+      "site": "sopranos",
+      "text": "VENUES & VENDORS",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 30,
+      "wordCount": 1
+    },
+    {
+      "site": "tallguy",
+      "text": "Locally Sourced",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 15,
+      "wordCount": 2
+    },
+    {
+      "site": "tallguy",
+      "text": "Sustainable Catering",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 20,
+      "wordCount": 2
+    },
+    {
+      "site": "tallguy",
+      "text": "made from scratch",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 17,
+      "wordCount": 3
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "SOCIAL EVENTS",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 13,
+      "wordCount": 2
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "WEDDINGS",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 8,
+      "wordCount": 1
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "CORPORATE EVENTS",
+      "level": "h3",
+      "style": "professional",
+      "charCount": 16,
+      "wordCount": 2
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "WORKPLACE",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 9,
+      "wordCount": 1
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "PRIVATE CHEF",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 12,
+      "wordCount": 2
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "SUMMER",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "SPRING",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "FALL",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 4,
+      "wordCount": 1
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "WINTER",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "AWARDS",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 6,
+      "wordCount": 1
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "ICONIC VENUES FOR YOUR EVENT",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 28,
+      "wordCount": 5
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "THE WORLD OF WOLFGANG PUCK",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 26,
+      "wordCount": 5
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "NOW HIRING IN A CITY NEAR YOU",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 29,
+      "wordCount": 7
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Join our mailing list",
+      "level": "h3",
+      "style": "neutral",
+      "charCount": 21,
+      "wordCount": 4
+    }
+  ]
+}

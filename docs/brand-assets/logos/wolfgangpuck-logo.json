@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Wolfgang Puck Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/45d3b928b364.png",
+      "caption": "The image displays the logo for Wolfgang Puck Catering, featuring the text \"W/PC\" and \"WOLFGANG PUCK CATERING\". suitable for background image",
+      "source": "Spoonfed",
+      "original_width": "1758px",
+      "original_height": "1318px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/6b4b543ba3d1.png",
+      "caption": "A minimalist logo for Wolfgang Puck Catering, featuring a stylized \"WP\" monogram and clean text. suitable for background image",
+      "source": "ZipRecruiter",
+      "original_width": "2648px",
+      "original_height": "408px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/864c19a4ff31.png",
+      "caption": "The image is a screenshot of the Wolfgang Puck Catering website, featuring tacos and event photos. Text: WOLFGANG PUCK CATERING, WHAT WE DO, LOCATIONS, CAREERS, CONTACT, INQUIRE, SETTING THE STANDARD FOR CULINARY EXCELLENCE, INQUIRE ABOUT YOUR EVENT, WHO WE ARE.",
+      "source": "Michelle Silver Art Direction + Graphic Design",
+      "original_width": "1920px",
+      "original_height": "1350px"
+    }
+  ]
+}

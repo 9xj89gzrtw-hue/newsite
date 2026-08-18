@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Sterling Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/78aea32cd9bd.jpg",
+      "caption": "A logo for Sterling Supper Club featuring a plate with an \"S\", a fork, and a knife. Text: Sterling Supper Club EAT, ENTERTAIN, EDUCATE. www.sterlingsupper.club",
+      "source": "Do512",
+      "original_width": "1284px",
+      "original_height": "1164px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/954a472c359f.png",
+      "caption": "This image is a catering menu for Saratoga Sandwich Company, featuring breakfast items, coffee, and beverages.",
+      "source": "saratoga sandwich company",
+      "original_width": "1035px",
+      "original_height": "800px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/acfcc15418e5.jpg",
+      "caption": "A group of people in red hoodies pose for a photo in front of a Pizza Hut restaurant. Pizza Hut. suitable for background image",
+      "source": "Sterling Restaurants",
+      "original_width": "1600px",
+      "original_height": "1066px"
+    }
+  ]
+}

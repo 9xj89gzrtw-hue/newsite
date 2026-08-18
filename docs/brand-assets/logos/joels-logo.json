@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Joel's Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/172b6e7ec8a8.jpg",
+      "caption": "Four open-faced sandwiches with pear, prosciutto, and blue cheese on a marble board. suitable for background image",
+      "source": "joels.com",
+      "original_width": "1000px",
+      "original_height": "1222px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/5847dce53642.jpg",
+      "caption": "A white plate holds a salad of radicchio, green puree, basil, and crumbs. suitable for background image",
+      "source": "joels.com",
+      "original_width": "1000px",
+      "original_height": "1360px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/693c45922234.jpg",
+      "caption": "A rustic charcuterie board with cheese and meat sits next to a basket of flowers. suitable for background image",
+      "source": "joels.com",
+      "original_width": "1000px",
+      "original_height": "1223px"
+    }
+  ]
+}

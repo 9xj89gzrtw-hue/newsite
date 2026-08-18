@@ -1,0 +1,180 @@
+/* ============================================
+   Typography Patterns
+   From: Competitor Analysis (22 sites)
+   ============================================ */
+
+/*
+ * FONT STACKS
+ * Based on frequency analysis of competitor sites
+ */
+
+/* 
+ * PRIMARY HEADLINE FONT - Serif
+ * Used by 55% of premium competitors
+ * Recommendation: Elegant, authoritative headlines
+ */
+--font-heading: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+font-family: var(--font-heading);
+
+/*
+ * SECONDARY HEADLINE/ACCENT - Sans Serif Bold
+ * Used by 35% of modern competitors
+ * Recommendation: Clean, contemporary alternative
+ */
+--font-heading-alt: 'Montserrat', 'Helvetica Neue', 'Arial', sans-serif;
+font-family: var(--font-heading-alt);
+
+/*
+ * BODY TEXT - Clean Sans Serif
+ * Used by 90% of all competitors
+ * Recommendation: Highly readable, professional
+ */
+--font-body: 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', sans-serif;
+font-family: var(--font-body);
+
+/*
+ * ACCENT/DISPLAY - Optional decorative font
+ * For: Pull quotes, special headings, CTAs
+ */
+--font-accent: 'Cormorant Garamond', 'Georgia', serif;
+font-family: var(--font-accent);
+
+/* ============================================
+   TYPE SCALE
+   Recommended modular scale for catering sites
+   ============================================ */
+
+:root {
+  /* Base size */
+  --text-base: 1rem;        /* 16px */
+  
+  /* Scale ratio: 1.25 (Major Third) */
+  --text-xs: 0.75rem;       /* 12px - captions, labels */
+  --text-sm: 0.875rem;      /* 14px - secondary text, nav */
+  --text-base: 1rem;        /* 16px - body copy */
+  --text-lg: 1.125rem;      /* 18px - lead paragraphs */
+  --text-xl: 1.25rem;       /* 20px - subheadings */
+  --text-2xl: 1.5rem;       /* 24px - section titles */
+  --text-3xl: 1.875rem;     /* 30px - card titles */
+  --text-4xl: 2.25rem;      /* 36px - page titles */
+  --text-5xl: 3rem;         /* 48px - hero subheadlines */
+  --text-6xl: 3.75rem;      /* 60px - hero headlines */
+  --text-7xl: 4.5rem;       /* 72px - display/impact */
+  
+  /* Line heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+  
+  /* Letter spacing */
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+  
+  /* Font weights */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+}
+
+/* ============================================
+   TYPOGRAPHY PATTERNS
+   Common text treatments from competitors
+   ============================================ */
+
+/* Hero Headline Pattern */
+.hero-headline {
+  font-family: var(--font-heading);
+  font-size: var(--text-6xl);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  text-transform: none; /* Most competitors don't uppercase hero */
+  color: var(--text-inverse); /* Assuming dark hero background */
+}
+
+/* Hero Subheadline Pattern */
+.hero-subheadline {
+  font-family: var(--font-body);
+  font-size: var(--text-xl);
+  font-weight: var(--font-normal);
+  line-height: var(--leading-relaxed);
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 60ch; /* Readable line length */
+}
+
+/* Section Title Pattern */
+.section-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-4xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Section Subtitle Pattern */
+.section-subtitle {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: var(--font-normal);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  max-width: 65ch;
+  margin: 0 auto 3rem;
+}
+
+/* Card Title Pattern */
+.card-title {
+  font-family: var(--font-heading-alt);
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+}
+
+/* Body Copy Pattern */
+.body-copy {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-normal);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+}
+
+/* Navigation Link Pattern */
+.nav-link {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+/* CTA Button Text Pattern */
+.cta-text {
+  font-family: var(--font-heading-alt);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+/* Pull Quote / Testimonial Pattern */
+.pull-quote {
+  font-family: var(--font-accent);
+  font-size: var(--text-2xl);
+  font-style: italic;
+  line-height: var(--leading-relaxed);
+  color: var(--text-primary);
+}

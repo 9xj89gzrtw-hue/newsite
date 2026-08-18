@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Creative Edge Parties catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/caded565cabf.png",
+      "caption": "The image is a blank white background with no content, text, or visual elements.",
+      "source": "www.creativeedgeparties.com",
+      "original_width": "1296px",
+      "original_height": "1296px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d845a3932106.png",
+      "caption": "A collage of three images: a minimalist dish, a rooftop dining setup, and a truffle and caviar plate.",
+      "source": "PartySlate",
+      "original_width": "2700px",
+      "original_height": "1800px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d09923596e62.jpg",
+      "caption": "Multiple white plates with appetizers of cured ham, cheese, and green leaves. suitable for background image",
+      "source": "The Event Planner Expo 2026",
+      "original_width": "1920px",
+      "original_height": "1193px"
+    }
+  ]
+}

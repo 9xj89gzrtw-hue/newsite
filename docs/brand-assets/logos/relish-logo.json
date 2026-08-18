@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Relish Caterers logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/965b8c84cbc8.jpg",
+      "caption": "People serving themselves from a buffet table filled with fresh fruits, vegetables, and meats. suitable for background image",
+      "source": "LinkedIn",
+      "original_width": "2450px",
+      "original_height": "612px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/bfdf2ab2c8ee.jpg",
+      "caption": "Miniature appetizers on wooden stands arranged along a black branch against a white background. suitable for background image",
+      "source": "relishcaterers.com",
+      "original_width": "1920px",
+      "original_height": "720px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/2c479d89f384.jpeg",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "relishcateringkitchen.com",
+      "original_width": "1440px",
+      "original_height": "1800px"
+    }
+  ]
+}

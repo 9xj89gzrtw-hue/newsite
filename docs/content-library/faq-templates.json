@@ -1,0 +1,176 @@
+{
+  "title": "20 Ready-to-Use FAQ Q&As for Catering Business",
+  "created": "2026-01-20",
+  "based_on": "Analysis of 15 catering websites",
+  "usage": "Customize these Q&As for your specific business - adjust details as needed",
+  "faqs": [
+    {
+      "id": 1,
+      "category": "pricing",
+      "question": "How much does catering cost?",
+      "answer": "Catering costs vary based on several factors including menu selections, service style, guest count, and event complexity. Our events typically range from $X to $XX per person for full-service catering. We recommend scheduling a complimentary consultation so we can provide a custom proposal tailored to your specific vision and budget.",
+      "seo_keywords": ["catering prices", "cost of catering", "how much is catering", "catering budget"],
+      "format_suggestion": "Place first in pricing section"
+    },
+    {
+      "id": 2,
+      "category": "pricing",
+      "question": "What's included in your per-person pricing?",
+      "answer": "Our comprehensive per-person pricing typically includes: custom menu design, professional service staff (typically 1 server per 10-15 guests), all food preparation and presentation, basic service equipment (chafing dishes, serving pieces, linens), setup and cleanup, and coordination with your venue or other vendors. We'll provide a detailed breakdown in your proposal so there are no surprises.",
+      "seo_keywords": ["what's included", "catering package includes", "full service catering"],
+      "format_suggestion": "Pair with pricing page"
+    },
+    {
+      "id": 3,
+      "category": "pricing",
+      "question": "Do you require a minimum number of guests?",
+      "answer": "Yes, we typically have a minimum guest count requirement of [X] guests for full-service catered events. For smaller gatherings, we offer alternative options such as drop-off catering, pick-up orders, or our 'intimate gathering' packages designed specifically for groups under [X] people. Contact us to discuss what works best for your celebration.",
+      "seo_keywords": ["minimum guests", "small party catering", "intimate event catering"],
+      "format_suggestion": "Include near booking information"
+    },
+    {
+      "id": 4,
+      "category": "pricing",
+      "question": "Is there a deposit required to book?",
+      "answer": "Yes, we require a deposit of [25-50]% of the estimated total to secure your event date on our calendar. The remaining balance is typically due [7-14] days before your event date. We accept various payment methods including credit cards, checks, and bank transfers. Detailed payment terms will be outlined in your proposal and contract.",
+      "seo_keywords": ["catering deposit", "booking deposit", "payment terms"],
+      "format_suggestion": "Include in booking/policy section"
+    },
+    {
+      "id": 5,
+      "category": "pricing",
+      "question": "Are there additional fees I should know about?",
+      "answer": "We believe in transparent pricing. Your proposal will include a clear itemization of all costs. Common additional items that may apply include: a service charge (typically [18-22]%) that goes directly to our staff, gratuity suggestions, travel fees for events beyond [X] miles from our kitchen, and any specialty rentals requested. We'll discuss all potential costs upfront during your consultation.",
+      "seo_keywords": ["hidden fees", "service charge", "gratuity", "additional costs"],
+      "format_suggestion": "Transparency-focused placement"
+    },
+    {
+      "id": 6,
+      "category": "dietary",
+      "question": "Can you accommodate dietary restrictions and allergies?",
+      "answer": "Absolutely! We have extensive experience accommodating a wide range of dietary needs including vegetarian, vegan, gluten-free, dairy-free, nut-free, kosher, halal, and specific food allergies. Please inform us of any dietary requirements during your consultation, and we'll ensure every guest has delicious options they can safely enjoy. We take allergies seriously and have protocols to prevent cross-contamination when needed.",
+      "seo_keywords": ["dietary restrictions", "allergy friendly", "vegetarian catering", "gluten free catering"],
+      "format_suggestion": "Prominent placement - high concern topic"
+    },
+    {
+      "id": 7,
+      "category": "dietary",
+      "question": "Do you offer vegetarian and vegan options?",
+      "answer": "Yes! We're proud to offer extensive vegetarian and vegan menus that are creative, satisfying, and enjoyed by all guests—not just those following plant-based diets. Our chefs create innovative plant-based dishes using seasonal, locally-sourced ingredients. Many clients tell us even their meat-loving guests rave about our veggie options!",
+      "seo_keywords": ["vegetarian catering", "vegan catering", "plant based menu"],
+      "format_suggestion": "Include with dietary FAQ group"
+    },
+    {
+      "id": 8,
+      "category": "menu",
+      "question": "Can I customize the menu?",
+      "answer": "We encourage it! While we offer curated sample menus for inspiration, every event we cater features a customized menu tailored to your preferences. Want to combine items from different menus? Have a family recipe you'd love us to recreate? Need to swap an ingredient? We're here to make your culinary vision a reality. Just share your ideas during consultation.",
+      "seo_keywords": ["custom menu", "personalized catering", "menu customization"],
+      "format_suggestion": "Menu page companion"
+    },
+    {
+      "id": 9,
+      "category": "menu",
+      "question": "Where do you source your ingredients?",
+      "answer": "Quality ingredients are the foundation of everything we create. We prioritize local sourcing whenever possible, building relationships with regional farmers, ranchers, and artisans. You'll find [specific examples: local produce from X farms, sustainable seafood, heritage-breed meats]. Seasonal availability means our menus change throughout the year to showcase ingredients at their peak.",
+      "seo_keywords": ["local sourcing", "farm to table", "sustainable catering", "quality ingredients"],
+      "format_suggestion": "About/philosophy section"
+    },
+    {
+      "id": 10,
+      "category": "menu",
+      "question": "Do you offer tastings?",
+      "answer": "Yes! We offer complimentary tastings for events of [100+] guests booked with us. For smaller events, tastings are available for a nominal fee ([~$150]) which is applied to your balance if you book. Tastings typically include 4-6 menu items of your choice and are a great opportunity to meet our team, discuss details, and finalize your perfect menu.",
+      "seo_keywords": ["catering tasting", "menu tasting", "food tasting event"],
+      "format_suggestion": "Booking process section"
+    },
+    {
+      "id": 11,
+      "category": "booking",
+      "question": "How far in advance should I book?",
+      "answer": "We recommend booking as early as possible—especially for peak season (May through October) and popular dates like Saturdays. Ideally, contact us 3-6 months before your event for social gatherings and 6-12 months ahead for weddings. That said, don't hesitate to reach out if your timeline is shorter; we can often accommodate shorter-notice events depending on availability.",
+      "seo_keywords": ["when to book caterer", "booking timeline", "advance notice catering"],
+      "format_suggestion": "Early visibility placement"
+    },
+    {
+      "id": 12,
+      "category": "booking",
+      "question": "What's your cancellation policy?",
+      "answer": "We understand that plans sometimes need to change. Our standard policy: cancellations made [60+] days before the event receive a full refund of deposit (minus a small administrative fee). Cancellations within [30-60] days receive [50%] refund. Cancellations within [30] days are non-refundable, though we may be able to apply funds to a future date. Specific terms are outlined in your contract.",
+      "seo_keywords": ["cancellation policy", "refund policy", "changing event date"],
+      "format_suggestion": "Policy section - important legal info"
+    },
+    {
+      "id": 13,
+      "category": "service",
+      "question": "What service styles do you offer?",
+      "answer": "We offer a variety of service styles to match your event vision:\n\n• **Plated Dining**: Traditional seated service with pre-selected options\n• **Buffet Style**: Self-service with varied stations\n• **Family Style**: Platters served tableside for sharing\n• **Action Stations**: Live cooking stations (carving, pasta, etc.)\n• **Cocktail Reception**: Passed appetizers and/or stationary displays\n• **Grazing Tables**: Artfully arranged spread for casual events\n\nMany events combine multiple styles—we'll help you decide what works best!",
+      "seo_keywords": ["service styles", "buffet vs plated", "catering formats"],
+      "format_suggestion": "Services overview page"
+    },
+    {
+      "id": 14,
+      "category": "service",
+      "question": "Does your team handle setup and cleanup?",
+      "answer": "Absolutely—that's part of what makes hiring a full-service caterer so valuable! Our team arrives early to set up all food service areas, including buffet tables, action stations, bars, and dessert displays. During your event, we maintain and replenish everything. Afterward, we complete full breakdown and cleanup of all catering-related items, leaving your venue spotless.",
+      "seo_keywords": ["setup and cleanup", "full service catering", "what caterer provides"],
+      "format_suggestion": "Service benefits highlight"
+    },
+    {
+      "id": 15,
+      "category": "logistics",
+      "question": "Do you provide rental equipment (linens, china, glassware)?",
+      "answer": "Yes! We can coordinate all your rental needs including tables, chairs, linens, china, flatware, glassware, and specialty items. We work with trusted rental partners and can include everything in one seamless proposal. Some items may be included in base pricing; others are quoted separately. We'll outline all options during planning.",
+      "seo_keywords": ["rental equipment", "china rental", "linen rental", "table rental"],
+      "format_suggestion": "Logistics/coordination section"
+    },
+    {
+      "id": 16,
+      "category": "logistics",
+      "question": "What venues do you work with?",
+      "answer": "We're experienced catering at a wide variety of venues including private homes, banquet halls, museums, gardens, wineries, corporate offices, warehouses, and unique off-site locations. If your venue has a kitchen, great! If not, we bring everything we need to prepare fresh food on-site. We're also happy to provide venue recommendations if you're still searching.",
+      "seo_keywords": ["catering venues", "off-site catering", "venue recommendations"],
+      "format_suggestion": "Venues/partnerships page"
+    },
+    {
+      "id": 17,
+      "category": "logistics",
+      "question": "What's your service area?",
+      "answer": "We primarily serve [City/Region] and surrounding areas within approximately [X] miles of our kitchen. We do occasionally travel farther for special events—just ask! Travel fees may apply for events outside our standard service area. Not sure if you're in our range? Contact us with your location and we'll let you know!",
+      "seo_keywords": ["service area", "delivery area", "catering radius", "locations served"],
+      "format_suggestion": "Contact/location page"
+    },
+    {
+      "id": 18,
+      "category": "beverage",
+      "question": "Can you provide bar service?",
+      "answer": "Yes! We offer full bar service including beer, wine, signature cocktails, and non-alcoholic beverage options. Choose from packaged tiers or build a custom bar package. We handle all licensing, bartenders, glassware, and supplies. Many clients find that having one vendor handle both food and beverages simplifies planning significantly.",
+      "seo_keywords": ["bar service", "bartender hire", "cocktail service", "drink package"],
+      "format_suggestion": "Beverage/add-ons section"
+    },
+    {
+      "id": 19,
+      "category": "process",
+      "question": "What happens after I submit an inquiry?",
+      "answer": "Here's what to expect:\n\n**Within 24 hours**: We'll respond to acknowledge your inquiry and may ask a few preliminary questions.\n\n**Within 3-5 days**: Schedule a consultation call or meeting (in-person or virtual—your preference).\n\n**Within 48 hours after consultation**: Receive your detailed custom proposal.\n\n**When ready**: Submit deposit to secure your date.\n\n**Leading up to event**: Menu finalization, tasting, timeline creation, and ongoing communication.\n\nWe make it easy and keep you informed every step of the way!",
+      "seo_keywords": ["catering process", "what to expect", "booking process"],
+      "format_suggestion": "Process/workflow page"
+    },
+    {
+      "id": 20,
+      "category": "general",
+      "question": "What makes you different from other caterers?",
+      "answer": "Great question! Here's what our clients consistently highlight:\n\n🍽️ **Culinary Excellence**: Our chefs bring [X] years of experience and genuine passion for creating memorable food experiences.\n\n✨ **True Customization**: No cookie-cutter menus. Every dish is crafted around YOUR vision.\n\n🤝 **White-Glove Service**: Professional, attentive staff who anticipate needs before they arise.\n\n📱 **Seamless Communication**: Responsive, organized, and proactive—you'll never wonder what's happening.\n\n🌱 **Values-Driven**: [Sustainability commitment, local sourcing, community involvement, etc.]\n\nBut don't just take our word for it—check out our client testimonials!",
+      "seo_keywords": ["best caterer", "why choose us", "catering differences", "unique catering"],
+      "format_suggestion": "About/differentiation section"
+    }
+  ],
+  "faq_formatting_tips": {
+    "accordion_recommendation": "Use expandable accordion format for clean UX - shows questions, expands to reveal answers on click",
+    "categorization": "Group FAQs by category (Pricing, Dietary, Booking, Service, etc.) with anchor links",
+    "searchability": "Consider adding search/filter functionality if FAQ list is long",
+    "mobile_optimization": "Ensure tap targets are large enough; accordions work well on mobile",
+    "schema_markup": "Implement FAQPage schema markup for SEO benefits / rich snippets",
+    "update_frequency": "Review and update FAQs quarterly based on actual customer questions received"
+  }
+}

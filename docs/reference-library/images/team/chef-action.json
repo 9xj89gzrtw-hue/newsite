@@ -1,0 +1,79 @@
+{
+  "success": true,
+  "query": "professional chef cooking kitchen action shot culinary",
+  "count": 10,
+  "ranked": true,
+  "captioned_count": 10,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ed5e9e4df20c.jpg",
+      "caption": "A smiling chef in a white uniform stands in a professional kitchen with stainless steel equipment. suitable for background image",
+      "source": "Magnific",
+      "original_width": "1280px",
+      "original_height": "720px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/a6003cd71910.jpg",
+      "caption": "Chefs in white shirts and blue aprons prepare food at ChefSteps Studios. Text: ChefSteps Studios, chefsteps.com, ChefSteps. suitable for background image",
+      "source": "www.chefsteps.com",
+      "original_width": "2500px",
+      "original_height": "1875px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/4917d1762f72.jpg",
+      "caption": "The image contains watermarks (Alamy). Text: alamy, Image ID: 3CN4TY6, www.alamy.com.",
+      "source": "Alamy",
+      "original_width": "1300px",
+      "original_height": "956px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/c0eeb03db21d.jpg",
+      "caption": "Chefs in white uniforms prepare dishes in a professional kitchen. Text: bon appétit. Suitable for background image",
+      "source": "YouTube",
+      "original_width": "1280px",
+      "original_height": "720px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/1e5bbbf22d13.jpg",
+      "caption": "A tattooed chef in a white shirt and black apron prepares food in a bright, modern kitchen. suitable for background image",
+      "source": "www.chefsteps.com",
+      "original_width": "2477px",
+      "original_height": "1651px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/53d6fac5a89a.jpg",
+      "caption": "A group of chefs in white uniforms cook intensely with flames and sparks in a high-tech kitchen.",
+      "source": "Lifestyle Asia Hong Kong",
+      "original_width": "1600px",
+      "original_height": "900px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/4017ead84fa6.jpg",
+      "caption": "A movie poster for \"Boiling Point\" featuring a chef in a busy kitchen with critical acclaim quotes.",
+      "source": "IMDb",
+      "original_width": "750px",
+      "original_height": "1071px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/37d947956d9d.jpg",
+      "caption": "A man with curly hair stands in a kitchen, looking back over his shoulder.",
+      "source": "The Boston Globe",
+      "original_width": "4393px",
+      "original_height": "3083px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/98a6103a4d2b.jpg",
+      "caption": "A woman in an apron pours ingredients into a bowl in a kitchen. suitable for background image",
+      "source": "In Cucina con Sofia",
+      "original_width": "1024px",
+      "original_height": "1024px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/f2dc1304f7a2.jpg",
+      "caption": "A chef in a white uniform carefully plating food with tweezers in a professional kitchen. suitable for background image",
+      "source": "Rolling Stone",
+      "original_width": "3840px",
+      "original_height": "2160px"
+    }
+  ]
+}

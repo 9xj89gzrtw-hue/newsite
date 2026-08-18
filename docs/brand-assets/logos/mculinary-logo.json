@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "M Culinary logo official catering",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/02c5e8007c52.png",
+      "caption": "A line drawing of a food truck next to the text \"K&M Food Truck and Catering\". suitable for background image",
+      "source": "Roaming Hunger",
+      "original_width": "1563px",
+      "original_height": "1563px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/389bfbe89ce7.jpg",
+      "caption": "A man in a black shirt and blue gloves serves food at an outdoor buffet line. suitable for background image",
+      "source": "mcpcatering.com",
+      "original_width": "850px",
+      "original_height": "1050px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/6f993bde3b7d.png",
+      "caption": "A circular logo with the text \"NuNaMi Bistro\" on a dark green background. suitable for background image",
+      "source": "NuNaMi Bistro",
+      "original_width": "4500px",
+      "original_height": "4500px"
+    }
+  ]
+}

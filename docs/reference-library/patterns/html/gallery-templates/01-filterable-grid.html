@@ -1,0 +1,76 @@
+<!-- ============================================
+     Gallery Template 1: Filterable Grid
+     Used by: Most competitors with galleries
+     Interactive filtering by event type
+     ============================================ -->
+
+<section class="gallery section">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="section-header">
+      <h2 class="section-title">Our Work</h2>
+      <p class="section-subtitle">
+        Browse our portfolio of events, from intimate dinners to grand celebrations
+      </p>
+    </div>
+    
+    <!-- Filter Tabs -->
+    <div class="gallery__filters" role="tablist">
+      <button class="filter-btn active" data-filter="all">All Events</button>
+      <button class="filter-btn" data-filter="weddings">Weddings</button>
+      <button class="filter-btn" data-filter="corporate">Corporate</button>
+      <button class="filter-btn" data-filter="social">Social</button>
+      <button class="filter-btn" data-filter="private">Private Parties</button>
+    </div>
+    
+    <!-- Gallery Grid -->
+    <div class="gallery__grid">
+      <!-- Gallery Item -->
+      <article class="gallery-item" data-category="weddings">
+        <div class="gallery-item__image-wrapper">
+          <img src="gallery-1.jpg" alt="Elegant wedding reception setup" loading="lazy" />
+          <div class="gallery-item__overlay">
+            <span class="gallery-item__category">Wedding</span>
+            <h3 class="gallery-item__title">Garden Wedding Reception</h3>
+            <span class="gallery-item__meta">150 Guests • Outdoor Venue</span>
+          </div>
+        </div>
+      </article>
+      
+      <!-- More gallery items... -->
+      <article class="gallery-item" data-category="corporate">
+        <div class="gallery-item__image-wrapper">
+          <img src="gallery-2.jpg" alt="Corporate gala dinner" loading="lazy" />
+          <div class="gallery-item__overlay">
+            <span class="gallery-item__category">Corporate</span>
+            <h3 class="gallery-item__title">Annual Gala Dinner</h3>
+            <span class="gallery-item__meta">300 Guests • Ballroom</span>
+          </div>
+        </div>
+      </article>
+      
+      <!-- Continue with more items... -->
+    </div>
+    
+    <!-- Load More / View All -->
+    <div class="gallery__footer">
+      <a href="/gallery" class="btn btn-secondary">View Full Gallery</a>
+    </div>
+  </div>
+</section>
+
+<!-- CSS Notes:
+  - CSS Grid: auto-fill, minmax(300px, 1fr)
+  - Filter animation: fade out/in or scale
+  - Hover overlay with details
+  - Lightbox on click (optional enhancement)
+  - Lazy loading for images below fold
+  - Masonry layout option for varied sizes
+-->
+
+<!-- JavaScript Notes:
+  - Filter buttons toggle data-category visibility
+  - Add .active class to clicked filter
+  - Smooth transition between states
+  - Consider URL hash for shareable filters
+-->

@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Gamma Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/12f07a3281d9.png",
+      "caption": "A black and white circular logo with the text \"ITS CRANKING\" and musical notes inside a shield. suitable for background image",
+      "source": "LogoMakr",
+      "original_width": "1024px",
+      "original_height": "1024px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/403dbadcd9ca.png",
+      "caption": "A circular logo for \"CUMILLA TRAVEL AND SUNDERBAN CARGO\" with text and transport icons. Text: CUMILLA TRAVEL AND SUNDERBAN CARGO, CUMILLA, EST. 2024.",
+      "source": "LogoMakr",
+      "original_width": "1024px",
+      "original_height": "1024px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/2c633c521fe6.jpeg",
+      "caption": "The image displays the \"Charles Village Pub & Patio\" (CVP) logo on a wooden surface with blurred lights. Text: CHARLES VILLAGE CVP PUB & PATIO. Suitable for background image",
+      "source": "Charles Village Pub and Patio",
+      "original_width": "1920px",
+      "original_height": "960px"
+    }
+  ]
+}

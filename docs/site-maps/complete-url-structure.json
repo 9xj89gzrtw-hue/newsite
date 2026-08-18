@@ -1,0 +1,1096 @@
+{
+  "sites": [
+    {
+      "name": "concept-catering",
+      "pages": [
+        {
+          "url": "/",
+          "text": ""
+        },
+        {
+          "url": "/about",
+          "text": "Über Uns"
+        },
+        {
+          "url": "/film-und-crew-catering",
+          "text": "Film & Crew Catering"
+        },
+        {
+          "url": "/eventcatering",
+          "text": "Event Catering"
+        },
+        {
+          "url": "/delivery-catering",
+          "text": "Delivery Catering"
+        },
+        {
+          "url": "/kontakt",
+          "text": "Kontakt"
+        },
+        {
+          "url": "tel:015170618130",
+          "text": "Jetzt anrufen"
+        },
+        {
+          "url": "mailto:anfrage@concept-catering.de?subject=Ich%20will%20%C3%BCbertrieben%20gutes%20Catering%20f%C3%BCr%20%E2%80%A6",
+          "text": "Schreib uns"
+        },
+        {
+          "url": "mailto:anfrage@concept-catering.de?subject=Anfrage%20Film%20%26%20Crew%20Catering",
+          "text": "Jetzt anfragen"
+        },
+        {
+          "url": "mailto:anfrage@concept-catering.de?subject=Anfrage%20Event%20Catering",
+          "text": "Jetzt anfragen"
+        },
+        {
+          "url": "mailto:anfrage@concept-catering.de?subject=Anfrage%20Delivery%20Catering",
+          "text": "Jetzt anfragen"
+        },
+        {
+          "url": "mailto:anfrage@concept-catering.de?subject=Anfrage",
+          "text": "anfrage@concept-catering.de"
+        },
+        {
+          "url": "tel:+4915170618130",
+          "text": "+49 151 706 181 30"
+        },
+        {
+          "url": "/datenschutzerklarung",
+          "text": "Datenschutzerklärung"
+        },
+        {
+          "url": "/impressum",
+          "text": "Impressum"
+        },
+        {
+          "url": "/policy.html",
+          "text": "Weitere Informationen"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "concordecatering",
+      "pages": [
+        {
+          "url": "/cart",
+          "text": "0"
+        },
+        {
+          "url": "/",
+          "text": ""
+        },
+        {
+          "url": "/events",
+          "text": "Events"
+        },
+        {
+          "url": "/contact",
+          "text": "Contact"
+        },
+        {
+          "url": "/boardroom",
+          "text": "The Boardroom"
+        },
+        {
+          "url": "/s/Catering-EventPackage-0102-wygk.pdf",
+          "text": "See event package"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "creativeedge",
+      "pages": [
+        {
+          "url": "/cart",
+          "text": "0"
+        },
+        {
+          "url": "/",
+          "text": ""
+        },
+        {
+          "url": "/kosher-k",
+          "text": "Kosher"
+        },
+        {
+          "url": "/west-edge-parties",
+          "text": "Venues"
+        },
+        {
+          "url": "/on-the-road",
+          "text": "On The Road"
+        },
+        {
+          "url": "/contact",
+          "text": "Contact"
+        },
+        {
+          "url": "/menu",
+          "text": "Folder:MENU"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "cutandtaste",
+      "pages": [
+        {
+          "url": "/",
+          "text": ""
+        },
+        {
+          "url": "/#catering-clients",
+          "text": "Clients"
+        },
+        {
+          "url": "/#event-spaces",
+          "text": "Venues"
+        },
+        {
+          "url": "/catering-event-galleries-las-vegas",
+          "text": "Gallery"
+        },
+        {
+          "url": "/catering-team-las-vegas",
+          "text": "The Team"
+        },
+        {
+          "url": "/contact",
+          "text": "Contact"
+        },
+        {
+          "url": "tel:7022700299",
+          "text": "(702) 270-0299"
+        },
+        {
+          "url": "/#about-us",
+          "text": "About"
+        },
+        {
+          "url": "/client-feedback",
+          "text": "Client Feedback"
+        },
+        {
+          "url": "/blog",
+          "text": "Blog"
+        },
+        {
+          "url": "/about",
+          "text": "About"
+        },
+        {
+          "url": "/wedding-catering-services",
+          "text": ""
+        },
+        {
+          "url": "/destination-catering-services",
+          "text": ""
+        },
+        {
+          "url": "/convention-catering-services",
+          "text": ""
+        },
+        {
+          "url": "/corporate-catering-services",
+          "text": ""
+        },
+        {
+          "url": "/boxed-lunch-catering",
+          "text": ""
+        },
+        {
+          "url": "/offsite-private-catering-services",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#reverse-photobooth-station",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#monolith-station",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#tree-of-life",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#knex",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#milk-cookies-station",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#chef-demo",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#composed-entrees",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#donut-wall",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#meat-and-cheese",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#hanging-station",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#hoagie-station",
+          "text": ""
+        },
+        {
+          "url": "/custom-event-stations/#small-plates",
+          "text": ""
+        },
+        {
+          "url": "/5-iron-golf",
+          "text": ""
+        },
+        {
+          "url": "/ascaya-clubhouse-event-space",
+          "text": ""
+        },
+        {
+          "url": "/battlebots",
+          "text": ""
+        },
+        {
+          "url": "/caesars-entertainment-studios-event-space",
+          "text": ""
+        },
+        {
+          "url": "/celebrity-cars-event-space",
+          "text": ""
+        },
+        {
+          "url": "/discovery-childrens-museum-event-space",
+          "text": ""
+        },
+        {
+          "url": "/downtown-las-vegas-events-center",
+          "text": ""
+        },
+        {
+          "url": "/the-doyle-event-space",
+          "text": ""
+        },
+        {
+          "url": "/fresh-wata-studios-event-space",
+          "text": ""
+        },
+        {
+          "url": "/greengale-farms-event-venue",
+          "text": ""
+        },
+        {
+          "url": "/historic-fifth-street-school-event-space",
+          "text": ""
+        },
+        {
+          "url": "/illuminarium-event-space",
+          "text": ""
+        },
+        {
+          "url": "/the-industrial-event-space",
+          "text": ""
+        },
+        {
+          "url": "/keep-memory-alive-events",
+          "text": ""
+        },
+        {
+          "url": "/lee-canyon",
+          "text": ""
+        },
+        {
+          "url": "/lotus-house-event-space",
+          "text": ""
+        },
+        {
+          "url": "/maverick-helicopters-event-venue",
+          "text": ""
+        },
+        {
+          "url": "/meetlv",
+          "text": ""
+        },
+        {
+          "url": "/mob-museum-event-venue",
+          "text": ""
+        },
+        {
+          "url": "/museum-of-illusions-event-venue",
+          "text": ""
+        },
+        {
+          "url": "/neon-museum-event-venue",
+          "text": ""
+        },
+        {
+          "url": "/speed-vegas",
+          "text": ""
+        },
+        {
+          "url": "/springs-preserve",
+          "text": ""
+        },
+        {
+          "url": "/velveteen-rabbit-event-venue",
+          "text": ""
+        },
+        {
+          "url": "/blog/ai-spotlight-on-las-vegas-premier-catering-company",
+          "text": "AI’s #1 Caterer Testimonial"
+        },
+        {
+          "url": "/1st-birthday-party-catering-gallery",
+          "text": ""
+        },
+        {
+          "url": "/convention-center-reception-catering-gallery",
+          "text": ""
+        },
+        {
+          "url": "/popup-restaurant-catering",
+          "text": ""
+        },
+        {
+          "url": "/r-d-photo-shoot-catering",
+          "text": ""
+        },
+        {
+          "url": "/stations-wedding-catering",
+          "text": ""
+        },
+        {
+          "url": "/blog/culinary-touchdown-cut-and-taste-showcase-at-the-super-bowl-lviii-tiktok-tailgate",
+          "text": ""
+        },
+        {
+          "url": "tel:702-443-1839",
+          "text": "702-443-1839"
+        },
+        {
+          "url": "mailto:info@cutandtastelv.com",
+          "text": "info@cutandtastelv.com"
+        },
+        {
+          "url": "tel:+17022700299",
+          "text": "(702) 270-0299"
+        },
+        {
+          "url": "/privacy",
+          "text": "Privacy"
+        },
+        {
+          "url": "/accessibility-statement",
+          "text": "Accessibility"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "elegantaffairs",
+      "pages": [
+        {
+          "url": "/about/our-venues/",
+          "text": "Discover Locations"
+        },
+        {
+          "url": "/about/our-services/",
+          "text": "Our Services"
+        },
+        {
+          "url": "/elegantaffairs/contact-us/",
+          "text": "CONTACT US"
+        },
+        {
+          "url": "tel:2129910078",
+          "text": "212-991-0078"
+        },
+        {
+          "url": "tel:5166768500",
+          "text": "516-676-8500"
+        },
+        {
+          "url": "tel:631 509 7310",
+          "text": "631-509-7310"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "gammacatering",
+      "pages": [
+        {
+          "url": "/en/",
+          "text": ""
+        },
+        {
+          "url": "/en/about-us/",
+          "text": "About Us"
+        },
+        {
+          "url": "/en/sustainability/",
+          "text": "Sustainability"
+        },
+        {
+          "url": "/en/services/",
+          "text": "Services"
+        },
+        {
+          "url": "/en/locations/",
+          "text": "LOCATIONS"
+        },
+        {
+          "url": "/en/career/",
+          "text": "CAREER"
+        },
+        {
+          "url": "/en/contact/",
+          "text": "CONTACT"
+        },
+        {
+          "url": "/en/request/",
+          "text": "Enquiry"
+        },
+        {
+          "url": "/en/services/#konzeption",
+          "text": "Find out more"
+        },
+        {
+          "url": "/en/services/#design",
+          "text": "Find out more"
+        },
+        {
+          "url": "/en/services/#umsetzung",
+          "text": "Find out more"
+        },
+        {
+          "url": "mailto:s.capeder@gammagruppe.ch",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840047",
+          "text": ""
+        },
+        {
+          "url": "mailto:l.bachmann@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "mailto:a.rey@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840038",
+          "text": ""
+        },
+        {
+          "url": "mailto:l.dietziker@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840042",
+          "text": ""
+        },
+        {
+          "url": "mailto:l.schmid@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840040",
+          "text": ""
+        },
+        {
+          "url": "mailto:e.gimenez@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840045",
+          "text": ""
+        },
+        {
+          "url": "mailto:l.seifert@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840049",
+          "text": ""
+        },
+        {
+          "url": "mailto:lager@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "mailto:d.tortomasi@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "mailto:t.kaiser@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417841044",
+          "text": ""
+        },
+        {
+          "url": "mailto:c.huber@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840030",
+          "text": ""
+        },
+        {
+          "url": "mailto:g.bretscher@gammagruppe.ch",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840041",
+          "text": ""
+        },
+        {
+          "url": "mailto:l.obrist@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840046",
+          "text": ""
+        },
+        {
+          "url": "mailto:c.dinicola@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840043",
+          "text": ""
+        },
+        {
+          "url": "mailto:m.dominguez@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840035",
+          "text": ""
+        },
+        {
+          "url": "mailto:p.hoesli@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0434973200",
+          "text": ""
+        },
+        {
+          "url": "mailto:l.sobriel@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840034",
+          "text": ""
+        },
+        {
+          "url": "mailto:c.beck@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840031",
+          "text": ""
+        },
+        {
+          "url": "mailto:d.ciccone@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417811001",
+          "text": ""
+        },
+        {
+          "url": "mailto:m.jost@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417840032",
+          "text": ""
+        },
+        {
+          "url": "mailto:n.schneider@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "mailto:s.delucchi@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "mailto:n.peter@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "tel:0417811096",
+          "text": ""
+        },
+        {
+          "url": "mailto:m.engelhardt@gammacatering.com",
+          "text": ""
+        },
+        {
+          "url": "/en/about-us/#team",
+          "text": "Meet the team"
+        },
+        {
+          "url": "tel:+41417811001",
+          "text": "TEL +41 41 781 10 01"
+        },
+        {
+          "url": "mailto:zug@gammacatering.com",
+          "text": "ZUG@GAMMACATERING.COM"
+        },
+        {
+          "url": "/en/imprint/",
+          "text": "Imprint"
+        },
+        {
+          "url": "/en/privacy-policy/",
+          "text": "Privacy"
+        },
+        {
+          "url": "/en/terms-conditions/",
+          "text": "Terms and conditions"
+        },
+        {
+          "url": "/en/frequently-asked-questions/",
+          "text": "FAQ"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "ggcatering",
+      "pages": [],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "jdkgroup",
+      "pages": [
+        {
+          "url": "mailto:info@thejdkgroup.com",
+          "text": "info@thejdkgroup.com"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "myradish",
+      "pages": [
+        {
+          "url": "/cart",
+          "text": "0"
+        },
+        {
+          "url": "/",
+          "text": ""
+        },
+        {
+          "url": "/workplace",
+          "text": "Workplace"
+        },
+        {
+          "url": "/events",
+          "text": "Events"
+        },
+        {
+          "url": "/our-approach",
+          "text": "Our Approach"
+        },
+        {
+          "url": "/careers",
+          "text": "Careers"
+        },
+        {
+          "url": "/contact-us-general-inquiry",
+          "text": "Contact"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "queenofhearts",
+      "pages": [],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "ridgewells",
+      "pages": [
+        {
+          "url": "mailto:info@ridgewells.com",
+          "text": "info@ridgewells.com"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "saltblock",
+      "pages": [
+        {
+          "url": "/cart",
+          "text": "0"
+        },
+        {
+          "url": "/plan",
+          "text": ""
+        },
+        {
+          "url": "/about-our-farm",
+          "text": "Farm-fresh Catering"
+        },
+        {
+          "url": "/brands",
+          "text": "Our Catering Brands"
+        },
+        {
+          "url": "/the-saltblock-difference",
+          "text": "The SaltBlock Difference"
+        },
+        {
+          "url": "/beverage-program",
+          "text": "Beverage Program"
+        },
+        {
+          "url": "/menus",
+          "text": "Sample Menus"
+        },
+        {
+          "url": "/our-menus",
+          "text": "Plan Your Menu"
+        },
+        {
+          "url": "/team",
+          "text": "Team"
+        },
+        {
+          "url": "/saltblock-exclusives",
+          "text": "SaltBlock Owned & Operated"
+        },
+        {
+          "url": "/venues",
+          "text": "All Venues"
+        },
+        {
+          "url": "/saltblock-hospitality-blog",
+          "text": "Event Planning Resources"
+        },
+        {
+          "url": "/farm-values",
+          "text": "Values"
+        },
+        {
+          "url": "/sbh-cares",
+          "text": "Community Support"
+        },
+        {
+          "url": "/saltblock-initiatives",
+          "text": "SaltBlock Initiatives"
+        },
+        {
+          "url": "/sb-blog/serving-tampa-with-excellence-innovation-and-heart",
+          "text": "Best of The City"
+        },
+        {
+          "url": "/contact",
+          "text": "Contact"
+        },
+        {
+          "url": "/",
+          "text": ""
+        },
+        {
+          "url": "/mega-catering",
+          "text": "Folder:Catering"
+        },
+        {
+          "url": "/mega-sbh-venues",
+          "text": "Folder:Venues"
+        },
+        {
+          "url": "/mega-farm",
+          "text": "Folder:Farm"
+        },
+        {
+          "url": "/mega-sbh-cares",
+          "text": "Folder:SBH Cares"
+        },
+        {
+          "url": "/giveaways",
+          "text": "Access Now"
+        },
+        {
+          "url": "/careers",
+          "text": "Careers"
+        },
+        {
+          "url": "tel:8777937526",
+          "text": "877.793.7526"
+        },
+        {
+          "url": "mailto:contact@saltblockhospitality.com",
+          "text": "Contact@Saltblockhospitality.com"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "sopranos",
+      "pages": [
+        {
+          "url": "/",
+          "text": ""
+        },
+        {
+          "url": "/corporate-events",
+          "text": "Corporate Events"
+        },
+        {
+          "url": "/breakfast-and-brunch",
+          "text": "Breakfast & Brunch"
+        },
+        {
+          "url": "/build-your-own-buffet",
+          "text": "Build Your Own Buffet"
+        },
+        {
+          "url": "/grill-and-bbq",
+          "text": "Grill & BBQ"
+        },
+        {
+          "url": "/themed-cuisine",
+          "text": "Themed Cuisine"
+        },
+        {
+          "url": "/catered-trays",
+          "text": "By The Tray"
+        },
+        {
+          "url": "/late-night-snacks",
+          "text": "Late Night Snacks"
+        },
+        {
+          "url": "/social-events",
+          "text": "Social Events"
+        },
+        {
+          "url": "/weddings",
+          "text": "weddings"
+        },
+        {
+          "url": "/event-bar-packages",
+          "text": "EVENT BAR PACKAGES"
+        },
+        {
+          "url": "/venues-vendors",
+          "text": "venues & vendors"
+        },
+        {
+          "url": "/contact",
+          "text": "Contact"
+        },
+        {
+          "url": "/build-your-own-buffet#family",
+          "text": "Family Style & Plated"
+        },
+        {
+          "url": "/appetizers-and-enhancements",
+          "text": "Apps & Enhancements"
+        },
+        {
+          "url": "tel:15867019526",
+          "text": "1 (800) WE-CATER"
+        },
+        {
+          "url": "/seasonal-specials",
+          "text": "Winter Specials"
+        },
+        {
+          "url": "/service-styles",
+          "text": "Service Styles"
+        },
+        {
+          "url": "mailto:info@sopranoscatering.com?subject=Hello!",
+          "text": "info@sopranoscatering.com"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "tallguy",
+      "pages": [
+        {
+          "url": "/cart",
+          "text": "0"
+        },
+        {
+          "url": "/our-story",
+          "text": "Our Story"
+        },
+        {
+          "url": "/sustainability",
+          "text": "Sustainability"
+        },
+        {
+          "url": "/venue-partners",
+          "text": "Venue Partners"
+        },
+        {
+          "url": "/faqs",
+          "text": "FAQs"
+        },
+        {
+          "url": "/careers",
+          "text": "Careers"
+        },
+        {
+          "url": "/weddings",
+          "text": "Weddings"
+        },
+        {
+          "url": "/events",
+          "text": "Events"
+        },
+        {
+          "url": "/drop-off",
+          "text": "Drop-Off"
+        },
+        {
+          "url": "/sports-catering",
+          "text": "Sports Catering"
+        },
+        {
+          "url": "/photo-gallery",
+          "text": "Gallery"
+        },
+        {
+          "url": "/",
+          "text": ""
+        },
+        {
+          "url": "/reach-out",
+          "text": "Reach Out"
+        },
+        {
+          "url": "/about",
+          "text": "Folder:About"
+        },
+        {
+          "url": "/catering",
+          "text": "Folder:Catering"
+        },
+        {
+          "url": "/terms-and-conditions",
+          "text": "Terms & Conditions"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    },
+    {
+      "name": "wolfgangpuck",
+      "pages": [
+        {
+          "url": "//wolfgangpuckcatering.com",
+          "text": ""
+        },
+        {
+          "url": "/recipe",
+          "text": "Recipes"
+        },
+        {
+          "url": "/careers",
+          "text": "Careers"
+        },
+        {
+          "url": "/press-inquiries",
+          "text": "Press Inquiries"
+        },
+        {
+          "url": "/contact",
+          "text": "Contact"
+        }
+      ],
+      "blogPosts": [],
+      "landingPages": [],
+      "downloads": [],
+      "categories": [],
+      "allUrls": []
+    }
+  ],
+  "summary": {
+    "totalSites": 15,
+    "totalUniquePages": 235
+  }
+}

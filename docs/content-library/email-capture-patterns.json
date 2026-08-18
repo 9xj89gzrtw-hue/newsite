@@ -1,0 +1,99 @@
+{
+  "analysis_date": "2026-01-20",
+  "total_sites_analyzed": 15,
+  "sites_with_email_capture": 0,
+  "summary": {
+    "capture_rate": "0/15 sites",
+    "most_common_promises": [],
+    "common_privacy_language": []
+  },
+  "site_findings": {},
+  "patterns_library": {
+    "headline_variations": [
+      "Subscribe to Our Newsletter",
+      "Join Our Mailing List",
+      "Get Updates Delivered",
+      "Stay Connected",
+      "Join the Inner Circle",
+      "Be the First to Know",
+      "News & Menu Releases",
+      "Subscribe for Special Offers"
+    ],
+    "subheadline_variations": [
+      "Receive news, updates, and special offers",
+      "Be the first to hear about new menus and events",
+      "Get catering tips and inspiration delivered to your inbox",
+      "Join our community of event enthusiasts",
+      "Stay up to date with our latest creations"
+    ],
+    "button_copy": [
+      "Subscribe",
+      "Sign Up",
+      "Join",
+      "Get Updates",
+      "Subscribe Now"
+    ],
+    "value_propositions": [
+      "New menu announcements",
+      "Seasonal specials and promotions",
+      "Event planning tips and inspiration",
+      "Behind-the-scenes kitchen content",
+      "Exclusive subscriber-only offers",
+      "Early access to tasting events",
+      "Catering industry insights",
+      "Recipe ideas and food trends"
+    ],
+    "privacy_assurances": [
+      "We respect your privacy. Unsubscribe anytime.",
+      "No spam. Just delicious updates.",
+      "We'll never share your information.",
+      "By signing up, you agree to our Privacy Policy.",
+      "You can opt out at any time.",
+      "Max 2 emails per month. Promise."
+    ],
+    "placement_strategies": [
+      {
+        "location": "footer",
+        "description": "Standard site-wide footer with email input"
+      },
+      {
+        "location": "hero_section",
+        "description": "Below main headline on homepage"
+      },
+      {
+        "location": "blog_end",
+        "description": "After blog post content"
+      },
+      {
+        "location": "sidebar",
+        "description": "Fixed sidebar on content pages"
+      },
+      {
+        "location": "popup_exit_intent",
+        "description": "Modal when user attempts to leave"
+      },
+      {
+        "location": "menu_page",
+        "description": "On menu pages with download offer"
+      },
+      {
+        "location": "contact_page",
+        "description": "Alongside contact form"
+      },
+      {
+        "location": "thank_you_page",
+        "description": "After inquiry submission"
+      }
+    ],
+    "best_practices": [
+      "Keep form fields minimal (Name + Email maximum)",
+      "Place value proposition above the fold",
+      "Use benefit-driven copy over generic language",
+      "Include clear privacy assurance below button",
+      "Consider offering immediate incentive (lead magnet)",
+      "Make mobile experience seamless (large inputs)",
+      "A/B test different value propositions",
+      "Segment lists by interest (wedding vs corporate vs social)"
+    ]
+  }
+}

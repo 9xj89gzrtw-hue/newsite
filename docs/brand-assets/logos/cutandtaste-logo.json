@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Cut & Taste Las Vegas catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/e83b59e6ba34.png",
+      "caption": "The image displays the text \"SECOND CHANCES TAVERN\" in bold red letters on a light gray background. suitable for background image",
+      "source": "www.secondchancestavern.com",
+      "original_width": "2560px",
+      "original_height": "961px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/34d2db98a92b.png",
+      "caption": "A white logo featuring a stylized anchor with the text \"WEST HOLLYWOOD\" and \"CATCH\".",
+      "source": "Catch Restaurants",
+      "original_width": "1000px",
+      "original_height": "1000px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/a36aab14c4af.jpg",
+      "caption": "A top-down view of a table filled with various Chinese dishes, including dim sum, stir-fries, and purple drinks. suitable for background image",
+      "source": "palettelv.com",
+      "original_width": "881px",
+      "original_height": "1200px"
+    }
+  ]
+}

@@ -1,0 +1,1450 @@
+{
+  "detailed_schemas": {
+    "concept-catering": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": []
+    },
+    "concordecatering": {
+      "organization": [
+        {
+          "image": "https://static1.squarespace.com/static/5fc91625d98c1a7115f1f7ed/t/6297cbc9f934f42d6540f0bf/1785357126424/",
+          "openingHours": "",
+          "@context": "http://schema.org",
+          "@type": "LocalBusiness"
+        }
+      ],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [
+        {
+          "url": "https://concordecatering.ca",
+          "name": "Concorde Catering",
+          "description": "",
+          "image": "//images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/aa330096-e214-49c3-a227-cb59fbdc8e00/CC-Logo-Blue.png",
+          "@context": "http://schema.org",
+          "@type": "WebSite"
+        }
+      ],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": []
+    },
+    "creativeedge": {
+      "organization": [
+        {
+          "address": "",
+          "image": "https://static1.squarespace.com/static/6840be6bc300d63ad7f66f2f/t/68434ef6a3b0c728cb1a2ab2/1779913725666/",
+          "@context": "http://schema.org",
+          "@type": "LocalBusiness"
+        }
+      ],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [
+        {
+          "@context": "https://schema.org/",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Parties",
+              "item": "https://www.creativeedgeparties.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "kosher k",
+              "item": "https://www.creativeedgeparties.com/kosher-k"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "West Edge Parties",
+              "item": "https://www.creativeedgeparties.com/west-edge-parties"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "On the Road",
+              "item": "https://www.creativeedgeparties.com/on-the-road"
+            }
+          ]
+        }
+      ],
+      "webpage": [
+        {
+          "url": "https://www.creativeedgeparties.com",
+          "name": "Creative Edge Parties",
+          "description": "",
+          "image": "//images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/43366d3b-fae5-4659-8e50-2a3e75b20bd8/CEP_LOGO_Egg_White.png",
+          "@context": "http://schema.org",
+          "@type": "WebSite"
+        }
+      ],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": [
+        {
+          "type": "corporation",
+          "schema": {
+            "@context": "https://schema.org",
+            "@type": "Corporation",
+            "name": "Creative Edge Parties",
+            "url": "https://www.creativeedgeparties.com/",
+            "logo": "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/43366d3b-fae5-4659-8e50-2a3e75b20bd8/CEP_LOGO_Egg_White.png?format=1500w",
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "+13056975200",
+              "contactType": "customer service",
+              "areaServed": "US",
+              "availableLanguage": "en"
+            },
+            "sameAs": [
+              "https://www.instagram.com/creativeedgeparties/?hl=en#",
+              "https://www.facebook.com/CreativeEdgeParties/"
+            ]
+          }
+        }
+      ]
+    },
+    "cutandtaste": {
+      "organization": [
+        {
+          "legalName": "Cut and Taste",
+          "address": "2053 East Pama Lane\nLas Vegas, NV, 89119\nUnited States",
+          "email": "info@cutandtastelv.com",
+          "telephone": "702-443-1839",
+          "sameAs": [
+            "http://www.facebook.com/cutandtastefood",
+            "mailto:info@cutandtastelv.com"
+          ],
+          "@context": "http://schema.org",
+          "@type": "Organization"
+        },
+        {
+          "address": "2053 East Pama Lane\nLas Vegas, NV, 89119\nUnited States",
+          "image": "https://static1.squarespace.com/static/5c1584394611a0d7e1311ce4/t/5c17fd020ebbe8efe833e780/1780338735067/",
+          "name": "Cut and Taste",
+          "openingHours": ", , , , , , ",
+          "@context": "http://schema.org",
+          "@type": "LocalBusiness"
+        }
+      ],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [
+        {
+          "url": "https://www.cutandtastelv.com",
+          "name": "Cut and Taste",
+          "description": "",
+          "image": "//images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1545075970785-M1QGFBFDD9QXIH5PX02R/cut-and-taste-las-vegas-catering.png",
+          "@context": "http://schema.org",
+          "@type": "WebSite"
+        }
+      ],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": []
+    },
+    "elegantaffairs": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": [
+        {
+          "type": "",
+          "schema": {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebPage",
+                "@id": "https://elegantaffairscaterers.com/",
+                "url": "https://elegantaffairscaterers.com/",
+                "name": "Full Service Off Premise Catering| Elegant Affairs| New York",
+                "isPartOf": {
+                  "@id": "https://elegantaffairscaterers.com/#website"
+                },
+                "about": {
+                  "@id": "https://elegantaffairscaterers.com/#organization"
+                },
+                "primaryImageOfPage": {
+                  "@id": "https://elegantaffairscaterers.com/#primaryimage"
+                },
+                "image": {
+                  "@id": "https://elegantaffairscaterers.com/#primaryimage"
+                },
+                "thumbnailUrl": "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg",
+                "datePublished": "2021-03-20T09:55:02+00:00",
+                "dateModified": "2025-05-23T11:45:30+00:00",
+                "description": "Top Quality Full Service Off-Premise Catering With Elegant Affairs. We Cater Weddings, Corporate Events, and Private Parties in NYC, and Hamptons.",
+                "breadcrumb": {
+                  "@id": "https://elegantaffairscaterers.com/#breadcrumb"
+                },
+                "inLanguage": "en-US",
+                "potentialAction": [
+                  {
+                    "@type": "ReadAction",
+                    "target": [
+                      "https://elegantaffairscaterers.com/"
+                    ]
+                  }
+                ]
+              },
+              {
+                "@type": "ImageObject",
+                "inLanguage": "en-US",
+                "@id": "https://elegantaffairscaterers.com/#primaryimage",
+                "url": "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg",
+                "contentUrl": "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg",
+                "width": 1465,
+                "height": 502,
+                "caption": "Catering Servics"
+              },
+              {
+                "@type": "BreadcrumbList",
+                "@id": "https://elegantaffairscaterers.com/#breadcrumb",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home"
+                  }
+                ]
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://elegantaffairscaterers.com/#website",
+                "url": "https://elegantaffairscaterers.com/",
+                "name": "Elegant Affairs",
+                "description": "",
+                "publisher": {
+                  "@id": "https://elegantaffairscaterers.com/#organization"
+                },
+                "potentialAction": [
+                  {
+                    "@type": "SearchAction",
+                    "target": {
+                      "@type": "EntryPoint",
+                      "urlTemplate": "https://elegantaffairscaterers.com/?s={search_term_string}"
+                    },
+                    "query-input": {
+                      "@type": "PropertyValueSpecification",
+                      "valueRequired": true,
+                      "valueName": "search_term_string"
+                    }
+                  }
+                ],
+                "inLanguage": "en-US"
+              },
+              {
+                "@type": "Organization",
+                "@id": "https://elegantaffairscaterers.com/#organization",
+                "name": "Elegant Affairs Caterers",
+                "url": "https://elegantaffairscaterers.com/",
+                "logo": {
+                  "@type": "ImageObject",
+                  "inLanguage": "en-US",
+                  "@id": "https://elegantaffairscaterers.com/#/schema/logo/image/",
+                  "url": "https://elegantaffairscaterers.com/wp-content/uploads/2021/06/ea-logo.svg",
+                  "contentUrl": "https://elegantaffairscaterers.com/wp-content/uploads/2021/06/ea-logo.svg",
+                  "width": 538,
+                  "height": 162,
+                  "caption": "Elegant Affairs Caterers"
+                },
+                "image": {
+                  "@id": "https://elegantaffairscaterers.com/#/schema/logo/image/"
+                },
+                "sameAs": [
+                  "https://www.facebook.com/elegantaffairscaterers/",
+                  "https://www.instagram.com/elegantaffairs1/",
+                  "https://www.youtube.com/channel/UChYm7vFNRGVf1iPiiZ7Em_Q"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "gammacatering": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": [
+        {
+          "type": "",
+          "schema": {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebPage",
+                "@id": "https://www.gammacatering.com/",
+                "url": "https://www.gammacatering.com/",
+                "name": "GAMMACATERING | Premium Catering &amp; Event Experiences",
+                "isPartOf": {
+                  "@id": "https://www.gammacatering.com/en/#website"
+                },
+                "about": {
+                  "@id": "https://www.gammacatering.com/en/#organization"
+                },
+                "datePublished": "2026-06-22T18:57:19+00:00",
+                "dateModified": "2026-08-11T15:42:45+00:00",
+                "description": "Premium Catering Switzerland &amp; Event Design since 1986. Personally accompanied, holistically conceived, uncompromising in quality.",
+                "breadcrumb": {
+                  "@id": "https://www.gammacatering.com/#breadcrumb"
+                },
+                "inLanguage": "en-GB",
+                "potentialAction": [
+                  {
+                    "@type": "ReadAction",
+                    "target": [
+                      "https://www.gammacatering.com/"
+                    ]
+                  }
+                ]
+              },
+              {
+                "@type": "BreadcrumbList",
+                "@id": "https://www.gammacatering.com/#breadcrumb",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Begin"
+                  }
+                ]
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://www.gammacatering.com/en/#website",
+                "url": "https://www.gammacatering.com/en/",
+                "name": "GAMMACATERING",
+                "description": "",
+                "publisher": {
+                  "@id": "https://www.gammacatering.com/en/#organization"
+                },
+                "potentialAction": [
+                  {
+                    "@type": "SearchAction",
+                    "target": {
+                      "@type": "EntryPoint",
+                      "urlTemplate": "https://www.gammacatering.com/en/?s={search_term_string}"
+                    },
+                    "query-input": {
+                      "@type": "PropertyValueSpecification",
+                      "valueRequired": true,
+                      "valueName": "search_term_string"
+                    }
+                  }
+                ],
+                "inLanguage": "en-GB"
+              },
+              {
+                "@type": "Organization",
+                "@id": "https://www.gammacatering.com/en/#organization",
+                "name": "GAMMACATERING",
+                "url": "https://www.gammacatering.com/en/",
+                "logo": {
+                  "@type": "ImageObject",
+                  "inLanguage": "en-GB",
+                  "@id": "https://www.gammacatering.com/en/#/schema/logo/image/",
+                  "url": "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/Gamma-40-Jahre-Icon-L-schwarz.svg",
+                  "contentUrl": "https://www.gammacatering.com/v4/wp-content/uploads/2026/07/Gamma-40-Jahre-Icon-L-schwarz.svg",
+                  "width": 102,
+                  "height": 108,
+                  "caption": "GAMMACATERING"
+                },
+                "image": {
+                  "@id": "https://www.gammacatering.com/en/#/schema/logo/image/"
+                },
+                "sameAs": [
+                  "https://www.facebook.com/gammacatering/photos/",
+                  "https://www.instagram.com/gamma_catering/",
+                  "https://www.linkedin.com/company/gamma-catering-ag?originalSubdomain=ch"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "ggcatering": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": [
+        {
+          "type": "",
+          "schema": {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                "author": {
+                  "@id": "https://www.ggcatering.com/#identity"
+                },
+                "copyrightHolder": {
+                  "@id": "https://www.ggcatering.com/#identity"
+                },
+                "copyrightYear": "2024",
+                "creator": {
+                  "@id": "https://turnstyle.studio/#creator"
+                },
+                "dateCreated": "2024-06-18T11:34:38-07:00",
+                "dateModified": "2026-02-04T21:08:03-08:00",
+                "datePublished": "2024-06-18T11:34:00-07:00",
+                "description": "Stellar food. Seamless service. Sustainably produced. Celebrate with the Bay Area's leading full-service catering company, Global Gourmet Catering.",
+                "headline": "Home",
+                "image": {
+                  "@type": "ImageObject",
+                  "url": "https://gg-web.transforms.svdcdn.com/production/default/SEO-image.jpg?w=1200&h=630&q=82&auto=format&fit=crop&dm=1727805006&s=d2a4d6788128860bb1f558fb707cef12"
+                },
+                "inLanguage": "en-us",
+                "mainEntityOfPage": "https://www.ggcatering.com/",
+                "name": "Global Gourmet",
+                "publisher": {
+                  "@id": "https://turnstyle.studio/#creator"
+                },
+                "url": "https://www.ggcatering.com/"
+              },
+              {
+                "@id": "https://www.ggcatering.com/#identity",
+                "@type": "LocalBusiness",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressCountry": "US",
+                  "addressLocality": "San Francisco",
+                  "addressRegion": "CA",
+                  "postalCode": "94107",
+                  "streetAddress": "1030 Illinois Street"
+                },
+                "description": "Stellar food. Seamless service. Sustainably produced. Celebrate with the Bay Area's leading full-service catering company, Global Gourmet Catering.",
+                "name": "Global Gourmet Catering",
+                "priceRange": "$",
+                "sameAs": [
+                  "https://www.instagram.com/globalgourmetcatering/",
+                  "https://www.linkedin.com/company/global-gourmet-catering/"
+                ],
+                "telephone": "415.701.0001",
+                "url": "https://www.ggcatering.com/"
+              },
+              {
+                "@id": "https://turnstyle.studio/#creator",
+                "@type": "LocalBusiness",
+                "description": "Turnstyle is a full-service creative agency with a dedicated team of designers, strategists, developers, and account specialists.",
+                "name": "Turnstyle",
+                "priceRange": "$",
+                "url": "https://turnstyle.studio/"
+              },
+              {
+                "@type": "BreadcrumbList",
+                "description": "Breadcrumbs list",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "item": "https://www.ggcatering.com/",
+                    "name": "Home",
+                    "position": 1
+                  }
+                ],
+                "name": "Breadcrumbs"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "jdkgroup": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": [
+        {
+          "type": "",
+          "schema": {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebPage",
+                "@id": "https://thejdkgroup.com/",
+                "url": "https://thejdkgroup.com/",
+                "name": "Harrisburg Catering and Event Planning | ",
+                "isPartOf": {
+                  "@id": "https://thejdkgroup.com/#website"
+                },
+                "about": {
+                  "@id": "https://thejdkgroup.com/#organization"
+                },
+                "datePublished": "2013-06-13T11:07:02+00:00",
+                "dateModified": "2024-02-25T14:44:56+00:00",
+                "description": "Serving Harrisburg, Lancaster, and York, the JDK Group is the region's premier full-service catering and event planning company",
+                "breadcrumb": {
+                  "@id": "https://thejdkgroup.com/#breadcrumb"
+                },
+                "inLanguage": "en-US",
+                "potentialAction": [
+                  {
+                    "@type": "ReadAction",
+                    "target": [
+                      "https://thejdkgroup.com/"
+                    ]
+                  }
+                ]
+              },
+              {
+                "@type": "BreadcrumbList",
+                "@id": "https://thejdkgroup.com/#breadcrumb",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home"
+                  }
+                ]
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://thejdkgroup.com/#website",
+                "url": "https://thejdkgroup.com/",
+                "name": "The JDK Group",
+                "description": "We Produce Events Worth Celebrating!",
+                "publisher": {
+                  "@id": "https://thejdkgroup.com/#organization"
+                },
+                "potentialAction": [
+                  {
+                    "@type": "SearchAction",
+                    "target": {
+                      "@type": "EntryPoint",
+                      "urlTemplate": "https://thejdkgroup.com/?s={search_term_string}"
+                    },
+                    "query-input": {
+                      "@type": "PropertyValueSpecification",
+                      "valueRequired": true,
+                      "valueName": "search_term_string"
+                    }
+                  }
+                ],
+                "inLanguage": "en-US"
+              },
+              {
+                "@type": "Organization",
+                "@id": "https://thejdkgroup.com/#organization",
+                "name": "The JDK Group",
+                "url": "https://thejdkgroup.com/",
+                "logo": {
+                  "@type": "ImageObject",
+                  "inLanguage": "en-US",
+                  "@id": "https://thejdkgroup.com/#/schema/logo/image/",
+                  "url": "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png",
+                  "contentUrl": "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png",
+                  "width": 80,
+                  "height": 80,
+                  "caption": "The JDK Group"
+                },
+                "image": {
+                  "@id": "https://thejdkgroup.com/#/schema/logo/image/"
+                },
+                "sameAs": [
+                  "https://www.facebook.com/thejdkgroup/",
+                  "https://x.com/thejdkgroup"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "myradish": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [
+        {
+          "url": "https://www.myradish.com",
+          "name": "Radish",
+          "image": "//images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/c45589f3-5f91-4d04-8dc5-df17730e9941/Radish_Poblano.png",
+          "@context": "http://schema.org",
+          "@type": "WebSite"
+        }
+      ],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": []
+    },
+    "queenofhearts": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": []
+    },
+    "ridgewells": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [
+        {
+          "@context": "https://schema.org/",
+          "@type": "WebSite",
+          "url": "https://www.ridgewells.com/",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://www.ridgewells.com/search?q={search_term}"
+            },
+            "query-input": "required name=search_term"
+          }
+        },
+        {
+          "@context": "https://schema.org/",
+          "@type": "WebSite",
+          "name": "Ridgewells Catering",
+          "url": "https://www.ridgewells.com"
+        }
+      ],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": []
+    },
+    "saltblock": {
+      "organization": [
+        {
+          "legalName": "SaltBlock Hospitality",
+          "address": "8414 Camden Street\nTampa, FL, 33614\nUnited States",
+          "email": "Contact@Saltblockhospitality.com",
+          "telephone": "877.793.7526",
+          "sameAs": [
+            "https://www.instagram.com/saltblockhospitality/",
+            "https://www.facebook.com/SaltBlockHospitality/"
+          ],
+          "@context": "http://schema.org",
+          "@type": "Organization"
+        },
+        {
+          "address": "8414 Camden Street\nTampa, FL, 33614\nUnited States",
+          "image": "https://static1.squarespace.com/static/628635115ffed10e289ac115/t/6286402ed3772a5abfeb6042/1786468104721/",
+          "name": "SaltBlock Hospitality",
+          "openingHours": "Mo 09:00-17:00, Tu 09:00-17:00, We 09:00-17:00, Th 09:00-17:00, Fr 09:00-17:00, , ",
+          "@context": "http://schema.org",
+          "@type": "LocalBusiness"
+        }
+      ],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [
+        {
+          "url": "https://saltblockhospitality.com",
+          "name": "Saltblock Hospitality",
+          "description": "",
+          "image": "//images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/38705ff8-cf19-47d2-abf4-7f0ec7bcafb5/Logo.png",
+          "@context": "http://schema.org",
+          "@type": "WebSite"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "url": "https://saltblockhospitality.com",
+          "name": "SaltBlock Hospitality",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://saltblockhospitality.com/search?query={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ],
+      "faq": [],
+      "event": [],
+      "service": [
+        {
+          "@context": "https://schema.org",
+          "@type": "CateringService",
+          "@id": "https://saltblockhospitality.com/#organization",
+          "name": "SaltBlock Hospitality",
+          "url": "https://saltblockhospitality.com",
+          "logo": "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/38705ff8-cf19-47d2-abf4-7f0ec7bcafb5/Logo.png",
+          "image": "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/38705ff8-cf19-47d2-abf4-7f0ec7bcafb5/Logo.png",
+          "description": "SaltBlock Hospitality delivers chef-driven, seed-oil-free menus with a modern approach to luxury catering in Tampa. Full-service catering, curated bar experiences, and event execution for weddings, corporate events, galas, and private celebrations.",
+          "slogan": "Raise the Bar",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "8414 Camden St",
+            "addressLocality": "Tampa",
+            "addressRegion": "FL",
+            "postalCode": "33614",
+            "addressCountry": "US"
+          },
+          "telephone": "+1-877-793-7526",
+          "contactPoint": [
+            {
+              "@type": "ContactPoint",
+              "telephone": "+1-877-793-7526",
+              "email": "Contact@SaltBlockHospitality.com",
+              "contactType": "Customer Service",
+              "availableLanguage": "en"
+            }
+          ],
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Monday"
+              ],
+              "opens": "09:00",
+              "closes": "17:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Tuesday"
+              ],
+              "opens": "09:00",
+              "closes": "17:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Wednesday"
+              ],
+              "opens": "09:00",
+              "closes": "17:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Thursday"
+              ],
+              "opens": "09:00",
+              "closes": "17:00"
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Friday"
+              ],
+              "opens": "09:00",
+              "closes": "17:00"
+            }
+          ],
+          "areaServed": {
+            "@type": "City",
+            "name": "Tampa",
+            "address": {
+              "@type": "PostalAddress",
+              "addressRegion": "FL",
+              "addressCountry": "US"
+            }
+          },
+          "serviceType": [
+            "Full-Service Catering",
+            "Drop-Off Catering",
+            "Bar Service",
+            "Event Catering",
+            "Wedding Catering",
+            "Corporate Catering"
+          ],
+          "hasPart": [
+            {
+              "@type": "WebPage",
+              "name": "Privacy Policy",
+              "url": "https://saltblockhospitality.com/privacy-policy"
+            },
+            {
+              "@type": "WebPage",
+              "name": "Terms of Service",
+              "url": "https://saltblockhospitality.com/terms-of-service"
+            }
+          ],
+          "sameAs": [
+            "https://www.instagram.com/saltblockhospitality/",
+            "https://www.facebook.com/SaltBlockHospitality/"
+          ]
+        }
+      ],
+      "product": [
+        {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "Elevate Your Event Experience with SaltBlock Hospitality",
+          "url": "https://saltblockhospitality.com/",
+          "brand": {
+            "@type": "Brand",
+            "name": "Elevate Your Event Experience with SaltBlock Hospitality"
+          },
+          "description": "Elevate your event with SaltBlock Hospitality&apos;s  food and beverage experiences at exclusive Tampa venues and farm-fresh ingredients. Plan with confidence!",
+          "image": [
+            "http://static1.squarespace.com/static/628635115ffed10e289ac115/t/62ac3fe2545417200c47f77e/1655455714968/sbh_social_banner.png?format=1500w"
+          ],
+          "mpn": "115971",
+          "sku": "1159710",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": 4.8,
+            "reviewCount": 156,
+            "bestRating": 5,
+            "worstRating": 1
+          },
+          "review": {
+            "@type": "Review",
+            "reviewBody": "Saltblock catered our summer party in Tampa this month and they did an exceptional job! From start to finish - the quality of both the food and the service were extraordinary.\nParker Skornschek made our event easy and fun. He is an excellent communicator and gave us the party we envisioned. We live in San Francisco and Parker made planning our party &quot;long distance&quot; a delightful experience. His preparation was awesome - he visited the house / location ahead of our arrival and made suggestions that we followed for the food layout. We asked for “California cuisine” and he created a menu that exceeded our expectations. Every dish was tasty, lovely and plentiful. Our guests complimented the delicious food, beautiful display and professional service.\nStaff Chef Grace, Lead assistant Akima, Kelly and Yoandra arrived early, prepped, prepared, arranged and served in the most subtle seamless way. Clean-up was fast and impeccable.\nWe HIGHLY recommend Parker, his team and SaltBlock Hospitality, and we hope to work with them again.",
+            "datePublished": "2026-07-25",
+            "author": {
+              "@type": "Person",
+              "name": "Donna Epstein"
+            },
+            "reviewRating": {
+              "@type": "Rating",
+              "ratingValue": 5
+            }
+          }
+        }
+      ],
+      "review": [],
+      "aggregaterating": [],
+      "other": []
+    },
+    "sopranos": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": []
+    },
+    "tallguy": {
+      "organization": [
+        {
+          "address": "",
+          "image": "https://static1.squarespace.com/static/613f95fa3c025158dc158b69/t/6418759530249c645a257b37/1770589010862/",
+          "@context": "http://schema.org",
+          "@type": "LocalBusiness"
+        }
+      ],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [
+        {
+          "url": "https://www.tallguyandagrill.com",
+          "name": "Tall Guy and a Grill",
+          "description": "",
+          "image": "//images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/a52dab6c-4721-4bd1-9ae5-753b03121730/TG_Alt_AndGrill_Cat_RGB_Horizontal_FullColor_Rev_OnRed.png",
+          "@context": "http://schema.org",
+          "@type": "WebSite"
+        }
+      ],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": []
+    },
+    "wolfgangpuck": {
+      "organization": [],
+      "local_business": [],
+      "restaurant": [],
+      "food_establishment": [],
+      "breadcrumb": [],
+      "webpage": [],
+      "faq": [],
+      "event": [],
+      "service": [],
+      "product": [],
+      "review": [],
+      "aggregaterating": [],
+      "other": [
+        {
+          "type": "",
+          "schema": {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": "https://wolfgangpuckcatering.com/#organization",
+                "name": "Wolfgang Puck Catering",
+                "url": "https://wolfgangpuckcatering.com/",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/wpc-logo.png"
+                },
+                "slogan": "The Standard for Culinary Excellence",
+                "description": "Wolfgang Puck Catering offers nationwide event catering services. Our offerings range from social and corporate events to workplace food services.",
+                "areaServed": {
+                  "@type": "Country",
+                  "name": "United States"
+                },
+                "sameAs": [
+                  "https://www.facebook.com/WolfgangPuckCatering/",
+                  "https://www.instagram.com/wpcatering/",
+                  "https://www.youtube.com/@WPCatering",
+                  "https://www.linkedin.com/company/wolfgang-puck-catering/"
+                ],
+                "mainEntityOfPage": "https://wolfgangpuckcatering.com/"
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://wolfgangpuckcatering.com/#website",
+                "url": "https://wolfgangpuckcatering.com/",
+                "name": "Wolfgang Puck Catering",
+                "publisher": {
+                  "@id": "https://wolfgangpuckcatering.com/#organization"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "summary": {
+    "summary_by_site": {
+      "concept-catering": {},
+      "concordecatering": {
+        "organization": 1,
+        "webpage": 1
+      },
+      "creativeedge": {
+        "organization": 1,
+        "breadcrumb": 1,
+        "webpage": 1,
+        "other": 1
+      },
+      "cutandtaste": {
+        "organization": 2,
+        "webpage": 1
+      },
+      "elegantaffairs": {
+        "other": 1
+      },
+      "gammacatering": {
+        "other": 1
+      },
+      "ggcatering": {
+        "other": 1
+      },
+      "jdkgroup": {
+        "other": 1
+      },
+      "myradish": {
+        "webpage": 1
+      },
+      "queenofhearts": {},
+      "ridgewells": {
+        "webpage": 2
+      },
+      "saltblock": {
+        "organization": 2,
+        "webpage": 2,
+        "service": 1,
+        "product": 1
+      },
+      "sopranos": {},
+      "tallguy": {
+        "organization": 1,
+        "webpage": 1
+      },
+      "wolfgangpuck": {
+        "other": 1
+      }
+    },
+    "common_patterns": {
+      "uses_organization_schema": [
+        "concordecatering",
+        "creativeedge",
+        "cutandtaste",
+        "saltblock",
+        "tallguy"
+      ],
+      "uses_local_business_schema": [],
+      "uses_breadcrumb_schema": [
+        "creativeedge"
+      ],
+      "uses_faq_schema": [],
+      "uses_event_schema": [],
+      "has_reviews_aggregate_rating": []
+    },
+    "schema_templates": {}
+  },
+  "local_seo": {
+    "concept-catering": {
+      "address": [],
+      "phone": [
+        "015170618130",
+        "015170618130",
+        "+4915170618130",
+        "+4915170618130",
+        "015170618130",
+        "015170618130",
+        "4915170618130",
+        "4915170618130"
+      ],
+      "email": [
+        "anfrage@concept-catering.de"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "concordecatering": {
+      "address": [],
+      "phone": [
+        "       "
+      ],
+      "email": [
+        "user@domain.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "creativeedge": {
+      "address": [],
+      "phone": [
+        "13056975200",
+        "       "
+      ],
+      "email": [
+        "user@domain.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "cutandtaste": {
+      "address": [],
+      "phone": [
+        "7022700299",
+        "7022700299",
+        "702-443-1839",
+        "+17022700299",
+        "665282776",
+        "1546570148231",
+        "702-443-1839",
+        "702-443-1839",
+        "\n\n  \n  ",
+        "7022700299",
+        "7022700299",
+        "702-443-1839",
+        "702-443-1839",
+        "\n      ",
+        "0 0 64 64",
+        "17022700299",
+        "702-443-1839",
+        "702-443-1839",
+        "702-443-1839",
+        "702-443-1839",
+        "(702) 270-0299",
+        "(702) 270-0299",
+        "(702) 270-0299"
+      ],
+      "email": [
+        "user@domain.com",
+        "info@cutandtastelv.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "elegantaffairs": {
+      "address": [],
+      "phone": [
+        "2129910078",
+        "5166768500",
+        "631 509 7310",
+        "682571599",
+        "1-212-991-0078",
+        "1-212-991-0078",
+        "2129910078",
+        "5166768500",
+        "631 509 7310",
+        "       ",
+        "       ",
+        "\t\t\t\t\t\t\t",
+        "\t\t\t\t\t\t\t",
+        "\t\t\t\t\t\t\t",
+        "682571599",
+        "       ",
+        "       ",
+        "212-991-0078",
+        "212-991-0078",
+        "212-991-0078",
+        "516-676-8500",
+        "631 509 7310",
+        "631-509-7310"
+      ],
+      "email": [
+        "chosen-sprite@2x.png"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "gammacatering": {
+      "address": [],
+      "phone": [
+        "0417840047",
+        "0417840038",
+        "0417840042",
+        "0417840040",
+        "0417840045",
+        "0417840049",
+        "0417840038",
+        "0417841044",
+        "0417840030",
+        "0417840041",
+        "0417840046",
+        "0417840043",
+        "0417840045",
+        "0417840035",
+        "0434973200",
+        "0417840034",
+        "0417840031",
+        "0417811001",
+        "0417840032",
+        "0417811001",
+        "0417811096",
+        "0417840038",
+        "0417840038",
+        "+41417811001",
+        " 1986. ",
+        "2026-08-11",
+        "0417840047",
+        "0417840038",
+        "0417840042",
+        "0417840040",
+        "0417840045",
+        "0417840049",
+        "0417840038",
+        "0417841044",
+        "0417840030",
+        "0417840041",
+        "0417840046",
+        "0417840043",
+        "0417840045",
+        "0417840035",
+        "0434973200",
+        "0417840034",
+        "0417840031",
+        "0417811001",
+        "0417840032",
+        "0417811001",
+        "0417811096",
+        "0417840038",
+        "0417840038",
+        "111-299 ",
+        "47.9375",
+        "47.9375",
+        "41417811001",
+        "41 41 781 10 01\n"
+      ],
+      "email": [
+        "l.obrist@gammacatering.com",
+        "n.schneider@gammacatering.com",
+        "lager@gammacatering.com",
+        "n.peter@gammacatering.com",
+        "d.ciccone@gammacatering.com",
+        "l.schmid@gammacatering.com",
+        "c.huber@gammacatering.com",
+        "s.delucchi@gammacatering.com",
+        "m.engelhardt@gammacatering.com",
+        "c.dinicola@gammacatering.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "ggcatering": {
+      "address": [],
+      "phone": [
+        "415.701.0001",
+        "415.701.0001"
+      ],
+      "email": [],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "jdkgroup": {
+      "address": [],
+      "phone": [
+        "       ",
+        "       ",
+        "       ",
+        "717-730-4661",
+        "717.730.4662",
+        "717-730-4661",
+        "717-730-4661",
+        "717.730.4662"
+      ],
+      "email": [
+        "info@thejdkgroup.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "myradish": {
+      "address": [],
+      "phone": [
+        "       ",
+        "\n      "
+      ],
+      "email": [
+        "user@domain.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "queenofhearts": {
+      "address": [],
+      "phone": [
+        "17911966857443453",
+        "17971365980915456",
+        "610.889.0477"
+      ],
+      "email": [],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "ridgewells": {
+      "address": [],
+      "phone": [
+        "0\n      ",
+        "\n      ",
+        "\n      ",
+        "\n      ",
+        "\n      ",
+        "       ",
+        "       ",
+        "7.120.3",
+        "1.1075.0",
+        "301.652.1515",
+        "(301) 652-1515"
+      ],
+      "email": [
+        "18d2f96d279149989b95faf0a4b41882@sentry-next.wixpress.com",
+        "8eb368c655b84e029ed79ad7a5c1718e@sentry.wixpress.com",
+        "2062d0a4929b45348643784b5cb39c36@sentry.wixpress.com",
+        "605a7baede844d278b89dc95ae0a9123@sentry-next.wixpress.com",
+        "5d1795a2db124a268f1e1bd88f503500@sentry.wixpress.com",
+        "8c4075d5481d476e945486754f783364@sentry.io",
+        "info@ridgewells.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "saltblock": {
+      "address": [],
+      "phone": [
+        "8777937526",
+        " ",
+        " ",
+        " ",
+        "877.793.7526",
+        "877.793.7526",
+        "10949925517",
+        "1-877-793-7526",
+        "1-877-793-7526",
+        "1-877-793-7526",
+        "1-877-793-7526",
+        "       ",
+        "\n\n  \n\n\n",
+        "8777937526",
+        "       ",
+        "       ",
+        "       ",
+        "       ",
+        "\n      ",
+        "\n      ",
+        "\n      ",
+        "877.793.7526",
+        "877.793.7526",
+        "877-793-7526",
+        "877-793-7526",
+        "877-793-7526",
+        "877-793-7526",
+        "877.793.7526"
+      ],
+      "email": [
+        "user@domain.com",
+        "Contact@SaltBlockHospitality.com",
+        "contact@saltblockhospitality.com",
+        "Contact@Saltblockhospitality.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 6,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "sopranos": {
+      "address": [],
+      "phone": [
+        "15867019526",
+        "15867019526",
+        "62829164",
+        "15867019526",
+        "62829164",
+        "15867019526",
+        "1 (800) ",
+        "644269930"
+      ],
+      "email": [
+        "info@sopranoscatering.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "tallguy": {
+      "address": [],
+      "phone": [
+        "       "
+      ],
+      "email": [
+        "user@domain.com"
+      ],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    },
+    "wolfgangpuck": {
+      "address": [],
+      "phone": [
+        "1787083269953"
+      ],
+      "email": [],
+      "hours": [],
+      "geo_coordinates": [],
+      "maps_embeds": 0,
+      "schema_address": null,
+      "schema_phone": null
+    }
+  }
+}

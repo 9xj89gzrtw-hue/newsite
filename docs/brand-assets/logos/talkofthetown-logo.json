@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Talk of the Town catering Atlanta logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/2418c9e6fab7.png",
+      "caption": "A white mobile bar truck with balloons and plants on a grassy field. suitable for background image",
+      "source": "PartySlate",
+      "original_width": "1248px",
+      "original_height": "832px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/aabad85fbfc5.jpeg",
+      "caption": "A catering table with fruit, coffee, and snacks in a film studio. Text: STAGE 3, COFFEE, HOT WATER, TAZO, KIND, NATURE VALLEY. suitable for background image",
+      "source": "Exquisite Delites Catering Company",
+      "original_width": "2752px",
+      "original_height": "1536px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/0ae6cce7680c.jpeg",
+      "caption": "Three people in a kitchen, one whisking red sauce in a bowl. Text: YUMBII. suitable for background image",
+      "source": "Eater Atlanta",
+      "original_width": "2400px",
+      "original_height": "1584px"
+    }
+  ]
+}

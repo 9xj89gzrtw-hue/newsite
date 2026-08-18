@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap Index</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"\"></a><br /><time></time></div>\n<div><a href=\"\"></a><br /><time></time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap Index",
+    "url": "https://sterlingcateringmn.com/sitemap.xml",
+    "usage": {
+      "tokens": 56
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 56
+    }
+  },
+  "status": 200
+}

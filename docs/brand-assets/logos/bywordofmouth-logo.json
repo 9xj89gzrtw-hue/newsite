@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "By Word of Mouth catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/e073c036674b.jpg",
+      "caption": "A food truck for \"Word of Mouth Catering\" displays various food images and the slogan \"Food For Your Soul\".",
+      "source": "Best Food Trucks",
+      "original_width": "1000px",
+      "original_height": "1000px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/f03fd8716097.jpg",
+      "caption": "A wedding party poses in front of a \"Word of Mouth BBQ\" catering truck. Text: WORD OF MOUTH BBQ, CATERING, WEDDINGS, PARTIES, EVENTS, IN-DO.",
+      "source": "The Knot",
+      "original_width": "1536px",
+      "original_height": "2048px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/be49fd1a797c.jpg",
+      "caption": "A close-up of a gourmet dish served on a large mushroom cap, surrounded by moss and pine needles. suitable for background image",
+      "source": "www.vendador.com",
+      "original_width": "2500px",
+      "original_height": "1381px"
+    }
+  ]
+}

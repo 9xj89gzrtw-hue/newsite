@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "GG Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/0958ba6d1848.jpeg",
+      "caption": "Colorful sliced beets with herbs and spices on a white background. suitable for background image",
+      "source": "www.ggcatering.com",
+      "original_width": "2304px",
+      "original_height": "2467px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/7eef70470ecf.jpg",
+      "caption": "A cup of coffee with latte art sits on a table next to a cafe menu. The image contains a large amount of text information.",
+      "source": "The Connecticut Life",
+      "original_width": "2500px",
+      "original_height": "3334px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/60393e11c421.jpg",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "Canva",
+      "original_width": "1600px",
+      "original_height": "1131px"
+    }
+  ]
+}

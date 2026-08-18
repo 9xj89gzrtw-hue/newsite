@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Elegant Affairs Caterers logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/c9842a6c37b1.jpg",
+      "caption": "The image displays the logo \"ELEGANT AFFAIRS\" with a stylized red script \"A\" on a white background. suitable for background image",
+      "source": "Informa Connect",
+      "original_width": "2060px",
+      "original_height": "480px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/0fbee85be677.jpg",
+      "caption": "A large white tent with chandeliers and a swing on a grassy lawn, suitable for background image.",
+      "source": "PartySlate",
+      "original_width": "3840px",
+      "original_height": "2033px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/c6590bb36122.jpg",
+      "caption": "An elegant banquet hall with round tables, lush floral centerpieces, and ornate architectural details. suitable for background image",
+      "source": "Yelp",
+      "original_width": "1000px",
+      "original_height": "1000px"
+    }
+  ]
+}

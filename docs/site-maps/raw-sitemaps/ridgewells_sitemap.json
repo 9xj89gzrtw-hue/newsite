@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap Index</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://www.ridgewells.com/blog-posts-sitemap.xml\">https://www.ridgewells.com/blog-posts-sitemap.xml</a><br /><time>2026-08-13</time></div>\n<div><a href=\"https://www.ridgewells.com/blog-categories-sitemap.xml\">https://www.ridgewells.com/blog-categories-sitemap.xml</a><br /><time>2026-08-13</time></div>\n<div><a href=\"https://www.ridgewells.com/dynamic-news_p_900c6372_1db6_4663_8d9e_4f5a0dbe1aaa_0_5000-sitemap.xml\">https://www.ridgewells.com/dynamic-news_p_900c6372_1db6_4663_8d9e_4f5a0dbe1aaa_0_5000-sitemap.xml</a><br /><time>2023-07-22</time></div>\n<div><a href=\"https://www.ridgewells.com/pages-sitemap.xml\">https://www.ridgewells.com/pages-sitemap.xml</a><br /><time>2026-07-20</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap Index",
+    "url": "https://ridgewells.com/sitemap.xml",
+    "usage": {
+      "tokens": 290
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 290
+    }
+  },
+  "status": 200
+}

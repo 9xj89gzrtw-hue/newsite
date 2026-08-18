@@ -1,0 +1,70 @@
+<!-- ============================================
+     Navigation Template 1: Standard Header
+     Clean, professional, most versatile
+     ============================================ -->
+
+<header class="header header--standard">
+  <div class="header__inner container">
+    <!-- Logo -->
+    <a href="/" class="header__logo">
+      <img src="logo.svg" alt="Concorde Catering" />
+    </a>
+    
+    <!-- Primary Navigation -->
+    <nav class="header__nav" aria-label="Main navigation">
+      <ul class="nav-list">
+        <li><a href="/about" class="nav-link">About</a></li>
+        <li><a href="/services" class="nav-link">Services</a></li>
+        <li><a href="/menus" class="nav-link">Menus</a></li>
+        <li><a href="/gallery" class="nav-link">Gallery</a></li>
+        <li><a href="/weddings" class="nav-link">Weddings</a></li>
+        <li><a href="/contact" class="nav-link">Contact</a></li>
+      </ul>
+    </nav>
+    
+    <!-- Header Actions -->
+    <div class="header__actions">
+      <a href="tel:+1234567890" class="header__phone">
+        <span class="phone-icon">📞</span>
+        (123) 456-7890
+      </a>
+      <a href="/contact" class="btn btn-primary header__cta">
+        Get a Quote
+      </a>
+      
+      <!-- Mobile menu toggle -->
+      <button class="hamburger" aria-label="Open menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-nav" id="mobileNav">
+    <nav aria-label="Mobile navigation">
+      <ul class="mobile-nav__list">
+        <li><a href="/about" class="mobile-nav__link">About</a></li>
+        <li><a href="/services" class="mobile-nav__link">Services</a></li>
+        <li><a href="/menus" class="mobile-nav__link">Menus</a></li>
+        <li><a href="/gallery" class="mobile-nav__link">Gallery</a></li>
+        <li><a href="/weddings" class="mobile-nav__link">Weddings</a></li>
+        <li><a href="/contact" class="mobile-nav__link">Contact</a></li>
+      </ul>
+      <div class="mobile-nav__cta">
+        <a href="tel:+1234567890" class="btn btn-secondary btn-block">
+          Call Now
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- CSS Notes:
+  - Sticky on scroll (add .header--sticky when scrolled)
+  - White background, subtle shadow
+  - Logo left, nav center/left, actions right
+  - Mobile: hamburger triggers slide-in drawer
+  - Consider hiding phone number on small mobile
+-->

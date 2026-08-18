@@ -1,0 +1,79 @@
+{
+  "success": true,
+  "query": "wedding reception catering romantic elegant dinner setup candles flowers",
+  "count": 10,
+  "ranked": true,
+  "captioned_count": 10,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/5306e5c77739.jpg",
+      "caption": "An elegant table setting with crystal glassware, lit candles, and white flowers by the sea. suitable for background image",
+      "source": "Pinterest",
+      "original_width": "736px",
+      "original_height": "1104px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/9c39674b6dd0.jpg",
+      "caption": "An elegant table setting with candles, flowers, and glassware. suitable for background image",
+      "source": "WedLuxe",
+      "original_width": "1024px",
+      "original_height": "1365px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/53f1795626d0.jpg",
+      "caption": "An elegant wedding table setting with white and pink roses, gold cutlery, and glassware. suitable for background image",
+      "source": "WedLuxe",
+      "original_width": "1707px",
+      "original_height": "2560px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/23080d3564f9.jpg",
+      "caption": "An elegant table setting with a floral centerpiece, candles, and a menu card. suitable for background image",
+      "source": "The Knot",
+      "original_width": "768px",
+      "original_height": "1024px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/36ec666afe1d.jpg",
+      "caption": "An elegant outdoor dining setup with yellow chairs, floral arrangements, and a long table on a stone patio. suitable for background image",
+      "source": "Vogue",
+      "original_width": "2560px",
+      "original_height": "1920px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/a8fcb52bf039.jpg",
+      "caption": "An elegant table setting with wine glasses, red roses, greenery, and candles. suitable for background image",
+      "source": "Kindred",
+      "original_width": "1280px",
+      "original_height": "1280px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/06c83abf7c83.png",
+      "caption": "An elegant outdoor dining table set with candles, flowers, and wooden chairs under draped fabric. suitable for background image",
+      "source": "EventWorks",
+      "original_width": "1600px",
+      "original_height": "900px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/15436b43182c.png",
+      "caption": "An elegant outdoor wedding reception table set with white linens, greenery, candles, and wooden chairs. suitable for background image",
+      "source": "EventWorks",
+      "original_width": "1600px",
+      "original_height": "900px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/840c9f19a508.jpeg",
+      "caption": "A clear wedding table setting with flowers, glasses, and a sign reading \"TABLE SIXTEEN\". suitable for background image",
+      "source": "weddingsonline",
+      "original_width": "736px",
+      "original_height": "1104px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/7c258d005707.jpg",
+      "caption": "An elegant dinner table set with flowers, candles, and glassware, surrounded by more candles on the floor. suitable for background image",
+      "source": "Green Wedding Shoes",
+      "original_width": "1024px",
+      "original_height": "1280px"
+    }
+  ]
+}

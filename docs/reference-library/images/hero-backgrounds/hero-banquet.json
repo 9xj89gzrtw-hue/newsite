@@ -1,0 +1,79 @@
+{
+  "success": true,
+  "query": "premium catering wedding banquet elegant food photography dark moody",
+  "count": 10,
+  "ranked": true,
+  "captioned_count": 10,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ff65902ade07.jpg",
+      "caption": "The image shows a variety of appetizers on wooden platters, featuring watermarks and text: \"alamy\", \"Image ID: 3EKXMXM\", \"www.alamy.com\".",
+      "source": "Alamy",
+      "original_width": "1300px",
+      "original_height": "956px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/b200afdd903a.webp",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "Create Today",
+      "original_width": "800px",
+      "original_height": "1143px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/e06d85ee0b8b.jpg",
+      "caption": "A bride and groom dance on a checkered floor at an outdoor evening wedding reception by the water.",
+      "source": "Marry Me Tampa Bay",
+      "original_width": "2000px",
+      "original_height": "1334px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/95935fc329c0.jpg",
+      "caption": "A person selects a dessert from a buffet table filled with various sweets. The image contains watermarks and text: alamy, Image ID: 2DKJ6P8, www.alamy.com.",
+      "source": "Alamy",
+      "original_width": "1300px",
+      "original_height": "956px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/4e859b10491e.jpg",
+      "caption": "An elegant table setting with red linens, gold cutlery, floral arrangements, and lit candles against a bokeh background. suitable for background image",
+      "source": "Smarty Had A Party!",
+      "original_width": "1536px",
+      "original_height": "1024px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/10234bb26358.jpg",
+      "caption": "The image contains watermarks and text: \"alamy\", \"Image ID: 3DX6HRP\", and \"www.alamy.com\".",
+      "source": "Alamy",
+      "original_width": "866px",
+      "original_height": "1390px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d845a3932106.png",
+      "caption": "A collage of three images: a minimalist dish, a rooftop dining setup, and a truffle and caviar plate.",
+      "source": "PartySlate",
+      "original_width": "2700px",
+      "original_height": "1800px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/b62b30db3785.jpg",
+      "caption": "An elegant wedding reception venue with a lush floral ceiling installation and wooden furniture. suitable for background image",
+      "source": "PartySlate",
+      "original_width": "1600px",
+      "original_height": "1143px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d8a7458303a6.jpg",
+      "caption": "The image contains watermarks and text: dreamstime.com, ID 127550869, Konstantin Malkov.",
+      "source": "Dreamstime.com",
+      "original_width": "1600px",
+      "original_height": "1157px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/546ae1887bd4.jpg",
+      "caption": "The image contains watermarks and text: alamy, Image ID: 3EKXN1K, www.alamy.com.",
+      "source": "Alamy",
+      "original_width": "866px",
+      "original_height": "1390px"
+    }
+  ]
+}

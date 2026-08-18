@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://www.creativeedgeparties.com/kosher-k\">https://www.creativeedgeparties.com/kosher-k</a><br /><time>2026-04-28</time></div>\n<div><a href=\"https://www.creativeedgeparties.com/home\">https://www.creativeedgeparties.com/home</a><br /><time>2025-11-27</time></div>\n<div><a href=\"https://www.creativeedgeparties.com/west-edge-parties\">https://www.creativeedgeparties.com/west-edge-parties</a><br /><time>2026-04-28</time></div>\n<div><a href=\"https://www.creativeedgeparties.com/contact\">https://www.creativeedgeparties.com/contact</a><br /><time>2025-11-24</time></div>\n<div><a href=\"https://www.creativeedgeparties.com/on-the-road\">https://www.creativeedgeparties.com/on-the-road</a><br /><time>2026-01-06</time></div>\n<div><a href=\"https://www.creativeedgeparties.com/creativeedgeparties-1\">https://www.creativeedgeparties.com/creativeedgeparties-1</a><br /><time>2025-11-27</time></div>\n<div><a href=\"https://www.creativeedgeparties.com/creativeedgeparties\">https://www.creativeedgeparties.com/creativeedgeparties</a><br /><time>2026-04-28</time></div>\n<div><a href=\"https://www.creativeedgeparties.com/link-in-bio\">https://www.creativeedgeparties.com/link-in-bio</a><br /><time>2026-04-02</time></div>\n<div><a href=\"https://www.creativeedgeparties.com/workwithus\">https://www.creativeedgeparties.com/workwithus</a><br /><time>2026-04-02</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap",
+    "url": "https://creativeedgeparties.com/sitemap.xml",
+    "usage": {
+      "tokens": 469
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 469
+    }
+  },
+  "status": 200
+}

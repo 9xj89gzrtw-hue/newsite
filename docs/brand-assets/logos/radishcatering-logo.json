@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Radish Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/dcc5a250361b.jpg",
+      "caption": "A clear image of a buffet table with various snacks, desserts, and green plants. suitable for background image",
+      "source": "Radish Events",
+      "original_width": "1600px",
+      "original_height": "1067px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/55f5b715d025.png",
+      "caption": "The image displays the text \"Careers & employment\" in dark green font within two rectangular boxes. suitable for background image",
+      "source": "Radish",
+      "original_width": "2192px",
+      "original_height": "1196px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/8f6af6e00aa3.png",
+      "caption": "The image displays the text \"MARIGOLD catering\" in a bold, stylized font with a sunburst graphic in the background. suitable for background image",
+      "source": "Marigold Kitchen",
+      "original_width": "1920px",
+      "original_height": "984px"
+    }
+  ]
+}

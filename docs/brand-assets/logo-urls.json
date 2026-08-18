@@ -1,0 +1,252 @@
+{
+  "myradish": {
+    "company_name": "Radish Catering",
+    "site_key": "myradish",
+    "favicons": [
+      "https://images.squarespace-cdn.com/content/v1/63dbd0b3982ede266f73e878/8c637677-ab8f-4854-8f7f-e34c24ad98e3/favicon.ico"
+    ],
+    "apple_touch_icons": [],
+    "logo_urls": [],
+    "og_images": [],
+    "source_file": "myradish.json"
+  },
+  "jdkgroup": {
+    "company_name": "The JDK Group",
+    "site_key": "jdkgroup",
+    "favicons": [
+      "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png"
+    ],
+    "apple_touch_icons": [],
+    "logo_urls": [
+      "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png",
+      "https://thejdkgroup.com/wp-content/uploads/2015/01/the-jdk-group-logo-camp-hill-pennsylvanina-catering-and-events.png"
+    ],
+    "og_images": [],
+    "source_file": "jdkgroup.json"
+  },
+  "saltblock": {
+    "company_name": "Salt Block Hospitality",
+    "site_key": "saltblock",
+    "favicons": [
+      "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/39a54e78-b49d-4e0c-bd4c-361a068cee94/favicon.ico?format=100w"
+    ],
+    "apple_touch_icons": [],
+    "logo_urls": [
+      "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/38705ff8-cf19-47d2-abf4-7f0ec7bcafb5/Logo.png?format=1500w",
+      "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/38705ff8-cf19-47d2-abf4-7f0ec7bcafb5/Logo.png?format=1500w",
+      "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/1655810812928-D11CHCP5TJ9T83Q63L1D/Murph%27s+Barbecue+Logo.png",
+      "https://images.squarespace-cdn.com/content/v1/628635115ffed10e289ac115/1655810812928-D11CHCP5TJ9T83Q63L1D/Murph%27s+Barbecue+Logo.png",
+      "https://static.elfsight.com/icons/app-all-in-one-reviews-logos-google-logo-multicolor.svg"
+    ],
+    "og_images": [],
+    "source_file": "saltblock.json"
+  },
+  "ridgewells": {
+    "company_name": "Ridgewells Catering",
+    "site_key": "ridgewells",
+    "favicons": [
+      "https://static.wixstatic.com/media/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png/v1/fill/w_192%2Ch_192%2Clg_1%2Cusm_0.66_1.00_0.01/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png",
+      "https://static.wixstatic.com/media/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png"
+    ],
+    "apple_touch_icons": [
+      "https://static.wixstatic.com/media/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png/v1/fill/w_180%2Ch_180%2Clg_1%2Cusm_0.66_1.00_0.01/93242c_713efa2f36d9446c844ececd2b83d0cb%7Emv2.png"
+    ],
+    "logo_urls": [
+      "https://static.wixstatic.com/media/93242c_7b32b030ecc74459b4dbe0c2eefcd91b~mv2.png/v1/fill/w_146,h_82,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/American-Express-logo-white.png",
+      "https://static.wixstatic.com/media/93242c_6a17c1eace2143d5b35b73f13e07ca3f~mv2.png/v1/fill/w_146,h_82,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/George-Washington-University-Logo-white.png",
+      "https://static.wixstatic.com/media/93242c_b7096c67282e4d6cbdd803e73c7851db~mv2.png/v1/fill/w_148,h_82,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/nbc-sports-logo-vector-white%20copy.png",
+      "https://static.wixstatic.com/media/93242c_a458dc9e6f6f43398ac0ba683d4fc92c~mv2.png/v1/fill/w_164,h_49,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/National-Geographic-Logo-white.png"
+    ],
+    "og_images": [],
+    "source_file": "ridgewells.json"
+  },
+  "gammacatering": {
+    "company_name": "Gamma Catering",
+    "site_key": "gammacatering",
+    "favicons": [
+      "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/cropped-favicon-192x192.webp",
+      "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/cropped-favicon-32x32.webp"
+    ],
+    "apple_touch_icons": [
+      "https://www.gammacatering.com/v4/wp-content/uploads/2026/06/cropped-favicon-180x180.webp"
+    ],
+    "logo_urls": [
+      "https://www.gammacatering.com/v4/wp-content/uploads/2026/02/gamma-catering-logo-mobile.svg",
+      "https://www.gammacatering.com/v4/wp-content/uploads/2026/02/gamma-catering-logo-white.svg",
+      "https://www.gammacatering.com/v4/wp-content/uploads/2026/02/gamma-catering-logo.svg"
+    ],
+    "og_images": [],
+    "source_file": "gammacatering.json"
+  },
+  "concept-catering": {
+    "company_name": "Concept Catering",
+    "site_key": "concept-catering",
+    "favicons": [
+      "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66cf17a3877a41458f4cb1b5_iPhone%2014%20Pro%20Max%20%E2%80%93%201.png"
+    ],
+    "apple_touch_icons": [
+      "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66cf1820837376fb429a923f_iPhone%2014%20Pro%20Max%20%E2%80%93%203.png"
+    ],
+    "logo_urls": [
+      "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66ceeb4fe5aab3b0fc000df2_CCC_Logo_weiss.png",
+      "https://cdn.prod.website-files.com/66ced54b353d5079c3f5b4d7/66ceeb4fe5aab3b0fc000df2_CCC_Logo_weiss.png"
+    ],
+    "og_images": [],
+    "source_file": "concept-catering.json"
+  },
+  "sopranos": {
+    "company_name": "Soprano's Catering",
+    "site_key": "sopranos",
+    "favicons": [
+      "https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/628ae458150b7b1ffd8d68c5_Sop_fav.png"
+    ],
+    "apple_touch_icons": [
+      "https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/62829164e1b0c622b28a3fd2_webclip.png"
+    ],
+    "logo_urls": [
+      "https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/628291fbf6e8a709d1ff8d4f_Sopranos-Logo-NO-Background-WHITE-AND-BLACK-LETTERS.png"
+    ],
+    "og_images": [],
+    "source_file": "sopranos.json"
+  },
+  "creativeedge": {
+    "company_name": "Creative Edge Parties",
+    "site_key": "creativeedge",
+    "favicons": [
+      "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/2086874e-824a-4469-ba96-f347bd23a8f8/favicon.ico?format=100w",
+      "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/3180f709-04fe-4b4d-ac3c-872eaa665b20/favicon.ico?format=100w"
+    ],
+    "apple_touch_icons": [],
+    "logo_urls": [
+      "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/43366d3b-fae5-4659-8e50-2a3e75b20bd8/CEP_LOGO_Egg_White.png?format=1500w",
+      "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/43366d3b-fae5-4659-8e50-2a3e75b20bd8/CEP_LOGO_Egg_White.png?format=1500w",
+      "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/f5f14022-c951-4df3-9ab6-2753b95670b9/CEP_Logo_Left+Light+Lt+Beige.png",
+      "https://images.squarespace-cdn.com/content/v1/6840be6bc300d63ad7f66f2f/f5f14022-c951-4df3-9ab6-2753b95670b9/CEP_Logo_Left+Light+Lt+Beige.png"
+    ],
+    "og_images": [],
+    "source_file": "creativeedge.json"
+  },
+  "cutandtaste": {
+    "company_name": "Cut & Taste Las Vegas",
+    "site_key": "cutandtaste",
+    "favicons": [
+      "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1550796939463-NDV5YI4D2L2XYEKCAYXK/favicon.ico"
+    ],
+    "apple_touch_icons": [],
+    "logo_urls": [
+      "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1697501720934-97HV1J5QV4GL11X3G6JB/blue-heron-logo-2023.png",
+      "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1697501720934-97HV1J5QV4GL11X3G6JB/blue-heron-logo-2023.png",
+      "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1697501720934-97HV1J5QV4GL11X3G6JB/blue-heron-logo-2023.png?format=300w",
+      "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1655334712548-CQDSY0RFLUZ9K1NMMXNY/Czarnowski-logo.png",
+      "https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1655334712548-CQDSY0RFLUZ9K1NMMXNY/Czarnowski-logo.png"
+    ],
+    "og_images": [],
+    "source_file": "cutandtaste.json"
+  },
+  "concordecatering": {
+    "company_name": "Concorde Catering",
+    "site_key": "concordecatering",
+    "favicons": [
+      "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/36f4b7de-1b8a-453c-95ea-b999839c29b4/favicon.ico?format=100w"
+    ],
+    "apple_touch_icons": [],
+    "logo_urls": [
+      "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/aa330096-e214-49c3-a227-cb59fbdc8e00/CC-Logo-Blue.png?format=1500w",
+      "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/aa330096-e214-49c3-a227-cb59fbdc8e00/CC-Logo-Blue.png?format=1500w",
+      "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/27ce3058-bc2e-4b15-944d-0e39f6b8a9c4/CG_PrimaryLogo_White.png",
+      "https://images.squarespace-cdn.com/content/v1/5fc91625d98c1a7115f1f7ed/27ce3058-bc2e-4b15-944d-0e39f6b8a9c4/CG_PrimaryLogo_White.png"
+    ],
+    "og_images": [],
+    "source_file": "concordecatering.json"
+  },
+  "elegantaffairs": {
+    "company_name": "Elegant Affairs Caterers",
+    "site_key": "elegantaffairs",
+    "favicons": [
+      "https://elegantaffairscaterers.com/wp-content/uploads/2021/04/favicon.png"
+    ],
+    "apple_touch_icons": [
+      "https://elegantaffairscaterers.com/wp-content/uploads/2021/04/favicon.png"
+    ],
+    "logo_urls": [
+      "https://elegantaffairscaterers.com/wp-content/uploads/2021/03/EACateringLogo.svg",
+      "https://elegantaffairscaterers.com/wp-content/uploads/2021/03/EACateringLogo.svg",
+      "https://elegantaffairscaterers.com/wp-content/themes/elegant-affairs/images/badge-logo.png",
+      "https://elegantaffairscaterers.com/wp-content/themes/elegant-affairs/images/badge-logo.png",
+      "https://elegantaffairscaterers.com/wp-content/themes/elegant-affairs/images/badge-logo.png"
+    ],
+    "og_images": [
+      "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/E-21-min.jpeg"
+    ],
+    "source_file": "elegantaffairs.json"
+  },
+  "tallguy": {
+    "company_name": "Tall Guy and a Grill",
+    "site_key": "tallguy",
+    "favicons": [
+      "https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/e3764139-d39e-4efa-9996-84ef4b9710e9/favicon.ico?format=100w"
+    ],
+    "apple_touch_icons": [],
+    "logo_urls": [
+      "https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/8a6bec35-4902-4a3f-a04c-379158473f2d/Partner+Logos+%285%29.png",
+      "https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/8a6bec35-4902-4a3f-a04c-379158473f2d/Partner+Logos+%285%29.png",
+      "https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/757a04cb-201a-4cf6-b45a-9921e5c9e468/Partner+Logos+%286%29.png",
+      "https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/757a04cb-201a-4cf6-b45a-9921e5c9e468/Partner+Logos+%286%29.png",
+      "https://images.squarespace-cdn.com/content/v1/613f95fa3c025158dc158b69/cbb52e68-5708-46f5-8a16-eebc422c1be0/Partner+Logos.png"
+    ],
+    "og_images": [],
+    "source_file": "tallguy.json"
+  },
+  "ggcatering": {
+    "company_name": "GG Catering",
+    "site_key": "ggcatering",
+    "favicons": [
+      "https://www.ggcatering.com/dist/img/meta/favicon.ico",
+      "https://www.ggcatering.com/dist/img/meta/logo-mark.svg"
+    ],
+    "apple_touch_icons": [
+      "https://www.ggcatering.com/dist/img/meta/logo-mark-180x180.png"
+    ],
+    "logo_urls": [],
+    "og_images": [],
+    "source_file": "ggcatering.json"
+  },
+  "queenofhearts": {
+    "company_name": "Queen of Hearts Catering",
+    "site_key": "queenofhearts",
+    "favicons": [
+      "https://queenofheartscatering.com/wp-content/uploads/2016/10/cropped-favicon-192x192.png",
+      "https://queenofheartscatering.com/wp-content/uploads/2016/10/cropped-favicon-32x32.png"
+    ],
+    "apple_touch_icons": [
+      "https://queenofheartscatering.com/wp-content/uploads/2016/10/cropped-favicon-180x180.png"
+    ],
+    "logo_urls": [
+      "https://queenofheartscatering.com/wp-content/themes/queen-hearts/images/logo.png",
+      "https://queenofheartscatering.com/wp-content/uploads/2016/09/footer-logo-1.png",
+      "https://queenofheartscatering.com/wp-content/themes/queen-hearts/images/PVG-logo.svg",
+      "https://queenofheartscatering.com/wp-content/uploads/2025/11/J-Scott-Catering-logo.svg",
+      "https://queenofheartscatering.com/wp-content/uploads/2025/11/Phoenixville-Foundry-logo.svg"
+    ],
+    "og_images": [],
+    "source_file": "queenofhearts.json"
+  },
+  "wolfgangpuck": {
+    "company_name": "Wolfgang Puck Catering",
+    "site_key": "wolfgangpuck",
+    "favicons": [
+      "https://wolfgangpuckcatering.com/hubfs/website/favicon%2048x48.png"
+    ],
+    "apple_touch_icons": [],
+    "logo_urls": [
+      "https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/wpc-logo.png?width=210&height=159&name=wpc-logo.png",
+      "https://wolfgangpuckcatering.com/hs-fs/hubfs/sticky-logo.png?width=122&height=48&name=sticky-logo.png",
+      "https://wolfgangpuckcatering.com/hs-fs/hubfs/wpc-logo-popup.png?width=286&height=218&name=wpc-logo-popup.png",
+      "https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/img-footer-logo.png?width=186&height=142&name=img-footer-logo.png"
+    ],
+    "og_images": [
+      "https://wolfgangpuckcatering.com/hubfs/Recipes/img-summer-roll.jpg"
+    ],
+    "source_file": "wolfgangpuck.json"
+  }
+}

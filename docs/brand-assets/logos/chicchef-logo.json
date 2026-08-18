@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Chic Chef Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/c804c2f1504b.jpg",
+      "caption": "A store display features a \"CHIC CHEF\" sign above shelves of various bottled products. Text: CHIC CHEF, THE STA. suitable for background image",
+      "source": "YouTube",
+      "original_width": "1280px",
+      "original_height": "720px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/545f0b7a85cc.jpg",
+      "caption": "A promotional poster for a \"Back to School Supply Drive\" event featuring a backpack and pencils. Text: MOREZ JOHNSON JR. PRESENTS BACK TO SCHOOL SUPPLY DRIVE CHIC CHEF CATERING Cradles to Crayons 2MODA SATURDAY AUGUST 22ND 11:00AM - 1:00PM WASHINGTON ELEMENTARY SCHOOL RIVERDALE, IL",
+      "source": "x.com",
+      "original_width": "932px",
+      "original_height": "1200px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/5bf5254d2df2.jpg",
+      "caption": "A circular logo with a stylized green and gold letter \"C\" on a cream background. suitable for background image",
+      "source": "Yelp",
+      "original_width": "1000px",
+      "original_height": "1000px"
+    }
+  ]
+}

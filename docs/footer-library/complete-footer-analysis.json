@@ -1,0 +1,1055 @@
+{
+  "metadata": {
+    "generated": "2026-08-18T21:53:37.023375",
+    "sites_analyzed": 22,
+    "successful_analyses": 19
+  },
+  "footer_patterns": {
+    "link_structures": [
+      {
+        "site": "concordecatering.ca",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 1,
+        "links_sample": [
+          {
+            "href": "https://concordegroup.ca",
+            "text": "concordegroup.ca"
+          }
+        ],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "pinterest"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "myradish.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 2,
+        "links_sample": [
+          {
+            "href": "/careers",
+            "text": "Careers"
+          },
+          {
+            "href": "/contact-us-general-inquiry",
+            "text": "Contact"
+          }
+        ],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "pinterest"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "ridgewells.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 1,
+        "links_sample": [
+          {
+            "href": "mailto:info@ridgewells.com",
+            "text": "info@ridgewells.com"
+          }
+        ],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "pinterest",
+          "youtube",
+          "tiktok"
+        ],
+        "copyright_format": "© 2026 by Ridgewells Catering",
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "sopranoscatering.com",
+        "columns": 4,
+        "column_labels": [
+          "Contact Info",
+          "Navigation",
+          "OUR&nbsp;AWARDS",
+          "Proudly Serving"
+        ],
+        "links_count": 10,
+        "links_sample": [
+          {
+            "href": "mailto:info@sopranoscatering.com?subject=Hello!",
+            "text": "info@sopranoscatering.com"
+          },
+          {
+            "href": "tel:15867019526",
+            "text": "1 (800) WE-CATER"
+          },
+          {
+            "href": "/",
+            "text": "Home"
+          },
+          {
+            "href": "/weddings",
+            "text": "Weddings"
+          },
+          {
+            "href": "/corporate-events",
+            "text": "Corporate Events"
+          },
+          {
+            "href": "/social-events",
+            "text": "Social Events"
+          },
+          {
+            "href": "/grill-and-bbq",
+            "text": "Grill &amp;&nbsp;BBQ"
+          },
+          {
+            "href": "/catered-trays",
+            "text": "By The Tray"
+          },
+          {
+            "href": "/appetizers-and-enhancements",
+            "text": "Apps &amp; Enhancements"
+          },
+          {
+            "href": "/contact",
+            "text": "Contact"
+          }
+        ],
+        "has_newsletter": false,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter"
+        ],
+        "copyright_format": "© 2023 Sopranos Catering, All Rights Reserved",
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "concept-catering.de",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 0,
+        "links_sample": [],
+        "has_newsletter": false,
+        "has_social": true,
+        "social_platforms": [
+          "instagram",
+          "twitter"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "talkofthetownatlanta.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 6,
+        "links_sample": [
+          {
+            "href": "mailto:andrew@TOTTAtl.com",
+            "text": "andrew@TOTTAtl.com"
+          },
+          {
+            "href": "tel:+14043344935",
+            "text": "404-334-4935"
+          },
+          {
+            "href": "https://www.facebook.com/TalkoftheTownCateringandSpecialEvents/",
+            "text": ""
+          },
+          {
+            "href": "https://twitter.com/TalkoftheTownGA",
+            "text": ""
+          },
+          {
+            "href": "https://www.instagram.com/tott_catering/",
+            "text": ""
+          },
+          {
+            "href": "mailto:andrew@tottalt.com",
+            "text": ""
+          }
+        ],
+        "has_newsletter": false,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter"
+        ],
+        "copyright_format": "Copyright 2025 Talk of the Town | All Rights Reserved | Designed by",
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "queenofheartscatering.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 2,
+        "links_sample": [
+          {
+            "href": "https://queenofheartscatering.com/privacy-policy-terms-of-service/",
+            "text": "Privacy &amp; Terms"
+          },
+          {
+            "href": "http://nuphoriq.com/",
+            "text": "nuphoriq"
+          }
+        ],
+        "has_newsletter": false,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "pinterest"
+        ],
+        "copyright_format": "© 2016 Queen of Hearts Catering | 193 Pennsylvania Ave. Malvern, PA 19355 | p: 610.889.0477 |",
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {
+          "privacy_policy": "https://queenofheartscatering.com/privacy-policy-terms-of-service/",
+          "terms": "https://queenofheartscatering.com/privacy-policy-terms-of-service/"
+        },
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "chicchefcatering.com",
+        "columns": 1,
+        "column_labels": [
+          "Find Us"
+        ],
+        "links_count": 11,
+        "links_sample": [
+          {
+            "href": "https://www.facebook.com/chicchefcateringchicago/",
+            "text": ""
+          },
+          {
+            "href": "https://www.instagram.com/chicchefcatering/",
+            "text": ""
+          },
+          {
+            "href": "/summer-bbq-kit/",
+            "text": "BBQ Kits"
+          },
+          {
+            "href": "/about/",
+            "text": "About"
+          },
+          {
+            "href": "/contact/",
+            "text": "Contact"
+          },
+          {
+            "href": "/menu/",
+            "text": "Menu"
+          },
+          {
+            "href": "/services/",
+            "text": "Services"
+          },
+          {
+            "href": "/vendors/",
+            "text": "Vendors"
+          },
+          {
+            "href": "http://careers",
+            "text": "Careers"
+          },
+          {
+            "href": "/sitemap/",
+            "text": "Sitemap"
+          },
+          {
+            "href": "https://isimplifyme.com/",
+            "text": "Website design by iSimplifyMe"
+          }
+        ],
+        "has_newsletter": false,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "pinterest",
+          "tiktok",
+          "yelp"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "relishcaterers.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 13,
+        "links_sample": [
+          {
+            "href": "mailto:info@relishcaterers.com",
+            "text": "info@relishcaterers.com"
+          },
+          {
+            "href": "tel:212-228-1672",
+            "text": "212-228-1672"
+          },
+          {
+            "href": "https://relishcaterers.com/contact/",
+            "text": "Contact us"
+          },
+          {
+            "href": "https://relishcaterers.com/corporate/",
+            "text": "Corporate"
+          },
+          {
+            "href": "https://relishcaterers.com/weddings/",
+            "text": "Weddings"
+          },
+          {
+            "href": "https://relishcaterers.com/social/",
+            "text": "Social"
+          },
+          {
+            "href": "https://relishcaterers.com/workplace-dining/",
+            "text": "Workplace"
+          },
+          {
+            "href": "https://relishcaterers.com/venues/",
+            "text": "Venues"
+          },
+          {
+            "href": "https://relishcaterers.com/about/",
+            "text": "About"
+          },
+          {
+            "href": "https://relishcaterers.com/nyc-catering-services/",
+            "text": "NYC Catering"
+          },
+          {
+            "href": "https://relishcaterers.com/manhattan-catering-services/",
+            "text": "Manhattan Catering"
+          },
+          {
+            "href": "https://relishcaterers.com/privacy-policy/",
+            "text": "Privacy"
+          },
+          {
+            "href": "https://nuphoriq.com/",
+            "text": "Site by Nuphoriq"
+          }
+        ],
+        "has_newsletter": false,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "pinterest",
+          "youtube"
+        ],
+        "copyright_format": "© 2026 Relish |",
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {
+          "privacy_policy": "https://relishcaterers.com/privacy-policy/"
+        },
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "sterlingcateringmn.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 1,
+        "links_sample": [
+          {
+            "href": "tel:612-999-6084",
+            "text": "612-999-6084"
+          }
+        ],
+        "has_newsletter": false,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "pinterest",
+          "youtube"
+        ],
+        "copyright_format": "copyright\"> 2026 \nSterling Catering |",
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "tallguyandagrill.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 0,
+        "links_sample": [],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "pinterest"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "joels.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 2,
+        "links_sample": [
+          {
+            "href": "mailto:hailey@joels.com",
+            "text": "hailey@joels.com"
+          },
+          {
+            "href": "http://midnightmktg.com",
+            "text": "Midnight Marketing"
+          }
+        ],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "pinterest",
+          "youtube",
+          "tiktok",
+          "yelp"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "ggcatering.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 0,
+        "links_sample": [],
+        "has_newsletter": false,
+        "has_social": true,
+        "social_platforms": [
+          "instagram",
+          "twitter",
+          "linkedin"
+        ],
+        "copyright_format": "© 2026 Global Gourmet Catering. All rights reserved.",
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "mculinary.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 0,
+        "links_sample": [],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "pinterest"
+        ],
+        "copyright_format": "© 2025 M Culinary Concepts",
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "saltblockhospitality.com",
+        "columns": 6,
+        "column_labels": [
+          "Catering",
+          "Venues",
+          "The Farm",
+          "Company",
+          "Contact",
+          "FOLLOW US",
+          "Looking for the perfect venue?"
+        ],
+        "links_count": 16,
+        "links_sample": [
+          {
+            "href": "/plan",
+            "text": "Get Started"
+          },
+          {
+            "href": "/giveaways",
+            "text": "Access Now"
+          },
+          {
+            "href": "/brands",
+            "text": "Our Catering Brands"
+          },
+          {
+            "href": "/the-saltblock-difference",
+            "text": "The SaltBlock Difference"
+          },
+          {
+            "href": "/our-menus",
+            "text": "Menus"
+          },
+          {
+            "href": "/team",
+            "text": "Team"
+          },
+          {
+            "href": "/saltblock-exclusives",
+            "text": "Saltblock Exclusives"
+          },
+          {
+            "href": "/venues",
+            "text": "All Venues"
+          },
+          {
+            "href": "/farm-values",
+            "text": "Values"
+          },
+          {
+            "href": "/about-our-farm",
+            "text": "About"
+          },
+          {
+            "href": "/the-saltblock-difference",
+            "text": "About"
+          },
+          {
+            "href": "/careers",
+            "text": "Careers"
+          },
+          {
+            "href": "/saltblock-hospitality-blog",
+            "text": "Blog"
+          },
+          {
+            "href": "tel:8777937526",
+            "text": "877.793.7526"
+          },
+          {
+            "href": "mailto:contact@saltblockhospitality.com",
+            "text": "Contact@Saltblockhospitality.com"
+          }
+        ],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "pinterest"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "thejdkgroup.com",
+        "error": "unbalanced parenthesis at position 18"
+      },
+      {
+        "site": "bywordofmouth.co.uk",
+        "error": "unbalanced parenthesis at position 18"
+      },
+      {
+        "site": "creativeedgeparties.com",
+        "columns": 1,
+        "column_labels": [
+          "Follow us"
+        ],
+        "links_count": 2,
+        "links_sample": [
+          {
+            "href": "/contact",
+            "text": "CONTACT"
+          },
+          {
+            "href": "https://app.termly.io/policy-viewer/policy.html?policyUUID=8d11c4e1-9b26-45a0-addb-ce3877551fad",
+            "text": "Privacy Policy"
+          }
+        ],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "pinterest",
+          "tiktok"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {
+          "privacy_policy": "https://app.termly.io/policy-viewer/policy.html?policyUUID=8d11c4e1-9b26-45a0-addb-ce3877551fad"
+        },
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "cutandtastelv.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 8,
+        "links_sample": [
+          {
+            "href": "tel:702-443-1839",
+            "text": "702-443-1839"
+          },
+          {
+            "href": "mailto:info@cutandtastelv.com",
+            "text": "info@cutandtastelv.com"
+          },
+          {
+            "href": "/contact",
+            "text": "Contact Us →"
+          },
+          {
+            "href": "https://maps.app.goo.gl/LQAsTnqkNrrXdPbWA",
+            "text": "2053 Pama Ln, Las Vegas, NV 89119"
+          },
+          {
+            "href": "tel:+17022700299",
+            "text": "(702) 270-0299"
+          },
+          {
+            "href": "/privacy",
+            "text": "Privacy"
+          },
+          {
+            "href": "/accessibility-statement",
+            "text": "Accessibility"
+          },
+          {
+            "href": "/contact",
+            "text": "Contact"
+          }
+        ],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "pinterest",
+          "tiktok"
+        ],
+        "copyright_format": "© 2026 Cut and Taste",
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {
+          "privacy_policy": "/privacy",
+          "accessibility": "/accessibility-statement"
+        },
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "elegantaffairscaterers.com",
+        "columns": 1,
+        "column_labels": [],
+        "links_count": 5,
+        "links_sample": [
+          {
+            "href": "/elegantaffairs/contact-us/",
+            "text": "CONTACT US"
+          },
+          {
+            "href": "tel:2129910078",
+            "text": "212-991-0078"
+          },
+          {
+            "href": "tel:5166768500",
+            "text": "516-676-8500"
+          },
+          {
+            "href": "tel:631 509 7310",
+            "text": "631-509-7310"
+          },
+          {
+            "href": "/elegantaffairs/contact-us/",
+            "text": "SUBSCRIBE TO OUR NEWSLETTER"
+          }
+        ],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "pinterest",
+          "youtube"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {},
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      },
+      {
+        "site": "gammacatering.com",
+        "error": "unbalanced parenthesis at position 18"
+      },
+      {
+        "site": "wolfgangpuckcatering.com",
+        "columns": 1,
+        "column_labels": [
+          "Join our mailing list"
+        ],
+        "links_count": 8,
+        "links_sample": [
+          {
+            "href": "/recipe",
+            "text": "Recipes"
+          },
+          {
+            "href": "/careers",
+            "text": "Careers"
+          },
+          {
+            "href": "/press-inquiries",
+            "text": "Press Inquiries"
+          },
+          {
+            "href": "/contact",
+            "text": "Contact"
+          },
+          {
+            "href": "https://wolfgangpuckcatering.com/terms-conditions/",
+            "text": "Terms of use"
+          },
+          {
+            "href": "https://wolfgangpuckcatering.com/privacy-policy/",
+            "text": "Privacy Policy"
+          },
+          {
+            "href": "https://privacyportal-eu-cdn.onetrust.com/dsarwebform/8394ad8c-2b46-4837-8771-cbc69779a644/31bea1f4-92c3-440b-be0e-468af4f4b1f3.html?Source=WolfgangPuck",
+            "text": "Privacy Request"
+          },
+          {
+            "href": "https://wolfgangpuckcatering.com/hubfs/Code-of-Business-Conduct-English.pdf",
+            "text": "Code of Business Conduct"
+          }
+        ],
+        "has_newsletter": true,
+        "has_social": true,
+        "social_platforms": [
+          "facebook",
+          "instagram",
+          "twitter",
+          "linkedin",
+          "youtube"
+        ],
+        "copyright_format": null,
+        "address_display": "none",
+        "addresses": [],
+        "legal_urls": {
+          "terms": "https://wolfgangpuckcatering.com/terms-conditions/",
+          "privacy_policy": "https://wolfgangpuckcatering.com/privacy-policy/"
+        },
+        "cookie_consent": {
+          "has_cookie_banner": false,
+          "banner_text": "",
+          "buttons": []
+        }
+      }
+    ],
+    "common_elements": {
+      "most_common_links": [
+        [
+          "contact",
+          6
+        ],
+        [
+          "careers",
+          4
+        ],
+        [
+          "about",
+          4
+        ],
+        [
+          "weddings",
+          2
+        ],
+        [
+          "contact us",
+          2
+        ],
+        [
+          "privacy",
+          2
+        ],
+        [
+          "privacy policy",
+          2
+        ],
+        [
+          "concordegroup.ca",
+          1
+        ],
+        [
+          "info@ridgewells.com",
+          1
+        ],
+        [
+          "info@sopranoscatering.com",
+          1
+        ],
+        [
+          "1 (800) we-cater",
+          1
+        ],
+        [
+          "home",
+          1
+        ],
+        [
+          "corporate events",
+          1
+        ],
+        [
+          "social events",
+          1
+        ],
+        [
+          "grill &amp;&nbsp;bbq",
+          1
+        ],
+        [
+          "by the tray",
+          1
+        ],
+        [
+          "apps &amp; enhancements",
+          1
+        ],
+        [
+          "andrew@tottatl.com",
+          1
+        ],
+        [
+          "404-334-4935",
+          1
+        ],
+        [
+          "privacy &amp; terms",
+          1
+        ],
+        [
+          "nuphoriq",
+          1
+        ],
+        [
+          "bbq kits",
+          1
+        ],
+        [
+          "menu",
+          1
+        ],
+        [
+          "services",
+          1
+        ],
+        [
+          "vendors",
+          1
+        ],
+        [
+          "sitemap",
+          1
+        ],
+        [
+          "website design by isimplifyme",
+          1
+        ],
+        [
+          "info@relishcaterers.com",
+          1
+        ],
+        [
+          "212-228-1672",
+          1
+        ],
+        [
+          "corporate",
+          1
+        ]
+      ],
+      "social_platforms_frequency": {
+        "facebook": 17,
+        "instagram": 19,
+        "twitter": 18,
+        "pinterest": 14,
+        "linkedin": 11,
+        "youtube": 6,
+        "tiktok": 5,
+        "yelp": 2
+      },
+      "newsletter_sites": [
+        "concordecatering.ca",
+        "myradish.com",
+        "ridgewells.com",
+        "tallguyandagrill.com",
+        "joels.com",
+        "mculinary.com",
+        "saltblockhospitality.com",
+        "creativeedgeparties.com",
+        "cutandtastelv.com",
+        "elegantaffairscaterers.com",
+        "wolfgangpuckcatering.com"
+      ]
+    }
+  },
+  "legal_pages": {
+    "privacy_policy": {
+      "queenofheartscatering.com": "https://queenofheartscatering.com/privacy-policy-terms-of-service/",
+      "relishcaterers.com": "https://relishcaterers.com/privacy-policy/",
+      "creativeedgeparties.com": "https://app.termly.io/policy-viewer/policy.html?policyUUID=8d11c4e1-9b26-45a0-addb-ce3877551fad",
+      "cutandtastelv.com": "/privacy",
+      "wolfgangpuckcatering.com": "https://wolfgangpuckcatering.com/privacy-policy/"
+    },
+    "terms": {
+      "queenofheartscatering.com": "https://queenofheartscatering.com/privacy-policy-terms-of-service/",
+      "wolfgangpuckcatering.com": "https://wolfgangpuckcatering.com/terms-conditions/"
+    },
+    "cookies": {},
+    "accessibility": {
+      "cutandtastelv.com": "/accessibility-statement"
+    }
+  },
+  "cookie_consent_patterns": []
+}

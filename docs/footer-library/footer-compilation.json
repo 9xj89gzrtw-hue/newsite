@@ -1,0 +1,820 @@
+{
+  "sites": [
+    {
+      "name": "concept-catering",
+      "footerHTML": "<section class=\"big-footer\"><div class=\"w-layout-grid footer-grid\"><div class=\"big-footer-title\">Concept<br/>Catering <br/>Crew</div><div class=\"w-layout-vflex flex-block\"><div class=\"title\">Kontakt</div><a class=\"big-footer-text\" href=\"#https://maps.app.goo.gl/ZuN6aDp6T8Zf5htAA\" target=\"_blank\">Concept Catering Crew GmbH<br/>Hammerweg 41<br/>51399 Burscheid</a><a class=\"big-footer-text\" href=\"mailto:anfrage@concept-catering.de?subject=Anfrage\">anfrage@concept-catering.de<br/></a><a class=\"big-footer-text\" href=\"tel:+4915170618130\">+49 151 706 181 30<br/></a></div><div class=\"w-layout-vflex flex-block\"><div class=\"title\">Seiten</div><div class=\"w-layout-vflex footer-page-links-wrapper\"><a aria-current=\"page\" class=\"big-footer-text w--current\" href=\"/\">Home</a><a class=\"big-footer-text\" href=\"/about\">Über uns</a><a class=\"big-footer-text\" href=\"/film-und-crew-catering\">Film &amp; Crew Catering</a><a class=\"big-footer-text\" href=\"/eventcatering\">Event &amp; Experience Catering</a><a class=\"big-footer-text\" href=\"/delivery-catering\">Delivery Catering</a><a class=\"big-footer-text\" href=\"/kontakt\">Kontakt</a></div></div><div class=\"w-layout-vflex flex-block\"><div class=\"title\">Social</div><div class=\"w-layout-vflex footer-page-links-wrapper\"><a class=\"big-footer-text\" href=\"https://www.instagram.com/conceptcateringcrew/\" target=\"_blank\">Instagram</a></div></div></div><a class=\"text-scroling-section w-inline-block\" href=\"/kontakt\" id=\"About\"><div class=\"text-animation-wrapper-2 first\" data-w-id=\"9f443ac3-4d40-f6fc-f569-90311ec6f3dc\"><div class=\"animation-content-2\" style=\"will-change: transform; transform: translate3d(-0.792%, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;\"><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div></div><div class=\"animation-content-2\" style=\"will-change: transform; transform: translate3d(-0.792%, 0px, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;\"><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div><h2 class=\"text-animation-3\">GET IN TOUCH</h2><div class=\"point-dot-3\"></div></div></div></a><div class=\"w-layout-hflex flex-block-4\"><a class=\"big-footer-text\" href=\"/datenschutzerklarung\">Datenschutzerklärung</a><a class=\"big-footer-text\" href=\"/impressum\">Impressum</a></div></section>",
+      "columns": [],
+      "contact": {
+        "phone": "+49 151 706 181 30",
+        "email": "Burscheidanfrage@concept-catering.de"
+      },
+      "social": {
+        "instagram": "https://www.instagram.com/conceptcateringcrew/"
+      },
+      "legal": {},
+      "copyright": "",
+      "paymentMethods": [],
+      "certifications": [],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "Concept Catering Crew GmbHHammerweg 4151399 Burscheid",
+          "url": "#https://maps.app.goo.gl/ZuN6aDp6T8Zf5htAA"
+        },
+        {
+          "text": "anfrage@concept-catering.de",
+          "url": "mailto:anfrage@concept-catering.de?subject=Anfrage"
+        },
+        {
+          "text": "+49 151 706 181 30",
+          "url": "tel:+4915170618130"
+        },
+        {
+          "text": "Home",
+          "url": "/"
+        },
+        {
+          "text": "Über uns",
+          "url": "/about"
+        },
+        {
+          "text": "Film & Crew Catering",
+          "url": "/film-und-crew-catering"
+        },
+        {
+          "text": "Event & Experience Catering",
+          "url": "/eventcatering"
+        },
+        {
+          "text": "Delivery Catering",
+          "url": "/delivery-catering"
+        },
+        {
+          "text": "Kontakt",
+          "url": "/kontakt"
+        },
+        {
+          "text": "Instagram",
+          "url": "https://www.instagram.com/conceptcateringcrew/"
+        },
+        {
+          "text": "GET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCHGET IN TOUCH",
+          "url": "/kontakt"
+        },
+        {
+          "text": "Datenschutzerklärung",
+          "url": "/datenschutzerklarung"
+        },
+        {
+          "text": "Impressum",
+          "url": "/impressum"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "concordecatering",
+      "footerHTML": "<footer class=\"sections\" data-footer-sections=\"\" id=\"footer-sections\">\n<section class=\"page-section full-bleed-section layout-engine-section background-width--full-bleed content-width--wide horizontal-alignment--center vertical-alignment--middle dark\" data-active=\"true\" data-animation=\"none\" data-controller=\"SectionWrapperController\" data-controllers-bound=\"SectionWrapperController\" data-current-context='{\n\"video\": {\n\"playbackSpeed\": 0.5,\n\"filter\": 1,\n\"filterStrength\": 0,\n\"zoom\": 0,\n\"videoSourceProvider\": \"none\"\n},\n\"backgroundImageId\": null,\n\"backgroundMediaEffect\": {\n\"type\": \"none\"\n},\n\"divider\": {\n\"enabled\": false\n},\n\"typeName\": \"page\"\n}' data-current-styles='{\n\"imageOverlayOpacity\": 0.15,\n\"backgroundWidth\": \"background-width--full-bleed\",\n\"customSectionHeight\": 1,\n\"horizontalAlignment\": \"horizontal-alignment--center\",\n\"verticalAlignment\": \"vertical-alignment--middle\",\n\"contentWidth\": \"content-width--wide\",\n\"customContentWidth\": 50,\n\"sectionTheme\": \"dark\",\n\"sectionAnimation\": \"none\",\n\"backgroundMode\": \"image\"\n}' data-fluid-engine-section=\"\" data-section-id=\"64c93b6610d8c1cc28dfa006\" data-section-theme=\"dark\" data-sqsp-section=\"fluid-engine\" data-test=\"page-section\">\n<div class=\"section-border\">\n<div class=\"section-background\">\n</div>\n</div>\n<div class=\"content-wrapper\" style=\"\n      \n        \n      \n    \">\n<div class=\"content\">\n<div data-fluid-engine=\"true\"><style>\n\n.fe-64c93b6654c43d007e3f8a43 {\n  --grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 0.0px);\n  --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (0.0px * (8 - 1)) ) / 8 );\n\n  display: grid;\n  position: relative;\n  grid-area: 1/1/-1/-1;\n  grid-template-rows: repeat(11,minmax(24px, auto));\n  grid-template-columns:\n    minmax(var(--grid-gutter), 1fr)\n    repeat(8, minmax(0, var(--cell-max-width)))\n    minmax(var(--grid-gutter), 1fr);\n  row-gap: 0.0px;\n  column-gap: 0.0px;\n  overflow-x: hidden;\n  overflow-x: clip;\n}\n\n@media (min-width: 768px) {\n  .background-width--inset .fe-64c93b6654c43d007e3f8a43 {\n    --inset-padding: calc(var(--sqs-site-gutter) * 2);\n  }\n\n  .fe-64c93b6654c43d007e3f8a43 {\n    --grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 0.0px);\n    --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (0.0px * (24 - 1)) ) / 24 );\n    --inset-padding: 0vw;\n\n    --row-height-scaling-factor: 0.0215;\n    --container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) ));\n\n    grid-template-rows: repeat(3,minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto));\n    grid-template-columns:\n      minmax(var(--grid-gutter), 1fr)\n      repeat(24, minmax(0, var(--cell-max-width)))\n      minmax(var(--grid-gutter), 1fr);\n  }\n}\n\n\n  .fe-block-yui_3_17_2_1_1692643018919_48629 {\n    grid-area: 2/2/8/7;\n    z-index: 3;\n\n    @media (max-width: 767px) {\n      \n      \n    }\n  }\n\n  .fe-block-yui_3_17_2_1_1692643018919_48629 .sqs-block {\n    justify-content: center;\n  }\n\n  .fe-block-yui_3_17_2_1_1692643018919_48629 .sqs-block-alignment-wrapper {\n    align-items: center;\n  }\n\n  @media (min-width: 768px) {\n    .fe-block-yui_3_17_2_1_1692643018919_48629 {\n      grid-area: 1/2/3/4;\n      z-index: 3;\n\n      \n\n      \n    }\n\n    .fe-block-yui_3_17_2_1_1692643018919_48629 .sqs-block {\n      justify-content: center;\n    }\n\n    .fe-block-yui_3_17_2_1_1692643018919_48629 .sqs-block-alignment-wrapper {\n      align-items: center;\n    }\n  }\n\n  .fe-block-64c93b66ed41c85d00b84e40 {\n    grid-area: 3/2/4/10;\n    z-index: 1;\n\n    @media (max-width: 767px) {\n      \n      \n    }\n  }\n\n  .fe-block-64c93b66ed41c85d00b84e40 .sqs-block {\n    justify-content: flex-start;\n  }\n\n  .fe-block-64c93b66ed41c85d00b84e40 .sqs-block-alignment-wrapper {\n    align-items: flex-start;\n  }\n\n  @media (min-width: 768px) {\n    .fe-block-64c93b66ed41c85d00b84e40 {\n      grid-area: 2/24/3/26;\n      z-index: 1;\n\n      \n\n      \n    }\n\n    .fe-block-64c93b66ed41c85d00b84e40 .sqs-block {\n      justify-content: flex-start;\n    }\n\n    .fe-block-64c93b66ed41c85d00b84e40 .sqs-block-alignment-wrapper {\n      align-items: flex-start;\n    }\n  }\n\n  .fe-block-64c93b66ffe0bfc664863fb3 {\n    grid-area: 9/2/11/10;\n    z-index: 0;\n\n    @media (max-width: 767px) {\n      \n      \n    }\n  }\n\n  .fe-block-64c93b66ffe0bfc664863fb3 .sqs-block {\n    justify-content: flex-start;\n  }\n\n  .fe-block-64c93b66ffe0bfc664863fb3 .sqs-block-alignment-wrapper {\n    align-items: flex-start;\n  }\n\n  @media (min-width: 768px) {\n    .fe-block-64c93b66ffe0bfc664863fb3 {\n      grid-area: 2/10/4/22;\n      z-index: 0;\n\n      \n\n      \n    }\n\n    .fe-block-64c93b66ffe0bfc664863fb3 .sqs-block {\n      justify-content: flex-start;\n    }\n\n    .fe-block-64c93b66ffe0bfc664863fb3 .sqs-block-alignment-wrapper {\n      align-items: flex-start;\n    }\n  }\n\n</style><div class=\"fluid-engine fe-64c93b6654c43d007e3f8a43\"><div class=\"fe-block fe-block-yui_3_17_2_1_1692643018919_48629\"><div class=\"sqs-block website-component-block sqs-block-website-component sqs-blo",
+      "columns": [],
+      "contact": {},
+      "social": {
+        "facebook": "https://www.facebook.com/ConcordeCatering"
+      },
+      "legal": {},
+      "copyright": "",
+      "paymentMethods": [],
+      "certifications": [],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "concordegroup.ca",
+          "url": "https://concordegroup.ca"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "creativeedge",
+      "footerHTML": "<footer class=\"sections\" data-footer-sections=\"\" id=\"footer-sections\">\n<section class=\"page-section full-bleed-section layout-engine-section background-width--full-bleed section-height--small content-width--wide horizontal-alignment--center vertical-alignment--middle black\" data-active=\"true\" data-animation=\"none\" data-controller=\"SectionWrapperController\" data-controllers-bound=\"SectionWrapperController\" data-current-context='{\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                \"video\": {\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \"playbackSpeed\": 0.5,\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \"filter\": 1,\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \"filterStrength\": 0,\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \"zoom\": 0,\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \"videoSourceProvider\": \"none\"\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                },\n                                                                                                                                                                                                                                                                                                              ",
+      "columns": [],
+      "contact": {
+        "address": "110 Barrow Street New York, NY 10014\n\n\n\n\n\nMIAMI240 NW 25th StreetUnit 601 Miami, FL 33127\n\n\n\n\n\nPALM BEACH480 Hibiscus Street Unit 112West Palm Beach, FL 33401"
+      },
+      "social": {
+        "facebook": "https://www.facebook.com/CreativeEdgeParties/"
+      },
+      "legal": {
+        "privacy": {
+          "text": "Privacy Policy",
+          "url": "https://app.termly.io/policy-viewer/policy.html?policyUUID=8d11c4e1-9b26-45a0-addb-ce3877551fad"
+        }
+      },
+      "copyright": "",
+      "paymentMethods": [],
+      "certifications": [],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "CONTACT",
+          "url": "/contact"
+        },
+        {
+          "text": "Privacy Policy",
+          "url": "https://app.termly.io/policy-viewer/policy.html?policyUUID=8d11c4e1-9b26-45a0-addb-ce3877551fad"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "cutandtaste",
+      "footerHTML": "<footer class=\"Footer\" data-controller=\"FooterBreakpoints\" data-controllers-bound=\"FooterBreakpoints\" role=\"contentinfo\">\n<div class=\"Footer-inner clear\">\n<div class=\"sqs-layout sqs-grid-12 columns-12 Footer-blocks Footer-blocks--top sqs-alternate-block-style-container\" data-layout-label=\"Footer Top Blocks\" data-type=\"block-field\" data-updated-on=\"1606347449595\" id=\"footerBlocksTop\"><div class=\"row sqs-row\"><div class=\"col sqs-col-12 span-12\"><div class=\"sqs-block website-component-block sqs-block-website-component sqs-block-spacer spacer-block sized vsize-1\" data-block-css='[\"https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.spacer/035a76fb-6d18-44eb-b588-c9985345d5bf_1156/website.components.spacer.styles.css\"]' data-block-scripts='[\"https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.spacer/035a76fb-6d18-44eb-b588-c9985345d5bf_1156/website.components.spacer.visitor.js\"]' data-block-type=\"1337\" data-definition-name=\"website.components.spacer\" data-website-component-id=\"yui_3_17_2_1_1546976361207_22640\" id=\"block-yui_3_17_2_1_1546976361207_22640\"><div class=\"sqs-block-content\"> </div></div><div class=\"sqs-block html-block sqs-block-html\" data-block-type=\"2\" data-sqsp-block=\"text\" id=\"block-yui_3_17_2_1_1546976361207_15904\"><div class=\"sqs-block-content\">\n<div class=\"sqs-html-content\" data-sqsp-text-block-content=\"\">\n<h2 style=\"text-align:center;white-space:pre-wrap;\">Follow Cut &amp; Taste</h2>\n</div>\n</div></div><div class=\"sqs-block instagram-block sqs-block-instagram\" data-block-json='{\"title\":true,\"thumbnail\":true,\"excerpt\":true,\"pageSize\":4,\"filter\":{},\"hSize\":null,\"floatDir\":null,\"pageCollectionId\":null,\"containingItemId\":null,\"connectedAccountId\":\"5c34fc622487fd69fcdfa850\",\"enable-search\":false,\"enable-search-disabled\":null,\"socialCollectionId\":\"\",\"previewCollectionId\":\"\",\"status\":\"undefined\",\"searchId\":\"undefined\",\"searchTerm\":\"\",\"refresh\":null,\"newWindow\":false,\"unsafeSearch\":null,\"search-deprecated-warning\":null,\"aspect-ratio\":\"square\",\"aspectRatio\":null,\"auto-crop\":true,\"blockAnimation\":\"none\",\"collectionId\":\"5c34fc622487fd69fcdfa850\",\"design\":\"grid\",\"lightbox\":false,\"padding\":0,\"show-meta\":true,\"show-meta-basic\":true,\"show-meta-only-title\":false,\"show-meta-only-description\":false,\"square-thumbs\":true,\"thumbnails-per-row\":4,\"vSize\":null}' data-block-type=\"25\" id=\"block-yui_3_17_2_1_1546976361207_5815\"><div class=\"sqs-block-content\">\n<div class=\"sqs-gallery-container sqs-gallery-block-grid sqs-gallery-aspect-ratio-square sqs-gallery-thumbnails-per-row-4 sqs-gallery-block-show-meta block-animation-none clear\" data-async-rendering-enabled=\"true\" id=\"yui_3_17_2_1_1787083263769_1788\">\n<div class=\"sqs-gallery sqs-gallery-design-grid\" id=\"yui_3_17_2_1_1787083263769_1805\">\n<div class=\"slide sqs-gallery-design-grid-slide\" data-animation-role=\"image\" data-type=\"image\" id=\"yui_3_17_2_1_1787083263769_1838\">\n<div class=\"margin-wrapper\">\n<a aria-label=\"\" class=\"image-slide-anchor content-fill\" href=\"https://www.instagram.com/p/CRhY1Tdssqn/\" style=\"overflow: hidden;\">\n<noscript><img alt=\"Who doesn&amp;rsquo;t love a small bite sampler to start their evening 😍😍😍\" src=\"https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1626726865711-13A8UTNG7JA4I69CSPE8/image-asset.jpeg\"/></noscript><img alt=\"Who doesn&amp;rsquo;t love a small bite sampler to start their evening 😍😍😍\" class=\"thumb-image\" data-image=\"https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1626726865711-13A8UTNG7JA4I69CSPE8/image-asset.jpeg\" data-image-dimensions=\"1280x1600\" data-image-focal-point=\"0.5,0.5\" data-image-id=\"60f5e1d182eb2851573b4b07\" data-load=\"false\" data-parent-ratio=\"1.0\" data-src=\"https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1626726865711-13A8UTNG7JA4I69CSPE8/image-asset.jpeg\" data-type=\"image\" elementtiming=\"system-gallery-block-grid\" style=\"opacity: 0; left: 0px; top: -37.875px; width: 303px; height: 378px; position: relative;\"/>\n</a>\n</div>\n</div>\n<div class=\"slide sqs-gallery-design-grid-slide\" data-animation-role=\"image\" data-type=\"image\" id=\"yui_3_17_2_1_1787083263769_1839\">\n<div class=\"margin-wrapper\">\n<a aria-label=\"\" class=\"image-slide-anchor content-fill\" href=\"https://www.instagram.com/p/CPwacvwNlY2/\" style=\"overflow: hidden;\">\n<noscript><img alt=\"When your food matches the floral 🤙🏼🤙🏼🤙🏼\n.\n.\n.\nPlanner: @idodetailslv \nPhotographer: @courtneypecorinophoto\" src=\"https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1622935957397-6CYM6WPBSCW2KZR5BUY9/image-asset.jpeg\"/></noscript><img alt=\"When your food matches the floral 🤙🏼🤙🏼🤙🏼\n.\n.\n.\nPlanner: @idodetailslv \nPhotographer: @courtneypecorinophoto\" class=\"thumb-image\" data-image=\"https://images.squarespace-cdn.com/content/v1/5c1584394611a0d7e1311ce4/1622935957397-6CYM6WPBSCW2KZR5BUY9/image-asset.jpeg\" data-image-dimensions=\"1024x683\" data-image-focal-point=\"0.5,0.5\" data-image-id=\"60bc099470faee6f7e10fe0c\" data-load",
+      "columns": [
+        {
+          "heading": "",
+          "links": [
+            {
+              "text": "Privacy",
+              "url": "/privacy"
+            },
+            {
+              "text": "Accessibility",
+              "url": "/accessibility-statement"
+            },
+            {
+              "text": "Contact",
+              "url": "/contact"
+            }
+          ]
+        }
+      ],
+      "contact": {
+        "phone": "702-443-1839",
+        "email": "info@cutandtastelv.com",
+        "address": "2053 East Pama Lane,\nLas Vegas, NV, 89119,\nUnited States\n702-443-1839\ninfo"
+      },
+      "social": {
+        "facebook": "http://www.facebook.com/cutandtastefood"
+      },
+      "legal": {
+        "privacy": {
+          "text": "Privacy",
+          "url": "/privacy"
+        },
+        "accessibility": {
+          "text": "Accessibility",
+          "url": "/accessibility-statement"
+        }
+      },
+      "copyright": "© 2026 Cut and Taste2053 Pama Ln, Las Vegas, NV 89119",
+      "paymentMethods": [
+        "Mastercard"
+      ],
+      "certifications": [
+        "Award Winner"
+      ],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "702-443-1839",
+          "url": "tel:702-443-1839"
+        },
+        {
+          "text": "info@cutandtastelv.com",
+          "url": "mailto:info@cutandtastelv.com"
+        },
+        {
+          "text": "2053 Pama Ln, Las Vegas, NV 89119",
+          "url": "https://maps.app.goo.gl/LQAsTnqkNrrXdPbWA"
+        },
+        {
+          "text": "(702) 270-0299",
+          "url": "tel:+17022700299"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "elegantaffairs",
+      "footerHTML": "<footer class=\"elementor elementor-207 elementor-location-footer\" data-elementor-id=\"207\" data-elementor-post-type=\"elementor_library\" data-elementor-type=\"footer\">\n<section class=\"elementor-section elementor-top-section elementor-element elementor-element-d96a640 elementor-section-content-top elementor-section-boxed elementor-section-height-default elementor-section-height-default\" data-e-type=\"section\" data-element_type=\"section\" data-id=\"d96a640\" data-settings='{\"background_background\":\"classic\"}'>\n<div class=\"elementor-container elementor-column-gap-default\">\n<div class=\"elementor-column elementor-col-25 elementor-top-column elementor-element elementor-element-62ec5ab\" data-e-type=\"column\" data-element_type=\"column\" data-id=\"62ec5ab\">\n<div class=\"elementor-widget-wrap elementor-element-populated\">\n<div class=\"elementor-element elementor-element-12b5813 reck_reg elementor-widget elementor-widget-heading\" data-e-type=\"widget\" data-element_type=\"widget\" data-id=\"12b5813\" data-widget_type=\"heading.default\">\n<div class=\"elementor-widget-container\">\n<h2 class=\"elementor-heading-title elementor-size-default\">It's party time</h2> </div>\n</div>\n<div class=\"elementor-element elementor-element-142f0f9 disable_default_margin domanie_reg elementor-widget elementor-widget-heading\" data-e-type=\"widget\" data-element_type=\"widget\" data-id=\"142f0f9\" data-widget_type=\"heading.default\">\n<div class=\"elementor-widget-container\">\n<h4 class=\"elementor-heading-title elementor-size-default\"><a href=\"/elegantaffairs/contact-us/\">CONTACT US</a></h4> </div>\n</div>\n<div class=\"elementor-element elementor-element-674d996 elementor-widget-divider--view-line elementor-widget elementor-widget-divider\" data-e-type=\"widget\" data-element_type=\"widget\" data-id=\"674d996\" data-widget_type=\"divider.default\">\n<div class=\"elementor-widget-container\">\n<div class=\"elementor-divider\">\n<span class=\"elementor-divider-separator\">\n</span>\n</div>\n</div>\n</div>\n<div class=\"elementor-element elementor-element-b830d9c elementor-shape-circle e-grid-align-left e-grid-align-mobile-center elementor-grid-0 elementor-widget elementor-widget-social-icons\" data-e-type=\"widget\" data-element_type=\"widget\" data-id=\"b830d9c\" data-widget_type=\"social-icons.default\">\n<div class=\"elementor-widget-container\">\n<div class=\"elementor-social-icons-wrapper elementor-grid\" role=\"list\">\n<span class=\"elementor-grid-item\" role=\"listitem\">\n<a class=\"elementor-icon elementor-social-icon elementor-social-icon-facebook elementor-animation-grow elementor-repeater-item-eb204a0\" href=\"https://www.facebook.com/elegantaffairscaterers/\" target=\"_blank\">\n<span class=\"elementor-screen-only\">Facebook</span>\n<i aria-hidden=\"true\" class=\"fab fa-facebook\"></i> </a>\n</span>\n<span class=\"elementor-grid-item\" role=\"listitem\">\n<a class=\"elementor-icon elementor-social-icon elementor-social-icon-youtube elementor-animation-grow elementor-repeater-item-a34985d\" href=\"https://www.youtube.com/channel/UChYm7vFNRGVf1iPiiZ7Em_Q\" target=\"_blank\">\n<span class=\"elementor-screen-only\">Youtube</span>\n<i aria-hidden=\"true\" class=\"fab fa-youtube\"></i> </a>\n</span>\n<span class=\"elementor-grid-item\" role=\"listitem\">\n<a class=\"elementor-icon elementor-social-icon elementor-social-icon-instagram elementor-animation-grow elementor-repeater-item-1214639\" href=\"https://www.instagram.com/elegantaffairs1/\" target=\"_blank\">\n<span class=\"elementor-screen-only\">Instagram</span>\n<i aria-hidden=\"true\" class=\"fab fa-instagram\"></i> </a>\n</span>\n</div>\n</div>\n</div>\n</div>\n</div>\n<div class=\"elementor-column elementor-col-50 elementor-top-column elementor-element elementor-element-44fe194\" data-e-type=\"column\" data-element_type=\"column\" data-id=\"44fe194\">\n<div class=\"elementor-widget-wrap elementor-element-populated\">\n<div class=\"elementor-element elementor-element-18b0cd2 elementor-widget elementor-widget-html\" data-e-type=\"widget\" data-element_type=\"widget\" data-id=\"18b0cd2\" data-widget_type=\"html.default\">\n<div class=\"elementor-widget-container\">\n<div align=\"center\"><a href=\"https://www.expertise.com/ny/nyc/catering\" style=\"display:inline-block; border:0;\" target=\"_blank\">\n<img data-lazy-src=\"https://elegantaffairscaterers.com/wp-content/uploads/2023/03/ny_nyc_catering_2022_transparent.webp\" height=\"160\" src=\"data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20200%20160'%3E%3C/svg%3E\" style=\"width:200px; display:block;\" width=\"200\"/><noscript><img height=\"160\" src=\"https://elegantaffairscaterers.com/wp-content/uploads/2023/03/ny_nyc_catering_2022_transparent.webp\" style=\"width:200px; display:block;\" width=\"200\"/></noscript></a></div> </div>\n</div>\n</div>\n</div>\n<div class=\"elementor-column elementor-col-25 elementor-top-column elementor-element elementor-element-0c35e01\" data-e-type=\"column\" data-element_type=\"column\" data-id=\"0c35e01\">\n<div class=\"elementor-widget-wrap elementor-element-populated\">\n<div class=\"elementor-element elementor-element-785f8a7 reck_reg disable_defalt_mrgin_sd elementor-",
+      "columns": [],
+      "contact": {
+        "phone": "212-991-0078 \n\n\n\n110",
+        "address": "240 West 30th StreetNew York, NY 10001Main"
+      },
+      "social": {
+        "facebook": "https://www.facebook.com/elegantaffairscaterers/"
+      },
+      "legal": {},
+      "copyright": "",
+      "paymentMethods": [
+        "Discover"
+      ],
+      "certifications": [],
+      "newsletter": true,
+      "uniqueElements": [
+        {
+          "text": "CONTACT US",
+          "url": "/elegantaffairs/contact-us/"
+        },
+        {
+          "text": "Facebook",
+          "url": "https://www.facebook.com/elegantaffairscaterers/"
+        },
+        {
+          "text": "Youtube",
+          "url": "https://www.youtube.com/channel/UChYm7vFNRGVf1iPiiZ7Em_Q"
+        },
+        {
+          "text": "Instagram",
+          "url": "https://www.instagram.com/elegantaffairs1/"
+        },
+        {
+          "text": "212-991-0078",
+          "url": "tel:2129910078"
+        },
+        {
+          "text": "516-676-8500",
+          "url": "tel:5166768500"
+        },
+        {
+          "text": "631-509-7310",
+          "url": "tel:631 509 7310"
+        },
+        {
+          "text": "SUBSCRIBE TO OUR NEWSLETTER",
+          "url": "/elegantaffairs/contact-us/"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "gammacatering",
+      "footerHTML": "<div class=\"locations-slider__footer\">\n<a class=\"locations-slider__all btn btn--outline\" href=\"/en/locations/\">ALL LOCATIONS</a>\n<div class=\"locations-slider__nav\">\n<div aria-disabled=\"true\" aria-label=\"Previous Locations\" class=\"locations-slider__arrow locations-slider__arrow--prev is-disabled\" data-locations-prev=\"\" role=\"button\" tabindex=\"0\">\n<svg aria-hidden=\"true\" fill=\"none\" focusable=\"false\" height=\"24\" viewbox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M15 6L9 12L15 18\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"></path>\n</svg>\n</div>\n<div aria-disabled=\"false\" aria-label=\"Next locations\" class=\"locations-slider__arrow locations-slider__arrow--next\" data-locations-next=\"\" role=\"button\" tabindex=\"0\">\n<svg aria-hidden=\"true\" fill=\"none\" focusable=\"false\" height=\"24\" viewbox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M9 6L15 12L9 18\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"></path>\n</svg>\n</div>\n</div>\n</div>",
+      "columns": [],
+      "contact": {},
+      "social": {},
+      "legal": {},
+      "copyright": "",
+      "paymentMethods": [],
+      "certifications": [],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "ALL LOCATIONS",
+          "url": "/en/locations/"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "ggcatering",
+      "footerHTML": "<footer class=\"relative z-10 pt-12 pb-6 bg-black text-white dark-bg\">\n<div class=\"wrapper\" data-enter=\"\" style=\"opacity: 1; transform: translateY(0rem);\">\n<div class=\"flex flex-col md:flex-row md:flex-wrap items-start\">\n<div class=\"w-full lg:w-1/2 mb-6 px-4\">\n<p class=\"my-0\">\n<a class=\"has-hover:hover:text-green transition-colors\" href=\"https://www.ggcatering.com/\">\n<svg aria-hidden=\"false\" class=\"w-32 sm:w-36 h-auto\" viewbox=\"0 0 895.97 303.24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M111.76 68.84c9.09 4.68 16.2 10.52 21.35 17.49V64.29h31.68v154.27c0 13.95-2.94 26.4-8.82 37.33-5.88 10.93-14.37 19.51-25.48 25.76-11.12 6.24-24.38 9.37-39.81 9.37-20.57 0-37.65-4.82-51.24-14.46-13.59-9.64-21.31-22.73-23.14-39.26h31.13c2.39 7.89 7.48 14.28 15.29 19.15 7.8 4.87 17.12 7.3 27.96 7.3 12.67 0 22.91-3.86 30.72-11.57 7.81-7.71 11.71-18.92 11.71-33.61v-25.35c-5.33 7.16-12.53 13.18-21.63 18.04-9.09 4.86-19.42 7.3-30.99 7.3-13.22 0-25.3-3.35-36.23-10.06-10.93-6.7-19.56-16.07-25.9-28.1-6.34-12.03-9.5-25.66-9.5-40.91s3.17-28.74 9.5-40.5c6.34-11.75 14.97-20.89 25.9-27.41 10.92-6.52 23-9.78 36.23-9.78 11.75 0 22.17 2.34 31.27 7.02Zm14.88 43.94c-4.32-7.71-9.96-13.59-16.94-17.63-6.98-4.04-14.51-6.06-22.59-6.06s-15.61 1.98-22.59 5.92c-6.98 3.95-12.63 9.74-16.94 17.36-4.32 7.62-6.47 16.67-6.47 27.14s2.16 19.65 6.47 27.55c4.31 7.9 10.01 13.91 17.08 18.04 7.07 4.13 14.55 6.2 22.45 6.2s15.61-2.02 22.59-6.06c6.98-4.04 12.62-9.96 16.94-17.77 4.31-7.8 6.47-16.94 6.47-27.41s-2.16-19.56-6.47-27.27ZM243.03 12.23v203.86h-31.41V12.23h31.41ZM316.85 208.79c-11.57-6.52-20.66-15.7-27.27-27.55-6.61-11.85-9.92-25.57-9.92-41.19s3.4-29.11 10.19-41.05c6.79-11.94 16.07-21.12 27.82-27.55s24.88-9.64 39.4-9.64 27.64 3.21 39.4 9.64c11.75 6.43 21.03 15.61 27.82 27.55 6.79 11.94 10.19 25.62 10.19 41.05s-3.49 29.11-10.47 41.05c-6.98 11.94-16.49 21.17-28.51 27.69-12.03 6.52-25.3 9.78-39.81 9.78s-27.27-3.26-38.85-9.78Zm61.57-23.28c7.07-3.86 12.81-9.64 17.22-17.36 4.41-7.71 6.61-17.08 6.61-28.1s-2.11-20.34-6.34-27.96c-4.23-7.62-9.83-13.36-16.8-17.22-6.98-3.86-14.51-5.78-22.59-5.78s-15.56 1.93-22.45 5.78c-6.89 3.86-12.35 9.6-16.39 17.22-4.04 7.62-6.06 16.94-6.06 27.96 0 16.35 4.17 28.97 12.53 37.88 8.36 8.91 18.87 13.36 31.54 13.36 8.08 0 15.66-1.93 22.73-5.79ZM524.43 68.84c9.27-4.68 19.6-7.02 30.99-7.02 13.4 0 25.53 3.21 36.37 9.64 10.83 6.43 19.37 15.56 25.62 27.41 6.24 11.85 9.37 25.39 9.37 40.63s-3.13 28.88-9.37 40.91c-6.25 12.03-14.83 21.4-25.76 28.1-10.93 6.71-23.01 10.06-36.23 10.06-11.76 0-22.18-2.3-31.27-6.89s-16.3-10.47-21.63-17.63v22.04h-31.41V12.23h31.41v74.66c5.32-7.34 12.62-13.36 21.9-18.04Zm63.91 43.53c-4.32-7.62-10.01-13.41-17.08-17.36-7.07-3.95-14.65-5.92-22.73-5.92s-15.38 2.02-22.45 6.06c-7.07 4.04-12.77 9.92-17.08 17.63-4.32 7.71-6.47 16.81-6.47 27.27s2.15 19.61 6.47 27.41c4.31 7.81 10.01 13.73 17.08 17.77 7.07 4.04 14.55 6.06 22.45 6.06s15.66-2.07 22.73-6.2c7.07-4.13 12.76-10.15 17.08-18.04 4.31-7.9 6.47-17.08 6.47-27.55s-2.16-19.51-6.47-27.14ZM662.45 99c6.34-11.75 14.97-20.89 25.9-27.41 10.92-6.52 23-9.78 36.23-9.78 11.94 0 22.36 2.34 31.27 7.02 8.9 4.68 16.02 10.52 21.35 17.49V64.28h31.68v151.79H777.2v-22.59c-5.33 7.16-12.58 13.13-21.76 17.91-9.19 4.77-19.65 7.16-31.41 7.16-13.04 0-24.98-3.35-35.81-10.06-10.84-6.7-19.42-16.07-25.76-28.1-6.34-12.03-9.5-25.66-9.5-40.91s3.17-28.74 9.5-40.5Zm108.27 13.77c-4.32-7.71-9.96-13.59-16.94-17.63-6.98-4.04-14.51-6.06-22.59-6.06S715.58 91.06 708.6 95c-6.98 3.95-12.63 9.74-16.94 17.36-4.32 7.62-6.47 16.67-6.47 27.14s2.16 19.65 6.47 27.55c4.31 7.9 10.01 13.91 17.08 18.04 7.07 4.13 14.55 6.2 22.45 6.2s15.61-2.02 22.59-6.06c6.98-4.04 12.62-9.96 16.94-17.77 4.31-7.8 6.47-16.94 6.47-27.41s-2.16-19.56-6.47-27.27ZM887.11 12.23v203.86H855.7V12.23h31.41Z\" fill=\"currentColor\" stroke-width=\"0\"></path></svg>\n</a>\n</p>\n</div>\n<div class=\"w-full lg:w-1/2 my-6 lg:mt-0\">\n<div class=\"flex flex-col md:flex-row gap-6 md:gap-0\">\n<div class=\"w-full md:w-1/2\">\n<ul class=\"px-4\">\n<li class=\"first-of-type:mt-0 last-of-type:mb-0\">\n<p class=\"my-0 text-base font-medium\"><a class=\"has-hover:hover:text-lime transition-colors\" href=\"https://www.ggcatering.com/what-we-do\"><span>What We Do</span></a></p>\n</li>\n<li class=\"first-of-type:mt-0 last-of-type:mb-0\">\n<p class=\"my-0 text-base font-medium\"><a class=\"has-hover:hover:text-lime transition-colors\" href=\"https://www.ggcatering.com/who-we-are\"><span>Who We Are</span></a></p>\n</li>\n<li class=\"first-of-type:mt-0 last-of-type:mb-0\">\n<p class=\"my-0 text-base font-medium\"><a class=\"has-hover:hover:text-lime transition-colors\" href=\"https://www.ggcatering.com/venues\"><span>Venues</span></a></p>\n</li>\n<li class=\"first-of-type:mt-0 last-of-type:mb-0\">\n<p class=\"my-0 text-base font-medium\"><a class=\"has-hover:hover:text-lime transition-colors\" href=\"https://www.ggcatering.com/contact\"><span>Contact</span></a></p>\n</li>\n</ul>\n</div>\n<div class=\"w-full md:w-1/2 flex flex-col\">\n<p class=\"px-4 text-base font-medium md:mt-0\">Connect</p>\n<ul class=\"flex flex-wrap items-center px-4 gap-4 mb-4\">\n<",
+      "columns": [
+        {
+          "heading": "",
+          "links": [
+            {
+              "text": "What We Do",
+              "url": "https://www.ggcatering.com/what-we-do"
+            },
+            {
+              "text": "Who We Are",
+              "url": "https://www.ggcatering.com/who-we-are"
+            },
+            {
+              "text": "Venues",
+              "url": "https://www.ggcatering.com/venues"
+            },
+            {
+              "text": "Contact",
+              "url": "https://www.ggcatering.com/contact"
+            }
+          ]
+        }
+      ],
+      "contact": {},
+      "social": {
+        "instagram": "https://www.instagram.com/globalgourmetcatering/"
+      },
+      "legal": {
+        "privacy": {
+          "text": "Privacy Policy",
+          "url": "https://www.ggcatering.com/privacy-policy"
+        }
+      },
+      "copyright": "© 2026 Global Gourmet Catering. All rights reserved.\n\n\n\n\nPrivacy Policy",
+      "paymentMethods": [],
+      "certifications": [],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "Privacy Policy",
+          "url": "https://www.ggcatering.com/privacy-policy"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "jdkgroup",
+      "footerHTML": "<footer class=\"wrapper-footer row\">\n<div class=\"main main-footer_sidebar\">\n<div class=\"block-inner block-inner_first\">\n<div class=\"row\">\n<div class=\"widget widget_footer widget_footerleft widget_text\" id=\"text-3\"> <div class=\"textwidget\"><div style=\"padding:20px;\"><img src=\"https://thejdkgroup.com/wp-content/uploads/2015/03/footer-CTA.png\" style=\"max-width:85%; margin: 0 auto 20px;\"/>\n<center> <a class=\"btn\" href=\"https://thejdkgroup.com/contact/\"><span>Tell Us About It!</span></a>\n</center></div></div>\n</div> </div>\n</div>\n</div>\n<div class=\"side side-footer_sidebar\">\n<div class=\"block-inner block-inner_last\">\n<div class=\"widget widget widget_footer widget_footerright widget_text\" id=\"text-4\"><h4 class=\"widget-title widget-title_footer widget-title_footerright\">Get In Touch With Us!</h4> <div class=\"textwidget\"><h3>Harrisburg Headquarters:</h3>\n1 Bishop Place<br/> Camp Hill, Pennsylvania 17011<br/>\n<span style=\"color:#de1247\"><i class=\"shc small icon-e-phone\"></i></span>\n<b>P:</b>717-730-4661<br/>\n<span style=\"color:#de1247\"><i class=\"shc small icon-e-phone\"></i></span>\n<b>F:</b>717.730.4662<br/>\n<span style=\"color:#de1247\"><i class=\"shc small icon-e-mail\"></i></span>\n<b>EMAIL:</b> <a href=\"mailto:info@thejdkgroup.com\">info@thejdkgroup.com</a>\n</div>\n</div> </div>\n</div>\n</footer>",
+      "columns": [],
+      "contact": {
+        "phone": "717-730-4661",
+        "email": "info@thejdkgroup.com",
+        "address": "1 Bishop Place Camp Hill, Pennsylvania 17011\n\nP"
+      },
+      "social": {},
+      "legal": {},
+      "copyright": "",
+      "paymentMethods": [],
+      "certifications": [
+        "NACE Member"
+      ],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "Tell Us About It!",
+          "url": "https://thejdkgroup.com/contact/"
+        },
+        {
+          "text": "info@thejdkgroup.com",
+          "url": "mailto:info@thejdkgroup.com"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "myradish",
+      "footerHTML": "<footer class=\"sections\" data-footer-sections=\"\" id=\"footer-sections\">\n<section class=\"page-section full-bleed-section layout-engine-section background-width--full-bleed section-height--small content-width--wide horizontal-alignment--center vertical-alignment--middle black-bold\" data-active=\"true\" data-animation=\"none\" data-controller=\"SectionWrapperController\" data-controllers-bound=\"SectionWrapperController\" data-current-context='{\n\"video\": {\n\"playbackSpeed\": 0.5,\n\"filter\": 1,\n\"filterStrength\": 0,\n\"zoom\": 0,\n\"videoSourceProvider\": \"none\"\n},\n\"backgroundImageId\": null,\n\"backgroundMediaEffect\": {\n\"type\": \"none\"\n},\n\"divider\": null,\n\"typeName\": \"page\"\n}' data-current-styles='{\n\"imageOverlayOpacity\": 0.15,\n\"backgroundWidth\": \"background-width--full-bleed\",\n\"sectionHeight\": \"section-height--small\",\n\"customSectionHeight\": 10,\n\"horizontalAlignment\": \"horizontal-alignment--center\",\n\"verticalAlignment\": \"vertical-alignment--middle\",\n\"contentWidth\": \"content-width--wide\",\n\"customContentWidth\": 50,\n\"sectionTheme\": \"black-bold\",\n\"sectionAnimation\": \"none\",\n\"backgroundMode\": \"image\"\n}' data-fluid-engine-section=\"\" data-section-id=\"63dc0d3735e4ee485c4d81a5\" data-section-theme=\"black-bold\" data-sqsp-section=\"fluid-engine\" data-test=\"page-section\">\n<div class=\"section-border\">\n<div class=\"section-background\">\n</div>\n</div>\n<div class=\"content-wrapper\" style=\"\n      \n        \n      \n    \">\n<div class=\"content\">\n<div data-fluid-engine=\"true\"><style>\n\n.fe-63dc0d3735e4ee485c4d81a4 {\n  --grid-gutter: calc(var(--sqs-mobile-site-gutter, 6vw) - 11.0px);\n  --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (8 - 1)) ) / 8 );\n\n  display: grid;\n  position: relative;\n  grid-area: 1/1/-1/-1;\n  grid-template-rows: repeat(10,minmax(24px, auto));\n  grid-template-columns:\n    minmax(var(--grid-gutter), 1fr)\n    repeat(8, minmax(0, var(--cell-max-width)))\n    minmax(var(--grid-gutter), 1fr);\n  row-gap: 11.0px;\n  column-gap: 11.0px;\n  overflow-x: hidden;\n  overflow-x: clip;\n}\n\n@media (min-width: 768px) {\n  .background-width--inset .fe-63dc0d3735e4ee485c4d81a4 {\n    --inset-padding: calc(var(--sqs-site-gutter) * 2);\n  }\n\n  .fe-63dc0d3735e4ee485c4d81a4 {\n    --grid-gutter: calc(var(--sqs-site-gutter, 4vw) - 11.0px);\n    --cell-max-width: calc( ( var(--sqs-site-max-width, 1500px) - (11.0px * (24 - 1)) ) / 24 );\n    --inset-padding: 0vw;\n\n    --row-height-scaling-factor: 0.0215;\n    --container-width: min(var(--sqs-site-max-width, 1500px), calc(100vw - var(--sqs-site-gutter, 4vw) * 2 - var(--inset-padding) ));\n\n    grid-template-rows: repeat(5,minmax(calc(var(--container-width) * var(--row-height-scaling-factor)), auto));\n    grid-template-columns:\n      minmax(var(--grid-gutter), 1fr)\n      repeat(24, minmax(0, var(--cell-max-width)))\n      minmax(var(--grid-gutter), 1fr);\n  }\n}\n\n\n  .fe-block-7c518946c67ec44e3074 {\n    grid-area: 2/2/4/10;\n    z-index: 0;\n\n    @media (max-width: 767px) {\n      \n      \n    }\n  }\n\n  .fe-block-7c518946c67ec44e3074 .sqs-block {\n    justify-content: flex-start;\n  }\n\n  .fe-block-7c518946c67ec44e3074 .sqs-block-alignment-wrapper {\n    align-items: flex-start;\n  }\n\n  @media (min-width: 768px) {\n    .fe-block-7c518946c67ec44e3074 {\n      grid-area: 1/6/3/12;\n      z-index: 0;\n\n      \n\n      \n    }\n\n    .fe-block-7c518946c67ec44e3074 .sqs-block {\n      justify-content: center;\n    }\n\n    .fe-block-7c518946c67ec44e3074 .sqs-block-alignment-wrapper {\n      align-items: center;\n    }\n  }\n\n  .fe-block-81f963c46f43b9aabb14 {\n    grid-area: 4/2/6/10;\n    z-index: 2;\n\n    @media (max-width: 767px) {\n      \n      \n    }\n  }\n\n  .fe-block-81f963c46f43b9aabb14 .sqs-block {\n    justify-content: center;\n  }\n\n  .fe-block-81f963c46f43b9aabb14 .sqs-block-alignment-wrapper {\n    align-items: center;\n  }\n\n  @media (min-width: 768px) {\n    .fe-block-81f963c46f43b9aabb14 {\n      grid-area: 1/18/3/21;\n      z-index: 2;\n\n      \n\n      \n    }\n\n    .fe-block-81f963c46f43b9aabb14 .sqs-block {\n      justify-content: center;\n    }\n\n    .fe-block-81f963c46f43b9aabb14 .sqs-block-alignment-wrapper {\n      align-items: center;\n    }\n  }\n\n  .fe-block-a86bbdb7896d9bb8091a {\n    grid-area: 7/2/9/10;\n    z-index: 3;\n\n    @media (max-width: 767px) {\n      \n      \n    }\n  }\n\n  .fe-block-a86bbdb7896d9bb8091a .sqs-block {\n    justify-content: center;\n  }\n\n  .fe-block-a86bbdb7896d9bb8091a .sqs-block-alignment-wrapper {\n    align-items: center;\n  }\n\n  @media (min-width: 768px) {\n    .fe-block-a86bbdb7896d9bb8091a {\n      grid-area: 1/10/3/18;\n      z-index: 3;\n\n      \n\n      \n    }\n\n    .fe-block-a86bbdb7896d9bb8091a .sqs-block {\n      justify-content: center;\n    }\n\n    .fe-block-a86bbdb7896d9bb8091a .sqs-block-alignment-wrapper {\n      align-items: center;\n    }\n  }\n\n  .fe-block-d3c8d40c6ff90596256d {\n    grid-area: 9/2/11/10;\n    z-index: 4;\n\n    @media (max-width: 767px) {\n      \n      \n    }\n  }\n\n  .fe-block-d3c8d40c6ff90596256d .sqs-block {\n    justify-content: center;\n  }\n\n  .fe-block-d3c8d40c6ff90596256d .sqs-block-alignment-wrapper ",
+      "columns": [],
+      "contact": {},
+      "social": {
+        "instagram": "https://www.instagram.com/my.radish/?hl=en"
+      },
+      "legal": {},
+      "copyright": "",
+      "paymentMethods": [],
+      "certifications": [
+        "Award Winner"
+      ],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "Careers",
+          "url": "/careers"
+        },
+        {
+          "text": "Contact",
+          "url": "/contact-us-general-inquiry"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "queenofhearts",
+      "footerHTML": "<footer class=\"site-footer\" itemscope=\"\" itemtype=\"https://schema.org/WPFooter\"> <!-- copyright -->\n<p>© 2016 Queen of Hearts Catering | 193 Pennsylvania Ave. Malvern, PA 19355 | p: 610.889.0477 | <a href=\"https://queenofheartscatering.com/privacy-policy-terms-of-service/\">Privacy &amp; Terms</a> | Site by <a href=\"http://nuphoriq.com/\" target=\"_blank\">nuphoriq</a></p>\n<!-- PVG link -->\n<!-- <a href=\"https://premierevenuegroup.com/\" target=\"_blank\" class=\"PvgLink\" aria-label=\"Visit Premiere Venue Group website\"><img src=\"https://queenofheartscatering.com/wp-content/themes/queen-hearts/images/PVG-logo.svg\" alt=\"PVG\" width=\"65\" height=\"25\"></a> -->\n<!-- Pinterest button -->\n</footer>",
+      "columns": [],
+      "contact": {
+        "address": "193 Pennsylvania Ave. Malvern, PA 19355"
+      },
+      "social": {},
+      "legal": {
+        "privacy": {
+          "text": "Privacy & Terms",
+          "url": "https://queenofheartscatering.com/privacy-policy-terms-of-service/"
+        },
+        "terms": {
+          "text": "Privacy & Terms",
+          "url": "https://queenofheartscatering.com/privacy-policy-terms-of-service/"
+        }
+      },
+      "copyright": "© 2016 Queen of Hearts Catering",
+      "paymentMethods": [],
+      "certifications": [],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "Privacy & Terms",
+          "url": "https://queenofheartscatering.com/privacy-policy-terms-of-service/"
+        },
+        {
+          "text": "nuphoriq",
+          "url": "http://nuphoriq.com/"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "ridgewells",
+      "footerHTML": "<footer class=\"comp-ldnvw4i8 S829f_\" id=\"comp-ldnvw4i8\" slots=\"[object Object]\" wix=\"[object Object]\"><!--$--><section class=\"ke5pl1 comp-ldnvw4i8_r_comp-ldnvvzhv wixui-footer fwXYgt\" data-block-level-container=\"Section\" data-testid=\"section-container\" id=\"comp-ldnvw4i8_r_comp-ldnvvzhv\" tabindex=\"-1\"><div class=\"QG9w8P\" data-hook=\"bgLayers\" data-motion-part=\"BG_LAYER comp-ldnvw4i8_r_comp-ldnvvzhv\" id=\"bgLayers_comp-ldnvw4i8_r_comp-ldnvvzhv\"><div class=\"LNYVZi ayCf9D\" data-testid=\"colorUnderlay\"></div><div class=\"ROWgFb\" data-motion-part=\"BG_MEDIA comp-ldnvw4i8_r_comp-ldnvvzhv\" id=\"bgMedia_comp-ldnvw4i8_r_comp-ldnvvzhv\"></div></div><div class=\"comp-ldnvw4i8_r_comp-ldnvvzhv-container\" data-testid=\"responsive-container-content\" role=\"group\"><!--$--><div class=\"comp-ldnvw4i8_r_comp-lk20dfyk nJiBti wixui-horizontal-line\" id=\"comp-ldnvw4i8_r_comp-lk20dfyk\"></div><!--/$--><!--$--><div class=\"comp-ldnvw4i8_r_comp-lk20erpn nJiBti wixui-horizontal-line\" id=\"comp-ldnvw4i8_r_comp-lk20erpn\"></div><!--/$--><!--$--><div class=\"HFEOE3 NaeT1r comp-ldnvw4i8_r_comp-lk2n6ybv-container comp-ldnvw4i8_r_comp-lk2n6ybv wixui-box\" dir=\"ltr\" id=\"comp-ldnvw4i8_r_comp-lk2n6ybv\" role=\"\"><div aria-hidden=\"true\" class=\"jdJeEr NYfD3h inner-box wixui-box\"></div><!--$--><div class=\"N8MGzv _v6ohL PO9MfV comp-ldnvw4i8_r_comp-lk1zwux1 wixui-rich-text\" data-testid=\"richTextElement\" id=\"comp-ldnvw4i8_r_comp-lk1zwux1\"><p class=\"font_2 wixui-rich-text__text\">Ridgewells Catering</p></div><!--/$--><!--$--><div class=\"N8MGzv _v6ohL PO9MfV comp-ldnvw4i8_r_comp-lk1zyvij wixui-rich-text\" data-testid=\"richTextElement\" id=\"comp-ldnvw4i8_r_comp-lk1zyvij\"><p class=\"font_8 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\">Ridgewells offers full service, off-premise catering for weddings, corporate events, social parties, and major live spectator events. Follow us on Instagram for the latest news and menu releases.</span></p></div><!--/$--><!--$--><div aria-disabled=\"false\" class=\"comp-ldnvw4i8_r_comp-lk204bjh lIkFMb\" id=\"comp-ldnvw4i8_r_comp-lk204bjh\"><a aria-disabled=\"false\" aria-label=\"Plan Your Event\" class=\"PoVCDy wixui-button ZhVEJq\" data-testid=\"linkElement\" href=\"https://www.ridgewells.com/book-an-event\" target=\"_self\"><span class=\"Gf1CuA wixui-button__label\">Plan Your Event</span></a></div><!--/$--></div><!--/$--><!--$--><div class=\"HFEOE3 NaeT1r comp-ldnvw4i8_r_comp-lk2n71mo-container comp-ldnvw4i8_r_comp-lk2n71mo wixui-box\" dir=\"ltr\" id=\"comp-ldnvw4i8_r_comp-lk2n71mo\" role=\"\"><div aria-hidden=\"true\" class=\"jdJeEr NYfD3h inner-box wixui-box\"></div><!--$--><div class=\"N8MGzv _v6ohL PO9MfV comp-ldnvw4i8_r_comp-lk208vpf wixui-rich-text\" data-testid=\"richTextElement\" id=\"comp-ldnvw4i8_r_comp-lk208vpf\"><p class=\"font_2 wixui-rich-text__text\">Contacts</p></div><!--/$--><!--$--><div class=\"HFEOE3 NaeT1r comp-ldnvw4i8_r_comp-ldnvuqg2-container comp-ldnvw4i8_r_comp-ldnvuqg2 wixui-box\" dir=\"ltr\" id=\"comp-ldnvw4i8_r_comp-ldnvuqg2\" role=\"\"><div aria-hidden=\"true\" class=\"jdJeEr NYfD3h inner-box wixui-box\"></div><!--$--><div class=\"UwkEpO _v6ohL PO9MfV comp-ldnvw4i8_r_comp-ldnvuqgi1 wixui-rich-text\" data-testid=\"richTextElement\" id=\"comp-ldnvw4i8_r_comp-ldnvuqgi1\"><p class=\"font_8 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\">5522 Dorsey Lane, Bethesda, MD 20816 </span></p>\n<p class=\"font_8 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\">(301) 652. 1515 | <a class=\"wixui-rich-text__text\" data-auto-recognition=\"true\" href=\"mailto:info@ridgewells.com\">info@ridgewells.com</a></span></p>\n<p class=\"font_8 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\"><span class=\"wixGuard wixui-rich-text__text\">​</span></span></p></div><!--/$--><!--$--><div class=\"comp-ldnvw4i8_r_comp-ldnvuqgn eAOB3n\" id=\"comp-ldnvw4i8_r_comp-ldnvuqgn\"><ul aria-label=\"Social Bar\" class=\"tDHQQD\"><li class=\"VGXFRO\" id=\"dataItem-ldnvuqgr-comp-ldnvw4i8_r_comp-ldnvuqgn\"><a aria-label=\"Ridgewells Catering Instagram\" class=\"FvIvPq\" data-testid=\"linkElement\" href=\"https://www.instagram.com/ridgewellsdc\" rel=\"noreferrer noopener\" target=\"_blank\"><wow-image class=\"Qh0lWW IKlnHc\" data-bg-effect-name=\"\" data-has-ssr-src=\"\" data-image-info='{\"containerId\":\"dataItem-ldnvuqgr-comp-ldnvw4i8_r_comp-ldnvuqgn\",\"displayMode\":\"fit\",\"encoding\":\"AVIF\",\"imageData\":{\"width\":201,\"height\":201,\"uri\":\"11062b_ca1d837ce7194421b781ee7384061a8e~mv2.png\",\"name\":\"\",\"displayMode\":\"fit\"}}' data-motion-part=\"BG_IMG dataItem-ldnvuqgr-comp-ldnvw4i8_r_comp-ldnvuqgn\" id=\"img_0_comp-ldnvw4i8_r_comp-ldnvuqgn\" style=\"--wix-img-max-width:max(201px, 100%)\"><img alt=\"Ridgewells Catering Instagram\" data-ssr-src-done=\"true\" fetchpriority=\"high\"/></wow-image></a></li><li class=\"VGXFRO\" id=\"dataItem-ldnvuqgt-comp-ldnvw4i8_r_comp-ldnvuqgn\"><a aria-label=\"Ridgewells Catering Facebook\" class=\"FvIvPq\" data-testid=\"linkElement\" href=\"https://www.facebook.com/ridgewellsdc/\" rel=\"noreferrer noopener\" target=\"_blank\"><wow-image class=\"Qh0lWW IKlnHc\" data-bg-effect-name=\"\" data-has-ssr-src=\"\" data-image-info='{\"conta",
+      "columns": [],
+      "contact": {
+        "phone": "20816 \n(301) 652",
+        "email": "info@ridgewells.com",
+        "address": "5522 Dorsey Lane, Bethesda, MD 20816"
+      },
+      "social": {
+        "facebook": "https://www.facebook.com/ridgewellsdc/"
+      },
+      "legal": {},
+      "copyright": "",
+      "paymentMethods": [],
+      "certifications": [],
+      "newsletter": true,
+      "uniqueElements": [
+        {
+          "text": "Plan Your Event",
+          "url": "https://www.ridgewells.com/book-an-event"
+        },
+        {
+          "text": "info@ridgewells.com",
+          "url": "mailto:info@ridgewells.com"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "saltblock",
+      "footerHTML": "<footer class=\"sections\" data-footer-sections=\"\" id=\"footer-sections\">\n<section class=\"page-section layout-engine-section background-width--full-bleed section-height--small content-width--wide horizontal-alignment--center vertical-alignment--middle white\" data-active=\"true\" data-animation=\"none\" data-controller=\"SectionWrapperController\" data-controllers-bound=\"SectionWrapperController\" data-current-context='{\n                                                                                                                                                                                                        \"video\": {\n                                                                                                                                                                                                          \"playbackSpeed\": 0.5,\n                                                                                                                                                                                                          \"filter\": 1,\n                                                                                                                                                                                                          \"filterStrength\": 0,\n                                                                                                                                                                                                          \"zoom\": 0,\n                                                                                                                                                                                                          \"videoSourceProvider\": \"none\"\n                                                                                                                                                                                                        },\n                                                                                                                                                                                                        \"backgroundImageId\": null,\n                                                                                                                                                                                                        \"backgroundMediaEffect\": {\n                                                                                                                                                                                                          \"type\": \"none\"\n                                                                                                                                                                                                        },\n                                                                                                                                                                                                        \"divider\": {\n                                                                                                                                                                                                          \"enabled\": false\n                                                                                                                                                                                                        },\n                                                                                                                                                                                                        \"typeName\": \"page\"\n                                                                                                                                                                                                      }' data-current-styles='{\n                                                                                                                                                                                                        \"imageOverlayOpacity\": 0.15,\n                                                                                                                                                                                                        \"backgroundWidth\": \"background-width--full-bleed\",\n                                                                                                                                                                                                        \"sectionHeight\": \"section-height--small\",\n                                                                                                                                                                                                        \"customSectionHeight\": 25,\n                                                                                                                                                                    ",
+      "columns": [],
+      "contact": {
+        "email": "Contact877.793.7526Contact@Saltblockhospitality.com",
+        "address": "8414 Camden St, Tampa, FL 33614\n\n\n\n\n\nFOLLOW US\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFACEBOOK\n\n\n\n\n\nINSTAGRAM\n\n\n\n\n\n\n\n\n\n \nFlawless events don"
+      },
+      "social": {
+        "facebook": "https://www.facebook.com/SaltBlockHospitality/"
+      },
+      "legal": {},
+      "copyright": "",
+      "paymentMethods": [
+        "Discover"
+      ],
+      "certifications": [
+        "Award Winner"
+      ],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "Get Started",
+          "url": "/plan"
+        },
+        {
+          "text": "Access Now",
+          "url": "/giveaways"
+        },
+        {
+          "text": "Our Catering Brands",
+          "url": "/brands"
+        },
+        {
+          "text": "The SaltBlock Difference",
+          "url": "/the-saltblock-difference"
+        },
+        {
+          "text": "Menus",
+          "url": "/our-menus"
+        },
+        {
+          "text": "Team",
+          "url": "/team"
+        },
+        {
+          "text": "Saltblock Exclusives",
+          "url": "/saltblock-exclusives"
+        },
+        {
+          "text": "All Venues",
+          "url": "/venues"
+        },
+        {
+          "text": "Values",
+          "url": "/farm-values"
+        },
+        {
+          "text": "About",
+          "url": "/about-our-farm"
+        },
+        {
+          "text": "About",
+          "url": "/the-saltblock-difference"
+        },
+        {
+          "text": "Careers",
+          "url": "/careers"
+        },
+        {
+          "text": "Blog",
+          "url": "/saltblock-hospitality-blog"
+        },
+        {
+          "text": "877.793.7526",
+          "url": "tel:8777937526"
+        },
+        {
+          "text": "Contact@Saltblockhospitality.com",
+          "url": "mailto:contact@saltblockhospitality.com"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "sopranos",
+      "footerHTML": "<footer class=\"bg-section footer-section\"><div class=\"wrapper w-container\"><div class=\"footer\"><div class=\"footer-column\"><h3 class=\"footer-header\">Contact Info</h3><p>Sopranos Catering<br/>17600 Clinton River Road<br/>Clinton Township, MI 48038</p><a class=\"footer-email\" href=\"mailto:info@sopranoscatering.com?subject=Hello!\">info@sopranoscatering.com</a><p><a class=\"phone\" href=\"tel:15867019526\">1 (800) WE-CATER</a></p><div class=\"social-icons footer-icons\"><a class=\"social-link w-inline-block\" href=\"https://www.facebook.com/sopranoscatering\" target=\"_blank\"><img alt=\"click to view Sopranos Facebook page\" src=\"https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/62829164e1b0c625208a3f93_facebook-icon-white.svg\"/></a><a class=\"social-link w-inline-block\" href=\"https://www.instagram.com/sopranoscatering/\" target=\"_blank\"><img alt=\"Click to visit Sopranos Instagram\" src=\"https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/62829164e1b0c607678a3fa5_instagram-icon-white.svg\"/></a></div></div><div class=\"footer-column\"><h5 class=\"footer-header\">Navigation</h5><a aria-current=\"page\" class=\"footer-link w--current\" href=\"/\">Home</a><div class=\"footer-link-badge\"><a class=\"footer-link\" href=\"/weddings\">Weddings</a></div><div class=\"footer-link-badge\"><a class=\"footer-link\" href=\"/corporate-events\">Corporate Events</a></div><div class=\"footer-link-badge\"><a class=\"footer-link\" href=\"/social-events\">Social Events</a></div><a class=\"footer-link\" href=\"/grill-and-bbq\">Grill &amp; BBQ</a><a class=\"footer-link\" href=\"/catered-trays\">By The Tray</a><a class=\"footer-link\" href=\"/appetizers-and-enhancements\">Apps &amp; Enhancements</a><a class=\"footer-link\" href=\"/contact\">Contact</a></div><div class=\"footer-column\"><h5 class=\"footer-header\">OUR AWARDS</h5><img alt=\"The Knot Best of Weddings Award 2022\" class=\"footer-badge\" loading=\"lazy\" src=\"https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/62829b6e66b7273303764640_1-Sopranos-badge.png\" width=\"100\"/><img alt=\"Vote 4 the Best Voted Best Caterer\" class=\"footer-badge\" loading=\"lazy\" src=\"https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/62829bd229589a428e8e1dde_Vote-4-The-Best.png\" width=\"100\"/><img alt=\"Expertise Best Caterer in Detroit 2019\" class=\"footer-badge\" loading=\"lazy\" src=\"https://cdn.prod.website-files.com/62829164e1b0c6edc08a3f44/62829bab48e4a67e2634331e_inverse.png\" width=\"100\"/></div><div class=\"footer-column\"><h5 class=\"footer-header\">Proudly Serving</h5><p>Proudly Catering to Armada, Auburn Hills, Birmingham, Bloomfield Hills, Centerline, Chesterfield, Clarkston, Clinton Township, Detroit, Fraser, Grosse Pointe, Lenox Macomb County, Macomb Township, Mount Clemens, New Haven, Oakland County, Oakland Township, Orion Township, Ray Township, Richmond, Rochester, Rochester Hills, Romeo, Roseville, Royal Oak, Shelby Township, St. Clair County, St. Clair Shores, Sterling Heights, Troy, Utica, Warren, Washington Township, West Bloomfield, and more!</p></div><div class=\"footer-bottom\"><div class=\"footer-bottom-content\"><div class=\"footer-bottom-text\">© 2023 Sopranos Catering, All Rights Reserved</div></div></div></div></div><div class=\"footer-bottom-base\"></div></footer>",
+      "columns": [],
+      "contact": {
+        "email": "48038info@sopranoscatering.com",
+        "address": "17600 Clinton River RoadClinton Township, MI 48038info"
+      },
+      "social": {
+        "facebook": "https://www.facebook.com/sopranoscatering"
+      },
+      "legal": {},
+      "copyright": "© 2023 Sopranos Catering, All Rights Reserved",
+      "paymentMethods": [
+        "Check"
+      ],
+      "certifications": [],
+      "newsletter": false,
+      "uniqueElements": [
+        {
+          "text": "info@sopranoscatering.com",
+          "url": "mailto:info@sopranoscatering.com?subject=Hello!"
+        },
+        {
+          "text": "1 (800) WE-CATER",
+          "url": "tel:15867019526"
+        },
+        {
+          "text": "Home",
+          "url": "/"
+        },
+        {
+          "text": "Weddings",
+          "url": "/weddings"
+        },
+        {
+          "text": "Corporate Events",
+          "url": "/corporate-events"
+        },
+        {
+          "text": "Social Events",
+          "url": "/social-events"
+        },
+        {
+          "text": "Grill & BBQ",
+          "url": "/grill-and-bbq"
+        },
+        {
+          "text": "By The Tray",
+          "url": "/catered-trays"
+        },
+        {
+          "text": "Apps & Enhancements",
+          "url": "/appetizers-and-enhancements"
+        },
+        {
+          "text": "Contact",
+          "url": "/contact"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "tallguy",
+      "footerHTML": "<footer class=\"sections\" data-footer-sections=\"\" id=\"footer-sections\">\n<section class=\"page-section layout-engine-section background-width--full-bleed section-height--custom content-width--wide horizontal-alignment--left vertical-alignment--middle dark\" data-active=\"true\" data-animation=\"none\" data-controller=\"SectionWrapperController\" data-controllers-bound=\"SectionWrapperController\" data-current-context='{\n          \"video\": {\n            \"playbackSpeed\": 0.5,\n            \"filter\": 1,\n            \"filterStrength\": 0,\n            \"zoom\": 0,\n            \"videoSourceProvider\": \"none\"\n          },\n          \"backgroundImageId\": null,\n          \"backgroundMediaEffect\": null,\n          \"divider\": null,\n          \"typeName\": \"page\"\n        }' data-current-styles='{\n          \"imageOverlayOpacity\": 0.15,\n          \"backgroundWidth\": \"background-width--full-bleed\",\n          \"sectionHeight\": \"section-height--custom\",\n          \"horizontalAlignment\": \"horizontal-alignment--left\",\n          \"verticalAlignment\": \"vertical-alignment--middle\",\n          \"contentWidth\": \"content-width--wide\",\n          \"sectionTheme\": \"dark\",\n          \"sectionAnimation\": \"none\",\n          \"backgroundMode\": \"image\"\n        }' data-section-id=\"61815c78a1ccc41698e09e1c\" data-section-theme=\"dark\" data-sqsp-section=\"classic-editor\" data-test=\"page-section\">\n<div class=\"section-border\">\n<div class=\"section-background\">\n</div>\n</div>\n<div class=\"content-wrapper\" style=\"\n      \n        \n          \n          padding-top: calc(vmax / 10); padding-bottom: calc(vmax / 10);\n        \n      \n    \">\n<div class=\"content\">\n<div class=\"sqs-layout sqs-grid-12 columns-12\" data-type=\"page-section\" id=\"page-section-61815c78a1ccc41698e09e1c\"><div class=\"row sqs-row\"><div class=\"col sqs-col-12 span-12\"><div class=\"sqs-block website-component-block sqs-block-website-component sqs-block-horizontalrule horizontalrule-block\" data-block-css='[\"https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.styles.css\"]' data-block-scripts='[\"https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.horizontalrule/6963bc9d-1eb2-4d4d-87d1-74120045f27f_200/website.components.horizontalrule.visitor.js\"]' data-block-type=\"1337\" data-definition-name=\"website.components.horizontalrule\" data-sqsp-block=\"line\" data-website-component-id=\"yui_3_17_2_1_1635867800190_12908\" id=\"block-yui_3_17_2_1_1635867800190_12908\"><div class=\"sqs-block-content\">\n<div>\n<hr/>\n<style class=\"transform-overrides-vars\">\n</style>\n</div>\n</div></div><div class=\"sqs-block newsletter-block sqs-block-newsletter rendered\" data-block-type=\"51\" data-border-radii='{\"topLeft\":{\"unit\":\"px\",\"value\":0.0},\"topRight\":{\"unit\":\"px\",\"value\":0.0},\"bottomLeft\":{\"unit\":\"px\",\"value\":0.0},\"bottomRight\":{\"unit\":\"px\",\"value\":0.0}}' data-sqsp-block=\"newsletter\" id=\"block-26d04801631793056fa4\"><div class=\"sqs-block-content\">\n<div class=\"newsletter-form-wrapper newsletter-form-show-name newsletter-form-wrapper--layoutFloat newsletter-form-wrapper--alignCenter\">\n<form autocomplete=\"on\" class=\"newsletter-form\" data-form-id=\"61815c78a1ccc41698e09e1a\" method=\"POST\" novalidate=\"\" onsubmit=\"return (function (form) {\n    Y.use('squarespace-form-submit', 'node', function usingFormSubmit(Y) {\n      (new Y.Squarespace.FormSubmit(form)).submit({\n        formId: '61815c78a1ccc41698e09e1a',\n        collectionId: '65a19ece57cce92947098be1',\n        objectName: 'page-section-61815c78a1ccc41698e09e1c'\n      });\n    });\n    return false;\n  })(this);\">\n<header class=\"newsletter-form-header\">\n<div class=\"newsletter-form-header-description\"><p class=\"\" style=\"white-space:pre-wrap;\">We heard you love food. We have a lot in common. Let's stay in touch.</p></div>\n</header>\n<div class=\"newsletter-form-body\">\n<div class=\"newsletter-form-fields-wrapper form-fields\" style=\"vertical-align: middle;\">\n<fieldset class=\"newsletter-form-name-fieldset form-item fields name required\" id=\"name-yui_3_17_2_1_1559597368474_10441\" style=\"vertical-align: bottom;\">\n<div class=\"newsletter-form-field-wrapper field first-name\">\n<label class=\"newsletter-form-field-label title\">First Name</label>\n<input class=\"newsletter-form-field-element field-element field-control\" data-title=\"First\" maxlength=\"30\" name=\"fname\" placeholder=\"First Name\" spellcheck=\"false\" type=\"text\" x-autocompletetype=\"given-name\"/>\n</div>\n<div class=\"newsletter-form-field-wrapper field last-name\">\n<label class=\"newsletter-form-field-label title\">Last Name</label>\n<input class=\"newsletter-form-field-element field-element field-control\" data-title=\"Last\" maxlength=\"30\" name=\"lname\" placeholder=\"Last Name\" spellcheck=\"false\" type=\"text\" x-autocompletetype=\"surname\"/>\n</div>\n</fieldset>\n<div class=\"newsletter-form-field-wrapper form-item field email required\" id=\"email-yui_3_17_2_1_1559597368474_10440\" style=\"vertical-align: bottom;\">\n<label class=\"ne",
+      "columns": [],
+      "contact": {},
+      "social": {},
+      "legal": {
+        "privacy": {
+          "text": "Privacy Policy",
+          "url": "https://www.tallguyandagrill.com/privacy-policy"
+        },
+        "terms": {
+          "text": "Terms & Conditions",
+          "url": "/terms-and-conditions"
+        }
+      },
+      "copyright": "",
+      "paymentMethods": [],
+      "certifications": [
+        "Green Business"
+      ],
+      "newsletter": true,
+      "uniqueElements": [
+        {
+          "text": "Privacy Policy",
+          "url": "https://www.tallguyandagrill.com/privacy-policy"
+        },
+        {
+          "text": "Terms & Conditions",
+          "url": "/terms-and-conditions"
+        }
+      ],
+      "fullPageLinks": []
+    },
+    {
+      "name": "wolfgangpuck",
+      "footerHTML": "<footer class=\"main_footer\">\n<div class=\"main_footer-body\">\n<div class=\"main_footer-logo\">\n<div class=\"hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module widget-type-custom-logo\" data-hs-cos-general-type=\"widget\" data-hs-cos-type=\"module\" id=\"hs_cos_wrapper_footer_logo\" style=\"\">\n<a href=\"//wolfgangpuckcatering.com\">\n<img alt=\"WPC Footer Logo\" class=\"main_logo\" height=\"142\" loading=\"eager\" sizes=\"(max-width: 186px) 100vw, 186px\" src=\"https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/img-footer-logo.png?width=186&amp;height=142&amp;name=img-footer-logo.png\" srcset=\"https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/img-footer-logo.png?width=93&amp;height=71&amp;name=img-footer-logo.png 93w, https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/img-footer-logo.png?width=186&amp;height=142&amp;name=img-footer-logo.png 186w, https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/img-footer-logo.png?width=279&amp;height=213&amp;name=img-footer-logo.png 279w, https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/img-footer-logo.png?width=372&amp;height=284&amp;name=img-footer-logo.png 372w, https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/img-footer-logo.png?width=465&amp;height=355&amp;name=img-footer-logo.png 465w, https://wolfgangpuckcatering.com/hs-fs/hubfs/raw_assets/public/wpc-june-2025/images/img-footer-logo.png?width=558&amp;height=426&amp;name=img-footer-logo.png 558w\" style=\"max-width: 100%; height: auto;\" width=\"186\"/>\n</a>\n</div>\n</div>\n<div class=\"main_footer-form\">\n<div class=\"hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_module widget-type-form\" data-hs-cos-general-type=\"widget\" data-hs-cos-type=\"module\" id=\"hs_cos_wrapper_footer_form\" style=\"\">\n<span class=\"hs_cos_wrapper hs_cos_wrapper_widget hs_cos_wrapper_type_form\" data-hs-cos-general-type=\"widget\" data-hs-cos-type=\"form\" id=\"hs_cos_wrapper_footer_form_\" style=\"\"><h3 class=\"hs_cos_wrapper form-title\" data-hs-cos-general-type=\"widget_field\" data-hs-cos-type=\"text\" id=\"hs_cos_wrapper_footer_form_title\">Join our mailing list</h3>\n<div data-hs-forms-root=\"true\" id=\"hs_form_target_footer_form\"><form accept-charset=\"UTF-8\" action=\"https://forms.hsforms.com/submissions/v3/public/submit/formsnext/multipart/42502924/739143cb-2ab2-4a1c-b637-0a7b5f5a4463\" class=\"hs-form-private hsForm_739143cb-2ab2-4a1c-b637-0a7b5f5a4463 hs-form-739143cb-2ab2-4a1c-b637-0a7b5f5a4463 hs-form-739143cb-2ab2-4a1c-b637-0a7b5f5a4463_401cb652-f0de-4476-8a47-fedc8d0f35ed hs-form stacked hs-custom-form\" data-form-id=\"739143cb-2ab2-4a1c-b637-0a7b5f5a4463\" data-instance-id=\"401cb652-f0de-4476-8a47-fedc8d0f35ed\" data-portal-id=\"42502924\" data-test-id=\"hsForm_739143cb-2ab2-4a1c-b637-0a7b5f5a4463_2229\" enctype=\"multipart/form-data\" id=\"hsForm_739143cb-2ab2-4a1c-b637-0a7b5f5a4463_2229\" method=\"POST\" novalidate=\"\" target=\"target_iframe_739143cb-2ab2-4a1c-b637-0a7b5f5a4463_2229\"><div class=\"hs_email hs-email hs-fieldtype-text field hs-form-field\"><label class=\"\" for=\"email-739143cb-2ab2-4a1c-b637-0a7b5f5a4463_2229\" id=\"label-email-739143cb-2ab2-4a1c-b637-0a7b5f5a4463_2229\"><span>Email</span><span class=\"hs-form-required\">*</span></label><div class=\"input\"><input autocomplete=\"email\" class=\"hs-input\" id=\"email-739143cb-2ab2-4a1c-b637-0a7b5f5a4463_2229\" inputmode=\"email\" name=\"email\" placeholder=\"Enter Email\" required=\"\" type=\"email\" value=\"\"/></div></div><div class=\"hs_submit hs-submit\"><div class=\"hs-field-desc\" style=\"display: none;\"></div><div class=\"actions\"><input class=\"hs-button primary large\" type=\"submit\" value=\"Submit\"/></div></div><input name=\"hs_context\" type=\"hidden\" value='{\"embedAtTimestamp\":\"1787083269859\",\"formDefinitionUpdatedAt\":\"1762465141066\",\"disableCookieSubmission\":\"true\",\"clonedFromForm\":\"876c46bd-056c-4d30-a61b-773551371425\",\"renderRawHtml\":\"true\",\"userAgent\":\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36\",\"pageTitle\":\"Wolfgang Puck Catering | The Standard for Culinary Excellence\",\"pageUrl\":\"https://wolfgangpuckcatering.com/\",\"pageId\":\"192183248290\",\"isHubSpotCmsGeneratedPage\":true,\"canonicalUrl\":\"https://wolfgangpuckcatering.com\",\"contentType\":\"standard-page\",\"hutk\":\"d6b4bcf4534f04b5cced38952973e3b6\",\"__hsfp\":\"546be0025c6f1935460b238a99c42c21\",\"__hssc\":\"143134570.1.1787083270766\",\"__hstc\":\"143134570.d6b4bcf4534f04b5cced38952973e3b6.1787083270766.1787083270766.1787083270766.1\",\"formTarget\":\"#hs_form_target_footer_form\",\"formInstanceId\":\"2229\",\"pageName\":\"Wolfgang Puck Catering | The Standard for Culinary Excellence\",\"rumScriptExecuteTime\":543.5,\"rumTotalRequestTime\":733.7000000000698,\"rumTotalRenderTime\":775.8000000000466,\"rumServiceResponseTime\":190.20000000006985,\"rumFormRenderTime\":42.09999999997672,\"connectionType\":\"4g\",\"firstContentfulPaint\":0,\"largestContentfulPaint\":0,\"locale\":\"en\",\"timestam",
+      "columns": [
+        {
+          "heading": "",
+          "links": [
+            {
+              "text": "Recipes",
+              "url": "/recipe"
+            },
+            {
+              "text": "Careers",
+              "url": "/careers"
+            },
+            {
+              "text": "Press Inquiries",
+              "url": "/press-inquiries"
+            },
+            {
+              "text": "Contact",
+              "url": "/contact"
+            }
+          ]
+        },
+        {
+          "heading": "",
+          "links": [
+            {
+              "text": "Terms of use",
+              "url": "https://wolfgangpuckcatering.com/terms-conditions/"
+            },
+            {
+              "text": "Privacy Policy",
+              "url": "https://wolfgangpuckcatering.com/privacy-policy/"
+            },
+            {
+              "text": "Privacy Request",
+              "url": "https://privacyportal-eu-cdn.onetrust.com/dsarwebform/8394ad8c-2b46-4837-8771-cbc69779a644/31bea1f4-92c3-440b-be0e-468af4f4b1f3.html?Source=WolfgangPuck"
+            },
+            {
+              "text": "Code of Business Conduct",
+              "url": "https://wolfgangpuckcatering.com/hubfs/Code-of-Business-Conduct-English.pdf"
+            },
+            {
+              "text": "Wolfgang Puck Catering 2026",
+              "url": "javascript:void(0);"
+            }
+          ]
+        }
+      ],
+      "contact": {},
+      "social": {
+        "facebook": "https://www.facebook.com/WolfgangPuckCatering/"
+      },
+      "legal": {
+        "terms": {
+          "text": "Terms of use",
+          "url": "https://wolfgangpuckcatering.com/terms-conditions/"
+        },
+        "privacy": {
+          "text": "Privacy Policy",
+          "url": "https://wolfgangpuckcatering.com/privacy-policy/"
+        }
+      },
+      "copyright": "",
+      "paymentMethods": [],
+      "certifications": [
+        "Award Winner"
+      ],
+      "newsletter": true,
+      "uniqueElements": [
+        {
+          "text": "facebook-f icon",
+          "url": "https://www.facebook.com/WolfgangPuckCatering/"
+        },
+        {
+          "text": "instagram icon",
+          "url": "https://www.instagram.com/wpcatering/"
+        },
+        {
+          "text": "youtube icon",
+          "url": "https://www.youtube.com/@WPCatering"
+        },
+        {
+          "text": "linkedin icon",
+          "url": "https://www.linkedin.com/company/wolfgang-puck-catering/"
+        }
+      ],
+      "fullPageLinks": []
+    }
+  ],
+  "commonPatterns": {
+    "socialPlatformFrequency": {
+      "facebook": 8,
+      "instagram": 3
+    },
+    "legalLinkFrequency": {
+      "privacy": 6,
+      "terms": 3,
+      "accessibility": 1
+    },
+    "paymentMethodFrequency": {
+      "Discover": 2,
+      "Mastercard": 1,
+      "Check": 1
+    },
+    "certificationFrequency": {
+      "Award Winner": 4,
+      "NACE Member": 1,
+      "Green Business": 1
+    },
+    "columnCountDistribution": {
+      "0": 12,
+      "1": 2,
+      "2": 1
+    },
+    "hasContactPhone": 5,
+    "hasContactEmail": 6,
+    "hasNewsletter": 4,
+    "hasCopyright": 4,
+    "commonColumnHeadings": {},
+    "copyrightFormats": [
+      "© 2026 Cut and Taste2053 Pama Ln, Las Vegas, NV 89119",
+      "© 2026 Global Gourmet Catering. All rights reserved.\n\n\n\n\nPrivacy Policy",
+      "© 2016 Queen of Hearts Catering",
+      "© 2023 Sopranos Catering, All Rights Reserved"
+    ]
+  },
+  "metadata": {
+    "totalSitesProcessed": 15,
+    "extractionType": "enhanced",
+    "extractionDate": "2026-08-18T21:29:44.420136"
+  },
+  "templateRecommendations": {
+    "recommendedSocialPlatforms": [
+      "instagram",
+      "facebook",
+      "linkedin",
+      "youtube"
+    ],
+    "recommendedLegalPages": [
+      "privacy-policy",
+      "terms-of-service",
+      "cookie-policy",
+      "accessibility-statement"
+    ],
+    "recommendedFooterColumns": [
+      {
+        "heading": "Services",
+        "links": [
+          "Corporate Events",
+          "Social Events",
+          "Weddings",
+          "Menus"
+        ]
+      },
+      {
+        "heading": "Company",
+        "links": [
+          "About Us",
+          "Our Team",
+          "Careers",
+          "Blog"
+        ]
+      },
+      {
+        "heading": "Resources",
+        "links": [
+          "Gallery",
+          "Testimonials",
+          "FAQ",
+          "Contact"
+        ]
+      }
+    ],
+    "recommendedContactElements": [
+      "phone",
+      "email",
+      "address",
+      "hours"
+    ],
+    "recommendedCertifications": [
+      "Food Safety Certified",
+      "Award Winning Caterer"
+    ],
+    "industryBestPractices": {
+      "alwaysInclude": [
+        "Privacy Policy",
+        "Terms of Service",
+        "Copyright Notice"
+      ],
+      "highlyRecommended": [
+        "Cookie Policy",
+        "Accessibility Statement",
+        "Newsletter Signup"
+      ],
+      "niceToHave": [
+        "Payment Icons",
+        "Trust Badges",
+        "Awards Strip"
+      ]
+    }
+  }
+}

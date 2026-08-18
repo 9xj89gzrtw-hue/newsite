@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Salt Block Hospitality logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/b85d900acbf8.jpg",
+      "caption": "An indoor wedding ceremony aisle with wooden chairs, candles, and greenery, illuminated by hanging lights. suitable for background image",
+      "source": "Saltblock Hospitality",
+      "original_width": "2500px",
+      "original_height": "1667px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/abccea0d83bd.jpg",
+      "caption": "A modern living room with a gray sofa, orange armchair, and abstract art. suitable for background image",
+      "source": "Kimpton Hotel Monaco Salt Lake City",
+      "original_width": "1700px",
+      "original_height": "960px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/01e2aef51a08.jpg",
+      "caption": "A modern chrome shower system with a large square rain showerhead, handheld sprayer, and control valve. suitable for background image",
+      "source": "Amazon.com",
+      "original_width": "894px",
+      "original_height": "900px"
+    }
+  ]
+}

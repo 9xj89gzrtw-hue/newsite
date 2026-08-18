@@ -1,0 +1,42 @@
+{
+  "total_count": 6,
+  "extraction_date": "2026-01-20",
+  "sources_analyzed": 15,
+  "categories": {
+    "general": 4,
+    "menu": 1,
+    "logistics": 1
+  },
+  "faqs": [
+    {
+      "source": "ridgewells",
+      "question": "What Our Clients Say About Us \"They have helped us overcome some crazy challenges the last two years",
+      "category": "general"
+    },
+    {
+      "source": "sopranos",
+      "question": "When we do, we're happy to recommend them to our clients",
+      "category": "general"
+    },
+    {
+      "source": "cutandtaste",
+      "question": "Why do I keep coming back for more of their food",
+      "category": "menu"
+    },
+    {
+      "source": "ggcatering",
+      "question": "What does this mean",
+      "category": "general"
+    },
+    {
+      "source": "ggcatering",
+      "question": "What we do: Corporate Conferences Marketing Events IPO Parties Receptions Company Celebrations See all work Your future event starts here",
+      "category": "general"
+    },
+    {
+      "source": "queenofhearts",
+      "question": "When your event day comes, you will have complete peace of mind and be able to enjoy your event as if you were a guest, too",
+      "category": "logistics"
+    }
+  ]
+}

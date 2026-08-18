@@ -1,0 +1,79 @@
+{
+  "success": true,
+  "query": "gourmet catering food photography professional plating white background",
+  "count": 10,
+  "ranked": true,
+  "captioned_count": 9,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/9501705fc755.jpg",
+      "caption": "A gourmet dish on a white plate with watermarks and text: dreamstime.com, ID 460993785 © Matsasih.",
+      "source": "Dreamstime.com",
+      "original_width": "1600px",
+      "original_height": "1157px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/e74991c90735.jpg",
+      "caption": "A high-angle shot of three gourmet appetizers on a white plate, garnished with herbs and sauce. suitable for background image",
+      "source": "Shutterstock",
+      "original_width": "1024px",
+      "original_height": "1538px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/fd31b446d5e6.jpg",
+      "caption": "The image contains watermarks and text: dreamstime.com, ID 367471292 © Iryna Kushnarova.",
+      "source": "Dreamstime.com",
+      "original_width": "1600px",
+      "original_height": "1004px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/28ebac59dcd6.jpg",
+      "caption": "A white plate holds two seared steaks, sauce, and garnishes on a marble table. suitable for background image",
+      "source": "PartySlate",
+      "original_width": "5288px",
+      "original_height": "3563px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/200d6b26cab0.jpg",
+      "caption": "The image contains watermarks. It shows a food spread with bread, appetizers, and garnishes on a wooden table. suitable for background image",
+      "source": "123RF",
+      "original_width": "1300px",
+      "original_height": "731px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/918498e6d1cc.jpg",
+      "caption": "The image contains watermarks and text: dreamstime.com, ID 384395542 © Hermawati Hermawati.",
+      "source": "Dreamstime.com",
+      "original_width": "1120px",
+      "original_height": "1690px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/d2a4cc7e5a0c.jpg",
+      "caption": "A high-clarity image of a fish fillet with watermarks \"alamy\" and text \"Image ID: 3A355T9 www.alamy.com\".",
+      "source": "Alamy",
+      "original_width": "1300px",
+      "original_height": "1065px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ad54a0d774f5.jpeg",
+      "caption": "",
+      "source": "Pexels",
+      "original_width": "4672px",
+      "original_height": "7008px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/5832ba871b39.jpg",
+      "caption": "COOKING SCHOOL The Basics of Food Plating kitchn suitable for background image",
+      "source": "The Kitchn",
+      "original_width": "3333px",
+      "original_height": "5000px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/31bcd481c04e.jpg",
+      "caption": "A gourmet dish with a green base, orange sauce, and shrimp garnish on a white background. suitable for background image",
+      "source": "Cloud Catering",
+      "original_width": "2500px",
+      "original_height": "1948px"
+    }
+  ]
+}

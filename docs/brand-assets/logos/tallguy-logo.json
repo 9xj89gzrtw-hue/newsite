@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Tall Guy and a Grill catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/5d07889437fe.png",
+      "caption": "A red background features the white text \"TALL GUY AND A GRILL\" and a black banner with \"CATERING\". suitable for background image",
+      "source": "www.tallguyandagrill.com",
+      "original_width": "2500px",
+      "original_height": "1046px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/cc9e9153316e.jpg",
+      "caption": "The image displays the logo for \"TALL GUY AND A GRILL CATERING\" on a white background. suitable for background image",
+      "source": "eGuide Tech Allies",
+      "original_width": "2240px",
+      "original_height": "1000px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/15a4af62038d.jpeg",
+      "caption": "A logo for \"Tall Guy and a Grill Catering\" featuring a chef figure, established in 2009. Text: EST. 2009 TALL GUY AND A GRILL CATERING",
+      "source": "Turner Hall Ballroom Weddings",
+      "original_width": "2400px",
+      "original_height": "2686px"
+    }
+  ]
+}

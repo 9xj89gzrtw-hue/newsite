@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Concept Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/6a03690224f1.jpg",
+      "caption": "A logo featuring a chef's hat, a fork, and a heart shape, with the text \"Lorem ipsum\" below. The image contains watermarks. Text: Lorem ipsum",
+      "source": "Dreamstime.com",
+      "original_width": "1600px",
+      "original_height": "1690px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/44c75cb6753b.jpg",
+      "caption": "A circular sign for \"Blue's on Franklin\" and text \"SMOKED NC BBQ\" on a building facade. Text: 110 W FRANKLIN ST, Blue's on Franklin, 2020, FOOD SPORTS AND MUSIC, CHAPEL HILL NC, SMOKED NC BBQ",
+      "source": "Chapelboro.com",
+      "original_width": "1280px",
+      "original_height": "640px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/7b4e7dbd7e14.jpg",
+      "caption": "The image displays the red Pizza Hut logo with the text \"Pizza Hut\" and a roof icon. suitable for background image",
+      "source": "Logos-World.net",
+      "original_width": "3840px",
+      "original_height": "2160px"
+    }
+  ]
+}

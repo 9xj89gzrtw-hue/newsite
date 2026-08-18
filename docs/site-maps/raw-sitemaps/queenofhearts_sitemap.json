@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap Index</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://queenofheartscatering.com/sitemap-misc.xml\">https://queenofheartscatering.com/sitemap-misc.xml</a><br /><time>2026-07-27T20:03:41+00:00</time></div>\n<div><a href=\"https://queenofheartscatering.com/post-sitemap.xml\">https://queenofheartscatering.com/post-sitemap.xml</a><br /><time>2026-07-27T20:03:41+00:00</time></div>\n<div><a href=\"https://queenofheartscatering.com/page-sitemap.xml\">https://queenofheartscatering.com/page-sitemap.xml</a><br /><time>2026-07-27T19:55:15+00:00</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap Index",
+    "url": "https://www.queenofheartscatering.com/sitemap.xml",
+    "usage": {
+      "tokens": 208
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 208
+    }
+  },
+  "status": 200
+}

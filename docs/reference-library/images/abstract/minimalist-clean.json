@@ -1,0 +1,79 @@
+{
+  "success": true,
+  "query": "minimalist clean white catering website design modern typography",
+  "count": 10,
+  "ranked": true,
+  "captioned_count": 10,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/5d14192db66b.jpg",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "Canva",
+      "original_width": "1131px",
+      "original_height": "1600px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/dda9a1912e28.jpg",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "Canva",
+      "original_width": "1131px",
+      "original_height": "1600px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/276a600e45a8.jpg",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "Framer",
+      "original_width": "3456px",
+      "original_height": "1990px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/7de77f8bdd79.jpg",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "Canva",
+      "original_width": "1131px",
+      "original_height": "1600px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/75ae0ecf8976.jpg",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "Dreamstime.com",
+      "original_width": "1600px",
+      "original_height": "776px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/cf7964ee4e4d.jpg",
+      "caption": "The image contains a large amount of text information and you do not need to output the text completely.",
+      "source": "Colorlib",
+      "original_width": "1800px",
+      "original_height": "2081px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/18f7ab55f1a4.jpg",
+      "caption": "A promotional banner for a food menu featuring grilled chicken skewers and vegetables, with a logo and text.",
+      "source": "GraphicsFamily",
+      "original_width": "2560px",
+      "original_height": "1440px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/95c3d780be8c.jpg",
+      "caption": "A logo for \"Adlenaire Catering\" featuring a fork and spoon icon. Text: Adlenaire Catering. suitable for background image",
+      "source": "Canva",
+      "original_width": "1600px",
+      "original_height": "1600px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/e3968117d7c2.jpg",
+      "caption": "A clear plastic cup filled with iced coffee and milk, featuring the text \"CONSIDERED CUPS\" and \"NKORA\". suitable for background image",
+      "source": "Framer",
+      "original_width": "3456px",
+      "original_height": "1990px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/ab0b67415be4.jpeg",
+      "caption": "The image displays the Webflow Templates page, featuring four distinct website design previews. Text: webflow, Templates, MARKABLE, clean agency template, EPIC, Design Is Intelligence Made Visible., Build your website with Moka today.",
+      "source": "Webflow",
+      "original_width": "2400px",
+      "original_height": "1260px"
+    }
+  ]
+}

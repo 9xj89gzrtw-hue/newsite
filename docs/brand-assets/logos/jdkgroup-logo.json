@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "The JDK Group catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/eb9760a541ac.jpg",
+      "caption": "A large event hall decorated with hanging white stars, green trees, and colorful stage lighting. suitable for background image",
+      "source": "thejdkgroup.com",
+      "original_width": "1800px",
+      "original_height": "800px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/275a4c107e15.jpg",
+      "caption": "A white plate holds a piece of pan-seared fish on a bed of beans in orange sauce, garnished with herbs. suitable for background image",
+      "source": "The JDK Group",
+      "original_width": "3600px",
+      "original_height": "2025px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/37053ff8e022.jpg",
+      "caption": "A close-up of a plate of dumplings in cream sauce, topped with bacon, herbs, and nuts. suitable for background image",
+      "source": "thejdkgroup.com",
+      "original_width": "1800px",
+      "original_height": "800px"
+    }
+  ]
+}

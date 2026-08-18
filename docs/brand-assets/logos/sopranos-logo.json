@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Soprano's Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/4c575715c939.jpg",
+      "caption": "The image displays the Serrano Brothers logo, established in 2011, for eatery, events, and catering services. suitable for background image",
+      "source": "Serrano Brothers Eatery",
+      "original_width": "2048px",
+      "original_height": "1098px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/3f590b364de8.jpg",
+      "caption": "A black baseball cap with red embroidered text \"The Sopranos\". suitable for background image",
+      "source": "Amazon.com",
+      "original_width": "1015px",
+      "original_height": "1000px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/3cb1cfdb6bbb.jpg",
+      "caption": "Close-up of open-faced salmon sandwiches with lettuce, olives, and sprouts on a dark slate surface. suitable for background image",
+      "source": "Sopranos Catering",
+      "original_width": "1500px",
+      "original_height": "2250px"
+    }
+  ]
+}

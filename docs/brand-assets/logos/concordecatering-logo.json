@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Concorde Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/3c526e7e63d2.png",
+      "caption": "A dark green circle with a white infinity symbol inside. suitable for background image",
+      "source": "Concorde",
+      "original_width": "992px",
+      "original_height": "993px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/04d8d677d6ff.jpg",
+      "caption": "The interior of an airplane cabin with rows of seats covered in protective plastic. suitable for background image",
+      "source": "Simple Flying",
+      "original_width": "1600px",
+      "original_height": "900px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/a1de146d98d7.jpg",
+      "caption": "4K Ultra HD movie cover for \"The Concorde Airport '79\" featuring a Concorde jet and cast portraits.",
+      "source": "Amazon.com",
+      "original_width": "795px",
+      "original_height": "1000px"
+    }
+  ]
+}

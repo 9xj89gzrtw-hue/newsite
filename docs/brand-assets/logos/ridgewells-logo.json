@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Ridgewells Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/eca1ac0085e0.jpg",
+      "caption": "The image displays the \"ridgewells CATERING\" logo on a white background. Text: ridgewells CATERING. suitable for background image",
+      "source": "YouTube",
+      "original_width": "900px",
+      "original_height": "900px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/dab32781fbac.jpg",
+      "caption": "Six people in aprons and masks stand before a purple Ridgewells catering truck reading \"Passion for celebration.\"",
+      "source": "Ridgewells Catering",
+      "original_width": "980px",
+      "original_height": "980px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/432565f70d78.jpg",
+      "caption": "A blue neon sign reading \"This is where the magic happens\" is mounted on a green plant wall above a white bench. suitable for background image",
+      "source": "Ridgewells Catering",
+      "original_width": "980px",
+      "original_height": "1470px"
+    }
+  ]
+}

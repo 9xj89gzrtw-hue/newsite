@@ -1,0 +1,104 @@
+/* ============================================
+   Extracted Color Palettes
+   From: Competitor Analysis (22 sites)
+   ============================================ */
+
+/* 
+ * PREMIUM/LUXURY PALETTE
+ * Used by: Wolfgang Puck, Gamma Catering, Elegant Affairs
+ * Best for: High-end positioning, corporate/wedding focus
+ */
+:root {
+  --premium-primary: #1a1a1a;        /* Near-black */
+  --premium-secondary: #2c3e50;      /* Deep navy */
+  --premium-accent: #c4a052;         /* Gold/champagne */
+  --premium-accent-light: #d4af37;   /* Brighter gold */
+  --premium-background: #fafafa;     /* Off-white */
+  --premium-surface: #ffffff;        /* Pure white */
+  --premium-text: #1a1a1a;           /* Dark text */
+  --premium-text-muted: #6b7280;     /* Gray text */
+  --premium-border: #e5e7eb;         /* Light border */
+}
+
+/*
+ * MODERN/FRESH PALETTE
+ * Used by: GG Catering, Creative Edge, By Word of Mouth
+ * Best for: Approachable, chef-driven, local feel
+ */
+:root {
+  --fresh-primary: #16a34a;          /* Green (growth, fresh) */
+  --fresh-primary-dark: #15803d;    /* Darker green */
+  --fresh-secondary: #0369a1;       /* Blue accent */
+  --fresh-accent: #f59e0b;          /* Warm amber */
+  --fresh-background: #ffffff;      /* White */
+  --fresh-surface: #f8fafc;         /* Very light gray */
+  --fresh-text: #1e293b;            /* Slate dark */
+  --fresh-text-muted: #64748b;      /* Slate muted */
+}
+
+/*
+ * BOLD/ENERGETIC PALETTE
+ * Used by: Sopranos, Cut & Taste LV
+ * Best for: High-energy, action-oriented brands
+ */
+:root {
+  --bold-primary: #dc2626;           /* Strong red */
+  --bold-primary-dark: #b91c1c;    /* Darker red */
+  --bold-secondary: #f97316;        /* Orange accent */
+  --bold-accent: #000000;           /* Black contrast */
+  --bold-background: #ffffff;
+  --bold-surface: #fef2f2;          /* Red-tinted white */
+  --bold-text: #171717;
+  --bold-text-muted: #525252;
+}
+
+/*
+ * CONCORDE CATERING - RECOMMENDED BASE
+ * Synthesized from analysis + brand guidelines
+ * Adjust based on final brand decisions
+ */
+:root {
+  /* Primary - Main brand color */
+  --color-primary: #0f172a;         /* Deep slate */
+  --color-primary-hover: #1e293b;
+  
+  /* Secondary - Accent color */
+  --color-secondary: #b8860b;       /* Dark goldenrod */
+  --color-secondary-light: #daa520; /* Goldenrod */
+  
+  /* Semantic colors */
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-error: #dc2626;
+  --color-info: #0284c7;
+  
+  /* Neutrals */
+  --color-white: #ffffff;
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-300: #cbd5e1;
+  --color-gray-400: #94a3b8;
+  --color-gray-500: #64748b;
+  --color-gray-600: #475569;
+  --color-gray-700: #334155;
+  --color-gray-800: #1e293b;
+  --color-gray-900: #0f172a;
+  
+  /* Backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-accent: #0f172a;
+  --bg-muted: #f1f5f9;
+  
+  /* Text */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+  
+  /* Borders */
+  --border-light: #e2e8f0;
+  --border-default: #cbd5e1;
+  --border-strong: #94a3b8;
+}

@@ -1,0 +1,30 @@
+{
+  "success": true,
+  "query": "Queen of Hearts Catering logo official",
+  "count": 3,
+  "ranked": true,
+  "captioned_count": 3,
+  "results": [
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/e15f1a83de47.jpg",
+      "caption": "The image shows the Tripoley board game box, a green game mat, playing cards, and poker chips.",
+      "source": "Amazon.com",
+      "original_width": "1910px",
+      "original_height": "1000px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/6c716208ac31.png",
+      "caption": "The image contains the text: THEKOI JAPANESE CUISINE SAKE BAR. It is a simple text-based image.",
+      "source": "www.thekoisushi.com",
+      "original_width": "1635px",
+      "original_height": "586px"
+    },
+    {
+      "original_url": "https://z-cdn.chatglm.cn/image-search-mcp/images-ppt/04df876c2f38.jpg",
+      "caption": "The image displays the text \"THE Brunch CLUB\" in white on a solid red background. suitable for background image",
+      "source": "Canva",
+      "original_width": "1600px",
+      "original_height": "1600px"
+    }
+  ]
+}

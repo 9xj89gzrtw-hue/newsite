@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap Index</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://joels.com/post-sitemap.xml\">https://joels.com/post-sitemap.xml</a><br /><time>2024-05-17T21:20:23+00:00</time></div>\n<div><a href=\"https://joels.com/page-sitemap.xml\">https://joels.com/page-sitemap.xml</a><br /><time>2026-08-05T13:41:13+00:00</time></div>\n<div><a href=\"https://joels.com/category-sitemap.xml\">https://joels.com/category-sitemap.xml</a><br /><time>2024-05-17T21:20:23+00:00</time></div>\n<div><a href=\"https://joels.com/post_tag-sitemap.xml\">https://joels.com/post_tag-sitemap.xml</a><br /><time>2024-05-17T21:20:23+00:00</time></div>\n<div><a href=\"https://joels.com/clients-category-sitemap.xml\">https://joels.com/clients-category-sitemap.xml</a><br /><time>2023-08-09T16:08:58+00:00</time></div>\n<div><a href=\"https://joels.com/restaurant-menu-category-sitemap.xml\">https://joels.com/restaurant-menu-category-sitemap.xml</a><br /><time>2019-11-18T10:44:59+00:00</time></div>\n<div><a href=\"https://joels.com/team-category-sitemap.xml\">https://joels.com/team-category-sitemap.xml</a><br /><time>2026-05-28T21:20:49+00:00</time></div>\n<div><a href=\"https://joels.com/testimonials-category-sitemap.xml\">https://joels.com/testimonials-category-sitemap.xml</a><br /><time>2023-08-09T17:52:50+00:00</time></div>\n<div><a href=\"https://joels.com/author-sitemap.xml\">https://joels.com/author-sitemap.xml</a><br /><time>2023-09-26T19:23:10+00:00</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap Index",
+    "url": "https://joels.com/sitemap.xml",
+    "usage": {
+      "tokens": 514
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 514
+    }
+  },
+  "status": 200
+}

@@ -1,0 +1,48 @@
+<!-- ============================================
+     Hero Template 3: Full Video/Cinematic
+     Used by: Wolfgang Puck, Cut & Taste LV
+     Best for: Premium/luxury positioning, high impact
+     ============================================ -->
+
+<section class="hero hero--cinematic">
+  <!-- Video background with fallback -->
+  <video class="hero__video" autoplay muted loop playsinline poster="poster.jpg">
+    <source src="hero-video.mp4" type="video/mp4" />
+  </video>
+  
+  <!-- Gradient overlay for text readability -->
+  <div class="hero__overlay hero__overlay--gradient"></div>
+  
+  <div class="hero__content container">
+    <div class="hero__badge">Setting the Standard</div>
+    
+    <h1 class="hero__headline">
+      <span class="hero__line">Culinary</span>
+      <span class="hero__line hero__line--accent">Excellence</span>
+    </h1>
+    
+    <p class="hero__subheadline">
+      An unparalleled dining experience for life's most important moments
+    </p>
+    
+    <div class="hero__cta-row">
+      <a href="/contact" class="btn btn-primary btn-hero">
+        Inquire About Your Event
+      </a>
+      <a href="/about" class="btn btn-ghost btn-hero">
+        Learn More →
+      </a>
+    </div>
+  </div>
+  
+  <!-- Floating accent element -->
+  <div class="hero__accent-shape"></div>
+</section>
+
+<!-- CSS Notes:
+  - Autoplay video (muted required)
+  - Strong gradient overlay (dark at bottom)
+  - Animated text reveal on load
+  - Accent shape for visual interest
+  - Consider performance: video < 5MB preferred
+-->

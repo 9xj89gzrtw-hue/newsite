@@ -1,0 +1,1031 @@
+{
+  "primaryAction": [
+    {
+      "site": "concordecatering",
+      "text": "Book Catering",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Get Started",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Facebook",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle Facebook Pixel",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "START PLANNING",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "www.facebook.com (opens in a new window)",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ridgewells",
+      "text": "ORDER",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ridgewells",
+      "text": "ORDER ONLINE",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "Get Started",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "tallguy",
+      "text": "Book your date",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Start Planning",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Book your event",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Book your Event",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Book your Wedding",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Book a Chef",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "facebook-f icon",
+      "type": "link_cta",
+      "context": "CTA link"
+    }
+  ],
+  "secondaryAction": [
+    {
+      "site": "concordecatering",
+      "text": "LEARN more",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "concordecatering",
+      "text": "Learn more",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Learn More",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Catering Customer Review",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Catering Events Review",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Reviews &amp; Recognition",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "view more",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ggcatering",
+      "text": "Overview",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "VIEW WEDDINGS",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "View&nbsp;Our Services",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "View Venues",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "View All Articles",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "myradish",
+      "text": "Learn more",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "queenofhearts",
+      "text": "Explore",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "queenofhearts",
+      "text": "Angela and Andrew’s Scenic “I Do” Views at Springton Manor Farm",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ridgewells",
+      "text": "VIEW MENU",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ridgewells",
+      "text": "View More",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ridgewells",
+      "text": "View All Posts",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ridgewells",
+      "text": "VIEW HERE",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "View Menus &amp; Packages →",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "Discover Our Brands →",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "View Summer Menu",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "View Spring Menu",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "View Fall Menu",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "View Winter Menu",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Explore our venues",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "VIEW MORE",
+      "type": "link_cta",
+      "context": "CTA link"
+    }
+  ],
+  "contactCTA": [
+    {
+      "site": "concept-catering",
+      "text": "contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "concordecatering",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "creativeedge",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "creativeedge",
+      "text": "CONTACT",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Contact Us →",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "Contact Us",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "elegantaffairs",
+      "text": "CONTACT US",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "gammacatering",
+      "text": "CONTACT",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ggcatering",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "CONTACT US",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "myradish",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "queenofhearts",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "Contact@Saltblockhospitality.com",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "sopranos",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "sopranos",
+      "text": "Contact Us",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Show submenu for Contact",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Contact",
+      "type": "link_cta",
+      "context": "CTA link"
+    }
+  ],
+  "quoteRequest": [
+    {
+      "site": "wolfgangpuck",
+      "text": "Privacy Request",
+      "type": "link_cta",
+      "context": "CTA link"
+    }
+  ],
+  "formSubmission": [
+    {
+      "site": "elegantaffairs",
+      "text": "Submit",
+      "type": "form_submit",
+      "context": "form submission"
+    },
+    {
+      "site": "sopranos",
+      "text": "Submit",
+      "type": "form_submit",
+      "context": "form submission"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Submit",
+      "type": "form_submit",
+      "context": "form submission"
+    }
+  ],
+  "navigationCTA": [
+    {
+      "site": "concordecatering",
+      "text": "Open Menu Close Menu",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "concordecatering",
+      "text": "Sign Up",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "creativeedge",
+      "text": "MENU",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "creativeedge",
+      "text": "Open Menu Close Menu",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "creativeedge",
+      "text": "Folder: MENU",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "cutandtaste",
+      "text": "About",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "cutandtaste",
+      "text": "Back",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "Today",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "10",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "11",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "12",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "13",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "14",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "15",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "16",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "17",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "18",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "19",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "201",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "21",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "22",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "23",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "24",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "25",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "26",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "27",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "28",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "29",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "30",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "31",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "Event of the Month",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "Show more",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "I accept all",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "Individual Privacy Preferences",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "Preferences",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "gammacatering",
+      "text": "0?'':' tabindex=\"-1\" disabled')+'>'+d+badge+'",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "ggcatering",
+      "text": "What We Do",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "ggcatering",
+      "text": "Who We Are",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "ggcatering",
+      "text": "Play Full Video",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Preferences",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Reject",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Accept All",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle Essential",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle Comments",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle Google Tag Manager",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle Statistics",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle Google Analytics",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle Marketing",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle LinkedIn Insight",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle Snapchat Pixel",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Toggle Cookie Policy",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Close",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Save and Close",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Winter Catering Menu",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Catering Menus",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Dinner Menus",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Breakfast &amp; Lunch Menus",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "jdkgroup",
+      "text": "Make the Holidays Unforgettable at our Exclusive Holiday Party Venues",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "myradish",
+      "text": "Open Menu Close Menu",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "myradish",
+      "text": "Let's eat!Let's eat!",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "queenofhearts",
+      "text": "Don't forget the drinks! We've got you covered wit",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ridgewells",
+      "text": "Skip to Main Content",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "ridgewells",
+      "text": "Join",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "ridgewells",
+      "text": "JOIN",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "ridgewells",
+      "text": "DOWNLOAD HOLIDAY MENU",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "ridgewells",
+      "text": "Plan Your Event",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "Catering",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "Venues",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "Farm",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "SBH Cares",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "Open Menu Close Menu",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "Play",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "UnmuteMute",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "Settings",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "SpeedNormal",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "SpeedGo back to previous menu",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "0.5x",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "0.75x",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "Normal",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "1.25x",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "1.5x",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "1.75x",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "2x",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "Exit fullscreenEnter fullscreen",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "saltblock",
+      "text": "Sample Menus",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "Plan Your Menu",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "Event Planning Resources",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "PLAN AN EVENT",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "Menus",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "saltblock",
+      "text": "Get the list",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "sopranos",
+      "text": "Wedding Menus",
+      "type": "link_cta",
+      "context": "CTA link"
+    },
+    {
+      "site": "tallguy",
+      "text": "About",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "tallguy",
+      "text": "Catering",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "tallguy",
+      "text": "Open Menu Close Menu",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "tallguy",
+      "text": "SUBSCRIBE",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Skip to main content",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Enable accessibility for low vision",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Open the accessibility menu",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Show submenu for Services",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Show submenu for Location",
+      "type": "button",
+      "context": "button element"
+    },
+    {
+      "site": "wolfgangpuck",
+      "text": "Menu",
+      "type": "link_cta",
+      "context": "CTA link"
+    }
+  ],
+  "phoneCTA": [
+    {
+      "site": "gammacatering",
+      "text": "This button closes the dialog. Its functionality is identical to the Accept only essential cookies button.",
+      "type": "button",
+      "context": "button element"
+    }
+  ],
+  "emailCTA": []
+}

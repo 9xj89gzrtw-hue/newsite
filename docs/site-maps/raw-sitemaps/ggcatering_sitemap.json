@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap Index</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://www.ggcatering.com/sitemaps-1-section-events-1-sitemap.xml\">https://www.ggcatering.com/sitemaps-1-section-events-1-sitemap.xml</a><br /><time>2025-02-10T09:51:56-08:00</time></div>\n<div><a href=\"https://www.ggcatering.com/sitemaps-1-section-landingPages-1-sitemap.xml\">https://www.ggcatering.com/sitemaps-1-section-landingPages-1-sitemap.xml</a><br /><time>2026-06-11T16:45:50-07:00</time></div>\n<div><a href=\"https://www.ggcatering.com/sitemaps-1-section-venueRegions-1-sitemap.xml\">https://www.ggcatering.com/sitemaps-1-section-venueRegions-1-sitemap.xml</a><br /><time>2024-07-26T08:47:32-07:00</time></div>\n<div><a href=\"https://www.ggcatering.com/sitemaps-1-section-venues-1-sitemap.xml\">https://www.ggcatering.com/sitemaps-1-section-venues-1-sitemap.xml</a><br /><time>2026-08-18T10:40:24-07:00</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap Index",
+    "url": "https://ggcatering.com/sitemap.xml",
+    "usage": {
+      "tokens": 332
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 332
+    }
+  },
+  "status": 200
+}

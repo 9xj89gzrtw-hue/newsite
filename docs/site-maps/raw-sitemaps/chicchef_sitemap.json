@@ -1,0 +1,22 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap Index</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://www.chicchefcatering.com/post-sitemap.xml\">https://www.chicchefcatering.com/post-sitemap.xml</a><br /><time>2026-08-16T03:38:25+00:00</time></div>\n<div><a href=\"https://www.chicchefcatering.com/page-sitemap.xml\">https://www.chicchefcatering.com/page-sitemap.xml</a><br /><time>2026-08-14T17:54:06+00:00</time></div>\n<div><a href=\"https://www.chicchefcatering.com/category-sitemap.xml\">https://www.chicchefcatering.com/category-sitemap.xml</a><br /><time>2026-08-16T03:38:25+00:00</time></div>\n<div><a href=\"https://www.chicchefcatering.com/author-sitemap.xml\">https://www.chicchefcatering.com/author-sitemap.xml</a><br /><time>2026-05-21T15:55:37+00:00</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "publishedTime": "Tue, 18 Aug 2026 21:46:25 GMT",
+    "title": "Sitemap Index",
+    "url": "https://chicchefcatering.com/sitemap.xml",
+    "usage": {
+      "tokens": 276
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 276
+    }
+  },
+  "status": 200
+}

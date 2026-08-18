@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap Index</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://relishcaterers.com/post-sitemap.xml\">https://relishcaterers.com/post-sitemap.xml</a><br /><time>2026-08-17T21:53:24+00:00</time></div>\n<div><a href=\"https://relishcaterers.com/page-sitemap.xml\">https://relishcaterers.com/page-sitemap.xml</a><br /><time>2026-08-17T17:59:25+00:00</time></div>\n<div><a href=\"https://relishcaterers.com/venue-sitemap.xml\">https://relishcaterers.com/venue-sitemap.xml</a><br /><time>2026-07-07T15:47:09+00:00</time></div>\n<div><a href=\"https://relishcaterers.com/landing-sitemap.xml\">https://relishcaterers.com/landing-sitemap.xml</a><br /><time>2026-08-18T20:25:25+00:00</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap Index",
+    "url": "https://relishcaterers.com/sitemap.xml",
+    "usage": {
+      "tokens": 262
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 262
+    }
+  },
+  "status": 200
+}

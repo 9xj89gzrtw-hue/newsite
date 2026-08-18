@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap Index</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://elegantaffairscaterers.com/post-sitemap.xml\">https://elegantaffairscaterers.com/post-sitemap.xml</a><br /><time>2025-04-01T12:20:39+00:00</time></div>\n<div><a href=\"https://elegantaffairscaterers.com/page-sitemap.xml\">https://elegantaffairscaterers.com/page-sitemap.xml</a><br /><time>2026-04-24T13:14:46+00:00</time></div>\n<div><a href=\"https://elegantaffairscaterers.com/carousel_el-sitemap.xml\">https://elegantaffairscaterers.com/carousel_el-sitemap.xml</a><br /><time>2021-04-28T21:36:39+00:00</time></div>\n<div><a href=\"https://elegantaffairscaterers.com/locations-sitemap.xml\">https://elegantaffairscaterers.com/locations-sitemap.xml</a><br /><time>2025-05-19T20:28:44+00:00</time></div>\n<div><a href=\"https://elegantaffairscaterers.com/journals-sitemap.xml\">https://elegantaffairscaterers.com/journals-sitemap.xml</a><br /><time>2023-10-17T15:16:44+00:00</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap Index",
+    "url": "https://elegantaffairscaterers.com/sitemap.xml",
+    "usage": {
+      "tokens": 344
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 344
+    }
+  },
+  "status": 200
+}

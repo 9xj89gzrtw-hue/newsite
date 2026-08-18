@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://www.tallguyandagrill.com/our-story\">https://www.tallguyandagrill.com/our-story</a><br /><time>2026-01-08</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/reach-out\">https://www.tallguyandagrill.com/reach-out</a><br /><time>2026-05-20</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/careers\">https://www.tallguyandagrill.com/careers</a><br /><time>2025-01-13</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/weddings\">https://www.tallguyandagrill.com/weddings</a><br /><time>2026-05-04</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/drop-off\">https://www.tallguyandagrill.com/drop-off</a><br /><time>2025-10-14</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/faqs\">https://www.tallguyandagrill.com/faqs</a><br /><time>2025-12-04</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/sustainability\">https://www.tallguyandagrill.com/sustainability</a><br /><time>2025-04-16</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/venue-partners\">https://www.tallguyandagrill.com/venue-partners</a><br /><time>2026-03-31</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/sports-catering\">https://www.tallguyandagrill.com/sports-catering</a><br /><time>2025-08-12</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/home\">https://www.tallguyandagrill.com/home</a><br /><time>2026-07-15</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/events\">https://www.tallguyandagrill.com/events</a><br /><time>2025-12-04</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/urban-farm-dinner\">https://www.tallguyandagrill.com/urban-farm-dinner</a><br /><time>2025-05-03</time></div>\n<div><a href=\"https://www.tallguyandagrill.com/photo-gallery\">https://www.tallguyandagrill.com/photo-gallery</a><br /><time>2025-03-20</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap",
+    "url": "https://tallguyandagrill.com/sitemap.xml",
+    "usage": {
+      "tokens": 699
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 699
+    }
+  },
+  "status": 200
+}

@@ -1,0 +1,21 @@
+{
+  "code": 200,
+  "data": {
+    "description": "",
+    "html": "<html><head><title>Sitemap</title><meta name=\"description\" content=\"\"></head><body><div><a href=\"https://concordecatering.ca/home\">https://concordecatering.ca/home</a><br /><time>2026-01-26</time></div>\n<div><a href=\"https://concordecatering.ca/events\">https://concordecatering.ca/events</a><br /><time>2026-04-23</time></div>\n<div><a href=\"https://concordecatering.ca/contact\">https://concordecatering.ca/contact</a><br /><time>2025-11-12</time></div>\n<div><a href=\"https://concordecatering.ca/boardroom\">https://concordecatering.ca/boardroom</a><br /><time>2026-07-29</time></div>\n<div><a href=\"https://concordecatering.ca/store\">https://concordecatering.ca/store</a><br /><time>2024-11-27</time></div></body></html>",
+    "httpStatus": 200,
+    "httpStatusText": "",
+    "metadata": {},
+    "title": "Sitemap",
+    "url": "https://concordecatering.ca/sitemap.xml",
+    "usage": {
+      "tokens": 237
+    }
+  },
+  "meta": {
+    "usage": {
+      "tokens": 237
+    }
+  },
+  "status": 200
+}
