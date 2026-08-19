@@ -167,7 +167,7 @@ export function SiteFooter() {
     >
       {/* Giant stacked brand name (Concept-style) — scales down on mobile */}
       <div className="mx-auto max-w-7xl overflow-hidden px-5 md:px-8 py-12">
-        <motion.h2
+        <motion.div
           className="font-display uppercase leading-[0.85] text-gold/10 whitespace-nowrap select-none"
           style={{ fontSize: "clamp(3rem, 18vw, 12rem)" }}
           aria-hidden
@@ -176,8 +176,8 @@ export function SiteFooter() {
           viewport={{ once: false, margin: "-100px" }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
         >
-          Interfood
-        </motion.h2>
+          Interfood Catering
+        </motion.div>
       </div>
 
       <div className="mx-auto max-w-7xl px-5 md:px-8">

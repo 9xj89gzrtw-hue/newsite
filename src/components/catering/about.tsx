@@ -335,18 +335,8 @@ export function About() {
                   fontSize: "clamp(2rem, 5vw, 4rem)",
                 }}
               >
-                {"Кейтеринг, в котором".split(" ").map((word, i) => (
-                  <motion.span
-                    key={i}
-                    className="inline-block mr-3"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 + i * 0.15, duration: 0.7 }}
-                  >
-                    {word}
-                  </motion.span>
-                ))}
+                <span className="inline-block">Кейтеринг,</span>{" "}
+                <span className="inline-block">в котором</span>
                 <br />
                 <motion.span 
                   className="gradient-text italic inline-block mt-1"
@@ -357,15 +347,7 @@ export function About() {
                 >
                   чувствуют
                 </motion.span>
-                <motion.span 
-                  className="text-ink inline-block"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.8, duration: 0.5 }}
-                >
-                  {" "}радость
-                </motion.span>
+                {" "}радость
               </motion.h2>
             </Reveal>
 

@@ -93,9 +93,10 @@ export function InstagramVideo() {
                 className="mt-5 font-display text-ink"
                 style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.1 }}
               >
-                Живём на кухне,{" "}
-                <span className="gradient-text italic">снимаем</span>
-                <br />в Instagram
+                <span className="inline-block">Живём на кухне,</span>{" "}
+                <span className="gradient-text inline-block italic">снимаем</span>
+                {" "}
+                <span className="inline-block">в Instagram</span>
               </h2>
             </Reveal>
             <Reveal delay={0.2}>

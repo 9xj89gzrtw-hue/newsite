@@ -815,18 +815,9 @@ export function Services() {
                 className="mt-6 font-display text-ink leading-[1.05]"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.25rem)" }}
               >
-                {"Всё для события".split(" ").map((word, i) => (
-                  <motion.span
-                    key={i}
-                    className="inline-block mr-4"
-                    initial={{ opacity: 0, y: 25 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.15 + i * 0.12, duration: 0.7 }}
-                  >
-                    {word}
-                  </motion.span>
-                ))}
+                <span className="inline-block">Всё</span>{" "}
+                <span className="inline-block">для</span>{" "}
+                <span className="inline-block">события</span>
                 <br className="hidden sm:block" />
                 <motion.span 
                   className="gradient-text italic inline-block mt-1"

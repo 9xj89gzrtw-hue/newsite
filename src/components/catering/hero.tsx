@@ -698,10 +698,9 @@ export function Hero() {
           className="font-display text-ink relative"
           style={{
             fontSize: "clamp(2.5rem, 11vw, 8.5rem)",
-            lineHeight: 0.95,
-            // Tighter headline tracking — Playfair Display looks more cinematic
-            // at -0.04em; pairs with the kinetic scale for the oversized-type effect.
-            letterSpacing: "-0.04em",
+            lineHeight: 1.0,
+            // Normal spacing for readability — avoid letter-spacing collapse
+            letterSpacing: "0.02m",
             viewTransitionName: "hero-title" as React.CSSProperties["viewTransitionName"],
           }}
           initial={{ opacity: 0 }}
@@ -711,7 +710,7 @@ export function Hero() {
           <span className="relative inline-block">
             {/* Text Scramble Effect for "Interfood" */}
             <TextScramble
-              text="Interfood"
+              text="Interfood Catering"
               delay={0.6}
               duration={0.9}
               staggerDelay={0.06}
@@ -732,8 +731,9 @@ export function Hero() {
             <SignatureFlourish isVisible={isLoaded} />
           </span>
           
+          {" "}{'\u00A0'}{/* Explicit space to prevent collapsing */}
           <motion.span 
-            className="gradient-text ml-3 inline-block"
+            className="gradient-text inline-block"
             initial={{ clipPath: "inset(100% 0 0 0)", opacity: 0 }}
             animate={{ 
               clipPath: isLoaded ? "inset(0% 0 0 0)" : "inset(100% 0 0 0)", 
@@ -741,7 +741,7 @@ export function Hero() {
             }}
             transition={{ delay: 1.8, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            est. 2008
+            с 2008 года
           </motion.span>
         </motion.h1>
 
@@ -794,7 +794,7 @@ export function Hero() {
           
           {/* Play video button (if video available or for demo) */}
           <PremiumCTAButton 
-            href="#video" 
+            href="#video-events" 
             variant="tertiary"
             cursorLabel="видео"
             className="inline-flex lg:hidden"
