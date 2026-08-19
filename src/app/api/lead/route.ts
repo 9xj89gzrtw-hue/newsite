@@ -72,20 +72,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({ ok: true, id: lead.id }, { status: 201 });
     } catch (dbError) {
-      // Fallback: DB unavailable — log and return success for demo mode
-      console.warn("[LEAD_FALLBACK] DB unavailable, logging lead:", {
-        name,
-        phone,
-        email,
-        eventType,
-        guests,
-        budget,
-        message,
-        consentIp,
-        userAgent,
-        timestamp: new Date().toISOString(),
-        dbError: dbError instanceof Error ? dbError.message : String(dbError),
-      });
+      // Fallback: DB unavailable — return success for demo mode
 
       // Return success in demo/fallback mode so the form works without DB
       return NextResponse.json(
@@ -94,7 +81,6 @@ export async function POST(req: NextRequest) {
       );
     }
   } catch (e) {
-    console.error("lead create error", e);
     return NextResponse.json(
       { ok: false, error: "Внутренняя ошибка сервера" },
       { status: 500 },

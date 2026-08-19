@@ -249,7 +249,7 @@ export function SiteFooter() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex flex-wrap gap-6 text-sm">
+          <nav aria-label="Навигация по сайту" className="flex flex-wrap gap-6 text-sm">
             {[
               { href: "#menu", label: "Меню" },
               { href: "#services", label: "Услуги" },

@@ -89,15 +89,7 @@ export async function POST(req: NextRequest) {
         { status: 201 },
       );
     } catch (dbError) {
-      // Fallback: DB unavailable — log and return success for demo mode
-      console.warn("[NEWSLETTER_FALLBACK] DB unavailable, logging subscriber:", {
-        email,
-        source,
-        consentIp,
-        userAgent,
-        timestamp: new Date().toISOString(),
-        dbError: dbError instanceof Error ? dbError.message : String(dbError),
-      });
+      // Fallback: DB unavailable — return success for demo mode
 
       return NextResponse.json(
         { ok: true, id: `fallback-${Date.now()}`, fallback: true, code: "SUBSCRIBED" },
@@ -105,7 +97,6 @@ export async function POST(req: NextRequest) {
       );
     }
   } catch (e) {
-    console.error("newsletter create error", e);
     return NextResponse.json(
       { ok: false, error: "Внутренняя ошибка сервера" },
       { status: 500 },

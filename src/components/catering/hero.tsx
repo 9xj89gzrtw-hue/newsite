@@ -710,6 +710,8 @@ export function Hero() {
             <span className="bg-gradient-to-r from-ink via-ink to-ink bg-clip-text text-transparent">
               Interfood<span className="text-gold">.</span>
             </span>
+            {/* Screen-reader only: keywords for SEO */}
+            <span className="sr-only"> — Премиальный кейтеринг в Санкт-Петербурге</span>
             {/* Underline animation */}
             <motion.span
               className="absolute -bottom-2 left-0 h-1 rounded-full bg-gradient-to-r from-gold to-terracotta"
