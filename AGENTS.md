@@ -786,3 +786,44 @@ fromscratchcatering.com, stevenscatering.com, chefbyrequest.com, и др.
    `agent-browser open/snapshot/screenshot/errors`.
 5. Финальный design-review: `z-ai vision -p "brutal critique" -i screenshot.png`.
 6. Commit (Conventional Commits) + push. Деплой авто из `main` на Vercel.
+
+---
+
+## 12. История сессий (Session Log)
+
+### 2026-01-18 (Z.ai Agent) — Цикл улучшения UI/UX на основе эталонов
+
+**Задача:** Улучшить текущий сайт на основе анализа 29 эталонных кейтеринг-сайтов.
+
+**Выполненные улучшения:**
+
+| Компонент | Изменения | Эталоны |
+|----------|----------|---------|
+| **Hero** | Text Scramble эффект, магнитные CTA с ripple, scroll progress indicator, 4-слойный параллакс, signature flourish | Salza, Wolfgang Puck |
+| **Menu** | Визуальные карточки типов с миниатурами, 3D tilt, shimmer effect, улучшенные price badges | Wolfgang Puck, Pinch Food Design |
+| **Services** | 3D perspective tilt, mood-based glow, diagonal wave entrance, category tags | Ridgewells, Creative Edge |
+| **Events Gallery** | Parallax depth on scroll, shine sweep hover, thumbnail strip в lightbox, featured items spanning 2 колонок | Creative Edge, Cut & Taste |
+| **Calculator** | Визуальные type-карточки с иконками, slider с ticks/bubble, animated checkboxes, pulse анимация итога | Calconic, Culinary Canvas |
+| **Testimonials** | Infinite marquee цитат, avatar placeholders, animated stars, video testimonial cards | Relish Caterers, Salt Block |
+| **Contact** | Floating labels, gold focus glow, confetti при успехе, office hours, social proof badge | Concorde Catering, Sterling |
+| **Global CSS** | Gold shimmer sweep, premium focus states, custom scrollbar, stagger helpers | Общий luxury паттерн |
+
+**Технические исправления:**
+- SSR fix: добавлен `export const dynamic = 'force-dynamic'` для страницы
+- Добавлены `typeof window !== 'undefined'` guards для клиентского кода
+- Исправлен import path для nuqs (`nuqs/adapters/next` вместо `nuqs/adapters/next/app`)
+- Исправлен импорт иконки (`MousePointer` вместо несуществующего `Swipe`)
+- Исправлена переменная `loading` → `formStatus` в contact.tsx
+
+**Commit:** `e09b7ae` — `feat: улучшение сайта на основе эталонных кейтеринг-сайтов`
+
+**Статус:** ✅ Выполнено, готово к push (требуется настройка GitHub credentials)
+
+---
+
+## 13. Известные проблемы / Technical Debt
+
+1. **GitHub auth** — для push нужно настроить GitHub token или SSH ключи
+2. **Agent Browser** — возможны проблемы с подключением к localhost в некоторых средах
+3. **Preloader** — может показываться долго при первом посещении (1400ms animation)
+4. **Mux видео** — не настроен playback ID, используется fallback изображение
