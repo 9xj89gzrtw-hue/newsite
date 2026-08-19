@@ -325,7 +325,7 @@ export function Calculator() {
                           className="flex flex-col items-center"
                           style={{ position: 'absolute', left: `${position}%`, transform: 'translateX(-50%)' }}
                         >
-                          <span className={`font-mono text-[9px] mb-1.5 ${isActive ? 'text-ink/60' : 'text-ink/25'}`}>
+                          <span className={`font-mono text-[10px] mb-1.5 ${isActive ? 'text-ink/60' : 'text-ink/40'}`}>
                             {tick >= 1000 ? `${tick/1000}k` : tick}
                           </span>
                           <div className={`w-0.5 rounded-full transition-colors ${isActive ? 'h-3 bg-gold/60' : 'h-2 bg-ink/15'}`} />
@@ -370,7 +370,7 @@ export function Calculator() {
                 <div className="flex items-center justify-between mt-2">
                   <button
                     onClick={() => setGuests((g) => Math.max(5, g - 5))}
-                    className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-1.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95"
+                    className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-2.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95 min-h-[44px]"
                     aria-label="Меньше гостей"
                   >
                     <Minus className="size-3" /> −5
@@ -384,7 +384,7 @@ export function Calculator() {
                   
                   <button
                     onClick={() => setGuests((g) => Math.min(500, g + 5))}
-                    className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-1.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95"
+                    className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-2.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95 min-h-[44px]"
                     aria-label="Больше гостей"
                   >
                     +5 <Plus className="size-3" />

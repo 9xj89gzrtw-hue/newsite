@@ -337,7 +337,7 @@ export function SnackBoxDelivery() {
                           setQty({});
                           setOpenRow(null);
                         }}
-                        className="rounded-full px-3 py-1.5 text-xs font-medium text-ink/50 transition-colors hover:text-bordeaux hover:underline"
+                        className="rounded-full px-3 py-2.5 text-xs font-medium text-ink/50 transition-colors hover:text-bordeaux hover:underline min-h-[44px]"
                       >
                         Сбросить
                       </button>

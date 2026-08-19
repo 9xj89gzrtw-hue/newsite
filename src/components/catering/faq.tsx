@@ -314,7 +314,7 @@ export function Faq() {
                   type="button"
                   onClick={() => setQuery("")}
                   aria-label="Очистить поиск"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex size-8 items-center justify-center rounded-full text-ink/50 hover:bg-ink/5 hover:text-ink transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex size-11 items-center justify-center rounded-full text-ink/50 hover:bg-ink/5 hover:text-ink transition-colors min-h-[44px] min-w-[44px]"
                 >
                   <X className="size-4" />
                 </button>
