@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, HelpCircle, Search, X } from "lucide-react";
+import { ChevronDown, HelpCircle, Search, X, ThumbsUp, ThumbsDown, Check } from "lucide-react";
 import { Reveal } from "./reveal";
 
 type FaqCategory = "ordering" | "logistics" | "menu" | "payment";
@@ -101,6 +101,130 @@ function highlightMatch(text: string, query: string) {
         {part.value}
       </mark>
     )
+  );
+}
+
+const VOTE_KEY = "faq-votes";
+const POSITIVE_THRESHOLD = 5; // show "Спасибо за отзыв!" after this many aggregate votes (localStorage-only)
+
+/**
+ * Read all faq votes from localStorage. Returns map of question → "up"|"down".
+ */
+function readVotes(): Record<string, "up" | "down"> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(VOTE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeVote(question: string, vote: "up" | "down") {
+  if (typeof window === "undefined") return;
+  try {
+    const all = readVotes();
+    all[question] = vote;
+    window.localStorage.setItem(VOTE_KEY, JSON.stringify(all));
+  } catch {
+    // ignore quota errors
+  }
+}
+
+/**
+ * WasHelpful — "Was this helpful?" thumb-up/down per answer.
+ * Vote persisted to localStorage; aggregates shown after threshold.
+ */
+function WasHelpful({ question }: { question: string }) {
+  const [vote, setVote] = useState<"up" | "down" | null>(null);
+  const [totalUp, setTotalUp] = useState(0);
+  const [totalDown, setTotalDown] = useState(0);
+
+  useEffect(() => {
+    const all = readVotes();
+    setVote(all[question] ?? null);
+    // Aggregate from localStorage — only this device's votes (no backend).
+    // For demo purposes; a real backend would store aggregates server-side.
+    const votes = Object.entries(all);
+    const up = votes.filter(([, v]) => v === "up").length;
+    const down = votes.filter(([, v]) => v === "down").length;
+    setTotalUp(up);
+    setTotalDown(down);
+  }, [question]);
+
+  const onVote = (choice: "up" | "down") => {
+    const newVote = vote === choice ? null : choice;
+    setVote(newVote);
+    if (newVote) {
+      writeVote(question, newVote);
+      // Optimistically update aggregate
+      if (newVote === "up") setTotalUp((n) => n + 1);
+      else setTotalDown((n) => n + 1);
+      if (vote && vote !== newVote) {
+        // Undo previous vote
+        if (vote === "up") setTotalUp((n) => Math.max(0, n - 1));
+        else setTotalDown((n) => Math.max(0, n - 1));
+      }
+    } else {
+      // Undo
+      if (vote === "up") setTotalUp((n) => Math.max(0, n - 1));
+      else if (vote === "down") setTotalDown((n) => Math.max(0, n - 1));
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-3 text-xs text-ink/50">
+      <span>Помог ответ?</span>
+      <button
+        type="button"
+        onClick={() => onVote("up")}
+        aria-pressed={vote === "up"}
+        aria-label="Да, помог"
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[28px] ${
+          vote === "up"
+            ? "border-sage/40 bg-sage/15 text-sage"
+            : "border-border-line hover:border-sage/30 hover:text-sage"
+        }`}
+      >
+        <ThumbsUp className="size-3" />
+        Да
+        {totalUp >= POSITIVE_THRESHOLD && (
+          <span className="font-mono text-[10px] opacity-70">{totalUp}</span>
+        )}
+      </button>
+      <button
+        type="button"
+        onClick={() => onVote("down")}
+        aria-pressed={vote === "down"}
+        aria-label="Нет, не помог"
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[28px] ${
+          vote === "down"
+            ? "border-bordeaux/30 bg-bordeaux/5 text-bordeaux"
+            : "border-border-line hover:border-bordeaux/30 hover:text-bordeaux"
+        }`}
+      >
+        <ThumbsDown className="size-3" />
+        Нет
+        {totalDown >= POSITIVE_THRESHOLD && (
+          <span className="font-mono text-[10px] opacity-70">{totalDown}</span>
+        )}
+      </button>
+      <AnimatePresence>
+        {vote && (
+          <motion.span
+            key="thanks"
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
+            transition={{ duration: 0.25 }}
+            className="inline-flex items-center gap-1 text-sage"
+          >
+            <Check className="size-3" />
+            Спасибо за отзыв!
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -295,6 +419,10 @@ export function Faq() {
                         <p className="px-6 pb-5 pl-16 leading-relaxed text-ink/70 text-base">
                           {highlightMatch(item.answer, query)}
                         </p>
+                        {/* Was this helpful? — thumb up/down (localStorage) */}
+                        <div className="px-6 pb-5 pl-16 border-t border-border-line/40 pt-3">
+                          <WasHelpful question={item.question} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -315,7 +443,7 @@ export function Faq() {
             </p>
             <a
               href="tel:+78129195911"
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.03] active:scale-[0.98] min-h-[44px]"
+              className="mt-4 inline-flex items-center gap-2 rounded-full cta-gradient-punchy bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.03] active:scale-[0.98] min-h-[44px]"
             >
               +7 (812) 919-59-11
             </a>

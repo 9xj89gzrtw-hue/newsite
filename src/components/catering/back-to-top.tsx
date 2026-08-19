@@ -41,6 +41,7 @@ export function BackToTop() {
     <motion.button
       onClick={scrollToTop}
       aria-label="Наверх страницы"
+      data-back-to-top=""
       initial={false}
       animate={
         visible

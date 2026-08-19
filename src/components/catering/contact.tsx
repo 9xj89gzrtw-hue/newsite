@@ -116,7 +116,10 @@ function useOfficeStatus() {
 }
 
 /**
- * Floating label input component with gold focus glow
+ * Floating label input component with gold focus glow + real-time validation.
+ * On blur: if a `validate` prop is passed and the value passes, show a sage
+ * CheckCircle2 next to the input. This rewards correct typing and reduces
+ * "submit → error → fix" round-trips.
  */
 function FloatingInput({
   id,
@@ -128,6 +131,7 @@ function FloatingInput({
   autoComplete,
   error,
   icon: Icon,
+  validate,
 }: {
   id: string;
   name?: string;
@@ -138,13 +142,30 @@ function FloatingInput({
   autoComplete?: string;
   error?: boolean;
   icon?: React.ComponentType<{ className?: string }>;
+  validate?: (value: string) => boolean;
 }) {
   const [focused, setFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+  const [touched, setTouched] = useState(false);
 
   useEffect(() => {
     setHasValue(value.length > 0);
   }, [value]);
+
+  // Real-time validation on blur: if validator passes, mark valid
+  const onBlur = () => {
+    setFocused(false);
+    setTouched(true);
+    if (validate && value) {
+      setIsValid(validate(value));
+    } else {
+      setIsValid(false);
+    }
+  };
+
+  // Show sage check only when: not focused (so user finished typing), value present, validator passed
+  const showValidCheck = !focused && touched && hasValue && isValid && !error;
 
   return (
     <div className="relative">
@@ -171,14 +192,30 @@ function FloatingInput({
           value={value}
           onChange={onChange}
           onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+          onBlur={onBlur}
           placeholder={placeholder}
           autoComplete={autoComplete}
           aria-invalid={error}
-          className={`w-full rounded-xl px-${Icon ? '11' : '4'} py-3.5 pr-4 text-ink outline-none transition-all placeholder:text-transparent ${
+          className={`w-full rounded-xl px-${Icon ? '11' : '4'} py-3.5 ${showValidCheck ? 'pr-12' : 'pr-4'} text-ink outline-none transition-all placeholder:text-transparent ${
             Icon ? 'pl-11' : ''
           }`}
         />
+        {/* Real-time validation check — sage CheckCircle2 on blur if valid */}
+        <AnimatePresence>
+          {showValidCheck && (
+            <motion.span
+              key="valid-check"
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 22 }}
+              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sage"
+              aria-hidden="true"
+            >
+              <CheckCircle2 className="size-5" />
+            </motion.span>
+          )}
+        </AnimatePresence>
         <label
           htmlFor={id}
           className={`pointer-events-none absolute left-${Icon ? '11' : '4'} top-1/2 -translate-y-1/2 text-sm transition-all duration-300 ${
@@ -1031,6 +1068,7 @@ export function Contact() {
                             placeholder="Как к вам обращаться"
                             error={validationErrors.name}
                             icon={Users}
+                            validate={(v) => v.trim().length >= 2}
                           />
                           
                           <FloatingInput
@@ -1043,6 +1081,7 @@ export function Contact() {
                             placeholder="+7 (___) ___-__-__"
                             error={validationErrors.phone}
                             icon={Phone}
+                            validate={(v) => /^(\+7|8)[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/.test(v.replace(/[^+0-9]/g, ""))}
                           />
                           
                           <FloatingInput
@@ -1054,6 +1093,7 @@ export function Contact() {
                             onChange={(e) => set("email", e.target.value)}
                             placeholder="Email (необязательно)"
                             icon={Mail}
+                            validate={(v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
                           />
 
                           {/* New field: Preferred call time */}

@@ -594,7 +594,7 @@ export function Calculator() {
                 <motion.a
                   href="#contact"
                   data-cursor="заявка"
-                  className="group flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-4 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl active:scale-[0.98] min-h-[44px]"
+                  className="group flex w-full items-center justify-center gap-2 rounded-full cta-gradient-punchy bg-gradient-to-r from-gold to-terracotta px-6 py-4 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl active:scale-[0.98] min-h-[44px]"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >

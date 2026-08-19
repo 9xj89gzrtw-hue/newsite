@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion, useMotionValue, useSpring } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Keyboard, MousePointer } from "lucide-react";
 import { Reveal } from "./reveal";
 import { MEDIA, EVENT_CATEGORIES } from "@/lib/media";
@@ -68,17 +68,48 @@ function GalleryItem({
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  
+
+  // 3D tilt — mouse-tracking rotateX/rotateY (Gamma tilt pattern, REF §1643).
+  // Disabled on reduced-motion. Spring-smoothed.
+  const mvX = useMotionValue(0);
+  const mvY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(mvY, [-0.5, 0.5], [6, -6]), {
+    stiffness: 200,
+    damping: 20,
+  });
+  const rotateY = useSpring(useTransform(mvX, [-0.5, 0.5], [-6, 6]), {
+    stiffness: 200,
+    damping: 20,
+  });
+
+  const onMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (reducedMotion || !ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      mvX.set((e.clientX - cx) / rect.width);
+      mvY.set((e.clientY - cy) / rect.height);
+    },
+    [mvX, mvY, reducedMotion],
+  );
+
+  const onMouseLeave = useCallback(() => {
+    if (reducedMotion) return;
+    mvX.set(0);
+    mvY.set(0);
+  }, [mvX, mvY, reducedMotion]);
+
   // Parallax scroll effect using framer-motion
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
-  
+
   // Alternate parallax speed based on index for depth variation
   const parallaxSpeed = index % 3 === 0 ? 30 : index % 3 === 1 ? 20 : 40;
   const y = useTransform(scrollYProgress, [0, 1], reducedMotion ? [0, 0] : [-parallaxSpeed, parallaxSpeed]);
-  
+
   // Determine aspect ratio with more dramatic variety
   const aspectRatio = ASPECT_RATIOS[index % ASPECT_RATIOS.length];
   const isFeatured = FEATURED_INDICES.includes(index);
@@ -86,7 +117,7 @@ function GalleryItem({
   return (
     <motion.div
       ref={ref}
-      style={{ y }}
+      style={{ y, perspective: 1000 }}
       layout
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -98,9 +129,16 @@ function GalleryItem({
         layout
         onClick={onClick}
         data-cursor="смотреть"
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
         className="group relative block w-full overflow-hidden rounded-xl card-lift"
         whileHover={!reducedMotion ? { y: -8 } : undefined}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          rotateX: reducedMotion ? 0 : rotateX,
+          rotateY: reducedMotion ? 0 : rotateY,
+          transformStyle: "preserve-3d",
+        }}
       >
         <div className={`relative w-full ${aspectRatio}`}>
           {/* Image skeleton placeholder */}
