@@ -311,7 +311,7 @@ function ExpandableDetails({ items }: { items: string[] }) {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
+        aria-expanded={open ? "true" : "false"}
         className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-gold transition-colors duration-200 hover:text-bordeaux"
       >
         Подробнее

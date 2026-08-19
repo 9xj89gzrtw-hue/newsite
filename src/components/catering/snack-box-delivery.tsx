@@ -241,7 +241,7 @@ export function SnackBoxDelivery() {
                                     }}
                                     disabled={n === 0}
                                     aria-label={`Уменьшить: ${item.name}`}
-                                    className="flex size-8 items-center justify-center rounded-full border border-border-line bg-white text-ink/70 transition-colors hover:border-gold/40 hover:text-gold disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="flex size-11 items-center justify-center rounded-full border border-border-line bg-white text-ink/70 transition-colors hover:border-gold/40 hover:text-gold disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px] min-w-[44px]"
                                     whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
                                   >
                                     <Minus className="size-3.5" />
@@ -266,7 +266,7 @@ export function SnackBoxDelivery() {
                                       increment(item.name);
                                     }}
                                     aria-label={`Увеличить: ${item.name}`}
-                                    className="flex size-8 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-sm shadow-gold/25 transition-transform hover:scale-105"
+                                    className="flex size-11 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-sm shadow-gold/25 transition-transform hover:scale-105 min-h-[44px] min-w-[44px]"
                                     whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
                                   >
                                     <Plus className="size-3.5" />
@@ -282,7 +282,7 @@ export function SnackBoxDelivery() {
                                     increment(item.name);
                                   }}
                                   aria-label={`Добавить: ${item.name}`}
-                                  className="flex size-8 items-center justify-center rounded-full border border-border-line bg-white text-ink/70 transition-colors hover:border-gold/40 hover:text-gold hover:bg-gold/5"
+                                  className="flex size-11 items-center justify-center rounded-full border border-border-line bg-white text-ink/70 transition-colors hover:border-gold/40 hover:text-gold hover:bg-gold/5 min-h-[44px] min-w-[44px]"
                                   whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
                                   initial={{ opacity: 0, scale: 0.9 }}
                                   animate={{ opacity: 1, scale: 1 }}

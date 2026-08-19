@@ -396,7 +396,7 @@ export function Faq() {
                   >
                     <button
                       onClick={() => toggle(item.originalIndex)}
-                      aria-expanded={isOpen}
+                      aria-expanded={isOpen ? "true" : "false"}
                       className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left group"
                     >
                       <span className="flex items-center gap-3 font-display text-lg text-ink pr-4">

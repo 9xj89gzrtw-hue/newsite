@@ -84,7 +84,7 @@ export function AnnouncementBar() {
           type="button"
           onClick={dismiss}
           aria-label="Закрыть объявление"
-          className="absolute right-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream"
+          className="absolute right-3 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream min-h-[44px] min-w-[44px]"
         >
           <X className="size-4" />
         </button>
@@ -123,7 +123,7 @@ export function AnnouncementBar() {
                 type="button"
                 onClick={dismiss}
                 aria-label="Закрыть объявление"
-                className="absolute right-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream"
+                className="absolute right-3 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream min-h-[44px] min-w-[44px]"
               >
                 <X className="size-4" />
               </button>

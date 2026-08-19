@@ -47,10 +47,10 @@ export function PressStrip() {
                 }}
                 className="group flex flex-col items-center gap-1 text-center"
               >
-                <span className="font-display text-2xl text-ink/35 transition-colors duration-300 group-hover:text-gold md:text-3xl">
+                <span className="font-display text-2xl text-ink/50 transition-colors duration-300 group-hover:text-gold md:text-3xl">
                   {p.name}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-ink/30 transition-colors duration-300 group-hover:text-gold/70">
+                <span className="font-mono text-[11px] uppercase tracking-wider text-ink/50 transition-colors duration-300 group-hover:text-gold/70">
                   {p.note}
                 </span>
               </motion.li>

@@ -113,11 +113,18 @@ const jsonLd = {
     streetAddress: "ул. Большая Морская, д. 18, офис 33",
   },
   geo: { "@type": "GeoCoordinates", latitude: 59.939495, longitude: 30.315785 },
-  openingHoursSpecification: [{
-    "@type": "OpeningHoursSpecification",
-    dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-    opens: "09:00", closes: "21:00",
-  }],
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+      opens: "09:00", closes: "19:00",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: "Saturday",
+      opens: "10:00", closes: "16:00",
+    },
+  ],
   founder: { "@type": "Person", name: "Нилов Дмитрий Игоревич" },
   foundingDate: "2014-04-14",
   areaServed: { "@type": "City", name: "Санкт-Петербург" },

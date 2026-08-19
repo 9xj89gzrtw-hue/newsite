@@ -1059,7 +1059,7 @@ function PackageCarousel({
                 {/* Expand/collapse button */}
                 {hiddenCount > 0 && (
                   <motion.button
-                    aria-expanded={isExpanded}
+                    aria-expanded={isExpanded ? "true" : "false"}
                     aria-controls={`dish-list-${idx}`}
                     onClick={() => setExpandedPackage(isExpanded ? null : pkg.name)}
                     className="mt-4 flex items-center gap-2 rounded-xl bg-gold/5 px-3 py-2.5 text-xs font-semibold text-gold transition-all hover:bg-gold/10 hover:text-terracotta min-h-[44px]"

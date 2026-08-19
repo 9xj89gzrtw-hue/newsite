@@ -366,7 +366,7 @@ function MegaMenu({ item }: { item: NavItem }) {
       <button
         type="button"
         aria-haspopup="true"
-        aria-expanded={open}
+        aria-expanded={open ? "true" : "false"}
         onKeyDown={onTriggerKey}
         onClick={() => go(item.href)}
         className="group flex min-h-[44px] items-center gap-1 text-sm font-medium opacity-70 transition-opacity duration-300 hover:opacity-100"
