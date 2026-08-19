@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
-import { Quote, Building2, Award, Users, Star } from "lucide-react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { Quote, Building2, Award, Users, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Reveal } from "./reveal";
 
 /**
@@ -163,9 +163,21 @@ function TestimonialCard({
 }
 
 /**
- * Testimonials section — LIGHT THEME
+ * Testimonials section — LIGHT THEME with auto-playing carousel (B2).
  */
 export function Testimonials() {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const count = TESTIMONIALS.length;
+
+  const go = (dir: 1 | -1) => setActive((p) => (p + dir + count) % count);
+
+  useEffect(() => {
+    if (paused) return;
+    const t = setInterval(() => setActive((p) => (p + 1) % count), 6500);
+    return () => clearInterval(t);
+  }, [paused, count]);
+
   return (
     <section id="testimonials" className="relative overflow-hidden bg-cream py-24 md:py-36">
       {/* Subtle background pattern */}
@@ -210,11 +222,63 @@ export function Testimonials() {
           </Reveal>
         </div>
 
-        {/* Testimonials grid */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {TESTIMONIALS.map((t, i) => (
-            <TestimonialCard key={t.id} testimonial={t} index={i} />
-          ))}
+        {/* Testimonial carousel (B2) — single auto-playing card with arrows + dots */}
+        <div
+          className="relative mt-16"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          aria-roledescription="carousel"
+          aria-label="Отзывы клиентов"
+        >
+          <div className="relative mx-auto max-w-2xl">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={TESTIMONIALS[active].id}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -24 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <TestimonialCard testimonial={TESTIMONIALS[active]} index={0} />
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Prev / Next arrows */}
+            <button
+              type="button"
+              onClick={() => go(-1)}
+              aria-label="Предыдущий отзыв"
+              className="absolute -left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-border-line bg-white/90 text-ink/70 shadow-md backdrop-blur-sm transition-all hover:border-gold hover:text-gold hover:-translate-y-[calc(50%+2px)] md:-left-14"
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => go(1)}
+              aria-label="Следующий отзыв"
+              className="absolute -right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-border-line bg-white/90 text-ink/70 shadow-md backdrop-blur-sm transition-all hover:border-gold hover:text-gold hover:-translate-y-[calc(50%+2px)] md:-right-14"
+            >
+              <ChevronRight className="size-5" />
+            </button>
+          </div>
+
+          {/* Dot indicators */}
+          <div className="mt-8 flex items-center justify-center gap-2.5">
+            {TESTIMONIALS.map((t, d) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setActive(d)}
+                aria-label={`Перейти к отзыву ${d + 1}`}
+                aria-current={d === active}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  d === active
+                    ? "w-8 bg-gradient-to-r from-gold to-terracotta"
+                    : "w-2 bg-ink/20 hover:bg-ink/35"
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Trust badges section */}

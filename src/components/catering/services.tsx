@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, X, Check, Sparkles, ArrowRight } from "lucide-react";
@@ -170,6 +170,19 @@ function ServiceCard({
 export function Services() {
   const [open, setOpen] = useState<number | null>(null);
   const current = open !== null ? SERVICES[open] : null;
+
+  // Allow the header mega-menu to open a specific service modal by index.
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const idx = (e as CustomEvent<number>).detail;
+      if (typeof idx === "number" && idx >= 0 && idx < SERVICES.length) {
+        setOpen(idx);
+      }
+    };
+    window.addEventListener("catering:service-open", handler as EventListener);
+    return () =>
+      window.removeEventListener("catering:service-open", handler as EventListener);
+  }, []);
 
   return (
     <section id="services" className="relative overflow-hidden bg-white py-28 md:py-40">

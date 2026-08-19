@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import type { MuxCSSProperties } from "@mux/mux-player-react";
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ArrowDown, Sparkles, Play, UtensilsCrossed, Star } from "lucide-react";
 import { MEDIA } from "@/lib/media";
 import { Magnetic } from "@/components/motion/magnetic";
@@ -119,6 +119,49 @@ function AnimatedCounter({
   }, [target, duration, delay]);
   
   return <span>{count.toLocaleString()}{suffix}</span>;
+}
+
+/**
+ * RotatingWord — GG Catering signature: cycles an adjective in the headline.
+ * Uses AnimatePresence mode="wait" so the outgoing word exits before the
+ * next one enters. Respects prefers-reduced-motion (renders first word only).
+ */
+function RotatingWord({
+  words,
+  interval = 2600,
+}: {
+  words: string[];
+  interval?: number;
+}) {
+  const reduce = useReducedMotion();
+  const [i, setI] = useState(0);
+
+  useEffect(() => {
+    if (reduce || words.length <= 1) return;
+    const t = setInterval(() => setI((p) => (p + 1) % words.length), interval);
+    return () => clearInterval(t);
+  }, [reduce, words.length, interval]);
+
+  if (reduce) {
+    return <span className="gradient-text italic">{words[0]}</span>;
+  }
+
+  return (
+    <span className="relative inline-flex h-[1.1em] overflow-hidden align-baseline">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={words[i]}
+          className="gradient-text italic"
+          initial={{ opacity: 0, y: "0.5em" }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: "-0.5em" }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {words[i]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
 }
 
 /**
@@ -281,6 +324,9 @@ export function Hero() {
             fontSize: "clamp(2.5rem, 11vw, 8.5rem)",
             lineHeight: 0.95,
             letterSpacing: "-0.025em",
+            // View Transitions API — cross-fade the hero title across routes
+            // (Ridgewells pattern). Progressive enhancement; no-op if unsupported.
+            viewTransitionName: "hero-title" as React.CSSProperties["viewTransitionName"],
           }}
           initial={{ opacity: 0 }}
           animate={{ opacity: isLoaded ? 1 : 0 }}
@@ -332,26 +378,20 @@ export function Hero() {
           </motion.span>
         </motion.h1>
 
-        {/* Subheadline with staggered word reveal */}
+        {/* Subheadline — rotating adjective (GG Catering pattern) */}
         <motion.p
           className="mt-8 max-w-xl font-display text-lg italic text-ink/70 md:max-w-2xl md:text-xl lg:text-2xl leading-relaxed"
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 25 }}
           transition={{ delay: 1.2, duration: 1, ease: [0.22, 1, 0.36, 1] }}
         >
-          {"Еда как искусство.".split(" ").map((word, i) => (
-            <motion.span
-              key={i}
-              className="inline-block mr-2"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 15 }}
-              transition={{ delay: 1.3 + i * 0.15, duration: 0.7 }}
-            >
-              {word}
-            </motion.span>
-          ))}
-          <br className="hidden sm:block" />
-          <span className="block mt-2 text-base md:text-lg text-ink/60">
+          <span className="inline-block">Еда как&nbsp;</span>
+          <RotatingWord
+            words={["искусство", "ритуал", "праздник", "магия"]}
+            interval={2600}
+          />
+          <span>.</span>
+          <span className="mt-2 block text-base not-italic text-ink/60 md:text-lg">
             Выездной кейтеринг полного цикла — от канапе до банкета на 500 гостей.
           </span>
         </motion.p>
@@ -412,7 +452,7 @@ export function Hero() {
           transition={{ delay: 2, duration: 1 }}
         >
           {[
-            { value: 16, suffix: "+ лет", label: "опыта", color: "bg-green-500" },
+            { value: 16, suffix: "+ лет", label: "опыта", color: "bg-sage" },
             { value: 2400, suffix: "+", label: "мероприятий", color: "bg-gold" },
             { value: 50000, suffix: "+", label: "гостей", color: "bg-terracotta" },
           ].map((stat, i) => (

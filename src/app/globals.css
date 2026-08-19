@@ -256,6 +256,31 @@ html.lenis body {
   white-space: nowrap;
 }
 
+/* Logo marquee — seamless infinite scroll (Gamma / Creative Edge pattern).
+   Track is duplicated in markup so translating -50% loops without a jump.
+   Pause on hover via .marquee-pause:hover ancestor. */
+@keyframes marquee-logos {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track-logos {
+  animation: marquee-logos 38s linear infinite;
+  will-change: transform;
+}
+.marquee-pause:hover .marquee-track-logos {
+  animation-play-state: paused;
+}
+
+/* View Transitions API — cross-fade between routes (Ridgewells pattern).
+   Progressive enhancement: no-op on browsers without support. */
+@view-transition {
+  navigation: auto;
+}
+
 /* Slow Ken-Burns drift for cinematic background plates.
    transform/opacity only — GPU-friendly, respects reduced-motion (global rule above). */
 @keyframes kenburns-slow {

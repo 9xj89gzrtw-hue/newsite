@@ -36,20 +36,31 @@ export const MEDIA = {
   } as Record<string, string>,
   // Real event photos from interfood-catering.ru gallery
   events: [
-    { src: "/media/event-01.png", caption: "Свадебный фуршет на крыше" },
-    { src: "/media/event-02.jpg", caption: "Корпоратив в офисе" },
-    { src: "/media/event-03.jpg", caption: "Банкет на корабле" },
-    { src: "/media/event-04.jpg", caption: "Выездная регистрация" },
-    { src: "/media/event-05.jpg", caption: "Мотофестиваль Harley Days" },
-    { src: "/media/event-06.jpg", caption: "Скандинавское барбекю" },
-    { src: "/media/event-07.jpg", caption: "Кофе-брейк на конференции" },
-    { src: "/media/event-09.jpg", caption: "Новогодний корпоратив" },
-    { src: "/media/event-10.jpg", caption: "Сезонный банкет" },
-    { src: "/media/event-11.jpg", caption: "Фуршет для гостей" },
-    { src: "/media/event-12.jpg", caption: "Праздничная сервировка" },
-    { src: "/media/event-02.jpg", caption: "Торжественный приём" },
+    { src: "/media/event-01.png", caption: "Свадебный фуршет на крыше", category: "Свадьбы" },
+    { src: "/media/event-02.jpg", caption: "Корпоратив в офисе", category: "Корпоративы" },
+    { src: "/media/event-03.jpg", caption: "Банкет на корабле", category: "Банкеты" },
+    { src: "/media/event-04.jpg", caption: "Выездная регистрация", category: "Свадьбы" },
+    { src: "/media/event-05.jpg", caption: "Мотофестиваль Harley Days", category: "Корпоративы" },
+    { src: "/media/event-06.jpg", caption: "Скандинавское барбекю", category: "Барбекю" },
+    { src: "/media/event-07.jpg", caption: "Кофе-брейк на конференции", category: "Кофе-брейки" },
+    { src: "/media/event-09.jpg", caption: "Новогодний корпоратив", category: "Корпоративы" },
+    { src: "/media/event-10.jpg", caption: "Сезонный банкет", category: "Банкеты" },
+    { src: "/media/event-11.jpg", caption: "Фуршет для гостей", category: "Фуршеты" },
+    { src: "/media/event-12.jpg", caption: "Праздничная сервировка", category: "Банкеты" },
+    { src: "/media/event-02.jpg", caption: "Торжественный приём", category: "Банкеты" },
   ],
 };
+
+/** Event categories for the gallery filter (A5 — filterable gallery). */
+export const EVENT_CATEGORIES = [
+  "Все",
+  "Свадьбы",
+  "Корпоративы",
+  "Банкеты",
+  "Фуршеты",
+  "Кофе-брейки",
+  "Барбекю",
+] as const;
 
 // Contacts — re-exported from config.ts (single source of truth).
 // Original source: interfood-catering.ru/kontakty

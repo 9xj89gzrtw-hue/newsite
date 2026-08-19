@@ -2,11 +2,14 @@ import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
 import { Hero } from "@/components/catering/hero";
 import { MarqueeBand } from "@/components/catering/marquee-band";
+import { LogoMarquee } from "@/components/catering/logo-marquee";
 import { About } from "@/components/catering/about";
 import { Manifesto } from "@/components/catering/manifesto";
+import { Process } from "@/components/catering/process";
 import { Menu } from "@/components/catering/menu";
 import { PromoBanner } from "@/components/catering/promo-banner";
 import { Services } from "@/components/catering/services";
+import { Pillars } from "@/components/catering/pillars";
 import { SnackBoxDelivery } from "@/components/catering/snack-box-delivery";
 import { EventsGallery } from "@/components/catering/events-gallery";
 import { VideoEvents } from "@/components/catering/video-events";
@@ -24,17 +27,23 @@ export default function Home() {
       <SiteHeader />
       <Hero />
       <MarqueeBand />
+      {/* Infinite client-logo marquee (Gamma / Creative Edge pattern) */}
+      <LogoMarquee />
       <About />
       {/* Manifesto: signature pinned scroll moment — «Манифест-as-Window» */}
       <Manifesto />
+      {/* Process: emotional timeline 01→04 (Creative Edge pattern) */}
+      <Process />
       {/* Menu: tabs + interactive list + real dishes + inline PDF download */}
       <Menu />
       <PromoBanner />
       {/* Services: 4-up image-card grid + modal */}
       <Services />
+      {/* Pillars: dual brand-pillar section (Salt Block pattern) */}
+      <Pillars />
       {/* Snack-box delivery: standalone service with price list */}
       <SnackBoxDelivery />
-      {/* Photo events gallery */}
+      {/* Photo events gallery — filterable by category + lightbox */}
       <EventsGallery />
       {/* Video events */}
       <VideoEvents />
@@ -43,7 +52,7 @@ export default function Home() {
         <Calculator />
       </Suspense>
       <InstagramVideo />
-      {/* Testimonials: real client reviews + trust badges */}
+      {/* Testimonials: carousel with auto-play + trust badges */}
       <Testimonials />
       {/* FAQ: frequently asked questions about catering */}
       <Faq />
