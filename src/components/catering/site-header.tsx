@@ -168,7 +168,7 @@ export function SiteHeader() {
         >
           {/* Logo — stylish minimal «Interfood.» */}
           <a
-            href="#home"
+            href="#main-content"
             className={`min-h-[44px] flex items-center font-display text-xl tracking-tight transition-colors duration-300 md:text-2xl hover-underline ${themeClasses.text}`}
           >
             Interfood<span className="text-gold">.</span>

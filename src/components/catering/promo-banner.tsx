@@ -1,7 +1,7 @@
 "use client";
 
 import { Reveal } from "./reveal";
-import { Flower2, ArrowRight } from "lucide-react";
+import { Flower2, ArrowRight, Sparkles } from "lucide-react";
 
 /**
  * Promo banner — LIGHT THEME
@@ -23,7 +23,8 @@ export function PromoBanner() {
         <div className="flex flex-col items-center gap-6 text-center md:flex-row md:gap-12 md:text-left">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.3em] text-white backdrop-blur-sm">
-              ✨ Акция · сезон {currentYear}
+              <Sparkles className="size-3" aria-hidden="true" />
+              <span>Акция · сезон {currentYear}</span>
             </span>
           </Reveal>
           <div className="flex-1">
@@ -47,7 +48,7 @@ export function PromoBanner() {
             <a
               href="#calculator"
               data-cursor="считать"
-              className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-4 text-sm font-semibold uppercase tracking-wider text-gold shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 hover:scale-[1.02]"
+              className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold uppercase tracking-wider text-gold shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 hover:scale-[1.02] min-h-[44px]"
             >
               Рассчитать свадьбу
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />

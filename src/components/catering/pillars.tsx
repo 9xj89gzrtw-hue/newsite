@@ -342,7 +342,7 @@ function ProgressDot({
     <button
       ref={ref}
       type="button"
-      className="group flex items-center gap-2"
+      className="group flex items-center gap-2 min-h-[44px] min-w-[44px] px-2 py-2"
       aria-label={`Показать «${label}»`}
       onClick={() => {
         // Scroll to this pillar's position in the pinned section

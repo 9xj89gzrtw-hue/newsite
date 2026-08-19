@@ -195,7 +195,7 @@ function FloatingInput({
           onBlur={onBlur}
           placeholder={placeholder}
           autoComplete={autoComplete}
-          aria-invalid={error}
+          aria-invalid={error ? "true" : "false"}
           className={`w-full rounded-xl px-${Icon ? '11' : '4'} py-3.5 ${showValidCheck ? 'pr-12' : 'pr-4'} text-ink outline-none transition-all placeholder:text-transparent ${
             Icon ? 'pl-11' : ''
           }`}

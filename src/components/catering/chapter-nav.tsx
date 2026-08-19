@@ -59,7 +59,7 @@ export function ChapterNav() {
             <li key={s.id}>
               <button
                 onClick={() => scrollTo(s.id)}
-                className="group flex items-center gap-2.5"
+                className="group flex items-center gap-2.5 min-h-[44px] min-w-[44px] px-2 py-2"
                 aria-label={`Перейти к разделу: ${s.label}`}
                 aria-current={isActive ? "true" : undefined}
               >
