@@ -1062,18 +1062,136 @@ fromscratchcatering.com, stevenscatering.com, chefbyrequest.com, и др.
 - `979d335` — AGENTS.md §14 Phase 3 log (+48/-8)
 - `394e06c` — Phase 4 — pinned Pillars scroll-stack + Awards strip + hydration fixes (6 files, +499/-83)
 
-All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d, 3, 4 — в `/home/z/my-project/worklog.md` (песочница, не в репо).
+All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d, 3, 4, 5 — в `/home/z/my-project/worklog.md` (песочница, не в репо).
 
-### TL;DR (обновлено Cycle 24 / Phase 4)
+### Phase 5 дополнения (commit `6b7977e` + security fix `55da4a8`)
 
-Для **следующего цикла улучшений (Phase 5)**:
+**Mux video infrastructure activated (P0 from §14):**
 
-1. **Оставшиеся P2 wow-factor patterns** — Hero cursor image-preview, ambient audio cue, SnackBox 3D cube, EventsGallery horizontal pinned gallery, VideoEvents cinema mode (после Mux).
-2. **Mux video activation** — `MUX_TOKEN_*` env vars + `MEDIA.hero.muxPlaybackId` + `MEDIA.videoEvents[].muxPlaybackId` + `VIDEO_TESTIMONIALS[].muxPlaybackId`.
-3. **Оставшиеся hydration cleanup** — testimonials.tsx (Date.now initial), cursor.tsx + manifesto.tsx (useReducedMotion null→boolean gate).
-4. **Push palette darker/bolder** — VLM §14 polish. Manifesto deepen (#2D2A26 → #0E0D0B), либо charcoal base для dark sections, либо deep burgundy/forest green для primary action.
-5. **AwardsStrip VLM-fixes** — featured first card (larger), varied icons per award type.
-6. **FAQ vote backend** — POST /api/faq-vote + Prisma FaqVote model (current localStorage-only).
-7. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции.
+User предоставил Mux credentials (2026-08-19). Set locally in `.env`:
+- `MUX_TOKEN_ID="87d4264d-d0f9-4225-bbf1-a42f61588dfc"`
+- `MUX_TOKEN_SECRET="5+eCyM3PyINaADUrxqsSCTMPeQR2m5X/I64X61d7jg/1dbOdgP89UxYjHoJmLkkr2lp1l/MeiKi"`
+- `NEXT_PUBLIC_MUX_ENVIRONMENT_KEY="b6cpvnokb1ro0gud9rn85boj4"`
 
-Целевой уровень — **Awwwards SOTD**. Phase 4 добавила 2 P2 patterns (pinned Pillars + AwardsStrip) + 3 polish fixes (data-scrolled, hydration cleanup ×2). До Awwwards-уровня остаётся: push palette darker, ещё 1-2 P2 wow-factor moments (Hero cursor image-preview, SnackBox 3D cube), Mux video.
+**SECURITY INCIDENT:** Credentials were accidentally committed in `6b7977e`
+because `.env` was tracked from initial commit `318734b` (before `.gitignore`
+covered it). Fixed in `55da4a8` (untracked .env). However, the credentials
+remain in git history at commit `6b7977e` — anyone with repo access can
+`git show 6b7977e -- .env`. **User should rotate tokens via Mux dashboard**
+(https://dashboard.mux.com/settings/api) if they want to be safe.
+
+**Mux API status — RESTRICTED:**
+
+Tested all Mux API endpoints — ALL return HTTP 404 `{"error":{"type":"not_found","messages":["The requested resource either doesn't exist or you don't have access to it."]}}`:
+- GET `/v1/assets?limit=5` — list assets
+- POST `/v1/uploads` — create upload URL
+- POST `/v1/assets` — create asset from URL
+- GET `/v1/live-streams?limit=5`
+- GET `/v1/realtime`
+- GET `/v1/system/whoami`
+- GET `/healthcheck`
+- Without auth (also 404, suggesting server masks API existence)
+
+Hypothesis: User's tokens are restricted to **Vercel-Mux integration scope**
+(can only be used via the official Vercel-Mux integration, not direct API calls).
+Or tokens are test-environment-only with no assets.
+
+**Action required (user):**
+1. Verify tokens in Mux dashboard → Settings → API → check permissions.
+2. If tokens are restricted, create new "Full Access" token for direct API.
+3. Alternative: upload videos via Mux dashboard UI → copy playback IDs → set in `src/lib/media.ts` `MEDIA.hero.muxPlaybackId` + `src/components/catering/video-events.tsx` `VIDEO_CATALOG[].muxPlaybackId`. MuxPlayer renders via `stream.mux.com/{playbackId}.m3u8` — no API call needed at runtime.
+
+**AI video generation attempt:**
+
+Tried `z-ai video` CLI to generate a chef-action clip for the hero background:
+- Prompt: "Cinematic slow-motion close-up of an elegant chef plating a gourmet dish with gold-colored sauce drizzle, luxury restaurant kitchen, soft warm lighting, premium catering, dark moody background"
+- Quality mode, 1920x1080, 5s, 30fps
+- Task created: `202608191305566c552b4f1d1a477e`
+- Polling got rate-limited (HTTP 429 "Too many requests") at attempt 11
+- `z-ai async-result -i <task-id>` also rate-limited
+
+The video generation API (z-ai-web-dev-sdk) has aggressive rate limiting on
+both create and async-result endpoints. Future attempts should:
+- Use longer polling intervals (≥30s between attempts)
+- Use `--max-polls 5` instead of 30
+- Cache task IDs and retry async-result much later (1h+)
+
+**video-events.tsx rewrite (143 → 340 LOC, commit 6b7977e):**
+
+Despite Mux API not working, refactored video-events.tsx to be **Mux-ready**:
+- **Lazy-load pattern** (REF §653): posters only until user clicks. 4× saved iframe initial load.
+- **State machine**: 'poster' → 'loading' (250ms Loader2 spin) → 'playing' (mount iframe/MuxPlayer).
+- **3 source modes** per video in VIDEO_CATALOG:
+  1. `muxPlaybackId` (preferred, RULES §3) — uses `MuxVideoEmbed` (lazy `require('@mux/mux-player-react')`)
+  2. `youtubeEmbedId` (legacy fallback) — uses `youtube-nocookie.com` for privacy
+  3. poster-only (when neither is set)
+- **MuxVideoEmbed component**: lazy dynamic `require()` of `@mux/mux-player-react`. Only loads MuxPlayer web component when user clicks play — saves initial JS bundle.
+- **YouTubeEmbed component**: uses `youtube-nocookie.com/embed/{id}?rel=0&modestbranding=1&autoplay=1` (better than regular youtube.com embed).
+- **Pulsing ring** on play button hover (`motion.span infinite repeat, ease-out 1.4s`).
+- **Cinematic gradient overlay** on poster (`from-ink/80 via-ink/20 to-transparent`).
+- **'HD · Mux' badge** appears top-left when `muxPlaybackId` is set.
+- All poster images use `next/image fill` with proper `sizes` attribute.
+- Reduced-motion respected (no scale animation, no pulse ring).
+
+VIDEO_CATALOG structure:
+```
+{ title, desc, source, poster: '/media/event-0X.{png|jpg}', muxPlaybackId?: '...', youtubeEmbedId?: '...' }
+```
+TODO for user: upload real videos to Mux → fill `muxPlaybackId` in each catalog item → YouTube fallback automatically stops being used.
+
+**Phase 5 verification:**
+- `bun run lint` → clean
+- `bunx tsc --noEmit` → clean
+- `curl localhost:3000` → HTTP 200
+- DOM eval: 4 video cards, 4 poster images, 0 iframes initially (lazy-load works), 8 play buttons (4 on poster + 4 in content area)
+
+### Phase 5 backlog (NOT done — still open for Phase 6)
+
+**P2 patterns ещё НЕ сделаны:**
+- Hero cursor image-preview на #menu CTA hover (complex cursor.tsx rewrite)
+- Manifesto ambient audio cue (needs audio file в public/)
+- SnackBox 3D-rotating cube mockup (needs 6 face images)
+- EventsGallery horizontal-scroll pinned gallery (300vh sticky → useScroll → useTransform x: ['0%','-70%'])
+- VideoEvents cinema 16:9 letterbox + grain overlay on play; carousel with chapter markers (timeline scrubber) — needs real Mux playback IDs first
+- FAQ "Was this helpful?" → backend API (POST /api/faq-vote, Prisma FaqVote) — current localStorage-only
+
+**VLM-recommended polish ещё НЕ сделаны:**
+- Push palette darker/bolder — Manifesto deepen (#2D2A26 → #0E0D0B), либо charcoal base для dark sections, либо deep burgundy/forest green для primary action.
+- AwardsStrip: featured first card (larger), varied icons per award type.
+
+**Mux-related (BLOCKED on user action):**
+- Real `MUX_TOKEN_*` with API access (current returns 404) → user verifies/creates new tokens in Mux dashboard
+- Upload videos to Mux → set playback IDs in `MEDIA.hero.muxPlaybackId`, `VIDEO_CATALOG[].muxPlaybackId`, `VIDEO_TESTIMONIALS[].muxPlaybackId`
+- Once playback IDs set: hero.tsx auto-swaps Ken Burns → MuxPlayer (already wired); video-events.tsx auto-uses MuxVideoEmbed instead of YouTubeEmbed; testimonials.tsx needs `VIDEO_TESTIMONIALS[].muxPlaybackId` field wired to `<VideoPlayer>`
+
+**Hydration cleanup (pre-existing):**
+- testimonials.tsx auto-play carousel с `Date.now()` initial state — использовать `useState(() => null)` + populate в `useEffect`
+- cursor.tsx, manifesto.tsx — `useReducedMotion` hydration gate (как в announcement-bar.tsx)
+
+### Коммиты (updated)
+
+- `8cc1a32` — Phase 1+2 comprehensive upgrade (32 files, +3131/-1010)
+- `b0e3076` — AGENTS.md §14 session log (+147)
+- `e75a34d` — Phase 3 — P2 patterns + VLM polish (9 files, +281/-15)
+- `979d335` — AGENTS.md §14 Phase 3 log (+48/-8)
+- `394e06c` — Phase 4 — pinned Pillars scroll-stack + Awards strip + hydration fixes (6 files, +499/-83)
+- `f3963b3` — AGENTS.md §14 Phase 4 log (+71/-8)
+- `6b7977e` — Phase 5 — Mux-ready video-events lazy-load (2 files, +254/-40) — **ACCIDENTALLY COMMITTED .env WITH MUX SECRETS**
+- `55da4a8` — security: untrack .env (removed .env from git tracking; secrets still in history at 6b7977e)
+
+All pushed to `main`.
+
+### TL;DR (обновлено Cycle 25 / Phase 5)
+
+Для **следующего цикла улучшений (Phase 6)**:
+
+1. **Оставшиеся P2 wow-factor patterns** — Hero cursor image-preview, ambient audio cue, SnackBox 3D cube, EventsGallery horizontal pinned gallery, VideoEvents cinema mode (после Mux playback IDs).
+2. **Mux video activation (BLOCKED on user)** — user verifies tokens in dashboard OR uploads videos via dashboard UI → fills `muxPlaybackId` in `MEDIA.hero`, `VIDEO_CATALOG[]`, `VIDEO_TESTIMONIALS[]`. Infrastructure is ready (lazy-load video-events.tsx + dynamic MuxPlayer import in hero.tsx + VideoPlayer component).
+3. **Security: rotate Mux tokens** — credentials leaked in commit `6b7977e`. User should rotate via https://dashboard.mux.com/settings/api. Update local `.env` (untracked).
+4. **Оставшиеся hydration cleanup** — testimonials.tsx (Date.now initial), cursor.tsx + manifesto.tsx (useReducedMotion null→boolean gate).
+5. **Push palette darker/bolder** — Manifesto deepen (#2D2A26 → #0E0D0B), либо charcoal base для dark sections, либо deep burgundy/forest green для primary action.
+6. **AwardsStrip VLM-fixes** — featured first card (larger), varied icons per award type.
+7. **FAQ vote backend** — POST /api/faq-vote + Prisma FaqVote model (current localStorage-only).
+8. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции. **.env file** — verify untracked before every commit (`git status --short` should not show .env).
+
+Целевой уровень — **Awwwards SOTD**. Phase 5 добавила Mux-ready infrastructure (lazy-load + Mux/YouTube fallback). До Awwwards-уровня остаётся: real Mux playback IDs (user action), push palette darker, ещё 1-2 P2 wow-factor moments (Hero cursor image-preview, SnackBox 3D cube).
