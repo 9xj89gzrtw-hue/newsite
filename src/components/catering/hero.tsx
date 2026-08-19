@@ -693,14 +693,13 @@ export function Hero() {
           <Star className="size-3 text-gold/60" />
         </motion.div>
 
-        {/* Headline — elegant serif with text scramble animation */}
+        {/* Headline — clean elegant serif headline */}
         <motion.h1
           className="font-display text-ink relative"
           style={{
-            fontSize: "clamp(2.5rem, 11vw, 8.5rem)",
-            lineHeight: 1.0,
-            // Normal spacing for readability — avoid letter-spacing collapse
-            letterSpacing: "0.02m",
+            fontSize: "clamp(2.5rem, 10vw, 7rem)",
+            lineHeight: 1.1,
+            letterSpacing: "0.01em",
             viewTransitionName: "hero-title" as React.CSSProperties["viewTransitionName"],
           }}
           initial={{ opacity: 0 }}
@@ -708,37 +707,24 @@ export function Hero() {
           transition={{ delay: 0.4, duration: 0.3 }}
         >
           <span className="relative inline-block">
-            {/* Text Scramble Effect for "Interfood" */}
-            <TextScramble
-              text="Interfood Catering"
-              delay={0.6}
-              duration={0.9}
-              staggerDelay={0.06}
-            />
-            
+            <span className="bg-gradient-to-r from-ink via-ink to-ink bg-clip-text text-transparent">
+              Interfood Catering
+            </span>
             {/* Underline animation */}
             <motion.span
-              className="gradient-text absolute -bottom-2 left-0 h-1 rounded-full"
+              className="absolute -bottom-2 left-0 h-1 rounded-full bg-gradient-to-r from-gold to-terracotta"
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: isLoaded ? "100%" : 0, opacity: isLoaded ? 1 : 0 }}
               transition={{ delay: 2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              style={{ 
-                background: "linear-gradient(90deg, var(--gold), var(--terracotta))",
-              }}
             />
-            
-            {/* Signature Flourish Element */}
-            <SignatureFlourish isVisible={isLoaded} />
           </span>
           
-          {" "}{'\u00A0'}{/* Explicit space to prevent collapsing */}
+          <br className="sm:hidden" />
+          {" "}
           <motion.span 
             className="gradient-text inline-block"
-            initial={{ clipPath: "inset(100% 0 0 0)", opacity: 0 }}
-            animate={{ 
-              clipPath: isLoaded ? "inset(0% 0 0 0)" : "inset(100% 0 0 0)", 
-              opacity: isLoaded ? 1 : 0 
-            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isLoaded ? 1 : 0 }}
             transition={{ delay: 1.8, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
             с 2008 года
