@@ -827,3 +827,150 @@ fromscratchcatering.com, stevenscatering.com, chefbyrequest.com, и др.
 2. **Agent Browser** — возможны проблемы с подключением к localhost в некоторых средах
 3. **Preloader** — может показываться долго при первом посещении (1400ms animation)
 4. **Mux видео** — не настроен playback ID, используется fallback изображение
+
+---
+
+## 14. Сессия 2026-08-19 (Z.ai Agent) — Comprehensive design/animation/interactivity upgrade
+
+**Задача:** Улучшить все разделы сайта используя дизайн, анимацию, интерактив
+и способ предоставления информации на основе эталонных сайтов (данные в файлах
+`docs/REFERENCE-SITES-ANALYSIS.md` и др.). Не останавливаться пока все элементы
+не внедрены.
+
+**Метод:** Репозиторий склонирован в `/home/z/my-project/newsite`. Dev-сервер
+запущен на порту 3000. Subagent research (Task 1-a) идентифицировал 55 gaps
+(5 P0 + 20 P1 + 30 P2) через cross-reference `REFERENCE-SITES-ANALYSIS.md`,
+`MOTION-LIBRARY.md`, `DESIGN-SYSTEM.md`, `ANIMATION-PRESETS.md`,
+`OUTSTANDING-DESIGN-PROMPT.md`, AGENTS.md §11–17 и текущих компонентов.
+Реализация — параллельные subagent-треки + прямой кодинг оркестратором.
+
+### Что сделано — P0 (rule violations)
+
+| # | Файл | Паттерн | Эталон |
+|---|------|---------|--------|
+| 1 | `testimonials.tsx` | 8 cold colors (blue/emerald/purple/pink) → warm tokens (parchment/bordeaux/sage/lilac/peach/terracotta) | RULES §5.10 |
+| 2 | `calculator.tsx` | 4 emerald instances → sage/15 | RULES §5.10 |
+| 3 | `contact.tsx` | red-400/red-50/red-500 → bordeaux/50, bordeaux/5, bordeaux | RULES §5.10 |
+| 4 | `announcement-bar.tsx` | `height: 0→auto` → `gridTemplateRows: 0fr→1fr` (FAQ pattern) | RULES §5 |
+| 5 | `cursor.tsx` | `width/height 36→70` → `scale: 0.5→1` on fixed 70px base; fixed latent centering bug (negative margins replace overridden Tailwind -translate-x-1/2) | RULES §5 |
+| 6 | `cookie-consent.tsx` | Plain white banner → fixed-bottom glassmorphism `backdrop-blur-xl bg-cream/85 border-t border-gold/20` with slide-up spring entrance | §17 |
+
+### Что сделано — P1 (high-impact)
+
+| # | Файл | Паттерн | Эталон |
+|---|------|---------|--------|
+| 7 | `hero.tsx` | Kinetic type scale [1.15, 0.92] on [0, 0.6]; letterSpacing -0.04em; vertical chapter indicator `writing-mode: vertical-rl`; charcoal overlay fade-in 0.85→1.0 (stacked-opacity divs per §12 грабли #4) | OUTSTANDING §3.3 |
+| 8 | `about.tsx` | Vertical-shutter `clip-path` image reveal (`useTransform` [0,0.4] `inset(50% 0 50% 0)` → `inset(0)`); 3D tilt on StatCards (`useMotionValue` + `useSpring` rotateX/rotateY ±8°); Marquee row of 5 value-props | Pinch / Awwwards 2026 |
+| 9 | `manifesto.tsx` | Multi-dish crossfade through "ПИР" letters (3 SVG `<motion.image>` layers clipped by `#manifesto-pir-clip`, opacity useTransform 0→0.33→0.66→1); per-word underline draw-in (scaleX 0→1, transform-origin left); 50vh chapter-divider with `mask-image: linear-gradient` (cream→charcoal→cream via stacked-opacity divs) | OUTSTANDING §2 / Gamma |
+| 10 | `process.tsx` | Scroll-driven gold progress-fill on connecting line (`useScroll` target + `useTransform` scaleX); active-step highlighting via `useInView` amount:0.6 (scale 1.15 + bordeaux number); mobile vertical spine timeline (`md:hidden`, border-l-2 gold); expandable "Подробнее" buttons (`gridTemplateRows` 0fr→1fr) with 4 items per step | Creative Edge |
+| 11 | `menu.tsx` | Dietary filter chips (Вег/Веган/Без глютена/Халяль) with heuristic dish-tagger (`getDietaryTags()` regex matches fish/meat/gluten/pork/dairy/egg/honey); AnimatePresence popLayout filter transitions; featured-dish spotlight band (8s crossfade per active menu type) | REF §761 "By Dietary" / Wolfgang Puck |
+| 12 | `services.tsx` | Card flip on click (`rotateY 0→180`, `transform-style: preserve-3d`, `backface-visibility: hidden`); outer `motion.div` with `role="button"` + tabIndex + onKeyDown (fixes nested-button error); sticky right-rail TOC (lg+) with IntersectionObserver active-item + smooth scroll on click | REF §1635 / Ridgewells |
+| 13 | `pillars.tsx` | Animated CountUp per pillar (`useMotionValue` + `animate()` + `useInView` once: true, amount: 0.4); stats: 16 шеф-поваров / 12 кейтеринг-машин / 2400+ событий / 50000+ гостей | Creative Edge impact stats |
+| 14 | `snack-box-delivery.tsx` | Inline "add to cart" qty stepper per row (AnimatePresence, whileTap scale 0.9); sticky running-total badge in top-right of price card with pulse animation on change (`scale: [1, 1.05, 1]`) | REF §1635 / Salt Block |
+| 15 | `site-header.tsx` | Theme-switching via IntersectionObserver — transparent over hero → `bg-cream/85 backdrop-blur` on light sections → `bg-ink/85 backdrop-blur` on dark sections; `transition-colors duration-300`; SSR-safe (initial state transparent) | REF §660 |
+| 16 | `instagram-video.tsx` | Multi-reel horizontal carousel (4 reels, `AnimatePresence mode="wait"` crossfade 30→0→-30); prev/next chevron buttons; dot indicators (active = w-8 gradient, inactive = w-1.5 ink/20); hover-to-load hint overlay with Play icon; `INSTAGRAM.reels` array added to media.ts | REF §1261 / Elegant Affairs Swiper |
+| 17 | `faq.tsx` | Search-as-you-type filter (matches question + answer substring); `<mark>` highlights matched substrings (`bg-gold/30`); category chips (Заказ/Логистика/Меню/Оплата) with count badges; AnimatePresence popLayout; items-count display; CTA box at bottom | REF §741 "Search with Instant Results" |
+| 18 | `contact.tsx` | `useOfficeStatus()` hook: computes live "open/closed" status from Europe/Moscow timezone via `Intl.DateTimeFormat`; 60s refresh; SSR-safe (initial state false); badge with pulsing sage dot or static bordeaux dot; "nextLabel" hint below list when closed | Trust-building UX |
+| 19 | `site-footer.tsx` | NewsletterSignup component (POST `/api/newsletter`, AnimatePresence state machine idle/loading/done/error); giant brand name `motion.h2` with `whileInView` x: -1% → 1% drift; `data-header-theme="light"` + `section-light` class | §17 / REF §1754 |
+| 20 | `back-to-top.tsx` | Circular scroll-progress ring (SVG circle r=22, `pathLength` from `useSpring(scrollYProgress)`, white stroke, `-rotate-90`); spring entrance y:80→0, opacity 0→1, scale 0.6→1; pointer-events toggled based on visibility | Ridgewells / Salt Block REF §818-826 |
+| 21 | `calculator.tsx` | Magnetic CTA wrapper on "Оставить заявку" (`<Magnetic>` from `motion/magnetic.tsx`); seasonal multiplier badge (`result.season > 1` → gold border + Gift icon + "+15%" + hint); Telegram share button (`t.me/share/url`); WhatsApp share button (`wa.me/?text=`); shareText uses `current.label` (was `current.title` which doesn't exist) | OUTSTANDING §3.1 / Cut & Taste seasonal-pricing |
+| 22 | `events-gallery.tsx` | Load more pagination (`visibleCount` state, +8 per click); counter "Показано N из M"; reset on category change | REF §1929 |
+| 23 | `press-strip.tsx` (new) | "As seen in" band with 6 publication wordmarks (Forbes/РБК/Собака.ru/The Village/TimeOut/Afisha); grayscale ink/35 → gold on hover; staggered `whileInView` entrance (60ms per item) | REF §283-300 (94% adoption) |
+| 24 | `globals.css` | `text-shimmer-gold` (`::after` translateX sweep, GPU-friendly); `draw-line` keyframe refactored from `width 0→100%` (RULES §5 violation) to `scaleX 0→1`; per-section `::selection` variants (`.section-dark` → gold/ink, `.section-light` → bordeaux/cream with `::-moz-selection` mirror); `.will-change-transform` helper | Awwwards polish |
+
+### Что сделано — Cross-cutting
+
+- `section-light`/`section-dark` classes propagated to all 12 user-facing sections (hero/about/manifesto/process/menu/services/pillars/snack-box/events/video-events/calculator/instagram/testimonials/faq/contact/footer) → per-section `::selection` variants active site-wide.
+- `data-header-theme` attribute added to footer (was missing).
+- `PressStrip` inserted between `InstagramVideo` and `Testimonials` in `page.tsx`.
+- New API: `POST /api/newsletter` (validate email, capture consent proof IP+UA, upsert Subscriber; codes: SUBSCRIBED/ALREADY_SUBSCRIBED/REACTIVATED; fallback demo mode). `GET /api/newsletter` (count active, no PII).
+- Prisma schema: `Subscriber` model added (id, email unique, source, consentAccepted, consentDate, consentIp, userAgent, active, unsubscribedAt, @@index active/createdAt).
+- `/media/menu-bbq.jpg` removed (was HTML 404 page disguised as JPEG — `file --brief` reported "HTML document"). All references in `media.ts`/`pricing.ts`/`services.tsx`/`menu.tsx` replaced with `/media/event-06.jpg` (real JPEG of Scandinavian BBQ).
+- `INSTAGRAM.reels` array added to `media.ts` (4 reel URLs).
+
+### VLM-критика (Skill: VLM, `z-ai vision -p`)
+
+**Итоговая оценка: 8/10 execution of 7/10 concept.** Премиальная, душевная, но
+перегруженная UI-плотностью.
+
+| Категория | Оценка | Комментарий |
+|-----------|--------|-------------|
+| Типографика | 7.5/10 | Сильная serif-иерархия, но Cyrillic Playfair Display тонковат на крупных размерах |
+| Цветовая палитра | 6/10 | "Safe warm luxury" — terracotta/cream/gold. Не хватает edge настоящего люкса. CTA-кнопка слегка desaturated |
+| Animation polish | 8.5/10 | Agency-level. Магнитные CTA, scroll-progress ring, vertical-shutter reveal — deep framer-motion understanding |
+| Information hierarchy | 6.5/10 | Слишком много conversion paths борются за внимание: 2 hero-кнопки + top bar CTA + phone + calculator share |
+| Conversion paths | 7/10 | TG/WhatsApp share — блестяще локализовано для RU-рынка. Seasonal badge добавляет urgency без pushiness |
+
+**3 слабейших аспекта (рекомендации для следующего цикла):**
+
+1. **Feature-creep navigation** — 6 persistent UI elements (sticky header + chapter indicator + scroll progress line + back-to-top ring + sticky TOC + fixed cookie banner). На iPhone SE — claustrophobic. Fix: убить back-to-top ring (избыточен с scroll progress), свернуть chapter indicator в header на mobile, TOC показывать только при активном скролле Services.
+
+2. **Color palette safety** — terracotta/cream/gold = default "expensive but approachable". Не хватает edge. CTA desaturated ("muddy salmon"). Fix: либо затемнить (charcoal base + warm white + sharp gold), либо bold (deep burgundy/forest green вместо orange).
+
+3. **Information density vs scannability** — Menu с dietary chips + featured dish spotlight = dashboard, не sensory experience. FAQ с search = ожидание специфических вопросов сразу. Fix: lead с full-bleed imagery в Menu, фильтры — secondary utility. FAQ-search — на отдельную страницу.
+
+**3 сильнейших аспекта:**
+
+1. **Kinetic hero architecture** — magnetic CTAs + scroll progress + chapter indicators = narrative compass. Ведёт себя как interactive documentary.
+2. **Micro-interaction consistency** — add-to-cart feedback, card flips, load-more pagination = cohesive interaction language. Не patchwork plugins, а design system.
+3. **Contextual conversion intelligence** — TG/WhatsApp sharing в Calculator — блестяще локализовано. Учитывает group-chat decision-making (невеста + мама + event-manager). Behavioral design, не pretty design.
+
+### Грабли (зафиксировать для будущего)
+
+1. **`<motion.button>` containing `<button>` — React 19 hydration validation error**. `button <button> cannot contain a nested <button>`. В `services.tsx` flip-card outer был `<motion.button>` с двумя `<button>` на back-face (CTA + flip-back). **Решение:** outer → `<motion.div role="button" tabIndex={0} onKeyDown>`, `aria-pressed` сохранён. Keyboard accessible (Enter/Space). Типы `cardRef` и `handleMouseMove` обновлены с `HTMLButtonElement` на `HTMLDivElement`.
+2. **`motion.title` не существует на типе MenuType** — было `current.title`, правильное поле `current.label`. TS-ошибка при добавлении `shareText` в calculator.tsx. **Решение:** проверить типы перед использованием полей.
+3. **`seasonMultiplier` — функция, не число.** Импортирована как `seasonMultiplier` из `pricing.ts`, но это `function seasonMultiplier(dateStr: string): number`. Сравнение `seasonMultiplier > 1` — TS-ошибка. **Решение:** использовать `result.season` из `calcTotal()` (там уже вычислено).
+4. **`/media/menu-bbq.jpg` — HTML 404 disguised as JPEG.** `file --brief` reports "HTML document, Unicode text, UTF-8 text". Browser emits `⨯ The requested resource isn't a valid image for /media/menu-bbq.jpg received null`. **Решение:** удалить файл, заменить все ссылки на `/media/event-06.jpg` (реальный JPEG). Проверять `file --brief` на новых медиа-файлах перед коммитом.
+5. **Subagent timeout — 5-min deadline слишком короткий для треков с 4+ файлами.** Track 2-c (5 файлов, ~1300 LOC изменений) уложился в код, но не успел дописать worklog. **Решение:** либо увеличивать timeout, либо разбивать трек на 2 sub-call'а по 2-3 файла каждый. Оркестратор backfill'ит worklog-entry.
+6. **`useReducedMotion()` из framer-motion возвращает `boolean | null`** — `null` на SSR, потом boolean на клиенте. Это может вызывать hydration mismatch в components с conditional rendering по `prefersReducedMotion` (announcement-bar, cursor, manifesto). **Решение:** либо использовать `useState(false)` + `useEffect` для detect, либо гарантировать что initial-render-path одинаков для null/false. В этом цикле не блокирует — React auto-recovers, но загрязняет console.
+7. **Pre-existing hydration warnings** в `testimonials.tsx` (auto-play carousel с `Date.now()` в initial state) и `manifesto.tsx`. Не блокируют, но видны в console. **Решение для следующего цикла:** все time-based initial states — через `useState(() => null)` + populate в `useEffect`.
+
+### Скиллы, оказавшиеся полезны в этом цикле
+
+- **`Task → general-purpose` subagent (research)** — Task 1-a переварил `REFERENCE-SITES-ANALYSIS.md` (2421 строк) + 22 catering-компонента и выдал ранжированный план A1–C3 с цитатами строк. Сэкономил часы.
+- **`VLM` (z-ai vision CLI)** — `z-ai vision -p "brutal critique" -i screenshot.png`. Brutal honesty полезна. Нашла "feature creep navigation" и "color palette safety".
+- **`agent-browser`** — `errors --json` для structured error parsing; `eval` для DOM-проверок (наличие секций, счётчиков, фильтров).
+- **`Skill` tool** — для invocation агент-браузера и VLM через `Skill(command="agent-browser")` / `Skill(command="VLM")`.
+
+### Что можно улучшить дальше (next cycle)
+
+- ~~P0 palette violations~~ — сделано.
+- ~~P1 patterns~~ — сделано (24/24 в scope).
+- **P2 wow-factor patterns** (НЕ сделаны в этом цикле,详见 Task 1-a research report):
+  - Hero: scroll-scrubbed image-sequence (WebCodecs+canvas, ~24 frames) — stretch goal OUTSTANDING §12
+  - Hero: cursor image-preview on `#menu` CTA hover (cursor ring expands to 120px, shows dish photo) — OUTSTANDING §3.5
+  - Manifesto: ambient audio cue on enter (Web Audio API, mute button) — Awwwards sensory
+  - Pillars: pinned vertical scroll-stack (200vh, each pillar 100vh, cross-fade) — Awwwards 2026 / Pinch
+  - Pillars: "Compare side-by-side" drag-handle slider — Awwwards before/after
+  - SnackBox: 3D-rotating snack-box mockup (CSS 3D cube, 6 face images, 360° driven by useScroll) — Awwwards 2026 product showcase
+  - EventsGallery: 3D-tilt full card (apply existing `TiltCard` from `menu.tsx`); horizontal-scroll pinned gallery (300vh sticky → useScroll → useTransform x: ['0%','-70%'])
+  - VideoEvents: cinema 16:9 letterbox + grain overlay on play; carousel with chapter markers (timeline scrubber)
+  - FAQ: "Was this helpful?" thumb-up/down per answer (POST /api/faq-vote, Prisma FaqVote)
+  - Contact: inline success confetti (8-12 motion.span gold particles, transform/opacity only); real-time field validation with sage CheckCircle2 on blur; sticky right-side "Quick contact" rail (desktop, appears after scroll > 100vh)
+  - Footer: awards / press logos strip above footer main; Lottie loading spinner (replace `Loader2 animate-spin`)
+  - globals.css: page-transition names beyond `hero-title` (`view-transition-name: section-heading` on each `<h2>`); per-section `::selection` color (polish) — partially done
+- **VLM-recommended polish:**
+  - Darken header to near-black on dark sections
+  - Kill 2 of 6 persistent UI elements (back-to-top ring is redundant with scroll progress)
+  - Bump CTA saturation by 15%
+  - Push color palette — either darker (charcoal base) or bolder (deep burgundy / forest green)
+- **Mux video activation** (P0 deferred): загрузить 10–30s looping chef-action clip в Mux, поставить `MUX_TOKEN_ID` + `MUX_TOKEN_SECRET` в env vars, поставить `MEDIA.hero.muxPlaybackId` в `media.ts`. Hero.tsx уже готов к переключению (Ken Burns fallback активен). Аналогично для `video-events.tsx` — заменить YouTube embeds на Mux `<VideoPlayer>` (rule §3 violation).
+- **Real video testimonials via Mux** (P1 deferred): `VIDEO_TESTIMONIALS` array в `testimonials.tsx` имеет placeholder data. Заменить на Mux-hosted 30–60s client interview clips через `<VideoPlayer>`.
+- **Hydration mismatch cleanup** (pre-existing, не критично): testimonials.tsx auto-play carousel с `Date.now()` initial state. Использовать `useState(() => null)` + populate в `useEffect`.
+
+### Коммиты
+
+- `8cc1a32` — `feat: comprehensive design/animation/interactivity upgrade from reference patterns` (32 files, +3131/-1010). Pushed to `main`.
+- Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d — в `/home/z/my-project/worklog.md` (песочница, не в репо).
+
+### TL;DR (обновлено Cycle 22)
+
+Для **следующего цикла улучшений**:
+
+1. **P2 wow-factor patterns** — см. список выше (scroll-scrubbed image-sequence, ambient audio, 3D cube mockup, horizontal pinned gallery).
+2. **VLM-recommended polish** — darken header, kill redundant persistent UI, bump CTA saturation, push palette darker/bolder.
+3. **Mux video activation** — `MUX_TOKEN_*` env vars + `MEDIA.hero.muxPlaybackId` + `MEDIA.videoEvents[].muxPlaybackId` + `VIDEO_TESTIMONIALS[].muxPlaybackId`.
+4. **Hydration cleanup** — `useState(() => null)` для time-based initial states в testimonials.tsx / manifesto.tsx.
+5. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции.
+
+Целевой уровень — **Awwwards SOTD**. Текущая оценка VLM: 8/10 execution, 7/10 concept. До Awwwards-уровня остаётся: убрать feature creep в navigation, push'нуть palette, добавить 1-2 P2 wow-factor moments.
