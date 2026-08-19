@@ -155,7 +155,7 @@ export default function RootLayout({
         <Toaster />
         <noscript>
           <div style={{ padding: '2rem', fontFamily: 'sans-serif', textAlign: 'center' }}>
-            <h1>Interfood Catering</h1>
+            <h1>Interfood.</h1>
             <p>Для работы сайта необходимо включить JavaScript.</p>
             <p style={{ marginTop: '1rem' }}>Позвоните: <a href="tel:+78129195911">+7 (812) 919-59-11</a></p>
           </div>

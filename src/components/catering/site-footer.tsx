@@ -178,7 +178,7 @@ export function SiteFooter() {
           viewport={{ once: false, margin: "-100px" }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
         >
-          Interfood Catering
+          Interfood<span className="text-gold">.</span>
         </motion.div>
       </div>
 

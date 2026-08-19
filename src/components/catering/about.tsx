@@ -359,7 +359,7 @@ export function About() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3, duration: 0.8 }}
               >
-                Interfood Catering — петербургская команда, которая превращает
+                Interfood. — петербургская команда, которая превращает
                 любое мероприятие в{" "}
                 <span className="text-ink font-medium relative">
                   ритуал застолья

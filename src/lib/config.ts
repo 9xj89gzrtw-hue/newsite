@@ -12,7 +12,7 @@
 
 export const SITE_CONFIG = {
   // Brand
-  brandName: "Interfood Catering",
+  brandName: "Interfood.",
   brandNameFull: "Интерфуд Кейтеринг (NILOV CATERING)",
   brandShort: "Interfood",
   slogan: "Кейтеринг, в котором чувствуют",
