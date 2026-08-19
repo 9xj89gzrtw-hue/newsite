@@ -30,3 +30,20 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Lead {
+  id              String    @id @default(cuid())
+  name            String
+  phone           String
+  email           String?
+  eventType       String?
+  guests          Int?
+  budget          Int?
+  message         String?
+  consentAccepted Boolean   @default(true)
+  consentDate     DateTime  @default(now())
+  consentIp       String?
+  userAgent       String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
