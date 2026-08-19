@@ -35,11 +35,3 @@ export type VideoSource = DirectVideoSource;
 export function videoPoster(source: VideoSource): string {
   return source.poster ?? "";
 }
-
-// Backwards-compat: muxPoster function (was used by hero.tsx + others).
-// Now just returns empty string — there's no Mux thumbnail endpoint.
-// Kept to avoid breaking imports; will be removed in a future cleanup.
-/** @deprecated Phase 6 — Mux removed. Use videoPoster() instead. */
-export function muxPoster(_playbackId: string): string {
-  return "";
-}

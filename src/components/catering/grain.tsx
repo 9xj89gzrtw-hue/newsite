@@ -20,11 +20,6 @@ export function GrainOverlay() {
     if (!el) return;
     let raf = 0;
     let pos = 0;
-    const tick = () => {
-      pos = (pos + 0.4) % 50;
-      el.style.backgroundPosition = `${-pos}px ${-pos}px`;
-      raf = requestAnimationFrame(tick);
-    };
     // Throttle to ~20fps for cheap CPU
     let last = 0;
     const loop = (t: number) => {
@@ -38,7 +33,6 @@ export function GrainOverlay() {
     raf = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(raf);
-      void tick;
     };
   }, []);
 

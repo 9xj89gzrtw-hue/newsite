@@ -41,6 +41,7 @@ export function AmbientAudio() {
   const oscillatorsRef = useRef<OscillatorNode[]>([]);
   const noiseSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const rafRef = useRef(0);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Detect when manifesto section is in viewport
   useEffect(() => {
@@ -136,7 +137,8 @@ export function AmbientAudio() {
 
         // Schedule next pulse with random delay
         const nextDelay = (attackTime + 5 + Math.random() * 8) * 1000;
-        setTimeout(pulseGain, nextDelay);
+        const timerId = setTimeout(pulseGain, nextDelay);
+        timersRef.current.push(timerId);
       };
       // Stagger initial pulses
       setTimeout(pulseGain, i * 1500 + Math.random() * 2000);
@@ -145,6 +147,9 @@ export function AmbientAudio() {
     });
 
     return () => {
+      // Clear all pending timers to prevent memory leaks
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
       oscillatorsRef.current.forEach((osc) => {
         try { osc.stop(); } catch { /* already stopped */ }
       });

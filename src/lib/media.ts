@@ -85,7 +85,7 @@ export const MEDIA = {
     { src: "/media/gamma-corporate.webp", caption: "Корпоративное мероприятие", category: "Корпоративы" },
     { src: "/media/gamma-private-event.webp", caption: "Частное торжество", category: "Банкеты" },
     { src: "/media/gamma-table-birds-eye.webp", caption: "Сервировка стола — вид сверху", category: "Фуршеты" },
-    { src: "/media/event-02.jpg", caption: "Торжественный приём", category: "Банкеты" },
+    { src: "/media/event-09.jpg", caption: "Новогодний банкет", category: "Банкеты" },
   ],
 };
 

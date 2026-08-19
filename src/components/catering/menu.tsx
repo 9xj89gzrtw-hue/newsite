@@ -389,7 +389,7 @@ export function Menu() {
       const t = MENU_TYPES.find((m) => m.id === typeId);
       toast.success(isCatalog ? "Каталог скачан" : `Меню «${t?.label}» скачано`);
     } catch (e) {
-      console.error(e);
+      // Silently fail - user sees toast error above
       toast.error("Не удалось сгенерировать PDF. Попробуйте ещё раз.");
     } finally {
       setDownloading(null);

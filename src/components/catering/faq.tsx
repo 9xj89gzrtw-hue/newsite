@@ -191,7 +191,7 @@ function WasHelpful({ question }: { question: string }) {
         onClick={() => onVote("up")}
         aria-pressed={vote === "up"}
         aria-label="Да, помог"
-        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[28px] ${
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[44px] min-w-[44px] ${
           vote === "up"
             ? "border-sage/40 bg-sage/15 text-sage"
             : "border-border-line hover:border-sage/30 hover:text-sage"
@@ -208,7 +208,7 @@ function WasHelpful({ question }: { question: string }) {
         onClick={() => onVote("down")}
         aria-pressed={vote === "down"}
         aria-label="Нет, не помог"
-        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[28px] ${
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[44px] min-w-[44px] ${
           vote === "down"
             ? "border-bordeaux/30 bg-bordeaux/5 text-bordeaux"
             : "border-border-line hover:border-bordeaux/30 hover:text-bordeaux"
