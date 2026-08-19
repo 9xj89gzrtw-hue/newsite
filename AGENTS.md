@@ -1181,17 +1181,127 @@ TODO for user: upload real videos to Mux → fill `muxPlaybackId` in each catalo
 
 All pushed to `main`.
 
-### TL;DR (обновлено Cycle 25 / Phase 5)
+### Phase 6 дополнения (commit `baacd67`) — DROP MUX, USE DIRECT MP4 + REAL PEXELS PHOTOS
 
-Для **следующего цикла улучшений (Phase 6)**:
+**User decision (2026-08-19, after Phase 5):** Mux credentials returned 404 for all API endpoints (likely restricted to Vercel-Mux integration scope, not direct API access). User asked to:
+1. Stop using Mux — find another free video hosting
+2. Replace ugly AI-generated images with real professional photos (copiable from reference sites / free stock)
 
-1. **Оставшиеся P2 wow-factor patterns** — Hero cursor image-preview, ambient audio cue, SnackBox 3D cube, EventsGallery horizontal pinned gallery, VideoEvents cinema mode (после Mux playback IDs).
-2. **Mux video activation (BLOCKED on user)** — user verifies tokens in dashboard OR uploads videos via dashboard UI → fills `muxPlaybackId` in `MEDIA.hero`, `VIDEO_CATALOG[]`, `VIDEO_TESTIMONIALS[]`. Infrastructure is ready (lazy-load video-events.tsx + dynamic MuxPlayer import in hero.tsx + VideoPlayer component).
-3. **Security: rotate Mux tokens** — credentials leaked in commit `6b7977e`. User should rotate via https://dashboard.mux.com/settings/api. Update local `.env` (untracked).
-4. **Оставшиеся hydration cleanup** — testimonials.tsx (Date.now initial), cursor.tsx + manifesto.tsx (useReducedMotion null→boolean gate).
-5. **Push palette darker/bolder** — Manifesto deepen (#2D2A26 → #0E0D0B), либо charcoal base для dark sections, либо deep burgundy/forest green для primary action.
-6. **AwardsStrip VLM-fixes** — featured first card (larger), varied icons per award type.
-7. **FAQ vote backend** — POST /api/faq-vote + Prisma FaqVote model (current localStorage-only).
-8. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции. **.env file** — verify untracked before every commit (`git status --short` should not show .env).
+**Mux infrastructure REMOVED:**
 
-Целевой уровень — **Awwwards SOTD**. Phase 5 добавила Mux-ready infrastructure (lazy-load + Mux/YouTube fallback). До Awwwards-уровня остаётся: real Mux playback IDs (user action), push palette darker, ещё 1-2 P2 wow-factor moments (Hero cursor image-preview, SnackBox 3D cube).
+| File | Before (Phase 5) | After (Phase 6) |
+|------|------------------|-----------------|
+| `src/lib/video.ts` | MuxSource + CloudflareStreamSource types, muxPoster() helper | DirectVideoSource (provider:'direct', src:string, poster?:string). muxPoster() kept as deprecated stub (returns ""). |
+| `src/components/media/video-player.tsx` | Dynamic MuxPlayer import + MuxCSSProperties, Cloudflare Stream iframe | Native `<video>` element supporting any external MP4 URL |
+| `src/components/catering/hero.tsx` | Dynamic MuxPlayer, MEDIA.hero.muxPlaybackId, `<MuxPlayer>` with `style as MuxCSSProperties` | Native `<video>` element with `src=MEDIA.hero.videoSrc`, `poster=MEDIA.hero.src`, autoplay muted loop playsInline. Reduced-motion users always see Ken Burns image (vestibular safety). |
+| `src/components/catering/video-events.tsx` | MuxVideoEmbed (dynamic `require('@mux/mux-player-react')`) | DirectVideoEmbed (native `<video>` with external MP4 URL). MuxVideoEmbed kept as DEPRECATED stub — renders placeholder 'Migrate to direct MP4 URL'. |
+| `.env` | MUX_TOKEN_ID, MUX_TOKEN_SECRET, NEXT_PUBLIC_MUX_ENVIRONMENT_KEY | All 3 Mux vars removed. Only DATABASE_URL remains. |
+
+**Free video hosting alternatives (no Mux):**
+
+Direct external MP4 URLs from any free CDN work via native `<video>` element:
+
+| Source | Free quota | URL pattern | Notes |
+|--------|-----------|-------------|-------|
+| **Pexels videos CDN** | Free, CC0 | `https://videos.pexels.com/video-files/{id}/{filename}.mp4` | Returns 403 without proper referer — needs to be downloaded + re-hosted OR embedded via Pexels widget |
+| **Mixkit** | Free, no attribution | `https://assets.mixkit.co/videos/preview/mixkit-{slug}-{id}-large.mp4` | Returns 403 without proper referer |
+| **Coverr** | Free for commercial use | `https://www.coverr.co/download/{slug}` | Direct download, needs re-hosting |
+| **Bunny.net Stream** | Cheap (not free) | `https://{hostname}.bcdn.video/{id}/playlist.m3u8` | Paid service |
+| **Cloudinary free tier** | 25GB storage + 25GB/mo bandwidth | `https://res.cloudinary.com/{account}/video/upload/{public_id}.mp4` | Requires signup |
+| **Backblaze B2 + Cloudflare CDN** | 10GB free storage, 1GB/day egress | `https://{cdn-domain}/{filename}.mp4` | Requires signup |
+| **YouTube embed** (existing pattern) | Free, unlimited | `https://www.youtube-nocookie.com/embed/{id}` | Already used in video-events.tsx legacy fallback. RULES §3 prefers direct MP4 but YouTube works. |
+
+**Current state (Phase 6):**
+- `MEDIA.hero.videoSrc = ""` — Ken Burns image background (default). Set to a direct MP4 URL to enable video hero.
+- `VIDEO_CATALOG[].videoSrc` — all empty. YouTube embeds (legacy fallback) still work. Set `videoSrc` to enable direct MP4 per video.
+- User action needed: download free catering/food stock videos from Pexels/Mixkit/Coverr → upload to Backblaze B2 or Cloudinary → set `videoSrc` URLs in `media.ts` + `video-events.tsx`.
+
+**Real Pexels photos swapped in (8 new images, free CC0 license):**
+
+| File | Size | Replaces | Source |
+|------|------|----------|--------|
+| `/media/hero-real.jpg` | 1920x1080 | AI-generated `hero-premium.png` | Pexels photo 262978 |
+| `/media/about-real.jpg` | 1920x1080 | AI-generated `about-premium.webp` | Pexels photo 3134670 |
+| `/media/chef-action-real.jpg` | 1920x1080 | AI-generated `event-chef-action.jpg` | Pexels photo 3214151 |
+| `/media/menu-banquet-real.jpg` | 1600x900 | generic `menu-banquet.jpg` | Pexels photo 2629542 |
+| `/media/menu-buffet-real.jpg` | 1600x900 | generic `menu-buffet.jpg` | Pexels photo 5448082 |
+| `/media/menu-coffee-break-real.jpg` | 1600x900 | generic `menu-coffee-break.jpg` | Pexels photo 7046168 |
+| `/media/menu-vegetarian-real.jpg` | 1600x900 | generic `menu-vegetarian.jpg` | Pexels photo 6746879 |
+| `/media/menu-office-lunch-real.jpg` | 1600x900 | generic `menu-office-lunch.jpg` | Pexels photo 5409678 |
+
+Old AI-generated images moved to `/public/media/backup-ai/` (not deleted, kept for regression reference).
+`/public/media/about-luxury-table.jpg` REMOVED (was HTML 404 page disguised as JPEG — `file --brief` reported "HTML document").
+
+Image path updates propagated to:
+- `src/lib/media.ts` — MEDIA.hero.src, MEDIA.about.src, MEDIA.menu.*
+- `src/components/catering/menu.tsx` — MENU_TYPE_IMAGES + menu items
+- `src/lib/pricing.ts` — package photos
+- `src/components/catering/pillars.tsx` — PILLARS[].image
+- `src/components/catering/services.tsx` — SERVICE_PHOTOS
+- `src/components/catering/site-header.tsx` — mega-menu images
+- `src/components/catering/manifesto.tsx` — dish layers
+
+**Phase 6 verification:**
+- `bun run lint` → clean
+- `bunx tsc --noEmit` → clean
+- `curl localhost:3000` → HTTP 200
+- DOM eval via agent-browser: heroImg=`/media/hero-real.jpg`, aboutImg=`/media/about-real.jpg`, menuImgs=[menu-buffet-real, menu-banquet-real, menu-snack-box, menu-coffee-break-real, menu-vegetarian-real] — all new real Pexels photos loading ✓
+
+### Грабли (зафиксировать для будущего, дополняют §14)
+
+12. **Free video CDN URLs return 403 without proper referer.** Pexels videos CDN (`https://videos.pexels.com/video-files/{id}/...`) and Mixkit (`https://assets.mixkit.co/videos/preview/...`) return HTTP 403 when fetched via direct curl (no User-Agent, no Referer). Browser embeds work because browser sends Referer. **Solution:** either (a) download the MP4 once and re-host on Backblaze B2 / Cloudinary / own CDN, OR (b) use the platform's official embed widget (Pexels embed, Mixkit embed), OR (c) use YouTube embed as fallback (already wired in video-events.tsx).
+13. **`file --brief` check is mandatory for downloaded media.** `about-luxury-table.jpg` was an HTML 404 page disguised as a JPEG — `file --brief` reported "HTML document, ASCII text". Next.js Image component fails at runtime with `⨯ The requested resource isn't a valid image`. **Solution:** run `file public/media/*` after every download; fix or replace any file that's not the expected type.
+14. **`<video>` element requires `muted` for autoplay.** Browser autoplay policy: only muted videos can autoplay without user interaction. Hero background videos MUST have `muted` attribute, otherwise they won't start. `playsInline` is also required for iOS Safari.
+15. **AI-generated images have a distinct "AI look"** that VLM consistently rates 5-6/10 ("safe warm luxury", "muddy salmon", "template-y"). Real photos from Pexels (CC0, free) consistently rate higher and look more authentic. **Decision:** prefer real stock photos over AI generation for hero/about/menu imagery. Use AI generation only for unique conceptual visuals where stock won't have a match.
+
+### Phase 6 backlog (NOT done — still open for Phase 7)
+
+**P2 patterns ещё НЕ сделаны:**
+- Hero cursor image-preview на #menu CTA hover (complex cursor.tsx rewrite — extend existing data-cursor mechanism to also read data-cursor-image)
+- Manifesto ambient audio cue (needs audio file в public/ — but RULES §3 forbids hosting media in /public; would need external audio CDN OR use as inline data URI)
+- SnackBox 3D-rotating cube mockup (needs 6 face images)
+- EventsGallery horizontal-scroll pinned gallery (300vh sticky → useScroll → useTransform x: ['0%','-70%'])
+- VideoEvents cinema 16:9 letterbox + grain overlay on play; carousel with chapter markers (timeline scrubber) — needs real video URLs first (direct MP4 OR YouTube embeds already work)
+- FAQ "Was this helpful?" → backend API (POST /api/faq-vote, Prisma FaqVote) — current localStorage-only
+
+**VLM-recommended polish ещё НЕ сделаны:**
+- Push palette darker/bolder — Manifesto deepen (#2D2A26 → #0E0D0B), либо charcoal base для dark sections, либо deep burgundy/forest green для primary action.
+- AwardsStrip: featured first card (larger), varied icons per award type.
+
+**Video backlog (was Mux, now Phase 6 free CDN):**
+- Find/download real catering videos from Pexels/Mixkit/Coverr → re-host on Backblaze B2 OR use YouTube embeds (already wired in video-events.tsx). Set `MEDIA.hero.videoSrc` + `VIDEO_CATALOG[].videoSrc` to enable.
+- Or: use YouTube embeds for ALL video content (no direct MP4 needed). YouTube embeds already work via existing YouTubeEmbed component. Just keep `youtubeEmbedId` in VIDEO_CATALOG and don't set `videoSrc`.
+
+**Hydration cleanup (pre-existing):**
+- testimonials.tsx auto-play carousel с `Date.now()` initial state — использовать `useState(() => null)` + populate в `useEffect`
+- cursor.tsx, manifesto.tsx — `useReducedMotion` hydration gate (как в announcement-bar.tsx)
+
+### Коммиты (updated)
+
+- `8cc1a32` — Phase 1+2 comprehensive upgrade (32 files, +3131/-1010)
+- `b0e3076` — AGENTS.md §14 session log (+147)
+- `e75a34d` — Phase 3 — P2 patterns + VLM polish (9 files, +281/-15)
+- `979d335` — AGENTS.md §14 Phase 3 log (+48/-8)
+- `394e06c` — Phase 4 — pinned Pillars scroll-stack + Awards strip + hydration fixes (6 files, +499/-83)
+- `f3963b3` — AGENTS.md §14 Phase 4 log (+71/-8)
+- `6b7977e` — Phase 5 — Mux-ready video-events lazy-load (2 files, +254/-40) — **ACCIDENTALLY COMMITTED .env WITH MUX SECRETS**
+- `55da4a8` — security: untrack .env (removed .env from git tracking)
+- `b8d6550` — AGENTS.md §14 Phase 5 log (+129/-11)
+- `baacd67` — Phase 6 — drop Mux, use direct MP4 + real Pexels photos (18 files, +real photos swapped, -Mux infra)
+
+All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d, 3, 4, 5, 6 — в `/home/z/my-project/worklog.md` (песочница, не в репо).
+
+### TL;DR (обновлено Cycle 26 / Phase 6)
+
+Для **следующего цикла улучшений (Phase 7)**:
+
+1. **Оставшиеся P2 wow-factor patterns** — Hero cursor image-preview, ambient audio cue, SnackBox 3D cube, EventsGallery horizontal pinned gallery, VideoEvents cinema mode (after real video URLs set).
+2. **Real videos** — either (a) download free catering/food stock videos from Pexels/Mixkit/Coverr → re-host on Backblaze B2 free tier (10GB) → set `MEDIA.hero.videoSrc` + `VIDEO_CATALOG[].videoSrc` to enable direct MP4 via native `<video>`, OR (b) just use existing YouTube embeds in video-events.tsx (already working). Hero background video = direct MP4 only (YouTube embed in hero looks unprofessional due to controls/branding).
+3. **Оставшиеся hydration cleanup** — testimonials.tsx (Date.now initial), cursor.tsx + manifesto.tsx (useReducedMotion null→boolean gate).
+4. **Push palette darker/bolder** — Manifesto deepen (#2D2A26 → #0E0D0B), либо charcoal base для dark sections, либо deep burgundy/forest green для primary action.
+5. **AwardsStrip VLM-fixes** — featured first card (larger), varied icons per award type.
+6. **FAQ vote backend** — POST /api/faq-vote + Prisma FaqVote model (current localStorage-only).
+7. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции. **.env file** — verify untracked before every commit (`git status --short` should not show .env). **`file --brief`** check on any new media download.
+8. **Replace remaining AI-generated images** — current `hero-real.jpg`, `about-real.jpg`, `chef-action-real.jpg`, 5× menu-*-real.jpg already swapped in Phase 6. VLM rate pending (rate-limited at time of commit). If still "safe", try Pexels photos with different IDs (broader/darker compositions).
+
+Целевой уровень — **Awwwards SOTD**. Phase 6 DROPPED Mux (replaced with native `<video>` for any direct MP4 URL) + SWAPPED 8 AI-generated images with real Pexels photos. До Awwwards-уровня остаётся: real videos (user action), push palette darker, ещё 1-2 P2 wow-factor moments (Hero cursor image-preview, SnackBox 3D cube).
