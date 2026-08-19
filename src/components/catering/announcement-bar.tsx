@@ -75,7 +75,7 @@ export function AnnouncementBar() {
           <span className="hidden sm:inline">Сезонные свадебные меню {currentYear} — </span>
           <a
             href="#menu"
-            className="font-semibold text-gold underline underline-offset-2 hover:text-peach transition-colors"
+            className="font-semibold text-cream underline underline-offset-2 hover:text-peach transition-colors"
           >
             смотреть меню →
           </a>
@@ -114,7 +114,7 @@ export function AnnouncementBar() {
                 <span className="hidden sm:inline">Сезонные свадебные меню {currentYear} — </span>
                 <a
                   href="#menu"
-                  className="font-semibold text-gold underline underline-offset-2 hover:text-peach transition-colors"
+                  className="font-semibold text-cream underline underline-offset-2 hover:text-peach transition-colors"
                 >
                   смотреть меню →
                 </a>

@@ -492,7 +492,7 @@ export function Pillars() {
                       <span className="font-mono text-xs uppercase tracking-[0.3em] text-gold">
                         {p.eyebrow}
                       </span>
-                      <h3 className="mt-2 font-display text-3xl text-ink md:text-4xl">
+                      <h3 className="mt-2 font-display text-xl text-ink md:text-2xl">
                         {p.title}
                       </h3>
                       <p className="mt-4 text-sm leading-relaxed text-ink/70 md:text-base">

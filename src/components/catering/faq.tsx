@@ -430,10 +430,12 @@ export function Faq() {
                         <p className="px-6 pb-5 pl-16 leading-relaxed text-ink/70 text-base">
                           {highlightMatch(item.answer, query)}
                         </p>
-                        {/* Was this helpful? — thumb up/down (localStorage) */}
-                        <div className="px-6 pb-5 pl-16 border-t border-border-line/40 pt-3">
-                          <WasHelpful question={item.question} />
-                        </div>
+                        {/* Was this helpful? — only render when open (avoids invisible tab-focusable buttons) */}
+                        {isOpen && (
+                          <div className="px-6 pb-5 pl-16 border-t border-border-line/40 pt-3">
+                            <WasHelpful question={item.question} />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

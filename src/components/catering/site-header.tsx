@@ -250,7 +250,7 @@ export function SiteHeader() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "-100%" }}
             transition={{ duration: 0.5, ease: [0.83, 0, 0.17, 1] }}
-            onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
+            onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); if (e.key === "Tab") { const menu = e.currentTarget; const focusable = menu.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])'); if (focusable.length === 0) return; const first = focusable[0]; const last = focusable[focusable.length - 1]; if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } } }}
           >
             <div className="flex items-center justify-between">
               <span className="font-display text-2xl text-ink">
@@ -288,14 +288,14 @@ export function SiteHeader() {
             <div className="mt-auto space-y-3 text-ink">
               <a
                 href={CONTACTS.phoneHref}
-                className="flex items-center gap-3 text-2xl font-display hover:text-gold transition-colors"
+                className="flex min-h-[44px] items-center gap-3 py-2 text-2xl font-display hover:text-gold transition-colors"
               >
                 <Phone className="size-5" />
                 {CONTACTS.phone}
               </a>
               <a
                 href={CONTACTS.whatsappHref}
-                className="flex items-center gap-3 text-sm text-ink/70 hover:text-gold transition-colors"
+                className="flex min-h-[44px] items-center gap-3 py-2 text-sm text-ink/70 hover:text-gold transition-colors"
               >
                 <MessageCircle className="size-4" />
                 WhatsApp: {CONTACTS.whatsapp}

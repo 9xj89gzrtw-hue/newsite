@@ -1160,7 +1160,7 @@ export function Contact() {
                                 href="/privacy"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                aria-label="Политика конфиденциальности (откроется в новой вкладке)"
+                                aria-label="Политика конфиденциальности"
                                 className="text-gold underline underline-offset-2 hover:text-terracotta transition-colors"
                               >
                                 Политикой конфиденциальности
