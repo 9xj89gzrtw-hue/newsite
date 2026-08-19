@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { LenisProvider } from "@/components/catering/lenis-provider";
 import { CustomCursor } from "@/components/catering/cursor";
+import { AmbientAudio } from "@/components/catering/ambient-audio";
 import { Preloader } from "@/components/catering/preloader";
 import { CookieConsent } from "@/components/catering/cookie-consent";
 import { GrainOverlay } from "@/components/catering/grain";
@@ -144,6 +145,7 @@ export default function RootLayout({
         />
         <Preloader />
         <CustomCursor />
+        <AmbientAudio />
         <GrainOverlay />
         <ChapterNav />
         <NuqsAdapter>

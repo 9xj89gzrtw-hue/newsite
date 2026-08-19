@@ -62,7 +62,13 @@ export const MEDIA = {
     bbq: "/media/ridgewells-scallops.jpg",          // Ridgewells "Beautifully seared golden diver scallops"
     "office-lunch": "/media/concept-banquet-table.jpg", // Concept "CCC-43 lange tafel"
   } as Record<string, string>,
-  // Real event photos from interfood-catering.ru gallery
+  // Real event photos — Phase 7/8/10 mix:
+  // - event-0[1-9,11,12].{png|jpg} — original interfood-catering.ru gallery
+  // - gamma-*.{webp} — Phase 10 Gamma Catering (gammacatering.com) real photos:
+  //   - gamma-wedding (Catering Weddings Switzerland)
+  //   - gamma-corporate (CATERING FOR CORPORATE EVENTS)
+  //   - gamma-private-event (Private Event Catering)
+  //   - gamma-table-birds-eye (TCZ Restaurant Table Salad Rosé Wine Bird's-eye view)
   events: [
     { src: "/media/event-01.png", caption: "Свадебный фуршет на крыше", category: "Свадьбы" },
     { src: "/media/event-02.jpg", caption: "Корпоратив в офисе", category: "Корпоративы" },
@@ -75,6 +81,10 @@ export const MEDIA = {
     { src: "/media/event-10.jpg", caption: "Сезонный банкет", category: "Банкеты" },
     { src: "/media/event-11.jpg", caption: "Фуршет для гостей", category: "Фуршеты" },
     { src: "/media/event-12.jpg", caption: "Праздничная сервировка", category: "Банкеты" },
+    { src: "/media/gamma-wedding.webp", caption: "Свадебный кейтеринг (Швейцария)", category: "Свадьбы" },
+    { src: "/media/gamma-corporate.webp", caption: "Корпоративное мероприятие", category: "Корпоративы" },
+    { src: "/media/gamma-private-event.webp", caption: "Частное торжество", category: "Банкеты" },
+    { src: "/media/gamma-table-birds-eye.webp", caption: "Сервировка стола — вид сверху", category: "Фуршеты" },
     { src: "/media/event-02.jpg", caption: "Торжественный приём", category: "Банкеты" },
   ],
 };

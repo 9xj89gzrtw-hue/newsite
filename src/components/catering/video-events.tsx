@@ -42,6 +42,10 @@ type VideoItem = {
   muxPlaybackId?: string;
   // Legacy YouTube fallback (still works, but RULES §3 prefers direct MP4).
   youtubeEmbedId?: string;
+  // Phase 10 — chapter markers (timeline scrubber). Each chapter has a
+  // label + start time in seconds. Click on chapter seeks video to that time.
+  // Only rendered for videoSrc items (direct MP4 supports seekable <video>).
+  chapters?: { label: string; time: number }[];
 };
 
 const VIDEO_CATALOG: VideoItem[] = [
@@ -54,6 +58,15 @@ const VIDEO_CATALOG: VideoItem[] = [
     // "Power Of Food" hero loop, silent, 16MB MP4. Same URL as MEDIA.hero.videoSrc
     // — reused here for the wedding reception context.
     videoSrc: "https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4",
+    // Phase 10 chapters — approximate times for the 16MB loop.
+    // (Times are estimates since the video is silent — actual chapters may
+    //  need adjustment once video is played. Click chapter to seek.)
+    chapters: [
+      { label: "Пролог", time: 0 },
+      { label: "Подача", time: 4 },
+      { label: "Сервировка", time: 8 },
+      { label: "Гости", time: 12 },
+    ],
   },
   {
     title: "Выездное барбекю",
@@ -84,6 +97,13 @@ const VIDEO_CATALOG: VideoItem[] = [
     // WordPress wp-content uploads — 533KB MP4, no CORS but <video> element
     // works cross-origin without CORS for video playback (not canvas access).
     videoSrc: "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/landscape-1.mp4",
+    // Phase 10 chapters — short clip (~8s based on file size 533KB at typical bitrate).
+    chapters: [
+      { label: "Открытие", time: 0 },
+      { label: "Панорама", time: 2 },
+      { label: "Детали", time: 4 },
+      { label: "Финал", time: 6 },
+    ],
   },
 ];
 
@@ -161,6 +181,7 @@ function VideoCard({
   videoSrc,
   muxPlaybackId,
   youtubeEmbedId,
+  chapters,
 }: VideoItem) {
   const [state, setState] = useState<"poster" | "loading" | "playing">("poster");
   const prefersReducedMotion = useReducedMotion();
@@ -285,7 +306,8 @@ function VideoCard({
               {videoSrc ? (
                 // Phase 6 — direct external MP4 URL via native <video>.
                 // Phase 9: cinema mode with letterbox + grain overlay on play.
-                <CinemaVideoEmbed src={videoSrc} poster={poster} title={title} />
+                // Phase 10: chapters prop for timeline scrubber.
+                <CinemaVideoEmbed src={videoSrc} poster={poster} title={title} chapters={chapters} />
               ) : muxPlaybackId ? (
                 // Phase 5 legacy — Mux playback ID (deprecated, renders stub).
                 <MuxVideoEmbed playbackId={muxPlaybackId} title={title} />
@@ -364,13 +386,18 @@ function DirectVideoEmbed({
   src,
   poster,
   title,
+  videoRef,
 }: {
   src: string;
   poster?: string;
   title: string;
+  // Phase 10: optional ref so parent (CinemaVideoEmbed) can read video.currentTime
+  // for chapter timeline + seek via chapter button click.
+  videoRef?: React.RefObject<HTMLVideoElement>;
 }) {
   return (
     <video
+      ref={videoRef}
       src={src}
       poster={poster}
       autoPlay
@@ -433,12 +460,44 @@ function CinemaVideoEmbed({
   src,
   poster,
   title,
+  chapters,
 }: {
   src: string;
   poster?: string;
   title: string;
+  chapters?: { label: string; time: number }[];
 }) {
   const prefersReducedMotion = useReducedMotion();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  // Track video time for chapter highlight + progress bar
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const onLoaded = () => setDuration(v.duration || 0);
+    const onTime = () => setCurrentTime(v.currentTime);
+    v.addEventListener("loadedmetadata", onLoaded);
+    v.addEventListener("timeupdate", onTime);
+    return () => {
+      v.removeEventListener("loadedmetadata", onLoaded);
+      v.removeEventListener("timeupdate", onTime);
+    };
+  }, []);
+
+  const seekTo = (time: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = time;
+    v.play().catch(() => { /* autoplay may be blocked */ });
+  };
+
+  // Determine which chapter is currently active
+  const activeChapter = chapters && chapters.length > 0
+    ? chapters.reduce((acc, ch, i) => (currentTime >= ch.time ? i : acc), 0)
+    : -1;
+
   return (
     <div className="relative h-full w-full bg-ink">
       {/* Cinema letterbox bars — top + bottom, scale-in on play */}
@@ -458,8 +517,8 @@ function CinemaVideoEmbed({
         style={{ height: "8%", transformOrigin: "bottom" }}
         aria-hidden="true"
       />
-      {/* The actual video player */}
-      <DirectVideoEmbed src={src} poster={poster} title={title} />
+      {/* The actual video player — now with ref for chapter seek */}
+      <DirectVideoEmbed src={src} poster={poster} title={title} videoRef={videoRef} />
       {/* Grain overlay (cinema film texture) — disabled for reduced-motion */}
       {!prefersReducedMotion && (
         <div
@@ -479,6 +538,50 @@ function CinemaVideoEmbed({
           Cinema
         </span>
       </div>
+      {/* Phase 10: Chapter timeline scrubber — shown only when chapters are defined */}
+      {chapters && chapters.length > 0 && duration > 0 && (
+        <div className="absolute bottom-3 left-3 right-3 z-20 flex flex-col gap-1.5 rounded-2xl bg-ink/85 p-2.5 backdrop-blur-md">
+          {/* Progress bar with chapter markers */}
+          <div className="relative h-1.5 w-full rounded-full bg-cream/20">
+            {/* Filled progress */}
+            <div
+              className="absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-gold to-terracotta"
+              style={{ width: `${(currentTime / duration) * 100}%` }}
+            />
+            {/* Chapter markers — vertical ticks at each chapter start time */}
+            {chapters.map((ch, i) => (
+              <button
+                key={`tick-${i}`}
+                type="button"
+                onClick={() => seekTo(ch.time)}
+                aria-label={`Глава ${i + 1}: ${ch.label}`}
+                className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full border-2 border-cream bg-gold/60 transition-all hover:scale-125 hover:bg-gold"
+                style={{ left: `calc(${(ch.time / duration) * 100}% - 5px)` }}
+              />
+            ))}
+          </div>
+          {/* Chapter labels — clickable, active highlighted */}
+          <div className="flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+            {chapters.map((ch, i) => (
+              <button
+                key={`label-${i}`}
+                type="button"
+                onClick={() => seekTo(ch.time)}
+                className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider transition-all ${
+                  activeChapter === i
+                    ? "bg-gradient-to-r from-gold to-terracotta text-white"
+                    : "bg-cream/10 text-cream/70 hover:bg-cream/20 hover:text-cream"
+                }`}
+              >
+                {ch.label}
+                <span className="ml-1.5 opacity-60">
+                  {Math.floor(ch.time / 60)}:{String(Math.floor(ch.time % 60)).padStart(2, "0")}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
