@@ -1,16 +1,30 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Download, Loader2, Check, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, Download, Loader2, Check, ChevronDown, Sparkles } from "lucide-react";
 import { Reveal } from "./reveal";
 import { MENU_TYPES, formatRUB, type MenuType } from "@/lib/pricing";
 import { generateMenuPdf } from "@/lib/pdf-client";
 import { toast } from "sonner";
 
 /**
- * Menu section — LIGHT THEME with elegant tabs and cards
+ * Map menu type IDs to their thumbnail images
+ */
+const MENU_TYPE_IMAGES: Record<string, string> = {
+  buffet: "/media/menu-buffet.jpg",
+  banquet: "/media/menu-banquet.jpg",
+  "snack-box": "/media/menu-snack-box.jpg",
+  "coffee-break": "/media/menu-coffee-break.jpg",
+  vegetarian: "/media/menu-vegetarian.jpg",
+  bbq: "/media/menu-bbq.jpg",
+  "office-lunch": "/media/menu-office-lunch.jpg",
+};
+
+/**
+ * Menu section — LIGHT THEME with elegant visual cards and enhanced package display
+ * Inspired by Wolfgang Puck Catering, Pinch Food Design, and MyRadish
  */
 export function Menu() {
   const [active, setActive] = useState(MENU_TYPES[0].id);
@@ -18,6 +32,7 @@ export function Menu() {
   const [expandedPackage, setExpandedPackage] = useState<string | null>(null);
   const current = MENU_TYPES.find((m) => m.id === active) ?? MENU_TYPES[0];
   const priceUnit = current.priceUnit ?? "/чел";
+  const prefersReducedMotion = useReducedMotion();
 
   const select = (id: string) => {
     setActive(id);
@@ -46,18 +61,11 @@ export function Menu() {
     }
   };
 
-  // Count-aware grid
-  const gridCols =
-    current.packages.length === 2
-      ? "md:grid-cols-2"
-      : current.packages.length === 4
-        ? "md:grid-cols-2 lg:grid-cols-4"
-        : "md:grid-cols-2 lg:grid-cols-3";
-
   return (
     <section id="menu" className="relative overflow-hidden bg-cream py-24 md:py-36">
       {/* Subtle decoration */}
       <div className="absolute top-1/2 right-0 w-80 h-80 bg-gradient-to-l from-gold/8 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-r from-terracotta/6 to-transparent rounded-full blur-3xl pointer-events-none" />
       
       <div className="relative mx-auto max-w-7xl px-5 md:px-8">
         {/* Header */}
@@ -79,73 +87,172 @@ export function Menu() {
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
-              <p className="mt-3 font-display italic text-lg text-ink/60">
+              <p className="mt-3 font-display italic text-lg text-ink/60 max-w-xl">
                 Пакеты с реальными блюдами и ценами. Скачайте PDF, чтобы показать команде.
               </p>
             </Reveal>
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Visual Menu Type Cards - Enhanced Tabs */}
         <Reveal delay={0.15}>
           <div
             role="tablist"
             aria-label="Типы меню"
-            className="mt-12 flex flex-wrap justify-center gap-2"
+            className="mt-12 flex flex-wrap justify-center gap-3 md:gap-4"
           >
-            {MENU_TYPES.map((m) => (
-              <button
-                key={m.id}
-                id={`tab-${m.id}`}
-                role="tab"
-                aria-selected={active === m.id}
-                aria-controls="menu-panel"
-                onClick={() => select(m.id)}
-                className={`whitespace-nowrap rounded-full px-4 py-3 text-xs font-medium transition-all duration-300 min-h-[44px] sm:px-5 sm:py-2.5 sm:text-sm ${
-                  active === m.id
-                    ? "bg-gradient-to-r from-gold to-terracotta text-white shadow-md shadow-gold/25"
-                    : "border border-border-line bg-white text-ink/70 hover:border-gold hover:text-gold"
-                }`}
-              >
-                {m.label}
-              </button>
-            ))}
+            {MENU_TYPES.map((m) => {
+              const isActive = active === m.id;
+              return (
+                <button
+                  key={m.id}
+                  id={`tab-${m.id}`}
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls="menu-panel"
+                  onClick={() => select(m.id)}
+                  className={`group relative flex min-h-[72px] sm:min-h-[80px] w-[140px] sm:w-[160px] flex-col items-center overflow-hidden rounded-2xl border-2 transition-all duration-500 ${
+                    isActive
+                      ? "border-transparent shadow-xl shadow-gold/20 scale-[1.02]"
+                      : "border-border-line/60 bg-white hover:border-gold/40 hover:shadow-lg hover:shadow-gold/10 hover:scale-[1.01]"
+                  }`}
+                >
+                  {/* Gradient border for active state */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabGlow"
+                      className="absolute inset-0 rounded-2xl"
+                      style={{
+                        background: "linear-gradient(135deg, #D4A574 0%, #C17F59 50%, #E8B896 100%)",
+                        zIndex: -1,
+                      }}
+                      transition={{ type: "spring", bounce: 0.25, duration: 0.6 }}
+                    />
+                  )}
+                  
+                  {/* Glow effect for active state */}
+                  {isActive && !prefersReducedMotion && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="absolute inset-0 rounded-2xl"
+                      style={{
+                        background: "radial-gradient(circle at center, rgba(212,165,116,0.25) 0%, transparent 70%)",
+                        boxShadow: "0 0 30px rgba(212,165,116,0.3), 0 0 60px rgba(193,127,89,0.15)",
+                      }}
+                    />
+                  )}
+
+                  {/* Thumbnail image */}
+                  <div className="relative h-16 w-full overflow-hidden sm:h-20">
+                    <Image
+                      src={MENU_TYPE_IMAGES[m.id] || "/media/menu-buffet.jpg"}
+                      alt={m.label}
+                      fill
+                      sizes="160px"
+                      className={`object-cover transition-transform duration-700 ${
+                        isActive ? "scale-110 opacity-90" : "scale-100 opacity-70 group-hover:opacity-90 group-hover:scale-105"
+                      }`}
+                    />
+                    <div className={`absolute inset-0 transition-opacity duration-300 ${
+                      isActive ? "bg-gradient-to-t from-black/70 via-black/20 to-transparent" : "bg-gradient-to-t from-black/60 via-black/30 to-transparent"
+                    }`} />
+                    
+                    {/* Price badge on thumbnail */}
+                    <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-2 py-0.5 shadow-sm">
+                      <Sparkles className={`size-2.5 ${isActive ? "text-gold" : "text-ink/40"} transition-colors`} />
+                      <span className={`font-mono text-[10px] font-bold leading-none ${isActive ? "text-ink" : "text-ink/70"}`}>
+                        от {formatRUB(m.perGuest)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Label */}
+                  <div className={`flex w-full items-center justify-center px-2 pb-2 pt-1.5 transition-colors duration-300 ${
+                    isActive ? "bg-white/95" : "bg-white/80 group-hover:bg-white/90"
+                  }`}>
+                    <span className={`font-display text-xs sm:text-sm font-medium leading-tight text-center transition-colors duration-300 ${
+                      isActive ? "text-ink" : "text-ink/70 group-hover:text-ink"
+                    }`}>
+                      {m.label}
+                    </span>
+                  </div>
+
+                  {/* Animated underline for active state */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTabIndicator"
+                      className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-gradient-to-r from-gold to-terracotta"
+                      transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </Reveal>
 
-        {/* Active menu context */}
+        {/* Active menu context with smooth transitions */}
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
             id="menu-panel"
             role="tabpanel"
             aria-labelledby={`tab-${current.id}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 24, scale: prefersReducedMotion ? 1 : 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -16, scale: prefersReducedMotion ? 1 : 0.98 }}
+            transition={{ 
+              duration: prefersReducedMotion ? 0.2 : 0.45, 
+              ease: [0.22, 1, 0.36, 1],
+              layout: { duration: 0.4 }
+            }}
             className="mt-10"
+            layout
           >
-            {/* Context line */}
-            <div className="mb-8 flex flex-wrap items-center justify-center gap-4 text-center">
-              <span className="rounded-full bg-gradient-to-r from-gold to-terracotta px-4 py-1.5 font-mono text-xs text-white shadow-sm">
-                от {formatRUB(current.perGuest)} {priceUnit}
+            {/* Context line with enhanced styling */}
+            <motion.div 
+              className="mb-8 flex flex-wrap items-center justify-center gap-4 text-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+            >
+              <span className="relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-2 font-mono text-xs text-white shadow-md shadow-gold/25 overflow-hidden">
+                {!prefersReducedMotion && (
+                  <motion.span
+                    className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "100%" }}
+                    transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1, ease: "easeInOut" }}
+                  />
+                )}
+                <Sparkles className="size-3 relative z-10" />
+                <span className="relative z-10">от {formatRUB(current.perGuest)} {priceUnit}</span>
               </span>
-              <span className="font-mono text-xs text-ink/50">
+              <span className="rounded-full bg-ink/5 px-4 py-2 font-mono text-xs text-ink/60">
                 мин. {current.minGuests} гостей
               </span>
               <span className="hidden text-ink/30 sm:inline">·</span>
-              <span className="hidden text-xs text-ink/60 sm:inline">{current.short}</span>
-            </div>
+              <span className="hidden max-w-xs text-xs text-ink/60 sm:inline">{current.short}</span>
+            </motion.div>
 
-            {/* Packages carousel/grid */}
-            <PackageCarousel packages={current.packages} current={current} expandedPackage={expandedPackage} setExpandedPackage={setExpandedPackage} dispatchMenuSelect={dispatchMenuSelect} priceUnit={priceUnit} />
+            {/* Packages carousel/grid with enhanced cards */}
+            <PackageCarousel 
+              packages={current.packages} 
+              current={current} 
+              expandedPackage={expandedPackage} 
+              setExpandedPackage={setExpandedPackage} 
+              dispatchMenuSelect={dispatchMenuSelect} 
+              priceUnit={priceUnit}
+              prefersReducedMotion={prefersReducedMotion}
+            />
 
             {/* Included in all packages */}
             <Reveal delay={0.3}>
               <div className="mt-8 rounded-2xl border border-border-line bg-white p-5 md:p-6 shadow-sm">
-                <h4 className="font-mono text-xs uppercase tracking-wider text-gold font-medium">
-                  ✓ Включено во все пакеты
+                <h4 className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-gold font-medium">
+                  <Check className="size-4" />
+                  Включено во все пакеты
                 </h4>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {current.included.map((item) => (
@@ -160,32 +267,44 @@ export function Menu() {
 
             {/* PDF download buttons */}
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <button
+              <motion.button
                 onClick={() => downloadPdf(current.id)}
                 disabled={downloading !== null}
                 aria-busy={downloading === current.id}
                 aria-label={`Скачать меню «${current.label}» в PDF`}
-                className="group flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-2.5 text-xs font-semibold text-white shadow-md shadow-gold/25 transition-all hover:shadow-lg hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
+                whileHover={!prefersReducedMotion ? { scale: 1.03, y: -2 } : undefined}
+                whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
+                className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3 text-xs font-semibold text-white shadow-lg shadow-gold/25 transition-all disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm min-h-[48px]"
               >
-                {downloading === current.id ? (
-                  <><Loader2 className="size-4 animate-spin" /> Готовим PDF…</>
-                ) : (
-                  <><Download className="size-4 group-hover:animate-bounce" /> Скачать меню</>
+                {!prefersReducedMotion && (
+                  <motion.span
+                    className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: "100%" }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                  />
                 )}
-              </button>
-              <button
+                {downloading === current.id ? (
+                  <><Loader2 className="size-4 animate-spin relative z-10" /> Готовим PDF…</>
+                ) : (
+                  <><Download className="size-4 group-hover:animate-bounce relative z-10" /> Скачать меню</>
+                )}
+              </motion.button>
+              <motion.button
                 onClick={() => downloadPdf("all")}
                 disabled={downloading !== null}
                 aria-busy={downloading === "all"}
                 aria-label="Скачать полный каталог всех меню в PDF"
-                className="flex items-center gap-2 rounded-full border border-border-line px-5 py-2.5 text-xs font-medium text-ink/70 transition-all hover:border-gold hover:bg-gold/5 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
+                whileHover={!prefersReducedMotion ? { scale: 1.03, y: -2 } : undefined}
+                whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
+                className="group flex items-center gap-2 rounded-full border-2 border-border-line bg-white px-6 py-3 text-xs font-medium text-ink/70 transition-all hover:border-gold hover:bg-gold/5 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm min-h-[48px]"
               >
                 {downloading === "all" ? (
                   <><Loader2 className="size-4 animate-spin" /> Готовим…</>
                 ) : (
-                  <><Download className="size-4" /> Полный каталог</>
+                  <><Download className="size-4 transition-transform group-hover:-translate-y-0.5" /> Полный каталог</>
                 )}
-              </button>
+              </motion.button>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -195,7 +314,116 @@ export function Menu() {
 }
 
 /**
- * Package carousel component
+ * Tilt card wrapper component for 3D hover effect
+ */
+function TiltCard({ 
+  children, 
+  className = "",
+  prefersReducedMotion = false,
+}: { 
+  children: React.ReactNode; 
+  className?: string;
+  prefersReducedMotion?: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), {
+    stiffness: 200,
+    damping: 30,
+  });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), {
+    stiffness: 200,
+    damping: 30,
+  });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    mouseX.set((e.clientX - centerX) / rect.width);
+    mouseY.set((e.clientY - centerY) / rect.height);
+  }, [mouseX, mouseY, prefersReducedMotion]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (prefersReducedMotion) return;
+    mouseX.set(0);
+    mouseY.set(0);
+  }, [mouseX, mouseY, prefersReducedMotion]);
+
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+        perspective: 800,
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/**
+ * Shimmer overlay component for shine effect on hover
+ */
+function ShimmerOverlay() {
+  return (
+    <motion.div
+      className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-2xl"
+      initial={{ opacity: 0 }}
+      whileHover={{ opacity: 1 }}
+    >
+      <motion.div
+        className="absolute inset-0 -translate-x-full"
+        style={{
+          background: "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.5) 45%, rgba(255,255,255,0.1) 55%, transparent 65%)",
+        }}
+        whileHover={{
+          translateX: ["-100%", "200%"],
+          transition: { duration: 0.7, ease: "easeInOut" },
+        }}
+      />
+    </motion.div>
+  );
+}
+
+/**
+ * Enhanced Price Badge with animation
+ */
+function PriceBadge({ price, unit }: { price: number; unit: string }) {
+  return (
+    <motion.span 
+      className="relative inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold to-terracotta px-3.5 py-1.5 font-mono text-xs font-bold text-white shadow-lg shadow-gold/30 overflow-hidden"
+      whileHover={{ scale: 1.05 }}
+      transition={{ type: "spring", stiffness: 400, damping: 15 }}
+    >
+      {/* Animated shimmer background */}
+      <motion.span
+        className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0"
+        animate={{ x: ["-100%", "200%"] }}
+        transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1.5, ease: "easeInOut" }}
+      />
+      
+      <Sparkles className="size-3 relative z-10 animate-pulse" />
+      <span className="relative z-10">от {formatRUB(price)}{unit}</span>
+    </motion.span>
+  );
+}
+
+/**
+ * Package carousel component with enhanced visuals
  */
 function PackageCarousel({
   packages,
@@ -204,6 +432,7 @@ function PackageCarousel({
   setExpandedPackage,
   dispatchMenuSelect,
   priceUnit,
+  prefersReducedMotion = false,
 }: {
   packages: MenuType["packages"];
   current: MenuType;
@@ -211,6 +440,7 @@ function PackageCarousel({
   setExpandedPackage: (v: string | null) => void;
   dispatchMenuSelect: (id: string) => void;
   priceUnit: string;
+  prefersReducedMotion?: boolean;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -227,7 +457,9 @@ function PackageCarousel({
     const el = scrollRef.current;
     if (!el) return;
     updateScroll();
-    if (window.innerWidth < 640 && el.scrollWidth > el.clientWidth) {
+    
+    // Mobile scroll hint animation
+    if (!prefersReducedMotion && typeof window !== 'undefined' && window.innerWidth < 640 && el.scrollWidth > el.clientWidth) {
       const maxScroll = el.scrollWidth - el.clientWidth;
       const hint = Math.min(maxScroll * 0.25, 120);
       const start = Date.now();
@@ -242,7 +474,7 @@ function PackageCarousel({
       const timer = setTimeout(() => requestAnimationFrame(tick), 600);
       return () => clearTimeout(timer);
     }
-  }, [current.id]);
+  }, [current.id, prefersReducedMotion]);
 
   const gridCols =
     packages.length === 2
@@ -255,16 +487,27 @@ function PackageCarousel({
     <div className="relative">
       {/* Edge fades on mobile */}
       {canScrollLeft && (
-        <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-8 bg-gradient-to-r from-cream to-transparent md:hidden" />
+        <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-10 bg-gradient-to-r from-cream via-cream to-transparent md:hidden" />
       )}
       {canScrollRight && (
-        <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 bg-gradient-to-l from-cream to-transparent md:hidden" />
+        <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-10 bg-gradient-to-l from-cream via-cream to-transparent md:hidden" />
+      )}
+
+      {/* Mobile scroll hint indicator */}
+      {!prefersReducedMotion && canScrollRight && typeof window !== 'undefined' && window.innerWidth < 640 && (
+        <motion.div 
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden sm:flex md:hidden"
+          animate={{ x: [0, 8, 0], opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <ChevronDown className="size-5 rotate-[-90deg] text-gold/60" />
+        </motion.div>
       )}
 
       <div
         ref={scrollRef}
         onScroll={updateScroll}
-        className={`hide-scrollbar -mx-5 flex gap-4 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:gap-5 md:px-0 ${gridCols}`}
+        className={`hide-scrollbar -mx-5 flex gap-5 overflow-x-auto px-5 pb-4 md:mx-0 md:grid md:gap-6 md:px-0 ${gridCols}`}
         style={{ WebkitOverflowScrolling: "touch", scrollSnapType: "x proximity" }}
       >
         {packages.map((pkg, idx) => {
@@ -275,59 +518,93 @@ function PackageCarousel({
           const isPremium = idx === packages.length - 1 && packages.length >= 2;
 
           return (
-            <motion.div
+            <TiltCard
               key={pkg.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.08 }}
-              style={{ scrollSnapAlign: "start" }}
-              className={`relative flex w-[280px] shrink-0 flex-col overflow-hidden rounded-2xl border bg-white shadow-md md:w-auto md:shrink card-l ${
-                isPremium ? "border-gold/30 shadow-gold/10" : "border-border-line"
+              prefersReducedMotion={prefersReducedMotion}
+              className={`relative flex w-[290px] shrink-0 flex-col overflow-hidden rounded-2xl border bg-white shadow-lg md:w-auto md:shrink transition-shadow duration-500 ${
+                isPremium 
+                  ? "border-gold/40 shadow-gold/15 ring-1 ring-gold/20" 
+                  : "border-border-line/80 hover:shadow-xl hover:border-gold/30"
               }`}
             >
+              {/* Shimmer overlay for premium feel */}
+              {!prefersReducedMotion && <ShimmerOverlay />}
+              
               {pkg.photo && (
-                <div className="relative aspect-[4/3] overflow-hidden img-zoom">
+                <div className="relative aspect-[4/3] overflow-hidden">
                   <Image
                     src={pkg.photo}
                     alt={pkg.name}
                     fill
-                    sizes="(max-width: 768px) 280px, 33vw"
-                    className="object-cover"
+                    sizes="(max-width: 768px) 290px, 33vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                    style={{ transform: "scale(1)" }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
-                    <div>
-                      <span className="font-mono text-xs uppercase tracking-wider text-gold">
-                        Пакет {idx + 1}
-                      </span>
-                      <h3 className="font-display text-xl text-white font-medium">{pkg.name}</h3>
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent" />
+                  
+                  {/* Package info overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <div className="flex items-end justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <motion.span 
+                          className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-gold"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 + idx * 0.05 }}
+                        >
+                          {isPremium && <Sparkles className="size-2.5" />}
+                          Пакет {idx + 1}
+                        </motion.span>
+                        <motion.h3 
+                          className="mt-1.5 font-display text-xl text-white font-semibold leading-tight truncate"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.15 + idx * 0.05 }}
+                        >
+                          {pkg.name}
+                        </motion.h3>
+                      </div>
+                      
+                      {/* Enhanced price badge */}
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.2 + idx * 0.05, type: "spring", bounce: 0.4 }}
+                      >
+                        <PriceBadge price={pkg.pricePerGuest} unit={priceUnit} />
+                      </motion.div>
                     </div>
-                    <span className="rounded-full bg-gradient-to-r from-gold to-terracotta px-3 py-1 font-mono text-xs text-white shadow-sm">
-                      от {formatRUB(pkg.pricePerGuest)}{priceUnit}
-                    </span>
                   </div>
                 </div>
               )}
 
               <div className="flex flex-1 flex-col p-5">
-                <p className="text-sm leading-relaxed text-ink/60">{pkg.description}</p>
+                <motion.p 
+                  className="text-sm leading-relaxed text-ink/60"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.25 + idx * 0.05 }}
+                >
+                  {pkg.description}
+                </motion.p>
 
-                <ul id={`dish-list-${idx}`} className="mt-4 space-y-2">
+                {/* Enhanced dish list with better hierarchy */}
+                <ul id={`dish-list-${idx}`} className="mt-4 space-y-2.5">
                   {visibleDishes.map((d, i) => (
                     <motion.li
                       key={i}
                       layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex items-baseline gap-2 text-sm"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: i * 0.03 + 0.3 }}
+                      className="group/dish flex items-baseline gap-2.5 text-sm"
                     >
-                      <span className="font-mono text-xs text-ink/40">
+                      <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-gold/10 font-mono text-[10px] font-bold text-gold transition-colors group-hover/dish:bg-gold/20">
                         {String(i + 1).padStart(2, "0")}
                       </span>
-                      <span className="flex-1 text-ink/80">{d.name}</span>
+                      <span className="flex-1 text-ink/80 leading-relaxed transition-colors group-hover/dish:text-ink">{d.name}</span>
                       {d.weight && (
-                        <span className="shrink-0 font-mono text-xs text-ink/40">
+                        <span className="shrink-0 rounded-full bg-ink/5 px-2 py-0.5 font-mono text-[10px] text-ink/45 tabular-nums">
                           {d.weight}
                         </span>
                       )}
@@ -335,27 +612,38 @@ function PackageCarousel({
                   ))}
                 </ul>
 
+                {/* Expand/collapse button */}
                 {hiddenCount > 0 && (
-                  <button
+                  <motion.button
                     aria-expanded={isExpanded}
                     aria-controls={`dish-list-${idx}`}
                     onClick={() => setExpandedPackage(isExpanded ? null : pkg.name)}
-                    className="mt-3 flex items-center gap-1 text-xs text-gold hover:text-terracotta transition-colors min-h-[44px] font-medium"
+                    className="mt-4 flex items-center gap-2 rounded-xl bg-gold/5 px-3 py-2.5 text-xs font-semibold text-gold transition-all hover:bg-gold/10 hover:text-terracotta min-h-[44px]"
+                    whileHover={!prefersReducedMotion ? { scale: 1.02 } : undefined}
+                    whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                   >
-                    {isExpanded ? "Свернуть" : `Показать ещё ${hiddenCount} позиций`}
-                    <ChevronDown className={`size-3 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
-                  </button>
+                    <span>{isExpanded ? "Свернуть" : `Показать ещё ${hiddenCount}`}</span>
+                    <motion.span
+                      animate={{ rotate: isExpanded ? 180 : 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                    >
+                      <ChevronDown className="size-3.5" />
+                    </motion.span>
+                  </motion.button>
                 )}
 
-                <button
+                {/* CTA button with enhanced styling */}
+                <motion.button
                   onClick={() => dispatchMenuSelect(current.id)}
-                  className="group mt-5 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-gold/20 transition-all hover:shadow-lg hover:-translate-y-0.5 min-h-[44px]"
+                  className="group mt-auto flex items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-xs font-bold text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:shadow-gold/30 min-h-[48px]"
+                  whileHover={!prefersReducedMotion ? { scale: 1.03, y: -2 } : undefined}
+                  whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                 >
-                  Рассчитать
-                  <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </button>
+                  <span>Рассчитать стоимость</span>
+                  <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </motion.button>
               </div>
-            </motion.div>
+            </TiltCard>
           );
         })}
       </div>

@@ -8,7 +8,7 @@ import { Preloader } from "@/components/catering/preloader";
 import { CookieConsent } from "@/components/catering/cookie-consent";
 import { GrainOverlay } from "@/components/catering/grain";
 import { ChapterNav } from "@/components/catering/chapter-nav";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { NuqsAdapter } from "nuqs/adapters/next";
 import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 
 const geistSans = Geist({

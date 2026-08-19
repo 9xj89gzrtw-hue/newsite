@@ -21,6 +21,9 @@ import { Contact } from "@/components/catering/contact";
 import { SiteFooter } from "@/components/catering/site-footer";
 import { BackToTop } from "@/components/catering/back-to-top";
 
+// Make this page dynamic to avoid SSR issues with window access in client components
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <main id="main-content" role="main" className="flex min-h-screen flex-col bg-cream">

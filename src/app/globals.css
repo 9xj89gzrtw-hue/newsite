@@ -648,6 +648,196 @@ html.lenis body {
   animation: background-shift 4s ease-in-out infinite;
 }
 
+/* ===== GLOBAL ANIMATION ENHANCEMENTS (Reference-inspired) ===== */
+
+/* Smooth page entrance - fade up */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gold shimmer sweep for cards (Cut & Taste / Vegas pattern) */
+@keyframes gold-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+.gold-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.gold-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(196, 149, 106, 0.15) 45%,
+    rgba(196, 112, 74, 0.2) 50%,
+    rgba(196, 149, 106, 0.15) 55%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.gold-shimmer:hover::after {
+  opacity: 1;
+  animation: gold-shimmer 1s ease-out forwards;
+}
+
+/* Text gradient animation for special headings */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
+}
+.animate-gradient-text {
+  background-size: 200% auto;
+  animation: gradient-shift 4s ease-in-out infinite;
+}
+
+/* Pulse ring for CTAs (Salza pattern) */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: pulse-ring 2s ease-out infinite;
+  z-index: -1;
+}
+
+/* Floating animation for decorative elements ( Ridgewells pattern) */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  75% {
+    transform: translateY(5px) rotate(-1deg);
+  }
+}
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Scale pulse for attention elements */
+@keyframes scale-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+.scale-pulse {
+  animation: scale-pulse 3s ease-in-out infinite;
+}
+
+/* Draw line animation for borders and dividers */
+@keyframes draw-line {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+.draw-line {
+  overflow: hidden;
+}
+.draw-line::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), var(--terracotta));
+  animation: draw-line 1.5s ease-out forwards;
+}
+
+/* Stagger children entrance helper */
+.stagger-entrance > * {
+  opacity: 0;
+  animation: var(--entrance-animation, reveal-up) 0.6s ease-out forwards;
+}
+.stagger-entrance > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-entrance > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-entrance > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-entrance > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-entrance > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-entrance > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-entrance > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-entrance > *:nth-child(8) { animation-delay: 0.4s; }
+
+/* Magnetic hover zone indicator */
+.magnetic-zone {
+  position: relative;
+}
+.magnetic-zone::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: inherit;
+  /* Invisible expansion area for magnetic effect */
+}
+
+/* Premium focus visible states (Accessibility + Luxury) */
+:focus-visible.premium-focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: inherit;
+  box-shadow: 0 0 20px rgba(196, 149, 106, 0.2);
+}
+
+/* Selection styling for premium feel */
+::selection {
+  background: rgba(196, 149, 106, 0.3);
+  color: inherit;
+}
+
+/* Scrollbar styling for premium feel (Webkit) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--gold), var(--terracotta));
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--terracotta), var(--gold));
+}
+
 /* Print stylesheet — optimise for printing */
 @media print {
   *,

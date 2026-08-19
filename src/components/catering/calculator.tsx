@@ -1,22 +1,77 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useQueryState, parseAsInteger, parseAsString } from "nuqs";
-import { motion, useMotionValue, animate } from "framer-motion";
-import { Minus, Plus, Check, Sparkles, Share2 } from "lucide-react";
+import { motion, useMotionValue, animate, AnimatePresence } from "framer-motion";
+import {
+  Minus,
+  Plus,
+  Check,
+  Sparkles,
+  Share2,
+  UtensilsCrossed,
+  Wine,
+  Package,
+  Coffee,
+  Leaf,
+  Flame,
+  Building2,
+  Settings,
+  Palette,
+  CakeSlice,
+  GlassWater,
+  Droplets,
+  FileSignature,
+  TrendingUp,
+} from "lucide-react";
 import { Reveal } from "./reveal";
 import {
   MENU_TYPES, ADDONS, calcTotal, formatRUB, seasonMultiplier,
 } from "@/lib/pricing";
 
+/* ───────── Event type icon mapping ───────── */
+const TYPE_ICONS: Record<string, React.ElementType> = {
+  banquet: UtensilsCrossed,
+  buffet: Wine,
+  "snack-box": Package,
+  "coffee-break": Coffee,
+  vegetarian: Leaf,
+  bbq: Flame,
+  "office-lunch": Building2,
+};
+
+const TYPE_EMOJIS: Record<string, string> = {
+  banquet: "🍽️",
+  buffet: "🥂",
+  "snack-box": "📦",
+  "coffee-break": "☕",
+  vegetarian: "🥗",
+  bbq: "🔥",
+  "office-lunch": "🏢",
+};
+
+/* ───────── Addon icon mapping ───────── */
+const ADDON_ICONS: Record<string, React.ElementType> = {
+  equipment: Settings,
+  decor: Palette,
+  cake: CakeSlice,
+  champagne: GlassWater,
+  fountain: Droplets,
+  registration: FileSignature,
+};
+
+/* ───────── Slider tick marks ───────── */
+const SLIDER_TICKS = [25, 50, 100, 200, 500];
+
 /**
- * Calculator — LIGHT THEME with elegant card styling
- * 
- * Inspired by Wolfgang Puck:
- * - Clean white cards
- * - Gold accent for selected items
- * - Animated total counter
- * - Sticky result panel
+ * Calculator — PREMIUM UI/UX with elegant animations
+ *
+ * Inspired by culinarycanvasstl.com, calconic.com, thecateringfinder.com
+ * - Visual event type cards with icons & glow animation
+ * - Enhanced slider with ticks, bubble & gold gradient fill
+ * - Addon cards with lucide icons & animated toggles
+ * - Result panel with pulse animation & staggered breakdown
+ * - Mobile-optimized touch interactions
  */
 export function Calculator() {
   // nuqs: typeId + guests are shareable via URL (?type=banquet&guests=60).
@@ -31,6 +86,10 @@ export function Calculator() {
   const [addons, setAddons] = useState<string[]>(["equipment", "decor"]);
   const [date, setDate] = useState("");
   const [copied, setCopied] = useState(false);
+  
+  // Track previous total for animation trigger
+  const [prevTotal, setPrevTotal] = useState(0);
+  const [totalChanged, setTotalChanged] = useState(false);
 
   // Listen for menu selection events (from #menu section clicks)
   useEffect(() => {
@@ -49,6 +108,16 @@ export function Calculator() {
   // Animated total
   const mv = useMotionValue(result.total);
   const [display, setDisplay] = useState(formatRUB(result.total));
+
+  // Detect total change for pulse animation
+  useEffect(() => {
+    if (prevTotal !== 0 && prevTotal !== result.total) {
+      setTotalChanged(true);
+      const timer = setTimeout(() => setTotalChanged(false), 600);
+      return () => clearTimeout(timer);
+    }
+    setPrevTotal(result.total);
+  }, [result.total, prevTotal]);
 
   useEffect(() => {
     const controls = animate(mv, result.total, {
@@ -72,8 +141,13 @@ export function Calculator() {
     }
   };
 
-  const toggleAddon = (id: string) =>
-    setAddons((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id]));
+  const toggleAddon = useCallback((id: string) =>
+    setAddons((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id])),
+  []);
+
+  // Calculate per-person price range for display
+  const perPersonMin = current.perGuest;
+  const perPersonMax = current.packages[current.packages.length - 1]?.pricePerGuest || current.perGuest;
 
   return (
     <section id="calculator" className="relative overflow-hidden bg-cream py-24 md:py-36">
@@ -109,109 +183,294 @@ export function Calculator() {
         <div className="mt-14 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           {/* Inputs — white card */}
           <Reveal className="rounded-2xl border border-border-line bg-white p-6 shadow-lg shadow-ink/5 md:p-8">
-            {/* Type selector */}
+            {/* ═══ Type selector — Visual Cards ═══ */}
             <div>
-              <label className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium">
-                1. Тип мероприятия
+              <label className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium flex items-center gap-2">
+                <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">1</span>
+                Тип мероприятия
               </label>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {MENU_TYPES.map((m) => (
-                  <button
-                    key={m.id}
-                    onClick={() => setTypeId(m.id)}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      typeId === m.id
-                        ? "bg-gradient-to-r from-gold to-terracotta text-white shadow-md shadow-gold/25"
-                        : "border border-border-line bg-cream/50 text-ink/70 hover:border-gold hover:bg-gold/5"
-                    }`}
-                  >
-                    {m.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Guests slider */}
-            <div className="mt-8">
-              <label className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium">
-                2. Гостей:{" "}
-                <span className="text-ink font-semibold">{guests}</span>
-                {guests < current.minGuests && (
-                  <span className="ml-2 text-gold">мин. {current.minGuests}</span>
-                )}
-              </label>
-              <div className="mt-3 flex items-center gap-4">
-                <button
-                  onClick={() => setGuests((g) => Math.max(5, g - 5))}
-                  className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line bg-cream/50 text-ink hover:border-gold hover:bg-gold/10 transition-colors"
-                  aria-label="Меньше"
-                >
-                  <Minus className="size-4" />
-                </button>
-                <input
-                  type="range"
-                  min={5}
-                  max={500}
-                  step={5}
-                  value={guests}
-                  onChange={(e) => setGuests(Number(e.target.value))}
-                  aria-valuenow={guests}
-                  aria-valuemin={5}
-                  aria-valuemax={500}
-                  aria-label={`Количество гостей: ${guests}`}
-                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-cream accent-gold [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md"
-                />
-                <button
-                  onClick={() => setGuests((g) => Math.min(500, g + 5))}
-                  className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line bg-cream/50 text-ink hover:border-gold hover:bg-gold/10 transition-colors"
-                  aria-label="Больше"
-                >
-                  <Plus className="size-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Addons */}
-            <div className="mt-8">
-              <label className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium">
-                3. Доп. услуги
-              </label>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                {ADDONS.map((a) => {
-                  const on = addons.includes(a.id);
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {MENU_TYPES.map((m) => {
+                  const IconComponent = TYPE_ICONS[m.id];
+                  const isSelected = typeId === m.id;
                   return (
-                    <button
-                      key={a.id}
-                      onClick={() => toggleAddon(a.id)}
-                      className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition-all ${
-                        on
-                          ? "border-gold bg-gold/10 text-ink shadow-sm"
-                          : "border-border-line bg-cream/30 text-ink/70 hover:border-gold/50"
+                    <motion.button
+                      key={m.id}
+                      onClick={() => setTypeId(m.id)}
+                      whileTap={{ scale: 0.96 }}
+                      whileHover={{ scale: 1.02 }}
+                      className={`group relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-300 ${
+                        isSelected
+                          ? "border-gold bg-gradient-to-br from-gold/10 to-terracotta/10 shadow-lg shadow-gold/20"
+                          : "border-border-line bg-cream/30 hover:border-gold/40 hover:bg-gold/5"
                       }`}
                     >
-                      <span className="flex items-center gap-2">
-                        <span
-                          className={`flex size-5 items-center justify-center rounded-md border transition-colors ${
-                            on ? "border-gold bg-gradient-to-r from-gold to-terracotta text-white" : "border-border-line"
-                          }`}
+                      {/* Glow effect when selected */}
+                      {isSelected && (
+                        <motion.div
+                          layoutId="type-glow"
+                          className="absolute inset-0 rounded-xl bg-gradient-to-br from-gold/20 to-transparent opacity-50"
+                          initial={false}
+                          transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+                        />
+                      )}
+                      
+                      {/* Icon container */}
+                      <div className={`relative flex size-12 items-center justify-center rounded-xl transition-all duration-300 ${
+                        isSelected 
+                          ? "bg-gradient-to-br from-gold to-terracotta text-white shadow-md" 
+                          : "bg-white text-ink/60 group-hover:text-gold group-hover:bg-gold/10"
+                      }`}>
+                        {IconComponent && <IconComponent className="size-5" />}
+                        {/* Pulse ring on selected */}
+                        {isSelected && (
+                          <motion.span
+                            className="absolute inset-0 rounded-xl border-2 border-gold"
+                            initial={{ scale: 1, opacity: 0.8 }}
+                            animate={{ scale: 1.15, opacity: 0 }}
+                            transition={{ repeat: Infinity, repeatDelay: 1.5, duration: 1 }}
+                          />
+                        )}
+                      </div>
+                      
+                      {/* Label */}
+                      <span className={`text-sm font-medium text-center leading-tight ${
+                        isSelected ? "text-ink" : "text-ink/70"
+                      }`}>
+                        {m.label}
+                      </span>
+                      
+                      {/* Price hint */}
+                      <span className="font-mono text-[10px] text-ink/40">
+                        от {formatRUB(m.perGuest)}/чел
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+              
+              {/* Selected type description */}
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={current.id}
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 5 }}
+                  className="mt-3 text-xs text-ink/50 italic"
+                >
+                  {current.short}
+                </motion.p>
+              </AnimatePresence>
+            </div>
+
+            {/* ═══ Guests Slider — Enhanced ═══ */}
+            <div className="mt-8">
+              <label className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">2</span>
+                  Количество гостей
+                </span>
+                <span className="flex items-baseline gap-1">
+                  <span className="text-xl font-bold text-ink">{guests}</span>
+                  <span className="text-xs text-ink/40">человек</span>
+                </span>
+              </label>
+              
+              {guests < current.minGuests && (
+                <motion.p
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="mt-2 flex items-center gap-1.5 font-mono text-xs text-terracotta bg-terracotta/10 px-3 py-1.5 rounded-full w-fit"
+                >
+                  <Sparkles className="size-3" />
+                  Минимум для этого типа: {current.minGuests} гостей
+                </motion.p>
+              )}
+
+              <div className="mt-5 relative">
+                {/* Custom slider track with fill */}
+                <div className="relative h-12 flex items-center">
+                  {/* Background track */}
+                  <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-cream" />
+                  
+                  {/* Filled track (gold gradient) */}
+                  <motion.div
+                    className="absolute left-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-gold to-terracotta origin-left"
+                    style={{
+                      width: `${((guests - 5) / (500 - 5)) * 100}%`,
+                    }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                  
+                  {/* Tick marks */}
+                  <div className="absolute inset-x-0 top-1/2 flex justify-between -translate-y-1/2 pointer-events-none">
+                    {[5, ...SLIDER_TICKS].map((tick) => {
+                      const position = ((tick - 5) / (500 - 5)) * 100;
+                      const isActive = guests >= tick;
+                      return (
+                        <div
+                          key={tick}
+                          className="flex flex-col items-center"
+                          style={{ position: 'absolute', left: `${position}%`, transform: 'translateX(-50%)' }}
                         >
-                          {on && <Check className="size-3" />}
-                        </span>
-                        {a.label}
-                      </span>
-                      <span className="font-mono text-xs text-ink/50">
-                        +{formatRUB(a.price)}
-                      </span>
-                    </button>
+                          <span className={`font-mono text-[9px] mb-1.5 ${isActive ? 'text-ink/60' : 'text-ink/25'}`}>
+                            {tick >= 1000 ? `${tick/1000}k` : tick}
+                          </span>
+                          <div className={`w-0.5 rounded-full transition-colors ${isActive ? 'h-3 bg-gold/60' : 'h-2 bg-ink/15'}`} />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Value bubble above thumb */}
+                  <motion.div
+                    className="absolute top-0 flex items-center justify-center pointer-events-none"
+                    style={{
+                      left: `${((guests - 5) / (500 - 5)) * 100}%`,
+                      transform: 'translateX(-50%)',
+                    }}
+                    animate={{ y: [-2, 0, -2] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  >
+                    <div className="bg-gradient-to-r from-gold to-terracotta text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg shadow-gold/30">
+                      {guests}
+                    </div>
+                    <div className="w-2 h-2 bg-gold rotate-45 -mb-1 mt-1" />
+                  </motion.div>
+
+                  {/* Actual input (invisible but functional) */}
+                  <input
+                    type="range"
+                    min={5}
+                    max={500}
+                    step={5}
+                    value={guests}
+                    onChange={(e) => setGuests(Number(e.target.value))}
+                    aria-valuenow={guests}
+                    aria-valuemin={5}
+                    aria-valuemax={500}
+                    aria-label={`Количество гостей: ${guests}`}
+                    className="relative z-10 h-12 w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-7 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-gold [&::-webkit-slider-thumb]:to-terracotta [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-gold/40 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:size-7 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-gradient-to-r [&::-moz-range-thumb]:from-gold [&::-moz-range-thumb]:to-terracotta [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:shadow-gold/40"
+                  />
+                </div>
+
+                {/* Quick adjust buttons */}
+                <div className="flex items-center justify-between mt-2">
+                  <button
+                    onClick={() => setGuests((g) => Math.max(5, g - 5))}
+                    className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-1.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95"
+                    aria-label="Меньше гостей"
+                  >
+                    <Minus className="size-3" /> −5
+                  </button>
+                  
+                  {/* Per-person indicator */}
+                  <div className="flex items-center gap-2 text-xs text-ink/50">
+                    <TrendingUp className="size-3.5 text-gold/60" />
+                    <span>~{formatRUB(Math.round(result.total / guestsClamped))}/чел</span>
+                  </div>
+                  
+                  <button
+                    onClick={() => setGuests((g) => Math.min(500, g + 5))}
+                    className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-1.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95"
+                    aria-label="Больше гостей"
+                  >
+                    +5 <Plus className="size-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* ═══ Addons — Enhanced Cards ═══ */}
+            <div className="mt-8">
+              <label className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium flex items-center gap-2">
+                <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">3</span>
+                Доп. услуги
+                {addons.length > 0 && (
+                  <span className="ml-auto font-normal text-gold">
+                    +{formatRUB(ADDONS.filter(a => addons.includes(a.id)).reduce((s, a) => s + a.price, 0))}
+                  </span>
+                )}
+              </label>
+              <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
+                {ADDONS.map((a) => {
+                  const on = addons.includes(a.id);
+                  const IconComponent = ADDON_ICONS[a.id];
+                  return (
+                    <motion.button
+                      key={a.id}
+                      onClick={() => toggleAddon(a.id)}
+                      whileTap={{ scale: 0.98 }}
+                      className={`group relative flex items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left transition-all duration-200 ${
+                        on
+                          ? "border-gold bg-gradient-to-r from-gold/10 to-terracotta/5 shadow-sm"
+                          : "border-border-line bg-cream/20 hover:border-gold/30 hover:bg-gold/5"
+                      }`}
+                    >
+                      {/* Animated checkbox */}
+                      <div className="relative shrink-0">
+                        <motion.div
+                          className={`flex size-6 items-center justify-center rounded-lg border-2 transition-colors ${
+                            on
+                              ? "border-gold bg-gradient-to-br from-gold to-terracotta"
+                              : "border-border-line bg-white group-hover:border-gold/40"
+                          }`}
+                          animate={on ? { scale: [1, 1.1, 1] } : {}}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <AnimatePresence mode="wait">
+                            {on && (
+                              <motion.div
+                                initial={{ scale: 0, rotate: -45 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                exit={{ scale: 0, rotate: 45 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                              >
+                                <Check className="size-3.5 text-white" strokeWidth={3} />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+                        
+                        {/* Ripple effect on toggle */}
+                        {on && (
+                          <motion.div
+                            className="absolute inset-0 rounded-lg border-2 border-gold"
+                            initial={{ scale: 1, opacity: 0.5 }}
+                            animate={{ scale: 1.4, opacity: 0 }}
+                            transition={{ duration: 0.4 }}
+                          />
+                        )}
+                      </div>
+
+                      {/* Icon */}
+                      <div className={`flex size-9 items-center justify-center rounded-lg transition-colors ${
+                        on ? "bg-gold/20 text-gold" : "bg-ink/5 text-ink/40 group-hover:bg-gold/10 group-hover:text-gold/70"
+                      }`}>
+                        {IconComponent && <IconComponent className="size-4" />}
+                      </div>
+
+                      {/* Label & Price */}
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-medium truncate ${on ? 'text-ink' : 'text-ink/70'}`}>
+                          {a.label}
+                        </p>
+                        <p className="font-mono text-xs text-ink/40">
+                          +{formatRUB(a.price)}
+                        </p>
+                      </div>
+                    </motion.button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Date picker */}
+            {/* ═══ Date picker ═══ */}
             <div className="mt-8">
-              <label htmlFor="calc-date" className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium">
-                4. Дата (необязательно)
+              <label htmlFor="calc-date" className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium flex items-center gap-2">
+                <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">4</span>
+                Дата мероприятия
+                <span className="font-normal text-ink/35">(необязательно)</span>
               </label>
               <input
                 type="date"
@@ -220,61 +479,136 @@ export function Calculator() {
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 aria-label="Дата мероприятия (необязательно)"
-                className="mt-3 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3 text-ink outline-none focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 transition-all"
+                className="mt-3 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 transition-all"
               />
               {date && seasonMultiplier(date) > 1 && (
-                <p className="mt-2 flex items-center gap-1.5 font-mono text-xs text-terracotta">
+                <motion.p
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 flex items-center gap-1.5 font-mono text-xs text-terracotta bg-terracotta/10 px-3 py-1.5 rounded-full w-fit"
+                >
                   <Sparkles className="size-3" />
-                  Сезонный спрос: +15%
-                </p>
+                  Сезонный коэффициент: +15%
+                </motion.p>
               )}
             </div>
           </Reveal>
 
-          {/* Result panel — sticky */}
+          {/* ═══ Result panel — Sticky with animations ═══ */}
           <Reveal delay={0.15}>
-            <div className="rounded-2xl border border-gold/20 bg-gradient-to-b from-white to-cream p-6 shadow-xl shadow-gold/5 md:p-8 lg:sticky lg:top-24">
-              <span className="font-mono text-xs uppercase tracking-wider text-ink/50 font-medium">
-                Предварительная смета
-              </span>
-
-              <div className="mt-4">
-                <div className="font-display gradient-text" style={{ fontSize: "clamp(2.2rem, 5.5vw, 3.5rem)", lineHeight: 1 }}>
-                  {display}
+            <div className="rounded-2xl border border-gold/20 bg-gradient-to-b from-white to-cream p-6 shadow-xl shadow-gold/5 md:p-8 lg:sticky lg:top-28">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs uppercase tracking-wider text-ink/50 font-medium">
+                  Предварительная смета
+                </span>
+                <div className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                  <TrendingUp className="size-3" />
+                  Онлайн-оценка
                 </div>
-                <p className="mt-2 text-base text-ink/50">
-                  ~ {formatRUB(Math.round(result.total / guestsClamped))} / гость · {guestsClamped} гостей
-                </p>
               </div>
 
-              <div className="mt-6 space-y-2.5 border-t border-border-line pt-5 text-sm">
-                <Row label={current.label} value={`${formatRUB(result.perGuest)} × ${guestsClamped}`} />
-                <Row label="Подытог" value={formatRUB(result.subtotal)} />
+              {/* Total with pulse animation */}
+              <div className="mt-5 relative">
+                <motion.div
+                  className={`font-display gradient-text ${totalChanged ? '' : ''}`}
+                  style={{ fontSize: "clamp(2.2rem, 5.5vw, 3.5rem)", lineHeight: 1 }}
+                  animate={totalChanged ? {
+                    scale: [1, 1.03, 1],
+                    textShadow: [
+                      "0 0 0 rgba(212,175,55,0)",
+                      "0 0 20px rgba(212,175,55,0.4)",
+                      "0 0 0 rgba(212,175,55,0)",
+                    ],
+                  } : {}}
+                  transition={{ duration: 0.5 }}
+                >
+                  {display}
+                </motion.div>
+                
+                {/* Per-person info */}
+                <motion.div
+                  className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-base text-ink/50"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <span>~ {formatRUB(Math.round(result.total / guestsClamped))} / гость</span>
+                  <span>·</span>
+                  <span>{guestsClamped} гостей</span>
+                </motion.div>
+
+                {/* Per-person range indicator */}
+                <motion.div
+                  className="mt-3 inline-flex items-center gap-2 rounded-lg bg-gold/10 px-3 py-1.5"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <span className="text-xs text-ink/50">Диапазон:</span>
+                  <span className="font-mono text-xs font-semibold text-gold">
+                    {formatRUB(perPersonMin)} – {formatRUB(perPersonMax)} / чел
+                  </span>
+                </motion.div>
+              </div>
+
+              {/* Breakdown with staggered animation */}
+              <div className="mt-6 space-y-1 border-t border-border-line pt-5 text-sm">
+                <Row label={current.label} value={`${formatRUB(result.perGuest)} × ${guestsClamped}`} index={0} />
+                <Row label="Подытог" value={formatRUB(result.subtotal)} index={1} />
                 {result.addonsTotal > 0 && (
-                  <Row label="Доп. услуги" value={formatRUB(result.addonsTotal)} />
+                  <Row label="Доп. услуги" value={formatRUB(result.addonsTotal)} index={2} highlight />
                 )}
                 {result.season > 1 && (
-                  <Row label="Сезон +15%" value={`×${result.season}`} />
+                  <Row label="Сезонный коэффициент" value={`×${result.season}`} index={3} warning />
                 )}
+                
+                {/* Value indicator */}
+                <motion.div
+                  className="mt-4 flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2.5 text-xs text-emerald-700"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Check className="size-4 text-emerald-500 shrink-0" />
+                  <span>
+                    Включено: обслуживание, посуда, цветы, доставка в КАД
+                  </span>
+                </motion.div>
               </div>
 
-              <a
+              {/* CTA Button */}
+              <motion.a
                 href="#contact"
                 data-cursor="заявка"
-                className="group mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-4 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:-translate-y-0.5"
+                className="group mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-4 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98]"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
               >
                 Оставить заявку с этой сметой
                 <Share2 className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </a>
+              </motion.a>
 
-              <button
+              {/* Share button */}
+              <motion.button
                 onClick={shareLink}
                 data-cursor="ссылка"
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-line px-5 py-3 text-xs font-medium uppercase tracking-wider text-ink/60 hover:border-gold hover:text-gold transition-colors"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-line px-5 py-3 text-xs font-medium uppercase tracking-wider text-ink/60 hover:border-gold hover:text-gold transition-colors active:scale-[0.98]"
+                whileTap={{ scale: 0.97 }}
               >
                 <Share2 className="size-3.5" />
-                {copied ? "✓ Ссылка скопирована!" : "Поделиться сметой"}
-              </button>
+                {copied ? (
+                  <motion.span
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-emerald-600"
+                  >
+                    ✓ Ссылка скопирована!
+                  </motion.span>
+                ) : (
+                  "Поделиться сметой"
+                )}
+              </motion.button>
 
               <p className="mt-3 text-center font-mono text-xs text-ink/40">
                 * Предварительная оценка. Финальная стоимость — после консультации.
@@ -287,12 +621,31 @@ export function Calculator() {
   );
 }
 
-/** Row component for the breakdown */
-function Row({ label, value }: { label: string; value: string }) {
+/** Row component for the breakdown with staggered animation */
+function Row({ 
+  label, 
+  value, 
+  index = 0,
+  highlight = false,
+  warning = false,
+}: { 
+  label: string; 
+  value: string; 
+  index?: number;
+  highlight?: boolean;
+  warning?: boolean;
+}) {
   return (
-    <div className="flex items-center justify-between py-1">
-      <span className="text-ink/60">{label}</span>
-      <span className="font-mono font-medium text-ink">{value}</span>
-    </div>
+    <motion.div
+      className={`flex items-center justify-between py-2 ${highlight ? 'text-gold' : warning ? 'text-terracotta' : ''}`}
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: 0.15 + index * 0.08, duration: 0.3 }}
+    >
+      <span className={highlight || warning ? 'font-medium' : 'text-ink/60'}>{label}</span>
+      <span className={`font-mono ${highlight ? 'font-semibold text-gold' : warning ? 'font-semibold text-terracotta' : 'font-medium text-ink'}`}>
+        {value}
+      </span>
+    </motion.div>
   );
 }
