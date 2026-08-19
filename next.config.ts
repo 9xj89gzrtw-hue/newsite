@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  reactStrictMode: false,
+  reactStrictMode: true,
   allowedDevOrigins: ["*.space-z.ai", "*.chatglm.cn", "*.z.ai"],
   images: {
     formats: ["image/avif", "image/webp"],

@@ -340,7 +340,7 @@ html.lenis body {
   border-radius: 9999px;
 }
 
-/* Skip to content link (WCAG 2.4.1) */
+/* Skip to content link (WCAG 2.4.1) — high contrast for accessibility */
 .skip-link {
   position: absolute;
   top: -100%;
@@ -348,13 +348,15 @@ html.lenis body {
   transform: translateX(-50%);
   z-index: 9999;
   padding: 0.75rem 1.5rem;
-  background: var(--bordeaux);
-  color: var(--paper);
+  background: var(--ink);
+  color: var(--cream);
   font-family: var(--font-mono);
   font-size: 0.875rem;
+  font-weight: 600;
   text-decoration: none;
   border-radius: 0.5rem;
   transition: top 0.2s ease;
+  border: 2px solid var(--gold);
 }
 .skip-link:focus {
   top: 1rem;
