@@ -188,7 +188,7 @@ export function SnackBoxDelivery() {
                           aria-controls={`stepper-${i}`}
                           aria-label={`${item.name}, добавить в заказ`}
                         >
-                          <span className="font-mono text-xs text-ink/40 w-6 shrink-0">
+                          <span className="font-mono text-xs text-ink/70 w-6 shrink-0">
                             {String(i + 1).padStart(2, "0")}
                           </span>
                           <span className="text-sm md:text-base text-ink/80 group-hover:text-ink transition-colors">
@@ -201,7 +201,7 @@ export function SnackBoxDelivery() {
                           <span className="font-mono text-sm font-semibold gradient-text tabular-nums">
                             {formatRUB(item.price)}
                           </span>
-                          <span className="font-mono text-xs text-ink/40 hidden sm:inline">
+                          <span className="font-mono text-xs text-ink/70 hidden sm:inline">
                             / {item.unit}
                           </span>
 
@@ -349,7 +349,7 @@ export function SnackBoxDelivery() {
                       className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold shadow-lg transition-all ${
                         hasAny
                           ? "bg-gradient-to-r from-gold to-terracotta text-white shadow-gold/25 hover:shadow-xl hover:-translate-y-0.5"
-                          : "cursor-not-allowed bg-ink/10 text-ink/40 shadow-none"
+                          : "cursor-not-allowed bg-ink/10 text-ink/70 shadow-none"
                       }`}
                     >
                       Оформить: {formatRUB(totalRub)}

@@ -34,7 +34,10 @@ const siteUrl = SITE_CONFIG.url;
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
     apple: "/apple-touch-icon.png",
   },
   title: {
@@ -63,13 +66,13 @@ export const metadata: Metadata = {
     locale: "ru_RU",
     url: siteUrl,
     siteName: "Interfood Catering",
-    images: [{ url: "/media/about-aman-venice.webp", width: 1600, height: 1166, alt: "Interfood Catering — банкет" }],
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Interfood Catering — банкет в Санкт-Петербурге" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Interfood Catering — Кейтеринг в Санкт-Петербурге",
     description: "Выездной кейтеринг полного цикла. Рассчитайте стоимость онлайн.",
-    images: ["/media/about-aman-venice.webp"],
+    images: ["/og-image.jpg"],
   },
   manifest: "/manifest.json",
   robots: {
@@ -96,14 +99,23 @@ export const viewport: Viewport = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "CateringService",
+  "@id": siteUrl + "#organization",
   name: "Interfood Catering",
   alternateName: "NILOV CATERING",
-  description: SITE_CONFIG.slogan + " — выездной кейтеринг полного цикла в Санкт-Петербурге.",
+  description: "«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Фуршет, банкет, кофе-брейк, барбекю от 2450₽/чел.",
   url: siteUrl,
+  logo: siteUrl + "/logo.svg",
+  image: siteUrl + "/og-image.jpg",
   telephone: CONTACTS.phone,
   email: CONTACTS.email,
-  image: siteUrl + "/media/about-aman-venice.webp",
   priceRange: "₽₽₽",
+  currenciesAccepted: "RUB",
+  paymentAccepted: "Наличные, Безналичный расчёт, Банковский перевод",
+  sameAs: [
+    "https://www.instagram.com/interfood.catering",
+    "https://wa.me/79119417205",
+    "https://vk.com/interfood",
+  ],
   address: {
     "@type": "PostalAddress",
     addressCountry: "RU",

@@ -75,7 +75,7 @@ export const MEDIA = {
     { src: "/media/event-02.jpg", caption: "Корпоратив в офисе", category: "Корпоративы" },
     { src: "/media/event-03.jpg", caption: "Банкет на корабле", category: "Банкеты" },
     { src: "/media/event-04.jpg", caption: "Выездная регистрация", category: "Свадьбы" },
-    { src: "/media/event-05.jpg", caption: "Мотофестиваль Harley Days", category: "Корпоративы" },
+    { src: "/media/event-05.jpg", caption: "Бренд-активация автоконцерна", category: "Корпоративы" },
     { src: "/media/event-06.jpg", caption: "Скандинавское барбекю", category: "Барбекю" },
     { src: "/media/event-07.jpg", caption: "Кофе-брейк на конференции", category: "Кофе-брейки" },
     { src: "/media/event-08.jpg", caption: "Новогодний банкет", category: "Банкеты" },

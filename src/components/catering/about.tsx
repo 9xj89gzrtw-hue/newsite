@@ -9,7 +9,7 @@ import { MEDIA } from "@/lib/media";
 import { Sparkles, Award, Users, Calendar, ChefHat } from "lucide-react";
 
 const STATS = [
-  { value: 16, suffix: "", label: "лет на рынке", icon: Award },
+  { value: 12, suffix: "", label: "лет на рынке", icon: Award },
   { value: 2400, suffix: "+", label: "мероприятий", icon: Calendar },
   { value: 50000, suffix: "+", label: "гостей", icon: Users },
   { value: 150, suffix: "+", label: "сотрудников", icon: ChefHat },

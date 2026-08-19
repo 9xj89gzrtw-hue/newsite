@@ -183,7 +183,7 @@ export function SiteHeader() {
                 <a
                   key={n.href}
                   href={n.href}
-                  className={`group relative text-sm font-medium opacity-70 transition-opacity duration-300 hover:opacity-100 hover-underline ${themeClasses.text}`}
+                  className={`group relative inline-flex min-h-[44px] items-center px-2 text-sm font-medium opacity-70 transition-opacity duration-300 hover:opacity-100 hover-underline ${themeClasses.text}`}
                 >
                   {n.label}
                 </a>

@@ -508,7 +508,7 @@ export function EventsGallery() {
               animate={{ opacity: 1 }}
               className="col-span-full py-20 text-center"
             >
-              <p className="font-display text-xl text-ink/40 italic">
+              <p className="font-display text-xl text-ink/70 italic">
                 Нет фотографий в этой категории
               </p>
             </motion.div>
@@ -535,7 +535,7 @@ export function EventsGallery() {
               </span>
               <ChevronRight className="size-4 transition-transform group-hover:translate-x-1" />
             </button>
-            <p className="font-mono text-[11px] uppercase tracking-wider text-ink/40">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-ink/70">
               Показано {visibleItems.length} из {items.length}
             </p>
           </motion.div>

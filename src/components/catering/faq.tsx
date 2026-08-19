@@ -298,7 +298,7 @@ export function Faq() {
           <div className="mb-5">
             <div className="relative">
               <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-ink/40"
+                className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-ink/70"
                 aria-hidden="true"
               />
               <input
@@ -307,7 +307,7 @@ export function Faq() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Поиск по вопросам…"
                 aria-label="Поиск по частым вопросам"
-                className="w-full rounded-full border border-border-line bg-cream/60 pl-12 pr-12 py-3.5 text-base text-ink placeholder:text-ink/40 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors min-h-[44px]"
+                className="w-full rounded-full border border-border-line bg-cream/60 pl-12 pr-12 py-3.5 text-base text-ink placeholder:text-ink/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors min-h-[44px]"
               />
               {query && (
                 <button
@@ -337,7 +337,7 @@ export function Faq() {
               }`}
             >
               Все
-              <span className="font-mono text-[10px] text-ink/40">
+              <span className="font-mono text-[10px] text-ink/70">
                 {faqItems.length}
               </span>
             </button>
@@ -357,7 +357,7 @@ export function Faq() {
                   }`}
                 >
                   {c.label}
-                  <span className="font-mono text-[10px] text-ink/40">
+                  <span className="font-mono text-[10px] text-ink/70">
                     {count}
                   </span>
                 </button>
@@ -367,7 +367,7 @@ export function Faq() {
         </Reveal>
 
         {/* Items count */}
-        <div className="mb-4 text-center font-mono text-xs uppercase tracking-wider text-ink/40">
+        <div className="mb-4 text-center font-mono text-xs uppercase tracking-wider text-ink/70">
           {filtered.length === 0
             ? "Ничего не найдено"
             : `Показано ${filtered.length} из ${faqItems.length}`}

@@ -175,7 +175,7 @@ export function Process() {
  * DesktopStep — single horizontal step in the 4-col grid.
  * Active-step highlighting via useInView (Task 2-b §5): when 60% of the step
  * is visible, scale the icon node (1.0 → 1.15) and brighten the number
- * (text-ink/40 → text-bordeaux). Transition duration 0.4 for smoothness.
+ * (text-ink/70 → text-bordeaux). Transition duration 0.4 for smoothness.
  */
 function DesktopStep({
   step,
@@ -284,7 +284,7 @@ function MobileStep({
         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-md shadow-gold/30">
           <Icon className="size-5" />
         </div>
-        <span className="font-mono text-xs uppercase tracking-wider text-ink/40">
+        <span className="font-mono text-xs uppercase tracking-wider text-ink/70">
           {step.num}
         </span>
         <h3 className="font-display text-xl text-ink">{step.title}</h3>

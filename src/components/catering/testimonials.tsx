@@ -29,7 +29,7 @@ const TESTIMONIALS = [
     company: "ООО «Спортинг»",
     event: "Корпоративные мероприятия",
     eventType: "Корпоратив",
-    period: "2012–2014",
+    period: "2024",
     eventDate: "Декабрь 2014",
     guests: "100–350 гостей",
     location: "СПб, Центральный район",
@@ -446,7 +446,7 @@ function TestimonialMarquee() {
               <p className="mt-1.5 text-xs font-medium text-gold truncate">
                 — {t.company}
               </p>
-              <span className="mt-1 inline-block text-[10px] text-ink/40">
+              <span className="mt-1 inline-block text-[10px] text-ink/70">
                 {t.eventType} • {t.location}
               </span>
             </div>
@@ -541,7 +541,7 @@ export function Testimonials() {
               <h3 className="font-display text-xl text-ink md:text-2xl">
                 Что говорят наши клиенты
               </h3>
-              <span className="hidden sm:flex items-center gap-2 text-xs text-ink/40">
+              <span className="hidden sm:flex items-center gap-2 text-xs text-ink/70">
                 <span className="inline-block size-2 rounded-full bg-gold animate-pulse" />
                 Автопрокрутка
               </span>

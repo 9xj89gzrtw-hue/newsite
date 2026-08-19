@@ -55,7 +55,7 @@ export function CookieConsent() {
             <div className="flex items-start gap-3">
               <Cookie className="mt-0.5 size-4 shrink-0 text-gold sm:size-5" />
               <p className="text-xs leading-relaxed text-ink/70 sm:text-sm">
-                Мы используем cookies для работы сайта и аналитики.{" "}
+                Мы используем cookies для работы сайта.{" "}
                 <Link
                   href="/privacy"
                   className="text-gold underline underline-offset-2 hover:text-terracotta transition-colors"

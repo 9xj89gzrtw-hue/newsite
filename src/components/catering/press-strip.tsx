@@ -28,7 +28,7 @@ export function PressStrip() {
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
-          <p className="mb-8 text-center font-mono text-xs uppercase tracking-[0.3em] text-ink/40">
+          <p className="mb-8 text-center font-mono text-xs uppercase tracking-[0.3em] text-ink/70">
             Нас упоминают в
           </p>
         </Reveal>

@@ -323,12 +323,14 @@ function FeaturedSpotlight({
                     aria-selected={i === idx}
                     aria-label={`Блюдо ${i + 1}`}
                     onClick={() => setIdx(i)}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                    className="min-h-[44px] min-w-[24px] flex items-center justify-center px-1"
+                  >
+                    <span className={`h-1.5 rounded-full transition-all duration-300 ${
                       i === idx
                         ? "w-10 bg-gold"
                         : "w-3 bg-cream/30 hover:bg-cream/60"
-                    }`}
-                  />
+                    }`} />
+                  </button>
                 ))}
                 {!prefersReducedMotion && (
                   <button
@@ -495,7 +497,7 @@ export function Menu() {
                     
                     {/* Price badge on thumbnail */}
                     <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-2 py-0.5 shadow-sm">
-                      <Sparkles className={`size-2.5 ${isActive ? "text-gold" : "text-ink/40"} transition-colors`} />
+                      <Sparkles className={`size-2.5 ${isActive ? "text-gold" : "text-ink/70"} transition-colors`} />
                       <span className={`font-mono text-[10px] font-bold leading-none ${isActive ? "text-ink" : "text-ink/70"}`}>
                         от {formatRUB(m.perGuest)}
                       </span>
@@ -554,7 +556,7 @@ export function Menu() {
                   onPressedChange={() => toggleDietary(id)}
                   size="sm"
                   aria-label={`Фильтр: ${label}`}
-                  className={`gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300 ${
+                  className={`gap-1.5 inline-flex min-h-[44px] items-center rounded-full border px-4 py-2 text-xs font-medium transition-all duration-300 ${
                     pressed
                       ? "border-gold/40 bg-gold/15 text-ink shadow-sm shadow-gold/15"
                       : "border-border-line bg-white text-ink/70 hover:border-gold/30 hover:bg-gold/5 hover:text-ink"

@@ -249,7 +249,7 @@ export function InstagramVideo() {
               )}
 
               {/* Counter */}
-              <div className="mt-3 text-center font-mono text-xs uppercase tracking-wider text-ink/40">
+              <div className="mt-3 text-center font-mono text-xs uppercase tracking-wider text-ink/70">
                 {String(activeIdx + 1).padStart(2, "0")} / {String(reels.length).padStart(2, "0")}
               </div>
             </div>

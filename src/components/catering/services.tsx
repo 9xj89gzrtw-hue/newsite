@@ -15,10 +15,10 @@ const SERVICE_PHOTOS: Record<string, string> = {
   UtensilsCrossed: "/media/event-03.jpg",
   ChefHat: "/media/event-10.jpg",
   Flower2: "/media/event-01.png",
-  Cake: "/media/concorde-avo-toast.jpg",
+  Cake: "/media/concorde-dessert.jpg",
   Wine: "/media/event-11.jpg",
   PartyPopper: "/media/event-02.jpg",
-  Droplets: "/media/menu-snack-box.jpg",
+  Droplets: "/media/ridgewells-gala.jpg",
   Flame: "/media/event-06.jpg",
 };
 
@@ -30,10 +30,10 @@ const SERVICE_CATEGORIES: Record<number, string[]> = {
   3: ["Выезд", "Ресторан"],
   4: ["Шеф", "Гастрономия"],
   5: ["Декор", "Флористика"],
-  6: ["Кофе-брейк", "Переговоры"],
+  6: ["Десерт", "Свадьба"],
   7: ["Бар", "Винная карта"],
-  8: ["Праздник", "Детский"],
-  9: ["Ланч", "Офис"],
+  8: ["Корпоратив", "Новый год"],
+  9: ["Десерт", "Праздник"],
   10: ["BBQ", "На природе"],
 };
 
@@ -649,7 +649,7 @@ function ProgressIndicator({
             transition={{ delay: i * 0.1, duration: 0.3 }}
           />
           <span className={`text-[10px] font-mono uppercase tracking-wider hidden sm:inline ${
-            i <= currentStep ? 'text-gold' : 'text-ink/40'
+            i <= currentStep ? 'text-gold' : 'text-ink/70'
           }`}>
             {step}
           </span>
@@ -891,7 +891,7 @@ export function Services() {
                 <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
                   Индекс
                 </span>
-                <span className="font-mono text-[10px] text-ink/40">
+                <span className="font-mono text-[10px] text-ink/70">
                   {String(activeIdx + 1).padStart(2, "0")} / {String(SERVICES.length).padStart(2, "0")}
                 </span>
               </div>

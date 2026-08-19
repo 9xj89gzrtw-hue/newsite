@@ -253,7 +253,7 @@ export function Calculator() {
                       </span>
                       
                       {/* Price hint */}
-                      <span className="font-mono text-[10px] text-ink/40">
+                      <span className="font-mono text-[10px] text-ink/70">
                         от {formatRUB(m.perGuest)}/чел
                       </span>
                     </motion.button>
@@ -284,7 +284,7 @@ export function Calculator() {
                 </span>
                 <span className="flex items-baseline gap-1">
                   <span className="text-xl font-bold text-ink">{guests}</span>
-                  <span className="text-xs text-ink/40">человек</span>
+                  <span className="text-xs text-ink/70">человек</span>
                 </span>
               </label>
               
@@ -325,7 +325,7 @@ export function Calculator() {
                           className="flex flex-col items-center"
                           style={{ position: 'absolute', left: `${position}%`, transform: 'translateX(-50%)' }}
                         >
-                          <span className={`font-mono text-[10px] mb-1.5 ${isActive ? 'text-ink/60' : 'text-ink/40'}`}>
+                          <span className={`font-mono text-[10px] mb-1.5 ${isActive ? 'text-ink/60' : 'text-ink/70'}`}>
                             {tick >= 1000 ? `${tick/1000}k` : tick}
                           </span>
                           <div className={`w-0.5 rounded-full transition-colors ${isActive ? 'h-3 bg-gold/60' : 'h-2 bg-ink/15'}`} />
@@ -457,7 +457,7 @@ export function Calculator() {
 
                       {/* Icon */}
                       <div className={`flex size-9 items-center justify-center rounded-lg transition-colors ${
-                        on ? "bg-gold/20 text-gold" : "bg-ink/5 text-ink/40 group-hover:bg-gold/10 group-hover:text-gold/70"
+                        on ? "bg-gold/20 text-gold" : "bg-ink/5 text-ink/70 group-hover:bg-gold/10 group-hover:text-gold/70"
                       }`}>
                         {IconComponent && <IconComponent className="size-4" />}
                       </div>
@@ -467,7 +467,7 @@ export function Calculator() {
                         <p className={`text-sm font-medium truncate ${on ? 'text-ink' : 'text-ink/70'}`}>
                           {a.label}
                         </p>
-                        <p className="font-mono text-xs text-ink/40">
+                        <p className="font-mono text-xs text-ink/70">
                           +{formatRUB(a.price)}
                         </p>
                       </div>
@@ -664,7 +664,7 @@ export function Calculator() {
                 </a>
               </div>
 
-              <p className="mt-3 text-center font-mono text-xs text-ink/40">
+              <p className="mt-3 text-center font-mono text-xs text-ink/70">
                 * Предварительная оценка. Финальная стоимость — после консультации.
               </p>
             </div>

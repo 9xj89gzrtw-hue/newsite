@@ -245,7 +245,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Горячее (3 шашлычка)",
         pricePerGuest: 1950,
         description: "3 вида шашлычков на углях",
-        photo: "/media/snack-3.jpg",
+        photo: "/media/concorde-handhelds.jpg",
         dishes: [
           { name: "Шашлычок из свиной вырезки в маринаде из горчицы и розмарина", weight: "120 гр" },
           { name: "Шашлычок из лосося (Фарерские острова) с соусом бешамель", weight: "120 гр" },

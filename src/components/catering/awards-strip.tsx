@@ -63,7 +63,7 @@ export function AwardsStrip() {
             </h2>
             <p className="mt-3 text-sm text-ink/55 max-w-md mx-auto">
               Профессиональные награды за качество кухни и сервиса — наш
-              16-летний путь отмечен индустрией.
+              12-летний путь отмечен индустрией.
             </p>
           </div>
         </Reveal>
@@ -144,7 +144,7 @@ export function AwardsStrip() {
                     <p className="text-[11px] font-medium leading-tight text-ink/70 transition-colors duration-300 group-hover:text-ink">
                       {award.title}
                     </p>
-                    <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-ink/40">
+                    <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-ink/70">
                       {award.year} · {award.org}
                     </p>
                   </div>

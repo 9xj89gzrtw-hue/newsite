@@ -789,7 +789,7 @@ export function Hero() {
           transition={{ delay: 2.1, duration: 1 }}
         >
           {[
-            { value: 16, suffix: "+ лет", label: "опыта", color: "bg-sage" },
+            { value: 12, suffix: "+ лет", label: "опыта", color: "bg-sage" },
             { value: 2400, suffix: "+", label: "мероприятий", color: "bg-gold" },
             { value: 50000, suffix: "+", label: "гостей", color: "bg-terracotta" },
           ].map((stat, i) => (
@@ -867,7 +867,7 @@ export function Hero() {
 
       {/* Bottom-left mono caption with subtle animation */}
       <motion.div 
-        className="absolute bottom-6 left-4 z-10 hidden font-mono text-xs uppercase tracking-wider text-ink/40 md:flex items-center gap-4"
+        className="absolute bottom-6 left-4 z-10 hidden font-mono text-xs uppercase tracking-wider text-ink/70 md:flex items-center gap-4"
         style={{ y: yParallaxNear }}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 0.5, x: 0 }}

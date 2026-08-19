@@ -67,7 +67,7 @@ export function ChapterNav() {
                   className={`font-mono text-[10px] uppercase tracking-wider transition-all duration-300 ${
                     isActive
                       ? "text-gold font-semibold opacity-100"
-                      : "text-ink/40 opacity-0 group-hover:opacity-100"
+                      : "text-ink/70 opacity-0 group-hover:opacity-100"
                   }`}
                 >
                   {s.label}

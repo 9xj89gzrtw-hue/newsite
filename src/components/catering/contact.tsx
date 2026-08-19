@@ -180,7 +180,7 @@ function FloatingInput({
       >
         {Icon && (
           <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-            focused ? "text-gold" : "text-ink/40"
+            focused ? "text-gold" : "text-ink/70"
           }`}>
             <Icon className="size-4" />
           </div>
@@ -223,7 +223,7 @@ function FloatingInput({
           } ${
             focused || hasValue
               ? `-top-2.5 ${Icon ? 'left-8' : 'left-3'} bg-white px-1 text-xs font-medium text-gold`
-              : `text-ink/40 ${Icon ? 'text-ink/40' : ''}`
+              : `text-ink/70 ${Icon ? 'text-ink/70' : ''}`
           }`}
         >
           {placeholder}
@@ -515,7 +515,7 @@ function OfficeHours() {
         ✨ {OFFICE_HOURS.note}
       </p>
       {!status.open && status.nextLabel && (
-        <p className="mt-1 text-[11px] text-ink/40">
+        <p className="mt-1 text-[11px] text-ink/70">
           {status.nextLabel}
         </p>
       )}
@@ -639,16 +639,18 @@ export function Contact() {
     if (step === 2) {
       const nameValid = data.name.trim().length > 1;
       const phoneValid = PHONE_REGEX.test(data.phone.replace(/[^+0-9]/g, ""));
-      setValidationErrors({
-        name: !nameValid,
-        phone: !phoneValid,
-      });
       return nameValid && phoneValid;
     }
     return data.consent;
   };
 
   const next = () => {
+    if (step === 2) {
+      const nameValid = data.name.trim().length > 1;
+      const phoneValid = PHONE_REGEX.test(data.phone.replace(/[^+0-9]/g, ""));
+      setValidationErrors({ name: !nameValid, phone: !phoneValid });
+      if (!nameValid || !phoneValid) return;
+    }
     if (stepValid()) {
       setStep((s) => Math.min(s + 1, STEPS.length - 1));
       setValidationErrors({});
@@ -692,7 +694,7 @@ export function Contact() {
       if (!res.ok) throw new Error("Ошибка отправки");
 
       setFormStatus("success");
-      toast.success("Заявка отправлена! Перезвоним в течение часа.");
+      toast.success("Заявка отправлена! Перезвоним в течение 15 минут.");
       
       // Reset after showing success state
       setTimeout(() => {
@@ -803,7 +805,7 @@ export function Contact() {
 
                 {/* Secondary contacts in compact row */}
                 <div className="pt-2">
-                  <p className="mb-3 font-mono text-xs uppercase tracking-wider text-ink/40">
+                  <p className="mb-3 font-mono text-xs uppercase tracking-wider text-ink/70">
                     Другие способы связи
                   </p>
                   <div className="grid grid-cols-2 gap-3">
@@ -885,7 +887,7 @@ export function Contact() {
                       transition={{ delay: 0.6 }}
                       className="mt-2 text-sm text-ink/60"
                     >
-                      Мы перезвоним в течение часа
+                      Мы перезвоним в течение 15 минут
                     </motion.p>
                   </motion.div>
                 ) : null}
@@ -1273,7 +1275,7 @@ export function Contact() {
               <MapPin className="size-4 transition-transform group-hover:scale-110" />
               {YANDEX_MAPS.address} — открыть в Яндекс.Картах →
             </a>
-            <span className="font-mono text-xs text-ink/40">
+            <span className="font-mono text-xs text-ink/70">
               {CONTACTS.city} · {CONTACTS.phone}
             </span>
           </div>

@@ -155,7 +155,7 @@ export function VideoEvents() {
         </div>
 
         <Reveal delay={0.3}>
-          <p className="mt-8 text-center font-mono text-xs text-ink/40">
+          <p className="mt-8 text-center font-mono text-xs text-ink/70">
             Кликните на превью, чтобы воспроизвести видео
           </p>
         </Reveal>

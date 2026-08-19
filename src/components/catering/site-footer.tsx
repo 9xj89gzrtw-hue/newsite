@@ -38,6 +38,7 @@ function useCurrentYear() {
  */
 function NewsletterSignup() {
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -45,6 +46,11 @@ function NewsletterSignup() {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setStatus("error");
       toast.error("Введите корректный email");
+      return;
+    }
+    if (!consent) {
+      setStatus("error");
+      toast.error("Необходимо согласие на обработку персональных данных");
       return;
     }
     setStatus("loading");
@@ -96,7 +102,7 @@ function NewsletterSignup() {
             name="email"
             required
             disabled={status === "loading" || status === "done"}
-            className="w-full rounded-full border border-border-line bg-cream/60 px-4 py-3 text-sm text-ink placeholder:text-ink/40 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors disabled:opacity-60 min-h-[44px]"
+            className="w-full rounded-full border border-border-line bg-cream/60 px-4 py-3 text-sm text-ink placeholder:text-ink/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors disabled:opacity-60 min-h-[44px]"
           />
         </div>
         <button
@@ -142,9 +148,21 @@ function NewsletterSignup() {
           </AnimatePresence>
         </button>
       </form>
-      <p className="mt-3 text-[11px] text-ink/40">
-        Нажимая «Подписаться», вы соглашаетесь с политикой обработки персональных данных (152-ФЗ).
-      </p>
+      <label className="mt-3 flex min-h-[44px] items-start gap-2 text-[11px] text-ink/70">
+        <input
+          type="checkbox"
+          checked={consent}
+          onChange={(e) => setConsent(e.target.checked)}
+          required
+          className="mt-0.5 size-4 shrink-0 accent-gold"
+          aria-label="Согласие на обработку персональных данных"
+        />
+        <span>
+          Я согласен на обработку персональных данных согласно{" "}
+          <a href="/privacy" className="text-bordeaux hover:underline">политике конфиденциальности</a>{" "}
+          (152-ФЗ).
+        </span>
+      </label>
     </div>
   );
 }

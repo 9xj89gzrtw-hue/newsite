@@ -60,7 +60,7 @@ export function LogoMarquee() {
           {track.map((name, i) => (
             <li
               key={`${name}-${i}`}
-              className="flex shrink-0 items-center gap-3 font-display text-lg text-ink/40 transition-colors duration-300 hover:text-gold md:text-2xl"
+              className="flex shrink-0 items-center gap-3 font-display text-lg text-ink/70 transition-colors duration-300 hover:text-gold md:text-2xl"
             >
               <span
                 aria-hidden="true"
