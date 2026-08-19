@@ -98,7 +98,7 @@ export function CustomCursor() {
   const hasPreview = Boolean(previewImage) && !prefersReducedMotion;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999] hidden md:block">
+    <div className="pointer-events-none fixed inset-0 z-[9999] hidden md:block" aria-hidden="true">
       {/* Dot — fixed 6px, fades + shrinks on hover (transform/opacity only) */}
       <motion.div
         className="fixed top-0 left-0 -ml-[3px] -mt-[3px] rounded-full bg-gold"
