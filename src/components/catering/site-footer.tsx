@@ -93,6 +93,8 @@ function NewsletterSignup() {
             }}
             placeholder="your@email.ru"
             aria-label="Email для подписки"
+            name="email"
+            required
             disabled={status === "loading" || status === "done"}
             className="w-full rounded-full border border-border-line bg-cream/60 px-4 py-3 text-sm text-ink placeholder:text-ink/40 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors disabled:opacity-60 min-h-[44px]"
           />

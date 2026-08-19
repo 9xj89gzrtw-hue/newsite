@@ -815,12 +815,12 @@ export function Services() {
                 className="mt-6 font-display text-ink leading-[1.05]"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.25rem)" }}
               >
-                <span className="inline-block">Всё</span>{" "}
-                <span className="inline-block">для</span>{" "}
-                <span className="inline-block">события</span>
+                <span className="inline-block">Всё</span>{"\u00A0"}
+                <span className="inline-block">для</span>{"\u00A0"}
+                <span className="inline-block">события</span>{"\u00A0"}
                 <br className="hidden sm:block" />
                 <motion.span 
-                  className="gradient-text italic inline-block mt-1"
+                  className="gradient-text italic"
                   initial={{ clipPath: "inset(100% 0 0 0)" }}
                   whileInView={{ clipPath: "inset(0% 0 0 0)" }}
                   viewport={{ once: true }}

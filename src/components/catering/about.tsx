@@ -335,19 +335,18 @@ export function About() {
                   fontSize: "clamp(2rem, 5vw, 4rem)",
                 }}
               >
-                <span className="inline-block">Кейтеринг,</span>{" "}
-                <span className="inline-block">в котором</span>
+                <span className="inline-block">Кейтеринг,</span>{"\u00A0"}
+                <span className="inline-block">в котором</span>{"\u00A0"}
                 <br />
                 <motion.span 
-                  className="gradient-text italic inline-block mt-1"
+                  className="gradient-text italic"
                   initial={{ clipPath: "inset(100% 0 0 0)" }}
                   whileInView={{ clipPath: "inset(0% 0 0 0)" }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  чувствуют
+                  чувствуют радость
                 </motion.span>
-                {" "}радость
               </motion.h2>
             </Reveal>
 
