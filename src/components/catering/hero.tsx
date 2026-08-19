@@ -741,7 +741,7 @@ export function Hero() {
             }}
             transition={{ delay: 1.8, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            .
+            est. 2008
           </motion.span>
         </motion.h1>
 

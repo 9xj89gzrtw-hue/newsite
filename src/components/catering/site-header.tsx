@@ -172,7 +172,7 @@ export function SiteHeader() {
             className={`min-h-[44px] flex items-center font-display text-xl tracking-tight transition-colors duration-300 md:text-2xl hover-underline ${themeClasses.text}`}
           >
             Interfood
-            <span className="text-gold">.</span>
+            <span className="text-gold">Catering</span>
           </a>
 
           {/* Desktop Navigation with mega-menus */}
@@ -235,7 +235,7 @@ export function SiteHeader() {
           >
             <div className="flex items-center justify-between">
               <span className="font-display text-2xl text-ink">
-                Interfood<span className="text-gold">.</span>
+                Interfood<span className="text-gold">Catering</span>
               </span>
               <button
                 onClick={() => setOpen(false)}
