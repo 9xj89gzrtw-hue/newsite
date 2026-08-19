@@ -90,9 +90,9 @@ function highlightMatch(text: string, query: string) {
     out.push({ key: `m-${k++}`, value: text.slice(idx, idx + q.length) });
     i = idx + q.length;
   }
-  return out.map((part) =>
+  return out.map((part, idx) =>
     typeof part === "string" ? (
-      <span key={`s-${part.slice(0, 6)}-${i}`}>{part}</span>
+      <span key={`s-${idx}-${part.slice(0, 6)}`}>{part}</span>
     ) : (
       <mark
         key={part.key}

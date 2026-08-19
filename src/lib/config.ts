@@ -62,7 +62,7 @@ export const CONTACTS = {
   telegramHref: "https://t.me/+79119417205",
   instagram: "@nilov_catering",
   instagramHref: "https://www.instagram.com/nilov_catering",
-  vk: "VK: nilovcatering",
+  vk: "nilovcatering",
   vkHref: "https://vk.com/nilovcatering",
   city: "Санкт-Петербург",
   email: "interfood-catering@yandex.ru",

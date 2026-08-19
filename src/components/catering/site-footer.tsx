@@ -91,7 +91,7 @@ function NewsletterSignup() {
               setEmail(e.target.value);
               if (status === "error" || status === "done") setStatus("idle");
             }}
-            placeholder="your@email.ru"
+            placeholder="email@example.ru"
             aria-label="Email для подписки"
             name="email"
             required
@@ -296,7 +296,7 @@ export function SiteFooter() {
 
         {/* Copyright bar */}
         <div className="mt-6 flex flex-col gap-3 text-xs text-ink/50 md:flex-row md:justify-between pb-8">
-          <p>© {year ?? new Date().getFullYear()} {SITE_CONFIG.brandName} · {CONTACTS.city}</p>
+          <p>© {year ?? 2025} {SITE_CONFIG.brandName} · {CONTACTS.city}</p>
           <p>152-ФЗ · ЗОПП · Данные хранятся на территории РФ</p>
         </div>
       </div>

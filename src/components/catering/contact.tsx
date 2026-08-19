@@ -78,7 +78,7 @@ function useOfficeStatus() {
   useEffect(() => {
     const compute = () => {
       const now = new Date();
-      // Use Europe/Berlin timezone per project convention — same as user.
+      // Use Europe/Moscow timezone per project convention (Russian company).
       // For simplicity, treat SPb local time (UTC+3) via Europe/Moscow.
       const fmt = new Intl.DateTimeFormat("ru-RU", {
         timeZone: "Europe/Moscow",

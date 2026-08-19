@@ -35,8 +35,9 @@ export const MEDIA = {
     alt: "Закат над накрытым банкетным столом у воды — Interfood Catering",
     // REAL catering video from Wolfgang Puck Catering (HubSpot CDN, CORS-enabled).
     // "Power Of Food" hero loop, silent, 16MB MP4.
-    // Direct external MP4 URL — works via native <video> element (Phase 6 pattern).
-    videoSrc: "",
+    // Video disabled — using Ken Burns image fallback for better performance.
+    // To enable: replace with real MP4 URL (CORS-enabled CDN recommended).
+    videoSrc: undefined as string | undefined,
   },
   about: {
     // Real catering photo from Ridgewells — "Bride and groom on the dance
@@ -85,7 +86,7 @@ export const MEDIA = {
     { src: "/media/gamma-corporate.webp", caption: "Корпоративное мероприятие", category: "Корпоративы" },
     { src: "/media/gamma-private-event.webp", caption: "Частное торжество", category: "Банкеты" },
     { src: "/media/gamma-table-birds-eye.webp", caption: "Сервировка стола — вид сверху", category: "Фуршеты" },
-    { src: "/media/event-09.jpg", caption: "Новогодний банкет", category: "Банкеты" },
+    { src: "/media/event-08.jpg", caption: "Новогодний банкет", category: "Банкеты" },
   ],
 };
 

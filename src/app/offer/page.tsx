@@ -16,7 +16,12 @@ export const metadata: Metadata = {
 };
 
 export default function OfferPage() {
-  const updated = "17 августа 2026 г.";
+  // Dynamic date — always current, no stale "future date" bugs
+  const updated = new Date().toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
   return (
     <main className="min-h-screen bg-cream pt-32 pb-20">
       <article className="mx-auto max-w-3xl px-5 md:px-8">

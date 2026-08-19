@@ -160,7 +160,7 @@ export function CustomCursor() {
           >
             <Image
               src={previewImage}
-              alt=""
+              alt="Превью блюда"
               fill
               sizes="120px"
               className="object-cover"
