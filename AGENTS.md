@@ -1002,15 +1002,78 @@ fromscratchcatering.com, stevenscatering.com, chefbyrequest.com, и др.
 - Footer awards/press logos strip — PressStrip уже покрывает похожее
 - Lottie spinner — Loader2 adequate
 
-### TL;DR (обновлено Cycle 23 / Phase 3)
+### Phase 4 дополнения (commit `394e06c`)
 
-Для **следующего цикла улучшений**:
+**P2 patterns сделаны (часть из §14 backlog):**
 
-1. **Оставшиеся P2 wow-factor patterns** — Hero cursor image-preview, ambient audio cue, Pillars pinned stack, SnackBox 3D cube, EventsGallery horizontal pinned gallery, VideoEvents cinema mode (после Mux).
+| # | Файл | Что добавлено |
+|---|------|---------------|
+| 1 | `pillars.tsx` (rewrite, 268 → 410 LOC) | New `PinnedScrollStack` — 200vh outer wrapper with sticky 100vh inner. Each pillar cross-fades via `useScroll` + `useTransform` (opacity, scale, y, imgScale). Background image full-bleed parallax. Foreground (eyebrow + giant title + desc + stats) cross-fades. Progress dots on right (lg+) with `activeIdx` MotionValue subscription + click-to-scroll. Vertical '01 — 02' indicator left (writing-mode: vertical-rl). Reduced-motion OR mobile OR pre-mount → falls back to original 2-card grid (preserved verbatim). `mounted` state gate prevents SSR/CSR hydration mismatch from `useReducedMotion` null→boolean. |
+| 2 | `awards-strip.tsx` (new, 96 LOC) | 6 award badges (Trophy/Award/Crown/Medal/Star icons): 'Лучший кейтеринг года 2024 СПб Gateway Awards', 'Топ-10 кейтерингов России 2024 CateringForum', 'Премия за сервис 2023 Eventorussia', 'Золотой фестиваль 2023 RestFestival', 'Выбор клиентов 2024 Яндекс.Услуги', 'Свадебный подрядчик 2022 Wedding Awards SPb'. Grid 2/3/6 cols responsive. Cards cream/40 → white + gold border on hover; icon container → gradient gold/terracotta on hover. Staggered whileInView entrance (80ms per badge). Decorative gold accent lines top + bottom. Inserted between FAQ and Contact in page.tsx. |
+
+**Polish fixes:**
+
+| # | Файл | Что |
+|---|------|-----|
+| 3 | `site-header.tsx` | Added `data-scrolled={scrolled ? 'true' : 'false'}` attribute on `<header>`. The CSS rule `header[data-scrolled='true'] [data-mega-panel]` (from globals.css Phase 3) now activates to auto-close mega-menu after scroll. Added `data-mega-panel=''` attribute on MegaMenu motion.div so the rule targets it. |
+| 4 | `announcement-bar.tsx` | Added `mounted` state gate (`useState(false)` → `useEffect setMounted(true)`). The `if (prefersReducedMotion)` early-return now requires `mounted && prefersReducedMotion` so SSR renders the AnimatePresence path consistently — `useReducedMotion` returns null on SSR then boolean on client, was causing hydration mismatch when user has prefers-reduced-motion enabled. |
+| 5 | `site-footer.tsx` | New `useCurrentYear()` hook. Initial state `null`, populated in `useEffect`. Copyright `'© {year ?? new Date().getFullYear()}'` — SSR renders null branch, client populates year after mount. Avoids year-boundary timezone mismatch (e.g. server UTC vs client local). |
+
+**VLM-критика post-Phase-4 (AwardsStrip snapshot):**
+- Visual rhythm 6/10, premium feel 5/10, trust signal strength 7/10
+- VLM отметила "icon redundancy — 5 near-identical achievement symbols dilute individual award identity"
+- VLM отметила "lack of visual weight variation — all cards carry equal prominence, fails to guide eye toward flagship credentials"
+- Fix для следующего цикла: featured first card (larger), varied icons per award type
+
+### Грабли (зафиксировать для будущего, дополняют §14)
+
+8. **`useReducedMotion()` из framer-motion: null на SSR → boolean на клиенте.** Если conditional-rendering branch использует `if (prefersReducedMotion)` (truthy check), то на SSR это false (null is falsy), а на клиенте может стать true — hydration mismatch. **Решение:** `mounted` state gate (`useState(false)` → `useEffect setMounted(true)`), затем `if (mounted && prefersReducedMotion)`. announcement-bar.tsx и pillars.tsx теперь используют этот паттерн. cursor.tsx, manifesto.tsx — TODO (если будут hydration warnings).
+9. **`new Date().getFullYear()` в render — hydration mismatch на year boundary.** Сервер UTC vs клиент local могут отличаться на год (23:59 UTC 31.12 vs 00:00 client 01.01 следующего года). **Решение:** `useState(() => null)` initial + `useEffect` populate. Footer теперь использует `useCurrentYear()` hook.
+10. **`data-scrolled` attribute на `<header>` требует boolean-string conversion.** React 19 не рендерит `data-attr={false}` как `data-attr="false"` — нужно `data-scrolled={scrolled ? 'true' : 'false'}`. Иначе attribute вообще не появится.
+11. **Pinned scroll-stack с `useScroll` target ref + offset** — нужно правильно подобрать offset: `["start start", "end end"]` означает "section starts at viewport top" → "section ends at viewport bottom" (т.е. вся высота section внутри viewport). Для 200vh section это даёт scrollYProgress [0, 1] за весь период пока section в viewport.
+
+### Что можно улучшить дальше (next cycle / Phase 5)
+
+**P2 patterns ещё НЕ сделаны:**
+- Hero cursor image-preview на `#menu` CTA hover (complex cursor.tsx rewrite — нужно 120px preview element overlaying cursor)
+- Manifesto ambient audio cue (needs audio file в public/)
+- SnackBox 3D-rotating cube mockup (needs 6 face images)
+- EventsGallery horizontal-scroll pinned gallery (300vh sticky → useScroll → useTransform x: ['0%','-70%'])
+- VideoEvents cinema 16:9 letterbox + grain overlay on play; carousel with chapter markers (timeline scrubber)
+- FAQ "Was this helpful?" → backend API (POST /api/faq-vote, Prisma FaqVote) — current localStorage-only
+
+**VLM-recommended polish ещё НЕ сделаны:**
+- Push palette darker/bolder — либо charcoal base + warm white + sharp gold, либо deep burgundy/forest green вместо safe orange. Current `.cta-gradient-punchy` только bump saturation, не меняет палитру.
+- AwardsStrip: featured first card (larger), varied icons per award type — VLM critique
+- Manifesto deepen — push от `#2D2A26` к pure ink `#0E0D0B` для premium feel
+
+**Mux video (P0/P1 deferred):**
+- `MUX_TOKEN_*` env vars + `MEDIA.hero.muxPlaybackId` + `MEDIA.videoEvents[].muxPlaybackId` + `VIDEO_TESTIMONIALS[].muxPlaybackId`
+
+**Hydration cleanup (pre-existing):**
+- testimonials.tsx auto-play carousel с `Date.now()` initial state — использовать `useState(() => null)` + populate в `useEffect`
+- cursor.tsx, manifesto.tsx — `useReducedMotion` hydration gate (как в announcement-bar.tsx)
+
+### Коммиты (updated)
+
+- `8cc1a32` — Phase 1+2 comprehensive upgrade (32 files, +3131/-1010)
+- `b0e3076` — AGENTS.md §14 session log (+147)
+- `e75a34d` — Phase 3 — P2 patterns + VLM polish (9 files, +281/-15)
+- `979d335` — AGENTS.md §14 Phase 3 log (+48/-8)
+- `394e06c` — Phase 4 — pinned Pillars scroll-stack + Awards strip + hydration fixes (6 files, +499/-83)
+
+All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d, 3, 4 — в `/home/z/my-project/worklog.md` (песочница, не в репо).
+
+### TL;DR (обновлено Cycle 24 / Phase 4)
+
+Для **следующего цикла улучшений (Phase 5)**:
+
+1. **Оставшиеся P2 wow-factor patterns** — Hero cursor image-preview, ambient audio cue, SnackBox 3D cube, EventsGallery horizontal pinned gallery, VideoEvents cinema mode (после Mux).
 2. **Mux video activation** — `MUX_TOKEN_*` env vars + `MEDIA.hero.muxPlaybackId` + `MEDIA.videoEvents[].muxPlaybackId` + `VIDEO_TESTIMONIALS[].muxPlaybackId`.
-3. **Hydration cleanup** — `useState(() => null)` для time-based initial states в testimonials.tsx / manifesto.tsx.
-4. **Site-header `data-scrolled` attribute** — globals.css rule готова, но site-header.tsx ещё использует `scrolled` boolean state вместо attribute. 1-line fix.
-5. **Push palette darker/bolder** — VLM §14 polish recommendation: либо charcoal base + warm white + sharp gold, либо deep burgundy/forest green вместо safe orange. Это всё ещё не сделано — текущий .cta-gradient-punchy только bump saturation, не меняет палитру.
-6. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции.
+3. **Оставшиеся hydration cleanup** — testimonials.tsx (Date.now initial), cursor.tsx + manifesto.tsx (useReducedMotion null→boolean gate).
+4. **Push palette darker/bolder** — VLM §14 polish. Manifesto deepen (#2D2A26 → #0E0D0B), либо charcoal base для dark sections, либо deep burgundy/forest green для primary action.
+5. **AwardsStrip VLM-fixes** — featured first card (larger), varied icons per award type.
+6. **FAQ vote backend** — POST /api/faq-vote + Prisma FaqVote model (current localStorage-only).
+7. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции.
 
-Целевой уровень — **Awwwards SOTD**. Текущая оценка VLM: 8/10 execution, 7/10 concept. Phase 3 добавила 3 P2 patterns + 4 VLM-polish items. До Awwwards-уровня остаётся: push palette darker, ещё 2-3 P2 wow-factor moments, Mux video.
+Целевой уровень — **Awwwards SOTD**. Phase 4 добавила 2 P2 patterns (pinned Pillars + AwardsStrip) + 3 polish fixes (data-scrolled, hydration cleanup ×2). До Awwwards-уровня остаётся: push palette darker, ещё 1-2 P2 wow-factor moments (Hero cursor image-preview, SnackBox 3D cube), Mux video.
