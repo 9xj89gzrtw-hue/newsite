@@ -1451,3 +1451,125 @@ All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d
 8. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции (when not rate-limited).
 
 Целевой уровень — **Awwwards SOTD**. Phase 7 replaced ALL off-topic Pexels images with 14 verified real catering photos scraped from 3 reference sites (concorde, ridgewells, concept-catering) + activated 2 real catering videos (Wolfgang Puck MP4 + GG Catering Vimeo). Hero now plays real "Power Of Food" video on autoplay muted loop. До Awwwards-уровня остаётся: push palette darker, ещё 1-2 P2 wow-factor moments, find more catering videos.
+
+### Phase 8 дополнения (commit `36f1e84`) — VLM polish + SnackBox 3D cube + FAQ vote backend + 2 more videos
+
+**VLM-recommended polish (Phase 5/6 backlog done):**
+
+| # | Component | What |
+|---|-----------|------|
+| 1 | `manifesto.tsx` | Palette deepened: bg `#2D2A26` → `#0E0D0B` (pure ink) for premium luxury feel. Comment updated. |
+| 2 | `awards-strip.tsx` | Featured first card (full-width gradient card with flagship award, large gradient icon, year stamp display). 5 varied icons per award type (UtensilsCrossed, Heart, Flame, Star, Gem — replaced 5 near-identical Trophy/Award/Crown/Medal/Star mix). Visual weight variation guides eye toward flagship credentials (VLM: 'Michelin star shouldn't visually equal local chamber award'). |
+
+**P2 wow-factor pattern (Phase 5 backlog done):**
+
+| # | Component | What |
+|---|-----------|------|
+| 3 | `snack-box-3d-cube.tsx` (new) | CSS 3D rotating cube mockup. 6 cube faces use 6 different real catering photos (concorde handhelds/scallops/avo-toast/veg-mosaic/dessert + concept banquet-table). Auto-rotates 360° over 24s, linear, repeat forever. Half-speed on hover (duration doubles to 48s). Reduced-motion: cube is static, shows front face only. `transform-style: preserve-3d` + `translateZ` half-cube + `rotateY/X` to orient each face. All GPU-composited (RULES §5 compliant — transform and opacity only). Integrated into SnackBoxDelivery left column below CTA. |
+
+**FAQ vote backend (Phase 5/6 backlog done):**
+
+| # | Component | What |
+|---|-----------|------|
+| 4 | `prisma/schema.prisma` | New `FaqVote` model: id, questionHash (unique), questionText, vote ('up'\|'down'), consentIp, userAgent, createdAt, updatedAt. Indexes on `vote` + `createdAt`. `bun run db:push` created table. |
+| 5 | `src/app/api/faq-vote/route.ts` (new) | `POST /api/faq-vote`: validates question + vote (up/down), captures consent proof (IP + User-Agent, 152-ФЗ compliant), upserts by `questionHash` (SHA-256 of trimmed question, truncated to 64 chars). One row per question (last-write-wins; per-device state still tracked in localStorage for instant UI feedback). Returns `{ok, id, vote}`. Fallback demo mode if DB unavailable. `GET /api/faq-vote`: optional `?question=` param returns latest vote for that question. Without param, returns top 20 recent votes with up/down counts (admin dashboard view). |
+| 6 | `faq.tsx` WasHelpful component | Now POSTs to `/api/faq-vote` in addition to localStorage. Fire-and-forget (no await) — UI doesn't block on server response. localStorage remains source of truth for instant UI feedback. |
+| 7 | Tested | `curl -X POST /api/faq-vote` returns `{ok:true, id, vote}`. `GET /api/faq-vote?question=...` returns `{ok:true, up:1, down:0, latestVote:'up', updatedAt}`. ✓ |
+
+**2 more real catering videos found (Phase 5 backlog extended):**
+
+| # | Source | URL | Used for |
+|---|--------|-----|----------|
+| 1 | cutandtastelv.com | Vimeo 692388530 | VIDEO_CATALOG[2] (Кофе-брейк) |
+| 2 | elegantaffairscaterers.com | `https://elegantaffairscaterers.com/wp-content/uploads/2021/07/landscape-1.mp4` (533KB, no CORS but `<video>` works cross-origin) | VIDEO_CATALOG[3] (Фуршет) `videoSrc` |
+
+VIDEO_CATALOG now has all 4 items with real catering content (was 2 real + 2 YouTube fallback):
+- [0] Свадебный банкет: videoSrc=Wolfgang Puck MP4, poster=ridgewells-wedding
+- [1] Выездное барбекю: youtubeEmbedId=1049137317 (GG Catering Vimeo), poster=ridgewells-scallops
+- [2] Кофе-брейк: youtubeEmbedId=692388530 (Cut and Taste Vimeo), poster=concorde-avo-toast
+- [3] Фуршет: videoSrc=Elegant Affairs MP4, poster=concorde-dessert
+
+**Reference site scraping findings (Phase 7 sites + new ones tested):**
+- ✅ concordcatering.ca — 5 catering photos scraped (Phase 7)
+- ✅ ridgewells.com — 6 catering photos scraped (Phase 7)
+- ✅ concept-catering.de — 3 catering photos scraped (Phase 7, Sony ILCE-7M4 pro camera)
+- ✅ wolfgangpuckcatering.com — direct MP4 video (Phase 7)
+- ✅ ggcatering.com — Vimeo embed (Phase 7)
+- ✅ cutandtastelv.com — Vimeo embed + Squarespace food photos (Phase 8)
+- ✅ elegantaffairscaterers.com — direct MP4 video on WordPress wp-content (Phase 8)
+- ❌ myradish.com — no `<video>` or YouTube/Vimeo embeds; recaptcha present
+- ❌ thejdkgroup.com — no `<video>` or YouTube/Vimeo embeds
+- ❌ queenofheartscatering.com — no `<video>` or YouTube/Vimeo embeds
+- ❌ relishcaterers.com — no `<video>` or YouTube/Vimeo embeds
+- ❌ mculinary.com — Cloudflare/SG captcha blocks (consistent with AGENTS.md §16)
+- ⚠️ creativeedgeparties.com — videos use `blob:` URLs (MSE-streamed, not directly linkable)
+- ⚠️ saltblockhospitality.com — videos use `blob:` URLs (MSE-streamed, not directly linkable)
+- ⚠️ sopranoscatering.com, tallguyandagrill.com, gammacatering.com/en — no `<video>` or YouTube/Vimeo embeds
+- ⚠️ ridgewells.com — has Instagram embed but no direct video
+- Not yet tested: talkofthetownatlanta.com, chicchefcatering.com, sterlingcateringmn.com, bywordofmouth.co.uk (all blocked by Cloudflare/CAPTCHA per AGENTS.md §16)
+
+**Phase 8 verification:**
+- `bun run lint` → clean
+- `bunx tsc --noEmit` → clean
+- `bun run db:push` → FaqVote table created
+- `curl localhost:3000` → HTTP 200
+- DOM eval via agent-browser:
+  - awardsFeatured=6 (cards), awardsFeaturedCard=1 (featured card with `<h3>`) ✓ (VLM-fix implemented)
+  - snackCube=1 (cube element with `style=perspective`) ✓ (3D cube integrated)
+  - manifestoBgDark=`rgb(14, 13, 11)`=`#0E0D0B` ✓ (palette darkened)
+- FAQ vote API tested:
+  - POST /api/faq-vote returns `{ok:true, id:'cmszpl4ye0000orldipewgiq7', vote:'up'}` ✓
+  - GET /api/faq-vote?question=... returns `{ok:true, up:1, down:0, latestVote:'up', updatedAt:'2026-08-19T06:26:48.278Z'}` ✓
+
+### Грабли (зафиксировать для будущего, дополняют §14)
+
+21. **CSS 3D cube requires `transform-style: preserve-3d` on parent + `backface-visibility: hidden` on each face.** Without `preserve-3d`, browser flattens children — cube appears as flat overlay of faces. Without `backface-visibility: hidden`, back faces show through front. **Solution:** set both on container + each face div. Webkit prefix required for Safari (`WebkitBackfaceVisibility: "hidden"`).
+22. **framer-motion `animate={{ rotateY: 360 }}` with `repeat: Infinity` + `ease: "linear"`** creates smooth infinite rotation. Avoid `ease: "easeInOut"` (default) — it produces noticeable speed changes at loop boundaries. For half-speed on hover, double the `duration` in `transition` prop (not the target value).
+23. **Prisma `questionHash` unique constraint + upsert pattern** requires explicit `findUnique` + `update` OR `create` because Prisma's `upsert` requires `where` clause with unique field. Pattern: `findUnique` → if exists `update`, else `create`. Alternative: `upsert({ where: { questionHash }, create: {...}, update: {...} })`.
+
+### Phase 8 backlog (NOT done — still open for Phase 9)
+
+**P2 patterns ещё НЕ сделаны:**
+- Hero cursor image-preview на #menu CTA hover (extend existing data-cursor mechanism to also read data-cursor-image — would need new 120px preview element overlaying cursor)
+- EventsGallery horizontal-scroll pinned gallery (300vh sticky → useScroll → useTransform x: ['0%','-70%'])
+- VideoEvents cinema 16:9 letterbox + grain overlay on play; carousel with chapter markers (timeline scrubber)
+- Manifesto ambient audio cue (needs audio file + external CDN — RULES §3 forbids hosting media in /public)
+
+**Hydration cleanup (pre-existing):**
+- testimonials.tsx — 5 sub-components use `useReducedMotion()` in JSX `initial` prop. SSR renders null (falsy) → fallback path; client renders boolean → may take reduced-branch. Causes hydration mismatch warnings. Solution: `mounted` state gate (like announcement-bar.tsx) per sub-component, OR shared `useMountedAndReducedMotion()` hook.
+- cursor.tsx, manifesto.tsx — same pattern, fewer instances.
+
+**Find more catering videos (still possible):**
+- Currently 4 real catering videos active (Wolfgang Puck MP4 + GG Catering Vimeo + Cut and Taste Vimeo + Elegant Affairs MP4). Could try remaining reference sites, but most are blocked or have no videos.
+- Alternative: download blob: URL videos from creativeedgeparties.com / saltblockhospitality.com via headless browser automation, then re-host on own CDN (Backblaze B2 free tier).
+
+### Коммиты (updated)
+
+- `8cc1a32` — Phase 1+2 comprehensive upgrade (32 files, +3131/-1010)
+- `b0e3076` — AGENTS.md §14 session log (+147)
+- `e75a34d` — Phase 3 — P2 patterns + VLM polish (9 files, +281/-15)
+- `979d335` — AGENTS.md §14 Phase 3 log (+48/-8)
+- `394e06c` — Phase 4 — pinned Pillars scroll-stack + Awards strip + hydration fixes (6 files, +499/-83)
+- `f3963b3` — AGENTS.md §14 Phase 4 log (+71/-8)
+- `6b7977e` — Phase 5 — Mux-ready video-events lazy-load (2 files, +254/-40) — **ACCIDENTALLY COMMITTED .env WITH MUX SECRETS**
+- `55da4a8` — security: untrack .env (removed .env from git tracking)
+- `b8d6550` — AGENTS.md §14 Phase 5 log (+129/-11)
+- `baacd67` — Phase 6 — drop Mux, use direct MP4 + real Pexels photos (18 files, +real photos swapped, -Mux infra)
+- `60cb6a5` — AGENTS.md §14 Phase 6 log (+121/-11)
+- `04c5d06` — Phase 7 — REAL catering photos + videos from reference sites (replaces off-topic Pexels images)
+- `7ed48dc` — AGENTS.md §14 Phase 7 log (+147/-1)
+- `36f1e84` — Phase 8 — VLM polish + SnackBox 3D cube + FAQ vote backend + 2 more videos
+
+All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d, 3, 4, 5, 6, 7, 8 — в `/home/z/my-project/worklog.md` (песочница, не в репо).
+
+### TL;DR (обновлено Cycle 28 / Phase 8)
+
+Для **следующего цикла улучшений (Phase 9)**:
+
+1. **Оставшиеся P2 wow-factor patterns** — Hero cursor image-preview, EventsGallery horizontal pinned gallery, VideoEvents cinema mode (after more video URLs).
+2. **Оставшиеся hydration cleanup** — testimonials.tsx (5 sub-components with useReducedMotion in JSX), cursor.tsx + manifesto.tsx (same pattern).
+3. **Find more catering videos** — most reference sites exhausted (4/23 have usable videos). Alternative: download blob: URL videos via headless browser automation, then re-host.
+4. **CRITICAL RULE**: Before inserting ANY image/video, ALWAYS verify content via (a) alt-text/filename on source site BEFORE download, OR (b) VLM critique AFTER download but BEFORE commit. NEVER download random photos by ID without checking what's depicted. **.env file** — verify untracked before every commit. **`file --brief`** check on any new media download.
+5. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции (when not rate-limited).
+
+Целевой уровень — **Awwwards SOTD**. Phase 8 added VLM polish (manifesto palette darkened to pure ink #0E0D0B + AwardsStrip featured first card with varied icons) + SnackBox 3D rotating cube (wow-factor P2) + FAQ vote backend (POST /api/faq-vote + Prisma FaqVote) + 2 more real catering videos (Cut and Taste Vimeo + Elegant Affairs MP4). 4/4 video-events items now have real catering content. До Awwwards-уровня остаётся: Hero cursor image-preview, EventsGallery horizontal pinned gallery, hydration cleanup.
