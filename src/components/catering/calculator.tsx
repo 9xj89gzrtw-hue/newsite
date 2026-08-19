@@ -268,7 +268,7 @@ export function Calculator() {
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 5 }}
-                  className="mt-3 text-xs text-ink/50 italic"
+                  className="mt-3 text-xs text-ink/70 italic"
                 >
                   {current.short}
                 </motion.p>
@@ -314,10 +314,10 @@ export function Calculator() {
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                   
-                  {/* Tick marks */}
+                  {/* Tick marks — evenly spaced visually, labels show actual values */}
                   <div className="absolute inset-x-0 top-1/2 flex justify-between -translate-y-1/2 pointer-events-none">
-                    {[5, ...SLIDER_TICKS].map((tick) => {
-                      const position = ((tick - 5) / (500 - 5)) * 100;
+                    {[5, ...SLIDER_TICKS].map((tick, i, arr) => {
+                      const position = (i / (arr.length - 1)) * 100;
                       const isActive = guests >= tick;
                       return (
                         <div
@@ -325,7 +325,7 @@ export function Calculator() {
                           className="flex flex-col items-center"
                           style={{ position: 'absolute', left: `${position}%`, transform: 'translateX(-50%)' }}
                         >
-                          <span className={`font-mono text-[10px] mb-1.5 ${isActive ? 'text-ink/60' : 'text-ink/70'}`}>
+                          <span className={`font-mono text-[10px] mb-1.5 ${isActive ? 'text-ink/70' : 'text-ink/70'}`}>
                             {tick >= 1000 ? `${tick/1000}k` : tick}
                           </span>
                           <div className={`w-0.5 rounded-full transition-colors ${isActive ? 'h-3 bg-gold/60' : 'h-2 bg-ink/15'}`} />
@@ -377,7 +377,7 @@ export function Calculator() {
                   </button>
                   
                   {/* Per-person indicator */}
-                  <div className="flex items-center gap-2 text-xs text-ink/50">
+                  <div className="flex items-center gap-2 text-xs text-ink/70">
                     <TrendingUp className="size-3.5 text-gold/60" />
                     <span>~{formatRUB(Math.round(result.total / guestsClamped))}/чел</span>
                   </div>
@@ -511,7 +511,7 @@ export function Calculator() {
             <div className="rounded-2xl border border-gold/20 bg-gradient-to-b from-white to-cream p-6 shadow-xl shadow-gold/5 md:p-8 lg:sticky lg:top-28">
               {/* Header */}
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs uppercase tracking-wider text-ink/50 font-medium">
+                <span className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium">
                   Предварительная смета
                 </span>
                 <div className="flex items-center gap-1 text-xs text-sage bg-sage/15 px-2 py-1 rounded-full">
@@ -540,7 +540,7 @@ export function Calculator() {
                 
                 {/* Per-person info */}
                 <motion.div
-                  className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-base text-ink/50"
+                  className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-base text-ink/70"
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
@@ -557,7 +557,7 @@ export function Calculator() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <span className="text-xs text-ink/50">Диапазон:</span>
+                  <span className="text-xs text-ink/70">Диапазон:</span>
                   <span className="font-mono text-xs font-semibold text-gold">
                     {formatRUB(perPersonMin)} – {formatRUB(perPersonMax)} / чел
                   </span>

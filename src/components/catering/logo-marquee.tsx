@@ -37,7 +37,7 @@ export function LogoMarquee() {
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
-          <p className="mb-7 text-center font-mono text-xs uppercase tracking-[0.35em] text-ink/45">
+          <p className="mb-7 text-center font-mono text-xs uppercase tracking-[0.35em] text-ink/70">
             Нам доверяют лидеры рынка
           </p>
         </Reveal>

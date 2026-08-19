@@ -468,7 +468,7 @@ export function EventsGallery() {
                     <span className={`inline-flex items-center justify-center min-w-[20px] h-5 rounded-full px-1.5 text-[10px] font-mono transition-colors duration-300 ${
                       isActive 
                         ? "bg-white/25 text-white" 
-                        : "bg-cream-2 text-ink/50 group-hover:bg-gold/10 group-hover:text-gold"
+                        : "bg-cream-2 text-ink/70 group-hover:bg-gold/10 group-hover:text-gold"
                     }`}>
                       {count}
                     </span>

@@ -486,8 +486,8 @@ function ServiceCard({
               </span>
             </div>
 
-            {/* Title */}
-            <h3 className="mt-4 font-display text-2xl leading-tight text-white sm:text-3xl">
+            {/* Title — aria-hidden (duplicate of front face h3 for a11y) */}
+            <h3 aria-hidden="true" className="mt-4 font-display text-2xl leading-tight text-white sm:text-3xl">
               {service.title}
             </h3>
             <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-cream/60">
@@ -835,7 +835,7 @@ export function Services() {
           {/* Description */}
           <Reveal delay={0.2}>
             <motion.p 
-              className="max-w-xs font-display italic text-ink/55 text-base leading-relaxed"
+              className="max-w-xs font-display italic text-ink/70 text-base leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -915,7 +915,7 @@ export function Services() {
                           className={`flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold transition-colors ${
                             isActive
                               ? "bg-gradient-to-r from-gold to-terracotta text-white"
-                              : "bg-ink/5 text-ink/45 group-hover:bg-gold/15 group-hover:text-gold"
+                              : "bg-ink/5 text-ink/70 group-hover:bg-gold/15 group-hover:text-gold"
                           }`}
                         >
                           {String(i + 1).padStart(2, "0")}
@@ -936,7 +936,7 @@ export function Services() {
                   );
                 })}
               </ol>
-              <div className="mt-4 rounded-lg border border-dashed border-border-line bg-white/50 px-3 py-2 text-[11px] leading-snug text-ink/50">
+              <div className="mt-4 rounded-lg border border-dashed border-border-line bg-white/50 px-3 py-2 text-[11px] leading-snug text-ink/70">
                 Нажмите на карточку, чтобы перевернуть. «Подробнее» откроет полное описание.
               </div>
             </div>
@@ -1052,7 +1052,7 @@ export function Services() {
                   
                   {/* Subtitle */}
                   <motion.p 
-                    className="mt-2 font-mono text-xs uppercase tracking-wider text-ink/50"
+                    className="mt-2 font-mono text-xs uppercase tracking-wider text-ink/70"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.25, duration: 0.5 }}

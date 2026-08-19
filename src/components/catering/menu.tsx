@@ -77,7 +77,7 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Тигровая креветка в цукини",
       chefNote: "Икра летучей рыбы и хрустящий слайс — текстура в каждом укусе.",
       price: "от 5 350 ₽ / чел",
-      image: "/media/concorde-handhelds.jpg",
+      image: "/media/ridgewells-scallops.jpg",
     },
   ],
   banquet: [
@@ -91,7 +91,7 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Дорада с вялеными томатами",
       chefNote: "Средиземноморское море на тарелке — простота и характер.",
       price: "от 6 970 ₽ / чел",
-      image: "/media/concorde-boardroom.webp",
+      image: "/media/ridgewells-gala.jpg",
     },
   ],
   "snack-box": [
@@ -105,7 +105,7 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Брускетта с палтусом",
       chefNote: "Бородинский хлеб и копчёное масло — питерский характер.",
       price: "690 ₽ / шт",
-      image: "/media/menu-snack-box.jpg",
+      image: "/media/concorde-handhelds.jpg",
     },
   ],
   "coffee-break": [
@@ -113,13 +113,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Капучино на 100% арабике",
       chefNote: "Бразильское зерно, температура 67°C — бариста-станция прямо на месте.",
       price: "от 2 200 ₽ / чел",
-      image: "/media/concorde-avo-toast.jpg",
+      image: "/media/menu-coffee-break.jpg",
     },
     {
       name: "Сырная тарелка",
       chefNote: "Бри, пармезан, дор-блю и мёд — медленная пауза между сессиями.",
       price: "от 2 200 ₽ / чел",
-      image: "/media/concorde-avo-toast.jpg",
+      image: "/media/concorde-dessert.jpg",
     },
   ],
   vegetarian: [
@@ -133,7 +133,7 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Веганский шоколадный мусс",
       chefNote: "Бельгийский шоколад и ягоды — десерт без единого продукта животного происхождения.",
       price: "от 3 250 ₽ / чел",
-      image: "/media/ridgewells-veg-mosaic.jpg",
+      image: "/media/concorde-dessert.jpg",
     },
   ],
   bbq: [
@@ -147,7 +147,7 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Шашлык из свиной вырезки",
       chefNote: "Горчица, розмарин и ночь в маринаде — простой и верный рецепт.",
       price: "от 2 200 ₽ / чел",
-      image: "/media/event-06.jpg",
+      image: "/media/event-07.jpg",
     },
   ],
   "office-lunch": [
@@ -155,7 +155,7 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Борщ классический",
       chefNote: "Долго, медленно, по-домашнему — обед, после которого работают лучше.",
       price: "от 950 ₽ / порция",
-      image: "/media/concept-banquet-table.jpg",
+      image: "/media/menu-office-lunch.jpg",
     },
     {
       name: "Котлета по-киевски",
@@ -544,7 +544,7 @@ export function Menu() {
             aria-label="Фильтр по диетическим предпочтениям"
             className="mt-10 flex flex-wrap items-center justify-center gap-2 md:gap-3"
           >
-            <span className="mr-2 font-mono text-[11px] uppercase tracking-[0.25em] text-ink/50">
+            <span className="mr-2 font-mono text-[11px] uppercase tracking-[0.25em] text-ink/70">
               Фильтр:
             </span>
             {DIETARY_CHIPS.map(({ id, label, icon: Icon }) => {
@@ -562,7 +562,7 @@ export function Menu() {
                       : "border-border-line bg-white text-ink/70 hover:border-gold/30 hover:bg-gold/5 hover:text-ink"
                   }`}
                 >
-                  <Icon className={`size-3.5 ${pressed ? "text-gold" : "text-ink/50"}`} />
+                  <Icon className={`size-3.5 ${pressed ? "text-gold" : "text-ink/70"}`} />
                   {label}
                 </Toggle>
               );
@@ -571,7 +571,7 @@ export function Menu() {
               <button
                 type="button"
                 onClick={() => setDietary([])}
-                className="ml-1 rounded-full px-3 py-1.5 text-xs font-medium text-ink/50 underline-offset-4 transition-colors hover:text-bordeaux hover:underline"
+                className="ml-1 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 underline-offset-4 transition-colors hover:text-bordeaux hover:underline"
               >
                 Сбросить
               </button>
@@ -1039,7 +1039,7 @@ function PackageCarousel({
                             </span>
                           )}
                           {d.weight && (
-                            <span className="shrink-0 rounded-full bg-ink/5 px-2 py-0.5 font-mono text-[10px] text-ink/45 tabular-nums">
+                            <span className="shrink-0 rounded-full bg-ink/5 px-2 py-0.5 font-mono text-[10px] text-ink/70 tabular-nums">
                               {d.weight}
                             </span>
                           )}
@@ -1050,7 +1050,7 @@ function PackageCarousel({
                   {/* Empty-state when a dietary filter has 0 matches */}
                   {hasDietary && visibleDishes.length === 0 && (
                     <li
-                      className="rounded-xl border border-dashed border-border-line bg-cream/40 px-4 py-6 text-center text-xs text-ink/50"
+                      className="rounded-xl border border-dashed border-border-line bg-cream/40 px-4 py-6 text-center text-xs text-ink/70"
                       role="status"
                     >
                       В этом пакете нет блюд, удовлетворяющих выбранным фильтрам.

@@ -319,7 +319,7 @@ function ContactCard({
       >
         <Icon
           className={`size-5 transition-colors duration-300 ${
-            highlight || hovered ? "text-gold" : "text-ink/55"
+            highlight || hovered ? "text-gold" : "text-ink/70"
           }`}
         />
         
@@ -461,7 +461,7 @@ function SummaryRow({
 }) {
   return (
     <li className="flex items-center justify-between gap-4 px-4 py-3">
-      <span className="flex items-center gap-2.5 text-sm text-ink/55">
+      <span className="flex items-center gap-2.5 text-sm text-ink/70">
         <Icon className="size-4 text-gold" />
         {label}
       </span>
@@ -508,7 +508,7 @@ function OfficeHours() {
           <span>{OFFICE_HOURS.saturday}</span>
         </li>
         <li className="flex justify-between">
-          <span className="text-ink/45">{OFFICE_HOURS.sunday}</span>
+          <span className="text-ink/70">{OFFICE_HOURS.sunday}</span>
         </li>
       </ul>
       <p className="mt-3 border-t border-border-line pt-3 text-xs text-gold/80 italic">
@@ -905,7 +905,7 @@ export function Contact() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-display text-2xl text-ink">Оставить заявку</h3>
-                    <p className="mt-1 text-sm text-ink/50">
+                    <p className="mt-1 text-sm text-ink/70">
                       Шаг {step + 1} из {STEPS.length} — {STEPS[step]}
                     </p>
                   </div>
@@ -965,7 +965,7 @@ export function Contact() {
                                   <span className="text-sm font-medium text-ink">
                                     {m.label}
                                   </span>
-                                  <span className="font-mono text-[11px] text-ink/50">
+                                  <span className="font-mono text-[11px] text-ink/70">
                                     от {m.perGuest.toLocaleString("ru-RU")} ₽
                                     {m.priceUnit ?? "/чел"}
                                   </span>
@@ -1051,7 +1051,7 @@ export function Contact() {
                               onChange={(e) => set("date", e.target.value)}
                               className="mt-2 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none transition-all focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 focus:shadow-[0_0_20px_rgba(196,149,106,0.15)]"
                             />
-                            <p className="mt-2 text-xs text-ink/45">
+                            <p className="mt-2 text-xs text-ink/70">
                               Необязательно — можно уточнить в звонке.
                             </p>
                           </div>
@@ -1240,7 +1240,7 @@ export function Contact() {
                 </div>
 
                 {/* Security notice */}
-                <p className="mt-3 flex items-center justify-center gap-1.5 font-mono text-xs text-ink/45">
+                <p className="mt-3 flex items-center justify-center gap-1.5 font-mono text-xs text-ink/70">
                   <ShieldCheck className="size-3.5 text-sage" />
                   Данные защищены · 152-ФЗ
                 </p>

@@ -227,10 +227,14 @@ export function SiteHeader() {
           <motion.div
             className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-br from-cream to-parchment px-6 py-6 lg:hidden"
             id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Меню навигции"
             initial={{ opacity: 0, y: "-100%" }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "-100%" }}
             transition={{ duration: 0.5, ease: [0.83, 0, 0.17, 1] }}
+            onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
           >
             <div className="flex items-center justify-between">
               <span className="font-display text-2xl text-ink">
@@ -407,7 +411,7 @@ function MegaMenu({ item }: { item: NavItem }) {
                           <span className="text-sm font-medium text-ink/80 group-hover:text-gold">
                             {m.label}
                           </span>
-                          <span className="font-mono text-[11px] text-ink/45">
+                          <span className="font-mono text-[11px] text-ink/70">
                             от {m.perGuest.toLocaleString("ru-RU")} ₽
                             {m.priceUnit ?? "/чел"}
                           </span>
@@ -462,7 +466,7 @@ function MegaMenu({ item }: { item: NavItem }) {
                           <span className="text-sm font-medium text-ink/80 group-hover:text-gold">
                             {s.title}
                           </span>
-                          <span className="text-[11px] text-ink/45">{s.short}</span>
+                          <span className="text-[11px] text-ink/70">{s.short}</span>
                         </button>
                       </li>
                     ))}

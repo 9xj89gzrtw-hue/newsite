@@ -30,14 +30,14 @@ const TESTIMONIALS = [
     event: "Корпоративные мероприятия",
     eventType: "Корпоратив",
     period: "2024",
-    eventDate: "Декабрь 2014",
+    eventDate: "Декабрь 2024",
     guests: "100–350 гостей",
     location: "СПб, Центральный район",
     image: "/media/review-1.jpg",
     rating: 5,
     verified: true,
     quote:
-      "Компания Interfood Catering обеспечила кейтеринговое сопровождение наших корпоративных мероприятий на протяжении трёх лет. Безупречное качество блюд, профессиональный сервис и пунктуальность — именно то, что требуется для имиджевых событий.",
+      "Компания Interfood Catering обеспечила кейтеринговое сопровождение наших корпоративных мероприятий в прошедшем году. Безупречное качество блюд, профессиональный сервис и пунктуальность — именно то, что требуется для имиджевых событий.",
     author: "Руководство ООО «Спортинг»",
     avatar: null,
     icon: Users,
@@ -105,7 +105,7 @@ const TESTIMONIALS = [
  */
 const TRUST_CLIENTS = [
   "Сбербанк", "Газпром нефть", "Ленэнерго", "Bayer",
-  "Porsche Russia", "L'Oréal", "Sanofi", "Nestlé",
+  "L'Oréal", "Sanofi", "Nestlé",
   "Danone", "Bosch", "Siemens", "IKEA",
 ];
 
@@ -340,13 +340,13 @@ function TestimonialCard({
         <div className="mt-auto border-t border-border-line pt-4">
           <div className="flex items-center justify-between mb-2">
             <EventTypeBadge type={testimonial.eventType} />
-            <div className="flex items-center gap-1.5 text-xs text-ink/50">
+            <div className="flex items-center gap-1.5 text-xs text-ink/70">
               <Calendar className="size-3" />
               <time>{testimonial.eventDate}</time>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/50">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink/70">
             <span>{testimonial.period}</span>
             <span className="inline-block size-1 rounded-full bg-ink/20" />
             <span>{testimonial.guests}</span>
@@ -519,7 +519,7 @@ export function Testimonials() {
                 4.9
               </span>
               <span className="h-4 w-px bg-border-line" />
-              <span className="text-sm text-ink/50">127+ отзывов</span>
+              <span className="text-sm text-ink/70">127+ отзывов</span>
               <span className="inline-flex items-center gap-1 rounded-full bg-sage/15 px-2 py-0.5 text-[10px] font-medium text-sage">
                 <CheckCircle2 className="size-3" />
                 Реальные клиенты

@@ -288,24 +288,24 @@ export function SiteFooter() {
 
         {/* Legal info — 152-ФЗ + ЗОПП */}
         <div className="mt-8 grid gap-6 border-t border-border-line pt-8 md:grid-cols-2">
-          <div className="space-y-1.5 text-xs text-ink/50">
+          <div className="space-y-1.5 text-xs text-ink/70">
             <p className="text-ink/80 font-medium">
               {LEGAL_INFO.legalForm} {LEGAL_INFO.legalName}
             </p>
-            <p>ИНН: {LEGAL_INFO.inn} · {LEGAL_INFO.ogrn}</p>
+            <p>ИНН: {LEGAL_INFO.inn} · ОГРНИП: {LEGAL_INFO.ogrn}</p>
             <p>{LEGAL_INFO.legalAddress}</p>
             <p>{CONTACTS.city} · {SITE_CONFIG.currency}</p>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs md:justify-end">
             <a
               href="/privacy"
-              className="min-h-[44px] flex items-center text-ink/50 hover:text-gold transition-colors"
+              className="min-h-[44px] flex items-center text-ink/70 hover:text-gold transition-colors"
             >
               Политика конфиденциальности
             </a>
             <a
               href="/offer"
-              className="min-h-[44px] flex items-center text-ink/50 hover:text-gold transition-colors"
+              className="min-h-[44px] flex items-center text-ink/70 hover:text-gold transition-colors"
             >
               Публичная оферта
             </a>
@@ -313,7 +313,7 @@ export function SiteFooter() {
         </div>
 
         {/* Copyright bar */}
-        <div className="mt-6 flex flex-col gap-3 text-xs text-ink/50 md:flex-row md:justify-between pb-8">
+        <div className="mt-6 flex flex-col gap-3 text-xs text-ink/70 md:flex-row md:justify-between pb-8">
           <p>© {year ?? 2025} {SITE_CONFIG.brandName} · {CONTACTS.city}</p>
           <p>152-ФЗ · ЗОПП · Данные хранятся на территории РФ</p>
         </div>

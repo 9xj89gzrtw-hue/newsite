@@ -151,7 +151,7 @@ function StatCard({
       </div>
       
       {/* Label */}
-      <div className="mt-2 font-mono text-[11px] uppercase tracking-wider text-ink/50 font-medium" style={{ transform: "translateZ(20px)" }}>
+      <div className="mt-2 font-mono text-[11px] uppercase tracking-wider text-ink/70 font-medium" style={{ transform: "translateZ(20px)" }}>
         {stat.label}
       </div>
     </motion.div>
@@ -292,7 +292,7 @@ export function About() {
                   </motion.div>
                   <div>
                     <div className="font-display text-xl font-semibold text-ink">С 2014</div>
-                    <div className="font-mono text-xs text-ink/50 uppercase tracking-wider">года</div>
+                    <div className="font-mono text-xs text-ink/70 uppercase tracking-wider">года</div>
                   </div>
                 </div>
               </motion.div>

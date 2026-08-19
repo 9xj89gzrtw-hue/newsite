@@ -121,7 +121,7 @@ export function InstagramVideo() {
               </a>
             </Reveal>
             <Reveal delay={0.4}>
-              <p className="mt-6 font-mono text-xs text-ink/45">
+              <p className="mt-6 font-mono text-xs text-ink/70">
                 Или напишите нам:{" "}
                 <a href={CONTACTS.whatsappHref} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-terracotta underline underline-offset-2 transition-colors">
                   WhatsApp {CONTACTS.whatsapp}

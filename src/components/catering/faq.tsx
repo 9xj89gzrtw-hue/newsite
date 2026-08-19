@@ -184,7 +184,7 @@ function WasHelpful({ question }: { question: string }) {
   };
 
   return (
-    <div className="flex items-center gap-3 text-xs text-ink/50">
+    <div className="flex items-center gap-3 text-xs text-ink/70">
       <span>Помог ответ?</span>
       <button
         type="button"
@@ -314,7 +314,7 @@ export function Faq() {
                   type="button"
                   onClick={() => setQuery("")}
                   aria-label="Очистить поиск"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex size-11 items-center justify-center rounded-full text-ink/50 hover:bg-ink/5 hover:text-ink transition-colors min-h-[44px] min-w-[44px]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex size-11 items-center justify-center rounded-full text-ink/70 hover:bg-ink/5 hover:text-ink transition-colors min-h-[44px] min-w-[44px]"
                 >
                   <X className="size-4" />
                 </button>

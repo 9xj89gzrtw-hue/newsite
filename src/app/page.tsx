@@ -28,7 +28,7 @@ export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
-    <main id="main-content" role="main" className="flex min-h-screen flex-col bg-cream">
+    <main id="main-content" role="main" tabIndex={-1} className="flex min-h-screen flex-col bg-cream outline-none">
       <SiteHeader />
       <Hero />
       <MarqueeBand />

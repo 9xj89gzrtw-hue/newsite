@@ -57,7 +57,7 @@ const VIDEO_CATALOG: VideoItem[] = [
     // Real catering video from Wolfgang Puck Catering (HubSpot CDN, CORS-enabled).
     // "Power Of Food" hero loop, silent, 16MB MP4. Same URL as MEDIA.hero.videoSrc
     // — reused here for the wedding reception context.
-    videoSrc: "https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4",
+    videoSrc: undefined,
     // Phase 10 chapters — approximate times for the 16MB loop.
     // (Times are estimates since the video is silent — actual chapters may
     //  need adjustment once video is played. Click chapter to seek.)
@@ -77,7 +77,7 @@ const VIDEO_CATALOG: VideoItem[] = [
     // iframe-based — uses YouTubeEmbed-style pattern but for Vimeo.
     // The vimeoEmbedId is read by YouTubeEmbed component (which renders
     // Vimeo iframe when the URL pattern matches).
-    youtubeEmbedId: "1049137317", // Vimeo video ID — YouTubeEmbed auto-detects Vimeo
+    youtubeEmbedId: undefined, // Vimeo video ID — YouTubeEmbed auto-detects Vimeo
   },
   {
     title: "Кофе-брейк на конференции",
@@ -86,7 +86,7 @@ const VIDEO_CATALOG: VideoItem[] = [
     poster: "/media/concorde-avo-toast.jpg",
     // Real catering video from Cut and Taste Las Vegas (Vimeo embed).
     // iframe-based — Vimeo video ID 692388530.
-    youtubeEmbedId: "692388530", // Vimeo video ID — YouTubeEmbed auto-detects Vimeo
+    youtubeEmbedId: undefined, // Vimeo video ID — YouTubeEmbed auto-detects Vimeo
   },
   {
     title: "Фуршет на банкете",
@@ -96,7 +96,7 @@ const VIDEO_CATALOG: VideoItem[] = [
     // Real catering video from Elegant Affairs NY (direct MP4 URL).
     // WordPress wp-content uploads — 533KB MP4, no CORS but <video> element
     // works cross-origin without CORS for video playback (not canvas access).
-    videoSrc: "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/landscape-1.mp4",
+    videoSrc: undefined,
     // Phase 10 chapters — short clip (~8s based on file size 533KB at typical bitrate).
     chapters: [
       { label: "Открытие", time: 0 },

@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, Home, UtensilsCrossed } from "lucide-react";
 import { CONTACTS } from "@/lib/config";
+
+export const metadata: Metadata = {
+  title: "Страница не найдена",
+  description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с Interfood Catering.",
+  robots: { index: false, follow: true },
+};
 
 export default function NotFound() {
   return (
@@ -9,13 +16,13 @@ export default function NotFound() {
         <span className="font-mono text-xs uppercase tracking-[0.3em] text-bordeaux">
           Ошибка 404
         </span>
-        <h1 className="mt-4 font-display text-6xl text-ink md:text-7xl">
+        <p className="mt-4 font-display text-7xl font-bold text-ink/30 md:text-8xl" aria-hidden="true">
           404
-        </h1>
-        <h2 className="mt-4 font-display text-2xl text-ink md:text-3xl">
+        </p>
+        <h1 className="mt-2 font-display text-2xl text-ink md:text-3xl">
           Страница не найдена
-        </h2>
-        <p className="mt-4 text-base text-ink/60">
+        </h1>
+        <p className="mt-4 text-base text-ink/70">
           Возможно, страница была перемещена или удалена. Вернитесь на главную
           или свяжитесь с нами — поможем организовать ваше мероприятие.
         </p>

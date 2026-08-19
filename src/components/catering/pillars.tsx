@@ -143,7 +143,7 @@ function CountUp({
       >
         {formatted}
       </motion.span>
-      <span className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/55">
+      <span className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/70">
         {label}
       </span>
     </div>

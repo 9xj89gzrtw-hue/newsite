@@ -326,7 +326,7 @@ export function SnackBoxDelivery() {
               {/* Footer: running total + reset + checkout CTA */}
               <div className="border-t border-border-line bg-parchment/50 px-6 py-4">
                 <div className="flex items-center justify-between gap-3">
-                  <div className="text-xs text-ink/50">
+                  <div className="text-xs text-ink/70">
                     * Мин. заказ — от 10 порций. Финальная стоимость зависит от объёма.
                   </div>
                   <div className="flex items-center gap-3">
@@ -337,7 +337,7 @@ export function SnackBoxDelivery() {
                           setQty({});
                           setOpenRow(null);
                         }}
-                        className="rounded-full px-3 py-2.5 text-xs font-medium text-ink/50 transition-colors hover:text-bordeaux hover:underline min-h-[44px]"
+                        className="rounded-full px-3 py-2.5 text-xs font-medium text-ink/70 transition-colors hover:text-bordeaux hover:underline min-h-[44px]"
                       >
                         Сбросить
                       </button>

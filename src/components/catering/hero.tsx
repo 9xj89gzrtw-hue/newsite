@@ -805,7 +805,7 @@ export function Hero() {
                 <span className={`inline-block size-2 rounded-full ${stat.color}`} />
                 <AnimatedCounter target={stat.value} suffix={stat.suffix} delay={2.3 + i * 0.15} />
               </span>
-              <span className="text-xs uppercase tracking-wider text-ink/50 font-medium">
+              <span className="text-xs uppercase tracking-wider text-ink/70 font-medium">
                 {stat.label}
               </span>
             </motion.div>
