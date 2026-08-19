@@ -592,8 +592,8 @@ export function Testimonials() {
             </button>
           </div>
 
-          {/* Dot indicators */}
-          <div className="mt-8 flex items-center justify-center gap-2.5">
+          {/* Dot indicators — 44px tappable wrapper, inner visual dot */}
+          <div className="mt-8 flex items-center justify-center gap-1.5">
             {TESTIMONIALS.map((t, d) => (
               <button
                 key={t.id}
@@ -601,12 +601,14 @@ export function Testimonials() {
                 onClick={() => setActive(d)}
                 aria-label={`Перейти к отзыву ${d + 1}`}
                 aria-current={d === active}
-                className={`h-2 rounded-full transition-all duration-300 ${
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center px-1"
+              >
+                <span className={`h-2 rounded-full transition-all duration-300 ${
                   d === active
                     ? "w-8 bg-gradient-to-r from-gold to-terracotta"
                     : "w-2 bg-ink/20 hover:bg-ink/35"
-                }`}
-              />
+                }`} />
+              </button>
             ))}
           </div>
         </div>

@@ -20,9 +20,11 @@ export function InstagramVideo() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
-  // Load Instagram embed script (lazy)
+  // Load Instagram embed script ONLY after cookie consent (152-ФЗ)
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const consent = localStorage.getItem("catering-cookie-consent");
+    if (consent !== "accepted") return; // Don't load Instagram tracker until consent
     const existing = document.getElementById("instagram-embed-js");
     if (!existing) {
       const s = document.createElement("script");

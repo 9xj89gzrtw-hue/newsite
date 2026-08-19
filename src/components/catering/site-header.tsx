@@ -65,6 +65,21 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   // Default theme = transparent (over hero).
   const [theme, setTheme] = useState<HeaderTheme>("transparent");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Focus management for mobile menu dialog
+  const prevOpen = useRef(false);
+  useEffect(() => {
+    if (open && !prevOpen.current) {
+      // Focus close button when menu opens
+      setTimeout(() => closeBtnRef.current?.focus(), 100);
+    } else if (!open && prevOpen.current) {
+      // Restore focus to trigger when menu closes
+      triggerRef.current?.focus();
+    }
+    prevOpen.current = open;
+  }, [open]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -209,6 +224,7 @@ export function SiteHeader() {
               <span className="sm:hidden">Расчёт</span>
             </a>
             <button
+              ref={triggerRef}
               onClick={() => setOpen(true)}
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors duration-300 lg:hidden ${themeClasses.text}`}
               aria-label="Открыть меню"
@@ -229,7 +245,7 @@ export function SiteHeader() {
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
-            aria-label="Меню навигции"
+            aria-label="Меню навигации"
             initial={{ opacity: 0, y: "-100%" }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "-100%" }}
@@ -241,6 +257,7 @@ export function SiteHeader() {
                 Interfood<span className="text-gold">.</span>
               </span>
               <button
+                ref={closeBtnRef}
                 onClick={() => setOpen(false)}
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 text-ink"
                 aria-label="Закрыть меню"

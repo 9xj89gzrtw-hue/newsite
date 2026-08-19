@@ -287,7 +287,7 @@ function MobileStep({
         <span className="font-mono text-xs uppercase tracking-wider text-ink/70">
           {step.num}
         </span>
-        <h3 className="font-display text-xl text-ink">{step.title}</h3>
+        <h3 aria-hidden="true" className="font-display text-xl text-ink">{step.title}</h3>
       </div>
 
       <p className="mt-2 text-sm text-ink/60">{step.desc}</p>

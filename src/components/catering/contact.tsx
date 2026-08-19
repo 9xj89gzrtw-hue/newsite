@@ -196,6 +196,8 @@ function FloatingInput({
           placeholder={placeholder}
           autoComplete={autoComplete}
           aria-invalid={error ? "true" : "false"}
+          aria-describedby={error ? `error-${id}` : undefined}
+          aria-label={placeholder}
           className={`w-full rounded-xl px-${Icon ? '11' : '4'} py-3.5 ${showValidCheck ? 'pr-12' : 'pr-4'} text-ink outline-none transition-all placeholder:text-transparent ${
             Icon ? 'pl-11' : ''
           }`}
@@ -233,13 +235,14 @@ function FloatingInput({
       <AnimatePresence>
         {error && (
           <motion.p
+            id={`error-${id}`}
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
             className="mt-1.5 flex items-center gap-1.5 text-xs text-bordeaux"
           >
             <AlertCircle className="size-3" />
-            Проверьте ввод
+            Проверьте поле «{placeholder}»
           </motion.p>
         )}
       </AnimatePresence>
@@ -276,6 +279,7 @@ function ContactCard({
 
   const content = (
     <motion.div
+      tabIndex={-1}
       className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border bg-white p-4 transition-all duration-300"
       style={{
         borderColor: highlight && hovered ? "rgba(196,149,106,0.6)" : undefined,
