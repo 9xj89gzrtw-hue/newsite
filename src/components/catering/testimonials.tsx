@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion, useInView, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
+import { useMounted } from "@/hooks/use-mounted";
 import {
   Quote,
   Building2,
@@ -145,7 +146,13 @@ function AnimatedStarRating({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
+  const mounted = useMounted();
   const reduceMotion = useReducedMotion();
+  // Gate reduceMotion with mounted to prevent SSR/CSR hydration mismatch
+  // (useReducedMotion returns null on SSR → falsy → fallback path on server;
+  // on client after mount → boolean. Without the gate, framer-motion `initial`
+  // prop would differ between server and client render → hydration warning.
+  const effectiveReduce = mounted && (reduceMotion ?? false);
 
   const sizeClasses = {
     sm: "size-4",
@@ -158,17 +165,17 @@ function AnimatedStarRating({
       {Array.from({ length: 5 }).map((_, i) => (
         <motion.div
           key={i}
-          initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0 }}
+          initial={effectiveReduce ? { opacity: 1 } : { opacity: 0, scale: 0 }}
           animate={
             isInView
               ? { opacity: 1, scale: 1 }
-              : reduceMotion
+              : effectiveReduce
                 ? { opacity: 1 }
                 : { opacity: 0, scale: 0 }
           }
           transition={{
-            duration: reduceMotion ? 0.001 : 0.4,
-            delay: reduceMotion ? 0 : i * 0.1,
+            duration: effectiveReduce ? 0.001 : 0.4,
+            delay: effectiveReduce ? 0 : i * 0.1,
             ease: [0.22, 1, 0.36, 1],
             type: "spring",
             stiffness: 300,
@@ -275,22 +282,24 @@ function TestimonialCard({
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
   const Icon = testimonial.icon;
+  const mounted = useMounted();
   const reduceMotion = useReducedMotion();
+  const effectiveReduce = mounted && (reduceMotion ?? false);
 
   return (
     <motion.div
       ref={ref}
-      initial={reduceMotion ? {} : { opacity: 0, y: 40 }}
+      initial={effectiveReduce ? {} : { opacity: 0, y: 40 }}
       animate={
         isInView
           ? { opacity: 1, y: 0 }
-          : reduceMotion
+          : effectiveReduce
             ? {}
             : { opacity: 0, y: 40 }
       }
       transition={{
-        duration: reduceMotion ? 0.001 : 0.7,
-        delay: reduceMotion ? 0 : index * 0.15,
+        duration: effectiveReduce ? 0.001 : 0.7,
+        delay: effectiveReduce ? 0 : index * 0.15,
         ease: [0.22, 1, 0.36, 1],
       }}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-border-line bg-white shadow-lg shadow-ink/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-ink/10"
@@ -395,22 +404,24 @@ function VideoTestimonialCard({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const mounted = useMounted();
   const reduceMotion = useReducedMotion();
+  const effectiveReduce = mounted && (reduceMotion ?? false);
 
   return (
     <motion.div
       ref={ref}
-      initial={reduceMotion ? {} : { opacity: 0, scale: 0.95 }}
+      initial={effectiveReduce ? {} : { opacity: 0, scale: 0.95 }}
       animate={
         isInView
           ? { opacity: 1, scale: 1 }
-          : reduceMotion
+          : effectiveReduce
             ? {}
             : { opacity: 0, scale: 0.95 }
       }
       transition={{
-        duration: reduceMotion ? 0.001 : 0.6,
-        delay: reduceMotion ? 0 : index * 0.2,
+        duration: effectiveReduce ? 0.001 : 0.6,
+        delay: effectiveReduce ? 0 : index * 0.2,
         ease: [0.22, 1, 0.36, 1],
       }}
       className="group relative aspect-video cursor-pointer overflow-hidden rounded-2xl border border-border-line bg-ink/5"
@@ -474,12 +485,17 @@ function VideoTestimonialCard({
 function TestimonialMarquee() {
   const [isPaused, setIsPaused] = useState(false);
   const reduceMotion = useReducedMotion();
+  const mounted = useMounted();
   const marqueeRef = useRef<HTMLDivElement>(null);
 
   // Duplicate content for seamless loop
   const quotes = [...TESTIMONIALS, ...TESTIMONIALS];
 
-  if (reduceMotion) {
+  // Gate reduceMotion with mounted to prevent SSR/CSR hydration mismatch.
+  // On SSR + initial client render, useReducedMotion() returns null → falsy →
+  // falls through to the animated marquee path (consistent on both sides).
+  // After mount, prefers-reduced-motion users get the static fallback instead.
+  if (mounted && reduceMotion) {
     return (
       <div className="overflow-hidden rounded-2xl border border-border-line bg-white p-6">
         <div className="grid gap-4 md:grid-cols-2">
@@ -562,7 +578,9 @@ export function Testimonials() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const count = TESTIMONIALS.length;
+  const mounted = useMounted();
   const reduceMotion = useReducedMotion();
+  const effectiveReduce = mounted && (reduceMotion ?? false);
 
   const go = (dir: 1 | -1) => setActive((p) => (p + dir + count) % count);
 
@@ -656,9 +674,9 @@ export function Testimonials() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={TESTIMONIALS[active].id}
-                initial={reduceMotion ? {} : { opacity: 0, y: 24 }}
-                animate={reduceMotion ? {} : { opacity: 1, y: 0 }}
-                exit={reduceMotion ? {} : { opacity: 0, y: -24 }}
+                initial={effectiveReduce ? {} : { opacity: 0, y: 24 }}
+                animate={effectiveReduce ? {} : { opacity: 1, y: 0 }}
+                exit={effectiveReduce ? {} : { opacity: 0, y: -24 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
                 <TestimonialCard testimonial={TESTIMONIALS[active]} index={0} />
@@ -750,12 +768,12 @@ export function Testimonials() {
               {TRUST_CLIENTS.map((client, i) => (
                 <motion.div
                   key={client}
-                  initial={reduceMotion ? {} : { opacity: 0, y: 20 }}
-                  whileInView={reduceMotion ? {} : { opacity: 1, y: 0 }}
+                  initial={effectiveReduce ? {} : { opacity: 0, y: 20 }}
+                  whileInView={effectiveReduce ? {} : { opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{
-                    duration: reduceMotion ? 0.001 : 0.5,
-                    delay: reduceMotion ? 0 : i * 0.05,
+                    duration: effectiveReduce ? 0.001 : 0.5,
+                    delay: effectiveReduce ? 0 : i * 0.05,
                     ease: [0.22, 1, 0.36, 1],
                   }}
                   className="group flex items-center justify-center rounded-xl border border-border-line bg-white px-4 py-5 transition-all duration-300 hover:border-gold/30 hover:shadow-lg hover:-translate-y-1"

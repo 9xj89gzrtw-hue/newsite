@@ -263,12 +263,15 @@ function PremiumCTAButton({
   href,
   variant = "primary",
   cursorLabel,
+  cursorImage,
   className = "",
 }: {
   children: React.ReactNode;
   href: string;
   variant?: "primary" | "secondary" | "tertiary";
   cursorLabel?: string;
+  // Phase 9: optional image URL shown in cursor ring on hover (wow-factor)
+  cursorImage?: string;
   className?: string;
 }) {
   const [ripples, setRipples] = useState<{ x: number; y: number; id: number }[]>([]);
@@ -303,6 +306,7 @@ function PremiumCTAButton({
         ref={buttonRef}
         href={href}
         data-cursor={cursorLabel}
+        data-cursor-image={cursorImage || undefined}
         onClick={handleClick}
         className={`${baseStyles} ${variants[variant]} ${className}`}
       >
@@ -779,6 +783,9 @@ export function Hero() {
             href="#menu" 
             variant="secondary"
             cursorLabel="меню"
+            // Phase 9: show real catering dish photo on cursor hover — wow-factor.
+            // Uses concorde-boardroom (BoardroomTableTop) which is a banquet table.
+            cursorImage="/media/concorde-boardroom.webp"
           >
             <UtensilsCrossed className="size-4 transition-transform group-hover:rotate-45" />
             Смотреть меню

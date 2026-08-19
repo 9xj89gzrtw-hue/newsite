@@ -284,7 +284,8 @@ function VideoCard({
             >
               {videoSrc ? (
                 // Phase 6 — direct external MP4 URL via native <video>.
-                <DirectVideoEmbed src={videoSrc} poster={poster} title={title} />
+                // Phase 9: cinema mode with letterbox + grain overlay on play.
+                <CinemaVideoEmbed src={videoSrc} poster={poster} title={title} />
               ) : muxPlaybackId ? (
                 // Phase 5 legacy — Mux playback ID (deprecated, renders stub).
                 <MuxVideoEmbed playbackId={muxPlaybackId} title={title} />
@@ -406,5 +407,78 @@ function YouTubeEmbed({ embedId, title }: { embedId: string; title: string }) {
       allowFullScreen
       className="h-full w-full"
     />
+  );
+}
+
+/**
+ * CinemaVideoEmbed — Phase 9 cinema mode wrapper.
+ *
+ * Wraps DirectVideoEmbed with:
+ * 1. 16:9 letterbox bars (top + bottom, scale-in from 0% to 100% on play)
+ * 2. Subtle grain overlay (SVG feTurbulence via .grain class from globals.css)
+ * 3. "CINEMA" badge top-right corner with pulsing dot
+ *
+ * The letterbox bars create cinematic black bars on top + bottom of the
+ * video player, suggesting a premium film presentation. They animate in
+ * via scaleY (transform/opacity only — RULES §5 compliant).
+ *
+ * The grain overlay adds subtle texture for film-like quality. Uses the
+ * .grain class from globals.css which is a fixed SVG feTurbulence filter
+ * with mix-blend-mode: overlay, opacity 0.05.
+ *
+ * Reduced-motion: letterbox bars are static (no scale animation), grain
+ * is disabled (replaced with subtle border-glow).
+ */
+function CinemaVideoEmbed({
+  src,
+  poster,
+  title,
+}: {
+  src: string;
+  poster?: string;
+  title: string;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <div className="relative h-full w-full bg-ink">
+      {/* Cinema letterbox bars — top + bottom, scale-in on play */}
+      <motion.div
+        className="absolute top-0 left-0 right-0 z-10 bg-ink"
+        initial={prefersReducedMotion ? { scaleY: 1 } : { scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{ height: "8%", transformOrigin: "top" }}
+        aria-hidden="true"
+      />
+      <motion.div
+        className="absolute bottom-0 left-0 right-0 z-10 bg-ink"
+        initial={prefersReducedMotion ? { scaleY: 1 } : { scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{ height: "8%", transformOrigin: "bottom" }}
+        aria-hidden="true"
+      />
+      {/* The actual video player */}
+      <DirectVideoEmbed src={src} poster={poster} title={title} />
+      {/* Grain overlay (cinema film texture) — disabled for reduced-motion */}
+      {!prefersReducedMotion && (
+        <div
+          className="grain pointer-events-none absolute inset-0 z-10 opacity-[0.07] mix-blend-overlay"
+          aria-hidden="true"
+        />
+      )}
+      {/* CINEMA badge — top-right corner with pulsing dot */}
+      <div className="absolute right-3 top-3 z-20 inline-flex items-center gap-1.5 rounded-full bg-ink/70 px-3 py-1.5 backdrop-blur-md">
+        <motion.span
+          className="size-1.5 rounded-full bg-gold"
+          animate={{ opacity: [1, 0.4, 1] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+          aria-hidden="true"
+        />
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-cream/80">
+          Cinema
+        </span>
+      </div>
+    </div>
   );
 }

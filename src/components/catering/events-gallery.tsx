@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion, use
 import { X, ChevronLeft, ChevronRight, Keyboard, MousePointer } from "lucide-react";
 import { Reveal } from "./reveal";
 import { MEDIA, EVENT_CATEGORIES } from "@/lib/media";
+import { useMounted } from "@/hooks/use-mounted";
 
 type Category = (typeof EVENT_CATEGORIES)[number];
 
@@ -541,6 +542,12 @@ export function EventsGallery() {
         )}
       </div>
 
+      {/* Phase 9 P2 wow-factor: Pinned horizontal-scroll gallery.
+          Only on lg+ desktop and non-reduced-motion. Mobile/reduced-motion
+          users see the masonry grid above. */}
+
+      <Phase9PinnedHorizontalGallery items={visibleItems} prefersReducedMotion={prefersReducedMotion ?? false} />
+
       {/* Enhanced Lightbox — professional gallery experience */}
       <AnimatePresence>
         {open !== null && (
@@ -671,5 +678,119 @@ export function EventsGallery() {
         )}
       </AnimatePresence>
     </section>
+  );
+}
+
+/**
+ * Phase9PinnedHorizontalGallery — pinned horizontal-scroll gallery band.
+ *
+ * Phase 9 P2 wow-factor pattern (AGENTS.md §14 backlog).
+ * 300vh outer wrapper holds a sticky 100vh inner container. As the user
+ * scrolls vertically through the section, the gallery translates left
+ * horizontally via useScroll + useTransform (x: ['0%', '-70%']).
+ *
+ * Only on lg+ desktop AND non-reduced-motion. Mobile/reduced-motion users
+ * see the existing masonry grid (above) — horizontal scroll is annoying
+ * on touch and triggers vestibular issues for reduced-motion users.
+ *
+ * `mounted` gate prevents SSR/CSR hydration mismatch from useReducedMotion
+ * null→boolean transition.
+ */
+function Phase9PinnedHorizontalGallery({
+  items,
+  prefersReducedMotion,
+}: {
+  items: typeof MEDIA.events;
+  prefersReducedMotion: boolean;
+}) {
+  const mounted = useMounted();
+  const ref = useRef<HTMLDivElement>(null);
+
+  // useScroll with target ref + offset for section-aware scroll progress.
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end end"],
+  });
+
+  // Translate the inner horizontal track left as the user scrolls.
+  // -70% means the track moves left by 70% of its width (10 cards × ~7% each).
+  // Adjust based on items.length if needed (more items = more translation).
+  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-70%"]);
+
+  // Progress bar at the bottom (visual indicator)
+  const progressScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
+  // Show only on lg+ desktop and non-reduced-motion and after mount.
+  // SSR + initial client render: hide (avoids hydration mismatch).
+  const shouldShow = mounted && !prefersReducedMotion && items.length > 3;
+
+  if (!shouldShow) return null;
+
+  return (
+    <div ref={ref} className="relative mt-16 h-[300vh] hidden lg:block">
+      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden bg-ink py-16">
+        {/* Eyebrow + caption */}
+        <div className="mx-auto mb-6 max-w-7xl px-5 md:px-8">
+          <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
+            <MousePointer className="size-3" />
+            Прокрутите вниз — события движутся вбок
+          </span>
+          <h3
+            className="mt-3 font-display text-cream"
+            style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)", lineHeight: 1.1 }}
+          >
+            Горизонтальная лента{" "}
+            <span className="gradient-text italic">событий</span>
+          </h3>
+        </div>
+
+        {/* Horizontal track — translates left as user scrolls */}
+        <motion.div
+          style={{ x }}
+          className="flex gap-6 px-[5vw] will-change-transform"
+        >
+          {items.map((item, i) => (
+            <div
+              key={`pinned-${item.src}-${i}`}
+              className="relative aspect-[4/5] w-[55vw] shrink-0 overflow-hidden rounded-3xl border border-cream/10 shadow-2xl shadow-ink/50 md:w-[35vw] lg:w-[25vw] xl:w-[20vw]"
+            >
+              <Image
+                src={item.src}
+                alt={item.caption}
+                fill
+                sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, 35vw"
+                className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-105"
+                loading="lazy"
+              />
+              {/* Dark gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" aria-hidden="true" />
+              {/* Caption */}
+              <div className="absolute bottom-0 left-0 right-0 p-5 text-cream">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-gold/80">
+                  {String(i + 1).padStart(2, "0")} · {item.category}
+                </span>
+                <p className="mt-1 font-display text-lg leading-tight">
+                  {item.caption}
+                </p>
+              </div>
+              {/* Card number badge */}
+              <span className="absolute right-4 top-4 z-10 rounded-full bg-ink/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-cream backdrop-blur-md">
+                {String(i + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
+              </span>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Progress bar at bottom */}
+        <div className="mx-auto mt-8 max-w-7xl px-5 md:px-8">
+          <div className="h-0.5 w-full bg-cream/15">
+            <motion.div
+              className="h-full origin-left bg-gradient-to-r from-gold to-terracotta"
+              style={{ scaleX: progressScaleX }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
