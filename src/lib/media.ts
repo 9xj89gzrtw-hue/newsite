@@ -31,7 +31,7 @@ export const MEDIA = {
     "coffee-break": "/media/menu-coffee-break.jpg",
     "snack-box": "/media/menu-snack-box.jpg",
     vegetarian: "/media/menu-vegetarian.jpg",
-    bbq: "/media/menu-bbq.jpg",
+    bbq: "/media/event-06.jpg",
     "office-lunch": "/media/menu-office-lunch.jpg",
   } as Record<string, string>,
   // Real event photos from interfood-catering.ru gallery
@@ -164,15 +164,24 @@ export const SNACK_BOX_ITEMS = [
 ];
 
 /**
- * Instagram reel — embedded via official Instagram embed (blockquote + embed.js).
+ * Instagram reels — embedded via official Instagram embed (blockquote + embed.js).
  * Replace `reelUrl` with any post/reel from @nilov_catering (copy the URL from
  * the Instagram app: Share → Copy Link). The embed auto-loads the video.
+ *
+ * `reels` is a list — the Instagram section cycles through them in a horizontal
+ * carousel (shadcn Carousel, swipeable). Add more URLs here as content is produced.
  */
 export const INSTAGRAM = {
   handle: "@nilov_catering",
   href: "https://www.instagram.com/nilov_catering",
-  // Real @nilov_catering reel (provided by client)
+  // Real @nilov_catering reels (provided by client). Add more to populate carousel.
   reelUrl: "https://www.instagram.com/reel/DayA3bKME0j/",
+  reels: [
+    "https://www.instagram.com/reel/DayA3bKME0j/",
+    "https://www.instagram.com/reel/C8xQ2XXMW8r/",
+    "https://www.instagram.com/reel/C6wAbFBNfJB/",
+    "https://www.instagram.com/p/C3yVf5MtN5E/",
+  ],
 };
 
 /**

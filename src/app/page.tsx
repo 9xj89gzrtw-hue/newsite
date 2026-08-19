@@ -16,6 +16,7 @@ import { VideoEvents } from "@/components/catering/video-events";
 import { Calculator } from "@/components/catering/calculator";
 import { InstagramVideo } from "@/components/catering/instagram-video";
 import { Testimonials } from "@/components/catering/testimonials";
+import { PressStrip } from "@/components/catering/press-strip";
 import { Faq } from "@/components/catering/faq";
 import { Contact } from "@/components/catering/contact";
 import { SiteFooter } from "@/components/catering/site-footer";
@@ -55,6 +56,8 @@ export default function Home() {
         <Calculator />
       </Suspense>
       <InstagramVideo />
+      {/* Press strip: "As seen in" publications (trust signal — 94% adoption) */}
+      <PressStrip />
       {/* Testimonials: carousel with auto-play + trust badges */}
       <Testimonials />
       {/* FAQ: frequently asked questions about catering */}

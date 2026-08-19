@@ -67,6 +67,55 @@ const OFFICE_HOURS = {
 };
 
 /**
+ * Compute whether the office is currently open.
+ * Returns { open: boolean; nextLabel: string } for the badge.
+ */
+function useOfficeStatus() {
+  const [status, setStatus] = useState<{ open: boolean; nextLabel: string }>({
+    open: false,
+    nextLabel: "",
+  });
+  useEffect(() => {
+    const compute = () => {
+      const now = new Date();
+      // Use Europe/Berlin timezone per project convention — same as user.
+      // For simplicity, treat SPb local time (UTC+3) via Europe/Moscow.
+      const fmt = new Intl.DateTimeFormat("ru-RU", {
+        timeZone: "Europe/Moscow",
+        weekday: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+      const parts = fmt.formatToParts(now);
+      const wd = parts.find((p) => p.type === "weekday")?.value ?? "";
+      const hr = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
+      const min = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
+      const time = hr * 60 + min;
+      const day = wd.toLowerCase();
+      let open = false;
+      let nextLabel = "";
+      if (["пн", "вт", "ср", "чт", "пт"].includes(day)) {
+        open = time >= 9 * 60 && time < 19 * 60;
+        nextLabel = open ? "до 19:00" : (time < 9 * 60 ? "откроемся в 9:00" : "откроемся в пн в 9:00");
+      } else if (day === "сб") {
+        open = time >= 10 * 60 && time < 16 * 60;
+        nextLabel = open ? "до 16:00" : (time < 10 * 60 ? "откроемся в 10:00" : "откроемся в пн в 9:00");
+      } else {
+        // Sun
+        open = false;
+        nextLabel = "откроемся в пн в 9:00";
+      }
+      setStatus({ open, nextLabel });
+    };
+    compute();
+    const id = setInterval(compute, 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+  return status;
+}
+
+/**
  * Floating label input component with gold focus glow
  */
 function FloatingInput({
@@ -102,7 +151,7 @@ function FloatingInput({
       <div
         className={`relative rounded-xl border bg-cream/50 transition-all duration-300 ${
           error
-            ? "border-red-400/60 bg-red-50/30"
+            ? "border-bordeaux/50 bg-bordeaux/5"
             : focused
             ? "border-gold bg-white shadow-[0_0_20px_rgba(196,149,106,0.15)]"
             : "border-border-line"
@@ -150,7 +199,7 @@ function FloatingInput({
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
-            className="mt-1.5 flex items-center gap-1.5 text-xs text-red-500"
+            className="mt-1.5 flex items-center gap-1.5 text-xs text-bordeaux"
           >
             <AlertCircle className="size-3" />
             Проверьте ввод
@@ -315,7 +364,7 @@ function ConfettiParticles() {
   if (prefersReducedMotion) {
     return (
       <div className="flex items-center justify-center py-8">
-        <CheckCircle2 className="size-16 text-green-500" />
+        <CheckCircle2 className="size-16 text-sage" />
       </div>
     );
   }
@@ -355,8 +404,8 @@ function ConfettiParticles() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
       >
-        <div className="flex size-16 items-center justify-center rounded-full bg-green-100 shadow-lg">
-          <CheckCircle2 className="size-8 text-green-600" />
+        <div className="flex size-16 items-center justify-center rounded-full bg-sage/15 shadow-lg">
+          <CheckCircle2 className="size-8 text-sage" />
         </div>
       </motion.div>
     </div>
@@ -388,11 +437,31 @@ function SummaryRow({
  * Office hours display component
  */
 function OfficeHours() {
+  const status = useOfficeStatus();
   return (
     <div className="rounded-xl border border-border-line bg-cream/40 p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <Clock className="size-4 text-gold" />
-        <span className="text-sm font-medium text-ink">Часы работы</span>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Clock className="size-4 text-gold" />
+          <span className="text-sm font-medium text-ink">Часы работы</span>
+        </div>
+        {/* Live "open/closed" badge */}
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${
+            status.open
+              ? "border-sage/40 bg-sage/15 text-sage"
+              : "border-bordeaux/30 bg-bordeaux/5 text-bordeaux"
+          }`}
+          title={status.nextLabel}
+        >
+          <motion.span
+            aria-hidden="true"
+            className={`size-1.5 rounded-full ${status.open ? "bg-sage" : "bg-bordeaux"}`}
+            animate={status.open ? { opacity: [1, 0.4, 1] } : { opacity: 1 }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+          />
+          {status.open ? "Открыто" : "Закрыто"}
+        </span>
       </div>
       <ul className="space-y-1.5 text-sm text-ink/70">
         <li className="flex justify-between">
@@ -408,6 +477,11 @@ function OfficeHours() {
       <p className="mt-3 border-t border-border-line pt-3 text-xs text-gold/80 italic">
         ✨ {OFFICE_HOURS.note}
       </p>
+      {!status.open && status.nextLabel && (
+        <p className="mt-1 text-[11px] text-ink/40">
+          {status.nextLabel}
+        </p>
+      )}
     </div>
   );
 }
@@ -432,7 +506,7 @@ function SocialProofBadge() {
     >
       <div className="relative">
         <Sparkles className="size-4 text-gold" />
-        <span className="absolute -right-1 -top-1 size-2 rounded-full bg-green-500 animate-pulse" />
+        <span className="absolute -right-1 -top-1 size-2 rounded-full bg-sage animate-pulse" />
       </div>
       <span className="text-sm font-medium text-ink/80">
         Ответим в течение <span className="text-gold font-semibold">15 минут</span>
@@ -615,7 +689,8 @@ export function Contact() {
   return (
     <section
       id="contact"
-      className="relative overflow-hidden bg-cream-2 py-24 md:py-36"
+      data-header-theme="light"
+      className="section-light relative overflow-hidden bg-cream-2 py-24 md:py-36"
     >
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 h-96 w-96 bg-gradient-to-l from-gold/8 to-transparent rounded-full blur-3xl pointer-events-none" />

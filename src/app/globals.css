@@ -761,17 +761,15 @@ html.lenis body {
   animation: scale-pulse 3s ease-in-out infinite;
 }
 
-/* Draw line animation for borders and dividers */
+/* Draw line animation for borders and dividers.
+   NOTE: uses transform: scaleX (GPU-friendly, RULES §5 compliant) —
+   not width: 0→100% (which would force layout/paint every frame). */
 @keyframes draw-line {
-  from {
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
 .draw-line {
-  overflow: hidden;
+  transform-origin: left;
 }
 .draw-line::after {
   content: '';
@@ -779,7 +777,9 @@ html.lenis body {
   width: 100%;
   height: 1px;
   background: linear-gradient(90deg, var(--gold), var(--terracotta));
-  animation: draw-line 1.5s ease-out forwards;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: draw-line 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Stagger children entrance helper */
@@ -912,4 +912,92 @@ html.lenis body {
     font-size: 0.8em;
     color: #666;
   }
+}
+
+/* ===== PREMIUM ANIMATION & UTILITY ENHANCEMENTS (Task 2-b) ===== */
+
+/* Gold shimmer text — premium accent for marquee items and headlines.
+   Uses transform: translateX (GPU-friendly, RULES §5 compliant —
+   background-position shifts are visually equivalent but force paint). */
+@keyframes text-shimmer-gold-anim {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.text-shimmer-gold {
+  position: relative;
+  display: inline-block;
+  color: var(--ink);
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: initial;
+}
+.text-shimmer-gold::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(196, 149, 106, 0.45) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  transform: translateX(-100%);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+.text-shimmer-gold:hover::after {
+  animation: text-shimmer-gold-anim 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Cursor-following preview text — utility hook (used later for cursor-follow
+   preview labels). Sets up an invisible, pointer-events-none element positioned
+   absolutely; consumer sets `transform: translate3d(x, y, 0)` via motion-value. */
+.cursor-follow-text {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(250, 248, 245, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.4rem 0.8rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(196, 149, 106, 0.35);
+  box-shadow: 0 8px 24px rgba(26, 26, 26, 0.08);
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+/* Per-section selection styling — dark sections get gold highlight,
+   light sections get bordeaux highlight. This complements the global
+   ::selection in @layer base. */
+.section-dark ::selection {
+  background: var(--gold);
+  color: var(--ink);
+}
+.section-dark ::-moz-selection {
+  background: var(--gold);
+  color: var(--ink);
+}
+.section-light ::selection {
+  background: var(--bordeaux);
+  color: var(--cream);
+}
+.section-light ::-moz-selection {
+  background: var(--bordeaux);
+  color: var(--cream);
+}
+
+/* will-change helper — applies transform + opacity hint for elements
+   that are known to animate (e.g. parallax layers, marquee tracks).
+   Use sparingly: only on elements that actually animate frequently. */
+.will-change-transform {
+  will-change: transform, opacity;
 }

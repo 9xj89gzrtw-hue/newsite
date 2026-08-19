@@ -1,6 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useTransform,
+  animate,
+  useReducedMotion,
+  type MotionValue,
+} from "framer-motion";
 import { ChefHat, Truck, ArrowRight } from "lucide-react";
 import { Reveal } from "./reveal";
 
@@ -11,6 +20,10 @@ import { Reveal } from "./reveal";
  *
  * Two equal cards contrasting the two halves of the value proposition:
  * the craft of the kitchen vs. the logistics of field service.
+ *
+ * Each card now also carries two animated counters (CountUp via useMotionValue
+ * + useTransform + useInView + animate). Lazy-triggered once when the card
+ * scrolls into view at 40% visibility.
  */
 const PILLARS = [
   {
@@ -21,6 +34,10 @@ const PILLARS = [
     points: ["Сезонное меню", "Фермерские продукты", "Открытая кухня", "Авторская подача"],
     accent: "from-gold/15 to-terracotta/10",
     image: "/media/menu-banquet.jpg",
+    stats: [
+      { value: 16, suffix: "", label: "шеф-поваров" },
+      { value: 2400, suffix: "+", label: "событий" },
+    ],
   },
   {
     icon: Truck,
@@ -30,13 +47,110 @@ const PILLARS = [
     points: ["Мебель и текстиль", "Фарфор и стекло", "Доставка и монтаж", "Официанты и сомелье"],
     accent: "from-sage/15 to-gold/10",
     image: "/media/menu-buffet.jpg",
+    stats: [
+      { value: 12, suffix: "", label: "кейтеринг-машин" },
+      { value: 50000, suffix: "+", label: "гостей" },
+    ],
   },
 ];
 
+type StatDef = { value: number; suffix?: string; label: string };
+
+/**
+ * CountUp — spring-driven count-up animation triggered once when the
+ * element scrolls into view (40% visible). Uses framer-motion primitives
+ * per task spec: useMotionValue + useTransform + useInView + animate().
+ *
+ * Reduced-motion: skip the animation, jump straight to the final value.
+ *
+ * NOTE: We fall back to a manual IntersectionObserver if `useInView` returns
+ * false for too long (some hydration / SSR edge cases in Next 16 + React 19).
+ */
+function CountUp({
+  value,
+  suffix = "",
+  label,
+  duration = 1.8,
+  prefersReducedMotion = false,
+}: {
+  value: number;
+  suffix?: string;
+  label: string;
+  duration?: number;
+  prefersReducedMotion?: boolean;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.4 });
+  const mv: MotionValue<number> = useMotionValue(0);
+  // Fallback trigger: if framer-motion's useInView doesn't fire within 3s,
+  // use a direct IntersectionObserver to set inViewFallback=true.
+  const [inViewFallback, setInViewFallback] = useState(false);
+  const effectiveInView = inView || inViewFallback;
+
+  // ru-RU thousand separator (space) for big numbers like 50 000.
+  const formatted = useTransform(mv, (latest) => {
+    const rounded = Math.round(latest);
+    return `${rounded.toLocaleString("ru-RU")}${suffix}`;
+  });
+
+  // Manual IntersectionObserver fallback (handles SSR / hydration edge cases).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (typeof IntersectionObserver === "undefined") return;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setInViewFallback(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!effectiveInView) return;
+    if (prefersReducedMotion) {
+      mv.set(value);
+      return;
+    }
+    const controls = animate(mv, value, {
+      duration,
+      ease: [0.22, 1, 0.36, 1],
+    });
+    return () => controls.stop();
+  }, [effectiveInView, value, duration, prefersReducedMotion, mv]);
+
+  return (
+    <div className="flex flex-col">
+      <motion.span
+        ref={ref}
+        className="font-display text-3xl leading-none text-ink md:text-4xl tabular-nums"
+      >
+        {formatted}
+      </motion.span>
+      <span className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/55">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 export function Pillars() {
+  const prefersReducedMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
   return (
     <section
+      ref={sectionRef}
       aria-label="Наши принципы"
+      data-header-theme="light"
       className="relative overflow-hidden bg-white py-24 md:py-32"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
@@ -119,6 +233,19 @@ export function Pillars() {
                       ))}
                     </ul>
 
+                    {/* CountUp stats — spring-driven, lazy-triggered via useInView */}
+                    <div className="mt-7 grid grid-cols-2 gap-4 border-t border-border-line pt-6">
+                      {p.stats.map((stat: StatDef) => (
+                        <CountUp
+                          key={stat.label}
+                          value={stat.value}
+                          suffix={stat.suffix}
+                          label={stat.label}
+                          prefersReducedMotion={prefersReducedMotion ?? false}
+                        />
+                      ))}
+                    </div>
+
                     <div className="mt-auto pt-8">
                       <a
                         href="#services"
@@ -138,3 +265,4 @@ export function Pillars() {
     </section>
   );
 }
+

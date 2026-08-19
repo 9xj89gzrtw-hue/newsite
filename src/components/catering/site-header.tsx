@@ -25,22 +25,100 @@ const NAV: NavItem[] = [
 ];
 
 /**
- * SiteHeader — transparent-to-solid navigation (LIGHT THEME)
+ * The header theme is set per-section via `data-header-theme` attributes
+ * on each `<section>` element. Valid values: "transparent" (over hero),
+ * "light" (cream/white sections), "dark" (Manifesto, PromoBanner).
+ */
+type HeaderTheme = "transparent" | "light" | "dark";
+
+const THEME_CLASSES: Record<HeaderTheme, { bg: string; text: string; linkHover: string }> = {
+  transparent: {
+    bg: "bg-transparent",
+    text: "text-cream",
+    linkHover: "hover:text-cream",
+  },
+  light: {
+    bg: "bg-cream/85 backdrop-blur-md shadow-sm border-b border-border-line",
+    text: "text-ink",
+    linkHover: "hover:text-ink",
+  },
+  dark: {
+    bg: "bg-ink/85 backdrop-blur-md shadow-lg border-b border-ink/20",
+    text: "text-cream",
+    linkHover: "hover:text-cream",
+  },
+};
+
+/**
+ * SiteHeader — theme-switching navigation (transparent → light → dark)
+ * based on which section's `data-header-theme` attribute is currently
+ * in view at the top of the viewport.
  *
- * Includes (this cycle):
+ * Includes:
  *  - AnnouncementBar: dismissible seasonal top bar (Salt Block pattern).
  *  - MegaMenu: hover/focus dropdowns for Меню and Услуги (100% adoption pattern).
  *  - Mobile quote CTA: second FAB linking to the calculator (sticky-CTA pattern).
+ *  - Section-aware theme switching via IntersectionObserver.
  */
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  // Default theme = transparent (over hero).
+  const [theme, setTheme] = useState<HeaderTheme>("transparent");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // IntersectionObserver: detect which section's `data-header-theme`
+  // attribute is currently overlapping the top of the viewport (where the
+  // header sits). Updates `theme` state. SSR-safe.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (typeof IntersectionObserver === "undefined") return;
+
+    // Header occupies roughly the top ~64px of viewport. We collapse the
+    // observer root to a thin band at the very top (negative bottom margin
+    // = -100% reduces root height to 0). A section that has any pixel
+    // overlapping that 0-px band is "intersecting" — exactly what we want.
+    const io = new IntersectionObserver(
+      (entries) => {
+        // Among intersecting entries, pick the topmost (smallest
+        // boundingClientRect.top). Handles edge case where two sections
+        // both touch the 0-line briefly during fast scroll.
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length === 0) return;
+        const topEl = visible[0].target as HTMLElement;
+        const next = (topEl.dataset.headerTheme as HeaderTheme | undefined) ?? "transparent";
+        setTheme((cur) => (cur === next ? cur : next));
+      },
+      {
+        // Top 0px = the very top of viewport. We pick a slightly positive
+        // height (top -1px to avoid weird flicker at exact 0).
+        rootMargin: "-1px 0px -100% 0px",
+        threshold: [0, 1],
+      },
+    );
+
+    const observeAll = () => {
+      document.querySelectorAll<HTMLElement>("[data-header-theme]").forEach((el) => {
+        io.observe(el);
+      });
+    };
+    // Run once on mount + re-run after a tick in case sections are still
+    // hydrating/mounting (some are client components that mount late).
+    observeAll();
+    const t = window.setTimeout(observeAll, 600);
+
+    return () => {
+      io.disconnect();
+      window.clearTimeout(t);
+    };
   }, []);
 
   useEffect(() => {
@@ -70,15 +148,14 @@ export function SiteHeader() {
     };
   }, [open]);
 
+  const themeClasses = THEME_CLASSES[theme];
+
   return (
     <>
       <header
         role="banner"
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-border-line"
-            : "bg-transparent"
-        }`}
+        data-theme={theme}
+        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${themeClasses.bg} ${themeClasses.text}`}
       >
         {/* Dismissible seasonal announcement bar (Salt Block pattern) */}
         <AnnouncementBar />
@@ -91,7 +168,7 @@ export function SiteHeader() {
           {/* Logo */}
           <a
             href="#home"
-            className="min-h-[44px] flex items-center font-display text-xl tracking-tight text-ink md:text-2xl hover-underline"
+            className={`min-h-[44px] flex items-center font-display text-xl tracking-tight transition-colors duration-300 md:text-2xl hover-underline ${themeClasses.text}`}
           >
             Interfood
             <span className="text-gold">.</span>
@@ -106,7 +183,7 @@ export function SiteHeader() {
                 <a
                   key={n.href}
                   href={n.href}
-                  className="group relative text-sm font-medium text-ink/70 transition-colors duration-300 hover:text-ink hover-underline"
+                  className={`group relative text-sm font-medium opacity-70 transition-opacity duration-300 hover:opacity-100 hover-underline ${themeClasses.text}`}
                 >
                   {n.label}
                 </a>
@@ -118,7 +195,7 @@ export function SiteHeader() {
           <div className="flex items-center gap-3">
             <a
               href={CONTACTS.phoneHref}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 text-sm font-medium text-ink/80 transition-colors hover:text-gold md:gap-2"
+              className={`min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 text-sm font-medium transition-colors hover:text-gold md:gap-2 ${themeClasses.text} opacity-80 hover:opacity-100`}
               aria-label="Позвонить"
             >
               <Phone className="size-5 shrink-0" />
@@ -133,7 +210,7 @@ export function SiteHeader() {
             </a>
             <button
               onClick={() => setOpen(true)}
-              className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 text-ink lg:hidden"
+              className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors duration-300 lg:hidden ${themeClasses.text}`}
               aria-label="Открыть меню"
               aria-expanded={open}
               aria-controls="mobile-menu"
@@ -292,7 +369,7 @@ function MegaMenu({ item }: { item: NavItem }) {
         aria-expanded={open}
         onKeyDown={onTriggerKey}
         onClick={() => go(item.href)}
-        className="group flex min-h-[44px] items-center gap-1 text-sm font-medium text-ink/70 transition-colors duration-300 hover:text-ink"
+        className="group flex min-h-[44px] items-center gap-1 text-sm font-medium opacity-70 transition-opacity duration-300 hover:opacity-100"
       >
         {item.label}
         <ChevronDown

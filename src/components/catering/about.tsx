@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useInView, useMotionValue, animate, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useMotionValue, useMotionTemplate, useSpring, useReducedMotion, animate, useScroll, useTransform } from "framer-motion";
 import { Reveal } from "./reveal";
+import { Marquee } from "@/components/motion/marquee";
 import { MEDIA } from "@/lib/media";
 import { Sparkles, Award, Users, Calendar, ChefHat } from "lucide-react";
 
@@ -12,6 +13,16 @@ const STATS = [
   { value: 2400, suffix: "+", label: "мероприятий", icon: Calendar },
   { value: 50000, suffix: "+", label: "гостей", icon: Users },
   { value: 150, suffix: "+", label: "сотрудников", icon: ChefHat },
+];
+
+// Value-props for the infinite marquee row (Task 2-b §3). Replaces the previous
+// static feature-tag chips. 5 distinct value-props, infinite-scrolling + pause-on-hover.
+const VALUE_PROPS = [
+  "Сезонные продукты",
+  "Авторская подача",
+  "Эко-упаковка",
+  "Шеф-персонал",
+  "Гибкий график",
 ];
 
 function CountUp({ to, suffix }: { to: number; suffix: string }) {
@@ -52,7 +63,10 @@ function CountUp({ to, suffix }: { to: number; suffix: string }) {
 }
 
 /**
- * Animated stat card with hover effects
+ * Animated stat card with hover effects + 3D mouse-tilt (Task 2-b §3).
+ * Tracks the pointer over the card surface and applies rotateX/rotateY
+ * within ±8°. Spring-smoothed for a luxurious "alive" feel.
+ * Respects prefers-reduced-motion (transform disabled when set).
  */
 function StatCard({ 
   stat, 
@@ -62,10 +76,38 @@ function StatCard({
   index: number;
 }) {
   const Icon = stat.icon;
+  const reduce = useReducedMotion();
+  
+  // 3D tilt: track mouse position relative to card center, normalize to [-0.5, 0.5].
+  const mvX = useMotionValue(0);
+  const mvY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(mvY, [-0.5, 0.5], [8, -8]), { stiffness: 200, damping: 15, mass: 0.3 });
+  const rotateY = useSpring(useTransform(mvX, [-0.5, 0.5], [-8, 8]), { stiffness: 200, damping: 15, mass: 0.3 });
+  // Compose the final transform string via useMotionTemplate — this is a hook,
+  // so always called (no conditional). When `reduce` is true we pass `undefined`
+  // as the style.transform value below, disabling the tilt without breaking the hook order.
+  const tiltTransform = useMotionTemplate`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (reduce) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    mvX.set((e.clientX - rect.left) / rect.width - 0.5);
+    mvY.set((e.clientY - rect.top) / rect.height - 0.5);
+  }
+  function handleMouseLeave() {
+    mvX.set(0);
+    mvY.set(0);
+  }
   
   return (
     <motion.div
-      className="group relative p-5 rounded-2xl bg-white/40 backdrop-blur-sm border border-gold/10 transition-all duration-500 hover:bg-white/80 hover:border-gold/30 hover:shadow-xl hover:shadow-gold/10"
+      className="group relative p-5 rounded-2xl bg-white/40 backdrop-blur-sm border border-gold/10 transition-colors duration-500 hover:bg-white/80 hover:border-gold/30"
+      style={{ 
+        transform: reduce ? undefined : tiltTransform, 
+        transformStyle: "preserve-3d",
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       whileHover={{ y: -8, scale: 1.02 }}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -76,7 +118,7 @@ function StatCard({
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold/0 to-terracotta/0 group-hover:from-gold/5 group-hover:to-terracotta/5 transition-all duration-500" />
       
       {/* Icon */}
-      <div className="relative flex items-center gap-2 mb-2">
+      <div className="relative flex items-center gap-2 mb-2" style={{ transform: "translateZ(40px)" }}>
         <motion.div 
           className="p-2 rounded-lg bg-gold/10 text-gold"
           whileHover={{ rotate: 15, scale: 1.1 }}
@@ -93,6 +135,7 @@ function StatCard({
         style={{
           fontSize: "clamp(1.6rem, 3vw, 2.5rem)",
           fontWeight: 600,
+          transform: "translateZ(40px)",
         }}
       >
         <CountUp to={stat.value} suffix={stat.suffix} />
@@ -108,7 +151,7 @@ function StatCard({
       </div>
       
       {/* Label */}
-      <div className="mt-2 font-mono text-[11px] uppercase tracking-wider text-ink/50 font-medium">
+      <div className="mt-2 font-mono text-[11px] uppercase tracking-wider text-ink/50 font-medium" style={{ transform: "translateZ(20px)" }}>
         {stat.label}
       </div>
     </motion.div>
@@ -129,6 +172,7 @@ function StatCard({
 export function About() {
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
   
   // Parallax for image container
   const { scrollYProgress } = useScroll({
@@ -138,12 +182,25 @@ export function About() {
   
   const imageY = useTransform(scrollYProgress, [0, 1], [60, -60]);
   const decorRotate = useTransform(scrollYProgress, [0, 1], [-2, 2]);
+  
+  // Vertical-shutter image reveal (Task 2-b §3): clipPath animates from
+  // a tight 50%-inset horizontal band (top + bottom 50% clipped → reveals
+  // only the middle horizontal sliver) to fully open (inset 0). Driven by
+  // the section's scrollYProgress over [0, 0.4] so the shutter completes
+  // revealing by the time the image is ~40% into view. RULES §5 compliant —
+  // clipPath is GPU-composited. Reduced-motion → 'none' (no animation).
+  const imageClipPath = useTransform(
+    scrollYProgress,
+    [0, 0.4],
+    ["inset(50% 0 50% 0)", "inset(0 0 0 0)"],
+  );
 
   return (
     <section
       id="about"
       ref={sectionRef}
-      className="relative overflow-hidden bg-cream py-28 md:py-40"
+      data-header-theme="light"
+      className="section-light relative overflow-hidden bg-cream py-28 md:py-40"
     >
       {/* Multi-layer decorative backgrounds */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-l from-gold/8 via-gold/3 to-transparent rounded-full blur-3xl pointer-events-none" />
@@ -186,10 +243,13 @@ export function About() {
                 style={{ rotate: decorRotate }}
               />
               
-              {/* Main image with parallax */}
+              {/* Main image with parallax + vertical-shutter clip-path reveal */}
               <motion.div 
                 className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-2xl shadow-ink/10"
-                style={{ y: imageY }}
+                style={{ 
+                  y: imageY,
+                  clipPath: reduce ? "none" : imageClipPath,
+                }}
               >
                 <Image
                   src={MEDIA.about.src}
@@ -347,38 +407,39 @@ export function About() {
               </motion.p>
             </Reveal>
 
-            {/* Feature highlights */}
-            <Reveal delay={0.35}>
-              <motion.div 
-                className="mt-8 flex flex-wrap gap-3"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-              >
-                {["Сезонные продукты", "Выездной сервис", "Полный цикл"].map((feature, i) => (
-                  <motion.span
-                    key={feature}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 border border-gold/15 text-sm text-ink/70 font-medium"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.55 + i * 0.1, duration: 0.5 }}
-                    whileHover={{ backgroundColor: "rgba(196,149,106,0.1)", borderColor: "rgba(196,149,106,0.3)", y: -2 }}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-gold" />
-                    {feature}
-                  </motion.span>
-                ))}
-              </motion.div>
-            </Reveal>
-
-            {/* Stats grid — enhanced cards */}
-            <div className="mt-14 grid grid-cols-2 gap-x-5 gap-y-6 sm:grid-cols-4">
+            {/* Stats grid — enhanced cards with 3D tilt (Task 2-b §3).
+                perspective: 1000px on the parent enables the rotateX/rotateY
+                children to render in 3D space. */}
+            <div 
+              className="mt-14 grid grid-cols-2 gap-x-5 gap-y-6 sm:grid-cols-4"
+              style={{ perspective: "1000px" }}
+            >
               {STATS.map((stat, i) => (
                 <StatCard key={stat.label} stat={stat} index={i} />
               ))}
             </div>
+            
+            {/* Marquee row of value-props (Task 2-b §3) — replaces the previous
+                static feature-tag chips. 5 value-props, infinite-scrolling,
+                pause-on-hover. Pure CSS transform: translateX (RULES §5). */}
+            <Reveal delay={0.4}>
+              <div 
+                className="mt-10 -mx-5 md:-mx-8 lg:-mx-12 xl:-mx-16"
+                aria-label="Преимущества Interfood Catering"
+              >
+                <Marquee speed={28} pauseOnHover>
+                  {VALUE_PROPS.map((prop) => (
+                    <span
+                      key={prop}
+                      className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/70 border border-gold/15 text-sm font-medium text-ink/70 whitespace-nowrap backdrop-blur-sm"
+                    >
+                      <span className="size-1.5 rounded-full bg-gold" />
+                      <span className="text-shimmer-gold">{prop}</span>
+                    </span>
+                  ))}
+                </Marquee>
+              </div>
+            </Reveal>
           </div>
         </div>
       </div>

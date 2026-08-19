@@ -259,6 +259,7 @@ export function EventsGallery() {
   const [category, setCategory] = useState<Category>("Все");
   const [showKeyboardHint, setShowKeyboardHint] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [visibleCount, setVisibleCount] = useState(8);
   const containerRef = useRef<HTMLElement>(null);
   
   // Respect user's motion preferences
@@ -272,6 +273,19 @@ export function EventsGallery() {
         : all.filter((e) => e.category === category),
     [all, category],
   );
+
+  // Reset visible count when category changes (so filtered views don't truncate)
+  useEffect(() => {
+    setVisibleCount(8);
+  }, [category]);
+
+  // Paginate — show first N items by default; rest on "Load more"
+  const visibleItems = useMemo(
+    () => items.slice(0, visibleCount),
+    [items, visibleCount],
+  );
+  const hasMore = visibleCount < items.length;
+  const remainingCount = items.length - visibleCount;
 
   // Category counts for badges
   const categoryCounts = useMemo(() => {
@@ -342,10 +356,11 @@ export function EventsGallery() {
   }, [touchStartX, prev, next]);
 
   return (
-    <section 
-      id="events" 
+    <section
+      id="events"
       ref={containerRef}
-      className="relative overflow-hidden bg-cream-2 py-24 md:py-36"
+      data-header-theme="light"
+      className="section-light relative overflow-hidden bg-cream-2 py-24 md:py-36"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         {/* Header */}
@@ -436,7 +451,7 @@ export function EventsGallery() {
           className="mt-12 columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-3 [&>*]:mb-4"
         >
           <AnimatePresence mode="popLayout">
-            {items.map((item, i) => (
+            {visibleItems.map((item, i) => (
               <GalleryItem
                 key={`${item.src}-${item.caption}-${category}`}
                 item={item}
@@ -460,6 +475,32 @@ export function EventsGallery() {
             </motion.div>
           )}
         </motion.div>
+
+        {/* Load more button — pagination reveal */}
+        {hasMore && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-10 flex flex-col items-center justify-center gap-3"
+          >
+            <button
+              type="button"
+              onClick={() => setVisibleCount((n) => n + 8)}
+              className="group inline-flex items-center gap-2 rounded-full border-2 border-gold/40 bg-gradient-to-r from-gold/10 to-transparent px-7 py-3.5 text-sm font-semibold text-gold transition-all hover:border-gold hover:from-gold hover:to-terracotta hover:text-white hover:shadow-lg hover:-translate-y-0.5 min-h-[44px]"
+            >
+              Показать ещё
+              <span className="font-mono text-[11px] opacity-70">
+                +{remainingCount}
+              </span>
+              <ChevronRight className="size-4 transition-transform group-hover:translate-x-1" />
+            </button>
+            <p className="font-mono text-[11px] uppercase tracking-wider text-ink/40">
+              Показано {visibleItems.length} из {items.length}
+            </p>
+          </motion.div>
+        )}
       </div>
 
       {/* Enhanced Lightbox — professional gallery experience */}

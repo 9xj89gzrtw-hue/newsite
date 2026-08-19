@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { ArrowUpRight, X, Check, Sparkles, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, X, Check, Sparkles, ArrowRight, RotateCcw } from "lucide-react";
 import { Reveal } from "./reveal";
 import { SERVICES } from "@/lib/media";
 
@@ -19,7 +19,7 @@ const SERVICE_PHOTOS: Record<string, string> = {
   Wine: "/media/event-11.jpg",
   PartyPopper: "/media/event-02.jpg",
   Droplets: "/media/menu-snack-box.jpg",
-  Flame: "/media/menu-bbq.jpg",
+  Flame: "/media/event-06.jpg",
 };
 
 // Category tags for each service index
@@ -154,43 +154,70 @@ function CategoryTags({
 }
 
 /**
- * Service Card Component — with enhanced 3D hover effects and animations
+ * Service Card Component — with enhanced 3D hover effects and animations.
+ * Flips on click to reveal back face with full description + CTA.
  */
 function ServiceCard({ 
   service, 
   index,
-  onClick,
-  gridIndex 
+  onOpenModal,
+  gridIndex,
+  prefersReducedMotion = false,
 }: { 
   service: typeof SERVICES[0]; 
   index: number;
-  onClick: () => void;
+  onOpenModal: () => void;
   gridIndex: number;
+  prefersReducedMotion?: boolean;
 }) {
-  const cardRef = useRef<HTMLButtonElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  
-  // Mouse position tracking for 3D tilt
+  const [flipped, setFlipped] = useState(false);
+
+  // Mouse position tracking for 3D tilt — disabled when flipped to avoid jitter.
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   
-  // Spring-based rotation transforms
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), {
+  // Spring-based rotation transforms (only used on the FRONT face — for the
+  // 3D tilt on hover effect, NOT for the flip itself).
+  const tiltRotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), {
     stiffness: 300,
     damping: 30,
   });
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), {
+  const tiltRotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), {
     stiffness: 300,
     damping: 30,
   });
-  
+  // The flip rotateY value — 0 (front) or 180 (back). useSpring is created
+  // once on mount; we call .set() when `flipped` changes (see useEffect below)
+  // so the spring animates to the new target instead of jumping.
+  const flipRotateY = useSpring(0, {
+    stiffness: 220,
+    damping: 28,
+    mass: 0.8,
+  });
+  useEffect(() => {
+    flipRotateY.set(flipped ? 180 : 0);
+  }, [flipped, flipRotateY]);
+  // Compose: when flipped, ignore tilt (front-face tilt is irrelevant on the back face).
+  // combinedRotateY = flip + (flipped ? 0 : tilt)
+  const combinedRotateY = useTransform(
+    [flipRotateY, tiltRotateY] as const,
+    ([flip, tilt]: number[]) => flip + (flip > 90 ? 0 : tilt),
+  );
+  // combinedRotateX = flipped ? 0 : tilt
+  const combinedRotateX = useTransform(
+    [flipRotateY, tiltRotateX] as const,
+    ([flip, rx]: number[]) => (flip > 90 ? 0 : rx),
+  );
+
   // Directional overlay slide direction based on even/odd
   const slideDirection = index % 2 === 0 
     ? { initial: { x: '-100%' }, animate: { x: '0%' } }  // Even: slide from left
     : { initial: { x: '100%' }, animate: { x: '0%' } };   // Odd: slide from right
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    if (prefersReducedMotion() || !cardRef.current) return;
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion || !cardRef.current || flipped) return;
     
     const rect = cardRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -198,9 +225,10 @@ function ServiceCard({
     
     mouseX.set(x);
     mouseY.set(y);
-  }, [mouseX, mouseY]);
+  }, [mouseX, mouseY, prefersReducedMotion, flipped]);
 
   const handleMouseEnter = () => {
+    if (flipped) return;
     setIsHovered(true);
   };
 
@@ -208,6 +236,24 @@ function ServiceCard({
     setIsHovered(false);
     mouseX.set(0);
     mouseY.set(0);
+  };
+
+  const handleFrontClick = () => {
+    if (prefersReducedMotion) {
+      // Skip flip animation, go straight to modal for reduced-motion users.
+      onOpenModal();
+      return;
+    }
+    setFlipped(true);
+    setIsHovered(false);
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  const handleBackClick = (e: React.MouseEvent) => {
+    // Clicking on the back-face "container" (not on a button) flips back.
+    e.stopPropagation();
+    setFlipped(false);
   };
 
   // Calculate diagonal entrance delay for wave pattern
@@ -226,32 +272,43 @@ function ServiceCard({
         duration: 0.7, 
         ease: [0.22, 1, 0.36, 1] 
       }}
+      style={{ perspective: "1200px" }}
     >
-      <motion.button
+      <motion.div
         ref={cardRef}
-        onClick={onClick}
+        role="button"
+        tabIndex={0}
+        onClick={handleFrontClick}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleFrontClick();
+          }
+        }}
         data-cursor="подробнее"
-        className="group relative block aspect-[3/4] w-full overflow-hidden rounded-2xl bg-cream text-left"
+        aria-label={`${service.title} — открыть описание`}
+        aria-pressed={flipped}
+        className="svc-flip-inner group relative block aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-2xl bg-cream text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
         style={{
           boxShadow: isHovered 
             ? `0 25px 60px -15px ${GLOW_COLORS[index % GLOW_COLORS.length]}, 0 0 40px -10px ${GLOW_COLORS[index % GLOW_COLORS.length]}`
             : "0 4px 20px -4px rgba(0,0,0,0.08)",
           transformStyle: "preserve-3d",
-          perspective: "1000px",
+          rotateY: prefersReducedMotion ? 0 : combinedRotateY,
+          rotateX: prefersReducedMotion ? 0 : combinedRotateX,
         }}
-        whileHover={{ 
-          y: -16,
-          rotateX: prefersReducedMotion() ? 0 : rotateX.get(),
-          rotateY: prefersReducedMotion() ? 0 : rotateY.get(),
-        }}
+        whileHover={flipped ? undefined : { y: -16 }}
         transition={{ 
-          duration: prefersReducedMotion() ? 0.3 : 0.5, 
+          duration: prefersReducedMotion ? 0.3 : 0.5, 
           ease: [0.22, 1, 0.36, 1],
         }}
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
+        {/* FRONT FACE — photo + title + icon + animated badges */}
+        <div className="svc-flip-face absolute inset-0 overflow-hidden rounded-2xl">
+
         {/* Photo with smooth zoom on hover */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
@@ -389,7 +446,106 @@ function ServiceCard({
           <div className="absolute bottom-0 left-0 w-8 h-0.5 bg-gradient-to-r from-gold to-transparent" style={{ boxShadow: '0 0 6px rgba(196,149,106,0.5)' }} />
           <div className="absolute bottom-0 left-0 w-0.5 h-8 bg-gradient-to-t from-gold to-transparent" style={{ boxShadow: '0 0 6px rgba(196,149,106,0.5)' }} />
         </div>
-      </motion.button>
+        </div>
+        {/* /FRONT FACE */}
+
+        {/* BACK FACE — full description + CTA "Подробнее →" opens the modal */}
+        <div
+          className="svc-flip-face svc-flip-back absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-ink p-5 text-cream sm:p-6"
+          onClick={handleBackClick}
+        >
+          {/* Soft gradient backdrop with gold glow */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `radial-gradient(circle at 80% 0%, ${GLOW_COLORS[index % GLOW_COLORS.length]} 0%, transparent 55%)`,
+            }}
+          />
+          {/* Decorative giant numeral */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-4 -top-8 font-display text-[10rem] leading-none text-cream/[0.06]"
+          >
+            {String(index + 1).padStart(2, "0")}
+          </span>
+
+          <div className="relative z-10 flex h-full flex-col">
+            {/* Eyebrow */}
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
+                <Sparkles className="size-3" />
+                Услуга {String(index + 1).padStart(2, "0")} / {String(SERVICES.length).padStart(2, "0")}
+              </span>
+              <span
+                className="inline-flex items-center gap-1 rounded-full border border-cream/20 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-cream/70"
+                aria-hidden="true"
+              >
+                <RotateCcw className="size-3" />
+                назад
+              </span>
+            </div>
+
+            {/* Title */}
+            <h3 className="mt-4 font-display text-2xl leading-tight text-white sm:text-3xl">
+              {service.title}
+            </h3>
+            <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-cream/60">
+              {service.short}
+            </p>
+
+            {/* Divider */}
+            <div className="mt-4 h-px w-full origin-left bg-gradient-to-r from-gold via-terracotta/40 to-transparent" />
+
+            {/* Full description */}
+            <p className="mt-4 flex-1 overflow-y-auto text-sm leading-relaxed text-cream/80 pr-1">
+              {service.desc}
+            </p>
+
+            {/* Feature chips */}
+            <ul className="mt-4 grid grid-cols-2 gap-1.5">
+              {service.features.map((f) => (
+                <li
+                  key={f}
+                  className="flex items-center gap-1.5 text-[11px] leading-tight text-cream/75"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-gold/20 text-gold"
+                  >
+                    <Check className="size-2.5" />
+                  </span>
+                  <span className="truncate">{f}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* CTA: opens the existing modal */}
+            <div className="mt-5 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenModal();
+                }}
+                className="group/cta inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.03] hover:shadow-xl hover:shadow-gold/30 active:scale-[0.98] min-h-[44px]"
+              >
+                Подробнее
+                <ArrowRight className="size-4 transition-transform duration-300 group-hover/cta:translate-x-1" />
+              </button>
+              <button
+                type="button"
+                onClick={handleBackClick}
+                aria-label="Перевернуть карточку обратно"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-cream/25 bg-cream/5 text-cream/80 transition-colors hover:bg-cream/10 hover:text-cream min-h-[44px] min-w-[44px]"
+              >
+                <RotateCcw className="size-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+        {/* /BACK FACE */}
+      </motion.div>
     </motion.div>
   );
 }
@@ -533,6 +689,28 @@ export function Services() {
   const [open, setOpen] = useState<number | null>(null);
   const current = open !== null ? SERVICES[open] : null;
   const [modalStep, setModalStep] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
+  // Active service index for sticky TOC highlighting (set via IntersectionObserver).
+  const [activeIdx, setActiveIdx] = useState<number>(0);
+  // Refs to each card wrapper element so we can both observe them and scroll to them.
+  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  // Inject backface-visibility CSS once.
+  const hasInjectedFlipStyle = useRef(false);
+
+  useEffect(() => {
+    if (hasInjectedFlipStyle.current) return;
+    if (typeof document === "undefined") return;
+    if (document.getElementById("svc-flip-style")) {
+      hasInjectedFlipStyle.current = true;
+      return;
+    }
+    const style = document.createElement("style");
+    style.id = "svc-flip-style";
+    style.textContent =
+      ".svc-flip-inner { transform-style: preserve-3d; } .svc-flip-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; } .svc-flip-back { transform: rotateY(180deg); }";
+    document.head.appendChild(style);
+    hasInjectedFlipStyle.current = true;
+  }, []);
 
   // Allow the header mega-menu to open a specific service modal by index.
   useEffect(() => {
@@ -559,8 +737,44 @@ export function Services() {
     return () => clearInterval(interval);
   }, [open]);
 
+  // IntersectionObserver: highlight the service card currently in the
+  // middle band of the viewport. Updates `activeIdx`. SSR-safe guard.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible.length === 0) return;
+        const top = visible[0];
+        const idx = Number((top.target as HTMLElement).dataset.serviceIdx);
+        if (!Number.isNaN(idx)) setActiveIdx(idx);
+      },
+      {
+        threshold: [0.2, 0.4, 0.6],
+        rootMargin: "-30% 0px -30% 0px",
+      },
+    );
+    cardRefs.current.forEach((el) => {
+      if (el) io.observe(el);
+    });
+    return () => io.disconnect();
+  }, []);
+
+  const scrollToService = (i: number) => {
+    const el = cardRefs.current[i];
+    if (!el) return;
+    el.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "center",
+    });
+    setActiveIdx(i);
+  };
+
   return (
-    <section id="services" className="relative overflow-hidden bg-white py-28 md:py-40">
+    <section id="services" data-header-theme="light" className="section-light relative overflow-hidden bg-white py-28 md:py-40">
       {/* Decorative background elements */}
       <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-gradient-to-r from-gold/6 to-transparent rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-gradient-to-l from-terracotta/5 to-transparent rounded-full blur-3xl pointer-events-none" />
@@ -641,17 +855,101 @@ export function Services() {
           </Reveal>
         </div>
 
-        {/* Services grid — 4 columns with diagonal wave entrance */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {SERVICES.map((s, i) => (
-            <ServiceCard
-              key={s.title}
-              service={s}
-              index={i}
-              gridIndex={i}
-              onClick={() => setOpen(i)}
-            />
-          ))}
+        {/* Services layout: 4-col grid + sticky TOC right rail (lg+) */}
+        <div className="mt-16 flex flex-col gap-10 lg:flex-row lg:gap-10">
+          {/* Services grid — 4 columns with diagonal wave entrance */}
+          <div className="flex-1 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {SERVICES.map((s, i) => (
+              <div
+                key={s.title}
+                ref={(el) => {
+                  cardRefs.current[i] = el;
+                }}
+                data-service-idx={i}
+                className="relative"
+              >
+                <ServiceCard
+                  service={s}
+                  index={i}
+                  gridIndex={i}
+                  onOpenModal={() => setOpen(i)}
+                  prefersReducedMotion={prefersReducedMotion ?? false}
+                />
+                {/* Highlight ring when this card is the active one (TOC sync) */}
+                <motion.span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -inset-1 rounded-[1.25rem] ring-2 ring-gold/50"
+                  initial={false}
+                  animate={{
+                    opacity: activeIdx === i ? 1 : 0,
+                    scale: activeIdx === i ? 1 : 0.97,
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Sticky right-rail "Service index" (TOC) — lg+ only */}
+          <aside
+            aria-label="Индекс услуг"
+            className="hidden lg:block lg:w-60 lg:shrink-0 lg:self-start lg:sticky lg:top-24"
+          >
+            <div className="rounded-2xl border border-border-line bg-cream/60 p-5 backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
+                  Индекс
+                </span>
+                <span className="font-mono text-[10px] text-ink/40">
+                  {String(activeIdx + 1).padStart(2, "0")} / {String(SERVICES.length).padStart(2, "0")}
+                </span>
+              </div>
+              <div className="mt-3 h-px w-full origin-left bg-gradient-to-r from-gold/60 via-terracotta/30 to-transparent" />
+              <ol className="mt-4 space-y-1">
+                {SERVICES.map((s, i) => {
+                  const isActive = activeIdx === i;
+                  return (
+                    <li key={s.title}>
+                      <button
+                        type="button"
+                        onClick={() => scrollToService(i)}
+                        aria-current={isActive ? "true" : undefined}
+                        className={`group flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors duration-200 ${
+                          isActive
+                            ? "bg-gradient-to-r from-gold/15 to-terracotta/10 text-ink"
+                            : "hover:bg-cream/80 text-ink/65 hover:text-ink"
+                        }`}
+                      >
+                        <span
+                          className={`flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold transition-colors ${
+                            isActive
+                              ? "bg-gradient-to-r from-gold to-terracotta text-white"
+                              : "bg-ink/5 text-ink/45 group-hover:bg-gold/15 group-hover:text-gold"
+                          }`}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="flex-1 truncate text-xs font-medium leading-tight">
+                          {s.title}
+                        </span>
+                        <span
+                          className={`h-1.5 w-1.5 shrink-0 rounded-full transition-all duration-200 ${
+                            isActive
+                              ? "scale-100 bg-gold shadow-[0_0_6px_rgba(196,149,106,0.6)]"
+                              : "scale-0 bg-transparent"
+                          }`}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+              <div className="mt-4 rounded-lg border border-dashed border-border-line bg-white/50 px-3 py-2 text-[11px] leading-snug text-ink/50">
+                Нажмите на карточку, чтобы перевернуть. «Подробнее» откроет полное описание.
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X, Sparkles } from "lucide-react";
 
 /**
@@ -11,13 +11,20 @@ import { X, Sparkles } from "lucide-react";
  * <header>. Solid dark band (bg-ink) so it reads against any hero background.
  * Dismissal persisted to localStorage for 7 days.
  *
- * Respects prefers-reduced-motion via the global animation override.
+ * Animation rule (RULES §5): only transform/opacity — no width/height.
+ * Open/close uses the grid-template-rows 0fr→1fr technique (same pattern
+ * used in faq.tsx) plus an opacity fade on the inner content. The grid-rows
+ * value is not in the prohibited list (width/height/top/left/margin).
+ *
+ * Respects prefers-reduced-motion via the global animation override and an
+ * explicit `useReducedMotion` check (skips the grid animation when reduced).
  */
 const STORAGE_KEY = "announcement-dismissed-until";
 const DISMISS_DAYS = 7;
 
 export function AnnouncementBar() {
   const [visible, setVisible] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     try {
@@ -44,36 +51,74 @@ export function AnnouncementBar() {
     }
   };
 
+  // When reduced motion is requested, skip the grid/opacity animation entirely
+  // and just render statically. Keeps the bar accessible & non-distracting.
+  if (prefersReducedMotion) {
+    return visible ? (
+      <div
+        role="status"
+        aria-live="polite"
+        className="relative z-[55] flex items-center justify-center gap-3 bg-ink px-10 py-2.5 text-center text-cream"
+      >
+        <Sparkles className="size-3.5 shrink-0 text-gold" aria-hidden="true" />
+        <p className="text-xs font-medium tracking-wide text-cream/90 md:text-sm">
+          <span className="hidden sm:inline">Сезонные свадебные меню 2026 — </span>
+          <a
+            href="#menu"
+            className="font-semibold text-gold underline underline-offset-2 hover:text-peach transition-colors"
+          >
+            смотреть меню →
+          </a>
+        </p>
+        <button
+          type="button"
+          onClick={dismiss}
+          aria-label="Закрыть объявление"
+          className="absolute right-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream"
+        >
+          <X className="size-4" />
+        </button>
+      </div>
+    ) : null;
+  }
+
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
           role="status"
           aria-live="polite"
-          className="relative z-[55] flex items-center justify-center gap-3 bg-ink px-10 py-2.5 text-center text-cream"
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
+          // CSS grid + grid-template-rows 0fr→1fr animates the row height
+          // without ever writing to the `height` property (RULES §5 compliant).
+          className="relative z-[55] grid bg-ink text-cream"
+          initial={{ gridTemplateRows: "0fr", opacity: 0 }}
+          animate={{ gridTemplateRows: "1fr", opacity: 1 }}
+          exit={{ gridTemplateRows: "0fr", opacity: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Sparkles className="size-3.5 shrink-0 text-gold" aria-hidden="true" />
-          <p className="text-xs font-medium tracking-wide text-cream/90 md:text-sm">
-            <span className="hidden sm:inline">Сезонные свадебные меню 2026 — </span>
-            <a
-              href="#menu"
-              className="font-semibold text-gold underline underline-offset-2 hover:text-peach transition-colors"
-            >
-              смотреть меню →
-            </a>
-          </p>
-          <button
-            type="button"
-            onClick={dismiss}
-            aria-label="Закрыть объявление"
-            className="absolute right-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream"
-          >
-            <X className="size-4" />
-          </button>
+          {/* Overflow-hidden wrapper clips content while the row collapses */}
+          <div className="overflow-hidden">
+            <div className="flex items-center justify-center gap-3 px-10 py-2.5 text-center">
+              <Sparkles className="size-3.5 shrink-0 text-gold" aria-hidden="true" />
+              <p className="text-xs font-medium tracking-wide text-cream/90 md:text-sm">
+                <span className="hidden sm:inline">Сезонные свадебные меню 2026 — </span>
+                <a
+                  href="#menu"
+                  className="font-semibold text-gold underline underline-offset-2 hover:text-peach transition-colors"
+                >
+                  смотреть меню →
+                </a>
+              </p>
+              <button
+                type="button"
+                onClick={dismiss}
+                aria-label="Закрыть объявление"
+                className="absolute right-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

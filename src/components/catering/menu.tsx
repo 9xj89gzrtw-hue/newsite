@@ -1,13 +1,170 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Download, Loader2, Check, ChevronDown, Sparkles } from "lucide-react";
+import { ArrowUpRight, Download, Loader2, Check, ChevronDown, Sparkles, Leaf, Wheat, Vegan, Star } from "lucide-react";
 import { Reveal } from "./reveal";
-import { MENU_TYPES, formatRUB, type MenuType } from "@/lib/pricing";
+import { Toggle } from "@/components/ui/toggle";
+import { MENU_TYPES, formatRUB, type MenuType, type Dish } from "@/lib/pricing";
 import { generateMenuPdf } from "@/lib/pdf-client";
 import { toast } from "sonner";
+
+/**
+ * Dietary tags derived from dish name via heuristic text matching.
+ * Tags: "veg" (vegetarian), "vegan", "gf" (gluten-free), "halal".
+ * Returns the set of dietary tags a dish satisfies.
+ */
+function getDietaryTags(name: string): string[] {
+  const lower = name.toLowerCase();
+  // Fish / seafood (counts as non-veg/non-vegan)
+  const fishRe = /(лосос|креветк|палтус|тунец|осьминог|гребешок|морепродукт|икра|мидии|устриц|раков|краб|дорад|сибас|карпаччо|форел|осётр|осетр|рыб|угорь|гольц|сельд)/i;
+  // Meat (mammal + bird, no fish)
+  const meatRe = /(свин|говяж|говядин|куриц|курин|барани|язык|буженин|бекон|ветчин|хамон|пармск|ростбиф|мяс|шашлык|бефстроган|котлет|салями|паштет|фрикадел|фарш|кебаб|люля|гусин|утин|утка|жаркое|сосиск|колбас|чоризо|печён|печен|рулет|тёпл|тепл|вырезк|бедро|грудк|фарш|шниц|бифштекс|рагу|стейк.*говядин|медальон)/i;
+  // Gluten sources
+  const glutenRe = /(брускетт|круассан|маффин|эклер|кекс|торт|пирож|бургер|лепёшк|лепешк|хлеб|крутон|гренк|тарталетк|песочн|бисквит|понч|пирог|багет|чиабат|лаваш|панчетт|спринг-ролл|блин)/i;
+  // Pork explicitly
+  const porkRe = /(свин|бекон|буженин|ветчин|хамон|салями|сосиск|колбас|чоризо|люля.*баран|рулет.*свин)/i;
+  // Dairy (milk, cheese, cream, butter)
+  const dairyRe = /(сыр|творожн|слив|рикотт|моцарелл|пармезан|бри|дор-блю|дорбл|фета|маскарпон|чеддер|сливочн|масл|сметан|йогурт|бешамель|крем|молок|сливк)/i;
+  // Eggs
+  const eggRe = /(яйц|перепелин)/i;
+  // Honey
+  const honeyRe = /(мёд|медов)/i;
+
+  const hasFish = fishRe.test(lower);
+  const hasMeat = meatRe.test(lower) || hasFish;
+  const hasGluten = glutenRe.test(lower);
+  const hasPork = porkRe.test(lower);
+  const hasDairy = dairyRe.test(lower);
+  const hasEgg = eggRe.test(lower);
+  const hasHoney = honeyRe.test(lower);
+
+  const tags: string[] = [];
+  if (!hasMeat) tags.push("veg");
+  if (!hasMeat && !hasDairy && !hasEgg && !hasHoney && !hasFish) tags.push("vegan");
+  if (!hasGluten) tags.push("gf");
+  if (!hasPork) tags.push("halal");
+  return tags;
+}
+
+/** All dietary chip definitions shown to the user. */
+const DIETARY_CHIPS = [
+  { id: "veg", label: "Вег", icon: Leaf },
+  { id: "vegan", label: "Веган", icon: Vegan },
+  { id: "gf", label: "Без глютена", icon: Wheat },
+  { id: "halal", label: "Халяль", icon: Star },
+] as const;
+
+/**
+ * Signature dishes for the spotlight block — one or more per menu type.
+ * Each shows a chef note + price badge. Cycles every 8s.
+ */
+const SIGNATURE_DISHES: Record<string, Array<{
+  name: string;
+  chefNote: string;
+  price: string;
+  image: string;
+}>> = {
+  buffet: [
+    {
+      name: "Лосось шеф-посол",
+      chefNote: "Творожный сыр, каперсы и красная икра — чистый вкус холодного моря.",
+      price: "от 5 350 ₽ / чел",
+      image: "/media/menu-buffet.jpg",
+    },
+    {
+      name: "Тигровая креветка в цукини",
+      chefNote: "Икра летучей рыбы и хрустящий слайс — текстура в каждом укусе.",
+      price: "от 5 350 ₽ / чел",
+      image: "/media/menu-buffet.jpg",
+    },
+  ],
+  banquet: [
+    {
+      name: "Стейк филе-миньон",
+      chefNote: "Говяжья вырезка с ягодным соусом — мясо, которому не нужно шоу.",
+      price: "от 6 970 ₽ / чел",
+      image: "/media/menu-banquet.jpg",
+    },
+    {
+      name: "Дорада с вялеными томатами",
+      chefNote: "Средиземноморское море на тарелке — простота и характер.",
+      price: "от 6 970 ₽ / чел",
+      image: "/media/menu-banquet.jpg",
+    },
+  ],
+  "snack-box": [
+    {
+      name: "Канапе с лососем и сливочным сыром",
+      chefNote: "Миниатюра, в которой умещается весь банк.",
+      price: "660 ₽ / шт",
+      image: "/media/menu-snack-box.jpg",
+    },
+    {
+      name: "Брускетта с палтусом",
+      chefNote: "Бородинский хлеб и копчёное масло — питерский характер.",
+      price: "690 ₽ / шт",
+      image: "/media/menu-snack-box.jpg",
+    },
+  ],
+  "coffee-break": [
+    {
+      name: "Капучино на 100% арабике",
+      chefNote: "Бразильское зерно, температура 67°C — бариста-станция прямо на месте.",
+      price: "от 2 200 ₽ / чел",
+      image: "/media/menu-coffee-break.jpg",
+    },
+    {
+      name: "Сырная тарелка",
+      chefNote: "Бри, пармезан, дор-блю и мёд — медленная пауза между сессиями.",
+      price: "от 2 200 ₽ / чел",
+      image: "/media/menu-coffee-break.jpg",
+    },
+  ],
+  vegetarian: [
+    {
+      name: "Овощное рагу в тыкве",
+      chefNote: "Нут, карри и сезонные овощи — тёплое блюдо, которое хочется неспешно.",
+      price: "от 3 250 ₽ / чел",
+      image: "/media/menu-vegetarian.jpg",
+    },
+    {
+      name: "Веганский шоколадный мусс",
+      chefNote: "Бельгийский шоколад и ягоды — десерт без единого продукта животного происхождения.",
+      price: "от 3 250 ₽ / чел",
+      image: "/media/menu-vegetarian.jpg",
+    },
+  ],
+  bbq: [
+    {
+      name: "Шашлык из лосося на кедровой доске",
+      chefNote: "Фарерский лосось, бешамель и красная икра — огонь и море.",
+      price: "от 3 500 ₽ / чел",
+      image: "/media/event-06.jpg",
+    },
+    {
+      name: "Шашлык из свиной вырезки",
+      chefNote: "Горчица, розмарин и ночь в маринаде — простой и верный рецепт.",
+      price: "от 2 200 ₽ / чел",
+      image: "/media/event-06.jpg",
+    },
+  ],
+  "office-lunch": [
+    {
+      name: "Борщ классический",
+      chefNote: "Долго, медленно, по-домашнему — обед, после которого работают лучше.",
+      price: "от 950 ₽ / порция",
+      image: "/media/menu-office-lunch.jpg",
+    },
+    {
+      name: "Котлета по-киевски",
+      chefNote: "Сочное куриное бедро, масло с травами внутри — классика жанра.",
+      price: "от 950 ₽ / порция",
+      image: "/media/menu-office-lunch.jpg",
+    },
+  ],
+};
 
 /**
  * Map menu type IDs to their thumbnail images
@@ -18,9 +175,180 @@ const MENU_TYPE_IMAGES: Record<string, string> = {
   "snack-box": "/media/menu-snack-box.jpg",
   "coffee-break": "/media/menu-coffee-break.jpg",
   vegetarian: "/media/menu-vegetarian.jpg",
-  bbq: "/media/menu-bbq.jpg",
+  bbq: "/media/event-06.jpg",
   "office-lunch": "/media/menu-office-lunch.jpg",
 };
+
+/**
+ * FeaturedSpotlight — 80vh band between tabs and packages.
+ * Shows ONE signature dish for the active menu type with a huge photo,
+ * chef note (italic Playfair Display) and price badge.
+ * Cycles every 8s through multiple signature dishes of the same type,
+ * or instantly when the menu tab changes.
+ */
+function FeaturedSpotlight({
+  activeMenuId,
+  prefersReducedMotion = false,
+}: {
+  activeMenuId: string;
+  prefersReducedMotion?: boolean;
+}) {
+  const dishes = SIGNATURE_DISHES[activeMenuId] ?? SIGNATURE_DISHES.buffet;
+  const [idx, setIdx] = useState(0);
+
+  // Reset index when active menu changes.
+  useEffect(() => {
+    setIdx(0);
+  }, [activeMenuId]);
+
+  // Cycle through signature dishes every 8s (skip if reduced motion).
+  useEffect(() => {
+    if (prefersReducedMotion || dishes.length <= 1) return;
+    const timer = setInterval(() => {
+      setIdx((prev) => (prev + 1) % dishes.length);
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [dishes.length, prefersReducedMotion]);
+
+  const dish = dishes[idx] ?? dishes[0];
+  const nextDishIdx = (idx + 1) % dishes.length;
+
+  return (
+    <div
+      aria-label="Авторское блюдо"
+      className="relative mt-12 h-[60vh] min-h-[420px] w-full overflow-hidden rounded-3xl border border-border-line/60 bg-ink shadow-2xl shadow-ink/20 md:h-[80vh] md:min-h-[540px]"
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`${activeMenuId}-${idx}`}
+          className="absolute inset-0"
+          initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 1.06 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: prefersReducedMotion ? 1 : 1.02 }}
+          transition={{
+            duration: prefersReducedMotion ? 0.2 : 0.9,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
+          <Image
+            src={dish.image}
+            alt={dish.name}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority={false}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/55 to-ink/15" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Content overlay */}
+      <div className="relative z-10 flex h-full flex-col justify-end p-6 md:p-12 lg:p-16">
+        <div className="max-w-2xl">
+          <motion.span
+            className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.3em] text-gold backdrop-blur-md"
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+          >
+            <Sparkles className="size-3" />
+            Авторское блюдо · {idx + 1} из {dishes.length}
+          </motion.span>
+
+          <AnimatePresence mode="wait">
+            <motion.h3
+              key={`name-${activeMenuId}-${idx}`}
+              className="mt-4 font-display text-3xl text-white md:text-5xl lg:text-6xl"
+              style={{ lineHeight: 1.05 }}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{
+                duration: prefersReducedMotion ? 0.2 : 0.6,
+                delay: prefersReducedMotion ? 0 : 0.15,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              {dish.name}
+            </motion.h3>
+          </AnimatePresence>
+
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={`note-${activeMenuId}-${idx}`}
+              className="mt-5 max-w-xl font-display text-base italic leading-relaxed text-cream/85 md:text-xl"
+              style={{ fontFamily: "var(--font-serif), 'Playfair Display', Georgia, serif" }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{
+                duration: prefersReducedMotion ? 0.2 : 0.6,
+                delay: prefersReducedMotion ? 0 : 0.3,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
+              «{dish.chefNote}»
+              <span className="mt-2 block font-sans text-[11px] not-italic uppercase tracking-[0.25em] text-gold/80">
+                — шеф-повар
+              </span>
+            </motion.p>
+          </AnimatePresence>
+
+          <div className="mt-7 flex flex-wrap items-center gap-4">
+            <motion.span
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-2.5 font-mono text-xs font-bold text-white shadow-lg shadow-gold/25"
+              initial={{ opacity: 0, scale: 0.85 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{
+                delay: prefersReducedMotion ? 0 : 0.45,
+                duration: prefersReducedMotion ? 0.2 : 0.55,
+                type: "spring",
+                bounce: 0.4,
+              }}
+            >
+              <Sparkles className="size-3" />
+              {dish.price}
+            </motion.span>
+
+            {dishes.length > 1 && (
+              <div className="flex items-center gap-2" role="tablist" aria-label="Авторские блюда">
+                {dishes.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    role="tab"
+                    aria-selected={i === idx}
+                    aria-label={`Блюдо ${i + 1}`}
+                    onClick={() => setIdx(i)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      i === idx
+                        ? "w-10 bg-gold"
+                        : "w-3 bg-cream/30 hover:bg-cream/60"
+                    }`}
+                  />
+                ))}
+                {!prefersReducedMotion && (
+                  <button
+                    type="button"
+                    onClick={() => setIdx(nextDishIdx)}
+                    className="ml-2 inline-flex items-center gap-2 rounded-full border border-cream/25 bg-cream/5 px-3 py-1.5 text-[11px] uppercase tracking-wider text-cream/80 transition-colors hover:bg-cream/15 hover:text-cream"
+                    aria-label="Следующее блюдо"
+                  >
+                    Далее
+                    <ArrowUpRight className="size-3" />
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Menu section — LIGHT THEME with elegant visual cards and enhanced package display
@@ -30,9 +358,16 @@ export function Menu() {
   const [active, setActive] = useState(MENU_TYPES[0].id);
   const [downloading, setDownloading] = useState<string | null>(null);
   const [expandedPackage, setExpandedPackage] = useState<string | null>(null);
+  const [dietary, setDietary] = useState<string[]>([]);
   const current = MENU_TYPES.find((m) => m.id === active) ?? MENU_TYPES[0];
   const priceUnit = current.priceUnit ?? "/чел";
   const prefersReducedMotion = useReducedMotion();
+
+  const toggleDietary = (id: string) => {
+    setDietary((prev) =>
+      prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id],
+    );
+  };
 
   const select = (id: string) => {
     setActive(id);
@@ -62,7 +397,7 @@ export function Menu() {
   };
 
   return (
-    <section id="menu" className="relative overflow-hidden bg-cream py-24 md:py-36">
+    <section id="menu" data-header-theme="light" className="relative overflow-hidden bg-cream py-24 md:py-36">
       {/* Subtle decoration */}
       <div className="absolute top-1/2 right-0 w-80 h-80 bg-gradient-to-l from-gold/8 to-transparent rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-r from-terracotta/6 to-transparent rounded-full blur-3xl pointer-events-none" />
@@ -192,6 +527,56 @@ export function Menu() {
           </div>
         </Reveal>
 
+        {/* Featured-dish spotlight block (Task 2-c §1) */}
+        <Reveal delay={0.05}>
+          <FeaturedSpotlight
+            activeMenuId={current.id}
+            prefersReducedMotion={prefersReducedMotion}
+          />
+        </Reveal>
+
+        {/* Dietary filter chips (Task 2-c §1) */}
+        <Reveal delay={0.1}>
+          <div
+            role="toolbar"
+            aria-label="Фильтр по диетическим предпочтениям"
+            className="mt-10 flex flex-wrap items-center justify-center gap-2 md:gap-3"
+          >
+            <span className="mr-2 font-mono text-[11px] uppercase tracking-[0.25em] text-ink/50">
+              Фильтр:
+            </span>
+            {DIETARY_CHIPS.map(({ id, label, icon: Icon }) => {
+              const pressed = dietary.includes(id);
+              return (
+                <Toggle
+                  key={id}
+                  pressed={pressed}
+                  onPressedChange={() => toggleDietary(id)}
+                  size="sm"
+                  aria-label={`Фильтр: ${label}`}
+                  className={`gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-300 ${
+                    pressed
+                      ? "border-gold/40 bg-gold/15 text-ink shadow-sm shadow-gold/15"
+                      : "border-border-line bg-white text-ink/70 hover:border-gold/30 hover:bg-gold/5 hover:text-ink"
+                  }`}
+                >
+                  <Icon className={`size-3.5 ${pressed ? "text-gold" : "text-ink/50"}`} />
+                  {label}
+                </Toggle>
+              );
+            })}
+            {dietary.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setDietary([])}
+                className="ml-1 rounded-full px-3 py-1.5 text-xs font-medium text-ink/50 underline-offset-4 transition-colors hover:text-bordeaux hover:underline"
+              >
+                Сбросить
+              </button>
+            )}
+          </div>
+        </Reveal>
+
         {/* Active menu context with smooth transitions */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -245,6 +630,7 @@ export function Menu() {
               dispatchMenuSelect={dispatchMenuSelect} 
               priceUnit={priceUnit}
               prefersReducedMotion={prefersReducedMotion}
+              dietary={dietary}
             />
 
             {/* Included in all packages */}
@@ -433,6 +819,7 @@ function PackageCarousel({
   dispatchMenuSelect,
   priceUnit,
   prefersReducedMotion = false,
+  dietary = [],
 }: {
   packages: MenuType["packages"];
   current: MenuType;
@@ -441,6 +828,7 @@ function PackageCarousel({
   dispatchMenuSelect: (id: string) => void;
   priceUnit: string;
   prefersReducedMotion?: boolean;
+  dietary?: string[];
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -512,9 +900,20 @@ function PackageCarousel({
       >
         {packages.map((pkg, idx) => {
           const isExpanded = expandedPackage === pkg.name;
-          const showAll = isExpanded || packages.length === 1;
-          const visibleDishes = showAll ? pkg.dishes : pkg.dishes.slice(0, 5);
-          const hiddenCount = pkg.dishes.length - 5;
+          const hasDietary = dietary.length > 0;
+          // When a dietary filter is active, show ALL matching dishes (no slicing).
+          // Otherwise use the original 5-dish preview + expand-to-all behaviour.
+          const filteredDishes: Dish[] = hasDietary
+            ? pkg.dishes.filter((d) => {
+                const tags = getDietaryTags(d.name);
+                return dietary.every((req) => tags.includes(req));
+              })
+            : pkg.dishes;
+          const showAll = isExpanded || packages.length === 1 || hasDietary;
+          const visibleDishes = showAll
+            ? filteredDishes
+            : filteredDishes.slice(0, 5);
+          const hiddenCount = hasDietary ? 0 : pkg.dishes.length - 5;
           const isPremium = idx === packages.length - 1 && packages.length >= 2;
 
           return (
@@ -588,28 +987,73 @@ function PackageCarousel({
                   {pkg.description}
                 </motion.p>
 
-                {/* Enhanced dish list with better hierarchy */}
+                {/* Enhanced dish list with better hierarchy + popLayout animations */}
                 <ul id={`dish-list-${idx}`} className="mt-4 space-y-2.5">
-                  {visibleDishes.map((d, i) => (
-                    <motion.li
-                      key={i}
-                      layout
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: i * 0.03 + 0.3 }}
-                      className="group/dish flex items-baseline gap-2.5 text-sm"
+                  <AnimatePresence mode="popLayout">
+                    {visibleDishes.map((d, i) => {
+                      const tags = getDietaryTags(d.name);
+                      return (
+                        <motion.li
+                          key={`${pkg.name}-${i}-${d.name.slice(0, 24)}`}
+                          layout
+                          initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.95, x: -8 }}
+                          animate={{ opacity: 1, scale: 1, x: 0 }}
+                          exit={{
+                            opacity: 0,
+                            scale: prefersReducedMotion ? 1 : 0.95,
+                            transition: { duration: prefersReducedMotion ? 0.15 : 0.25 },
+                          }}
+                          transition={{
+                            duration: prefersReducedMotion ? 0.15 : 0.3,
+                            delay: prefersReducedMotion ? 0 : i * 0.03 + 0.25,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
+                          data-dietary={tags.join(" ") || undefined}
+                          className="group/dish flex items-baseline gap-2.5 text-sm"
+                        >
+                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-gold/10 font-mono text-[10px] font-bold text-gold transition-colors group-hover/dish:bg-gold/20">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span className="flex-1 text-ink/80 leading-relaxed transition-colors group-hover/dish:text-ink">
+                            {d.name}
+                          </span>
+                          {/* Dietary tag chips (shown only when filter is active) */}
+                          {hasDietary && tags.length > 0 && (
+                            <span className="flex shrink-0 items-center gap-1">
+                              {tags.map((t) => {
+                                const chip = DIETARY_CHIPS.find((c) => c.id === t);
+                                if (!chip) return null;
+                                const Icon = chip.icon;
+                                return (
+                                  <span
+                                    key={t}
+                                    className="inline-flex size-4 items-center justify-center rounded-full bg-sage/20 text-sage"
+                                    aria-label={chip.label}
+                                  >
+                                    <Icon className="size-2.5" />
+                                  </span>
+                                );
+                              })}
+                            </span>
+                          )}
+                          {d.weight && (
+                            <span className="shrink-0 rounded-full bg-ink/5 px-2 py-0.5 font-mono text-[10px] text-ink/45 tabular-nums">
+                              {d.weight}
+                            </span>
+                          )}
+                        </motion.li>
+                      );
+                    })}
+                  </AnimatePresence>
+                  {/* Empty-state when a dietary filter has 0 matches */}
+                  {hasDietary && visibleDishes.length === 0 && (
+                    <li
+                      className="rounded-xl border border-dashed border-border-line bg-cream/40 px-4 py-6 text-center text-xs text-ink/50"
+                      role="status"
                     >
-                      <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-gold/10 font-mono text-[10px] font-bold text-gold transition-colors group-hover/dish:bg-gold/20">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <span className="flex-1 text-ink/80 leading-relaxed transition-colors group-hover/dish:text-ink">{d.name}</span>
-                      {d.weight && (
-                        <span className="shrink-0 rounded-full bg-ink/5 px-2 py-0.5 font-mono text-[10px] text-ink/45 tabular-nums">
-                          {d.weight}
-                        </span>
-                      )}
-                    </motion.li>
-                  ))}
+                      В этом пакете нет блюд, удовлетворяющих выбранным фильтрам.
+                    </li>
+                  )}
                 </ul>
 
                 {/* Expand/collapse button */}

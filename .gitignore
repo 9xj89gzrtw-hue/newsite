@@ -61,3 +61,9 @@ tallguy_screenshot.png
 qoh_screenshot.png
 worklog.md
 .zscripts/
+
+# screenshot artifacts from agent-browser sessions
+/screenshots/
+/before-*.png
+/phase*.png
+/after-*.png

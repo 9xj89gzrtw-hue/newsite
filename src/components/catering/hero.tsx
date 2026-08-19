@@ -434,7 +434,10 @@ function ScrollProgressIndicator({ scrollProgress }: { scrollProgress: ReturnTyp
   const opacity = useTransform(scrollProgress, [0, 0.05, 0.9, 1], [0, 1, 1, 0]);
 
   return (
-    <div className="absolute top-0 left-0 right-0 h-[2px] z-50 bg-ink/5">
+    <div
+      aria-hidden="true"
+      className="absolute top-0 left-0 right-0 h-[2px] z-50 bg-ink/5"
+    >
       <motion.div
         className="h-full w-full origin-left"
         style={{
@@ -479,9 +482,18 @@ export function Hero() {
     offset: ["start start", "end start"],
   });
   
-  // Multiple parallax layers for depth — enhanced with more layers
-  const scale = useTransform(scrollYProgress, [0, 0.8], [1, 0.85]);
+  // Multiple parallax layers for depth — enhanced with more layers.
+  // Kinetic oversized type scale: headline enters at 1.15 and settles to 0.92
+  // over the first 60% of scroll, then holds (creates a "cinematic zoom-out"
+  // feel as the user descends into the page).
+  const scale = useTransform(scrollYProgress, [0, 0.6], [1.15, 0.92]);
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+
+  // Chapter palette-shift hand-off: charcoal (bg-ink) overlay fades in at the
+  // very end of the hero scroll (0.85 → 1.0), blending the light hero surface
+  // into the next dark section. Uses opacity only (RULES §5 compliant) —
+ // stacked-overlay pattern per AGENTS.md §12 грабли #4, NOT backgroundColor interpolation.
+  const chapterShiftOpacity = useTransform(scrollYProgress, [0.85, 1.0], [0, 0.6]);
   const blur = useTransform(scrollYProgress, [0, 0.6], [0, 12]);
   const filter = useTransform(blur, (b) => `blur(${b}px)`);
   const yText = useTransform(scrollYProgress, [0, 0.8], [0, -120]); // Increased parallax distance
@@ -510,7 +522,8 @@ export function Hero() {
     <section
       id="home"
       ref={ref}
-      className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-cream"
+      data-header-theme="transparent"
+      className="section-light relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-cream"
     >
       {/* Scroll Progress Indicator */}
       <ScrollProgressIndicator scrollProgress={pageScrollProgress} />
@@ -679,7 +692,9 @@ export function Hero() {
           style={{
             fontSize: "clamp(2.5rem, 11vw, 8.5rem)",
             lineHeight: 0.95,
-            letterSpacing: "-0.025em",
+            // Tighter headline tracking — Playfair Display looks more cinematic
+            // at -0.04em; pairs with the kinetic scale for the oversized-type effect.
+            letterSpacing: "-0.04em",
             viewTransitionName: "hero-title" as React.CSSProperties["viewTransitionName"],
           }}
           initial={{ opacity: 0 }}
@@ -811,17 +826,22 @@ export function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Left-side chapter indicator — vertical, desktop only */}
+      {/* Left-side chapter indicator — vertical, desktop only.
+          Uses writing-mode: vertical-rl (per design spec) for true vertical text
+          instead of -rotate-90 hack. Text reads top-to-bottom along the left edge. */}
       <motion.div
         aria-hidden="true"
-        className="absolute left-5 top-1/2 z-10 hidden -translate-y-1/2 -rotate-90 origin-center md:block lg:left-8"
-        style={{ y: yParallaxForeground }}
+        className="absolute left-8 top-1/2 z-10 hidden -translate-y-1/2 md:block lg:left-8"
+        style={{
+          y: yParallaxForeground,
+          writingMode: "vertical-rl" as React.CSSProperties["writingMode"],
+        }}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 0.4, x: 0 }}
         transition={{ delay: 2.6, duration: 0.8 }}
       >
         <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-ink whitespace-nowrap">
-          01 / 08 — Главная
+          01 — ГЛАВНАЯ
         </span>
       </motion.div>
 
@@ -892,6 +912,16 @@ export function Hero() {
       >
         <div className="w-24 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
       </motion.div>
+
+      {/* Chapter palette-shift hand-off: charcoal overlay that fades in at the
+          very end of the hero scroll (0.85 → 1.0). Sits below content (z-0) so
+          the headline + CTAs remain legible above it; bg-ink at 0.6 opacity
+          visually bridges the light hero into the next dark section. */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 bg-ink"
+        style={{ opacity: chapterShiftOpacity }}
+      />
     </section>
   );
 }

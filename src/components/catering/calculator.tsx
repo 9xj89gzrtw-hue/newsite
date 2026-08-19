@@ -23,8 +23,12 @@ import {
   Droplets,
   FileSignature,
   TrendingUp,
+  Send as TelegramIcon,
+  MessageCircle,
+  Gift,
 } from "lucide-react";
 import { Reveal } from "./reveal";
+import { Magnetic } from "@/components/motion/magnetic";
 import {
   MENU_TYPES, ADDONS, calcTotal, formatRUB, seasonMultiplier,
 } from "@/lib/pricing";
@@ -141,6 +145,14 @@ export function Calculator() {
     }
   };
 
+  // Build shareable URLs for Telegram + WhatsApp
+  const shareText = `Смета на кейтеринг: ${formatRUB(result.total)} — ${current.label}, ${guests} гостей. Подробности:`;
+  const shareUrlEncoded = typeof window !== "undefined"
+    ? encodeURIComponent(`${window.location.origin}/?type=${typeId}&guests=${guests}#calculator`)
+    : "";
+  const telegramShareUrl = `https://t.me/share/url?url=${shareUrlEncoded}&text=${encodeURIComponent(shareText)}`;
+  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText} ${decodeURIComponent(shareUrlEncoded)}`)}`;
+
   const toggleAddon = useCallback((id: string) =>
     setAddons((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id])),
   []);
@@ -150,7 +162,7 @@ export function Calculator() {
   const perPersonMax = current.packages[current.packages.length - 1]?.pricePerGuest || current.perGuest;
 
   return (
-    <section id="calculator" className="relative overflow-hidden bg-cream py-24 md:py-36">
+    <section id="calculator" data-header-theme="light" className="section-light relative overflow-hidden bg-cream py-24 md:py-36">
       {/* Subtle glow effect */}
       <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-gold/10 blur-[120px]" />
 
@@ -502,7 +514,7 @@ export function Calculator() {
                 <span className="font-mono text-xs uppercase tracking-wider text-ink/50 font-medium">
                   Предварительная смета
                 </span>
-                <div className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                <div className="flex items-center gap-1 text-xs text-sage bg-sage/15 px-2 py-1 rounded-full">
                   <TrendingUp className="size-3" />
                   Онлайн-оценка
                 </div>
@@ -565,35 +577,53 @@ export function Calculator() {
                 
                 {/* Value indicator */}
                 <motion.div
-                  className="mt-4 flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2.5 text-xs text-emerald-700"
+                  className="mt-4 flex items-center gap-2 rounded-lg bg-sage/15 px-3 py-2.5 text-xs text-sage"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <Check className="size-4 text-emerald-500 shrink-0" />
+                  <Check className="size-4 text-sage shrink-0" />
                   <span>
                     Включено: обслуживание, посуда, цветы, доставка в КАД
                   </span>
                 </motion.div>
               </div>
 
-              {/* CTA Button */}
-              <motion.a
-                href="#contact"
-                data-cursor="заявка"
-                className="group mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-4 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98]"
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-              >
-                Оставить заявку с этой сметой
-                <Share2 className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </motion.a>
+              {/* CTA Button — wrapped in <Magnetic> for cursor-tracking translation */}
+              <Magnetic className="mt-7">
+                <motion.a
+                  href="#contact"
+                  data-cursor="заявка"
+                  className="group flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-4 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl active:scale-[0.98] min-h-[44px]"
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  Оставить заявку с этой сметой
+                  <Share2 className="size-4 transition-transform group-hover:translate-x-0.5" />
+                </motion.a>
+              </Magnetic>
 
-              {/* Share button */}
+              {/* Seasonal multiplier badge — visible when surcharge is active */}
+              {result.season > 1 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="mt-3 flex items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-[11px] font-medium text-gold"
+                  title="Сезонный спрос повышен — финальную смету уточнит менеджер"
+                >
+                  <Gift className="size-3.5" />
+                  Сезонная надбавка +{Math.round((result.season - 1) * 100)}%
+                  <span className="text-gold/60">·</span>
+                  <span className="text-gold/70">спросите про весенние акции</span>
+                </motion.div>
+              )}
+
+              {/* Share button — copy URL */}
               <motion.button
                 onClick={shareLink}
                 data-cursor="ссылка"
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-line px-5 py-3 text-xs font-medium uppercase tracking-wider text-ink/60 hover:border-gold hover:text-gold transition-colors active:scale-[0.98]"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-line px-5 py-3 text-xs font-medium uppercase tracking-wider text-ink/60 hover:border-gold hover:text-gold transition-colors active:scale-[0.98] min-h-[44px]"
                 whileTap={{ scale: 0.97 }}
               >
                 <Share2 className="size-3.5" />
@@ -601,7 +631,7 @@ export function Calculator() {
                   <motion.span
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="text-emerald-600"
+                    className="text-sage"
                   >
                     ✓ Ссылка скопирована!
                   </motion.span>
@@ -609,6 +639,30 @@ export function Calculator() {
                   "Поделиться сметой"
                 )}
               </motion.button>
+
+              {/* Share to messengers — Telegram + WhatsApp */}
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <a
+                  href={telegramShareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Поделиться сметой в Telegram (откроется в новой вкладке)"
+                  className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/60 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
+                >
+                  <TelegramIcon className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                  Telegram
+                </a>
+                <a
+                  href={whatsappShareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Поделиться сметой в WhatsApp (откроется в новой вкладке)"
+                  className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/60 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
+                >
+                  <MessageCircle className="size-3.5 transition-transform group-hover:scale-110" />
+                  WhatsApp
+                </a>
+              </div>
 
               <p className="mt-3 text-center font-mono text-xs text-ink/40">
                 * Предварительная оценка. Финальная стоимость — после консультации.

@@ -9,7 +9,7 @@ import { Flower2, ArrowRight } from "lucide-react";
  */
 export function PromoBanner() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-gold via-terracotta to-gold py-16 md:py-24">
+    <section data-header-theme="dark" className="relative overflow-hidden bg-gradient-to-r from-gold via-terracotta to-gold py-16 md:py-24">
       {/* Decorative flowers */}
       <div className="pointer-events-none absolute -right-10 -top-10 opacity-20">
         <Flower2 className="size-64 text-white" />

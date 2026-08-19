@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Cookie } from "lucide-react";
 import { ANALYTICS } from "@/lib/config";
 
@@ -9,9 +10,18 @@ const STORAGE_KEY = "catering-cookie-consent";
 
 /**
  * Cookie consent banner — LIGHT THEME (152-ФЗ compliant).
+ *
+ * Fixed-bottom glassmorphism banner with a subtle slide-up entrance.
+ * Sits above the footer and other fixed UI at z-[60]. The translucent
+ * cream + backdrop-blur lets the hero read through naturally instead of
+ * occluding it on first visit.
+ *
+ * Entrance/exit uses only transform + opacity (RULES §5). Reduced-motion
+ * users get an instant fade instead of the slide-up spring.
  */
 export function CookieConsent() {
   const [show, setShow] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -30,35 +40,48 @@ export function CookieConsent() {
   };
 
   return (
-    show && (
-      <div className="fixed bottom-0 left-0 right-0 z-[70] max-h-[80vh] overflow-y-auto border-t border-border-line bg-white/95 backdrop-blur-xl p-3 shadow-2xl sm:p-4 md:p-6">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-6">
-          <div className="flex items-start gap-2.5 sm:gap-3">
-            <Cookie className="mt-0.5 size-4 shrink-0 text-gold sm:size-5" />
-            <p className="text-xs leading-relaxed text-ink/70 sm:text-sm">
-              Мы используем cookies для работы сайта и аналитики.{" "}
-              <Link href="/privacy" className="text-gold underline underline-offset-2 hover:text-terracotta transition-colors">
-                Политика конфиденциальности
-              </Link>
-            </p>
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          role="dialog"
+          aria-label="Согласие на использование cookies"
+          className="fixed bottom-0 inset-x-0 z-[60] backdrop-blur-xl bg-cream/85 border-t border-gold/20 shadow-[0_-8px_24px_rgba(0,0,0,0.06)]"
+          initial={prefersReducedMotion ? { opacity: 0 } : { y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={prefersReducedMotion ? { opacity: 0 } : { y: 100, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 200, damping: 26 }}
+        >
+          <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+            <div className="flex items-start gap-3">
+              <Cookie className="mt-0.5 size-4 shrink-0 text-gold sm:size-5" />
+              <p className="text-xs leading-relaxed text-ink/70 sm:text-sm">
+                Мы используем cookies для работы сайта и аналитики.{" "}
+                <Link
+                  href="/privacy"
+                  className="text-gold underline underline-offset-2 hover:text-terracotta transition-colors"
+                >
+                  Политика конфиденциальности
+                </Link>
+              </p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <button
+                onClick={() => decide("rejected")}
+                className="min-h-[44px] rounded-full border border-border-line px-3 py-1.5 text-xs font-medium text-ink/70 transition-all hover:border-gold hover:bg-gold/5 sm:px-4 sm:py-2"
+              >
+                Только нужные
+              </button>
+              <button
+                onClick={() => decide("accepted")}
+                className="min-h-[44px] rounded-full bg-gradient-to-r from-gold to-terracotta px-4 py-1.5 text-xs font-semibold text-white shadow-md shadow-gold/20 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:px-5 sm:py-2"
+              >
+                Принять
+              </button>
+            </div>
           </div>
-          <div className="flex shrink-0 gap-2">
-            <button
-              onClick={() => decide("rejected")}
-              className="rounded-full border border-border-line px-3 py-1.5 text-xs font-medium text-ink/70 transition-all hover:border-gold hover:bg-gold/5 sm:px-4 sm:py-2 min-h-[44px]"
-            >
-              Только нужные
-            </button>
-            <button
-              onClick={() => decide("accepted")}
-              className="rounded-full bg-gradient-to-r from-gold to-terracotta px-4 py-1.5 text-xs font-semibold text-white shadow-md shadow-gold/20 transition-all hover:shadow-lg hover:-translate-y-0.5 sm:px-5 sm:py-2 min-h-[44px]"
-            >
-              Принять
-            </button>
-          </div>
-        </div>
-      </div>
-    )
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

@@ -38,7 +38,7 @@ const VIDEO_CATALOG = [
 
 export function VideoEvents() {
   return (
-    <section id="video-events" className="relative overflow-hidden bg-cream py-24 md:py-36">
+    <section id="video-events" data-header-theme="light" className="section-light relative overflow-hidden bg-cream py-24 md:py-36">
       {/* Subtle decoration */}
       <div className="absolute top-1/2 left-0 w-72 h-72 bg-gradient-to-r from-gold/8 to-transparent rounded-full blur-3xl pointer-events-none" />
       

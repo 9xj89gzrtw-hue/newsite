@@ -47,3 +47,20 @@ model Lead {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 }
+
+model Subscriber {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  source          String?  // "footer", "calculator", "instagram", etc.
+  consentAccepted Boolean  @default(true)
+  consentDate     DateTime @default(now())
+  consentIp       String?
+  userAgent       String?
+  active          Boolean  @default(true)
+  unsubscribedAt  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([active])
+  @@index([createdAt])
+}

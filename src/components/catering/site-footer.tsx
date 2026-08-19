@@ -1,36 +1,179 @@
-import { Phone, MessageCircle, Instagram, Send as Telegram, Users as VkIcon, Mail } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Phone,
+  MessageCircle,
+  Instagram,
+  Send as Telegram,
+  Users as VkIcon,
+  Mail,
+  ArrowRight,
+  CheckCircle2,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 import { CONTACTS } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
+import { toast } from "sonner";
+
+/**
+ * NewsletterSignup — gold-CTA email signup with success state.
+ * Posts to /api/newsletter (Prisma Subscriber model).
+ * Glassmorphism card on dark background to feel premium.
+ */
+function NewsletterSignup() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setStatus("error");
+      toast.error("Введите корректный email");
+      return;
+    }
+    setStatus("loading");
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "footer" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data?.code === "ALREADY_SUBSCRIBED") {
+          setStatus("done");
+          toast.info("Вы уже подписаны — спасибо!");
+          return;
+        }
+        throw new Error(data?.error || "Не удалось подписаться");
+      }
+      setStatus("done");
+      setEmail("");
+      toast.success("Подписка оформлена! Сезонное меню и акции — у вас в почте.");
+    } catch (err) {
+      setStatus("error");
+      toast.error(err instanceof Error ? err.message : "Ошибка сети, попробуйте позже");
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-gold/20 bg-gradient-to-br from-white to-cream/40 p-5 shadow-sm">
+      <div className="mb-3 flex items-center gap-2">
+        <Sparkles className="size-4 text-gold" />
+        <span className="font-display text-lg text-ink">Сезонное меню и спецпредложения</span>
+      </div>
+      <p className="mb-4 text-sm text-ink/60">
+        Раз в месяц — свежая коллекция блюд, гастро-тренды и сезонные акции.
+        Без спама, отписка в один клик.
+      </p>
+      <form onSubmit={onSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-start">
+        <div className="relative flex-1">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (status === "error" || status === "done") setStatus("idle");
+            }}
+            placeholder="your@email.ru"
+            aria-label="Email для подписки"
+            disabled={status === "loading" || status === "done"}
+            className="w-full rounded-full border border-border-line bg-cream/60 px-4 py-3 text-sm text-ink placeholder:text-ink/40 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors disabled:opacity-60 min-h-[44px]"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={status === "loading" || status === "done"}
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 min-h-[44px]"
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            {status === "loading" ? (
+              <motion.span
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2"
+              >
+                <Loader2 className="size-4 animate-spin" />
+                Подписка…
+              </motion.span>
+            ) : status === "done" ? (
+              <motion.span
+                key="done"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2"
+              >
+                <CheckCircle2 className="size-4" />
+                Готово!
+              </motion.span>
+            ) : (
+              <motion.span
+                key="idle"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2"
+              >
+                Подписаться
+                <ArrowRight className="size-4" />
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
+      </form>
+      <p className="mt-3 text-[11px] text-ink/40">
+        Нажимая «Подписаться», вы соглашаетесь с политикой обработки персональных данных (152-ФЗ).
+      </p>
+    </div>
+  );
+}
 
 /**
  * SiteFooter — LIGHT THEME with elegant warm styling
- * 
+ *
  * Inspired by MyRadish and Ridgewells:
  * - Warm cream background
- * - Giant stacked brand name (Concept-style)
+ * - Giant stacked brand name (Concept-style) with slow horizontal drift on scroll
  * - Gold accent links
+ * - Newsletter signup (P1 — Prisma Subscriber-backed)
  * - Clean organized layout
  */
 export function SiteFooter() {
   return (
     <footer
       role="contentinfo"
-      className="relative border-t border-border-line bg-cream mt-auto"
+      data-header-theme="light"
+      className="section-light relative border-t border-border-line bg-cream mt-auto"
     >
       {/* Giant stacked brand name (Concept-style) — scales down on mobile */}
       <div className="mx-auto max-w-7xl overflow-hidden px-5 md:px-8 py-12">
-        <h2
+        <motion.h2
           className="font-display uppercase leading-[0.85] text-gold/10 whitespace-nowrap select-none"
           style={{ fontSize: "clamp(3rem, 18vw, 12rem)" }}
           aria-hidden
+          initial={{ x: "-1%" }}
+          whileInView={{ x: "1%" }}
+          viewport={{ once: false, margin: "-100px" }}
+          transition={{ duration: 1.2, ease: "easeInOut" }}
         >
           Interfood
-        </h2>
+        </motion.h2>
       </div>
 
       <div className="mx-auto max-w-7xl px-5 md:px-8">
+        {/* Newsletter signup band */}
+        <div className="border-t border-border-line pt-8">
+          <NewsletterSignup />
+        </div>
+
         {/* Main footer content */}
-        <div className="flex flex-col gap-8 border-t border-border-line pt-8 md:flex-row md:items-center md:justify-between">
+        <div className="mt-8 flex flex-col gap-8 border-t border-border-line pt-8 md:flex-row md:items-center md:justify-between">
           {/* Contact links */}
           <div className="flex flex-wrap items-center gap-5">
             <a

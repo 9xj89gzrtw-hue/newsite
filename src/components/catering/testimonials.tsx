@@ -227,14 +227,15 @@ function AvatarPlaceholder({
    ────────────────────────────────────────────── */
 function EventTypeBadge({ type }: { type: string }) {
   const badgeColors: Record<string, string> = {
-    Свадьба: "bg-pink-50 text-pink-700 border-pink-200",
-    Корпоратив: "bg-blue-50 text-blue-700 border-blue-200",
+    // Warm-palette event-type accents — no cold (blue/emerald/purple/pink) tech-startup colors.
+    Свадьба: "bg-peach/20 text-terracotta border-peach/40",
+    Корпоратив: "bg-parchment/60 text-bordeaux border-bordeaux/30",
     Банкет: "bg-amber-50 text-amber-700 border-amber-200",
-    Выставка: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    Церемония: "bg-purple-50 text-purple-700 border-purple-200",
+    Выставка: "bg-sage/15 text-sage border-sage/30",
+    Церемония: "bg-lilac/15 text-lilac border-lilac/30",
   };
 
-  const colors = badgeColors[type] || "bg-gray-50 text-gray-700 border-gray-200";
+  const colors = badgeColors[type] || "bg-cream/60 text-ink/70 border-border-line";
 
   return (
     <span
@@ -252,7 +253,7 @@ function EventTypeBadge({ type }: { type: string }) {
    ────────────────────────────────────────────── */
 function VerifiedBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+    <span className="inline-flex items-center gap-1 rounded-full bg-sage/15 px-2 py-0.5 text-[10px] font-medium text-sage">
       <ShieldCheck className="size-3" />
       Проверено
     </span>
@@ -530,7 +531,7 @@ function TestimonialMarquee() {
               <div className="flex items-center gap-2 mb-1">
                 <AnimatedStarRating rating={t.rating} size="sm" />
                 {t.verified && (
-                  <ShieldCheck className="size-3.5 text-emerald-600" />
+                  <ShieldCheck className="size-3.5 text-sage" />
                 )}
               </div>
               <p className="text-sm text-ink/70 italic line-clamp-2">
@@ -572,7 +573,7 @@ export function Testimonials() {
   }, [paused, count, reduceMotion]);
 
   return (
-    <section id="testimonials" className="relative overflow-hidden bg-cream py-24 md:py-36">
+    <section id="testimonials" data-header-theme="light" className="section-light relative overflow-hidden bg-cream py-24 md:py-36">
       {/* Subtle background pattern */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -611,7 +612,7 @@ export function Testimonials() {
               </span>
               <span className="h-4 w-px bg-border-line" />
               <span className="text-sm text-ink/50">127+ отзывов</span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+              <span className="inline-flex items-center gap-1 rounded-full bg-sage/15 px-2 py-0.5 text-[10px] font-medium text-sage">
                 <CheckCircle2 className="size-3" />
                 Реальные клиенты
               </span>

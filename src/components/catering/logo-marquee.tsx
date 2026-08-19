@@ -32,6 +32,7 @@ export function LogoMarquee() {
   return (
     <section
       aria-label="Клиенты, которые нам доверяют"
+      data-header-theme="light"
       className="relative border-y border-border-line bg-cream py-10 md:py-14"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">

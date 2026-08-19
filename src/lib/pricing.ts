@@ -245,7 +245,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Горячее (3 шашлычка)",
         pricePerGuest: 1950,
         description: "3 вида шашлычков на углях",
-        photo: "/media/menu-bbq.jpg",
+        photo: "/media/event-06.jpg",
         dishes: [
           { name: "Шашлычок из свиной вырезки в маринаде из горчицы и розмарина", weight: "120 гр" },
           { name: "Шашлычок из лосося (Фарерские острова) с соусом бешамель", weight: "120 гр" },
@@ -393,7 +393,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Базовый",
         pricePerGuest: 2200,
         description: "7 позиций — шашлык из свинины и курицы, овощи-гриль",
-        photo: "/media/menu-bbq.jpg",
+        photo: "/media/event-06.jpg",
         dishes: [
           { name: "Шашлык из свиной вырезки в маринаде из горчицы и розмарина", weight: "200 гр" },
           { name: "Шашлык из куриного бедра в йогурте и специях", weight: "180 гр" },
@@ -408,7 +408,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 3500,
         description: "10 позиций — добавлены лосось на кедровой доске, морепродукты, бургеры",
-        photo: "/media/menu-bbq.jpg",
+        photo: "/media/event-06.jpg",
         dishes: [
           { name: "Шашлык из свиной вырезки в маринаде из горчицы и розмарина", weight: "200 гр" },
           { name: "Шашлык из куриного бедра в йогурте и специях", weight: "180 гр" },
