@@ -718,17 +718,6 @@ export function Hero() {
               transition={{ delay: 2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             />
           </span>
-          
-          <br className="sm:hidden" />
-          {" "}
-          <motion.span 
-            className="gradient-text inline-block"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isLoaded ? 1 : 0 }}
-            transition={{ delay: 1.8, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            с 2008 года
-          </motion.span>
         </motion.h1>
 
         {/* Subheadline — rotating adjective (GG Catering pattern) */}
