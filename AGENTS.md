@@ -1657,3 +1657,49 @@ All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d
 4. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции (when not rate-limited).
 
 Целевой уровень — **Awwwards SOTD**. Phase 9 added hydration cleanup (useMounted hook + testimonials.tsx 5 sub-components — fixed all hydration mismatch warnings) + EventsGallery horizontal-scroll pinned gallery (300vh sticky, useScroll+useTransform x ['0%','-70%'], 10 items horizontal) + Hero cursor image-preview (data-cursor-image attribute → 120px image preview next to cursor on #menu CTA hover) + VideoEvents cinema mode (16:9 letterbox bars + grain overlay + CINEMA badge). All 4 P2 patterns from Phase 5 backlog done. До Awwwards-уровня остаётся: Manifesto ambient audio cue (needs audio file), VideoEvents carousel with chapter markers (needs more video URLs), find more catering videos.
+
+---
+
+## 15. Циклы аудита качества (Hostile Reviewer)
+
+### Методология (начато Cycle 1)
+
+Запускаются **3 параллельных HOSTILE REVIEWER** агента через Task tool.
+Каждый критик находит ≥7 дефектов в разных категориях.
+Циклы повторяются пока все 3 критика не поставят ≥9.3/10.
+Минимум 5 циклов, максимум 100.
+
+### Чеклист критиков
+
+| Код | Проверка |
+|-----|----------|
+| C1 | Все кнопки работают (onClick handlers) |
+| C2 | Ссылки ведут куда обещают (href) |
+| C3 | Фото загружаются (/public/media/) |
+| C4 | Форма отправляется (/api/lead/) |
+| C5 | Mobile touch targets ≥44px (WCAG 2.5.8) |
+| C6 | Цены видны |
+| C7 | Контраст WCAG AA (4.5:1 для текста) |
+| C8 | Нет визуальных багов (overlap, overflow) |
+
+### История циклов
+
+| Цикл | Дата | Оценки | Основные исправления |
+|------|------|--------|---------------------|
+| 1 | 2026-01-XX | 2.5, 3.5, 3.5 | videoSrc→undefined, event-09 дубликат→event-08, EN placeholder→RU, timezone Berlin→Moscow, dynamic dates, VK prefix, alt атрибуты, React keys |
+| 2 | 2026-01-XX | 5.5, 6.5, 5.5 | event-08 порядок, destructive color #C44040, aria-expanded строки, dynamic год, Yandex Maps адрес |
+| 3 | 2026-01-XX | 6.8, 6.8, 6.8 | aria-expanded ещё 4 места, touch targets announcement-bar/snack-box, contrast press-strip, JSON-LD часы |
+| 4 | 2026-01-XX | 6.8, 6.2, 6.8 | FAQ clear button, process "Подробнее", snack-box "Сбросить", calculator +/-5, calculator contrast |
+| 5 | 2026-01-XX | 6.8, 6.8, 5.8 | #home→#main-content, promo-banner CTA min-h, emoji→Sparkles icon, chapter-nav/pillars touch targets, aria-invalid string |
+
+### Накопленные дефекты для следующих циклов
+
+**Оставшиеся категории для улучшения:**
+- Raw `<img>` vs `<Image>` (pillars.tsx, site-header.tsx mega-menu)
+- VideoEvents chapter controls (size-2.5 = 10px)
+- Focus trap на мобильном меню
+- Cookie consent кнопки type="button"
+- HTML required атрибуты на форме
+- PressStrip контраст text-ink/50 → /70
+- InstagramVideo CTA min-h-[44px]
+- hreflang для SEO
