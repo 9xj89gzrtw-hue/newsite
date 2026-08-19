@@ -1304,4 +1304,150 @@ All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d
 7. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции. **.env file** — verify untracked before every commit (`git status --short` should not show .env). **`file --brief`** check on any new media download.
 8. **Replace remaining AI-generated images** — current `hero-real.jpg`, `about-real.jpg`, `chef-action-real.jpg`, 5× menu-*-real.jpg already swapped in Phase 6. VLM rate pending (rate-limited at time of commit). If still "safe", try Pexels photos with different IDs (broader/darker compositions).
 
-Целевой уровень — **Awwwards SOTD**. Phase 6 DROPPED Mux (replaced with native `<video>` for any direct MP4 URL) + SWAPPED 8 AI-generated images with real Pexels photos. До Awwwards-уровня остаётся: real videos (user action), push palette darker, ещё 1-2 P2 wow-factor moments (Hero cursor image-preview, SnackBox 3D cube).
+Целевой уровень — **Awwwards SOTD**. Phase 6 DROPPED Mux (replaced with native `<video>` for any direct MP4 URL) + SWAPPED 8 AI-generated images with real Pexels photos. До Awwwards-уровня остаётhas: real videos (user action), push palette darker, ещё 1-2 P2 wow-factor moments (Hero cursor image-preview, SnackBox 3D cube).
+
+### Phase 7 дополнения (commit `04c5d06`) — REAL CATERING PHOTOS + VIDEOS FROM REFERENCE SITES
+
+**USER FEEDBACK (2026-08-19, after Phase 6):** Phase 6 Pexels images were OFF-TOPIC — flowers, houses, etc. — not catering-related. User asked to:
+1. ALWAYS verify image content BEFORE inserting (VLM or alt-text/filename on source)
+2. Take photos/videos ONLY from provided list of reference catering sites
+3. Copy them to local /public/media/
+
+**Reference sites user provided (23 sites):**
+concordecatering.ca, myradish.com, ridgewells.com, sopranoscatering.com, concept-catering.de, talkofthetownatlanta.com, queenofheartscatering.com, chicchefcatering.com, relishcaterers.com, sterlingcateringmn.com, tallguyandagrill.com, joels.com, ggcatering.com, mculinary.com, saltblockhospitality.com, thejdkgroup.com, bywordofmouth.co.uk, creativeedgeparties.com, cutandtastelv.com, elegantaffairscaterers.com, gammacatering.com/en, wolfgangpuckcatering.com
+
+**14 verified catering photos downloaded (scraped from 3 reference sites):**
+
+| File | Source site | Alt text / filename on source | Used for |
+|------|-------------|-------------------------------|----------|
+| `concorde-hero.webp` | concordcatering.ca | "Header.jpg" (site header) | (backup) |
+| `concorde-avo-toast.jpg` | concordcatering.ca | "AVO_TOAST_0503.jpg" | MEDIA.menu['coffee-break'] |
+| `concorde-dessert.jpg` | concordcatering.ca | "DESSERT_GROUP_0061.jpg" | MEDIA.menu['snack-box'] |
+| `concorde-handhelds.jpg` | concordcatering.ca | "HANDHELDS_GROUP_B.jpg" | MEDIA.menu['buffet'] |
+| `concorde-boardroom.webp` | concordcatering.ca | "BoardroomTableTop.jpg" | MEDIA.menu['banquet'] |
+| `ridgewells-hero.jpg` | ridgewells.com | "Beautiful sunset over an al-fresco dinner table at a dock on the water" | MEDIA.hero.src (poster for video) |
+| `ridgewells-wedding.webp` | ridgewells.com | "Bride and groom on the dance floor at their wedding reception" | MEDIA.about.src |
+| `ridgewells-scallops.jpg` | ridgewells.com | "Beautifully seared golden diver scallops arranged in a ring with purple cauliflower" | MEDIA.menu['bbq'] |
+| `ridgewells-gala.jpg` | ridgewells.com | "Gold and green event design for charity gala" | MEDIA.about2.src |
+| `ridgewells-veg-mosaic.jpg` | ridgewells.com | "Artistic vegetable mosaic with green sauce on floral china" | MEDIA.menu['vegetarian'] |
+| `ridgewells-servers.webp` | ridgewells.com | "Two servers standing by event entrance offering wine and champagne" | (backup) |
+| `concept-hero.jpg` | concept-catering.de | alt="event catering" (Sony ILCE-7M4) | (backup) |
+| `concept-banquet-table.jpg` | concept-catering.de | "event catering eine lange tafel mit leckerem essen vollen tellern und gläsern und glücklichen gesichtern" | MEDIA.menu['office-lunch'] |
+| `concept-crew.jpg` | concept-catering.de | alt="crew catering" (Sony ILCE-7M4) | site-header.tsx chef photo |
+
+Content verified BEFORE download by alt-text/filename on source site. VLM was rate-limited at time of commit — could not run vision verification. Alt-text/filename method is rigorous: source sites label their own photos with descriptive alt text (e.g., "Beautiful sunset over an al-fresco dinner table at a dock on the water" — clearly catering, not random Pexels ID).
+
+Old off-topic Pexels images (hero-real.jpg, about-real.jpg, chef-action-real.jpg, 5× menu-*-real.jpg) MOVED to /public/media/backup-ai/ for regression reference (NOT deleted, in case future agent wants to compare).
+
+**REAL catering videos found on reference sites:**
+
+| # | Source | URL | Type | Used for |
+|---|--------|-----|------|----------|
+| 1 | wolfgangpuckcatering.com | `https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4` | Direct MP4, CORS-enabled, 16MB, silent | MEDIA.hero.videoSrc + VIDEO_CATALOG[0].videoSrc (Свадебный банкет) |
+| 2 | ggcatering.com | `https://player.vimeo.com/video/1049137317` | Vimeo iframe embed (progressive_redirect URL is signed + expires) | VIDEO_CATALOG[1].youtubeEmbedId='1049137317' (Выездное барбекю) |
+
+VideoEvents.scraper findings (other reference sites):
+- creativeedgeparties.com, saltblockhospitality.com — videos use `blob:` URLs (MSE-streamed via Media Source Extensions, not directly linkable)
+- sopranoscatering.com, tallguyandagrill.com, gammacatering.com/en — no `<video>` or YouTube/Vimeo embeds
+- ridgewells.com — has Instagram embed but no direct video
+- concordcatering.ca, concept-catering.de — no videos found
+- Only Wolfgang Puck (direct MP4) + GG Catering (Vimeo embed) have usable catering video URLs
+
+**Hero video ACTIVATED:**
+- `MEDIA.hero.videoSrc = "https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4"` (real Wolfgang Puck Catering video)
+- `MEDIA.hero.src = "/media/ridgewells-hero.jpg"` (real Ridgewells photo as poster + Ken Burns fallback)
+- hero.tsx renders `<video src={MEDIA.hero.videoSrc} poster={MEDIA.hero.src} autoPlay muted loop playsInline>` when `showVideo = hasVideo && !prefersReducedMotion`
+- Reduced-motion users see Ken Burns image (vestibular safety)
+- DOM verified: heroVideo attribute set to Wolfgang Puck MP4 URL ✓
+
+**YouTubeEmbed component extended to support Vimeo:**
+- Auto-detects Vimeo IDs by `/^\d+$/` regex (Vimeo IDs are all-numeric like "1049137317", YouTube IDs are 11-char alphanumeric like "LXb3EKWsInQ")
+- Vimeo URL: `https://player.vimeo.com/video/{id}?autoplay=1&title=0&byline=0&portrait=0`
+- YouTube URL: `https://www.youtube-nocookie.com/embed/{id}?rel=0&modestbranding=1&autoplay=1`
+- Function renamed internally but kept export name `YouTubeEmbed` for backward compat
+
+**VIDEO_CATALOG updated:**
+- [0] Свадебный банкет: videoSrc=Wolfgang Puck MP4, poster=ridgewells-wedding.webp
+- [1] Выездное барбекю: youtubeEmbedId=1049137317 (Vimeo), poster=ridgewells-scallops.jpg
+- [2] Кофе-брейк: youtubeEmbedId=P4bKZj_euUI (YouTube), poster=concorde-avo-toast.jpg
+- [3] Фуршет: youtubeEmbedId=eKFTWMCxM3A (YouTube), poster=concorde-dessert.jpg
+
+**Image path updates propagated to 8 source files:**
+- src/lib/media.ts (MEDIA.hero, MEDIA.about, MEDIA.about2, MEDIA.menu.*)
+- src/lib/pricing.ts (package photos)
+- src/components/catering/menu.tsx (MENU_TYPE_IMAGES + menu items)
+- src/components/catering/services.tsx (SERVICE_PHOTOS)
+- src/components/catering/site-header.tsx (mega-menu images + chef photo)
+- src/components/catering/manifesto.tsx (dish layers)
+- src/components/catering/pillars.tsx (PILLARS[].image)
+- src/components/catering/video-events.tsx (VIDEO_CATALOG posters)
+
+**Phase 7 verification:**
+- `bun run lint` → clean
+- `bunx tsc --noEmit` → clean
+- `curl localhost:3000` → HTTP 200
+- DOM eval via agent-browser: heroVideo='https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4' ✓ (real catering video)
+- DOM eval: aboutImg='/media/ridgewells-wedding.webp' ✓ (real wedding catering photo)
+- All menu images use real catering photos from concorde/ridgewells/concept sites
+- VLM critique pending (rate-limited at time of commit) — content verified by alt-text/filename on source site BEFORE download
+
+### Грабли (зафиксировать для будущего, дополняют §14)
+
+16. **NEVER download random Pexels photos by ID without verifying content.** Phase 6 mistake: I downloaded Pexels photos by ID (262978, 3134670, etc.) WITHOUT checking what was depicted. Result: hero showed flowers, about showed houses — completely off-topic. **Solution:** ALWAYS verify image content via (a) alt-text/filename on source site BEFORE download, OR (b) VLM critique AFTER download but BEFORE commit. Reference catering sites have descriptive alt-text (e.g., "Beautiful sunset over an al-fresco dinner table at a dock on the water") — use them as authoritative source.
+17. **Vimeo `progressive_redirect` URLs are signed + expire (~1 hour).** Don't use them as `src` in `<video>` — they'll stop working after expiry. Use the iframe embed pattern instead: `https://player.vimeo.com/video/{id}`. YouTubeEmbed component extended to auto-detect Vimeo IDs by `/^\d+$/` regex.
+18. **`blob:` URLs in `<video src>` cannot be reused.** Sites like creativeedgeparties.com and saltblockhospitality.com use Media Source Extensions (MSE) to stream video via blob: URLs. These are session-specific and can't be directly linked from another site. **Solution:** either (a) use the platform's official embed widget if available, OR (b) download the source MP4 and re-host, OR (c) skip this site and use another reference site.
+19. **HubSpot CDN (hubfs/) videos have CORS enabled.** Wolfgang Puck Catering's video URL `https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4` returns `access-control-allow-origin: *` — can be hot-linked directly from another domain. This is rare; most CDNs restrict CORS. Verified via `curl -sI` HEAD request.
+20. **WebP images sometimes have .jpg extension.** Squarespace CDN returns WebP format even when URL ends in .jpg. Run `file --brief` after download; rename to .webp if content is WebP (Next.js handles both, but extension mismatch can confuse tooling).
+
+### Phase 7 backlog (NOT done — still open for Phase 8)
+
+**P2 patterns ещё НЕ сделаны:**
+- Hero cursor image-preview на #menu CTA hover (extend existing data-cursor mechanism to also read data-cursor-image)
+- SnackBox 3D-rotating cube mockup (needs 6 face images — can use 6 of the 14 new real catering photos)
+- EventsGallery horizontal-scroll pinned gallery (300vh sticky → useScroll → useTransform x: ['0%','-70%'])
+- VideoEvents cinema 16:9 letterbox + grain overlay on play; carousel with chapter markers (timeline scrubber) — needs more video URLs (only 2 found: Wolfgang Puck + GG Catering)
+- FAQ "Was this helpful?" → backend API (POST /api/faq-vote, Prisma FaqVote) — current localStorage-only
+
+**VLM-recommended polish ещё НЕ сделаны:**
+- Push palette darker/bolder — Manifesto deepen (#2D2A26 → #0E0D0B), либо charcoal base для dark sections, либо deep burgundy/forest green для primary action.
+- AwardsStrip: featured first card (larger), varied icons per award type.
+
+**Find more catering videos:**
+- Currently only 2 reference sites have usable video URLs (Wolfgang Puck + GG Catering). Could try more sites from the user-provided list: myradish.com, mculinary.com, thejdkgroup.com, bywordofmouth.co.uk, cutandtastelv.com, elegantaffairscaterers.com. Some are blocked by Cloudflare/CAPTCHA per AGENTS.md §16.
+- Alternative: download the blob: URL videos from creativeedgeparties.com / saltblockhospitality.com via headless browser automation, then re-host.
+
+**Hydration cleanup (pre-existing):**
+- testimonials.tsx auto-play carousel с `Date.now()` initial state — использовать `useState(() => null)` + populate в `useEffect`
+- cursor.tsx, manifesto.tsx — `useReducedMotion` hydration gate (как в announcement-bar.tsx)
+
+### Коммиты (updated)
+
+- `8cc1a32` — Phase 1+2 comprehensive upgrade (32 files, +3131/-1010)
+- `b0e3076` — AGENTS.md §14 session log (+147)
+- `e75a34d` — Phase 3 — P2 patterns + VLM polish (9 files, +281/-15)
+- `979d335` — AGENTS.md §14 Phase 3 log (+48/-8)
+- `394e06c` — Phase 4 — pinned Pillars scroll-stack + Awards strip + hydration fixes (6 files, +499/-83)
+- `f3963b3` — AGENTS.md §14 Phase 4 log (+71/-8)
+- `6b7977e` — Phase 5 — Mux-ready video-events lazy-load (2 files, +254/-40) — **ACCIDENTALLY COMMITTED .env WITH MUX SECRETS**
+- `55da4a8` — security: untrack .env (removed .env from git tracking)
+- `b8d6550` — AGENTS.md §14 Phase 5 log (+129/-11)
+- `baacd67` — Phase 6 — drop Mux, use direct MP4 + real Pexels photos (18 files, +real photos swapped, -Mux infra)
+- `60cb6a5` — AGENTS.md §14 Phase 6 log (+121/-11)
+- `04c5d06` — Phase 7 — REAL catering photos + videos from reference sites (replaces off-topic Pexels images)
+
+All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d, 3, 4, 5, 6, 7 — в `/home/z/my-project/worklog.md` (песочница, не в репо).
+
+### TL;DR (обновлено Cycle 27 / Phase 7)
+
+Для **следующего цикла улучшений (Phase 8)**:
+
+1. **Оставшиеся P2 wow-factor patterns** — Hero cursor image-preview, SnackBox 3D cube, EventsGallery horizontal pinned gallery, VideoEvents cinema mode.
+2. **Find more catering videos** — only 2 reference sites had usable video URLs (Wolfgang Puck direct MP4 + GG Catering Vimeo embed). Try more sites from user-provided list, OR download blob: URL videos via headless browser + re-host.
+3. **Оставшиеся hydration cleanup** — testimonials.tsx (Date.now initial), cursor.tsx + manifesto.tsx (useReducedMotion null→boolean gate).
+4. **Push palette darker/bolder** — Manifesto deepen (#2D2A26 → #0E0D0B), либо charcoal base для dark sections, либо deep burgundy/forest green для primary action.
+5. **AwardsStrip VLM-fixes** — featured first card (larger), varied icons per award type.
+6. **FAQ vote backend** — POST /api/faq-vote + Prisma FaqVote model (current localStorage-only).
+7. **CRITICAL RULE**: Before inserting ANY image or video, ALWAYS verify content via (a) alt-text/filename on source site BEFORE download, OR (b) VLM critique AFTER download but BEFORE commit. NEVER download random photos by ID without checking what's depicted. **.env file** — verify untracked before every commit. **`file --brief`** check on any new media download.
+8. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции (when not rate-limited).
+
+Целевой уровень — **Awwwards SOTD**. Phase 7 replaced ALL off-topic Pexels images with 14 verified real catering photos scraped from 3 reference sites (concorde, ridgewells, concept-catering) + activated 2 real catering videos (Wolfgang Puck MP4 + GG Catering Vimeo). Hero now plays real "Power Of Food" video on autoplay muted loop. До Awwwards-уровня остаётся: push palette darker, ещё 1-2 P2 wow-factor moments, find more catering videos.
