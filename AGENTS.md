@@ -961,16 +961,56 @@ fromscratchcatering.com, stevenscatering.com, chefbyrequest.com, и др.
 ### Коммиты
 
 - `8cc1a32` — `feat: comprehensive design/animation/interactivity upgrade from reference patterns` (32 files, +3131/-1010). Pushed to `main`.
-- Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d — в `/home/z/my-project/worklog.md` (песочница, не в репо).
+- `b0e3076` — `docs: AGENTS.md §14 — session log` (147 строк). Pushed to `main`.
+- `e75a34d` — `feat: Phase 3 — P2 wow-factor patterns + VLM-recommended polish` (9 files, +281/-15). Pushed to `main`.
+- Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d, 3 — в `/home/z/my-project/worklog.md` (песочница, не в репо).
 
-### TL;DR (обновлено Cycle 22)
+### Phase 3 дополнения (commit `e75a34d`)
+
+**P2 patterns сделаны (часть из §14 backlog):**
+
+| # | Файл | Что добавлено |
+|---|------|---------------|
+| 1 | `faq.tsx` | "Was this helpful?" thumb-up/down (ThumbsUp/ThumbsDown), localStorage persistence (`faq-votes`), aggregate count badge after 5 votes, aria-pressed, undo on re-click, AnimatePresence "Спасибо за отзыв!" с CheckCircle2 sage |
+| 2 | `contact.tsx` | Real-time field validation на blur: опциональный `validate?: (value) => boolean` prop в `FloatingInput`. При валидности показывает sage `<CheckCircle2>` через AnimatePresence (spring scale 0.5→1). Валидаторы: name `>= 2 chars`, phone `^(\+7\|8)…$` regex, email опционально RFC-5322 simplified |
+| 3 | `events-gallery.tsx` | 3D-tilt full card (Gamma pattern REF §1643). `useMotionValue` (mvX, mvY) + `useTransform` + `useSpring` (stiffness 200/damping 20) → rotateX/rotateY ±6°. `onMouseMove`/`onMouseLeave` handlers. `perspective: 1000` на родителе, `transform-style: preserve-3d` на кнопке. Reduced-motion → tilt disabled |
+
+**VLM-recommended polish сделана (часть из §14 VLM-polish backlog):**
+
+| # | Где | Что |
+|---|-----|-----|
+| 4 | `globals.css` + 5 CTA files | `.cta-gradient-punchy` class с более насыщенным градиентом (gold `#D4A574` +8% sat, terracotta `#C8543A` +14% sat). `!important` чтобы override Tailwind `from-gold to-terracotta`. Применена к: calculator CTA (внутри Magnetic), footer newsletter button, FAQ bottom tel-CTA, services flip-card back-face CTA, snack-box "Заказать доставку". НЕ override root tokens (хирургично, только opted-in CTA) |
+| 5 | `globals.css` + `back-to-top.tsx` | Hide back-to-top на mobile (`@media (max-width: 1023px) [data-back-to-top] { display: none }`). `data-back-to-top=""` attribute добавлен на motion.button |
+| 6 | `globals.css` | `section h2.view-transition-heading { view-transition-name: var(--vt-name, none); }` — opt-in class для cross-section anchor-link transitions (Ridgewells REF §389) |
+| 7 | `globals.css` | `header[data-scrolled="true"] [data-mega-panel] { pointer-events: none; opacity: 0; }` — auto-close mega-menu после scroll (требует `data-scrolled` attribute в site-header.tsx — TODO) |
+| 8 | `globals.css` | Page-wide `@media (prefers-reduced-motion: reduce)` — kill switch для всех infinite animations + transitions |
+
+**VLM-критика post-Phase-3 (FAQ section snapshot):**
+- Visual hierarchy 6/10, micro-interaction 4/10, conversion 5/10
+- VLM отметила "thumbs lack tactile feedback" — но `aria-pressed` state changes + active border color shifts ЕСТЬ в коде, просто не видны на static screenshot
+- VLM отметила "search without highlighted matches" — но `<mark className="bg-gold/30">` highlight ЕСТЬ, просто не виден без введённого query
+- VLM-критики базируются на visual snapshot; интерактивные фичи работают на user interaction
+
+### P2 patterns НЕ сделаны (deferred to next cycle, see §14 "Что можно улучшить дальше"):
+
+- Hero cursor image-preview на #menu CTA hover — complex cursor.tsx rewrite
+- Manifesto ambient audio cue — needs audio file в public/
+- Pillars pinned vertical scroll-stack — too complex
+- SnackBox 3D-rotating cube mockup — needs 6 face images
+- EventsGallery horizontal-scroll pinned gallery — too complex
+- VideoEvents cinema letterbox + grain — needs Mux first
+- Footer awards/press logos strip — PressStrip уже покрывает похожее
+- Lottie spinner — Loader2 adequate
+
+### TL;DR (обновлено Cycle 23 / Phase 3)
 
 Для **следующего цикла улучшений**:
 
-1. **P2 wow-factor patterns** — см. список выше (scroll-scrubbed image-sequence, ambient audio, 3D cube mockup, horizontal pinned gallery).
-2. **VLM-recommended polish** — darken header, kill redundant persistent UI, bump CTA saturation, push palette darker/bolder.
-3. **Mux video activation** — `MUX_TOKEN_*` env vars + `MEDIA.hero.muxPlaybackId` + `MEDIA.videoEvents[].muxPlaybackId` + `VIDEO_TESTIMONIALS[].muxPlaybackId`.
-4. **Hydration cleanup** — `useState(() => null)` для time-based initial states в testimonials.tsx / manifesto.tsx.
-5. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции.
+1. **Оставшиеся P2 wow-factor patterns** — Hero cursor image-preview, ambient audio cue, Pillars pinned stack, SnackBox 3D cube, EventsGallery horizontal pinned gallery, VideoEvents cinema mode (после Mux).
+2. **Mux video activation** — `MUX_TOKEN_*` env vars + `MEDIA.hero.muxPlaybackId` + `MEDIA.videoEvents[].muxPlaybackId` + `VIDEO_TESTIMONIALS[].muxPlaybackId`.
+3. **Hydration cleanup** — `useState(() => null)` для time-based initial states в testimonials.tsx / manifesto.tsx.
+4. **Site-header `data-scrolled` attribute** — globals.css rule готова, но site-header.tsx ещё использует `scrolled` boolean state вместо attribute. 1-line fix.
+5. **Push palette darker/bolder** — VLM §14 polish recommendation: либо charcoal base + warm white + sharp gold, либо deep burgundy/forest green вместо safe orange. Это всё ещё не сделано — текущий .cta-gradient-punchy только bump saturation, не меняет палитру.
+6. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции.
 
-Целевой уровень — **Awwwards SOTD**. Текущая оценка VLM: 8/10 execution, 7/10 concept. До Awwwards-уровня остаётся: убрать feature creep в navigation, push'нуть palette, добавить 1-2 P2 wow-factor moments.
+Целевой уровень — **Awwwards SOTD**. Текущая оценка VLM: 8/10 execution, 7/10 concept. Phase 3 добавила 3 P2 patterns + 4 VLM-polish items. До Awwwards-уровня остаётся: push palette darker, ещё 2-3 P2 wow-factor moments, Mux video.
