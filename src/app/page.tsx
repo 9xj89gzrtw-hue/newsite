@@ -17,6 +17,7 @@ import { Calculator } from "@/components/catering/calculator";
 import { InstagramVideo } from "@/components/catering/instagram-video";
 import { Testimonials } from "@/components/catering/testimonials";
 import { PressStrip } from "@/components/catering/press-strip";
+import { AwardsStrip } from "@/components/catering/awards-strip";
 import { Faq } from "@/components/catering/faq";
 import { Contact } from "@/components/catering/contact";
 import { SiteFooter } from "@/components/catering/site-footer";
@@ -62,6 +63,8 @@ export default function Home() {
       <Testimonials />
       {/* FAQ: frequently asked questions about catering */}
       <Faq />
+      {/* Awards strip — premium trust signals before footer */}
+      <AwardsStrip />
       <Contact />
       <SiteFooter />
       {/* Back-to-top button (appears on scroll > 500px) */}

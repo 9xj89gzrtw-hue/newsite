@@ -155,6 +155,7 @@ export function SiteHeader() {
       <header
         role="banner"
         data-theme={theme}
+        data-scrolled={scrolled ? "true" : "false"}
         className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${themeClasses.bg} ${themeClasses.text}`}
       >
         {/* Dismissible seasonal announcement bar (Salt Block pattern) */}
@@ -382,6 +383,7 @@ function MegaMenu({ item }: { item: NavItem }) {
           <motion.div
             role="menu"
             aria-label={item.label}
+            data-mega-panel=""
             className="absolute left-1/2 top-full z-50 mt-2 w-[34rem] max-w-[calc(100vw-2rem)] -translate-x-1/2 overflow-hidden rounded-2xl border border-border-line bg-white/97 shadow-2xl shadow-ink/10 backdrop-blur-xl"
             initial={{ opacity: 0, y: -8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

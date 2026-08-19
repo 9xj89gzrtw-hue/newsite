@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Phone,
@@ -17,6 +17,19 @@ import {
 import { CONTACTS } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
 import { toast } from "sonner";
+
+/**
+ * Stable current year — computed once on mount to avoid SSR/CSR
+ * hydration mismatch (server timezone vs client timezone may differ
+ * across the year boundary, causing "© 2026" vs "© 2027" mismatch).
+ */
+function useCurrentYear() {
+  const [year, setYear] = useState<number | null>(null);
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+  return year;
+}
 
 /**
  * NewsletterSignup — gold-CTA email signup with success state.
@@ -145,6 +158,7 @@ function NewsletterSignup() {
  * - Clean organized layout
  */
 export function SiteFooter() {
+  const year = useCurrentYear();
   return (
     <footer
       role="contentinfo"
@@ -280,7 +294,7 @@ export function SiteFooter() {
 
         {/* Copyright bar */}
         <div className="mt-6 flex flex-col gap-3 text-xs text-ink/50 md:flex-row md:justify-between pb-8">
-          <p>© {new Date().getFullYear()} {SITE_CONFIG.brandName} · {CONTACTS.city}</p>
+          <p>© {year ?? new Date().getFullYear()} {SITE_CONFIG.brandName} · {CONTACTS.city}</p>
           <p>152-ФЗ · ЗОПП · Данные хранятся на территории РФ</p>
         </div>
       </div>

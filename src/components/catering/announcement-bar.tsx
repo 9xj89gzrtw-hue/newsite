@@ -25,6 +25,14 @@ const DISMISS_DAYS = 7;
 export function AnnouncementBar() {
   const [visible, setVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  // Track mount to gate rendering of reduced-motion variant —
+  // avoids SSR/CSR hydration mismatch (useReducedMotion returns null on SSR,
+  // then a boolean on client; rendering the reduced-branch during initial
+  // hydration causes a mismatch because server renders the AnimatePresence path.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     try {
@@ -51,9 +59,10 @@ export function AnnouncementBar() {
     }
   };
 
-  // When reduced motion is requested, skip the grid/opacity animation entirely
+  // When reduced motion is requested AND we've mounted (so prefersReducedMotion
+  // has resolved to a real boolean), skip the grid/opacity animation entirely
   // and just render statically. Keeps the bar accessible & non-distracting.
-  if (prefersReducedMotion) {
+  if (mounted && prefersReducedMotion) {
     return visible ? (
       <div
         role="status"
