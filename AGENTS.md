@@ -1573,3 +1573,87 @@ All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d
 5. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции (when not rate-limited).
 
 Целевой уровень — **Awwwards SOTD**. Phase 8 added VLM polish (manifesto palette darkened to pure ink #0E0D0B + AwardsStrip featured first card with varied icons) + SnackBox 3D rotating cube (wow-factor P2) + FAQ vote backend (POST /api/faq-vote + Prisma FaqVote) + 2 more real catering videos (Cut and Taste Vimeo + Elegant Affairs MP4). 4/4 video-events items now have real catering content. До Awwwards-уровня остаётся: Hero cursor image-preview, EventsGallery horizontal pinned gallery, hydration cleanup.
+
+### Phase 9 дополнения (commit `91e7f2e`) — hydration cleanup + 3 P2 wow-factor patterns
+
+**Hydration cleanup (Phase 8 backlog done):**
+
+| # | Component | What |
+|---|-----------|------|
+| 1 | `src/hooks/use-mounted.ts` (new) | `useMounted()` hook: returns false during SSR + initial client render, true after mount. Use to gate conditional rendering that depends on client-only APIs (useReducedMotion, useScroll, window, localStorage) — avoids SSR/CSR hydration mismatches when the client branch differs from server. |
+| 2 | `testimonials.tsx` | Applied `useMounted + effectiveReduce = mounted && (reduceMotion ?? false)` pattern to ALL 5 sub-components that use `useReducedMotion` in JSX `initial`/`animate`/`exit`/`duration`/`delay` props: AnimatedStarRating, TestimonialCard, VideoTestimonialCard, TestimonialMarquee (early-return `mounted && reduceMotion`), Testimonials main (carousel + trust clients grid). |
+| 3 | Verified | agent-browser errors count went from ~14 (with hydration mismatch warnings) to 0 after browser session close+reopen. Console clean (only Fast Refresh info messages). |
+
+**EventsGallery horizontal-scroll pinned gallery (Phase 5 backlog done):**
+
+| # | Component | What |
+|---|-----------|------|
+| 4 | `events-gallery.tsx` Phase9PinnedHorizontalGallery (new) | 300vh outer wrapper with sticky 100vh inner container. useScroll target ref + offset ['start start', 'end end'] for section-aware scroll progress. useTransform scrollYProgress [0,1] → x ['0%','-70%'] for horizontal track translation. 10 items shown in horizontal flex row, each aspect-[4/5], responsive widths (5vw→35vw→25vw→20vw at sm/md/lg/xl). Progress bar at bottom (scaleX 0→1 driven by scrollYProgress). 'Прокрутите вниз — события движутся вбок' eyebrow + 'Горизонтальная лента событий' heading. Each card has dark gradient overlay + caption + category badge + index number (NN / 10). Only on lg+ desktop AND non-reduced-motion AND mounted AND items.length > 3. mounted gate prevents SSR/CSR hydration mismatch from useReducedMotion null→boolean transition. Mobile/reduced-motion users see the existing masonry grid above. |
+
+**Hero cursor image-preview на #menu CTA hover (Phase 5 backlog done):**
+
+| # | Component | What |
+|---|-----------|------|
+| 5 | `cursor.tsx` rewrite | New state: `previewImage` (URL string, set from `data-cursor-image` attribute on hovered element). New motion.div preview element: fixed 120px, scales 0→1 on data-cursor-image hover via AnimatePresence. Spring-tracked previewX/previewY (stiffness 500, damping 32) — follows cursor closely, less lag than ring. next/image with object-cover inside the 120px circle, rounded-2xl, gold/40 border, shadow-2xl. Subtle gradient overlay from-ink/20 for depth. Label badge shows below the preview image (rounded-full bg-ink/85 text-cream). When preview is active: ring hides (opacity 0, scale 0) — preview takes over. Reduced-motion: preview disabled (data-cursor-image reads but no preview shown, just label). Existing dot + ring + label behavior preserved when no data-cursor-image. |
+| 6 | `hero.tsx` PremiumCTAButton | New optional `cursorImage` prop (URL string). Passes through to `data-cursor-image` attribute on the `<a>` element. #menu CTA 'Смотреть меню' now has `cursorImage='/media/concorde-boardroom.webp'` — hovering shows real catering dish photo (BoardroomTableTop from concordcatering.ca) in 120px circle next to cursor. |
+
+**VideoEvents cinema 16:9 letterbox + grain overlay (Phase 5 backlog done):**
+
+| # | Component | What |
+|---|-----------|------|
+| 7 | `video-events.tsx` CinemaVideoEmbed (new) | Wraps DirectVideoEmbed with cinema-mode overlays. 16:9 letterbox bars: top + bottom 8% height each, scale-in from 0 to 1 (scaleY, transform-origin top/bottom). RULES §5 compliant — transform only. Grain overlay: .grain class from globals.css (SVG feTurbulence, mix-blend-mode: overlay, opacity 0.07). Disabled for reduced-motion. 'CINEMA' badge top-right with pulsing gold dot (animate opacity [1, 0.4, 1] infinite 1.6s). Reduced-motion: letterbox bars are static (no scale animation), grain disabled. video-events.tsx VideoCard render: when videoSrc is set, uses CinemaVideoEmbed instead of DirectVideoEmbed (cinema mode wraps the direct MP4 player). |
+
+**Phase 9 verification:**
+- `bun run lint` → clean
+- `bunx tsc --noEmit` → clean
+- `curl localhost:3000` → HTTP 200
+- DOM eval via agent-browser:
+  - heroMenuCtaImageAttr: '/media/concorde-boardroom.webp' ✓ (data-cursor-image set on #menu CTA)
+  - pinnedItems: 10 ✓ (horizontal-scroll gallery items render after scroll on lg+)
+  - eventsSection: 1 ✓, videoSection: 1 ✓
+- agent-browser errors: 0 after browser session close+reopen (was ~14 with hydration mismatch warnings before testimonials.tsx fix). Console clean (only Fast Refresh info messages).
+
+### Phase 9 backlog (NOT done — still open for Phase 10)
+
+**P2 patterns ещё НЕ сделаны:**
+- Manifesto ambient audio cue (needs audio file + external CDN — RULES §3 forbids hosting media in /public)
+- VideoEvents carousel with chapter markers (timeline scrubber) — needs more video URLs (only 4 active currently)
+
+**Hydration cleanup remaining (low priority — non-blocking warnings):**
+- cursor.tsx — uses `useReducedMotion` in JSX `animate` prop (scale) but `enabled` state gates initial render so no SSR mismatch. Low priority.
+- manifesto.tsx — uses `useReducedMotion` in conditional `if (reduce)` early-return. Could add mounted gate but currently works because framer-motion's early-return doesn't render different DOM on server vs client (both render nothing).
+
+**Find more catering videos (mostly exhausted):**
+- Currently 4 real catering videos active (Wolfgang Puck MP4 + GG Catering Vimeo + Cut and Taste Vimeo + Elegant Affairs MP4). Most reference sites blocked or have no videos. Could try downloading blob: URL videos from creativeedgeparties.com / saltblockhospitality.com via headless browser automation, then re-host on own CDN (Backblaze B2 free tier).
+
+### Коммиты (updated)
+
+- `8cc1a32` — Phase 1+2 comprehensive upgrade (32 files, +3131/-1010)
+- `b0e3076` — AGENTS.md §14 session log (+147)
+- `e75a34d` — Phase 3 — P2 patterns + VLM polish (9 files, +281/-15)
+- `979d335` — AGENTS.md §14 Phase 3 log (+48/-8)
+- `394e06c` — Phase 4 — pinned Pillars scroll-stack + Awards strip + hydration fixes (6 files, +499/-83)
+- `f3963b3` — AGENTS.md §14 Phase 4 log (+71/-8)
+- `6b7977e` — Phase 5 — Mux-ready video-events lazy-load (2 files, +254/-40) — **ACCIDENTALLY COMMITTED .env WITH MUX SECRETS**
+- `55da4a8` — security: untrack .env (removed .env from git tracking)
+- `b8d6550` — AGENTS.md §14 Phase 5 log (+129/-11)
+- `baacd67` — Phase 6 — drop Mux, use direct MP4 + real Pexels photos (18 files, +real photos swapped, -Mux infra)
+- `60cb6a5` — AGENTS.md §14 Phase 6 log (+121/-11)
+- `04c5d06` — Phase 7 — REAL catering photos + videos from reference sites (replaces off-topic Pexels images)
+- `7ed48dc` — AGENTS.md §14 Phase 7 log (+147/-1)
+- `36f1e84` — Phase 8 — VLM polish + SnackBox 3D cube + FAQ vote backend + 2 more videos
+- `a2b89dd` — AGENTS.md §14 Phase 8 log (+122)
+- `91e7f2e` — Phase 9 — hydration cleanup + EventsGallery horizontal pinned + Hero cursor image-preview + VideoEvents cinema mode (6 files, +332/-25)
+
+All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d, 3, 4, 5, 6, 7, 8, 9 — в `/home/z/my-project/worklog.md` (песочница, не в репо).
+
+### TL;DR (обновлено Cycle 29 / Phase 9)
+
+Для **следующего цикла улучшений (Phase 10)**:
+
+1. **Оставшиеся P2 patterns** — Manifesto ambient audio cue (needs audio file + external CDN), VideoEvents carousel with chapter markers (needs more video URLs).
+2. **Find more catering videos** — most reference sites exhausted (4/23 have usable videos). Alternative: download blob: URL videos via headless browser automation, then re-host на Backblaze B2 free tier.
+3. **CRITICAL RULE**: Before inserting ANY image/video, ALWAYS verify content via (a) alt-text/filename on source site BEFORE download, OR (b) VLM critique AFTER download but BEFORE commit. NEVER download random photos by ID without checking what's depicted. **.env file** — verify untracked before every commit. **`file --brief`** check on any new media download.
+4. **Lint + typecheck** зелёные перед коммитом. **Agent-browser** end-to-end верификация. **VLM** brutal-honesty critique каждой секции (when not rate-limited).
+
+Целевой уровень — **Awwwards SOTD**. Phase 9 added hydration cleanup (useMounted hook + testimonials.tsx 5 sub-components — fixed all hydration mismatch warnings) + EventsGallery horizontal-scroll pinned gallery (300vh sticky, useScroll+useTransform x ['0%','-70%'], 10 items horizontal) + Hero cursor image-preview (data-cursor-image attribute → 120px image preview next to cursor on #menu CTA hover) + VideoEvents cinema mode (16:9 letterbox bars + grain overlay + CINEMA badge). All 4 P2 patterns from Phase 5 backlog done. До Awwwards-уровня остаётся: Manifesto ambient audio cue (needs audio file), VideoEvents carousel with chapter markers (needs more video URLs), find more catering videos.
