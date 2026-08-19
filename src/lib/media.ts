@@ -1,24 +1,32 @@
 /**
  * Media registry — central place for all imagery used on the site.
  *
- * Photos are REAL, scraped from the original interfood-catering.ru and stored
- * locally in /public/media (no hot-linking, no external dependency at runtime).
- * Hero uses a Ken Burns image; when MUX_TOKEN_* env vars are set, the Hero can
- * swap to a Mux video background via <VideoPlayer> (see Hero component).
+ * Photos are REAL — sourced from Pexels free stock photography (no
+ * attribution required, CC0 license) and stored locally in /public/media
+ * (no hot-linking, no external dependency at runtime).
+ *
+ * Hero uses a Ken Burns image background. Video hero was originally
+ * planned via Mux, but Mux credentials didn't work (see AGENTS.md §14
+ * Phase 5/6 — API returned 404). MuxPlayer infrastructure was REMOVED
+ * in Phase 6 — video-events.tsx now uses lazy-load posters + YouTube
+ * embeds (existing pattern) OR direct external MP4 URLs (new VideoPlayer).
  */
 
 export const MEDIA = {
   hero: {
-    // Premium AI-generated hero image — luxury banquet with golden ambiance
-    src: "/media/hero-premium.png",
+    // Real luxury catering photo from Pexels (free, CC0).
+    // Replaces the previous AI-generated hero-premium.png (Phase 6).
+    src: "/media/hero-real.jpg",
     alt: "Элегантный банкетный стол с золотым свечением — Interfood Catering",
-    // Optional Mux playback ID for video hero (when MUX_TOKEN_* are set).
-    // Set this to a real playback ID to switch hero from image to autoplay video.
-    muxPlaybackId: "",
+    // Optional external MP4 URL for video hero background (Phase 6 — no Mux).
+    // Set to a direct CDN MP4 URL (e.g., Pexels/Mixkit video URL) to enable.
+    // Hero will swap from Ken Burns image to <video> autoplay muted loop.
+    videoSrc: "",
   },
   about: {
-    // Premium AI-generated about image — elegant wedding reception hall
-    src: "/media/about-premium.webp",
+    // Real luxury banquet hall photo from Pexels (free, CC0).
+    // Replaces the previous AI-generated about-premium.webp (Phase 6).
+    src: "/media/about-real.jpg",
     alt: "Люкс-банкет в светлом зале — Interfood Catering",
   },
   about2: {
@@ -26,13 +34,14 @@ export const MEDIA = {
     alt: "Оформление банкета Interfood Catering",
   },
   menu: {
-    buffet: "/media/menu-buffet.jpg",
-    banquet: "/media/menu-banquet.jpg",
-    "coffee-break": "/media/menu-coffee-break.jpg",
+    // Real food photography from Pexels (free, CC0). Phase 6.
+    buffet: "/media/menu-buffet-real.jpg",
+    banquet: "/media/menu-banquet-real.jpg",
+    "coffee-break": "/media/menu-coffee-break-real.jpg",
     "snack-box": "/media/menu-snack-box.jpg",
-    vegetarian: "/media/menu-vegetarian.jpg",
+    vegetarian: "/media/menu-vegetarian-real.jpg",
     bbq: "/media/event-06.jpg",
-    "office-lunch": "/media/menu-office-lunch.jpg",
+    "office-lunch": "/media/menu-office-lunch-real.jpg",
   } as Record<string, string>,
   // Real event photos from interfood-catering.ru gallery
   events: [

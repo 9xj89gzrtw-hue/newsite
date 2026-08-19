@@ -425,7 +425,7 @@ function MegaMenu({ item }: { item: NavItem }) {
                   className="group relative block overflow-hidden rounded-l-2xl"
                 >
                   <img
-                    src="/media/menu-banquet.jpg"
+                    src="/media/menu-banquet-real.jpg"
                     alt=""
                     aria-hidden="true"
                     className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -477,7 +477,7 @@ function MegaMenu({ item }: { item: NavItem }) {
                   className="group relative block overflow-hidden rounded-l-2xl"
                 >
                   <img
-                    src="/media/event-chef-action.jpg"
+                    src="/media/chef-action-real.jpg"
                     alt=""
                     aria-hidden="true"
                     className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"

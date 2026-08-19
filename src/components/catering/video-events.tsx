@@ -9,16 +9,19 @@ import { Reveal } from "./reveal";
 /**
  * VideoEvents — LIGHT THEME
  *
- * Видео-секция мероприятий. Поддерживает 3 типа источника:
- * 1. Mux playback ID — выводит `<MuxPlayer>` (динамический импорт, lazy).
- *    Используется когда заполнен `muxPlaybackId` в VIDEO_CATALOG.
- * 2. YouTube embed — fallback когда `muxPlaybackId` пустой. Правило §3
- *    требует Mux, но для совместимости с legacy-плейсхолдерами оставлен
- *    fallback. Когда пользователь загрузит клипы в Mux-дашборд и заполнит
- *    `muxPlaybackId`, YouTube fallback автоматически перестанет использоваться.
- * 3. Poster-only with play button — lazy-load pattern: пользователь видит
- *    постер до клика, видeoswar подгружается по клику. Сохраняет пропускную
- *    способность (4× iframe initial load для первой страницы).
+ * Видео-секция мероприятий. Phase 6 architecture (no Mux):
+ * 1. Direct external MP4 URL — preferred (RULES §3 — no .mp4 in /public,
+ *    always stream from CDN). Uses native <video> via DirectVideoEmbed.
+ *    Set `videoSrc` in VIDEO_CATALOG to enable. Sources: Pexels videos CDN,
+ *    Mixkit, Coverr, Bunny.net Stream, Cloudinary free tier, Backblaze B2 +
+ *    Cloudflare CDN.
+ * 2. Mux playback ID — DEPRECATED (Phase 6 removed MuxPlayer). Renders a
+ *    stub message telling user to migrate to videoSrc. Kept for backward
+ *    compat with any existing data.
+ * 3. YouTube embed — legacy fallback when no direct MP4 URL set.
+ * 4. Poster-only with play button — lazy-load pattern: пользователь видит
+ *    постер до клика, видео подгружается по клику. Сохраняет пропускную
+ *    способность (4× iframe initial load saved).
  *
  * P1 patterns (REFERENCE-SITES-ANALYSIS.md §653 Lazy Loading + §1261 Swiper):
  *  - Lazy-load videos on click: posters only until interaction
@@ -31,8 +34,14 @@ type VideoItem = {
   desc: string;
   source: string;
   poster?: string; // /media/*.jpg — shown until user clicks
-  muxPlaybackId?: string; // when set, use Mux; else fall back to YouTube
-  youtubeEmbedId?: string; // legacy fallback
+  // Phase 6 — direct external MP4 URL (preferred, from any free CDN).
+  // When set, DirectVideoEmbed uses native <video> element.
+  videoSrc?: string;
+  // Phase 5 legacy — Mux playback ID. DEPRECATED in Phase 6. Renders stub.
+  // Migrate to videoSrc (direct MP4 URL).
+  muxPlaybackId?: string;
+  // Legacy YouTube fallback (still works, but RULES §3 prefers direct MP4).
+  youtubeEmbedId?: string;
 };
 
 const VIDEO_CATALOG: VideoItem[] = [
@@ -41,8 +50,9 @@ const VIDEO_CATALOG: VideoItem[] = [
     desc: "Подача блюд, сервировка, атмосфера торжества",
     source: "Роскошный кейтеринг",
     poster: "/media/event-01.png",
-    // Mux playback ID — TODO: user uploads to Mux dashboard, fills in real ID
-    // muxPlaybackId: "REPLACE_WITH_REAL_MUX_PLAYBACK_ID",
+    // Phase 6 — to enable direct MP4, set videoSrc to a CDN URL like:
+    //   "https://videos.pexels.com/video-files/{id}/{filename}.mp4"
+    // videoSrc: "",
     youtubeEmbedId: "LXb3EKWsInQ",
   },
   {
@@ -139,6 +149,7 @@ function VideoCard({
   desc,
   source,
   poster,
+  videoSrc,
   muxPlaybackId,
   youtubeEmbedId,
 }: VideoItem) {
@@ -223,10 +234,15 @@ function VideoCard({
                 </motion.span>
               </div>
 
-              {/* "Mux" badge if available — indicates premium streaming */}
-              {muxPlaybackId && (
+              {/* HD badge — indicates direct CDN streaming */}
+              {videoSrc && (
                 <div className="absolute left-3 top-3 z-10 rounded-full bg-gold/90 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-white backdrop-blur-sm">
-                  HD · Mux
+                  HD · CDN
+                </div>
+              )}
+              {muxPlaybackId && (
+                <div className="absolute left-3 top-3 z-10 rounded-full bg-bordeaux/80 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-white backdrop-blur-sm" title="Mux playback IDs are deprecated in Phase 6 — migrate to videoSrc">
+                  Mux · legacy
                 </div>
               )}
             </motion.button>
@@ -257,9 +273,14 @@ function VideoCard({
               transition={{ duration: 0.3 }}
               className="absolute inset-0"
             >
-              {muxPlaybackId ? (
+              {videoSrc ? (
+                // Phase 6 — direct external MP4 URL via native <video>.
+                <DirectVideoEmbed src={videoSrc} poster={poster} title={title} />
+              ) : muxPlaybackId ? (
+                // Phase 5 legacy — Mux playback ID (deprecated, renders stub).
                 <MuxVideoEmbed playbackId={muxPlaybackId} title={title} />
               ) : youtubeEmbedId ? (
+                // Legacy YouTube fallback.
                 <YouTubeEmbed embedId={youtubeEmbedId} title={title} />
               ) : (
                 <div className="flex h-full items-center justify-center text-cream/60 text-sm">
@@ -298,33 +319,56 @@ function VideoCard({
 }
 
 /**
- * MuxVideoEmbed — renders `<MuxPlayer>` via dynamic import.
- * MuxPlayer is a web component that touches `window`, so it must be
- * client-only (ssr: false). Wrapped here so it only loads when the user
- * actually clicks play (saves initial JS bundle).
+ * MuxVideoEmbed — DEPRECATED in Phase 6.
+ *
+ * Phase 6 removed Mux infrastructure (API returned 404 — credentials likely
+ * restricted to Vercel-Mux integration scope). Replaced with DirectVideoEmbed
+ * below, which uses a native <video> element supporting any external MP4 URL
+ * from free CDNs (Pexels videos, Mixkit, Coverr, Bunny.net, Cloudinary,
+ * Backblaze B2 + Cloudflare CDN).
+ *
+ * This stub kept to avoid breaking the muxPlaybackId prop in VIDEO_CATALOG
+ * (legacy fallback). If a video has muxPlaybackId set (legacy), it renders
+ * a placeholder message telling the user to migrate to direct MP4 URL.
  */
-function MuxVideoEmbed({ playbackId, title }: { playbackId: string; title: string }) {
-  // Lazy dynamic import — MuxPlayer web component only loads on demand.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const MuxPlayer = require("@mux/mux-player-react").default as React.ComponentType<{
-    playbackId: string;
-    streamType?: string;
-    autoPlay?: boolean;
-    muted?: boolean;
-    loop?: boolean;
-    playsInline?: boolean;
-    className?: string;
-  }>;
+function MuxVideoEmbed({ playbackId }: { playbackId: string; title: string }) {
   return (
-    <MuxPlayer
-      playbackId={playbackId}
-      streamType="on-demand"
+    <div className="flex h-full items-center justify-center bg-ink p-4 text-center text-cream/60 text-sm">
+      Mux playback ID &quot;{playbackId}&quot; requires Mux API access (Phase 5
+      was removed). Migrate to a direct MP4 URL in VIDEO_CATALOG.videoSrc
+      (Phase 6 pattern).
+    </div>
+  );
+}
+
+/**
+ * DirectVideoEmbed — Phase 6.
+ *
+ * Renders a native <video> element with a direct external MP4 URL from any
+ * free CDN (Pexels videos, Mixkit, Coverr, Bunny.net, Cloudinary, etc.).
+ * No SDK needed, no API calls, no provider lock-in.
+ *
+ * Autoplay muted loop (browser autoplay policy compliant).
+ */
+function DirectVideoEmbed({
+  src,
+  poster,
+  title,
+}: {
+  src: string;
+  poster?: string;
+  title: string;
+}) {
+  return (
+    <video
+      src={src}
+      poster={poster}
       autoPlay
       muted
       loop
       playsInline
-      className="h-full w-full"
-      // Note: title is set via aria-label since MuxPlayer doesn't have a `title` prop.
+      controls
+      className="h-full w-full object-cover"
       aria-label={title}
     />
   );

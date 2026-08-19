@@ -71,13 +71,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Лосось шеф-посол",
       chefNote: "Творожный сыр, каперсы и красная икра — чистый вкус холодного моря.",
       price: "от 5 350 ₽ / чел",
-      image: "/media/menu-buffet.jpg",
+      image: "/media/menu-buffet-real.jpg",
     },
     {
       name: "Тигровая креветка в цукини",
       chefNote: "Икра летучей рыбы и хрустящий слайс — текстура в каждом укусе.",
       price: "от 5 350 ₽ / чел",
-      image: "/media/menu-buffet.jpg",
+      image: "/media/menu-buffet-real.jpg",
     },
   ],
   banquet: [
@@ -85,13 +85,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Стейк филе-миньон",
       chefNote: "Говяжья вырезка с ягодным соусом — мясо, которому не нужно шоу.",
       price: "от 6 970 ₽ / чел",
-      image: "/media/menu-banquet.jpg",
+      image: "/media/menu-banquet-real.jpg",
     },
     {
       name: "Дорада с вялеными томатами",
       chefNote: "Средиземноморское море на тарелке — простота и характер.",
       price: "от 6 970 ₽ / чел",
-      image: "/media/menu-banquet.jpg",
+      image: "/media/menu-banquet-real.jpg",
     },
   ],
   "snack-box": [
@@ -113,13 +113,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Капучино на 100% арабике",
       chefNote: "Бразильское зерно, температура 67°C — бариста-станция прямо на месте.",
       price: "от 2 200 ₽ / чел",
-      image: "/media/menu-coffee-break.jpg",
+      image: "/media/menu-coffee-break-real.jpg",
     },
     {
       name: "Сырная тарелка",
       chefNote: "Бри, пармезан, дор-блю и мёд — медленная пауза между сессиями.",
       price: "от 2 200 ₽ / чел",
-      image: "/media/menu-coffee-break.jpg",
+      image: "/media/menu-coffee-break-real.jpg",
     },
   ],
   vegetarian: [
@@ -127,13 +127,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Овощное рагу в тыкве",
       chefNote: "Нут, карри и сезонные овощи — тёплое блюдо, которое хочется неспешно.",
       price: "от 3 250 ₽ / чел",
-      image: "/media/menu-vegetarian.jpg",
+      image: "/media/menu-vegetarian-real.jpg",
     },
     {
       name: "Веганский шоколадный мусс",
       chefNote: "Бельгийский шоколад и ягоды — десерт без единого продукта животного происхождения.",
       price: "от 3 250 ₽ / чел",
-      image: "/media/menu-vegetarian.jpg",
+      image: "/media/menu-vegetarian-real.jpg",
     },
   ],
   bbq: [
@@ -155,13 +155,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Борщ классический",
       chefNote: "Долго, медленно, по-домашнему — обед, после которого работают лучше.",
       price: "от 950 ₽ / порция",
-      image: "/media/menu-office-lunch.jpg",
+      image: "/media/menu-office-lunch-real.jpg",
     },
     {
       name: "Котлета по-киевски",
       chefNote: "Сочное куриное бедро, масло с травами внутри — классика жанра.",
       price: "от 950 ₽ / порция",
-      image: "/media/menu-office-lunch.jpg",
+      image: "/media/menu-office-lunch-real.jpg",
     },
   ],
 };
@@ -170,13 +170,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
  * Map menu type IDs to their thumbnail images
  */
 const MENU_TYPE_IMAGES: Record<string, string> = {
-  buffet: "/media/menu-buffet.jpg",
-  banquet: "/media/menu-banquet.jpg",
+  buffet: "/media/menu-buffet-real.jpg",
+  banquet: "/media/menu-banquet-real.jpg",
   "snack-box": "/media/menu-snack-box.jpg",
-  "coffee-break": "/media/menu-coffee-break.jpg",
-  vegetarian: "/media/menu-vegetarian.jpg",
+  "coffee-break": "/media/menu-coffee-break-real.jpg",
+  vegetarian: "/media/menu-vegetarian-real.jpg",
   bbq: "/media/event-06.jpg",
-  "office-lunch": "/media/menu-office-lunch.jpg",
+  "office-lunch": "/media/menu-office-lunch-real.jpg",
 };
 
 /**
@@ -481,7 +481,7 @@ export function Menu() {
                   {/* Thumbnail image */}
                   <div className="relative h-16 w-full overflow-hidden sm:h-20">
                     <Image
-                      src={MENU_TYPE_IMAGES[m.id] || "/media/menu-buffet.jpg"}
+                      src={MENU_TYPE_IMAGES[m.id] || "/media/menu-buffet-real.jpg"}
                       alt={m.label}
                       fill
                       sizes="160px"

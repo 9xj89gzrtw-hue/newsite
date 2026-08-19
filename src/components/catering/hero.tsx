@@ -2,22 +2,21 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
-import type { MuxCSSProperties } from "@mux/mux-player-react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ArrowDown, Sparkles, Play, UtensilsCrossed, Star } from "lucide-react";
 import { MEDIA } from "@/lib/media";
 import { Magnetic } from "@/components/motion/magnetic";
 
 /**
- * MuxPlayer loaded client-side only (web component, touches window).
- * Activates ONLY when MEDIA.hero.muxPlaybackId is set — otherwise the hero
- * uses a Ken Burns image (default, no Mux tokens required).
+ * Hero background — uses Ken Burns image by default.
+ * When MEDIA.hero.videoSrc is set (direct CDN MP4 URL — Phase 6, no Mux),
+ * hero swaps to <video autoplay muted loop> background.
+ * Reduced-motion → always Ken Burns image (no video).
+ *
+ * Phase 5 had MuxPlayer support, but Mux API returned 404 for all endpoints
+ * (credentials likely restricted). Removed in Phase 6 — replaced with simple
+ * <video> element supporting any direct external MP4 URL.
  */
-const MuxPlayer = dynamic(
-  () => import("@mux/mux-player-react").then((m) => m.default),
-  { ssr: false, loading: () => null },
-);
 
 // ─── Scramble Characters Set ────────────────────────────────────────────────
 const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*";
@@ -510,7 +509,11 @@ export function Hero() {
   // Rotation for subtle 3D tilt effect on scroll
   const rotateX = useTransform(scrollYProgress, [0, 0.8], [0, 3]);
   
-  const hasVideo = Boolean(MEDIA.hero.muxPlaybackId);
+  const hasVideo = Boolean(MEDIA.hero.videoSrc);
+  const prefersReducedMotion = useReducedMotion();
+  // Show video only when: videoSrc is set AND user hasn't requested reduced motion.
+  // (Reduced-motion users get the Ken Burns image — videos can be vestibular triggers.)
+  const showVideo = hasVideo && !prefersReducedMotion;
 
   useEffect(() => {
     // Trigger entrance animations after mount
@@ -528,24 +531,24 @@ export function Hero() {
       {/* Scroll Progress Indicator */}
       <ScrollProgressIndicator scrollProgress={pageScrollProgress} />
 
-      {/* Background: Mux video OR Ken Burns image */}
+      {/* Background: external MP4 video OR Ken Burns image (Phase 6 — no Mux) */}
       <motion.div 
         className="absolute inset-0" 
         style={{ scale: bgScale }}
       >
-        {hasVideo ? (
-          <MuxPlayer
-            playbackId={MEDIA.hero.muxPlaybackId}
-            streamType="on-demand"
+        {showVideo ? (
+          // Direct external MP4 video — supports any CDN URL (Pexels, Mixkit, etc.).
+          // Autoplay muted loop (browser autoplay policy compliant). Poster = hero image
+          // shows before video loads. Reduced-motion users see Ken Burns image (above check).
+          <video
+            src={MEDIA.hero.videoSrc}
+            poster={MEDIA.hero.src}
             autoPlay
             muted
             loop
             playsInline
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            } as MuxCSSProperties}
+            className="absolute inset-0 size-full object-cover"
+            aria-label={MEDIA.hero.alt}
           />
         ) : (
           <Image

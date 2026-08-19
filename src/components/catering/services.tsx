@@ -9,13 +9,13 @@ import { SERVICES } from "@/lib/media";
 
 // Photo per service (from MEDIA.menu / events)
 const SERVICE_PHOTOS: Record<string, string> = {
-  Heart: "/media/menu-banquet.jpg",
+  Heart: "/media/menu-banquet-real.jpg",
   Gem: "/media/event-04.jpg",
   Truck: "/media/event-09.jpg",
   UtensilsCrossed: "/media/event-03.jpg",
   ChefHat: "/media/event-10.jpg",
   Flower2: "/media/event-01.png",
-  Cake: "/media/menu-coffee-break.jpg",
+  Cake: "/media/menu-coffee-break-real.jpg",
   Wine: "/media/event-11.jpg",
   PartyPopper: "/media/event-02.jpg",
   Droplets: "/media/menu-snack-box.jpg",

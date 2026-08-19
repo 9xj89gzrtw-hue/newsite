@@ -1,20 +1,9 @@
 "use client";
 
 import * as React from "react";
-import dynamic from "next/dynamic";
-import type { MuxCSSProperties } from "@mux/mux-player-react";
 import type { VideoSource } from "@/lib/video";
-import { muxPoster } from "@/lib/video";
+import { videoPoster } from "@/lib/video";
 import { cn } from "@/lib/utils";
-
-/**
- * MuxPlayer is a web component shipped via a React wrapper. It must only render
- * on the client (it touches `window`), so we load it with `ssr: false`.
- */
-const MuxPlayer = dynamic(
-  () => import("@mux/mux-player-react").then((m) => m.default),
-  { ssr: false, loading: () => null },
-);
 
 type VideoPlayerProps = {
   source: VideoSource;
@@ -30,9 +19,18 @@ type VideoPlayerProps = {
 };
 
 /**
- * Single video component for the whole site. Streams via Mux (primary) or
- * Cloudflare Stream (fallback) — see `lib/video.ts`. Never point this at a
- * local `.mp4` in /public (Vercel bandwidth penalty).
+ * Single video component for the whole site.
+ *
+ * Phase 6 (2026-08-19): Mux + Cloudflare Stream REMOVED.
+ * Now uses native <video> element with direct external MP4 URLs from any
+ * free CDN (Pexels videos, Mixkit, Coverr, Bunny.net Stream, Cloudinary
+ * free tier, Backblaze B2 + Cloudflare CDN, etc.).
+ *
+ * Never point this at a local `.mp4` in /public — Vercel bandwidth penalty
+ * (per docs/RULES.md §3). Always use an external CDN URL.
+ *
+ * For YouTube/Vimeo embeds, use the iframe pattern directly (see
+ * src/components/catering/video-events.tsx YouTubeEmbed component).
  */
 export function VideoPlayer({
   source,
@@ -50,27 +48,21 @@ export function VideoPlayer({
         className,
       )}
     >
-      {source.provider === "mux" ? (
-        <MuxPlayer
-          playbackId={source.playbackId}
-          streamType={source.streamType ?? "on-demand"}
-          poster={source.poster ?? muxPoster(source.playbackId)}
+      {source.provider === "direct" ? (
+        <video
+          src={source.src}
+          poster={source.poster ?? videoPoster(source)}
           autoPlay={autoPlay}
           muted={autoPlay}
           loop={loop}
           playsInline
-          style={hideControls ? ({ "--controls": "none" } as MuxCSSProperties) : undefined}
+          controls={!hideControls}
           className="h-full w-full"
         />
       ) : (
-        <iframe
-          // Cloudflare Stream embed
-          src={`https://customer-${source.customerSubdomain}.cloudflarestream.com/${source.videoUid}/iframe`}
-          title="Cloudflare Stream video"
-          sandbox="allow-scripts allow-same-origin allow-presentation"
-          allow="autoplay; picture-in-picture"
-          className="h-full w-full"
-        />
+        <div className="flex h-full items-center justify-center text-cream/60 text-sm">
+          Неизвестный источник видео
+        </div>
       )}
     </div>
   );
