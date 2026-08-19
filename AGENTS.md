@@ -1703,3 +1703,33 @@ All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d
 - PressStrip контраст text-ink/50 → /70
 - InstagramVideo CTA min-h-[44px]
 - hreflang для SEO
+
+### Циклы 6-10 (сессия 2026-08-19, GLM-5.2 agent-mode)
+
+| Цикл | Оценки критиков | Основные исправления |
+|------|----------------|---------------------|
+| 6 | A:1.0, B:0.5, C:0.8 → REJECT | **КРИТИЧНО:** Vercel деплоил Z.ai scaffold вместо Interfood сайта. Push триггерил rebuild. +23 source дефекта: est.2008→2014, FAQ minimums, fabricated Porsche testimonials, avrora Cyrillic, dynamic dates, English 404, hreflang, /calculator rewrite, fallback leak, backup-ai removed |
+| 7 | A:garbage, B:5.2, C:4.8 → REJECT | Form crash (stepValid setState в render), 16→12 лет, Harley Days, SLA, 3D cube alts, service photos/tags, JSON-LD @id/logo/sameAs, real PNG icons, og-image 1200×630, contrast ink/40→/70, gold #C4956A→#8B6534, touch targets |
+| 8 | A:fail, B:5.5, C:4.5 → REJECT | External videos REMOVED (Wolfgang Puck/GG/Cut&Taste/Elegant), vegetarian dairy, slider ticks even-spaced, dish photos, testimonial dates, Porsche from trust, 404 H1+title, mobile menu role=dialog+Esc, main tabIndex=-1, services back-h3 aria-hidden, contrast /45/50/55→/70, favicon.ico removed |
+| 9 | A:fail, B:fail, C:4.5 → REJECT | Instagram embed.js gated behind consent (152-ФЗ), mobile menu focus mgmt (focus close on open, restore on close), aria-label typo, aria-describedby+id on form errors, contact cards tabIndex=-1, testimonial dots 44px, process mobile h3 aria-hidden |
+| 10 | single:4.8 → REJECT | FAQ vote buttons conditional render (16 invisible tab-focusable), mobile menu Tab/Shift+Tab focus trap, mobile contact links min-h-[44px], announcement bar gold→cream (3.32:1→13.5:1), pillars h3 reduced, consent aria-label cleaned |
+
+**Key learnings для следующих циклов:**
+1. **Деплой verification обязателен** — Vercel может деплоить stale build. Всегда `curl` проверять `<title>` и `lang` после push.
+2. **`stepValid()` НЕ должен вызывать `setState`** — если используется в `disabled={}` при рендере → React crash #301/#418.
+3. **`text-ink/40-55` все FAIL WCAG AA** — использовать `/70` минимум для текста на cream.
+4. **`--gold: #8B6534` на тёмном фоне = 3.32:1 (FAIL)** — на dark bg использовать `text-cream`, не `text-gold`.
+5. **External videos/photos = misrepresentation** — никогда не встраивать видео конкурентов как своё.
+6. **`grid-rows-[0fr]` + `overflow-hidden` ≠ `display:none`** — контент остаётся в tab order. Использовать conditional render или `inert`.
+7. **`aria-label` на `<a>` внутри `<label>`** попадает в accessible name чекбокса — не ставить туда visual hints.
+8. **Focus trap требует Tab/Shift+Tab wrap** — одного Esc недостаточно для WCAG 2.1.2.
+9. **Apple-touch-icon должен быть real PNG** — iOS не принимает SVG с .png расширением.
+10. **`favicon.ico` должен быть real ICO** — SVG с .ico расширением + nosniff = не рендерится.
+
+**Оставшиеся дефекты для Cycle 11+ (из Cycle 10 critic):**
+- Cookie banner obscures mobile FABs (lift state to context, hide FABs)
+- Native date input English labels (replace with Calendar component)
+- Phone field needs explicit aria-label (placeholder ≠ label)
+- Contact card link accessible names (add aria-label overrides)
+- 2 menu signature dish photo mismatches remain (Сырная тарелка, Котлета)
+- DB still not connected (leads return fallback success without persistence)
