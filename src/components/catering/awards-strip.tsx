@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Reveal } from "./reveal";
-import { Award, Trophy, Star, Crown, Medal } from "lucide-react";
+import { Award, Trophy, Star, Crown, Medal, Sparkles, Heart, UtensilsCrossed, Gem, Flame } from "lucide-react";
 
 /**
  * AwardsStrip — premium awards / press badges band above footer main.
@@ -10,27 +10,33 @@ import { Award, Trophy, Star, Crown, Medal } from "lucide-react";
  * VLM §14 backlog: "Footer: awards / press logos strip above footer main".
  * REFERENCE-SITES-ANALYSIS.md §283-300: 94% adoption of trust signals.
  *
- * Shows 6 award badges in grayscale → warm gold on hover.
- * Staggered whileInView entrance (80ms per badge).
- * Each badge has: icon, title, year, organization.
+ * Phase 8 VLM-fix: featured first card (larger, full gradient bg) + varied
+ * icons per award type (was 5 near-identical achievement symbols — VLM said
+ * "icon redundancy dilutes individual award identity").
  */
 type Award = {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   year: string;
   org: string;
+  featured?: boolean;
 };
 
 const AWARDS: Award[] = [
-  { icon: Trophy, title: "Лучший кейтеринг года", year: "2024", org: "СПб Gateway Awards" },
-  { icon: Award, title: "Топ-10 кейтерингов России", year: "2024", org: "CateringForum" },
-  { icon: Crown, title: "Премия за сервис", year: "2023", org: "Eventorussia" },
-  { icon: Medal, title: "Золотой фестиваль", year: "2023", org: "RestFestival" },
+  // Featured — flagship award (VLM-fix: visual weight variation)
+  { icon: Crown, title: "Лучший кейтеринг года", year: "2024", org: "СПб Gateway Awards", featured: true },
+  // Varied icons per award type (VLM-fix: no 5 near-identical achievement symbols)
+  { icon: UtensilsCrossed, title: "Топ-10 кейтерингов России", year: "2024", org: "CateringForum" },
+  { icon: Heart, title: "Премия за сервис", year: "2023", org: "Eventorussia" },
+  { icon: Flame, title: "Золотой фестиваль", year: "2023", org: "RestFestival" },
   { icon: Star, title: "Выбор клиентов", year: "2024", org: "Яндекс.Услуги" },
-  { icon: Trophy, title: "Свадебный подрядчик", year: "2022", org: "Wedding Awards SPb" },
+  { icon: Gem, title: "Свадебный подрядчик", year: "2022", org: "Wedding Awards SPb" },
 ];
 
 export function AwardsStrip() {
+  const featured = AWARDS.filter((a) => a.featured);
+  const regular = AWARDS.filter((a) => !a.featured);
+
   return (
     <section
       aria-label="Награды и достижения"
@@ -62,9 +68,61 @@ export function AwardsStrip() {
           </div>
         </Reveal>
 
+        {/* Featured award — full-width gradient card (VLM-fix) */}
+        {featured.length > 0 && (
+          <Reveal delay={0.05}>
+            <ul className="mt-10 grid gap-4">
+              {featured.map((award, i) => {
+                const Icon = award.icon;
+                return (
+                  <motion.li
+                    key={`featured-${award.title}-${award.year}`}
+                    initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="group relative overflow-hidden rounded-3xl border border-gold/30 bg-gradient-to-br from-gold/15 via-terracotta/10 to-cream-2 p-6 sm:p-8"
+                  >
+                    {/* Decorative shimmer overlay */}
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -right-12 -top-12 size-48 rounded-full bg-gradient-to-br from-gold/20 to-transparent blur-2xl"
+                    />
+                    <div className="relative flex flex-col items-center gap-5 text-center sm:flex-row sm:text-left">
+                      {/* Large gradient icon — flagship weight */}
+                      <span className="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-gold to-terracotta text-white shadow-lg shadow-gold/30 transition-transform duration-500 group-hover:scale-105">
+                        <Icon className="size-8" />
+                      </span>
+                      <div className="flex-1">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold/80">
+                          ★ Флагманская награда
+                        </span>
+                        <h3 className="mt-1.5 font-display text-2xl text-ink sm:text-3xl">
+                          {award.title}
+                        </h3>
+                        <p className="mt-1 font-mono text-xs uppercase tracking-wider text-ink/50">
+                          {award.year} · {award.org}
+                        </p>
+                      </div>
+                      {/* Year stamp — premium feel */}
+                      <span
+                        aria-hidden="true"
+                        className="font-display text-5xl text-gold/30 select-none sm:text-6xl"
+                      >
+                        {award.year}
+                      </span>
+                    </div>
+                  </motion.li>
+                );
+              })}
+            </ul>
+          </Reveal>
+        )}
+
+        {/* Regular awards — grid of 5 cards */}
         <Reveal delay={0.1}>
-          <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {AWARDS.map((award, i) => {
+          <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {regular.map((award, i) => {
               const Icon = award.icon;
               return (
                 <motion.li

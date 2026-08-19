@@ -71,14 +71,19 @@ const VIDEO_CATALOG: VideoItem[] = [
     desc: "Корпоративное обслуживание, деловые мероприятия",
     source: "Корпоративный кофе-брейк",
     poster: "/media/concorde-avo-toast.jpg",
-    youtubeEmbedId: "P4bKZj_euUI",
+    // Real catering video from Cut and Taste Las Vegas (Vimeo embed).
+    // iframe-based — Vimeo video ID 692388530.
+    youtubeEmbedId: "692388530", // Vimeo video ID — YouTubeEmbed auto-detects Vimeo
   },
   {
     title: "Фуршет на банкете",
     desc: "Канапе, брускетты, подача официантами",
     source: "Обслуживание фуршета",
     poster: "/media/concorde-dessert.jpg",
-    youtubeEmbedId: "eKFTWMCxM3A",
+    // Real catering video from Elegant Affairs NY (direct MP4 URL).
+    // WordPress wp-content uploads — 533KB MP4, no CORS but <video> element
+    // works cross-origin without CORS for video playback (not canvas access).
+    videoSrc: "https://elegantaffairscaterers.com/wp-content/uploads/2021/07/landscape-1.mp4",
   },
 ];
 

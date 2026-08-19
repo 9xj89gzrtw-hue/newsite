@@ -64,3 +64,20 @@ model Subscriber {
   @@index([active])
   @@index([createdAt])
 }
+
+model FaqVote {
+  id           String   @id @default(cuid())
+  // Question text is the key (hash to dedupe + index)
+  questionHash String   @unique
+  questionText String
+  vote         String   // "up" | "down"
+  // Anonymous identifier — IP + User-Agent hash for one-vote-per-user.
+  // (Compliant with 152-ФЗ — collected as consent proof metadata)
+  consentIp    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([vote])
+  @@index([createdAt])
+}

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Truck, ArrowUpRight, Minus, Plus } from "lucide-react";
 import { Reveal } from "./reveal";
+import { SnackBoxCube3D } from "./snack-box-3d-cube";
 import { SNACK_BOX_ITEMS } from "@/lib/media";
 import { formatRUB } from "@/lib/pricing";
 
@@ -108,6 +109,16 @@ export function SnackBoxDelivery() {
                 Заказать доставку
                 <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </a>
+            </Reveal>
+
+            {/* Phase 8 P2 wow-factor: 3D-rotating cube mockup
+                6 cube faces use 6 real catering photos from reference sites
+                (concorde handhelds/scallops/avo-toast/veg-mosaic/dessert/banquet-table).
+                Auto-rotates 360° over 24s; half-speed on hover; static for reduced-motion. */}
+            <Reveal delay={0.5}>
+              <div className="mt-10">
+                <SnackBoxCube3D />
+              </div>
             </Reveal>
           </div>
 

@@ -21,7 +21,7 @@ import {
  *   3. Beneath it, a one-sentence brand manifesto colorizes word-by-word from
  *      soft to full opacity. Each word also gets a 1px bordeaux underline that
  *      draws in left-to-right (scaleX 0 → 1) synced with the colorize transform.
- *   4. The section background eases from warm charcoal (#2D2A26) to cream (#FAF8F5)
+ *   4. The section background eases from deep ink (#0E0D0B) to cream (#FAF8F5)
  *      over the second half via a stacked cream-overlay div.
  *   5. After the pinned scroll-space ends, a 50vh chapter-divider gradient
  *      (cream→charcoal→cream) bridges the manifesto into the next section,
@@ -145,7 +145,7 @@ export function Manifesto() {
       id="manifesto"
       ref={containerRef}
       data-header-theme="dark"
-      className="section-dark relative bg-[#2D2A26]"
+      className="section-dark relative bg-[#0E0D0B]"
     >
       {/* Scroll space — 250vh gives ~150vh of pinned scroll-play. */}
       <div className="h-[250vh]">
@@ -170,7 +170,7 @@ export function Manifesto() {
               sizes="100vw"
               className="object-cover kenburns-slow"
             />
-            <div className="absolute inset-0 bg-[#2D2A26]/50" />
+            <div className="absolute inset-0 bg-[#0E0D0B]/50" />
           </motion.div>
 
           {/* Eyebrow — gold accent for light theme */}

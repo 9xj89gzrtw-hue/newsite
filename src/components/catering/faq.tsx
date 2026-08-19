@@ -157,7 +157,7 @@ function WasHelpful({ question }: { question: string }) {
     setVote(newVote);
     if (newVote) {
       writeVote(question, newVote);
-      // Optimistically update aggregate
+      // Optimistically update aggregate (localStorage-only state)
       if (newVote === "up") setTotalUp((n) => n + 1);
       else setTotalDown((n) => n + 1);
       if (vote && vote !== newVote) {
@@ -165,6 +165,17 @@ function WasHelpful({ question }: { question: string }) {
         if (vote === "up") setTotalUp((n) => Math.max(0, n - 1));
         else setTotalDown((n) => Math.max(0, n - 1));
       }
+      // Phase 8: also POST to /api/faq-vote for server-side aggregate (152-ФЗ
+      // compliant — captures IP + User-Agent as consent proof). Fire-and-forget
+      // (no await) — UI doesn't block on server response. localStorage remains
+      // the source of truth for instant UI feedback.
+      fetch("/api/faq-vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, vote: newVote }),
+      }).catch(() => {
+        // Silent fail — vote is already in localStorage, server is best-effort.
+      });
     } else {
       // Undo
       if (vote === "up") setTotalUp((n) => Math.max(0, n - 1));
