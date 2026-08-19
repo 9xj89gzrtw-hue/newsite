@@ -48,3 +48,16 @@ Thumbs.db
 *.log
 dev.log
 server.log
+
+# examples & tests (not for production)
+/examples/
+/tests/
+/tool-results/
+/download/
+/upload/
+/mini-services/
+--timeout
+tallguy_screenshot.png
+qoh_screenshot.png
+worklog.md
+.zscripts/
