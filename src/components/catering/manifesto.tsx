@@ -39,8 +39,8 @@ const MANIFESTO_IMG_ALT = "Праздничная сервировка банк�
 // page (file extension is .jpg but content is text/html — would fail to render
 // as an SVG <image>). Using /media/event-06.jpg (Скандинавское барбекю) instead.
 const MANIFESTO_DISHES = [
-  { src: "/media/menu-buffet-real.jpg", alt: "Фуршетная линия — Interfood Catering" },
-  { src: "/media/menu-banquet-real.jpg", alt: "Банкетная сервировка — Interfood Catering" },
+  { src: "/media/concorde-handhelds.jpg", alt: "Фуршетная линия — Interfood Catering" },
+  { src: "/media/concorde-boardroom.webp", alt: "Банкетная сервировка — Interfood Catering" },
   { src: "/media/event-06.jpg", alt: "Выездное барбекю — Interfood Catering" },
 ] as const;
 

@@ -272,7 +272,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Базовый",
         pricePerGuest: 900,
         description: "7 позиций — кофе, чай, выпечка, фрукты",
-        photo: "/media/menu-coffee-break-real.jpg",
+        photo: "/media/concorde-avo-toast.jpg",
         dishes: [
           { name: "Кофе зерновой (100% арабика, Бразилия)", weight: "200 мл" },
           { name: "Чай листовой (чёрный/зелёный)", weight: "200 мл" },
@@ -287,7 +287,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Стандарт",
         pricePerGuest: 1450,
         description: "10 позиций — добавлены салаты и горячие закуски",
-        photo: "/media/menu-coffee-break-real.jpg",
+        photo: "/media/concorde-avo-toast.jpg",
         dishes: [
           { name: "Кофе зерновой (100% арабика, Бразилия)", weight: "200 мл" },
           { name: "Чай листовой (чёрный/зелёный)", weight: "200 мл" },
@@ -305,7 +305,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 2200,
         description: "12 позиций — капучино, авторская выпечка, сырная тарелка",
-        photo: "/media/menu-coffee-break-real.jpg",
+        photo: "/media/concorde-avo-toast.jpg",
         dishes: [
           { name: "Капучино / Латте (профессиональная кофемашина, 100% арабика)", weight: "200 мл" },
           { name: "Чай листовой премиум (Эрл Грей, Жасмин, Молочный улун)", weight: "200 мл" },
@@ -341,7 +341,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Базовый",
         pricePerGuest: 2450,
         description: "8 позиций — канапе, брускетты, салаты",
-        photo: "/media/menu-vegetarian-real.jpg",
+        photo: "/media/ridgewells-veg-mosaic.jpg",
         dishes: [
           { name: "Канапе с авокадо, томатами черри и кунжутом на пшеничном крутоне", weight: "35 гр" },
           { name: "Канапе с печёным перцем, тофу и базиликом на ржаной гренке", weight: "35 гр" },
@@ -357,7 +357,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 3250,
         description: "11 позиций — добавлены средиземноморские шашлычки и гратен",
-        photo: "/media/menu-vegetarian-real.jpg",
+        photo: "/media/ridgewells-veg-mosaic.jpg",
         dishes: [
           { name: "Канапе с авокадо, томатами черри, кунжутом и микрозеленью", weight: "35 гр" },
           { name: "Канапе с печёным перцем, тофу, базиликом и кедровыми орешками", weight: "35 гр" },
@@ -442,7 +442,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Базовый",
         pricePerGuest: 650,
         description: "5 позиций — салат, суп, горячее, напиток",
-        photo: "/media/menu-office-lunch-real.jpg",
+        photo: "/media/concept-banquet-table.jpg",
         dishes: [
           { name: "Салат на выбор: Оливье с курицей / Винегрет / Цезарь с куриным бедром", weight: "150 гр" },
           { name: "Суп на выбор: Борщ классический / Тыквенный-пюре / Грибной с лисичками", weight: "250 мл" },
@@ -455,7 +455,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Расширенный",
         pricePerGuest: 950,
         description: "7 позиций — добавлены закуска и выпечка",
-        photo: "/media/menu-office-lunch-real.jpg",
+        photo: "/media/concept-banquet-table.jpg",
         dishes: [
           { name: "Закуска: брускетта с куриным паштетом и брусничным соусом / канапе с сыром", weight: "60 гр" },
           { name: "Салат на выбор из 5 видов (Оливье, Винегрет, Цезарь, Греческий, Мимоза)", weight: "150 гр" },

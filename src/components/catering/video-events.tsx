@@ -49,31 +49,35 @@ const VIDEO_CATALOG: VideoItem[] = [
     title: "Свадебный банкет",
     desc: "Подача блюд, сервировка, атмосфера торжества",
     source: "Роскошный кейтеринг",
-    poster: "/media/event-01.png",
-    // Phase 6 — to enable direct MP4, set videoSrc to a CDN URL like:
-    //   "https://videos.pexels.com/video-files/{id}/{filename}.mp4"
-    // videoSrc: "",
-    youtubeEmbedId: "LXb3EKWsInQ",
+    poster: "/media/ridgewells-wedding.webp",
+    // Real catering video from Wolfgang Puck Catering (HubSpot CDN, CORS-enabled).
+    // "Power Of Food" hero loop, silent, 16MB MP4. Same URL as MEDIA.hero.videoSrc
+    // — reused here for the wedding reception context.
+    videoSrc: "https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4",
   },
   {
     title: "Выездное барбекю",
     desc: "Гриль на свежем воздухе, скандинавский стиль",
     source: "Выездной гриль-кейтеринг",
-    poster: "/media/event-02.jpg",
-    youtubeEmbedId: "sTANio_2cJI",
+    poster: "/media/ridgewells-scallops.jpg",
+    // Real catering video from GG Catering (Vimeo embed).
+    // iframe-based — uses YouTubeEmbed-style pattern but for Vimeo.
+    // The vimeoEmbedId is read by YouTubeEmbed component (which renders
+    // Vimeo iframe when the URL pattern matches).
+    youtubeEmbedId: "1049137317", // Vimeo video ID — YouTubeEmbed auto-detects Vimeo
   },
   {
     title: "Кофе-брейк на конференции",
     desc: "Корпоративное обслуживание, деловые мероприятия",
     source: "Корпоративный кофе-брейк",
-    poster: "/media/event-03.jpg",
+    poster: "/media/concorde-avo-toast.jpg",
     youtubeEmbedId: "P4bKZj_euUI",
   },
   {
     title: "Фуршет на банкете",
     desc: "Канапе, брускетты, подача официантами",
     source: "Обслуживание фуршета",
-    poster: "/media/event-04.jpg",
+    poster: "/media/concorde-dessert.jpg",
     youtubeEmbedId: "eKFTWMCxM3A",
   },
 ];
@@ -375,14 +379,20 @@ function DirectVideoEmbed({
 }
 
 /**
- * YouTubeEmbed — legacy fallback. Uses youtube-nocookie.com for privacy.
- * Will be replaced by MuxVideoEmbed once user provides muxPlaybackId values
- * in VIDEO_CATALOG above.
+ * YouTubeEmbed — supports both YouTube and Vimeo video IDs.
+ * Auto-detects Vimeo IDs by length (Vimeo IDs are typically 9-digit numeric,
+ * YouTube IDs are 11-char alphanumeric). Uses youtube-nocookie.com for
+ * YouTube privacy; Vimeo player.vimeo.com.
  */
 function YouTubeEmbed({ embedId, title }: { embedId: string; title: string }) {
+  // Vimeo IDs are all-numeric (e.g. "1049137317"); YouTube IDs are 11-char mixed.
+  const isVimeo = /^\d+$/.test(embedId);
+  const src = isVimeo
+    ? `https://player.vimeo.com/video/${embedId}?autoplay=1&title=0&byline=0&portrait=0`
+    : `https://www.youtube-nocookie.com/embed/${embedId}?rel=0&modestbranding=1&autoplay=1`;
   return (
     <iframe
-      src={`https://www.youtube-nocookie.com/embed/${embedId}?rel=0&modestbranding=1&autoplay=1`}
+      src={src}
       title={title}
       role="img"
       loading="lazy"

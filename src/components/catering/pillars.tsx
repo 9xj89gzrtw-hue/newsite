@@ -40,7 +40,7 @@ const PILLARS = [
     desc: "Сезонные продукты с фермерских хозяйств, авторские рецепты, ручная сборка каждого блюда. Открытая кухня на мероприятии — гости видят процесс.",
     points: ["Сезонное меню", "Фермерские продукты", "Открытая кухня", "Авторская подача"],
     accent: "from-gold/15 to-terracotta/10",
-    image: "/media/menu-banquet-real.jpg",
+    image: "/media/concorde-boardroom.webp",
     stats: [
       { value: 16, suffix: "", label: "шеф-поваров" },
       { value: 2400, suffix: "+", label: "событий" },
@@ -53,7 +53,7 @@ const PILLARS = [
     desc: "Полная логистика под ключ: мебель, посуда, текстиль, техника, доставка и монтаж. Команда официантов и сомелье — на месте с утра до последнего гостя.",
     points: ["Мебель и текстиль", "Фарфор и стекло", "Доставка и монтаж", "Официанты и сомелье"],
     accent: "from-sage/15 to-gold/10",
-    image: "/media/menu-buffet-real.jpg",
+    image: "/media/concorde-handhelds.jpg",
     stats: [
       { value: 12, suffix: "", label: "кейтеринг-машин" },
       { value: 50000, suffix: "+", label: "гостей" },

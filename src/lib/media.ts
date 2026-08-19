@@ -1,47 +1,66 @@
 /**
  * Media registry — central place for all imagery used on the site.
  *
- * Photos are REAL — sourced from Pexels free stock photography (no
- * attribution required, CC0 license) and stored locally in /public/media
- * (no hot-linking, no external dependency at runtime).
+ * Photos are REAL, sourced from reference catering sites (per user request
+ * 2026-08-19 — copied directly from concordcatering.ca, ridgewells.com,
+ * concept-catering.de — all are premium real-world catering businesses with
+ * professional food photography). Stored locally in /public/media (no
+ * hot-linking at runtime — downloaded once, served from our own /public).
  *
- * Hero uses a Ken Burns image background. Video hero was originally
- * planned via Mux, but Mux credentials didn't work (see AGENTS.md §14
- * Phase 5/6 — API returned 404). MuxPlayer infrastructure was REMOVED
- * in Phase 6 — video-events.tsx now uses lazy-load posters + YouTube
- * embeds (existing pattern) OR direct external MP4 URLs (new VideoPlayer).
+ * Hero background: real catering video from Wolfgang Puck Catering
+ * (https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4)
+ * — HubSpot CDN, CORS-enabled (access-control-allow-origin: *), 16MB MP4,
+ * silent "Power Of Food" hero loop. Autoplay muted loop via native <video>.
+ * Reduced-motion users see Ken Burns image fallback (vestibular safety).
+ *
+ * Phase 5/6 history: Mux was tried (API returned 404 for all endpoints —
+ * credentials likely restricted to Vercel-Mux integration scope). MuxPlayer
+ * infrastructure was REMOVED in Phase 6 — replaced with native <video>
+ * element supporting any external MP4 URL from any free CDN.
+ *
+ * Phase 7 (2026-08-19): user feedback — previous Pexels images by ID were
+ * not catering-related (flowers, houses, etc.). ALL Phase 6 Pexels images
+ * replaced with real catering photos scraped from reference sites
+ * (concordecatering.ca, ridgewells.com, concept-catering.de). Image content
+ * verified by filename/alt-text BEFORE download (not by VLM, which was
+ * rate-limited at time of commit — see AGENTS.md §14 грабли #13).
  */
 
 export const MEDIA = {
   hero: {
-    // Real luxury catering photo from Pexels (free, CC0).
-    // Replaces the previous AI-generated hero-premium.png (Phase 6).
-    src: "/media/hero-real.jpg",
-    alt: "Элегантный банкетный стол с золотым свечением — Interfood Catering",
-    // Optional external MP4 URL for video hero background (Phase 6 — no Mux).
-    // Set to a direct CDN MP4 URL (e.g., Pexels/Mixkit video URL) to enable.
-    // Hero will swap from Ken Burns image to <video> autoplay muted loop.
-    videoSrc: "",
+    // Real catering photo from Ridgewells — "Beautiful sunset over an
+    // al-fresco dinner table at a dock on the water" (per alt text on
+    // ridgewells.com). 1920x1080. Used as poster for video + Ken Burns fallback.
+    src: "/media/ridgewells-hero.jpg",
+    alt: "Закат над накрытым банкетным столом у воды — Interfood Catering",
+    // REAL catering video from Wolfgang Puck Catering (HubSpot CDN, CORS-enabled).
+    // "Power Of Food" hero loop, silent, 16MB MP4.
+    // Direct external MP4 URL — works via native <video> element (Phase 6 pattern).
+    videoSrc: "https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4",
   },
   about: {
-    // Real luxury banquet hall photo from Pexels (free, CC0).
-    // Replaces the previous AI-generated about-premium.webp (Phase 6).
-    src: "/media/about-real.jpg",
-    alt: "Люкс-банкет в светлом зале — Interfood Catering",
+    // Real catering photo from Ridgewells — "Bride and groom on the dance
+    // floor at their wedding reception surrounded by friends and family".
+    // 1920x1080. Wedding reception catering context.
+    src: "/media/ridgewells-wedding.webp",
+    alt: "Свадебный банкет — танец молодожёнов в окружении гостей — Interfood Catering",
   },
   about2: {
-    src: "/media/event-11.jpg",
-    alt: "Оформление банкета Interfood Catering",
+    // Real catering photo from Ridgewells — "Gold and green event design
+    // for charity gala". 1600x900. Premium gala event.
+    src: "/media/ridgewells-gala.jpg",
+    alt: "Оформление премиального благотворительного банкета — Interfood Catering",
   },
   menu: {
-    // Real food photography from Pexels (free, CC0). Phase 6.
-    buffet: "/media/menu-buffet-real.jpg",
-    banquet: "/media/menu-banquet-real.jpg",
-    "coffee-break": "/media/menu-coffee-break-real.jpg",
-    "snack-box": "/media/menu-snack-box.jpg",
-    vegetarian: "/media/menu-vegetarian-real.jpg",
-    bbq: "/media/event-06.jpg",
-    "office-lunch": "/media/menu-office-lunch-real.jpg",
+    // Real food photos scraped from reference catering sites (Phase 7).
+    // Each verified by filename/alt-text on source site before download.
+    buffet: "/media/concorde-handhelds.jpg",        // Concorde "HANDHELDS_GROUP_B"
+    banquet: "/media/concorde-boardroom.webp",      // Concorde "BoardroomTableTop"
+    "coffee-break": "/media/concorde-avo-toast.jpg", // Concorde "AVO_TOAST_0503"
+    "snack-box": "/media/concorde-dessert.jpg",     // Concorde "DESSERT_GROUP_0061"
+    vegetarian: "/media/ridgewells-veg-mosaic.jpg",  // Ridgewells "Artistic vegetable mosaic"
+    bbq: "/media/ridgewells-scallops.jpg",          // Ridgewells "Beautifully seared golden diver scallops"
+    "office-lunch": "/media/concept-banquet-table.jpg", // Concept "CCC-43 lange tafel"
   } as Record<string, string>,
   // Real event photos from interfood-catering.ru gallery
   events: [
