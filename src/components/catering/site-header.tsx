@@ -212,7 +212,7 @@ export function SiteHeader() {
               onClick={() => setOpen(true)}
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors duration-300 lg:hidden ${themeClasses.text}`}
               aria-label="Открыть меню"
-              aria-expanded={open}
+              aria-expanded={open ? "true" : "false"}
               aria-controls="mobile-menu"
             >
               <Menu className="size-6" />
@@ -240,7 +240,7 @@ export function SiteHeader() {
                 onClick={() => setOpen(false)}
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 text-ink"
                 aria-label="Закрыть меню"
-                aria-expanded={open}
+                aria-expanded={open ? "true" : "false"}
                 aria-controls="mobile-menu"
               >
                 <X className="size-7" />
@@ -433,7 +433,7 @@ function MegaMenu({ item }: { item: NavItem }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
                   <div className="relative flex h-full min-h-[16rem] flex-col justify-end p-5">
                     <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-                      Сезон 2026
+                      Сезон {new Date().getFullYear()}
                     </span>
                     <p className="mt-2 font-display text-xl text-white">
                       Свадебное банкетное меню

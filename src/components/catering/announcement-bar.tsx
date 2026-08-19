@@ -25,6 +25,7 @@ const DISMISS_DAYS = 7;
 export function AnnouncementBar() {
   const [visible, setVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const currentYear = new Date().getFullYear();
   // Track mount to gate rendering of reduced-motion variant —
   // avoids SSR/CSR hydration mismatch (useReducedMotion returns null on SSR,
   // then a boolean on client; rendering the reduced-branch during initial
@@ -71,7 +72,7 @@ export function AnnouncementBar() {
       >
         <Sparkles className="size-3.5 shrink-0 text-gold" aria-hidden="true" />
         <p className="text-xs font-medium tracking-wide text-cream/90 md:text-sm">
-          <span className="hidden sm:inline">Сезонные свадебные меню 2026 — </span>
+          <span className="hidden sm:inline">Сезонные свадебные меню {currentYear} — </span>
           <a
             href="#menu"
             className="font-semibold text-gold underline underline-offset-2 hover:text-peach transition-colors"
@@ -110,7 +111,7 @@ export function AnnouncementBar() {
             <div className="flex items-center justify-center gap-3 px-10 py-2.5 text-center">
               <Sparkles className="size-3.5 shrink-0 text-gold" aria-hidden="true" />
               <p className="text-xs font-medium tracking-wide text-cream/90 md:text-sm">
-                <span className="hidden sm:inline">Сезонные свадебные меню 2026 — </span>
+                <span className="hidden sm:inline">Сезонные свадебные меню {currentYear} — </span>
                 <a
                   href="#menu"
                   className="font-semibold text-gold underline underline-offset-2 hover:text-peach transition-colors"

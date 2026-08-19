@@ -136,7 +136,7 @@
   --muted-foreground: var(--ink-soft);
   --accent: var(--beige);
   --accent-foreground: var(--ink);
-  --destructive: #B8860B;
+  --destructive: #C44040;
   --border: var(--border-line);
   --input: var(--border-line);
   --ring: var(--gold);
@@ -158,7 +158,7 @@
   --muted-foreground: var(--paper-soft);
   --accent: #2D2A26;
   --accent-foreground: var(--paper);
-  --destructive: #B8860B;
+  --destructive: #C44040;
   --border: var(--border-line-dark);
   --input: var(--border-line-dark);
   --ring: var(--gold);

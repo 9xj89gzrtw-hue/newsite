@@ -8,6 +8,7 @@ import { Flower2, ArrowRight } from "lucide-react";
  * Акция «Флористика в подарок» при заказе свадебного банкета/фуршета.
  */
 export function PromoBanner() {
+  const currentYear = new Date().getFullYear();
   return (
     <section data-header-theme="dark" className="relative overflow-hidden bg-gradient-to-r from-gold via-terracotta to-gold py-16 md:py-24">
       {/* Decorative flowers */}
@@ -22,7 +23,7 @@ export function PromoBanner() {
         <div className="flex flex-col items-center gap-6 text-center md:flex-row md:gap-12 md:text-left">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.3em] text-white backdrop-blur-sm">
-              ✨ Акция · сезон 2026
+              ✨ Акция · сезон {currentYear}
             </span>
           </Reveal>
           <div className="flex-1">

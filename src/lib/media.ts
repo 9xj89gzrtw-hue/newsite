@@ -78,6 +78,7 @@ export const MEDIA = {
     { src: "/media/event-05.jpg", caption: "Мотофестиваль Harley Days", category: "Корпоративы" },
     { src: "/media/event-06.jpg", caption: "Скандинавское барбекю", category: "Барбекю" },
     { src: "/media/event-07.jpg", caption: "Кофе-брейк на конференции", category: "Кофе-брейки" },
+    { src: "/media/event-08.jpg", caption: "Новогодний банкет", category: "Банкеты" },
     { src: "/media/event-09.jpg", caption: "Новогодний корпоратив", category: "Корпоративы" },
     { src: "/media/event-10.jpg", caption: "Сезонный банкет", category: "Банкеты" },
     { src: "/media/event-11.jpg", caption: "Фуршет для гостей", category: "Фуршеты" },
@@ -86,7 +87,6 @@ export const MEDIA = {
     { src: "/media/gamma-corporate.webp", caption: "Корпоративное мероприятие", category: "Корпоративы" },
     { src: "/media/gamma-private-event.webp", caption: "Частное торжество", category: "Банкеты" },
     { src: "/media/gamma-table-birds-eye.webp", caption: "Сервировка стола — вид сверху", category: "Фуршеты" },
-    { src: "/media/event-08.jpg", caption: "Новогодний банкет", category: "Банкеты" },
   ],
 };
 
@@ -233,7 +233,7 @@ export const YANDEX_MAPS = {
     "https://yandex.ru/map-widget/v1/?ll=30.315785%2C59.939495&z=11&pt=30.315785,59.939495,pm2rdm",
   // Direct link for "open in maps" button
   href: "https://yandex.ru/maps/-/CTgzMJKL",
-  // Address (display)
-  address: "Санкт-Петербург",
+  // Address (display) — using full legal address from LEGAL_INFO
+  address: "ул. Большая Морская, д. 18, офис 33, Санкт-Петербург",
 };
 
