@@ -36,7 +36,7 @@ export const MEDIA = {
     // REAL catering video from Wolfgang Puck Catering (HubSpot CDN, CORS-enabled).
     // "Power Of Food" hero loop, silent, 16MB MP4.
     // Direct external MP4 URL — works via native <video> element (Phase 6 pattern).
-    videoSrc: "https://wolfgangpuckcatering.com/hubfs/26S%20No%20Sound%20Power%20Of%20Food.mp4",
+    videoSrc: "",,
   },
   about: {
     // Real catering photo from Ridgewells — "Bride and groom on the dance
