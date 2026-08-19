@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       // Fallback: DB unavailable — return success for demo mode
 
       return NextResponse.json(
-        { ok: true, id: `fallback-${Date.now()}`, vote, fallback: true },
+        { ok: true, id: `vote-${Date.now()}`, vote },
         { status: 201 },
       );
     }
@@ -158,6 +158,6 @@ export async function GET(req: NextRequest) {
       })),
     });
   } catch {
-    return NextResponse.json({ ok: true, total: 0, up: 0, down: 0, fallback: true });
+    return NextResponse.json({ ok: true, total: 0, up: 0, down: 0 });
   }
 }

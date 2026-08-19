@@ -13,15 +13,17 @@ export const metadata: Metadata = {
     type: "website",
     url: "/privacy",
   },
+  twitter: {
+    card: "summary",
+    title: "Политика конфиденциальности — Interfood Catering",
+    description: "Как мы защищаем ваши персональные данные в соответствии с 152-ФЗ.",
+  },
 };
 
 export default function PrivacyPage() {
-  // Dynamic date — always current, no stale "future date" bugs
-  const updated = new Date().toLocaleDateString("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  // Hardcoded revision date — 152-ФЗ requires a stable, traceable document version.
+  // Update this constant only when the document content actually changes.
+  const updated = "1 сентября 2025 г.";
   return (
     <main className="min-h-screen bg-cream pt-32 pb-20">
       <article className="mx-auto max-w-3xl px-5 md:px-8">
@@ -29,7 +31,7 @@ export default function PrivacyPage() {
           <span className="font-mono text-xs uppercase tracking-[0.3em] text-bordeaux">
             Документ
           </span>
-          <h1 className="mt-4 font-display text-4xl text-ink md:text-5xl">
+          <h1 className="mt-4 font-display text-3xl text-ink break-words hyphens-auto md:text-5xl">
             Политика конфиденциальности
           </h1>
           <p className="mt-3 font-mono text-sm text-ink-soft">
@@ -161,7 +163,7 @@ export default function PrivacyPage() {
         </div>
 
         <footer className="mt-16 border-t border-ink/10 pt-8">
-          <a href="/#contact" className="text-bordeaux hover:underline">
+          <a href="/#contact" className="text-bordeaux hover:underline inline-flex min-h-[44px] items-center py-2 font-medium">
             ← Вернуться на сайт
           </a>
         </footer>

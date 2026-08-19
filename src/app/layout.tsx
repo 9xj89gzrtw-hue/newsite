@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     "nilov catering",
   ],
   authors: [{ name: "Interfood Catering" }],
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", languages: { "ru-RU": "/", "x-default": "/" } },
   openGraph: {
     title: "Interfood Catering — Кейтеринг в Санкт-Петербурге",
     description:

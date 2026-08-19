@@ -245,7 +245,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Горячее (3 шашлычка)",
         pricePerGuest: 1950,
         description: "3 вида шашлычков на углях",
-        photo: "/media/event-06.jpg",
+        photo: "/media/snack-3.jpg",
         dishes: [
           { name: "Шашлычок из свиной вырезки в маринаде из горчицы и розмарина", weight: "120 гр" },
           { name: "Шашлычок из лосося (Фарерские острова) с соусом бешамель", weight: "120 гр" },
@@ -287,7 +287,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Стандарт",
         pricePerGuest: 1450,
         description: "10 позиций — добавлены салаты и горячие закуски",
-        photo: "/media/concorde-avo-toast.jpg",
+        photo: "/media/concorde-dessert.jpg",
         dishes: [
           { name: "Кофе зерновой (100% арабика, Бразилия)", weight: "200 мл" },
           { name: "Чай листовой (чёрный/зелёный)", weight: "200 мл" },
@@ -305,7 +305,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 2200,
         description: "12 позиций — капучино, авторская выпечка, сырная тарелка",
-        photo: "/media/concorde-avo-toast.jpg",
+        photo: "/media/cutandtaste-artichoke.webp",
         dishes: [
           { name: "Капучино / Латте (профессиональная кофемашина, 100% арабика)", weight: "200 мл" },
           { name: "Чай листовой премиум (Эрл Грей, Жасмин, Молочный улун)", weight: "200 мл" },
@@ -357,7 +357,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 3250,
         description: "11 позиций — добавлены средиземноморские шашлычки и гратен",
-        photo: "/media/ridgewells-veg-mosaic.jpg",
+        photo: "/media/menu-vegetarian.jpg",
         dishes: [
           { name: "Канапе с авокадо, томатами черри, кунжутом и микрозеленью", weight: "35 гр" },
           { name: "Канапе с печёным перцем, тофу, базиликом и кедровыми орешками", weight: "35 гр" },
@@ -408,7 +408,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 3500,
         description: "10 позиций — добавлены лосось на кедровой доске, морепродукты, бургеры",
-        photo: "/media/event-06.jpg",
+        photo: "/media/event-07.jpg",
         dishes: [
           { name: "Шашлык из свиной вырезки в маринаде из горчицы и розмарина", weight: "200 гр" },
           { name: "Шашлык из куриного бедра в йогурте и специях", weight: "180 гр" },
@@ -455,7 +455,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Расширенный",
         pricePerGuest: 950,
         description: "7 позиций — добавлены закуска и выпечка",
-        photo: "/media/concept-banquet-table.jpg",
+        photo: "/media/menu-office-lunch.jpg",
         dishes: [
           { name: "Закуска: брускетта с куриным паштетом и брусничным соусом / канапе с сыром", weight: "60 гр" },
           { name: "Салат на выбор из 5 видов (Оливье, Винегрет, Цезарь, Греческий, Мимоза)", weight: "150 гр" },

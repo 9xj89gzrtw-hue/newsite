@@ -91,7 +91,7 @@ function NewsletterSignup() {
               setEmail(e.target.value);
               if (status === "error" || status === "done") setStatus("idle");
             }}
-            placeholder="email@example.ru"
+            placeholder="Ваш email"
             aria-label="Email для подписки"
             name="email"
             required

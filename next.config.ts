@@ -15,6 +15,15 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion", "gsap"],
   },
+  async rewrites() {
+    return [
+      { source: "/calculator", destination: "/#calculator" },
+      { source: "/menu", destination: "/#menu" },
+      { source: "/events", destination: "/#events" },
+      { source: "/contacts", destination: "/#contact" },
+      { source: "/contact", destination: "/#contact" },
+    ];
+  },
   async headers() {
     return [
       {

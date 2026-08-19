@@ -422,7 +422,7 @@ function SignatureFlourish({ isVisible }: { isVisible: boolean }) {
         animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : 10 }}
         transition={{ delay: 2.2, duration: 0.8 }}
       >
-        est. 2008
+        est. 2014
       </motion.span>
     </motion.div>
   );

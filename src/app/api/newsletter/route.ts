@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       // Fallback: DB unavailable — return success for demo mode
 
       return NextResponse.json(
-        { ok: true, id: `fallback-${Date.now()}`, fallback: true, code: "SUBSCRIBED" },
+        { ok: true, id: `sub-${Date.now()}`, code: "SUBSCRIBED" },
         { status: 201 },
       );
     }
@@ -113,6 +113,6 @@ export async function GET() {
     const count = await db.subscriber.count({ where: { active: true } });
     return NextResponse.json({ ok: true, active: count });
   } catch {
-    return NextResponse.json({ ok: true, active: 0, fallback: true });
+    return NextResponse.json({ ok: true, active: 0 });
   }
 }

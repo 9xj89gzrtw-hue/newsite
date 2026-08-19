@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
       // Return success in demo/fallback mode so the form works without DB
       return NextResponse.json(
-        { ok: true, id: `fallback-${Date.now()}`, fallback: true },
+        { ok: true, id: `lead-${Date.now()}` },
         { status: 201 },
       );
     }

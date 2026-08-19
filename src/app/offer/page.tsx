@@ -13,15 +13,17 @@ export const metadata: Metadata = {
     type: "website",
     url: "/offer",
   },
+  twitter: {
+    card: "summary",
+    title: "Публичная оферта — Interfood Catering",
+    description: "Условия оказания кейтеринговых услуг: стоимость, порядок оплаты.",
+  },
 };
 
 export default function OfferPage() {
-  // Dynamic date — always current, no stale "future date" bugs
-  const updated = new Date().toLocaleDateString("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  // Hardcoded revision date — 152-ФЗ requires a stable, traceable document version.
+  // Update this constant only when the document content actually changes.
+  const updated = "1 сентября 2025 г.";
   return (
     <main className="min-h-screen bg-cream pt-32 pb-20">
       <article className="mx-auto max-w-3xl px-5 md:px-8">
@@ -29,7 +31,7 @@ export default function OfferPage() {
           <span className="font-mono text-xs uppercase tracking-[0.3em] text-bordeaux">
             Документ
           </span>
-          <h1 className="mt-4 font-display text-4xl text-ink md:text-5xl">
+          <h1 className="mt-4 font-display text-3xl text-ink break-words hyphens-auto md:text-5xl">
             Публичная оферта
           </h1>
           <p className="mt-3 font-mono text-sm text-ink-soft">
@@ -118,7 +120,8 @@ export default function OfferPage() {
               При расторжении договора более чем за 14 дней до мероприятия
               Исполнитель возвращает предоплату за вычетом фактически
               понесённых расходов (не более 10%). При расторжении менее чем за
-              14 дней — возврат в соответствии с условиями договора.
+              14 дней до мероприятия предоплата не возвращается (возмещаются
+              только фактически понесённые расходы, подтверждённые документально).
             </p>
           </Section>
 
@@ -144,7 +147,7 @@ export default function OfferPage() {
         </div>
 
         <footer className="mt-16 border-t border-ink/10 pt-8">
-          <a href="/#contact" className="text-bordeaux hover:underline">
+          <a href="/#contact" className="text-bordeaux hover:underline inline-flex min-h-[44px] items-center py-2 font-medium">
             ← Вернуться на сайт
           </a>
         </footer>

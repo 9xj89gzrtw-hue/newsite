@@ -12,7 +12,6 @@ import {
   Star,
   ChevronLeft,
   ChevronRight,
-  Play,
   MapPin,
   Calendar,
   ShieldCheck,
@@ -80,7 +79,7 @@ const TESTIMONIALS = [
     icon: Star,
   },
   {
-    id: "avrorа",
+    id: "avrora",
     company: "Премия «АВРОРА»",
     event: "Фуршет церемонии награждения",
     eventType: "Церемония",
@@ -100,29 +99,6 @@ const TESTIMONIALS = [
   },
 ];
 
-/**
- * Video testimonials — placeholder cards for video reviews
- */
-const VIDEO_TESTIMONIALS = [
-  {
-    id: "video-1",
-    title: "Отзыв о свадебном банкете",
-    author: "Елена и Михаил К.",
-    event: "Свадьба • 120 гостей",
-    duration: "2:34",
-    thumbnail: "/media/video-thumb-1.jpg",
-    date: "Июль 2023",
-  },
-  {
-    id: "video-2",
-    title: "Корпоратив Porsche Russia",
-    author: "HR-директор Porsche Russia",
-    event: "Корпоратив • 200 гостей",
-    duration: "3:12",
-    thumbnail: "/media/video-thumb-2.jpg",
-    date: "Сентябрь 2023",
-  },
-];
 
 /**
  * Клиенты, которые нам доверяют — логотипы/названия компаний.
@@ -391,92 +367,6 @@ function TestimonialCard({
   );
 }
 
-/* ──────────────────────────────────────────────
-   VIDEO TESTIMONIAL CARD
-   Video placeholder with play button and gradient overlay
-   ────────────────────────────────────────────── */
-function VideoTestimonialCard({
-  video,
-  index,
-}: {
-  video: (typeof VIDEO_TESTIMONIALS)[0];
-  index: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-  const mounted = useMounted();
-  const reduceMotion = useReducedMotion();
-  const effectiveReduce = mounted && (reduceMotion ?? false);
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={effectiveReduce ? {} : { opacity: 0, scale: 0.95 }}
-      animate={
-        isInView
-          ? { opacity: 1, scale: 1 }
-          : effectiveReduce
-            ? {}
-            : { opacity: 0, scale: 0.95 }
-      }
-      transition={{
-        duration: effectiveReduce ? 0.001 : 0.6,
-        delay: effectiveReduce ? 0 : index * 0.2,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className="group relative aspect-video cursor-pointer overflow-hidden rounded-2xl border border-border-line bg-ink/5"
-    >
-      {/* Thumbnail placeholder */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gold/30 via-terracotta/20 to-bordeaux/30">
-        {/* Subtle pattern */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-            backgroundSize: "16px 16px",
-          }}
-        />
-      </div>
-
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
-
-      {/* Play button */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex size-16 items-center justify-center rounded-full bg-white/90 shadow-xl backdrop-blur-sm transition-all duration-300 group-hover:bg-white group-hover:shadow-2xl md:size-18"
-          aria-label={`Воспроизвести видео: ${video.title}`}
-        >
-          <Play className="size-6 text-gold ml-1 fill-gold md:size-7" />
-        </motion.button>
-      </div>
-
-      {/* Duration badge */}
-      <div className="absolute top-3 right-3 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
-        {video.duration}
-      </div>
-
-      {/* Info at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-4">
-        <h4 className="font-display text-base text-white font-medium line-clamp-1">
-          {video.title}
-        </h4>
-        <div className="mt-1 flex items-center justify-between">
-          <p className="text-xs text-white/70">{video.author}</p>
-          <span className="text-[10px] font-mono uppercase tracking-wider text-white/50">
-            {video.date}
-          </span>
-        </div>
-        <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/90 backdrop-blur-sm">
-          <CheckCircle2 className="size-3" />
-          {video.event}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
 
 /* ──────────────────────────────────────────────
    INFINITE MARQUEE FOR TEXT QUOTES
@@ -721,30 +611,30 @@ export function Testimonials() {
           </div>
         </div>
 
-        {/* Video Testimonials Section */}
-        <div className="mt-20">
+        {/* Case studies on request — honest replacement for unverifiable video testimonials */}
+        <div className="mt-20 rounded-2xl border border-border-line bg-gradient-to-br from-cream to-white p-8 md:p-10">
           <Reveal>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="font-display text-xl text-ink md:text-2xl">
-                  Видеоотзывы
+            <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="max-w-xl">
+                <span className="font-mono text-xs uppercase tracking-[0.3em] text-gold">
+                  Кейсы по запросу
+                </span>
+                <h3 className="mt-3 font-display text-xl text-ink md:text-2xl">
+                  Покажем реальные кейсы под ваш формат
                 </h3>
-                <p className="mt-1 text-sm text-ink/50">
-                  Послушайте истории наших клиентов
+                <p className="mt-2 text-sm text-ink/60">
+                  Пришлём портфолио мероприятий вашего типа: фуршеты, банкеты,
+                  корпоративы. Включаем фотоотчёт, сметы и отзывы заказчиков.
                 </p>
               </div>
-              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-gold/10 px-3 py-1.5 text-xs font-medium text-gold">
-                <Play className="size-3" fill="currentColor" />
-                2 видео
-              </span>
+              <a
+                href="#contact"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-bordeaux px-7 py-3 text-sm font-medium text-cream transition-colors hover:bg-bordeaux/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordeaux"
+              >
+                Запросить кейсы
+              </a>
             </div>
           </Reveal>
-
-          <div className="grid gap-6 sm:grid-cols-2">
-            {VIDEO_TESTIMONIALS.map((video, i) => (
-              <VideoTestimonialCard key={video.id} video={video} index={i} />
-            ))}
-          </div>
         </div>
 
         {/* Trust badges section */}
