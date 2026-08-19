@@ -1188,9 +1188,10 @@ export function Contact() {
                       type="button"
                       onClick={next}
                       disabled={!stepValid()}
+                      aria-disabled={!stepValid()}
                       whileHover={!prefersReducedMotion && stepValid() ? { y: -2 } : undefined}
                       whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
-                      className="group flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                      className="group flex min-h-[44px] min-w-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
                     >
                       Далее
                       <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -1199,10 +1200,11 @@ export function Contact() {
                     <motion.button
                       type="submit"
                       disabled={formStatus !== "idle" || !data.consent}
+                      aria-disabled={formStatus !== "idle" || !data.consent}
                       data-cursor="отправить"
                       whileHover={!prefersReducedMotion && formStatus === "idle" ? { y: -2 } : undefined}
                       whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
-                      className="group relative flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                      className="group relative flex min-h-[44px] min-w-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
                     >
                       {formStatus === "loading" ? (
                         <>
