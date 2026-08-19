@@ -688,3 +688,101 @@ fromscratchcatering.com, stevenscatering.com, chefbyrequest.com, и др.
 4. Приоритет реализации: P0 (sticky nav, bold hero, counters) → P1 (video, parallax) → P2 (custom cursor, page transitions)
 
 Целевой уровень — **любой из 23 проанализированных сайтов** (Gamma/Wolfgang Puck/Ridgewells tier).
+
+---
+
+## 17. «Reference Replication» — 10 паттернов из эталон-библиотеки (Cycle 21, 19.08.2026)
+
+> Цикл фокусируется на воспроизведении конкретных паттернов, собранных в
+> `docs/reference-library/` и `docs/REFERENCE-SITES-ANALYSIS.md`, но ещё НЕ
+> реализованных на сайте. Анализ текущего кода vs. эталоны выполнен через
+> субагента (Task ID 1, worklog в песочнице).
+
+### Что реализовано (коммит `3a2a7b2`, 14 файлов, +1443/-210)
+
+| # | Паттерн | Эталон | Файл |
+|---|---------|--------|------|
+| A1 | **Mega-menu навигация** (Меню▾ / Услуги▾, hover+focus+keyboard) | Wolfgang Puck, 100% adoption | `site-header.tsx` |
+| A2 | **Rotating adjective headline** («Еда как [искусство·ритуал·праздник·магия]») | GG Catering | `hero.tsx` |
+| A3 | **Infinite client-logo marquee** (CSS seamless loop, pause-on-hover) | Gamma, Creative Edge | `logo-marquee.tsx` (новый) |
+| A4 | **Multi-step contact form** (4 шага, progress bar, localStorage draft) | GG Catering, Wolfgang Puck | `contact.tsx` |
+| A5 | **Filterable gallery** (category tabs + AnimatePresence layout) | best-practices §4 | `events-gallery.tsx`, `media.ts` |
+| B1 | **Process timeline** (01 МЕЧТА → 04 ПРАЗДНИК, connecting line) | Creative Edge | `process.tsx` (новый) |
+| B2 | **Testimonial carousel** (auto-play, arrows+dots, pause-on-hover) | REF §792-803 | `testimonials.tsx` |
+| B3 | **View Transitions API** (`@view-transition` + `view-transition-name: hero-title`) | Ridgewells | `globals.css`, `hero.tsx` |
+| B4 | **Dual-pillar section** (Шеф-крафт / Выезд-сервис) | Salt Block | `pillars.tsx` (новый) |
+| C1 | **Dismissible announcement bar** (7-day localStorage, AnimatePresence) | Salt Block | `announcement-bar.tsx` (новый) |
+| C2 | **Mobile quote CTA** (второй FAB → #calculator) | REF §709-738 | `site-header.tsx` |
+
+### Связывание mega-menu ↔ секции (новые CustomEvents)
+- `catering:service-open` (detail: number) — слушается в `services.tsx`,
+  открывает модалку услуги по индексу. Mega-menu «Услуги» диспатчит его.
+- `catering:menu-select` (detail: string) — уже существовал; mega-menu
+  «Меню» переиспользует его для синхронизации типа с калькулятором.
+
+### Грабли (зафиксировать для будущего)
+
+1. **`react-hooks/set-state-in-effect` НЕ был отключён** вопреки §11 грабли #6.
+   В `eslint.config.mjs` стояли `exhaustive-deps` и `purity` off, но не
+   `set-state-in-effect`. Из-за этого `bun run lint` был красным на
+   `cursor.tsx` / `preloader.tsx` (pre-existing). **Решение:** добавлено
+   `"react-hooks/set-state-in-effect": "off"`. Теперь lint зелёный.
+2. **`docs/` и `scripts/` линтились как app-код** — `.js`-скрипты с `require()`
+   (`scripts/db-push-if-set.js`, `docs/service-packages/extract_packages.js`)
+   падали по `@typescript-eslint/no-require-imports`. **Решение:** добавлены в
+   `ignores` (`docs/**`, `scripts/**`, `agent/**`) — это утилитарные скрипты,
+   не app-код.
+3. **Dev-сервер в песочнице выживает через double-fork.** Ранее (§11 грабли #5)
+   фикс: «dev + agent-browser в одном bash-вызове». Найдено более удобное
+   решение: запуск через `(bun run dev > dev.log 2>&1 &)` (subshell + `&`)
+   — процесс выживает на границе tool-call, и можно делать верификацию в
+   ОТДЕЛЬНЫХ bash-вызовах. `nohup ... & disown` НЕ помогает; `setsid ... &`
+   НЕ помогает; именно `( ... & )` (subshell) — работает.
+4. **Холодный зелёный — нарушение палитры.** VLM-критика (Skill: VLM) нашла
+   `bg-green-500` (trust-счётчик «16+ лет») и `text-green-600` (ShieldCheck
+   в форме). Это «cold tech-startup color» вне OKLCH-палитры. **Решение:**
+   заменены на `bg-sage` / `text-sage` (`--sage: #7D8470`, тёплый зелёный
+   из палитры). Правило §5 п.10 «без индиго/синего» расширено в практике:
+   **любой холодный цвет** (green-500, blue-*, cyan-*) — вне палитры.
+5. **`view-transition-name` в style через TS** — React 19 тип `CSSProperties`
+   поддерживает `viewTransitionName`, но для надёжности приведён
+   `as React.CSSProperties["viewTransitionName"]`.
+
+### Скиллы, оказавшиеся полезны в этом цикле
+- **`Task → general-purpose` subagent** (research): за один проход переварил
+  `REFERENCE-SITES-ANALYSIS.md` (2421 строк) + 22 компонента сайта и выдал
+  ранжированный план A1–C3 с цитатами строк. **Главный вывод:** всегда
+  запускать такой research-субагент перед реализацией — экономит часы.
+- **`VLM` (z-ai vision CLI)**: `z-ai vision -p "..." -i img` — brutal-honesty
+  критика скриншота. Нашла палитровое нарушение (green dot), которое я пропустил.
+  Использовать для финального design-review каждой секции.
+- **`agent-browser`**: end-to-end верификация. `eval` для программных проверок
+  (наличие секций, счётчики, фильтры) — надёжнее, чем ручной клик по refs.
+  Hover-интеракции (mega-menu) проверяются через `dispatchEvent(new MouseEvent('mouseenter'))`.
+
+### Что можно улучшить дальше
+- ~~Mega-menu~~ — сделано. Расширить: sticky-on-scroll поведение mega-panel
+  (закрытие при scroll).
+- ~~Real testimonials carousel~~ — сделано. Добавить видео-отзывы (через Mux).
+- **Announcement bar**: VLM назвала тёмный бар «discount banner» (субъективно).
+  Альтернатива: тонкая cream-полоса с золотым бордером. Текущий вариант
+  (тёмный ink-бар + gold-ссылка) — стандартный премиум-паттерн, оставлен.
+- **Hero typography**: VLM 6.5/10 — «safe, template-y». Для Awwwards-уровня
+  нужен кастомный kerning/weight Playfair Display + более смелый масштаб.
+- **Cookie consent**: перекрывает hero на первом визите (pre-existing) —
+  стоит переделать в fixed-bottom glassmorphism в бренд-цветах.
+- C3 Newsletter signup (footer + `/api/newsletter` + Prisma `Subscriber`) —
+  не сделан в этом цикле (требует schema-миграции); добавить следующим.
+
+### TL;DR (обновлено Cycle 21)
+
+Для **быстрой репликации эталонных паттернов**:
+1. Запусти research-субагента (Task → general-purpose) с промптом
+   «перевари REFERENCE-SITES-ANALYSIS.md + текущие компоненты → ранжированный
+   план НЕреализованного». Получишь конкретный список с цитатами строк.
+2. Реализуй Tier A (100% adoption паттерны) первым — макс. видимый эффект.
+3. После каждой правки: `bun run lint` + `bunx tsc --noEmit`.
+4. Верификация: `(bun run dev > dev.log 2>&1 &)` → poll HTTP 200 →
+   `agent-browser open/snapshot/screenshot/errors`.
+5. Финальный design-review: `z-ai vision -p "brutal critique" -i screenshot.png`.
+6. Commit (Conventional Commits) + push. Деплой авто из `main` на Vercel.
