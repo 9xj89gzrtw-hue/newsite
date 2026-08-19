@@ -693,7 +693,7 @@ export function Hero() {
           <Star className="size-3 text-gold/60" />
         </motion.div>
 
-        {/* Headline — clean elegant serif headline */}
+        {/* Headline — stylish minimal «Interfood.» */}
         <motion.h1
           className="font-display text-ink relative"
           style={{
@@ -708,7 +708,7 @@ export function Hero() {
         >
           <span className="relative inline-block">
             <span className="bg-gradient-to-r from-ink via-ink to-ink bg-clip-text text-transparent">
-              Interfood Catering
+              Interfood<span className="text-gold">.</span>
             </span>
             {/* Underline animation */}
             <motion.span
