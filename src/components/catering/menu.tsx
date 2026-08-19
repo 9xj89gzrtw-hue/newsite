@@ -417,7 +417,7 @@ export function Menu() {
                 className="mt-5 font-display text-ink"
                 style={{ fontSize: "clamp(2rem, 5.5vw, 4rem)", lineHeight: 1 }}
               >
-                Меню{" "}
+                Меню{"\u00A0"}
                 <span className="gradient-text italic">мероприятий</span>
               </h2>
             </Reveal>

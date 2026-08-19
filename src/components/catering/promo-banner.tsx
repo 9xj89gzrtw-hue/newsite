@@ -31,7 +31,7 @@ export function PromoBanner() {
                 className="font-display text-white"
                 style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)", lineHeight: 1.1 }}
               >
-                Флористика в подарок<br />при заказе свадьбы
+                Флористика в подарок{"\u00A0"}при заказе свадьбы
               </h2>
             </Reveal>
             <Reveal delay={0.2}>

@@ -109,7 +109,7 @@ export function Process() {
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.05 }}
             >
-              Четыре шага{" "}
+              Четыре шага{"\u00A0"}
               <span className="gradient-text italic">до праздника</span>
             </h2>
           </Reveal>
