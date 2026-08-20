@@ -134,6 +134,7 @@ function FloatingInput({
   validate,
   ariaLabelText,
   required,
+  pattern,
 }: {
   id: string;
   name?: string;
@@ -147,6 +148,7 @@ function FloatingInput({
   validate?: (value: string) => boolean;
   ariaLabelText?: string;
   required?: boolean;
+  pattern?: string;
 }) {
   const [focused, setFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
@@ -204,6 +206,7 @@ function FloatingInput({
           aria-label={ariaLabelText || placeholder}
           aria-required={required ? "true" : undefined}
           required={required}
+          pattern={pattern}
           className={`w-full rounded-xl px-${Icon ? '11' : '4'} py-3.5 ${showValidCheck ? 'pr-12' : 'pr-4'} text-ink outline-none transition-all placeholder:text-transparent ${
             Icon ? 'pl-11' : ''
           }`}
@@ -1048,7 +1051,7 @@ export function Contact() {
                               value={Math.min(data.guests, 500)}
                               onChange={(e) => set("guests", Number(e.target.value))}
                               className="mt-4 w-full accent-gold"
-                              aria-label="Ползунок количества гостей"
+                              aria-label="Количество гостей"
                             />
                           </div>
 
@@ -1064,6 +1067,7 @@ export function Contact() {
                               type="date"
                               value={data.date}
                               min={new Date().toISOString().split("T")[0]}
+                              aria-label="Желаемая дата мероприятия"
                               onChange={(e) => set("date", e.target.value)}
                               className="mt-2 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none transition-all focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 focus:shadow-[0_0_20px_rgba(196,149,106,0.15)]"
                             />
@@ -1096,6 +1100,7 @@ export function Contact() {
                             name="phone"
                             type="tel"
                             autoComplete="tel"
+                            pattern="^(\+7|8)[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$"
                             value={data.phone}
                             onChange={(e) => set("phone", e.target.value)}
                             placeholder="+7 (___) ___-__-__"

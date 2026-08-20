@@ -491,6 +491,7 @@ export function Calculator() {
                 id="calc-date"
                 name="eventDate"
                 value={date}
+                aria-label="Дата мероприятия (необязательно)"
                 onChange={(e) => setDate(e.target.value)}
                 className="mt-3 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 transition-all"
               />

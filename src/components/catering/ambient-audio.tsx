@@ -185,7 +185,7 @@ export function AmbientAudio() {
       type="button"
       onClick={() => setEnabled((e) => !e)}
       aria-pressed={enabled}
-      aria-label={enabled ? "Выключить ambient звук" : "Включить ambient звук манифеста"}
+      aria-label={enabled ? "Выключить ambient звук манифеста" : "Включить ambient звук манифеста"}
       title={enabled ? "Звук включен — нажмите чтобы выключить" : "Включить ambient звук (мягкий кухонный гул)"}
       className="fixed right-6 top-24 z-50 inline-flex size-10 items-center justify-center rounded-full border border-gold/40 bg-ink/85 text-gold backdrop-blur-md transition-all hover:scale-110 hover:border-gold hover:bg-ink hover:shadow-lg hover:shadow-gold/30 min-h-[44px] min-w-[44px] hidden md:flex"
     >

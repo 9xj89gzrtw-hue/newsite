@@ -233,7 +233,7 @@ function DesktopStep({
         </p>
 
         {/* Expandable details */}
-        <ExpandableDetails items={step.details} />
+        <ExpandableDetails items={step.details} stepNum={step.num} />
       </motion.li>
     </Reveal>
   );
@@ -292,7 +292,7 @@ function MobileStep({
 
       <p className="mt-2 text-sm text-ink/70">{step.desc}</p>
 
-      <ExpandableDetails items={step.details} />
+      <ExpandableDetails items={step.details} stepNum={step.num} />
     </motion.li>
   );
 }
@@ -302,7 +302,7 @@ function MobileStep({
  * animation (FAQ pattern, RULES §5-compliant: gridTemplateRows is explicitly
  * allowed). ChevronDown rotates 180° when open.
  */
-function ExpandableDetails({ items }: { items: string[] }) {
+function ExpandableDetails({ items, stepNum }: { items: string[]; stepNum: string }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
 
@@ -312,6 +312,7 @@ function ExpandableDetails({ items }: { items: string[] }) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open ? "true" : "false"}
+        aria-controls={`step-content-${stepNum}`}
         className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-gold transition-colors duration-200 hover:text-bordeaux min-h-[44px] px-2"
       >
         Подробнее
@@ -326,6 +327,7 @@ function ExpandableDetails({ items }: { items: string[] }) {
 
       {/* Grid-rows 0fr → 1fr — FAQ pattern. */}
       <motion.div
+        id={`step-content-${stepNum}`}
         className="grid"
         initial={false}
         animate={{ gridTemplateRows: open ? "1fr" : "0fr" }}

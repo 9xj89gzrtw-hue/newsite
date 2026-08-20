@@ -227,7 +227,7 @@ export function SiteHeader() {
               ref={triggerRef}
               onClick={() => setOpen(true)}
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors duration-300 lg:hidden ${themeClasses.text}`}
-              aria-label="Открыть меню"
+              aria-label={open ? "Закрыть меню" : "Открыть меню"}
               aria-expanded={open ? "true" : "false"}
               aria-controls="mobile-menu"
             >
