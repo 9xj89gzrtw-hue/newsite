@@ -1762,3 +1762,121 @@ All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d
 - Deeper keyboard nav edge cases
 
 Все коммиты запушены в main. Сайт: https://newsite-three-kappa.vercel.app/
+
+---
+
+## 17. «Ridgewells Editorial Layer» — цикл 21 (20.08.2026)
+
+> Копирование стиля ridgewells.com (luxury DC catering): добавлены 4 новые
+> секции + перепроектирован MarqueeBand + усилен header. Полный анализ в
+> [`docs/RIDGEWELLS-ANALYSIS.md`](docs/RIDGEWELLS-ANALYSIS.md) (793 строки,
+> 6.6k слов, 12 raw-assets в `docs/reference-library/ridgewells/`).
+
+### Новые компоненты (6 шт. в `src/components/catering/`)
+
+| Файл | Назначение | WOW |
+|------|-----------|-----|
+| `outline-button.tsx` | Ridgewells "View More" — квадратная outline-кнопка (1.5px border, radius 0, hover fill+invert, light/dark variants) | — |
+| `section-header.tsx` | Reusable editorial eyebrow + huge Playfair headline со staggered reveal | — |
+| `editorial-intro.tsx` | WOW #1: painterly radial-gradient intro (10-layer blooms + grain + vignette), peach eyebrow, headline с italic-accent + manual `<br>`, dual outline CTAs | ★★★ |
+| `marquee-band.tsx` (REDESIGNED) | WOW #2: solid deep-bordeaux (#4A2515) bg, infinite CSS marquee Playfair italic фразы + gold star SVGs со sparkle pulse, cream pill CTA "Забронировать дату" | ★★★ |
+| `services-overview.tsx` | Ridgewells two-up 50/50 split grid: 4 категории (Свадьбы/Корпоративы/Частные приёмы/Крупные события), 16:10 images + hover-zoom + caption reveal, 48-56px serif titles, outline buttons | ★★ |
+| `quote-band.tsx` | WOW #3: solid bordeaux bg + layered radial blooms, 3 gold stars + 4.9/5, tinted-cream headline (#F7EFE6), oversized gold quote mark, Playfair quote, thank-you letter photo с dramatic shadow + date badge | ★★★ |
+| `social-handle.tsx` | Ridgewells giant `@nilov_catering` closer (clamp 3-6rem), IG icon + "Следите за нами" eyebrow, hashtag #ЕдаКакИскусство, thin editorial rules | ★★ |
+
+### CSS-утилиты (258 строк в `globals.css`, блок «RIDGEWELLS EDITORIAL LAYER»)
+
+- `.painterly-bg-warm` / `.painterly-bg-deep` — 10-layer radial-gradient «digital watercolor» (cream base / dark espresso base). Pure CSS, zero asset weight.
+- `.eyebrow` / `.eyebrow-wide` — wide-tracked uppercase micro-labels (ls 0.22-0.3em).
+- `.display-headline` / `.display-headline-xl` — 60-80px Playfair, weight 400, lh 0.95-0.98, `text-wrap: balance`.
+- `.ridge-outline-btn` — square outline button, `::before` scaleX hover-fill.
+- `.section-bordeaux` — deep `#4A2515` base + layered radial blooms via `::before` (bordeaux token `#7A4A1F` слишком светлый для solid-секций — override).
+- `.ridge-marquee-track` — infinite -50% translate (32s linear).
+- `.ridge-img-zoom` — 0.7s hover zoom (cubic-bezier 0.4,0,0.2,1).
+- `.ridge-caption` — hover-reveal (opacity + translateY).
+- `.giant-handle` — clamp(3rem, 10vw, 6rem) Playfair.
+- `.ridge-rule` — editorial thin horizontal divider.
+- `.ridge-star` — sparkle pulse keyframe (2.4s, staggered via inline animationDelay).
+- `.ridge-quote-marks` / `.ridge-quote-open` — oversized gold quotes behind text.
+- `painterly-drift` keyframe — subtle 30s background-position drift.
+
+### Палитра (маппинг Ridgewells → наш)
+
+| Ridgewells | Наш токен | Примечание |
+|-----------|-----------|-----------|
+| `#502875` aubergine | `--bordeaux #7A4A1F` (warm brown) → override `#4A2515` для solid-секций | brown недостаточно dramatic для full-bleed |
+| `#71297F` magenta | `--terracotta #9A4F2A` | warm mid-accent |
+| `#DDA8D9` light orchid | `--gold #8B6534` / `--peach #E8B889` | light highlight |
+| `#414142` charcoal | `--ink #1A1A1A` / `--night-2 #2D2A26` | почти идентичны |
+| `#F1EBF5` lavender-tinted-white | `#F7EFE6` warm-tinted-cream | Ridgewells trick — НЕ pure white на dark bg |
+| `#FFFFFF` white | `--cream #FAF8F5` | warmer feel |
+
+### VLM critique-loop (/loop directive)
+
+4 итерации brutal-honesty VLM-критики (`z-ai vision` CLI, glm-5v-turbo):
+
+| Итерация | EditorialIntro | MarqueeBand | ServicesOverview | QuoteBand | SocialHandle |
+|----------|----------------|-------------|------------------|-----------|--------------|
+| v1 | 4/10 | 2/10* | — | 6.5/10 | — |
+| v2 | 6.5/10 | 3/10* | — | 8/10 | — |
+| v3 | 7/10 | 6.5/10 | 5.5/10** | — | 8/10 |
+| v4 | **8/10** | **8.5/10** | **7.5/10** | **8/10** | **8/10** |
+
+\* MarqueeBand v1-v2: VLM критиковал LogoMarquee (скриншот захватил не ту секцию — MarqueeBand 90px, а ниже LogoMarquee 400px). Исправлено scrollIntoView `block:center`.
+\*\* ServicesOverview v3: скриншот не показал карточки (ниже fold). Исправлено scroll-Y+400.
+
+**Ключевые фиксы по итерациям:**
+- v1→v2: painterly-bg-warm → painterly-bg-deep (dark base для cream-text contrast); bordeaux token `#7A4A1F` → `#4A2515` (deep solid); italic accent gold → peach `#E8B889`; box-shadow на quote photo.
+- v2→v3: local SVG feTurbulence grain overlay (opacity 0.08); deeper vignette; eyebrow gold → peach; quote text 1.2rem → 1.45rem + font-display + letter-spacing.
+- v3→v4: outline-btn border 1px → 1.5px; `text-wrap: balance` на `.display-headline`; ridge-star sparkle pulse keyframe; headline text-shadow; CTA pill box-shadow.
+
+### Грабли (зафиксировать для будущего)
+
+1. **`--bordeaux` токен `#7A4A1F` — warm brown, НЕ deep wine** — слишком светлый/мутный для full-bleed solid-секций (VLM: "flat, muddy"). Override в `.section-bordeaux` на `#4A2515` (-38% L). Blooms остаются на lighter bordeaux/terracotta для depth.
+2. **`painterly-bg-warm` (light base) + `section-dark` (cream text) = low contrast** — cream text исчезает на light blooms. Решение: для dark-text-on-dark-bg секций использовать `painterly-bg-deep` (dark espresso base `#1F1410`).
+3. **`<style jsx>` НЕ работает в App Router** (parsing error, AGENTS §13.2) — но plain `<style>{`...`}</style>` тоже лучше избегать; выносите стили в `globals.css` или className.
+4. **`scrollIntoView({block:'start'})` на тонкой секции (90px MarqueeBand)** — viewport захватывает секции ниже. Используйте `block:'center'` или scroll-Y+offset для точного скриншота.
+5. **VLM может критиковать не ту секцию** если скриншот захватил несколько — делайте таргетированный скриншот (centered) или уменьшайте viewport height.
+6. **framer-motion `useScroll({target:ref})` даёт benign warning** "Target ref is defined but not hydrated" при SSR — non-blocking, страница рендерится. Гардить через `useMounted` не обязательно (motion обрабатывает null ref).
+
+### Скиллы, оказавшиеся полезны
+
+- **`agent-browser`**: end-to-end верификация — open, scrollIntoView via eval, screenshot, errors. КРИТИЧНО: dev-сервер + agent-browser в ОДНОМ bash-вызове (иначе ERR_CONNECTION_REFUSED — sandbox убивает процессную группу).
+- **`VLM` (z-ai vision CLI)**: brutal-honesty критика скриншотов. `z-ai vision -p "..." -i "./img.png"`. glm-5v-turbo даёт конкретные score + fix recommendations. 4 итерации подняли score с 2-4 до 8-8.5.
+- **`Task → general-purpose` subagent**: параллельный research ridgewells.com (DOM inspection + screenshots + web-search). Дал 793-строчный анализ за один вызов.
+
+### Что можно улучшить дальше (Cycle 22+)
+
+- ~~Painterly bg flat~~ — fixed (grain + vignette + dark base).
+- ~~Marquee CTA breaks flow~~ — acceptable (Ridgewells pattern, CTA на right).
+- Hero: добавить Ridgewells-style image slideshow опцию (сейчас Ken Burns) — P3, не критично.
+- Cookie banner перекрывает EditorialIntro CTA — pre-existing, нужен autofocus + focus trap.
+- `text-wrap: balance` работает в Chrome 114+ / Safari 17.4+ — fallback для старых браузеров не настроен (orphan-words возможны).
+- LCP: EditorialIntro — не LCP-критично (после hero), но можно добавить `priority` на первое изображение hero если ещё нет.
+
+### Файлы этого цикла
+
+```
+src/components/catering/outline-button.tsx       (new, 64 lines)
+src/components/catering/section-header.tsx        (new, 110 lines)
+src/components/catering/editorial-intro.tsx       (new, 148 lines)
+src/components/catering/marquee-band.tsx          (redesigned, 124 lines)
+src/components/catering/services-overview.tsx     (new, 172 lines)
+src/components/catering/quote-band.tsx            (new, 184 lines)
+src/components/catering/social-handle.tsx         (new, 118 lines)
+src/components/catering/site-header.tsx           (+16 lines: micro-label CTA)
+src/app/page.tsx                                  (+15 lines: 4 new sections)
+src/app/globals.css                               (+258 lines: Ridgewells utilities)
+docs/RIDGEWELLS-ANALYSIS.md                       (new, 793 lines)
+docs/reference-library/ridgewells/                (new, 12 raw assets)
+docs/reference-library/our-site/                  (new, 18 verification screenshots)
+```
+
+**TL;DR (Cycle 21):** добавлен Ridgewells-style editorial layer — 4 новые секции
+(EditorialIntro, MarqueeBand redesigned, ServicesOverview, QuoteBand, SocialHandle)
++ 2 reusable primitives (OutlineButton, SectionHeader) + 258 строк CSS-утилит.
+VLM critique-loop сошёлся на 8-8.5/10 (с 2-4/10 начального). `lint` + `typecheck`
+зелёные. Brand "Interfood Catering" сохранён, palette cream/bordeaux/terracotta/
+honey (NO indigo/blue). Для solid-bordeaux секций override токена `#7A4A1F` →
+`#4A2515` (deep). VLM-верификация через `z-ai vision` CLI — обязательно для
+каждого нового визуального блока.

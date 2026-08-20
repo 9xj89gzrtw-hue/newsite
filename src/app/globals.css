@@ -1062,3 +1062,261 @@ header[data-scrolled="true"] [data-mega-panel] {
     scroll-behavior: auto !important;
   }
 }
+
+/* =====================================================================
+   RIDGEWELLS EDITORIAL LAYER — Cycle 21
+   Patterns extracted from ridgewells.com (see docs/RIDGEWELLS-ANALYSIS.md).
+   Premium "luxury magazine" feel via typography scale + painterly color
+   blooms + disciplined restraint. Adapted to our cream/bordeaux/terracotta/
+   honey palette (NO indigo/blue — Ridgewells' aubergine → our bordeaux).
+   ===================================================================== */
+
+/* --- Painterly radial-gradient background (Ridgewells signature wow #1) ---
+   10 layered radial gradients → "digital watercolor" bloom.
+   Pure CSS, zero asset weight. Two variants: warm (cream base, bordeaux +
+   terracotta + honey blooms) for light sections; deep (espresso base) for
+   dark sections. Respects reduced-motion (static). */
+.painterly-bg-warm {
+  background-color: var(--cream);
+  background-image:
+    radial-gradient(circle at 89.58% 53.33%, color-mix(in srgb, var(--bordeaux) 75%, transparent) 0%, 17.5%, transparent 38%),
+    radial-gradient(circle at 52.5% 52.5%, color-mix(in srgb, var(--terracotta) 70%, transparent) 0%, 17.5%, transparent 38%),
+    radial-gradient(circle at 52.92% 84.17%, color-mix(in srgb, var(--terracotta) 65%, transparent) 0%, 17.5%, transparent 38%),
+    radial-gradient(circle at 15% 38.33%, color-mix(in srgb, var(--bordeaux) 70%, transparent) 0%, 17.5%, transparent 38%),
+    radial-gradient(circle at 12.5% 100%, color-mix(in srgb, var(--gold) 60%, transparent) 0%, 14.17%, transparent 28%),
+    radial-gradient(circle at 96.67% 5.83%, color-mix(in srgb, var(--gold) 55%, transparent) 0%, 14.17%, transparent 28%),
+    radial-gradient(circle at 52.08% 1.67%, color-mix(in srgb, var(--bordeaux) 55%, transparent) 0%, 20.88%, transparent 48%),
+    radial-gradient(circle at 20.83% 2.5%, color-mix(in srgb, var(--terracotta) 50%, transparent) 0%, 49.07%, transparent 60%),
+    radial-gradient(circle at 85% 83.33%, color-mix(in srgb, var(--terracotta) 55%, transparent) 0%, 60.2%, transparent 72%),
+    radial-gradient(circle at 48.9% 49.52%, var(--cream) 0%, 100%, transparent 100%);
+}
+
+.painterly-bg-deep {
+  background-color: #1F1410; /* deep espresso-bordeaux base — darker than --night-2 for drama */
+  background-image:
+    radial-gradient(circle at 89.58% 53.33%, rgba(122, 74, 31, 0.95) 0%, 22%, transparent 45%),
+    radial-gradient(circle at 52.5% 52.5%, rgba(154, 79, 42, 0.9) 0%, 22%, transparent 45%),
+    radial-gradient(circle at 52.92% 84.17%, rgba(154, 79, 42, 0.85) 0%, 22%, transparent 45%),
+    radial-gradient(circle at 15% 38.33%, rgba(122, 74, 31, 0.9) 0%, 22%, transparent 45%),
+    radial-gradient(circle at 12.5% 100%, rgba(139, 101, 52, 0.75) 0%, 18%, transparent 32%),
+    radial-gradient(circle at 96.67% 5.83%, rgba(139, 101, 52, 0.7) 0%, 18%, transparent 32%),
+    radial-gradient(circle at 52.08% 1.67%, rgba(122, 74, 31, 0.85) 0%, 25%, transparent 52%),
+    radial-gradient(circle at 20.83% 2.5%, rgba(154, 79, 42, 0.75) 0%, 55%, transparent 65%),
+    radial-gradient(circle at 85% 83.33%, rgba(154, 79, 42, 0.8) 0%, 65%, transparent 75%),
+    radial-gradient(circle at 48.9% 49.52%, rgba(31, 20, 16, 0.6) 0%, 100%, transparent 100%);
+}
+
+/* --- Ridgewells editorial type utilities ---
+   Eyebrow: 12-16px, weight 600, ls 2-3px, uppercase.
+   Display headline: 60-80px Playfair, weight 400, no letter-spacing, lh 0.95. */
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: clamp(0.7rem, 0.95vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+.eyebrow-wide {
+  font-family: var(--font-sans);
+  font-size: clamp(0.8rem, 1.1vw, 1.1rem);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+.display-headline {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 0.98;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  text-wrap: balance;
+}
+.display-headline-xl {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  font-size: clamp(3rem, 8vw, 6rem);
+  text-wrap: balance;
+}
+
+/* --- Ridgewells "View More" outline button ---
+   1px border, border-radius 0 (square), hover fills with text color + inverts.
+   Two variants via data-variant: "light" (dark border on light bg) and
+   "dark" (cream border on dark bg). */
+.ridge-outline-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.25rem;
+  border: 1.5px solid currentColor;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+.ridge-outline-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 0;
+}
+.ridge-outline-btn:hover::before,
+.ridge-outline-btn:focus-visible::before {
+  transform: scaleX(1);
+}
+.ridge-outline-btn > * {
+  position: relative;
+  z-index: 1;
+  transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ridge-outline-btn:hover > *,
+.ridge-outline-btn:focus-visible > * {
+  color: var(--cream);
+}
+.ridge-outline-btn[data-variant="dark"]:hover > *,
+.ridge-outline-btn[data-variant="dark"]:focus-visible > * {
+  color: var(--night);
+}
+
+/* --- Solid bordeaux section (Ridgewells testimonials wow #3) ---
+   Tinted-cream headline (#F5EFE6 equiv) instead of pure white for tonal
+   cohesion with the bordeaux bg.
+   NOTE: --bordeaux token (#7A4A1F) is a warm brown — too light/muddy for
+   a dramatic full-bleed solid section (VLM 4/10: "flat, muddy"). Override
+   with a deeper, richer wine-brown for the solid sections only. Blooms
+   stay on the lighter bordeaux/terracotta for depth. */
+.section-bordeaux {
+  background-color: #4A2515; /* deep rich bordeaux — -38% L vs --bordeaux */
+  color: var(--cream);
+  position: relative;
+}
+.section-bordeaux::before {
+  /* Layered depth: two large soft radial blooms (bordeaux + terracotta)
+     on the deep base so the section isn't flat. Pointer-events:none. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at 85% 15%, rgba(122, 74, 31, 0.55) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 10% 90%, rgba(154, 79, 42, 0.45) 0%, transparent 60%),
+    radial-gradient(ellipse 90% 70% at 50% 50%, transparent 40%, rgba(26, 26, 26, 0.25) 100%);
+}
+.section-bordeaux > * {
+  position: relative;
+  z-index: 1;
+}
+.section-bordeaux .tinted-headline {
+  color: #F7EFE6; /* warm-tinted white — Ridgewells' #F1EBF5 trick, warm-shifted */
+}
+
+/* --- Ridgewells editorial quote marks — oversized gold, behind text --- */
+.ridge-quote-marks {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gold);
+  opacity: 0.55;
+  line-height: 0.6;
+  user-select: none;
+  pointer-events: none;
+}
+.ridge-quote-open {
+  font-size: clamp(5rem, 10vw, 8rem);
+}
+
+/* --- True infinite marquee (Ridgewells marquee band wow #2) ---
+   Track duplicated → translate -50% loops seamlessly. */
+@keyframes ridge-marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+.ridge-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ridge-marquee 32s linear infinite;
+  will-change: transform;
+}
+.ridge-marquee-pause:hover .ridge-marquee-track,
+.ridge-marquee-pause:focus-within .ridge-marquee-track {
+  animation-play-state: paused;
+}
+
+/* --- Slow image hover-zoom for two-up service cards (Ridgewells 0.4s ease) --- */
+.ridge-img-zoom {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+.group:hover .ridge-img-zoom,
+.ridge-card:hover .ridge-img-zoom {
+  transform: scale(1.06);
+}
+
+/* --- Caption reveal on hover (Ridgewells SHOW_ON_HOVER pattern) --- */
+.ridge-caption {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.group:hover .ridge-caption,
+.ridge-card:hover .ridge-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Giant social handle type (Ridgewells @RidgewellsDC 82px) --- */
+.giant-handle {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-size: clamp(3rem, 10vw, 6rem);
+}
+
+/* --- Editorial divider line (Ridgewells thin horizontal rule under badges) --- */
+.ridge-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor 20%, currentColor 80%, transparent);
+  opacity: 0.3;
+}
+
+/* --- Star sparkle pulse (marquee-band decorative stars) ---
+   Subtle opacity + scale pulse so the stars feel "alive" as they scroll.
+   Staggered via inline animation-delay on each star (set in marquee-band.tsx). */
+@keyframes ridge-star-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+.ridge-star {
+  animation: ridge-star-pulse 2.4s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+/* --- Reduce painterly bg motion (subtle drift on the blooms) --- */
+@keyframes painterly-drift {
+  0%, 100% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
+  50% { background-position: 2% 1%, -1% 2%, 1% -2%, -2% 1%, 2% -1%, -1% -2%, 1% 2%, -2% -1%, 2% 1%, 0% 0%; }
+}
+.painterly-drift {
+  animation: painterly-drift 30s ease-in-out infinite;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+}

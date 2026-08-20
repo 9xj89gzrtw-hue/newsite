@@ -208,8 +208,12 @@ export function SiteHeader() {
             )}
           </nav>
 
-          {/* Right side actions */}
-          <div className="flex items-center gap-3">
+          {/* Right side actions — Ridgewells micro-label CTAs + gradient primary.
+              Ridgewells uses wide-tracked uppercase text links (INQUIRE/ORDER)
+              at 11-13px, ls 2-2.5px, no button container. We mirror with
+              "ЗАКАЗАТЬ" (→ #contact) as a text micro-label, keeping the
+              gradient "Рассчитать" as the primary CTA. */}
+          <div className="flex items-center gap-4 md:gap-5">
             <a
               href={CONTACTS.phoneHref}
               className={`min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 text-sm font-medium transition-colors hover:text-gold md:gap-2 ${themeClasses.text} opacity-80 hover:opacity-100`}
@@ -217,6 +221,14 @@ export function SiteHeader() {
             >
               <Phone className="size-5 shrink-0" />
               <span className="hidden md:inline">{CONTACTS.phone}</span>
+            </a>
+            {/* Ridgewells micro-label CTA — wide-tracked uppercase text link */}
+            <a
+              href="#contact"
+              className={`hidden xl:inline-flex min-h-[44px] items-center eyebrow-wide ${themeClasses.text} opacity-75 transition-opacity duration-300 hover:opacity-100 hover-underline`}
+              style={{ fontSize: "0.72rem" }}
+            >
+              Заказать
             </a>
             <a
               href="#calculator"

@@ -1,48 +1,111 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 /**
- * Horizontal marquee bound to vertical scroll (Concept-Catering signature).
- * LIGHT THEME: warm cream background with gold accents and soft text.
+ * MarqueeBand — Ridgewells solid-color infinite marquee (WOW #2).
+ *
+ * Pattern source: docs/RIDGEWELLS-ANALYSIS.md §2.7, §6.4, §9 (P2.2), §10.5.
+ * Ridgewells uses a 94px-tall solid-aubergine band with a single brand
+ * sentence + white pill CTA. We adapt: solid bordeaux bg, the brand phrase
+ * "Нет праздника лучше, чем наш праздник" repeated infinitely, with a
+ * cream pill CTA "Забронировать дату" on the right (desktop).
+ *
+ * Implementation: duplicated track → translateX(-50%) loops seamlessly.
+ * CSS-driven (.ridge-marquee-track) so it runs off the main thread.
+ * Pause on hover/focus. Respects prefers-reduced-motion (static render).
  */
-export function MarqueeBand() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);
 
-  const phrase =
-    "Кейтеринг полного цикла • Фуршет • Банкет • Свадьбы • Корпоративы • Выездная регистрация • Барбекю • ";
-  const items = Array.from({ length: 4 }, () => phrase);
+const PHRASE = "Нет праздника лучше, чем наш праздник";
+const SEPARATOR = "✦"; // elegant star, not a heavy bullet
 
+function MarqueeContent({ paused = false }: { paused?: boolean }) {
+  // Render enough copies to fill 2× the viewport width so the -50% translate
+  // loops without a visible seam. 8 copies is safe on ultra-wide.
+  const items = Array.from({ length: 8 });
   return (
     <div
-      ref={ref}
-      className="relative overflow-hidden border-y border-gold/20 bg-cream-2 py-5 md:py-7"
+      className={`ridge-marquee-track ${paused ? "" : ""}`}
+      aria-hidden={paused ? undefined : "true"}
     >
-      {/* Subtle gradient edges for fade effect */}
-      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-cream-2 to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-cream-2 to-transparent z-10 pointer-events-none" />
-      
-      <motion.div className="marquee-track" style={{ x }}>
-        {items.map((t, i) => (
-          <span
-            key={i}
-            className="font-display uppercase text-ink/70"
-            style={{
-              fontSize: "clamp(1.8rem, 4.5vw, 4.5rem)",
-              lineHeight: 1,
-            }}
+      {items.map((_, i) => (
+        <span
+          key={i}
+          className="flex items-center gap-8 whitespace-nowrap px-8 font-display text-cream"
+          style={{ fontSize: "clamp(1.6rem, 3.6vw, 3rem)", lineHeight: 1 }}
+        >
+          <span className="italic">{PHRASE}</span>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="ridge-star text-gold"
+            aria-hidden="true"
+            style={{ flexShrink: 0, animationDelay: `${(i % 4) * 0.3}s` }}
           >
-            {t}
-            <span className="mx-6 inline-block size-3 rounded-full bg-gradient-to-r from-gold to-terracotta align-middle md:size-3.5" />
-          </span>
-        ))}
-      </motion.div>
+            <path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.5l7.1-.6z" />
+          </svg>
+        </span>
+      ))}
     </div>
+  );
+}
+
+export function MarqueeBand() {
+  const reduce = useReducedMotion();
+
+  return (
+    <section
+      data-header-theme="dark"
+      aria-label="Слоган Interfood Catering"
+      className="section-bordeaux ridge-marquee-pause relative overflow-hidden border-y border-gold/20"
+    >
+      {/* Marquee track — two identical halves for seamless -50% loop.
+          When reduced-motion is set, render a single static centered line. */}
+      {reduce ? (
+        <div className="flex items-center justify-center py-7 md:py-9">
+          <span
+            className="font-display italic text-cream"
+            style={{ fontSize: "clamp(1.5rem, 3.2vw, 2.6rem)" }}
+          >
+            {PHRASE}
+          </span>
+        </div>
+      ) : (
+        <div className="relative flex items-center py-7 md:py-9">
+          {/* Edge fade masks for a cinematic "appearing from nowhere" feel */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-bordeaux to-transparent md:w-40" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-bordeaux to-transparent md:w-40" />
+
+          {/* The duplicated track (so -50% translate loops seamlessly) */}
+          <div className="flex w-max">
+            <MarqueeContent />
+            <MarqueeContent />
+          </div>
+
+          {/* Floating CTA pill — desktop only, sits above the marquee on the right.
+              Mobile users see the marquee text + can scroll to #contact. */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+            className="pointer-events-none absolute inset-y-0 right-6 z-20 hidden items-center md:flex"
+          >
+            <Link
+              href="#contact"
+              className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-cream px-6 py-3 font-sans text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-bordeaux transition-all duration-300 hover:scale-105 hover:bg-gold hover:text-cream"
+              style={{ boxShadow: "0 4px 20px rgba(255,255,255,0.18), 0 8px 30px rgba(0,0,0,0.25)" }}
+            >
+              Забронировать дату
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </motion.div>
+        </div>
+      )}
+    </section>
   );
 }

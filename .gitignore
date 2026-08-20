@@ -67,3 +67,7 @@ worklog.md
 /before-*.png
 /phase*.png
 /after-*.png
+
+# Cycle 21 — transient VLM verification screenshots (regenerated each run)
+docs/reference-library/our-site/
+docs/reference-library/our-site-hero.png

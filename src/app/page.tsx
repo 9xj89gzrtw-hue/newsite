@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
 import { Hero } from "@/components/catering/hero";
+import { EditorialIntro } from "@/components/catering/editorial-intro";
 import { MarqueeBand } from "@/components/catering/marquee-band";
 import { LogoMarquee } from "@/components/catering/logo-marquee";
 import { About } from "@/components/catering/about";
@@ -8,7 +9,9 @@ import { Manifesto } from "@/components/catering/manifesto";
 import { Process } from "@/components/catering/process";
 import { Menu } from "@/components/catering/menu";
 import { PromoBanner } from "@/components/catering/promo-banner";
+import { ServicesOverview } from "@/components/catering/services-overview";
 import { Services } from "@/components/catering/services";
+import { QuoteBand } from "@/components/catering/quote-band";
 import { Pillars } from "@/components/catering/pillars";
 import { SnackBoxDelivery } from "@/components/catering/snack-box-delivery";
 import { EventsGallery } from "@/components/catering/events-gallery";
@@ -20,6 +23,7 @@ import { PressStrip } from "@/components/catering/press-strip";
 import { AwardsStrip } from "@/components/catering/awards-strip";
 import { Faq } from "@/components/catering/faq";
 import { Contact } from "@/components/catering/contact";
+import { SocialHandle } from "@/components/catering/social-handle";
 import { SiteFooter } from "@/components/catering/site-footer";
 import { BackToTop } from "@/components/catering/back-to-top";
 
@@ -31,6 +35,9 @@ export default function Home() {
     <main id="main-content" role="main" tabIndex={-1} className="flex min-h-screen flex-col bg-cream outline-none">
       <SiteHeader />
       <Hero />
+      {/* EditorialIntro — Ridgewells WOW #1: painterly radial-gradient intro */}
+      <EditorialIntro />
+      {/* MarqueeBand — Ridgewells WOW #2: solid-bordeaux infinite marquee */}
       <MarqueeBand />
       {/* Infinite client-logo marquee (Gamma / Creative Edge pattern) */}
       <LogoMarquee />
@@ -42,8 +49,12 @@ export default function Home() {
       {/* Menu: tabs + interactive list + real dishes + inline PDF download */}
       <Menu />
       <PromoBanner />
-      {/* Services: 4-up image-card grid + modal */}
+      {/* ServicesOverview — Ridgewells two-up 50/50 editorial grid (Cycle 21) */}
+      <ServicesOverview />
+      {/* Services: 4-up image-card grid + modal (existing 3D interactive) */}
       <Services />
+      {/* QuoteBand — Ridgewells WOW #3: solid-bordeaux client quote */}
+      <QuoteBand />
       {/* Pillars: dual brand-pillar section (Salt Block pattern) */}
       <Pillars />
       {/* Snack-box delivery: standalone service with price list */}
@@ -66,6 +77,8 @@ export default function Home() {
       {/* Awards strip — premium trust signals before footer */}
       <AwardsStrip />
       <Contact />
+      {/* SocialHandle — Ridgewells giant @nilov_catering closer (Cycle 21) */}
+      <SocialHandle />
       <SiteFooter />
       {/* Back-to-top button (appears on scroll > 500px) */}
       <BackToTop />
