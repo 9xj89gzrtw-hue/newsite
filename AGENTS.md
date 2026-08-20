@@ -1880,3 +1880,76 @@ VLM critique-loop сошёлся на 8-8.5/10 (с 2-4/10 начального).
 honey (NO indigo/blue). Для solid-bordeaux секций override токена `#7A4A1F` →
 `#4A2515` (deep). VLM-верификация через `z-ai vision` CLI — обязательно для
 каждого нового визуального блока.
+
+---
+
+## 🎭 CYCLE 22 — Sopranos Catering Redesign (2026-08-20)
+
+### Что сделано
+Полный ребрендинг с "Interfood Catering" (RU/СПб) → "Soprano's Catering" (EN/Michigan, USA) по образцу sopranoscatering.com.
+
+### Архитектурные изменения (НЕ ОТКАТЫВАТЬ)
+
+#### 1. Шрифты (layout.tsx)
+- `Oswald` (display, uppercase, condensed) → CSS var `--font-display`, класс `.font-display`
+- `Karla` (body, humanist sans) → CSS var `--font-sans`
+- `Great Vibes` (script accent для "Welcome to", "Made with Love") → CSS var `--font-script`, класс `.font-script`
+- `Playfair_Display` сохранён для обратной совместимости
+- Все шрифты подключены через `next/font/google` (self-hosted, no external requests at runtime)
+
+#### 2. Цветовая палитра (globals.css `:root`)
+- `--gold: #D4A373` (Sopranos warm tan-gold, БЫЛО #8B6534 deep brown-gold)
+- `--ink: #1F2937` (Sopranos dark navy, БЫЛО #1A1A1A)
+- `--cream: #F9FAFB` (Sopranos off-white, БЫЛО #FAF8F5)
+- `--terracotta: #C19B76` (warm muted bronze, БЫЛО #9A4F2A dark terracotta)
+- Все остальные токены (`--bordeaux`, `--sage`, `--orange` и т.д.) сохранены для обратной совместимости
+
+#### 3. Sopranos-экспорты в `src/lib/media.ts`
+- `SOPRANOS_ASSETS` — logo (black/white), 3 badges, icons (dinner, apple, gallery), social SVGs
+- `SOPRANOS_HERO_SLIDES` — 4 фото для hero slider (Eastern Market / Banquet / Weddings / Corporate)
+- `SOPRANOS_NAV` — структура навигации (Home/Corporate/Social/Weddings/Grill&BBQ/By The Tray/Venues/Contact) с mega-подменю
+- `SOPRANOS_SERVICES` — 6 категорий услуг с фото
+- `SOPRANOS_CITIES` — 36 городов Southeast Michigan для marquee
+- `SOPRANOS_AWARDS` — 3 реальных бейджа Sopranos
+- `SOPRANOS_WINTER_SPECIALS` — 3 сезонных пакета с ценами в $
+- `SOPRANOS_PARTNERS` — 4 venue/vendor-партнёра
+- `SOPRANOS_SERVICE_STYLES` — Pick Up / Drop Off / Full Service
+
+#### 4. Компоненты
+- `hero.tsx` — full-viewport photo slider + Eastern Market story + collapsible Check Your Date sidebar (auto-collapse при scrollY > 0.7*viewport)
+- `site-header.tsx` — Sopranos logo image + nav с mega-menus (Corporate/Social dropdowns с фото-картой)
+- `site-footer.tsx` — dark navy + "Made with Love" script + 3-col (Contact Info / Navigation / Our Awards) + Proudly Serving cities marquee ( CitiesTrack с trackId для marquee-duplicate)
+- `awards-strip.tsx` — реальные Sopranos бейджи (badge.png, vote-best.png, inverse.png)
+- `winter-specials.tsx` (NEW) — dark navy section "NEW WINTER SPECIALS" с 3 gold-bordered cards
+
+#### 5. Контент (config.ts)
+- Brand: "Soprano's Catering" (Michigan)
+- Phone: `1 (800) WE-CATER` → `tel:+18009322837`
+- Email: `info@sopranoscatering.com`
+- Address: `17600 Clinton River Road, Clinton Township, MI 48038`
+- Instagram: `@sopranoscatering`
+- Currency: USD, Language: en, Timezone: America/Detroit
+
+### Грабли (НЕ ПОВТОРЯТЬ)
+
+1. **multi-edit atomic failure**: MultiEdit с 8+ правками часто падает на одной правке — используй 3-4 правки за раз, иначе откатываются все.
+2. **Setsid для dev server**: `nohup bun run dev &` умирает после выхода bash. Только `setsid -f bash -c 'exec bun run dev'` выживает.
+3. **Duplicate React keys в marquee**: если один и тот же массив рендерится дважды для seamless-loop marquee, нужно передавать `trackId="a"` / `trackId="b"` в компонент-обёртку.
+4. **Next.js Image warnings**: при `width={180} height={0}` нужно `style={{ width: "auto", height: "auto" }}` чтобы избежать "width or height modified" warning.
+5. **Sticky sidebar overlap**: `fixed right-4 top-1/2` sidebar перекрывает контент на ВСЕХ секциях. Решение: `useEffect` с scroll-listener → `setCollapsed(scrollY > 0.7*viewport)` → render compact tab вместо full panel.
+6. **Hero headline overflow**: при sticky right sidebar нужно `lg:pr-[380px]` чтобы headline не обрезался справа.
+7. **Old code after MultiEdit failure**: если MultiEdit упал, проверь что старый код удалён — иначе он продолжит использовать устаревшие импорты и вызовет duplicate keys.
+
+### Эталоны для копирования
+- **Sopranos original**: https://www.sopranoscatering.com/ (Webflow, Oswald+Karla+GreatVibes, dark navy+gold)
+- **VLM-анализ скриншотов**: `docs/reference-library/sites/sopranos/screenshots/` (hero, full, weddings, mobile)
+- **RAW HTML целевого сайта**: `/home/z/my-project/sopranos_home.json`
+
+### Файлы для перевода (если ещё остались RU-строки)
+```bash
+grep -r '[А-Яа-яЁё]' src/components/catering/ --include="*.tsx" \
+  | grep -v -E "(hero|site-header|site-footer|awards-strip|winter-specials|announcement-bar|cookie-consent)"
+```
+
+---
+*Cycle 22 complete. Site: https://newsite-three-kappa.vercel.app — Sopranos Catering redesign live.*
