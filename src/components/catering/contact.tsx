@@ -980,7 +980,7 @@ export function Contact() {
                                     {m.label}
                                   </span>
                                   <span className="font-mono text-[11px] text-ink/70">
-                                    от {m.perGuest.toLocaleString("ru-RU")} ₽ {m.priceUnit ?? "/чел"}
+                                    от {m.perGuest.toLocaleString("ru-RU")} ₽{m.priceUnit ?? "/чел"}
                                   </span>
                                 </button>
                               );
@@ -1049,13 +1049,14 @@ export function Contact() {
                           </div>
 
                           <div>
-                            <label
-                              htmlFor="lead-date"
+                            <div
+                              role="group"
+                              aria-label="Желаемая дата мероприятия"
                               className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-ink/70"
                             >
                               <Calendar className="size-3.5" />
                               Желаемая дата
-                            </label>
+                            </div>
                             <input
                               id="lead-date"
                               type="date"
@@ -1171,7 +1172,6 @@ export function Contact() {
                                 href="/privacy"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                aria-label="Политика конфиденциальности"
                                 className="text-gold underline underline-offset-2 hover:text-terracotta transition-colors"
                               >
                                 Политикой конфиденциальности

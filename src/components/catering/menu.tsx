@@ -336,7 +336,7 @@ function FeaturedSpotlight({
                   <button
                     type="button"
                     onClick={() => setIdx(nextDishIdx)}
-                    className="ml-2 inline-flex items-center gap-2 rounded-full border border-cream/25 bg-cream/5 px-3 py-1.5 text-[11px] uppercase tracking-wider text-cream/80 transition-colors hover:bg-cream/15 hover:text-cream"
+                    className="ml-2 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-cream/25 bg-cream/5 px-4 py-2 text-[11px] uppercase tracking-wider text-cream/80 transition-colors hover:bg-cream/15 hover:text-cream"
                     aria-label="Следующее блюдо"
                   >
                     Далее

@@ -154,7 +154,6 @@ function NewsletterSignup() {
             onChange={(e) => setConsent(e.target.checked)}
             required
             className="mt-0.5 size-4 shrink-0 accent-gold"
-            aria-label="Согласие на обработку персональных данных"
           />
           <span>
             Я согласен на обработку персональных данных согласно{" "}

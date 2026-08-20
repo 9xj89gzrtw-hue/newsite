@@ -209,6 +209,7 @@ export function Calculator() {
                     <motion.button
                       key={m.id}
                       onClick={() => setTypeId(m.id)}
+                      aria-pressed={isSelected}
                       whileTap={{ scale: 0.96 }}
                       whileHover={{ scale: 1.02 }}
                       className={`group relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-300 ${
@@ -412,6 +413,7 @@ export function Calculator() {
                     <motion.button
                       key={a.id}
                       onClick={() => toggleAddon(a.id)}
+                      aria-pressed={on}
                       whileTap={{ scale: 0.98 }}
                       className={`group relative flex items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left transition-all duration-200 ${
                         on
@@ -479,11 +481,11 @@ export function Calculator() {
 
             {/* ═══ Date picker ═══ */}
             <div className="mt-8">
-              <label htmlFor="calc-date" className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
+              <div role="group" aria-label="Дата мероприятия (необязательно)" className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
                 <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">4</span>
                 Дата мероприятия
                 <span className="font-normal text-ink/70">(необязательно)</span>
-              </label>
+              </div>
               <input
                 type="date"
                 id="calc-date"

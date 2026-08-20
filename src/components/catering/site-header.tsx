@@ -309,14 +309,14 @@ export function SiteHeader() {
       <a
         href="#calculator"
         aria-label="Рассчитать стоимость"
-        className="fixed bottom-40 right-6 z-[70] flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-lg shadow-gold/30 transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
+        className="fixed bottom-44 right-6 z-[70] flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-lg shadow-gold/30 transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
       >
         <Calculator className="size-6" />
       </a>
       <a
         href={CONTACTS.phoneHref}
         aria-label="Позвонить"
-        className="fixed bottom-24 right-6 z-[70] flex size-14 items-center justify-center rounded-full border-2 border-gold/40 bg-white/90 text-gold shadow-lg shadow-gold/20 backdrop-blur-sm transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
+        className="fixed bottom-28 right-6 z-[70] flex size-14 items-center justify-center rounded-full border-2 border-gold/40 bg-white/90 text-gold shadow-lg shadow-gold/20 backdrop-blur-sm transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
       >
         <Phone className="size-6" />
       </a>
