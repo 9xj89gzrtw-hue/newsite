@@ -30,7 +30,7 @@ import {
  */
 
 const MANIFESTO_IMG = "/media/event-12.jpg";
-const MANIFESTO_IMG_ALT = "Festive banquet table setting — Soprano's Catering";
+const MANIFESTO_IMG_ALT = "Праздничная сервировка банкетного стола — Interfood Catering";
 
 // Three dish photos that crossfade through the «LOVE» letters as the user scrolls.
 // Layer 1 is visible at the start; layer 2 peaks at 33% scroll; layer 3 settles
@@ -39,14 +39,14 @@ const MANIFESTO_IMG_ALT = "Festive banquet table setting — Soprano's Catering"
 // page (file extension is .jpg but content is text/html — would fail to render
 // as an SVG <image>). Using /media/event-06.jpg (Scandinavian BBQ) instead.
 const MANIFESTO_DISHES = [
-  { src: "/media/concorde-handhelds.jpg", alt: "Reception line — Soprano's Catering" },
-  { src: "/media/concorde-boardroom.webp", alt: "Banquet table setting — Soprano's Catering" },
-  { src: "/media/event-06.jpg", alt: "Outdoor BBQ — Soprano's Catering" },
+  { src: "/media/concorde-handhelds.jpg", alt: "Фуршетная линия — Interfood Catering" },
+  { src: "/media/concorde-boardroom.webp", alt: "Сервировка банкетного стола — Interfood Catering" },
+  { src: "/media/event-06.jpg", alt: "Барбекю на природе — Interfood Catering" },
 ] as const;
 
 // Single poetic line, split into words for scroll-colorize + underline draw-in.
 const MANIFESTO_WORDS =
-  "Culinary innovation and impeccable service is the cornerstone of Soprano's Catering — committed to long term relationships based on personal service and exceptional quality.".split(
+  "Кулинарное новаторство и безупречный сервис — краеугольный камень Interfood Catering. Мы стремимся строить долгосрочные отношения на основе личного сервиса и исключительного качества.".split(
     " ",
   );
 
@@ -178,17 +178,17 @@ export function Manifesto() {
             style={{ opacity: eyebrowOpacity }}
             className="absolute left-1/2 top-[14vh] -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.5em] text-gold/60 md:text-xs"
           >
-            03 · Manifesto
+            03 · Манифест
           </motion.span>
 
           {/* sr-only heading for document outline / screen readers */}
-          <h2 className="sr-only">Made with Love — Soprano's Catering Manifesto</h2>
+          <h2 className="sr-only">Сделано с любовью — Манифест Interfood Catering</h2>
 
           {/* The word-as-window: «LOVE» as SVG with multi-dish crossfade layers (Task 2-b §4). */}
           <motion.div
             style={{ opacity: wordOpacity, scale: wordScale, y: wordY }}
             className="relative flex w-full items-center justify-center px-4"
-            aria-label="Love"
+            aria-label="Любовь"
             role="img"
           >
             <svg
@@ -277,7 +277,7 @@ export function Manifesto() {
             style={{ opacity: sublineOpacity }}
             className="absolute bottom-[6vh] left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.4em] text-gold/60 md:text-xs"
           >
-            On to the menu →
+            Дальше — меню →
           </motion.span>
         </div>
       </div>

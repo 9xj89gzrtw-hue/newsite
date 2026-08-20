@@ -1270,7 +1270,7 @@ export function Contact() {
           <div className="overflow-hidden rounded-2xl border border-border-line shadow-lg shadow-ink/5">
             <iframe
               src={YANDEX_MAPS.embedSrc}
-              title="Soprano's Catering on the map — Clinton Township, MI"
+              title="Interfood Catering на карте — Санкт-Петербург, ул. Большая Морская, 18"
               className="h-[360px] w-full md:h-[440px]"
               loading="lazy"
               sandbox="allow-scripts allow-same-origin allow-presentation"

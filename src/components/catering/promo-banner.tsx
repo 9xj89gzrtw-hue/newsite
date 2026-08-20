@@ -4,8 +4,8 @@ import { Reveal } from "./reveal";
 import { Flower2, ArrowRight, Sparkles } from "lucide-react";
 
 /**
- * Promo banner — LIGHT THEME
- * New Winter Specials — Hearty Buffets from $24/guest.
+ * Промо-баннер — LIGHT THEME
+ * Сезонные свадебные меню 2026 — смотреть меню.
  */
 export function PromoBanner() {
   const currentYear = new Date().getFullYear();
@@ -24,7 +24,7 @@ export function PromoBanner() {
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.3em] text-white backdrop-blur-sm">
               <Sparkles className="size-3" aria-hidden="true" />
-              <span>Promo · Winter {currentYear}</span>
+              <span>Промо · Зима {currentYear}</span>
             </span>
           </Reveal>
           <div className="flex-1">
@@ -33,14 +33,15 @@ export function PromoBanner() {
                 className="font-display text-white"
                 style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)", lineHeight: 1.1 }}
               >
-                New Winter Specials —{"\u00A0"}Hearty Buffets from $24/guest
+                Сезонные свадебные меню 2026{"\u00A0"}
+                <span className="block md:inline">— смотреть меню →</span>
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
               <p className="mt-3 max-w-2xl text-base text-white/90">
-                Slow-braised short ribs, root vegetable mash, winter greens, and crusty bread.
-                Seasonal menus hand-crafted by our chefs — perfect for office gatherings,
-                holiday parties, and winter celebrations.
+                Томёная грудинка, пюре из корнеплодов, зимняя зелень и свежий хлеб.
+                Сезонные меню от наших шеф-поваров — идеально для корпоративных встреч,
+                новогодних праздников и зимних торжеств.
               </p>
             </Reveal>
           </div>
@@ -50,7 +51,7 @@ export function PromoBanner() {
               data-cursor="view"
               className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold uppercase tracking-wider text-gold shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 hover:scale-[1.02] min-h-[44px]"
             >
-              View Specials
+              Смотреть спецпредложения
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </a>
           </Reveal>

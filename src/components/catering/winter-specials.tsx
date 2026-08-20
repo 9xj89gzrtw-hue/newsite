@@ -7,26 +7,23 @@ import { Reveal } from "./reveal";
 import { SOPRANOS_WINTER_SPECIALS } from "@/lib/media";
 
 /**
- * WinterSpecials — Sopranos "NEW WINTER SPECIALS" seasonal band.
+ * WinterSpecials — сезонная секция «НОВЫЕ ЗИМНИЕ СПЕЦПРЕДЛОЖЕНИЯ».
  *
- * Dark navy (#1F2937 / bg-ink) high-contrast section with gold accents and
- * cream text. Uses SOPRANOS_WINTER_SPECIALS data (3 cards):
- *  1. Hearty Winter Buffet       — /media/menu-buffet.jpg        — $24/guest
- *  2. Holiday Hors d'Oeuvres     — /media/concorde-handhelds.jpg — $18/guest
- *  3. Hot Cocoa & Dessert Bar    — /media/concorde-dessert.jpg   — $15/guest
+ * Тёмная navy (#1F2937 / bg-ink) high-contrast секция с золотыми акцентами и
+ * cream-текстом. Использует SOPRANOS_WINTER_SPECIALS (3 карточки):
+ *  1. Зимний банкет                — /media/menu-buffet.jpg        — 2400 ₽/чел
+ *  2. Праздничные закуски         — /media/concorde-handhelds.jpg — 1800 ₽/чел
+ *  3. Какао-бар и десерты         — /media/concorde-dessert.jpg   — 1500 ₽/чел
  *
- * Each card: full-width aspect-video image, dark gradient overlay, gold price
- * badge top-right, content (title / desc / "Reserve →" link), hover lift +
- * gold border + image zoom. Section uses .grain texture for premium feel.
- * All animations respect useReducedMotion().
- *
- * data-header-theme="dark" so the sticky site header switches to its dark
- * variant over this section.
+ * Каждая карточка: полноширинное aspect-video изображение, тёмный градиент,
+ * золотой бейдж цены сверху-справа, контент (название / описание / «Забронировать →»),
+ * hover lift + gold border + image zoom. Секция использует .grain текстуру.
+ * Все анимации учитывают useReducedMotion().
  */
 
-/** Extracts "$XX/guest" price string from a winter special description. */
+/** Извлекает строку цены «XXXX ₽/чел» из описания спецпредложения. */
 function extractPrice(desc: string): string {
-  const match = desc.match(/\$\d+\/guest/i);
+  const match = desc.match(/\d+\s+₽\/чел/i);
   return match ? match[0] : "";
 }
 
@@ -36,7 +33,7 @@ export function WinterSpecials() {
   return (
     <section
       id="winter-specials"
-      aria-label="New winter specials"
+      aria-label="Новые зимние спецпредложения"
       data-header-theme="dark"
       className="grain relative overflow-hidden bg-ink py-20 text-cream"
     >
@@ -67,17 +64,17 @@ export function WinterSpecials() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="font-script text-5xl text-gold"
             >
-              New
+              Новые
             </motion.p>
           )}
           {reduce && (
-            <p className="font-script text-5xl text-gold">New</p>
+            <p className="font-script text-5xl text-gold">Новые</p>
           )}
 
           <Reveal delay={0.05}>
             <span className="inline-flex items-center gap-2 rounded-full bg-gold/10 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.3em] text-gold">
               <Snowflake className="size-3" />
-              Seasonal
+              Сезон
             </span>
           </Reveal>
 
@@ -90,15 +87,15 @@ export function WinterSpecials() {
                 letterSpacing: "-0.02em",
               }}
             >
-              Winter Specials
+              Зимние спецпредложения
             </h2>
           </Reveal>
 
           <Reveal delay={0.15}>
             <p className="mx-auto mt-5 max-w-2xl text-sm text-cream/70 sm:text-base">
-              Warm up your winter events with our seasonal catering packages.
-              Slow-braised comfort foods, hearty buffets, and indulgent dessert
-              bars — perfect for holiday parties and corporate gatherings.
+              Согрейте ваши зимние мероприятия нашими сезонными пакетами кейтеринга.
+              Томлёные блюда уютной кухни, сытные буфеты и роскошные десертные
+              станции — идеально для новогодних праздников и корпоративных встреч.
             </p>
           </Reveal>
         </div>
@@ -134,7 +131,7 @@ export function WinterSpecials() {
                     {/* Floating price badge top-right */}
                     {price && (
                       <span className="absolute right-3 top-3 rounded-full bg-gold px-3 py-1.5 font-display text-[11px] uppercase tracking-wider text-white shadow-lg shadow-black/30">
-                        From {price}
+                        от {price}
                       </span>
                     )}
                   </div>
@@ -151,7 +148,7 @@ export function WinterSpecials() {
                       {special.desc}
                     </p>
 
-                    {/* Reserve → link — 44px touch target */}
+                    {/* Забронировать → ссылка — 44px touch target */}
                     <a
                       href="#contact"
                       className="mt-5 inline-flex min-h-11 items-center gap-2 font-display text-sm uppercase tracking-wider text-gold transition-colors hover:text-gold/80"
@@ -163,7 +160,7 @@ export function WinterSpecials() {
                             : "transition-transform duration-300 group-hover:translate-x-1"
                         }`}
                       >
-                        Reserve
+                        Забронировать
                       </span>
                       <ArrowRight
                         className={`size-4 ${

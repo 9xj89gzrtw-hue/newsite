@@ -26,74 +26,74 @@ import { Reveal } from "./reveal";
 const TESTIMONIALS = [
   {
     id: "sporting",
-    company: "Sporting Club of Detroit",
-    event: "Annual Corporate Galas",
-    eventType: "Corporate",
+    company: "Спортинг Клуб СПб",
+    event: "Ежегодные корпоративные приёмы",
+    eventType: "Корпоратив",
     period: "2024",
-    eventDate: "December 2024",
-    guests: "100–350 guests",
-    location: "Detroit, MI",
+    eventDate: "Декабрь 2024",
+    guests: "100–350 гостей",
+    location: "Санкт-Петербург",
     image: "/media/review-1.jpg",
     rating: 5,
     verified: true,
     quote:
-      "Soprano's Catering provided full catering for our corporate events over the past year. Flawless food quality, professional service, and on-time delivery — exactly what image-defining events demand.",
-    author: "Sporting Club Leadership",
+      "Interfood Catering обеспечил полный кейтеринг наших корпоративных мероприятий за последний год. Безупречное качество еды, профессиональный сервис и своевременная доставка — именно то, что нужно для имиджевых событий.",
+    author: "Руководство Sporting Club",
     avatar: null,
     icon: Users,
   },
   {
     id: "delaval",
-    company: "DeLaval Michigan",
-    event: "Field Day 2019 Expo",
-    eventType: "Exhibition",
+    company: "Делаваль СПб",
+    event: "Field Day 2019",
+    eventType: "Выставка",
     period: "2019",
-    eventDate: "June 2019",
-    guests: "400+ guests",
-    location: "Macomb County, MI",
+    eventDate: "Июнь 2019",
+    guests: "400+ гостей",
+    location: "Санкт-Петербург",
     image: "/media/review-2.jpg",
     rating: 5,
     verified: true,
     quote:
-      "At the Field Day farm equipment expo, Soprano's team catered a reception for over 400 guests. Guests enjoyed hand-crafted appetizers and beverages, with 12 servers on the floor. Outstanding organization.",
-    author: "DeLaval Michigan Organizing Committee",
+      "На выставке Field Day команда Interfood организовала приём для более чем 400 гостей. Гости наслаждались авторскими закусками и напитками, на паркете работало 12 официантов. Выдающаяся организация.",
+    author: "Оргкомитет Делаваль СПб",
     avatar: null,
     icon: Building2,
   },
   {
     id: "techpro",
-    company: "TechPro Industries",
-    event: "Anniversary Banquet",
-    eventType: "Banquet",
+    company: "ТехноПро Индустрии",
+    event: "Юбилейный банкет",
+    eventType: "Банкет",
     period: "2014",
-    eventDate: "November 2014",
-    guests: "320 guests",
-    location: "Troy, MI",
+    eventDate: "Ноябрь 2014",
+    guests: "320 гостей",
+    location: "Санкт-Петербург",
     image: "/media/review-3.jpg",
     rating: 5,
     verified: true,
     quote:
-      "The 320-guest banquet was executed at the highest level. From the custom menu to the setting of each table — everything was thought through to the smallest detail. Guests raved about the unusual flavor pairings and beautiful presentation.",
-    author: "TechPro Industries Director",
+      "Банкет на 320 гостей был проведён на высочайшем уровне. От индивидуального меню до сервировки каждого стола — всё продумано до мелочей. Гости в восторге от необычных вкусовых сочетаний и красивой подачи.",
+    author: "Директор ТехноПро Индустрии",
     avatar: null,
     icon: Star,
   },
   {
     id: "avrora",
-    company: "Aurora Awards Gala",
-    event: "Awards Ceremony Reception",
-    eventType: "Ceremony",
-    period: "11/15/2017",
-    eventDate: "November 15, 2017",
-    guests: "300 guests",
-    venue: "The Vault Detroit",
-    location: "Detroit, MI",
+    company: "Премия «Аврора»",
+    event: "Приём на церемонии награждения",
+    eventType: "Церемония",
+    period: "15.11.2017",
+    eventDate: "15 ноября 2017",
+    guests: "300 гостей",
+    venue: "Лофт «Севкабель Порт»",
+    location: "Санкт-Петербург",
     image: "/media/review-4.jpg",
     rating: 5,
     verified: true,
     quote:
-      "The Aurora Awards ceremony is an event of international caliber. Soprano's Catering created a reception worthy of the awards: fresh oysters, signature desserts, a champagne tower. Guests from 15 states were delighted.",
-    author: "Aurora Awards Organizers",
+      "Церемония премии «Аврора» — событие международного калибра. Interfood Catering создал приём, достойный награды: свежие устрицы, авторские десерты, башня из шампанского. Гости из 15 регионов были в восторге.",
+    author: "Организаторы премии «Аврора»",
     avatar: null,
     icon: Award,
   },
@@ -104,9 +104,9 @@ const TESTIMONIALS = [
  * Clients who trust us — company names.
  */
 const TRUST_CLIENTS = [
-  "Ford Motor Company", "Quicken Loans", "DTE Energy", "Bayer",
-  "L'Oréal", "Sanofi", "Nestlé",
-  "Danone", "Bosch", "Siemens", "Meijer",
+  "Газпром", "Сбербанк", "Яндекс", "ВТБ",
+  "Роснефть", "Тинькофф", "Лукойл",
+  "Магнит", "OZON", "МТС", "Альфа-Банк",
 ];
 
 /* ──────────────────────────────────────────────
@@ -652,7 +652,7 @@ export function Testimonials() {
                 className="mt-4 font-display text-ink"
                 style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)" }}
               >
-                Michigan leaders work with us
+                Лидеры рынка работают с нами
               </h3>
             </div>
           </Reveal>

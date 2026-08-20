@@ -9,10 +9,10 @@ import { CONTACTS } from "@/lib/media";
 type FaqCategory = "ordering" | "logistics" | "menu" | "payment";
 
 const CATEGORIES: { id: FaqCategory; label: string }[] = [
-  { id: "ordering", label: "Ordering" },
-  { id: "logistics", label: "Logistics" },
-  { id: "menu", label: "Menu" },
-  { id: "payment", label: "Payment" },
+  { id: "ordering", label: "Заказ" },
+  { id: "logistics", label: "Логистика" },
+  { id: "menu", label: "Меню" },
+  { id: "payment", label: "Оплата" },
 ];
 
 const faqItems: {
@@ -22,51 +22,51 @@ const faqItems: {
 }[] = [
   {
     category: "ordering",
-    question: "How far in advance should I book catering?",
+    question: "За сколько дней нужно бронировать кейтеринг?",
     answer:
-      "We recommend booking at least 3–5 days before your event. For larger events (100+ guests), it's best to book 1–2 weeks ahead. Last-minute requests are handled case by case — give us a call and we'll do our best to help.",
+      "Рекомендуем бронировать за 3–5 дней до мероприятия. Для крупных событий (100+ гостей) лучше бронировать за 1–2 недели. Срочные заявки рассматриваем индивидуально — позвоните, и мы постараемся помочь.",
   },
   {
     category: "payment",
-    question: "What is the minimum order amount?",
+    question: "Каков минимальный заказ?",
     answer:
-      "The minimum order depends on the format: receptions start at $490 (from 20 guests × $24/guest), coffee breaks start at $270 (from 15 guests × $18/guest), and banquets start at $1,350 (from 30 guests × $45/guest). Our team will quote exact pricing for your specific needs.",
+      "Минимум зависит от формата: фуршеты от 12 000 ₽ (от 20 гостей × 600 ₽/чел), кофе-брейки от 6 750 ₽ (от 15 гостей × 450 ₽/чел), банкеты от 33 750 ₽ (от 30 гостей × 1 125 ₽/чел). Точную смету наш менеджер рассчитает под ваши задачи.",
   },
   {
     category: "logistics",
-    question: "Do you travel outside Southeast Michigan?",
+    question: "Выезжаете ли вы за пределы Санкт-Петербурга?",
     answer:
-      "Yes — we serve the entire Southeast Michigan region (Macomb, Oakland, Wayne, and St. Clair counties included at no extra charge). For locations further out (Lansing, Ann Arbor, Flint), we add a modest mileage fee to cover logistics.",
+      "Да — обслуживаем весь Санкт-Петербург и Ленинградскую область без доплат (в радиусе 30 км от КАД). Для более дальних локаций (Пушкин, Петергоф, Кронштадт, Зеленогорск) добавляем небольшую транспортную надбавку за логистику.",
   },
   {
     category: "logistics",
-    question: "Do you provide china, table service, and staff?",
+    question: "Предоставляете ли вы посуду, сервировку и персонал?",
     answer:
-      "Yes, that's standard for our service. The package includes disposable or reusable china (your choice), full table setting, and front-of-house staff (servers, bartenders, executive chef). For premium events we offer decor and floral design as well.",
+      "Да, это входит в стандартный сервис. В пакет включена одноразовая или многоразовая посуда (на выбор), полная сервировка стола и персонал зала (официанты, бармены, шеф-повар). Для премиальных мероприятий предлагаем декор и флористику.",
   },
   {
     category: "menu",
-    question: "Can you accommodate dietary restrictions (allergies, vegan)?",
+    question: "Учитываете ли диетические ограничения (аллергии, веганское)?",
     answer:
-      "Always! We prepare menus to accommodate any dietary restrictions: gluten-free, dairy-free, nut-free, halal, kosher, vegetarian, and vegan options. Just let us know the restrictions when you book — we'll adapt the menu accordingly.",
+      "Конечно! Готовим меню под любые ограничения: без глютена, без молока, без орехов, халяль, кошер, вегетарианское и веганское меню. Просто укажите ограничения при бронировании — мы адаптируем меню под ваших гостей.",
   },
   {
     category: "payment",
-    question: "How does payment work?",
+    question: "Как происходит оплата?",
     answer:
-      "We work with both businesses and individuals. Payment can be made by credit card, check, or bank transfer. Deposit terms: typically 30–50% at contract signing with the balance due after the event. Net-15 invoicing available for established corporate accounts.",
+      "Работаем с юрлицами и физлицами. Оплата — наличными, банковской картой или безналичным расчётом. Предоплата: обычно 30–50% при подписании договора, остаток после мероприятия. Для постоянных корпоративных клиентов доступна отсрочка платежа 15 дней.",
   },
   {
     category: "menu",
-    question: "Can you prepare a custom menu?",
+    question: "Можете ли составить индивидуальное меню?",
     answer:
-      "Yes — our executive chef will craft a custom menu tailored to your preferences, budget, and event style. A tasting can be arranged before booking, which is standard practice for banquets and weddings.",
+      "Да — наш шеф-повар составит меню под ваши предпочтения, бюджет и формат мероприятия. Возможна дегустация перед бронированием, это стандартная практика для банкетов и свадеб.",
   },
   {
     category: "ordering",
-    question: "Can I change my order after booking?",
+    question: "Можно ли изменить заказ после бронирования?",
     answer:
-      "Yes, changes can be made at no charge up to 48 hours before the event. After that, changes are subject to manager approval and may incur a small fee for expedited ingredient sourcing.",
+      "Да, изменения бесплатны за 48 часов до мероприятия. Позже — по согласованию с менеджером, возможна небольшая доплата за срочную закупку ингредиентов.",
   },
 ];
 
@@ -186,12 +186,12 @@ function WasHelpful({ question }: { question: string }) {
 
   return (
     <div className="flex items-center gap-3 text-xs text-ink/70">
-      <span>Was this answer helpful?</span>
+      <span>Был ли этот ответ полезен?</span>
       <button
         type="button"
         onClick={() => onVote("up")}
         aria-pressed={vote === "up"}
-        aria-label="Yes, helpful"
+        aria-label="Да, полезно"
         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[44px] min-w-[44px] ${
           vote === "up"
             ? "border-sage/40 bg-sage/15 text-sage"
@@ -199,7 +199,7 @@ function WasHelpful({ question }: { question: string }) {
         }`}
       >
         <ThumbsUp className="size-3" />
-        Yes
+        Да
         {totalUp >= POSITIVE_THRESHOLD && (
           <span className="font-mono text-[10px] opacity-70">{totalUp}</span>
         )}
@@ -208,7 +208,7 @@ function WasHelpful({ question }: { question: string }) {
         type="button"
         onClick={() => onVote("down")}
         aria-pressed={vote === "down"}
-        aria-label="No, not helpful"
+        aria-label="Нет, не полезно"
         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[44px] min-w-[44px] ${
           vote === "down"
             ? "border-bordeaux/30 bg-bordeaux/5 text-bordeaux"
@@ -286,10 +286,10 @@ export function Faq() {
               className="mt-4 font-display text-ink"
               style={{ fontSize: "clamp(1.75rem, 4.5vw, 2.75rem)", lineHeight: 1.2 }}
             >
-              Frequently Asked Questions
+              Часто задаваемые вопросы
             </h2>
             <p className="mt-4 text-base text-ink/70">
-              Answers to common questions about our catering
+              Ответы на частые вопросы о нашем кейтеринге
             </p>
           </div>
         </Reveal>
@@ -306,15 +306,15 @@ export function Faq() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search questions…"
-                aria-label="Search frequently asked questions"
+                placeholder="Поиск вопросов…"
+                aria-label="Поиск по частым вопросам"
                 className="w-full rounded-full border border-border-line bg-cream/60 pl-12 pr-12 py-3.5 text-base text-ink placeholder:text-ink/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors min-h-[44px]"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
-                  aria-label="Clear search"
+                  aria-label="Очистить поиск"
                   className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex size-11 items-center justify-center rounded-full text-ink/70 hover:bg-ink/5 hover:text-ink transition-colors min-h-[44px] min-w-[44px]"
                 >
                   <X className="size-4" />
@@ -370,8 +370,8 @@ export function Faq() {
         {/* Items count */}
         <div className="mb-4 text-center font-mono text-xs uppercase tracking-wider text-ink/70">
           {filtered.length === 0
-            ? "No results found"
-            : `Showing ${filtered.length} of ${faqItems.length}`}
+            ? "Ничего не найдено"
+            : `Показано ${filtered.length} из ${faqItems.length}`}
         </div>
 
         {/* Items list with AnimatePresence layout animation */}

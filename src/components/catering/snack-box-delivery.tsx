@@ -89,15 +89,15 @@ export function SnackBoxDelivery() {
             </Reveal>
             <Reveal delay={0.2}>
               <p className="mt-5 max-w-md text-base leading-relaxed text-ink/70 font-display">
-                Ready-to-serve trays for events of any size — appetizers,
-                bruschetta, salads, hot dishes. Individual packaging, easy
-                serving. Delivery across Southeast Michigan.
+                Готовые к подаче лотки для мероприятий любого масштаба — закуски,
+                брускетты, салаты, горячее. Индивидуальная упаковка, удобная
+                подача. Доставка по Санкт-Петербургу и области.
               </p>
             </Reveal>
             <Reveal delay={0.3}>
               <div className="mt-6 flex items-center gap-3 text-sm text-ink/70 bg-white/70 inline-flex px-4 py-2 rounded-full">
                 <Truck className="size-5 text-gold" />
-                <span>Southeast Michigan · 10-piece min · 1-day turnaround</span>
+                <span>Санкт-Петербург · минимум 10 шт · доставка за 1 день</span>
               </div>
             </Reveal>
             <Reveal delay={0.4}>

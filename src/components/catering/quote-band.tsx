@@ -24,10 +24,10 @@ const EASE = [0.4, 0, 0.2, 1] as const;
 
 const FEATURED_QUOTE = {
   quote:
-    "Soprano's does everything the old world way. From hand-picking our own produce at Eastern Market, to making our own salad dressing — every detail is made with love.",
-  client: "The Soprano Family",
-  event: "Founders · Soprano's Catering · Clinton Township, MI",
-  date: "Est. 1985",
+    "«Еда как искусство — наш принцип. Каждый банкет мы готовим как для себя: с вниманием к деталям, любовью к продукту и уважением к гостям.»",
+  client: "Команда Interfood Catering",
+  event: "Основатель · Нилов Дмитрий Игоревич · Санкт-Петербург",
+  date: "С 2014 года",
   image: "/media/review-4.jpg",
 };
 
@@ -37,7 +37,7 @@ export function QuoteBand() {
   return (
     <section
       data-header-theme="dark"
-      aria-label="Customer testimonial — The Soprano Family"
+      aria-label="Отзыв клиента — Команда Interfood Catering"
       className="section-bordeaux relative overflow-hidden py-24 md:py-36"
     >
       {/* Subtle painterly depth — bordeaux blooms on bordeaux base */}
@@ -74,7 +74,7 @@ export function QuoteBand() {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.7, ease: EASE }}
               className="mb-7 flex items-center gap-2"
-              aria-label="Rated 5 out of 5"
+              aria-label="Оценка 5 из 5"
             >
               {[0, 1, 2].map((i) => (
                 <motion.svg
@@ -94,7 +94,7 @@ export function QuoteBand() {
                 </motion.svg>
               ))}
               <span className="ml-3 font-sans text-[0.78rem] font-semibold uppercase tracking-[0.2em] text-cream/80">
-                4.9 / 5 · 127+ reviews
+                4,9 / 5 · 127+ отзывов
               </span>
             </motion.div>
 
@@ -106,9 +106,9 @@ export function QuoteBand() {
               transition={{ duration: 0.9, delay: 0.1, ease: EASE }}
               className="display-headline tinted-headline"
             >
-              What our
+              Что наши
               <br />
-              <span className="italic">clients say.</span>
+              <span className="italic">клиенты говорят.</span>
             </motion.h2>
 
             {/* The quote — with oversized gold marks flanking (mobile shows inline).
@@ -156,7 +156,7 @@ export function QuoteBand() {
             >
               <Image
                 src={FEATURED_QUOTE.image}
-                alt={`Thank-you letter from ${FEATURED_QUOTE.client}`}
+                alt={`Благодарственное письмо от ${FEATURED_QUOTE.client}`}
                 fill
                 sizes="(max-width: 768px) 80vw, 360px"
                 className="object-cover"

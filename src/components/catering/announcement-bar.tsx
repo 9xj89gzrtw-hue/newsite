@@ -72,18 +72,18 @@ export function AnnouncementBar() {
       >
         <Sparkles className="size-3.5 shrink-0 text-gold" aria-hidden="true" />
         <p className="text-xs font-medium tracking-wide text-cream/90 md:text-sm">
-          <span className="hidden sm:inline">New Winter Specials {currentYear} — </span>
+          <span className="hidden sm:inline">Новые зимние спецпредложения {currentYear} — </span>
           <a
             href="#winter-specials"
             className="font-semibold text-cream underline underline-offset-2 hover:text-peach transition-colors"
           >
-            view seasonal menu →
+            смотреть сезонное меню →
           </a>
         </p>
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Close announcement"
+          aria-label="Закрыть объявление"
           className="absolute right-3 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream min-h-[44px] min-w-[44px]"
         >
           <X className="size-4" />
@@ -111,18 +111,18 @@ export function AnnouncementBar() {
             <div className="flex items-center justify-center gap-3 px-10 py-2.5 text-center">
               <Sparkles className="size-3.5 shrink-0 text-gold" aria-hidden="true" />
               <p className="text-xs font-medium tracking-wide text-cream/90 md:text-sm">
-                <span className="hidden sm:inline">New Winter Specials {currentYear} — </span>
+                <span className="hidden sm:inline">Новые зимние спецпредложения {currentYear} — </span>
                 <a
                   href="#winter-specials"
                   className="font-semibold text-cream underline underline-offset-2 hover:text-peach transition-colors"
                 >
-                  view seasonal menu →
+                  смотреть сезонное меню →
                 </a>
               </p>
               <button
                 type="button"
                 onClick={dismiss}
-                aria-label="Close announcement"
+                aria-label="Закрыть объявление"
                 className="absolute right-3 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream min-h-[44px] min-w-[44px]"
               >
                 <X className="size-4" />

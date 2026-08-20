@@ -71,34 +71,34 @@ export const MEDIA = {
   //   - gamma-private-event (Private Event Catering)
   //   - gamma-table-birds-eye (TCZ Restaurant Table Salad Rosé Wine Bird's-eye view)
   events: [
-    { src: "/media/event-01.png", caption: "Wedding rooftop reception", category: "Weddings" },
-    { src: "/media/event-02.jpg", caption: "Corporate office event", category: "Corporate" },
-    { src: "/media/event-03.jpg", caption: "Banquet on a boat", category: "Banquets" },
-    { src: "/media/event-04.jpg", caption: "Outdoor ceremony", category: "Weddings" },
-    { src: "/media/event-05.jpg", caption: "Outdoor holiday reception", category: "Corporate" },
-    { src: "/media/event-06.jpg", caption: "Tented outdoor banquet", category: "Banquets" },
-    { src: "/media/event-07.jpg", caption: "Conference coffee break", category: "Coffee Breaks" },
-    { src: "/media/event-08.jpg", caption: "Live-fire BBQ grilling", category: "BBQ" },
-    { src: "/media/event-09.jpg", caption: "New Year corporate party", category: "Corporate" },
-    { src: "/media/event-10.jpg", caption: "Seasonal banquet", category: "Banquets" },
-    { src: "/media/event-11.jpg", caption: "Guest reception", category: "Receptions" },
-    { src: "/media/event-12.jpg", caption: "Holiday table setting", category: "Banquets" },
-    { src: "/media/gamma-wedding.webp", caption: "Wedding catering", category: "Weddings" },
-    { src: "/media/gamma-corporate.webp", caption: "Corporate event", category: "Corporate" },
-    { src: "/media/gamma-private-event.webp", caption: "Private celebration", category: "Banquets" },
-    { src: "/media/gamma-table-birds-eye.webp", caption: "Table setting — bird's eye view", category: "Receptions" },
+    { src: "/media/event-01.png", caption: "Свадебный фуршет на крыше", category: "Свадьбы" },
+    { src: "/media/event-02.jpg", caption: "Корпоратив в офисе", category: "Корпоративы" },
+    { src: "/media/event-03.jpg", caption: "Банкет на корабле", category: "Банкеты" },
+    { src: "/media/event-04.jpg", caption: "Выездная регистрация", category: "Свадьбы" },
+    { src: "/media/event-05.jpg", caption: "Праздничный фуршет на воздухе", category: "Корпоративы" },
+    { src: "/media/event-06.jpg", caption: "Банкет в шатре на природе", category: "Банкеты" },
+    { src: "/media/event-07.jpg", caption: "Кофе-брейк на конференции", category: "Кофе-брейки" },
+    { src: "/media/event-08.jpg", caption: "Выездное барбекю — гриль на углях", category: "Барбекю" },
+    { src: "/media/event-09.jpg", caption: "Новогодний корпоратив", category: "Корпоративы" },
+    { src: "/media/event-10.jpg", caption: "Сезонный банкет", category: "Банкеты" },
+    { src: "/media/event-11.jpg", caption: "Фуршет для гостей", category: "Фуршеты" },
+    { src: "/media/event-12.jpg", caption: "Праздничная сервировка", category: "Банкеты" },
+    { src: "/media/gamma-wedding.webp", caption: "Свадебный кейтеринг (Швейцария)", category: "Свадьбы" },
+    { src: "/media/gamma-corporate.webp", caption: "Корпоративное мероприятие", category: "Корпоративы" },
+    { src: "/media/gamma-private-event.webp", caption: "Частное торжество", category: "Банкеты" },
+    { src: "/media/gamma-table-birds-eye.webp", caption: "Сервировка стола — вид сверху", category: "Фуршеты" },
   ],
 };
 
 /** Event categories for the gallery filter (A5 — filterable gallery). */
 export const EVENT_CATEGORIES = [
-  "All",
-  "Weddings",
-  "Corporate",
-  "Banquets",
-  "Receptions",
-  "Coffee Breaks",
-  "BBQ",
+  "Все",
+  "Свадьбы",
+  "Корпоративы",
+  "Банкеты",
+  "Фуршеты",
+  "Кофе-брейки",
+  "Барбекю",
 ] as const;
 
 // Contacts — re-exported from config.ts (single source of truth).
@@ -266,125 +266,124 @@ export const SOPRANOS_ASSETS = {
 } as const;
 
 /**
- * Sopranos hero slider images — uses existing project media (high-quality
- * catering photos) because Sopranos original Webflow slider images aren't
- * publicly accessible without JS rendering. These match the dark/moody/warm
- * mood of Sopranos hero (food photography on rustic tables).
+ * Hero slider images — премиальный кейтеринг в стиле Sopranos.
+ * Реальные фотографии блюд и сервировки (см. комментарии к MEDIA выше).
+ * Подобраны под настроение: тёмные, тёплые, с золотыми акцентами.
  */
 export const SOPRANOS_HERO_SLIDES = [
   {
     src: "/media/ridgewells-hero.jpg",
-    alt: "Catered dinner table at sunset — Soprano's Catering",
-    caption: "Eastern Market • Old World Way",
+    alt: "Банкетный стол на закате — Interfood Catering",
+    caption: "Еда как искусство · Выездной кейтеринг",
   },
   {
     src: "/media/menu-banquet.jpg",
-    alt: "Banquet table with seasonal dishes — Soprano's Catering",
-    caption: "Hand-picked produce • Made from scratch",
+    alt: "Банкетный стол с сезонными блюдами — Interfood Catering",
+    caption: "Свежие продукты · Готовим с нуля",
   },
   {
     src: "/media/event-wedding-light.jpg",
-    alt: "Wedding reception catering — Soprano's Catering",
-    caption: "Weddings • Corporate • Social Events",
+    alt: "Свадебный банкет — Interfood Catering",
+    caption: "Свадьбы · Корпоративы · Частные приёмы",
   },
   {
     src: "/media/concorde-boardroom.webp",
-    alt: "Corporate catering setup — Soprano's Catering",
-    caption: "Professional Service • Competitive Prices",
+    alt: "Корпоративный кейтеринг — Interfood Catering",
+    caption: "Премиальный сервис · С 2014 года",
   },
 ] as const;
 
 /**
- * Sopranos top-level navigation — copied from sopranoscatering.com.
- * Used by site-header for the desktop nav.
+ * Навигация верхнего уровня — стиль Sopranos (mega-меню с группами услуг).
+ * Используется в site-header для десктопа.
  */
 export const SOPRANOS_NAV = [
   {
-    label: "Home",
+    label: "Главная",
     href: "#main-content",
   },
   {
-    label: "Corporate",
+    label: "Корпоратив",
     href: "#services",
     mega: {
-      title: "Corporate Events",
+      title: "Корпоративные события",
       items: [
-        { label: "Breakfast & Brunch", href: "#services" },
-        { label: "Boxed Lunches", href: "#services" },
-        { label: "Meetings & Breaks", href: "#services" },
-        { label: "Build Your Own Buffet", href: "#menu" },
-        { label: "Grill & BBQ", href: "#services" },
-        { label: "Themed Cuisine", href: "#menu" },
-        { label: "By The Tray", href: "#snack-box" },
-        { label: "Late Night Snacks", href: "#menu" },
+        { label: "Завтраки и бранчи", href: "#services" },
+        { label: "Бизнес-ланчи", href: "#services" },
+        { label: "Кофе-брейки и перерывы", href: "#services" },
+        { label: "Фуршет по вашему выбору", href: "#menu" },
+        { label: "Гриль и барбекю", href: "#services" },
+        { label: "Тематические меню", href: "#menu" },
+        { label: "Подносом и лотками", href: "#snack-box" },
+        { label: "Вечерние закуски", href: "#menu" },
       ],
     },
   },
   {
-    label: "Social",
+    label: "События",
     href: "#services",
     mega: {
-      title: "Social Events",
+      title: "Частные события",
       items: [
-        { label: "Build Your Own Buffet", href: "#menu" },
-        { label: "Grill & BBQ", href: "#services" },
-        { label: "Themed Cuisine", href: "#menu" },
-        { label: "By The Tray", href: "#snack-box" },
-        { label: "Breakfast & Brunch", href: "#menu" },
-        { label: "Late Night Snacks", href: "#menu" },
+        { label: "Фуршет по вашему выбору", href: "#menu" },
+        { label: "Гриль и барбекю", href: "#services" },
+        { label: "Тематические меню", href: "#menu" },
+        { label: "Подносом и лотками", href: "#snack-box" },
+        { label: "Завтраки и бранчи", href: "#menu" },
+        { label: "Вечерние закуски", href: "#menu" },
       ],
     },
   },
-  { label: "Weddings", href: "#about" },
-  { label: "Grill & BBQ", href: "#services" },
-  { label: "By The Tray", href: "#snack-box" },
-  { label: "Venues & Vendors", href: "#pillars" },
-  { label: "Contact", href: "#contact" },
+  { label: "Свадьбы", href: "#about" },
+  { label: "Гриль и BBQ", href: "#services" },
+  { label: "Поднос", href: "#snack-box" },
+  { label: "Площадки", href: "#pillars" },
+  { label: "Контакты", href: "#contact" },
 ] as const;
 
 /**
- * Sopranos service cards — six main service categories with photos.
- * Inspired by Sopranos "OUR SERVICES" section structure.
+ * Карточки услуг — шесть основных категорий с фотографиями.
+ * По структуре Sopranos «OUR SERVICES».
  */
 export const SOPRANOS_SERVICES = [
   {
-    title: "Corporate Events",
-    desc: "Breakfast, brunch, boxed lunches, meetings & breaks. Full-service or pick-up and drop-off for offices large and small.",
+    title: "Корпоративы",
+    desc: "Завтраки, бранчи, бизнес-ланчи, кофе-брейки. Кейтеринг полного цикла или доставка с нашим транспортом для офисов любого размера.",
     image: "/media/concorde-boardroom.webp",
     icon: "Briefcase",
     href: "#services",
   },
   {
-    title: "Social Events",
-    desc: "Build your own buffet, themed cuisine, late night snacks. From intimate gatherings to large celebrations.",
+    title: "Частные приёмы",
+    desc: "Фуршет по вашему выбору, тематические меню, вечерние закуски. От камерных ужинов до больших праздников.",
     image: "/media/event-11.jpg",
     icon: "PartyPopper",
     href: "#services",
   },
   {
-    title: "Weddings",
-    desc: "Our chefs understand the importance of your wedding day. Every detail considered, every expectation exceeded.",
+    title: "Свадьбы",
+    desc: "Наши шеф-повара понимают важность вашего свадебного дня. Каждая деталь учтена, каждое ожидание превзойдено.",
     image: "/media/event-wedding-light.jpg",
     icon: "Heart",
     href: "#about",
   },
   {
-    title: "Grill & BBQ",
-    desc: "Live-fire grilling on site. Smoked brisket, baby back ribs, hand-crafted sausages and seasonal vegetables.",
+    title: "Гриль и барбекю",
+    desc: "Живой огонь на площадке: томлёная грудинка, рёбрышки, авторские колбаски и сезонные овощи на углях.",
     image: "/media/event-08.jpg",
     icon: "Flame",
     href: "#services",
   },
   {
-    title: "By The Tray",
-    desc: "Pick-up and drop-off catering by the tray. Perfect for small get-togethers and office meetings.",
+    title: "Подносом и лотками",
+    desc: "Доставка готовых закусок лотками. Идеально для небольших встреч и офисных перерывов.",
     image: "/media/snack-1.jpg",
     icon: "UtensilsCrossed",
     href: "#snack-box",
   },
   {
-    title: "Venues & Vendors",
-    desc: "Proudly recommend partners who share our passion for excellence. Venues, florists, photographers and more.",
+    title: "Площадки и партнёры",
+    desc: "С гордостью рекомендуем партнёров, разделяющих наше стремление к совершенству. Лофты, флористы, фотографы и многое другое.",
     image: "/media/event-06.jpg",
     icon: "MapPin",
     href: "#pillars",
@@ -392,110 +391,112 @@ export const SOPRANOS_SERVICES = [
 ] as const;
 
 /**
- * Sopranos service styles — pick-up, drop-off, full-service options.
- * From "SERVICE STYLES" section.
+ * Стили сервиса — самовывоз, доставка, под ключ.
+ * По структуре Sopranos «SERVICE STYLES».
  */
 export const SOPRANOS_SERVICE_STYLES = [
   {
-    title: "Pick Up",
-    desc: "Place your order and pick up at our Clinton Township kitchen. Freshly prepared, packaged for transport.",
+    title: "Самовывоз",
+    desc: "Оформите заказ и заберите его с нашей кухни на Большой Морской. Готовим свежее и упаковываем для транспортировки.",
     icon: "ShoppingBag",
   },
   {
-    title: "Drop Off",
-    desc: "We deliver to your venue, set up disposable serving ware, and leave you to enjoy the event.",
+    title: "Доставка",
+    desc: "Привозим на вашу площадку, сервируем одноразовую подачу — и оставляем вас наслаждаться мероприятием.",
     icon: "Truck",
   },
   {
-    title: "Full Service",
-    desc: "Complete catering experience — chefs, servers, equipment, set-up and clean-up. For weddings and large events.",
+    title: "Под ключ",
+    desc: "Полный кейтеринг — шеф-повар, официанты, оборудование, монтаж и демонтаж. Для свадеб и крупных событий.",
     icon: "UtensilsCrossed",
   },
 ] as const;
 
 /**
- * Sopranos venue & vendor partners — "VENUES & VENDORS" section.
+ * Площадки и партнёры — Санкт-Петербург.
  */
 export const SOPRANOS_PARTNERS = [
   {
-    name: "The Vault",
-    type: "Venue",
-    desc: "Historic Detroit bank vault transformed into a stunning event space.",
+    name: "Лофт на Чайке",
+    type: "Площадка",
+    desc: "Индустриальный лофт в центре Петербурга с панорамными окнами — свадьбы и корпоративы.",
     image: "/media/event-02.jpg",
   },
   {
-    name: "Birmingham Bloomfield",
-    type: "Venue",
-    desc: "Elegant banquet hall for weddings and corporate galas in Bloomfield Hills.",
+    name: "Севкабель Порт",
+    type: "Площадка",
+    desc: "Современное пространство на берегу Финского залива — банкеты и приёмы.",
     image: "/media/event-06.jpg",
   },
   {
-    name: "Lake St. Clair",
-    type: "Venue",
-    desc: "Waterfront venue with panoramic views for ceremonies and receptions.",
+    name: "Тауэр",
+    type: "Площадка",
+    desc: "Премиальный банкетный зал для свадеб и корпоративных торжеств.",
     image: "/media/event-04.jpg",
   },
   {
-    name: "Bellissimo Floral",
-    type: "Vendor",
-    desc: "Award-winning floral design studio specializing in wedding and event florals.",
+    name: "Студия флористики Bella",
+    type: "Партнёр",
+    desc: "Студия флористики и декора, специализирующаяся на свадебном и корпоративном оформлении.",
     image: "/media/event-12.jpg",
   },
 ] as const;
 
 /**
- * Sopranos Proudly Serving — Southeast Michigan cities list.
- * From the footer "Proudly Catering to..." section.
+ * География обслуживания — районы и пригороды Санкт-Петербурга.
+ * Используется в футере «С гордостью обслуживаем…».
  */
 export const SOPRANOS_CITIES = [
-  "Armada", "Auburn Hills", "Birmingham", "Bloomfield Hills", "Centerline",
-  "Chesterfield", "Clarkston", "Clinton Township", "Detroit", "Fraser",
-  "Grosse Pointe", "Lenox", "Macomb County", "Macomb Township", "Mount Clemens",
-  "New Haven", "Oakland County", "Oakland Township", "Orion Township",
-  "Ray Township", "Richmond", "Rochester", "Rochester Hills", "Romeo",
-  "Roseville", "Royal Oak", "Shelby Township", "St. Clair County",
-  "St. Clair Shores", "Sterling Heights", "Troy", "Utica", "Warren",
-  "Washington Township", "West Bloomfield",
+  "Адмиралтейский", "Василеостровский", "Выборгский", "Калининский",
+  "Кировский", "Колпинский", "Красногвардейский", "Красносельский",
+  "Кронштадтский", "Курортный", "Московский", "Невский",
+  "Петроградский", "Петродворцовый", "Приморский", "Пушкинский",
+  "Фрунзенский", "Центральный", "Павловск", "Пушкин",
+  "Сестрорецк", "Зеленогорск", "Кронштадт", "Ломоносов",
+  "Петергоф", "Стрельна", "Парнас", "Шушары",
+  "Метро Девяткино", "Метро Купчино", "Метро Ладожская", "Метро Парнас",
+  "Метро Пр. Просвещения", "Метро Старая Деревня", "Метро Чёрная речка",
 ] as const;
 
 /**
- * Sopranos awards — real badges downloaded from sopranoscatering.com.
+ * Награды и признание Interfood Catering.
+ * Используется в awards-strip.tsx — текстовые карточки с lucide-иконками.
  */
 export const SOPRANOS_AWARDS = [
   {
-    title: "1-Sopranos Badge",
-    image: "/media/sopranos/badge.png",
-    alt: "Sopranos Catering — Award Badge",
+    title: "Лучший кейтеринг года 2024",
+    icon: "Award",
+    alt: "Лучший кейтеринг года 2024 — Interfood Catering",
   },
   {
-    title: "Vote 4 The Best",
-    image: "/media/sopranos/vote-best.png",
-    alt: "Vote 4 The Best — Sopranos Catering Award",
+    title: "Топ-10 кейтерингов России",
+    icon: "Trophy",
+    alt: "Топ-10 кейтерингов России — Interfood Catering",
   },
   {
-    title: "Inverse Award",
-    image: "/media/sopranos/inverse.png",
-    alt: "Sopranos Catering — Recognition Award",
+    title: "Премия за сервис",
+    icon: "Star",
+    alt: "Премия за сервис — Interfood Catering",
   },
 ] as const;
 
 /**
- * Sopranos Winter Specials — "NEW WINTER SPECIALS" section content.
+ * Зимние спецпредложения — «НОВЫЕ ЗИМНИЕ СПЕЦПРЕДЛОЖЕНИЯ».
  */
 export const SOPRANOS_WINTER_SPECIALS = [
   {
-    title: "Hearty Winter Buffet",
-    desc: "Slow-braised short ribs, root vegetable mash, winter greens, crusty bread. $24/guest.",
+    title: "Зимний банкет",
+    desc: "Томлёная грудинка, пюре из корнеплодов, зимняя зелень, свежий хлеб. 2400 ₽/чел.",
     image: "/media/menu-buffet.jpg",
   },
   {
-    title: "Holiday Hors d'Oeuvres",
-    desc: "Cranberry brie bites, smoked salmon blinis, spiced meatballs. $18/guest (12-piece min).",
+    title: "Праздничные закуски",
+    desc: "Канапе с бри и клюквой, блинчики с лососем, пряные фрикадельки. 1800 ₽/чел (минимум 12 шт).",
     image: "/media/concorde-handhelds.jpg",
   },
   {
-    title: "Hot Cocoa & Dessert Bar",
-    desc: "Gourmet hot cocoa station with toppings, plus seasonal dessert table. $15/guest.",
+    title: "Какао-бар и десерты",
+    desc: "Гастрономическая станция с горячим какао и топпингами, а также сезонный десертный стол. 1500 ₽/чел.",
     image: "/media/concorde-dessert.jpg",
   },
 ] as const;

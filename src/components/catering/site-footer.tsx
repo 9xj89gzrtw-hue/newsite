@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Phone,
@@ -13,15 +12,26 @@ import {
   Loader2,
   Sparkles,
   ChevronRight,
+  Trophy,
+  Award,
+  Star,
+  Instagram,
+  Send,
+  MessageCircle,
 } from "lucide-react";
 import {
   SOPRANOS_CITIES,
   SOPRANOS_AWARDS,
-  SOPRANOS_ASSETS,
   CONTACTS,
 } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
 import { toast } from "sonner";
+
+const FOOTER_AWARD_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  Award,
+  Trophy,
+  Star,
+};
 
 /**
  * Stable current year — computed once on mount to avoid SSR/CSR
@@ -50,12 +60,12 @@ function NewsletterSignup() {
     e.preventDefault();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setStatus("error");
-      toast.error("Please enter a valid email address");
+      toast.error("Пожалуйста, введите корректный email");
       return;
     }
     if (!consent) {
       setStatus("error");
-      toast.error("Please accept the privacy policy to subscribe");
+      toast.error("Для подписки необходимо согласиться с политикой конфиденциальности");
       return;
     }
     setStatus("loading");
@@ -69,17 +79,17 @@ function NewsletterSignup() {
       if (!res.ok) {
         if (data?.code === "ALREADY_SUBSCRIBED") {
           setStatus("done");
-          toast.info("You're already subscribed — thank you!");
+          toast.info("Вы уже подписаны — спасибо!");
           return;
         }
         throw new Error(data?.error || "Subscription failed");
       }
       setStatus("done");
       setEmail("");
-      toast.success("You're subscribed! Seasonal menus & specials on the way.");
+      toast.success("Готово! Сезонные меню и спецпредложения уже в пути.");
     } catch (err) {
       setStatus("error");
-      toast.error(err instanceof Error ? err.message : "Network error, try again later");
+      toast.error(err instanceof Error ? err.message : "Ошибка сети, попробуйте позже");
     }
   };
 
@@ -88,12 +98,12 @@ function NewsletterSignup() {
       <div className="mb-3 flex items-center gap-2">
         <Sparkles className="size-4 text-gold" aria-hidden="true" />
         <span className="font-display text-lg uppercase tracking-wide text-cream">
-          Seasonal Menu &amp; Specials
+          Сезонные меню и спецпредложения
         </span>
       </div>
       <p className="mb-4 text-sm text-cream/70">
-        Once a month — fresh seasonal dishes, gourmet trends, and exclusive
-        catering offers. No spam, one-click unsubscribe.
+        Раз в месяц — свежие сезонные блюда, гастрономические тренды и
+        эксклюзивные предложения кейтеринга. Без спама, отписка в один клик.
       </p>
       <form onSubmit={onSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <div className="relative flex-1">
@@ -104,8 +114,8 @@ function NewsletterSignup() {
               setEmail(e.target.value);
               if (status === "error" || status === "done") setStatus("idle");
             }}
-            placeholder="Your email address"
-            aria-label="Email address for newsletter subscription"
+            placeholder="Ваш email"
+            aria-label="Email для подписки на рассылку"
             name="email"
             required
             disabled={status === "loading" || status === "done"}
@@ -127,7 +137,7 @@ function NewsletterSignup() {
                 className="flex items-center gap-2"
               >
                 <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                Subscribing…
+                Подписка…
               </motion.span>
             ) : status === "done" ? (
               <motion.span
@@ -138,7 +148,7 @@ function NewsletterSignup() {
                 className="flex items-center gap-2"
               >
                 <CheckCircle2 className="size-4" aria-hidden="true" />
-                Done!
+                Готово!
               </motion.span>
             ) : (
               <motion.span
@@ -148,7 +158,7 @@ function NewsletterSignup() {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-2"
               >
-                Subscribe
+                Подписаться
                 <ArrowRight className="size-4" aria-hidden="true" />
               </motion.span>
             )}
@@ -163,9 +173,9 @@ function NewsletterSignup() {
             className="mt-0.5 size-4 shrink-0 accent-gold"
           />
           <span>
-            I agree to the processing of my personal data according to the{" "}
+            Я соглашаюсь на обработку персональных данных в соответствии с{" "}
             <a href="/privacy" className="text-gold hover:underline">
-              privacy policy
+              политикой конфиденциальности
             </a>
             .
           </span>
@@ -175,16 +185,16 @@ function NewsletterSignup() {
   );
 }
 
-/** Footer navigation — Sopranos footer nav links. */
+/** Навигация футера — ссылки на ключевые разделы. */
 const FOOTER_NAV = [
-  { label: "Home", href: "#main-content" },
-  { label: "Weddings", href: "#about" },
-  { label: "Corporate Events", href: "#services" },
-  { label: "Social Events", href: "#services" },
-  { label: "Grill & BBQ", href: "#services" },
-  { label: "By The Tray", href: "#snack-box" },
-  { label: "Apps & Enhancements", href: "#menu" },
-  { label: "Contact", href: "#contact" },
+  { label: "Главная", href: "#main-content" },
+  { label: "Свадьбы", href: "#about" },
+  { label: "Корпоративы", href: "#services" },
+  { label: "События", href: "#services" },
+  { label: "Гриль и BBQ", href: "#services" },
+  { label: "Поднос", href: "#snack-box" },
+  { label: "Закуски", href: "#menu" },
+  { label: "Контакты", href: "#contact" },
 ] as const;
 
 /** Stagger reveal container variant — columns fade up one after another. */
@@ -221,17 +231,14 @@ function CitiesTrack({ trackId = '' }: { trackId?: string }) {
 }
 
 /**
- * SiteFooter — SOPRANOS CATERING dark navy footer.
+ * SiteFooter — тёмный navy футер Interfood Catering.
  *
- * Layout (matching sopranoscatering.com):
- * 1. "Made with Love" intro band (Great Vibes script + subtext)
- * 2. Newsletter signup (dark glass card)
- * 3. Three-column main content: Contact Info / Navigation / Our Awards
- * 4. "Proudly Serving" cities marquee (Southeast Michigan)
- * 5. Copyright bar
- *
- * Design tokens: bg-ink (#1F2937), text-cream, gold accent, Oswald display,
- * Great Vibes script, Karla body. Respects prefers-reduced-motion.
+ * Layout (в стиле sopranoscatering.com):
+ * 1. «Сделано с любовью» (intro band, Great Vibes script + подзаголовок)
+ * 2. Подписка на рассылку (тёмная glass-карточка)
+ * 3. Трёхколоночный контент: Контакты / Навигация / Награды
+ * 4. «С гордостью обслуживаем» — маркие районов СПб
+ * 5. Копирайт
  */
 export function SiteFooter() {
   const year = useCurrentYear();
@@ -244,13 +251,13 @@ export function SiteFooter() {
     <footer
       role="contentinfo"
       data-header-theme="dark"
-      aria-label="Site footer"
+      aria-label="Подвал сайта"
       className="grain relative mt-auto overflow-hidden bg-ink text-cream"
     >
       {/* Decorative top gold rule */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent" aria-hidden="true" />
 
-      {/* ============ Section 1 — "Made with Love" intro band ============ */}
+      {/* ============ Section 1 — «Сделано с любовью» intro band ============ */}
       <div className="mx-auto max-w-7xl px-5 pt-16 pb-10 text-center md:px-8 md:pt-20">
         <motion.div
           {...motionProps}
@@ -266,7 +273,7 @@ export function SiteFooter() {
               className="font-script text-gold"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)" }}
             >
-              Made with Love
+              Сделано с любовью
             </span>
             <Heart
               className="size-7 fill-gold text-gold"
@@ -275,10 +282,9 @@ export function SiteFooter() {
             />
           </motion.div>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-cream/80 md:text-base">
-            Whether you are having a small family gathering or celebrating a
-            holiday, Soprano&apos;s Catering wants you to be able to enjoy the
-            day with your family and friends and leave the cooking to us. At
-            Soprano&apos;s Catering, we are here to serve you!
+            Будь то семейное собрание или большой праздник — Interfood Catering
+            хочет, чтобы вы могли наслаждаться днём в кругу семьи и друзей,
+            доверив готовку нам. Мы здесь, чтобы обслужить вас!
           </p>
         </motion.div>
       </div>
@@ -291,7 +297,7 @@ export function SiteFooter() {
       {/* ============ Section 3 — Three-column main content ============ */}
       <div className="mx-auto max-w-7xl px-5 py-14 md:px-8">
         <div className="grid gap-10 md:grid-cols-3 md:gap-8">
-          {/* ---- Column 1: Contact Info ---- */}
+          {/* ---- Column 1: Контакты ---- */}
           <motion.section
             {...motionProps}
             custom={0}
@@ -303,26 +309,17 @@ export function SiteFooter() {
               id="footer-contact-heading"
               className="eyebrow-wide text-sm text-gold"
             >
-              Contact Info
+              Контакты
             </h2>
 
-            <Image
-              src={SOPRANOS_ASSETS.logoWhite}
-              alt="Soprano's Catering — white logo"
-              width={180}
-              height={54}
-              sizes="180px"
-              className="max-w-[180px]"
-              style={{ width: "auto", height: "auto" }}
-              priority={false}
-            />
+            <span className="font-display text-3xl font-bold uppercase tracking-[0.02em] text-cream">
+              Interfood<span className="text-gold">.</span>
+            </span>
 
             <address className="not-italic text-sm leading-relaxed text-cream/80">
-              Sopranos Catering
+              {LEGAL_INFO.legalName}
               <br />
-              17600 Clinton River Road
-              <br />
-              Clinton Township, MI 48038
+              {LEGAL_INFO.legalAddress}
             </address>
 
             <div className="flex flex-col gap-2 text-sm">
@@ -348,44 +345,48 @@ export function SiteFooter() {
               </a>
             </div>
 
-            {/* Social icons row */}
+            {/* Соцсети */}
             <div className="mt-2 flex items-center gap-3">
               <a
-                href="https://www.facebook.com/sopranoscatering"
+                href={CONTACTS.vkHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Soprano's Catering on Facebook (opens in new tab)"
+                aria-label="Interfood Catering в ВКонтакте (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
               >
-                <img
-                  src={SOPRANOS_ASSETS.facebook}
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="size-5"
-                  aria-hidden="true"
-                />
+                <span className="font-display text-xs font-bold uppercase text-cream">VK</span>
               </a>
               <a
                 href={CONTACTS.instagramHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Soprano's Catering on Instagram (opens in new tab)"
+                aria-label="Interfood Catering в Instagram (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
               >
-                <img
-                  src={SOPRANOS_ASSETS.instagram}
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="size-5"
-                  aria-hidden="true"
-                />
+                <Instagram className="size-5 text-cream" aria-hidden="true" />
+              </a>
+              <a
+                href={CONTACTS.telegramHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Interfood Catering в Telegram (открывается в новой вкладке)"
+                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+              >
+                <Send className="size-5 text-cream" aria-hidden="true" />
+              </a>
+              <a
+                href={CONTACTS.whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Написать в WhatsApp (открывается в новой вкладке)"
+                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+              >
+                <MessageCircle className="size-5 text-cream" aria-hidden="true" />
               </a>
             </div>
           </motion.section>
 
-          {/* ---- Column 2: Navigation ---- */}
+          {/* ---- Column 2: Навигация ---- */}
           <motion.nav
             {...motionProps}
             custom={1}
@@ -397,7 +398,7 @@ export function SiteFooter() {
               id="footer-nav-heading"
               className="eyebrow-wide text-sm text-gold"
             >
-              Navigation
+              Навигация
             </h2>
             <ul className="flex flex-col gap-1">
               {FOOTER_NAV.map((link) => (
@@ -417,7 +418,7 @@ export function SiteFooter() {
             </ul>
           </motion.nav>
 
-          {/* ---- Column 3: Our Awards ---- */}
+          {/* ---- Column 3: Наши награды ---- */}
           <motion.section
             {...motionProps}
             custom={2}
@@ -429,42 +430,43 @@ export function SiteFooter() {
               id="footer-awards-heading"
               className="eyebrow-wide text-sm text-gold"
             >
-              Our Awards
+              Наши награды
             </h2>
             <div className="flex flex-wrap items-center gap-4">
-              {SOPRANOS_AWARDS.map((award) => (
-                <a
-                  key={award.title}
-                  href="#awards"
-                  className="group block transition-transform duration-300 hover:scale-110 hover:rotate-3"
-                  aria-label={award.alt}
-                >
-                  <Image
-                    src={award.image}
-                    alt={award.alt}
-                    width={100}
-                    height={100}
-                    sizes="100px"
-                    className="size-[100px] object-contain drop-shadow-lg"
-                  />
-                </a>
-              ))}
+              {SOPRANOS_AWARDS.map((award) => {
+                const Icon = FOOTER_AWARD_ICONS[award.icon] ?? Trophy;
+                return (
+                  <a
+                    key={award.title}
+                    href="#awards"
+                    className="group flex flex-col items-center gap-2 transition-transform duration-300 hover:scale-105"
+                    aria-label={award.alt}
+                  >
+                    <div className="flex size-16 items-center justify-center rounded-full border border-gold/30 bg-gold/10">
+                      <Icon className="size-8 text-gold" />
+                    </div>
+                    <span className="max-w-[100px] text-center font-mono text-[10px] uppercase tracking-wider text-cream/60">
+                      {award.title}
+                    </span>
+                  </a>
+                );
+              })}
             </div>
             <p className="text-xs text-cream/60">
-              Recognized by Southeast Michigan&apos;s most prestigious catering
-              awards.
+              Признание на премиях Санкт-Петербурга и России за качество кухни
+              и сервиса.
             </p>
           </motion.section>
         </div>
       </div>
 
-      {/* ============ Section 4 — "Proudly Serving" cities marquee ============ */}
+      {/* ============ Section 4 — «С гордостью обслуживаем» маркие ============ */}
       <div className="border-t border-cream/10 bg-ink/60">
         <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
           <div className="mb-4 flex flex-col items-center text-center">
-            <h2 className="eyebrow-wide text-sm text-gold">Proudly Serving</h2>
+            <h2 className="eyebrow-wide text-sm text-gold">С гордостью обслуживаем</h2>
             <p className="mt-2 text-sm text-cream/70">
-              Proudly Catering to Southeast Michigan
+              Выездной кейтеринг в Санкт-Петербурге и области
             </p>
           </div>
 
@@ -507,11 +509,11 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* ============ Section 5 — Copyright bar ============ */}
+      {/* ============ Section 5 — Копирайт ============ */}
       <div className="border-t border-cream/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-xs text-cream/50 md:flex-row md:px-8">
           <p className="text-center md:text-left">
-            © {year ?? 2025} {SITE_CONFIG.brandName}, All Rights Reserved
+            © {year ?? 2025} {SITE_CONFIG.brandName}, Санкт-Петербург · Все права защищены
           </p>
           <a
             href={CONTACTS.phoneHref}

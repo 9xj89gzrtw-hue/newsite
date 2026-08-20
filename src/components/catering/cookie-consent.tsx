@@ -55,7 +55,7 @@ export function CookieConsent() {
           ref={bannerRef}
           role="dialog"
           aria-modal="true"
-          aria-label="Cookie consent"
+          aria-label="Согласие на использование cookies"
           onKeyDown={(e) => { if (e.key === "Escape") setShow(false); if (e.key === "Tab" && bannerRef.current) { const focusable = bannerRef.current.querySelectorAll<HTMLElement>('button, [href]'); if (focusable.length === 0) return; const first = focusable[0]; const last = focusable[focusable.length - 1]; if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } } }}
           className="fixed bottom-0 inset-x-0 z-[60] backdrop-blur-xl bg-cream/85 border-t border-gold/20 shadow-[0_-8px_24px_rgba(0,0,0,0.06)]"
           initial={prefersReducedMotion ? { opacity: 0 } : { y: 100, opacity: 0 }}
@@ -67,12 +67,12 @@ export function CookieConsent() {
             <div className="flex items-start gap-3">
               <Cookie className="mt-0.5 size-4 shrink-0 text-gold sm:size-5" />
               <p className="text-xs leading-relaxed text-ink/70 sm:text-sm">
-                We use cookies to keep the site working.{" "}
+                Мы используем cookies для корректной работы сайта.{" "}
                 <Link
                   href="/privacy"
                   className="text-gold underline underline-offset-2 hover:text-terracotta transition-colors"
                 >
-                  Privacy Policy
+                  Политика конфиденциальности
                 </Link>
               </p>
             </div>
@@ -82,13 +82,13 @@ export function CookieConsent() {
                 onClick={() => decide("rejected")}
                 className="min-h-[44px] rounded-full border border-border-line px-3 py-1.5 text-xs font-medium text-ink/70 transition-all hover:border-gold hover:bg-gold/5 sm:px-4 sm:py-2"
               >
-                Necessary only
+                Только необходимые
               </button>
               <button
                 onClick={() => decide("accepted")}
                 className="min-h-[44px] rounded-full bg-gradient-to-r from-gold to-terracotta px-4 py-1.5 text-xs font-semibold text-white shadow-md shadow-gold/20 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:px-5 sm:py-2"
               >
-                Accept
+                Принять
               </button>
             </div>
           </div>

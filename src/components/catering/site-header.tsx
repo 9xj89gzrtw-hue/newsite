@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone, ChevronDown, Calendar, Mail } from "lucide-react";
-import { CONTACTS } from "@/lib/media";
-import { SOPRANOS_NAV, SOPRANOS_ASSETS } from "@/lib/media";
+import { CONTACTS, SOPRANOS_NAV } from "@/lib/media";
 import { AnnouncementBar } from "./announcement-bar";
 
 // Build NAV from Sopranos nav structure (copied from sopranoscatering.com)
@@ -18,7 +16,7 @@ type NavItem = {
 const NAV: NavItem[] = SOPRANOS_NAV.map((n) => ({
   href: n.href,
   label: n.label,
-  mega: n.label === "Corporate" ? "corporate" : n.label === "Social" ? "social" : undefined,
+  mega: n.label === "Корпоратив" ? "corporate" : n.label === "События" ? "social" : undefined,
 })) as NavItem[];
 
 /**
@@ -180,21 +178,15 @@ export function SiteHeader() {
             scrolled ? "py-3" : "py-5"
           }`}
         >
-          {/* Sopranos logo — white variant on dark/transparent, black on light */}
+          {/* Interfood wordmark — текстовый логотип (gold dot) */}
           <a
             href="#main-content"
             className={`min-h-[44px] flex items-center transition-opacity duration-300 hover:opacity-80 ${themeClasses.text}`}
-            aria-label="Soprano's Catering — Home"
+            aria-label="Interfood Catering — главная"
           >
-            <Image
-              src={theme === "light" ? SOPRANOS_ASSETS.logoBlack : SOPRANOS_ASSETS.logoWhite}
-              alt="Soprano's Catering"
-              width={160}
-              height={48}
-              priority
-              className="h-9 w-auto md:h-11"
-              style={{ width: "auto", height: "auto" }}
-            />
+            <span className="font-display text-2xl md:text-3xl font-bold uppercase tracking-[0.02em]">
+              Interfood<span className="text-gold">.</span>
+            </span>
           </a>
 
           {/* Desktop Navigation with mega-menus */}
@@ -214,29 +206,29 @@ export function SiteHeader() {
             )}
           </nav>
 
-          {/* Right side actions — Sopranos phone + Reserve CTA + Check Your Date */}
+          {/* Right side actions — телефон + CTA «Проверить дату» */}
           <div className="flex items-center gap-4 md:gap-5">
             <a
               href={CONTACTS.phoneHref}
               className={`min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 transition-colors hover:text-gold md:gap-2 ${themeClasses.text} opacity-85 hover:opacity-100`}
-              aria-label={`Call ${CONTACTS.phone}`}
+              aria-label={`Позвонить ${CONTACTS.phone}`}
             >
               <Phone className="size-5 shrink-0" />
               <span className="hidden md:inline font-display text-sm font-medium uppercase tracking-wide">{CONTACTS.phone}</span>
             </a>
-            {/* Sopranos primary CTA — "Check Your Date" gold pill */}
+            {/* Главная CTA — «Проверить дату» gold pill */}
             <a
               href="#contact"
               className="group min-h-[44px] inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-2.5 font-display text-xs font-semibold uppercase tracking-wider text-white shadow-md shadow-gold/20 transition-all duration-300 hover:shadow-lg hover:shadow-gold/30 hover:-translate-y-0.5 sm:px-6 sm:text-sm"
             >
               <Calendar className="size-4 shrink-0" />
-              <span>Check Your Date</span>
+              <span>Проверить дату</span>
             </a>
             <button
               ref={triggerRef}
               onClick={() => setOpen(true)}
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors duration-300 lg:hidden ${themeClasses.text}`}
-              aria-label={open ? "Close menu" : "Open menu"}
+              aria-label={open ? "Закрыть меню" : "Открыть меню"}
               aria-expanded={open ? "true" : "false"}
               aria-controls="mobile-menu"
             >
@@ -262,19 +254,14 @@ export function SiteHeader() {
             onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); if (e.key === "Tab") { const menu = e.currentTarget; const focusable = menu.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])'); if (focusable.length === 0) return; const first = focusable[0]; const last = focusable[focusable.length - 1]; if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } } }}
           >
             <div className="flex items-center justify-between">
-              <Image
-                src={SOPRANOS_ASSETS.logoBlack}
-                alt="Soprano's Catering"
-                width={180}
-                height={54}
-                className="h-12 w-auto"
-                style={{ width: "auto", height: "auto" }}
-              />
+              <span className="font-display text-3xl font-bold uppercase tracking-[0.02em] text-ink">
+                Interfood<span className="text-gold">.</span>
+              </span>
               <button
                 ref={closeBtnRef}
                 onClick={() => setOpen(false)}
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 text-ink"
-                aria-label="Close menu"
+                aria-label="Закрыть меню"
                 aria-expanded={open ? "true" : "false"}
                 aria-controls="mobile-menu"
               >
@@ -319,17 +306,17 @@ export function SiteHeader() {
         )}
       </AnimatePresence>
 
-      {/* Mobile FABs — phone (bottom) + Check Your Date (above) */}
+      {/* Mobile FABs — телефон (снизу) + Проверить дату (выше) */}
       <a
         href="#contact"
-        aria-label="Check Your Date"
+        aria-label="Проверить дату"
         className="fixed bottom-60 right-6 z-[70] flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-lg shadow-gold/30 transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
       >
         <Calendar className="size-6" />
       </a>
       <a
         href={CONTACTS.phoneHref}
-        aria-label="Call Soprano's Catering"
+        aria-label="Позвонить Interfood Catering"
         className="fixed bottom-44 right-6 z-[70] flex size-14 items-center justify-center rounded-full border-2 border-gold/40 bg-white/90 text-gold shadow-lg shadow-gold/20 backdrop-blur-sm transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
       >
         <Phone className="size-6" />
@@ -388,9 +375,9 @@ function MegaMenu({ item }: { item: NavItem }) {
     item.mega === "corporate"
       ? "/media/concorde-boardroom.webp"
       : "/media/event-11.jpg";
-  const featuredEyebrow = item.mega === "corporate" ? "Corporate Catering" : "Social Events";
-  const featuredTitle = item.mega === "corporate" ? "Office lunches & meetings" : "Celebrate every moment";
-  const featuredCta = "View all options →";
+  const featuredEyebrow = item.mega === "corporate" ? "Корпоративный кейтеринг" : "Частные события";
+  const featuredTitle = item.mega === "corporate" ? "Бизнес-ланчи и встречи" : "Празднуйте каждый момент";
+  const featuredCta = "Смотреть все опции →";
 
   return (
     <div

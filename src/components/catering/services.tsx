@@ -22,20 +22,20 @@ type LocalService = {
 
 const SERVICES: LocalService[] = SOPRANOS_SERVICES.map((s, i) => {
   const shortByIndex = [
-    "Full-service for your wedding day",
-    "From intimate gatherings to large celebrations",
-    "Hand-crafted menus, every detail considered",
-    "Live-fire grilling on site",
-    "Pick-up & drop-off catering",
-    "Trusted partner venues & vendors",
+    "Полный сервис для вашего свадебного дня",
+    "От камерных ужинов до больших праздников",
+    "Авторские меню, каждая деталь учтена",
+    "Живой огонь прямо на площадке",
+    "Самовывоз и доставка кейтеринга",
+    "Проверенные площадки и партнёры",
   ];
   const featuresByIndex: string[][] = [
-    ["Custom menu", "Welcome zone", "Concept-driven service", "Servers & sommeliers"],
-    ["Build-your-own buffet", "Themed cuisine", "Late night snacks", "Service staff"],
-    ["Tasting available", "Custom menu", "Sommelier on site", "Full service"],
-    ["Smoked brisket", "Baby back ribs", "Hand-crafted sausages", "Seasonal vegetables"],
-    ["Pick-up at our kitchen", "Drop-off & setup", "Disposable serving ware", "Easy ordering"],
-    ["Venue partners", "Florists", "Photographers", "One-stop-shop"],
+    ["Индивидуальное меню", "Welcome-зона", "Сервировка под концепцию", "Официанты и сомелье"],
+    ["Фуршет по вашему выбору", "Тематические меню", "Вечерние закуски", "Сервис-персонал"],
+    ["Дегустация по запросу", "Индивидуальное меню", "Сомелье на площадке", "Полный сервис"],
+    ["Томлёная грудинка", "Рёбрышки", "Авторские колбаски", "Сезонные овощи"],
+    ["Самовывоз с нашей кухни", "Доставка и монтаж", "Одноразовая подача", "Простой заказ"],
+    ["Площадки-партнёры", "Флористы", "Фотографы", "Всё в одном месте"],
   ];
   return {
     icon: s.icon,
@@ -67,17 +67,17 @@ const SERVICE_PHOTOS: Record<string, string> = {
 
 // Category tags for each service index
 const SERVICE_CATEGORIES: Record<number, string[]> = {
-  0: ["Wedding", "Banquet"],
-  1: ["Corporate", "Social"],
-  2: ["Catering", "Made with Love"],
-  3: ["BBQ", "Outdoor"],
-  4: ["Pick-up", "Drop-off"],
-  5: ["Venues", "Vendors"],
-  6: ["Catering", "Service"],
-  7: ["Events", "Michigan"],
-  8: ["Corporate", "Holiday"],
-  9: ["Dessert", "Event"],
-  10: ["BBQ", "Outdoor"],
+  0: ["Свадьба", "Банкет"],
+  1: ["Корпоратив", "Событие"],
+  2: ["Кейтеринг", "С любовью"],
+  3: ["Гриль", "На природе"],
+  4: ["Самовывоз", "Доставка"],
+  5: ["Площадки", "Партнёры"],
+  6: ["Кейтеринг", "Сервис"],
+  7: ["События", "СПб"],
+  8: ["Корпоратив", "Праздник"],
+  9: ["Десерт", "Событие"],
+  10: ["Гриль", "На природе"],
 };
 
 // Glow colors based on service mood
@@ -575,13 +575,13 @@ function ServiceCard({
                 }}
                 className="group/cta inline-flex flex-1 items-center justify-center gap-2 rounded-full cta-gradient-punchy bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.03] hover:shadow-xl hover:shadow-gold/30 active:scale-[0.98] min-h-[44px]"
               >
-                Details
+                Подробнее
                 <ArrowRight className="size-4 transition-transform duration-300 group-hover/cta:translate-x-1" />
               </button>
               <button
                 type="button"
                 onClick={handleBackClick}
-                aria-label="Flip card back"
+                aria-label="Перевернуть карточку"
                 className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-cream/25 bg-cream/5 text-cream/80 transition-colors hover:bg-cream/10 hover:text-cream min-h-[44px] min-w-[44px]"
               >
                 <RotateCcw className="size-4" />
@@ -679,7 +679,7 @@ function ProgressIndicator({
   currentStep: number; 
   totalSteps: number;
 }) {
-  const steps = ['Info', 'Description', 'Features', 'Action'];
+  const steps = ['Инфо', 'Описание', 'Функции', 'Действие'];
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
@@ -849,20 +849,20 @@ export function Services() {
                 >
                   <Sparkles size={12} />
                 </motion.span>
-                Services
+                Услуги
                 <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
               </motion.span>
             </Reveal>
-            
+
             {/* Main headline */}
             <Reveal delay={0.1}>
               <motion.h2
                 className="mt-6 font-display text-ink leading-[1.05]"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.25rem)" }}
               >
-                <span className="inline-block">Everything</span>{"\u00A0"}
-                <span className="inline-block">for</span>{"\u00A0"}
-                <span className="inline-block">your event</span>{"\u00A0"}
+                <span className="inline-block">Всё</span>{"\u00A0"}
+                <span className="inline-block">для</span>{"\u00A0"}
+                <span className="inline-block">вашего события</span>{"\u00A0"}
                 <br className="hidden sm:block" />
                 <motion.span
                   className="gradient-text italic"
@@ -871,22 +871,22 @@ export function Services() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.45, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  in one place
+                  в одном месте
                 </motion.span>
               </motion.h2>
             </Reveal>
           </div>
-          
+
           {/* Description */}
           <Reveal delay={0.2}>
-            <motion.p 
+            <motion.p
               className="max-w-xs font-display italic text-ink/70 text-base leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.35, duration: 0.7 }}
             >
-              Six service directions under one roof. Click any card to see what each includes.
+              Шесть направлений кейтеринга под одной крышей. Нажмите на карточку, чтобы увидеть подробности.
             </motion.p>
           </Reveal>
         </div>
@@ -926,15 +926,15 @@ export function Services() {
             ))}
           </div>
 
-          {/* Sticky right-rail "Service index" (TOC) — lg+ only */}
+          {/* Sticky right-rail «Индекс услуг» (TOC) — lg+ only */}
           <aside
-            aria-label="Service index"
+            aria-label="Индекс услуг"
             className="hidden lg:block lg:w-60 lg:shrink-0 lg:self-start lg:sticky lg:top-24"
           >
             <div className="rounded-2xl border border-border-line bg-cream/60 p-5 backdrop-blur-sm">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-                  Index
+                  Индекс
                 </span>
                 <span className="font-mono text-[10px] text-ink/70">
                   {String(activeIdx + 1).padStart(2, "0")} / {String(SERVICES.length).padStart(2, "0")}
@@ -982,7 +982,7 @@ export function Services() {
                 })}
               </ol>
               <div className="mt-4 rounded-lg border border-dashed border-border-line bg-white/50 px-3 py-2 text-[11px] leading-snug text-ink/70">
-                Click any card to flip it. “Details” opens the full description.
+                Нажмите на карточку, чтобы перевернуть. «Подробнее» открывает полное описание.
               </div>
             </div>
           </aside>
@@ -1049,7 +1049,7 @@ export function Services() {
                   setModalStep(0);
                 }}
                 className="absolute right-5 top-5 z-10 flex size-11 items-center justify-center rounded-full bg-cream/90 text-ink/70 backdrop-blur-md shadow-lg transition-all duration-300 hover:bg-gold hover:text-white"
-                aria-label="Close"
+                aria-label="Закрыть"
                 whileHover={{ 
                   scale: 1.1, 
                   rotate: 90,
@@ -1079,7 +1079,7 @@ export function Services() {
                     transition={{ delay: 0.15, duration: 0.5 }}
                   >
                     <Sparkles size={11} />
-                    Service {(open ?? 0) + 1} of {SERVICES.length}
+                    Услуга {(open ?? 0) + 1} из {SERVICES.length}
                   </motion.span>
                   
                   {/* Progress Indicator */}
@@ -1175,7 +1175,7 @@ export function Services() {
                       }}
                       whileTap={{ scale: 0.97 }}
                     >
-                      Get a Quote
+                      Рассчитать стоимость
                       <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                     </motion.a>
                     
@@ -1196,7 +1196,7 @@ export function Services() {
                       }}
                       whileTap={{ scale: 0.97 }}
                     >
-                      Ask a Question
+                      Задать вопрос
                     </motion.a>
                   </div>
                 </div>

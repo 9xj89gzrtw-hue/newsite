@@ -54,7 +54,7 @@ export function InstagramVideo() {
       const iframes = containerRef.current?.querySelectorAll('iframe');
       iframes?.forEach((iframe) => {
         if (!iframe.getAttribute('title')) {
-          iframe.setAttribute('title', 'Instagram video by Soprano\'s Catering');
+          iframe.setAttribute('title', 'Instagram видео — Interfood Catering');
         }
         if (!iframe.getAttribute('sandbox')) {
           iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-popups');
@@ -154,7 +154,7 @@ export function InstagramVideo() {
                       data-instgrm-permalink={reels[activeIdx]}
                       data-instgrm-captioned
                       data-instgrm-version="14"
-                      title={`Instagram video ${activeIdx + 1} by Soprano's Catering (${INSTAGRAM.handle})`}
+                      title={`Instagram видео ${activeIdx + 1} — Interfood Catering (${INSTAGRAM.handle})`}
                       style={{
                         background: "#FAF8F5",
                         border: 0,

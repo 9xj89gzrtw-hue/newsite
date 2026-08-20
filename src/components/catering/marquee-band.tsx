@@ -18,7 +18,7 @@ import { ArrowRight } from "lucide-react";
  * Pause on hover/focus. Respects prefers-reduced-motion (static render).
  */
 
-const PHRASE = "Eastern Market · Old World Way · Made with Love";
+const PHRASE = "Еда как искусство · Выездной кейтеринг · Сделано с любовью";
 const SEPARATOR = "✦"; // elegant star, not a heavy bullet
 
 function MarqueeContent({ paused = false }: { paused?: boolean }) {
@@ -60,7 +60,7 @@ export function MarqueeBand() {
   return (
     <section
       data-header-theme="dark"
-      aria-label="Soprano's Catering slogan"
+      aria-label="Слоган Interfood Catering"
       className="section-bordeaux ridge-marquee-pause relative overflow-hidden border-y border-gold/20"
     >
       {/* Marquee track — two identical halves for seamless -50% loop.
@@ -100,7 +100,7 @@ export function MarqueeBand() {
               className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-cream px-6 py-3 font-sans text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-bordeaux transition-all duration-300 hover:scale-105 hover:bg-gold hover:text-cream"
               style={{ boxShadow: "0 4px 20px rgba(255,255,255,0.18), 0 8px 30px rgba(0,0,0,0.25)" }}
             >
-              Book Your Date
+              Забронировать дату
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </motion.div>

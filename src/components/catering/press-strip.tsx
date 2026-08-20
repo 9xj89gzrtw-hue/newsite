@@ -12,24 +12,24 @@ import { Reveal } from "./reveal";
  * Static text (no external logos) to avoid asset bloat.
  */
 const PRESS = [
-  { name: "Detroit Free Press", note: "Michigan" },
-  { name: "Metro Parent", note: "SE Michigan" },
-  { name: "WXYZ Detroit", note: "Channel 7" },
-  { name: "Hour Detroit", note: "Magazine" },
-  { name: "Metro Times", note: "Detroit" },
-  { name: "DBusiness", note: "Michigan" },
+  { name: "Санкт-Петербургские ведомости", note: "СПб" },
+  { name: "The Village СПб", note: "город" },
+  { name: "Time Out Петербург", note: "журнал" },
+  { name: "Где СПб", note: "гид" },
+  { name: "Телеграф", note: "СМИ" },
+  { name: "Деловой Петербург", note: "бизнес" },
 ];
 
 export function PressStrip() {
   return (
     <section
-      aria-label="Press about us"
+      aria-label="СМИ о нас"
       className="relative overflow-hidden border-y border-border-line bg-white py-12"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
           <p className="mb-8 text-center font-mono text-xs uppercase tracking-[0.3em] text-ink/70">
-            As seen in
+            Как нас видят
           </p>
         </Reveal>
         <Reveal delay={0.1}>

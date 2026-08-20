@@ -40,35 +40,35 @@ type OverviewCard = {
 
 const CARDS: OverviewCard[] = [
   {
-    title: "Weddings",
-    tag: "Made with Love",
-    body: "Full-service wedding catering: custom menu, welcome zone with canapés and sparkling wine, table settings tailored to your concept, servers and sommeliers on site.",
+    title: "Свадьбы",
+    tag: "Сделано с любовью",
+    body: "Свадебный банкет под ключ: индивидуальное меню, welcome-зона с канапе и игристым, сервировка под вашу концепцию, официанты и сомелье на площадке.",
     image: "/media/event-04.jpg",
-    alt: "Wedding reception — beautifully set table with floral centerpiece",
+    alt: "Свадебный банкет — красиво сервированный стол с флористическим декором",
     href: "#about",
   },
   {
-    title: "Corporate Events",
-    tag: "Image-Defining Moments",
-    body: "Catering for galas, product launches, holiday parties, and corporate picnics. Impeccable food quality and service, punctual delivery — for events that define your brand.",
+    title: "Корпоративы",
+    tag: "Моменты, формирующие имидж",
+    body: "Кейтеринг для гал, презентаций, новогодних корпоративов и пикников. Безупречное качество еды и сервиса, пунктуальная доставка — для событий, которые формируют ваш бренд.",
     image: "/media/event-02.jpg",
-    alt: "Corporate event — reception line for guests",
+    alt: "Корпоративное событие — фуршетная линия для гостей",
     href: "#services",
   },
   {
-    title: "Social Events",
-    tag: "Heartfelt Gatherings",
-    body: "From intimate dinners to large celebrations: birthdays, anniversaries, home parties, backyard picnics. We bring the restaurant to you.",
+    title: "Частные приёмы",
+    tag: "Камерные встречи",
+    body: "От камерных ужинов до больших праздников: дни рождения, годовщины, домашние вечеринки, пикники на природе. Привозим ресторан к вам.",
     image: "/media/event-03.jpg",
-    alt: "Private gathering — table set for an intimate dinner at home",
+    alt: "Частная встреча — стол для камерного ужина дома",
     href: "#services",
   },
   {
-    title: "Major Events",
-    tag: "Scale & Precision",
-    body: "Banquets for 300+ guests, exhibitions, award ceremonies, city-wide festivals. Logistics precision, plating speed, and hospitality at an international standard.",
+    title: "Крупные события",
+    tag: "Масштаб и точность",
+    body: "Банкеты на 300+ гостей, выставки, церемонии награждения, городские фестивали. Точность логистики, скорость подачи и сервис международного уровня.",
     image: "/media/event-09.jpg",
-    alt: "Major event — banquet hall with hundreds of guests",
+    alt: "Крупное событие — банкетный зал с сотнями гостей",
     href: "#services",
   },
 ];
@@ -117,7 +117,7 @@ function OverviewCardItem({ card, index }: { card: OverviewCard; index: number }
         <p className="mt-5 max-w-md text-[1.02rem] leading-[1.55] text-ink/70">{card.body}</p>
         <div className="mt-7 text-ink">
           <OutlineButton href={card.href} variant="light">
-            View Details
+            Подробнее
           </OutlineButton>
         </div>
       </div>
@@ -138,15 +138,15 @@ export function ServicesOverview() {
       <div className="mx-auto max-w-7xl px-6 md:px-10">
         {/* Section header — Ridgewells editorial rhythm */}
         <SectionHeader
-          eyebrow="What We Do"
+          eyebrow="Что мы делаем"
           headline={
             <>
-              Full-service catering
+              Кейтеринг полного цикла
               <br />
-              <span className="italic text-bordeaux">for any occasion.</span>
+              <span className="italic text-bordeaux">для любого события.</span>
             </>
           }
-          lead="From a reception for 20 to a banquet for 500 — we bring it all: china, glassware, linens, and service. Below are the four directions we cater most often."
+          lead="От фуршета на 20 гостей до банкета на 500 — мы привозим всё: фарфор, стекло, текстиль и сервис. Ниже — четыре направления, в которых мы работаем чаще всего."
           tone="light"
           align="left"
           className="mb-14 max-w-3xl"
@@ -171,7 +171,7 @@ export function ServicesOverview() {
             href="#services"
             className="font-sans text-[0.85rem] font-semibold uppercase tracking-[0.22em] text-ink underline-offset-[6px] transition-colors hover:text-bordeaux hover:underline"
           >
-            View All Services
+            Все услуги
           </Link>
         </motion.div>
       </div>

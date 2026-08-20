@@ -9,20 +9,20 @@ import { MEDIA } from "@/lib/media";
 import { Sparkles, Award, Users, Calendar, ChefHat } from "lucide-react";
 
 const STATS = [
-  { value: 40, suffix: "+", label: "years of tradition", icon: Award },
-  { value: 10000, suffix: "+", label: "events catered", icon: Calendar },
-  { value: 500000, suffix: "+", label: "guests served", icon: Users },
-  { value: 75, suffix: "+", label: "team members", icon: ChefHat },
+  { value: 11, suffix: "+", label: "лет на рынке", icon: Award },
+  { value: 2500, suffix: "+", label: "проведённых событий", icon: Calendar },
+  { value: 75000, suffix: "+", label: "гостей обслужено", icon: Users },
+  { value: 35, suffix: "+", label: "членов команды", icon: ChefHat },
 ];
 
 // Value-props for the infinite marquee row (Task 2-b §3). Replaces the previous
 // static feature-tag chips. 5 distinct value-props, infinite-scrolling + pause-on-hover.
 const VALUE_PROPS = [
-  "Seasonal Produce",
-  "Made From Scratch",
-  "Hand-Picked at Eastern Market",
-  "Old World Recipes",
-  "Made with Love",
+  "Сезонные продукты",
+  "Готовим с нуля",
+  "Авторская кухня",
+  "Сделано с любовью",
+  "С 2014 года",
 ];
 
 function CountUp({ to, suffix }: { to: number; suffix: string }) {
@@ -38,8 +38,8 @@ function CountUp({ to, suffix }: { to: number; suffix: string }) {
     const controls = animate(count, to, {
       duration: 2.2,
       ease: [0.22, 1, 0.36, 1],
-      onUpdate: (v) => setDisplay(Math.round(v).toLocaleString("en-US")),
-      onComplete: () => setDisplay(to.toLocaleString("en-US")),
+      onUpdate: (v) => setDisplay(Math.round(v).toLocaleString("ru-RU")),
+      onComplete: () => setDisplay(to.toLocaleString("ru-RU")),
     });
     return () => controls.stop();
   }, [inView, to, count, hasAnimated]);
@@ -48,7 +48,7 @@ function CountUp({ to, suffix }: { to: number; suffix: string }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (display === "0") {
-        setDisplay(to.toLocaleString("en-US"));
+        setDisplay(to.toLocaleString("ru-RU"));
       }
     }, 3000);
     return () => clearTimeout(timer);
@@ -291,8 +291,8 @@ export function About() {
                     <Award size={20} />
                   </motion.div>
                   <div>
-                    <div className="font-display text-xl font-semibold text-ink">Since 1985</div>
-                    <div className="font-mono text-xs text-ink/70 uppercase tracking-wider">Michigan owned</div>
+                    <div className="font-display text-xl font-semibold text-ink">С 2014 года</div>
+                    <div className="font-mono text-xs text-ink/70 uppercase tracking-wider">Санкт-Петербург</div>
                   </div>
                 </div>
               </motion.div>
@@ -322,7 +322,7 @@ export function About() {
                 >
                   <Sparkles size={12} />
                 </motion.span>
-                About Us
+                О нас
                 <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
               </motion.span>
             </Reveal>
@@ -335,8 +335,8 @@ export function About() {
                   fontSize: "clamp(2rem, 5vw, 4rem)",
                 }}
               >
-                <span className="inline-block">Weddings,</span>{"\u00A0"}
-                <span className="inline-block">made</span>{"\u00A0"}
+                <span className="inline-block">Свадьбы,</span>{"\u00A0"}
+                <span className="inline-block">созданные</span>{"\u00A0"}
                 <br />
                 <motion.span
                   className="gradient-text italic"
@@ -345,7 +345,7 @@ export function About() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  with love
+                  с любовью
                 </motion.span>
               </motion.h2>
             </Reveal>
@@ -359,10 +359,10 @@ export function About() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3, duration: 0.8 }}
               >
-                We couldn&rsquo;t be happier that you&rsquo;re considering us to cater your wedding. Our chefs
-                understand the importance of your {" "}
+                Мы не могли быть счастливее, что вы рассматриваете нас для
+                кейтеринга вашей свадьбы. Наши шеф-повара понимают важность вашего {" "}
                 <span className="text-ink font-medium relative">
-                  wedding day
+                  свадебного дня
                   <motion.span 
                     className="absolute bottom-0 left-0 w-full h-0.5 bg-gold/50 origin-left"
                     initial={{ scaleX: 0 }}
@@ -371,7 +371,7 @@ export function About() {
                     transition={{ delay: 0.8, duration: 0.6 }}
                   />
                 </span>
-                {" "}and will work closely with you to ensure every detail is considered.
+                {" "}и будут работать с вами, чтобы каждая деталь была учтена, а каждое ожидание превзойдено.
               </motion.p>
             </Reveal>
 
@@ -383,9 +383,9 @@ export function About() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.4, duration: 0.8 }}
               >
-                From intimate dinners to celebrations for 500 guests — we bring it all: china,
-                glassware, linens, servers, and an open kitchen if you&rsquo;d like one. A restaurant,
-                wherever you need it.
+                От камерных ужинов до празднования на 500 гостей — мы привозим
+                всё: фарфор, стекло, текстиль, официантов и при желании открытую
+                кухню. Ресторан там, где он вам нужен.
               </motion.p>
             </Reveal>
 
@@ -407,7 +407,7 @@ export function About() {
             <Reveal delay={0.4}>
               <div 
                 className="mt-10 -mx-5 md:-mx-8 lg:-mx-12 xl:-mx-16"
-                aria-label="Soprano's Catering value props"
+                aria-label="Преимущества Interfood Catering"
               >
                 <Marquee speed={28} pauseOnHover>
                   {VALUE_PROPS.map((prop) => (

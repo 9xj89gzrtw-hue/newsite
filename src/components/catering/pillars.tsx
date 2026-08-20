@@ -35,28 +35,28 @@ import { Reveal } from "./reveal";
 const PILLARS = [
   {
     icon: ChefHat,
-    eyebrow: "Kitchen",
-    title: "Chef Craft",
-    desc: "Hand-picked seasonal produce from Eastern Market, time-honored family recipes, every dish assembled by hand. An open kitchen on site — guests see the craft unfold.",
-    points: ["Seasonal menu", "Eastern Market produce", "Open kitchen", "Handcrafted plating"],
+    eyebrow: "Кухня",
+    title: "Авторская кухня",
+    desc: "Отобранные сезонные продукты, семейные рецепты, каждое блюдо собрано вручную. Открытая кухня на площадке — гости видят, как рождается мастерство.",
+    points: ["Сезонное меню", "Свежие продукты", "Открытая кухня", "Авторская подача"],
     accent: "from-gold/15 to-terracotta/10",
     image: "/media/concorde-boardroom.webp",
     stats: [
-      { value: 16, suffix: "", label: "executive chefs" },
-      { value: 10000, suffix: "+", label: "events" },
+      { value: 16, suffix: "", label: "шеф-поваров" },
+      { value: 10000, suffix: "+", label: "событий" },
     ],
   },
   {
     icon: Truck,
-    eyebrow: "Service",
-    title: "Field Service",
-    desc: "Full-service logistics: tables, china, glassware, linens, equipment, delivery, and setup. Our team of servers and sommeliers is on site from morning until the last guest leaves.",
-    points: ["Tables & linens", "China & glassware", "Delivery & setup", "Servers & sommeliers"],
+    eyebrow: "Сервис",
+    title: "Сервис на площадке",
+    desc: "Логистика под ключ: столы, фарфор, стекло, текстиль, оборудование, доставка и монтаж. Наша команда официантов и сомелье на площадке с утра до последнего гостя.",
+    points: ["Мебель и текстиль", "Фарфор и стекло", "Доставка и монтаж", "Официанты и сомелье"],
     accent: "from-sage/15 to-gold/10",
     image: "/media/concorde-handhelds.jpg",
     stats: [
-      { value: 12, suffix: "", label: "catering trucks" },
-      { value: 500000, suffix: "+", label: "guests" },
+      { value: 12, suffix: "", label: "грузовиков кейтеринга" },
+      { value: 75000, suffix: "+", label: "гостей" },
     ],
   },
 ];
@@ -94,10 +94,10 @@ function CountUp({
   const [inViewFallback, setInViewFallback] = useState(false);
   const effectiveInView = inView || inViewFallback;
 
-  // en-US thousand separator (comma) for big numbers like 50,000.
+  // ru-RU thousand separator (non-breaking space) for big numbers like 50 000.
   const formatted = useTransform(mv, (latest) => {
     const rounded = Math.round(latest);
-    return `${rounded.toLocaleString("en-US")}${suffix}`;
+    return `${rounded.toLocaleString("ru-RU")}${suffix}`;
   });
 
   // Manual IntersectionObserver fallback (handles SSR / hydration edge cases).
@@ -273,7 +273,7 @@ function PinnedScrollStack({
                     {p.stats.map((stat: StatDef) => (
                       <div key={stat.label} className="flex flex-col">
                         <span className="font-display text-3xl leading-none text-cream md:text-4xl tabular-nums">
-                          {stat.value.toLocaleString("en-US")}
+                          {stat.value.toLocaleString("ru-RU")}
                           {stat.suffix}
                         </span>
                         <span className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/55">
@@ -417,7 +417,7 @@ export function Pillars() {
   return (
     <section
       ref={sectionRef}
-      aria-label="Our principles"
+      aria-label="Наши принципы"
       data-header-theme="light"
       className="section-light relative overflow-hidden bg-white py-24 md:py-32"
     >
@@ -427,7 +427,7 @@ export function Pillars() {
           <Reveal>
             <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
               <span className="size-1.5 rounded-full bg-gold animate-pulse" />
-              Two Foundations
+              Два основания
             </span>
           </Reveal>
           <Reveal delay={0.1}>
@@ -435,14 +435,14 @@ export function Pillars() {
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.05 }}
             >
-              Kitchen and service —{" "}
-              <span className="gradient-text italic">one whole</span>
+              Кухня и сервис —{" "}
+              <span className="gradient-text italic">единое целое</span>
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mt-5 text-base leading-relaxed text-ink/70">
-              The perfect event happens when flawless food meets flawless
-              service. We own both halves of that promise.
+              Идеальное событие рождается, когда безупречная еда встречает безупречный
+              сервис. Мы держим в руках обе половины этого обещания.
             </p>
           </Reveal>
         </div>
@@ -532,7 +532,7 @@ export function Pillars() {
                           href="#services"
                           className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-ink transition-colors duration-300 hover:text-gold"
                         >
-                          Learn More
+                          Подробнее
                           <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
                         </a>
                       </div>

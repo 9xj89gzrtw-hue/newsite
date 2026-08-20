@@ -27,49 +27,49 @@ const STEPS: Array<{
   {
     num: "01",
     icon: Sparkles,
-    title: "Inquiry",
-    desc: "We get to know you, listen to your vision for the event, and recommend a format and venue that fit your occasion and budget.",
+    title: "Заявка",
+    desc: "Знакомимся, выслушиваем ваше видение события, подбираем формат и площадку под повод и бюджет.",
     details: [
-      "Free 30-minute consultation",
-      "Format selection: buffet / banquet / coffee break",
-      "Venue recommendations within your budget",
-      "Preliminary quote within 1 business day",
+      "Бесплатная 30-минутная консультация",
+      "Выбор формата: фуршет / банкет / кофе-брейк",
+      "Рекомендации по площадкам под ваш бюджет",
+      "Предварительная смета в течение 1 рабочего дня",
     ],
   },
   {
     num: "02",
     icon: PenTool,
-    title: "Menu Tasting",
-    desc: "We craft a custom menu and detailed quote. Tasting available on request. We lock in the date and finalize every detail.",
+    title: "Дегустация меню",
+    desc: "Составляем индивидуальное меню и детальную смету. Дегустация по запросу. Фиксируем дату и финализируем детали.",
     details: [
-      "Custom menu tailored to your occasion and season",
-      "Quote with transparent line-item detail",
-      "Optional menu tasting with our chefs",
-      "Signed agreement and date hold",
+      "Индивидуальное меню под повод и сезон",
+      "Смета с прозрачной постатейной детализацией",
+      "Дегустация с нашими шеф-пова́рами",
+      "Подписание договора и бронь даты",
     ],
   },
   {
     num: "03",
     icon: Utensils,
-    title: "Event Day",
-    desc: "Delivery, setup, open kitchen if you'd like one, and our team of servers and sommeliers on site until the last guest leaves.",
+    title: "День мероприятия",
+    desc: "Доставка, монтаж, при желании открытая кухня, а также команда официантов и сомелье на площадке до последнего гостя.",
     details: [
-      "Delivery 3–4 hours before start time",
-      "Equipment setup and full table service",
-      "Open kitchen with our executive chef",
-      "Servers and sommeliers on site",
+      "Доставка за 3–4 часа до начала",
+      "Монтаж оборудования и полная сервировка",
+      "Открытая кухня с шеф-пова́ром",
+      "Официанты и сомелье на площадке",
     ],
   },
   {
     num: "04",
     icon: PartyPopper,
-    title: "Follow-Up",
-    desc: "We plate in the rhythm of your celebration and clean up after — you enjoy the moment with your guests. We check in after the event.",
+    title: "Сопровождение",
+    desc: "Подаём блюда в ритме вашего праздника и убираем после — вы наслаждаетесь моментом с гостями. Связываемся с вами после.",
     details: [
-      "Courses paced with the flow of your event",
-      "Sommelier and bartender on site",
-      "Breakdown and cleanup after the event",
-      "Final invoice and follow-up next day",
+      "Смена блюд в ритме вашего события",
+      "Сомелье и бармен на площадке",
+      "Демонтаж и уборка после мероприятия",
+      "Финальный счёт и обратная связь на следующий день",
     ],
   },
 ];
@@ -91,7 +91,7 @@ export function Process() {
     <section
       id="process"
       ref={sectionRef}
-      aria-label="How we work"
+      aria-label="Как мы работаем"
       data-header-theme="light"
       className="section-light relative overflow-hidden bg-cream py-24 md:py-32"
     >
@@ -101,7 +101,7 @@ export function Process() {
           <Reveal>
             <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
               <span className="size-1.5 rounded-full bg-gold animate-pulse" />
-              How We Work
+              Как мы работаем
             </span>
           </Reveal>
           <Reveal delay={0.1}>
@@ -109,14 +109,14 @@ export function Process() {
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.05 }}
             >
-              Four steps{"\u00A0"}
-              <span className="gradient-text italic">to your event</span>
+              Четыре шага{"\u00A0"}
+              <span className="gradient-text italic">до вашего события</span>
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mt-5 text-base leading-relaxed text-ink/70">
-              From the first call to the last guest — every step is led by a team
-              that loves what they do.
+              От первого звонка до последнего гостя — каждым шагом руководит команда,
+              которая любит то, что делает.
             </p>
           </Reveal>
         </div>
@@ -162,7 +162,7 @@ export function Process() {
               href="#calculator"
               className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-gold transition-all duration-300 hover:bg-gold/20 hover:border-gold/50 hover:-translate-y-0.5"
             >
-              Plan My Event
+              Рассчитать стоимость
             </a>
           </div>
         </Reveal>
@@ -315,7 +315,7 @@ function ExpandableDetails({ items, stepNum }: { items: string[]; stepNum: strin
         aria-controls={`step-content-${stepNum}`}
         className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-gold transition-colors duration-200 hover:text-bordeaux min-h-[44px] px-2"
       >
-        Read More
+        Подробнее
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: reduce ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}

@@ -295,7 +295,7 @@ function AnimatedCounter({ current, total }: { current: number; total: number })
  */
 export function EventsGallery() {
   const [open, setOpen] = useState<number | null>(null);
-  const [category, setCategory] = useState<Category>("All");
+  const [category, setCategory] = useState<Category>("Все");
   const [showKeyboardHint, setShowKeyboardHint] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState(8);
@@ -307,7 +307,7 @@ export function EventsGallery() {
   const all = MEDIA.events;
   const items = useMemo(
     () =>
-      category === "All"
+      category === "Все"
         ? all
         : all.filter((e) => e.category === category),
     [all, category],

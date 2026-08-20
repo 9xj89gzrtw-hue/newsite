@@ -19,8 +19,8 @@ import { Instagram, ArrowUpRight } from "lucide-react";
  */
 
 const EASE = [0.4, 0, 0.2, 1] as const;
-const INSTAGRAM_URL = "https://www.instagram.com/sopranoscatering";
-const HASHTAG = "#MadeWithLove";
+const INSTAGRAM_URL = "https://www.instagram.com/nilov_catering";
+const HASHTAG = "#ЕдаКакИскусство";
 
 export function SocialHandle() {
   const reduce = useReducedMotion();
@@ -73,9 +73,9 @@ export function SocialHandle() {
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex items-center transition-colors hover:text-bordeaux"
-            aria-label="Soprano's Catering on Instagram — @sopranoscatering"
+            aria-label="Interfood Catering в Instagram — @nilov_catering"
           >
-            <span className="italic">@sopranos</span>
+            <span className="italic">@nilov</span>
             <span className="not-italic">catering</span>
             <ArrowUpRight
               className="ml-3 size-[0.6em] text-gold transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"

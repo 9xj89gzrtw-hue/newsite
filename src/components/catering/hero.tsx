@@ -1,30 +1,17 @@
 "use client";
 
 /**
- * Hero — Sopranos Catering (sopranoscatering.com) style.
+ * Hero — Interfood Catering (стиль Sopranos Catering, sopranoscatering.com).
  *
- * Full-viewport (100vh) cinematic hero:
- *  1. Background photo slider (4 slides, 5s autoplay, crossfade, pause-on-hover,
- *     Ken Burns slow zoom, reduced-motion = static first slide).
- *  2. Centered hero content: Great Vibes script "Welcome to" (gold),
- *     massive Oswald headline "SOPRANO'S CATERING" (stagger-in),
- *     Eastern Market story subtext, gold pill CTA, phone link.
- *  3. Sticky "Check Your Date" sidebar (desktop ≥ lg) — white card with gold
- *     header bar, lead-gen form posting to /api/lead with sonner toast feedback.
- *  4. Bottom hero strip — "NEW WINTER SPECIALS" band with gold border-top.
- *
- * Design tokens (globals.css):
- *  - --gold #D4A373 (text-gold / bg-gold)
- *  - --ink #1F2937 (text-ink / bg-ink) — dark navy
- *  - --cream #F9FAFB (bg-cream)
- *  - .font-display → Oswald (uppercase condensed headings)
- *  - .font-script → Great Vibes (script accent)
- *  - .kenburns-slow → 22s slow zoom keyframe
- *
- * Accessibility:
- *  - All animations honour useReducedMotion().
- *  - Form inputs have aria-labels; touch targets ≥ 44px.
- *  - data-header-theme="transparent" so SiteHeader switches to overlay mode.
+ * Полноэкранный кинематографичный hero (100vh):
+ *  1. Фоновый слайдер фото (4 слайда, 5s автоплей, crossfade, пауза на ховер,
+ *     Ken Burns slow zoom, reduced-motion = статичный первый слайд).
+ *  2. Центрированный контент: Great Vibes script «Добро пожаловать в» (gold),
+ *     массивный Oswald-заголовок «INTERFOOD» (stagger-in),
+ *     подзаголовок «Еда как искусство», gold pill CTA, телефон.
+ *  3. Sticky «Проверить дату» sidebar (desktop ≥ lg) — белая карточка с золотой
+ *     шапкой, lead-gen форма, POST /api/lead, sonner toast feedback.
+ *  4. Нижняя полоса hero — «НОВЫЕ ЗИМНИЕ СПЕЦПРЕДЛОЖЕНИЯ» с gold border-top.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -48,7 +35,6 @@ import {
 import { toast } from "sonner";
 import {
   SOPRANOS_HERO_SLIDES,
-  SOPRANOS_ASSETS,
   CONTACTS,
 } from "@/lib/media";
 
@@ -57,14 +43,14 @@ import {
 const SLIDE_INTERVAL_MS = 5000;
 
 const EVENT_TYPES = [
-  "Corporate",
-  "Social",
-  "Wedding",
-  "Grill & BBQ",
-  "By The Tray",
+  "Корпоратив",
+  "Частное событие",
+  "Свадьба",
+  "Гриль и барбекю",
+  "Подносом и лотками",
 ] as const;
 
-const HEADLINE_WORDS = ["SOPRANO'S", "CATERING"];
+const HEADLINE_WORDS = ["INTERFOOD", "CATERING"];
 
 // ─── Sub-components ────────────────────────────────────────────────────────
 
@@ -133,7 +119,7 @@ function HeroSlider({
           <button
             key={i}
             type="button"
-            aria-label={`Go to slide ${i + 1}`}
+            aria-label={`Перейти к слайду ${i + 1}`}
             aria-current={i === activeIndex}
             onClick={() => {
               /* allow click-to-jump */
@@ -164,14 +150,14 @@ function ScrollIndicator({ reduce }: { reduce: boolean | null }) {
   return (
     <motion.a
       href="#editorial-intro"
-      aria-label="Scroll to next section"
+      aria-label="Прокрутить к следующему разделу"
       className="absolute bottom-20 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2 text-cream/80 transition-colors hover:text-gold md:bottom-24"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1.2, duration: 0.8 }}
     >
       <span className="font-display text-[10px] uppercase tracking-[0.32em]">
-        Scroll
+        Листать
       </span>
       <motion.span
         aria-hidden="true"
@@ -201,7 +187,6 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
   const [submitting, setSubmitting] = useState(false);
   // collapsed = compact floating tab; expanded = full form panel
   const [collapsed, setCollapsed] = useState(false);
-
   // Auto-collapse when user scrolls past ~70% of hero viewport.
   // Re-expands only on explicit click of the tab.
   useEffect(() => {
@@ -242,11 +227,11 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }).catch(() => null);
-      toast.success("Thank you! We'll be in touch shortly.");
+      toast.success("Спасибо! Мы свяжемся с вами в ближайшее время.");
       setSubmitted(true);
       form.reset();
     } catch {
-      toast.error("Something went wrong. Please call us instead.");
+      toast.error("Произошла ошибка. Пожалуйста, позвоните нам.");
     } finally {
       setSubmitting(false);
     }
@@ -257,7 +242,7 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
 
   return (
     <motion.aside
-      aria-label="Check your date — quick quote form"
+      aria-label="Проверить дату — быстрый расчёт стоимости"
       className="fixed right-4 top-1/2 z-30 hidden -translate-y-1/2 lg:block xl:right-8"
       initial={reduce ? { opacity: 0 } : { opacity: 0, x: 40 }}
       animate={reduce ? { opacity: 1 } : { opacity: 1, x: 0 }}
@@ -269,7 +254,7 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
           <motion.button
             type="button"
             onClick={() => setCollapsed(false)}
-            aria-label="Open Check Your Date form"
+            aria-label="Открыть форму «Проверить дату»"
             aria-expanded={false}
             className="group flex w-[180px] flex-col items-center gap-2 rounded-xl bg-gold px-4 py-4 text-white shadow-2xl shadow-ink/30 ring-1 ring-black/5 transition hover:scale-[1.03] hover:bg-terracotta xl:w-[200px]"
             initial={{ opacity: 0, x: 20 }}
@@ -279,10 +264,10 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
           >
             <Calendar className="h-5 w-5 text-white" aria-hidden="true" />
             <span className="font-display text-xs font-semibold uppercase tracking-[0.14em] text-white">
-              Check Your Date
+              Проверить дату
             </span>
             <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-white/80">
-              Tap to expand
+              Нажмите, чтобы развернуть
               <ChevronDown className="h-3 w-3 rotate-[-90deg]" aria-hidden="true" />
             </span>
           </motion.button>
@@ -304,11 +289,11 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
           type="button"
           onClick={() => setCollapsed(true)}
           className="flex w-full items-center justify-between bg-gold px-5 py-3.5 transition-colors hover:bg-terracotta"
-          aria-label="Collapse Check Your Date form"
+          aria-label="Свернуть форму «Проверить дату»"
           aria-expanded={true}
         >
           <h3 className="font-display text-sm font-semibold uppercase tracking-[0.14em] text-white">
-            Check Your Date
+            Проверить дату
           </h3>
           <ChevronDown className="h-4 w-4 rotate-180 text-white transition-transform" aria-hidden="true" />
         </button>
@@ -328,18 +313,18 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                   <UtensilsCrossed className="h-6 w-6 text-gold" aria-hidden="true" />
                 </div>
                 <p className="font-display text-base font-semibold uppercase tracking-wide text-ink">
-                  Thank You!
+                  Спасибо!
                 </p>
                 <p className="text-sm text-ink-soft">
-                  Your request has been received. A Soprano&apos;s event
-                  specialist will reach out within one business day.
+                  Ваша заявка получена. Специалист Interfood Catering
+                  свяжется с вами в течение одного рабочего дня.
                 </p>
                 <button
                   type="button"
                   onClick={() => setSubmitted(false)}
                   className="mt-2 min-h-[44px] w-full rounded-md border border-[var(--border-line)] bg-[var(--cream-2)] px-4 py-2 text-sm font-medium text-ink transition hover:border-gold hover:bg-white"
                 >
-                  Submit another request
+                  Отправить ещё одну заявку
                 </button>
               </motion.div>
             ) : (
@@ -352,7 +337,7 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                 exit={{ opacity: 0 }}
               >
                 {/* Full Name */}
-                <Field label="Full Name" htmlFor="cyd-name">
+                <Field label="Имя" htmlFor="cyd-name">
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft/60">
                     <User className="h-4 w-4" aria-hidden="true" />
                   </span>
@@ -362,14 +347,14 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                     type="text"
                     required
                     autoComplete="name"
-                    aria-label="Full name"
-                    placeholder="Jane Doe"
+                    aria-label="Имя"
+                    placeholder="Иван Иванов"
                     className={`${inputBase} pl-9`}
                   />
                 </Field>
 
                 {/* Phone */}
-                <Field label="Phone Number" htmlFor="cyd-phone">
+                <Field label="Телефон" htmlFor="cyd-phone">
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft/60">
                     <Phone className="h-4 w-4" aria-hidden="true" />
                   </span>
@@ -379,14 +364,14 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                     type="tel"
                     required
                     autoComplete="tel"
-                    aria-label="Phone number"
-                    placeholder="1 (800) WE-CATER"
+                    aria-label="Телефон"
+                    placeholder="=7 (812) 919-59-11"
                     className={`${inputBase} pl-9`}
                   />
                 </Field>
 
                 {/* Email */}
-                <Field label="Email Address" htmlFor="cyd-email">
+                <Field label="Email" htmlFor="cyd-email">
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft/60">
                     <Mail className="h-4 w-4" aria-hidden="true" />
                   </span>
@@ -396,14 +381,14 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                     type="email"
                     required
                     autoComplete="email"
-                    aria-label="Email address"
-                    placeholder="jane@email.com"
+                    aria-label="Email"
+                    placeholder="ivan@email.com"
                     className={`${inputBase} pl-9`}
                   />
                 </Field>
 
                 {/* Event Type */}
-                <Field label="Event Type" htmlFor="cyd-type">
+                <Field label="Тип события" htmlFor="cyd-type">
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft/60">
                     <UtensilsCrossed className="h-4 w-4" aria-hidden="true" />
                   </span>
@@ -411,11 +396,11 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                     id="cyd-type"
                     name="eventType"
                     defaultValue=""
-                    aria-label="Event type"
+                    aria-label="Тип события"
                     className={`${inputBase} appearance-none pl-9`}
                   >
                     <option value="" disabled>
-                      Select…
+                      Выберите…
                     </option>
                     {EVENT_TYPES.map((t) => (
                       <option key={t} value={t}>
@@ -429,7 +414,7 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                 </Field>
 
                 {/* Date */}
-                <Field label="Date" htmlFor="cyd-date">
+                <Field label="Дата" htmlFor="cyd-date">
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft/60">
                     <Calendar className="h-4 w-4" aria-hidden="true" />
                   </span>
@@ -437,13 +422,13 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                     id="cyd-date"
                     name="date"
                     type="date"
-                    aria-label="Event date"
+                    aria-label="Дата события"
                     className={`${inputBase} pl-9`}
                   />
                 </Field>
 
                 {/* Guests */}
-                <Field label="Number of People" htmlFor="cyd-guests">
+                <Field label="Количество гостей" htmlFor="cyd-guests">
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft/60">
                     <Users className="h-4 w-4" aria-hidden="true" />
                   </span>
@@ -454,20 +439,20 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                     min={10}
                     step={1}
                     inputMode="numeric"
-                    aria-label="Number of people (minimum 10)"
+                    aria-label="Количество гостей (минимум 10)"
                     placeholder="25"
                     className={`${inputBase} pl-9`}
                   />
                 </Field>
 
                 {/* How did you hear */}
-                <Field label="How did you hear about us?" htmlFor="cyd-source">
+                <Field label="Как вы о нас узнали?" htmlFor="cyd-source">
                   <input
                     id="cyd-source"
                     name="source"
                     type="text"
-                    aria-label="How did you hear about us"
-                    placeholder="Friend, Google, Instagram…"
+                    aria-label="Как вы о нас узнали"
+                    placeholder="Друг, Google, Instagram…"
                     className={inputBase}
                   />
                 </Field>
@@ -478,12 +463,12 @@ function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
                   disabled={submitting}
                   className="mt-1 min-h-[44px] w-full rounded-md bg-gold px-4 py-3 font-display text-sm font-semibold uppercase tracking-[0.12em] text-white transition hover:brightness-105 hover:shadow-lg hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {submitting ? "Sending…" : "Request Quote"}
+                  {submitting ? "Отправка…" : "Отправить заявку"}
                 </button>
 
                 <p className="pt-1 text-center text-[11px] leading-relaxed text-ink-soft/70">
-                  By submitting you agree to be contacted by Soprano&apos;s
-                  Catering about your event.
+                  Отправляя форму, вы соглашаетесь на обработку персональных
+                  данных и обратный звонок специалиста Interfood Catering.
                 </p>
               </motion.form>
             )}
@@ -532,10 +517,10 @@ function WinterSpecialsStrip({ reduce }: { reduce: boolean | null }) {
       >
         <div className="flex flex-col">
           <span className="font-display text-[10px] uppercase tracking-[0.28em] text-gold md:text-[11px]">
-            New Winter Specials
+            Новые зимние спецпредложения
           </span>
           <span className="font-display text-sm font-semibold uppercase tracking-wide text-cream md:text-base">
-            Hearty seasonal menus · From $15/guest
+            Сезонные меню · от 1500 ₽/чел
           </span>
         </div>
         <motion.span
@@ -544,7 +529,7 @@ function WinterSpecialsStrip({ reduce }: { reduce: boolean | null }) {
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
         >
           <span className="font-display text-xs uppercase tracking-[0.18em]">
-            Discover
+            Подробнее
           </span>
           <ArrowRight className="h-4 w-4 text-gold" aria-hidden="true" />
         </motion.span>
@@ -556,8 +541,8 @@ function WinterSpecialsStrip({ reduce }: { reduce: boolean | null }) {
 // ─── Main Hero export ─────────────────────────────────────────────────────
 
 /**
- * Hero — Sopranos Catering full-viewport hero.
- * Preserved export name `Hero` (named export) — page.tsx imports `{ Hero }`.
+ * Hero — Interfood Catering, полноэкранный hero.
+ * Сохранённое имя экспорта `Hero` — page.tsx импортирует `{ Hero }`.
  */
 export function Hero() {
   const reduce = useReducedMotion();
@@ -598,7 +583,7 @@ export function Hero() {
   return (
     <section
       data-header-theme="transparent"
-      aria-label="Soprano's Catering — welcome"
+      aria-label="Interfood Catering — добро пожаловать"
       className="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-ink"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -610,7 +595,7 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center px-6 pt-20 pb-28 text-center md:px-8 lg:items-start lg:justify-center lg:text-left lg:pl-12 lg:pr-[380px]">
         <div className="flex max-w-3xl flex-col items-center lg:items-start lg:text-left">
 
-          {/* "Welcome to" — Great Vibes script, gold */}
+          {/* "Добро пожаловать в" — Great Vibes script, gold */}
           <motion.p
             className="font-script text-gold"
             style={{ fontSize: "clamp(2rem, 5vw, 3rem)" }}
@@ -618,12 +603,12 @@ export function Hero() {
             animate={shouldAnimate ? { opacity: 1, y: 0 } : undefined}
             transition={{ delay: 0.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            Welcome to
+            Добро пожаловать в
           </motion.p>
 
           {/* Massive headline — Oswald uppercase, stagger-in per word */}
           <h1 className="mt-1 md:mt-2">
-            <span className="sr-only">Soprano&apos;s Catering</span>
+            <span className="sr-only">Interfood Catering</span>
             <span
               aria-hidden="true"
               className="flex flex-col items-center gap-1 md:flex-row md:gap-4"
@@ -666,17 +651,16 @@ export function Hero() {
             <span className="h-px w-10 bg-gold/50" />
           </motion.div>
 
-          {/* Eastern Market story subtext */}
+          {/* Еда как искусство — Interfood brand story */}
           <motion.p
             className="mt-6 max-w-2xl text-[15px] leading-relaxed text-cream/80 md:text-base"
             initial={shouldAnimate ? { opacity: 0, y: 12 } : false}
             animate={shouldAnimate ? { opacity: 1, y: 0 } : undefined}
             transition={{ delay: 1.3, duration: 0.7 }}
           >
-            From hand-picking our own produce directly from Eastern Market, to
-            making our own salad dressing, Soprano&apos;s does everything the
-            old world way! At Soprano&apos;s we guarantee you will love our
-            excellent food, professional service, and competitive prices.
+            «Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге.
+            Свадебные банкеты, корпоративы, фуршеты, кофе-брейки и барбекю от
+            2450 ₽/чел. Рассчитайте стоимость онлайн за 30 секунд.
           </motion.p>
 
           {/* CTA + phone */}
@@ -690,7 +674,7 @@ export function Hero() {
               href="#contact"
               className="font-display inline-flex min-h-[44px] items-center justify-center rounded-full bg-gold px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white transition hover:scale-105 hover:shadow-xl hover:shadow-gold/30"
             >
-              Contact Us
+              Связаться с нами
             </a>
 
             <a
@@ -704,7 +688,7 @@ export function Hero() {
             </a>
           </motion.div>
 
-          {/* Mobile-only inline "Check Your Date" CTA (sidebar is hidden on < lg) */}
+          {/* Mobile-only inline «Проверить дату» CTA (sidebar is hidden on < lg) */}
           <motion.a
             href="#contact"
             className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-gold/50 bg-ink/30 px-6 py-2.5 font-display text-xs uppercase tracking-[0.16em] text-gold backdrop-blur-sm transition hover:bg-gold hover:text-white lg:hidden"
@@ -712,7 +696,7 @@ export function Hero() {
             animate={shouldAnimate ? { opacity: 1 } : undefined}
             transition={{ delay: 1.7, duration: 0.6 }}
           >
-            Check Your Date
+            Проверить дату
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </motion.a>
         </div>
@@ -727,7 +711,7 @@ export function Hero() {
       {/* ── Bottom winter specials strip ──────────────────────────────── */}
       <WinterSpecialsStrip reduce={reduce} />
 
-      {/* Decorative brand mark — tiny gold Soprano's seal in top-left
+      {/* Decorative brand mark — tiny Interfood seal in top-left
           corner of the content area (subtle trust signal). */}
       <motion.div
         className="absolute left-6 top-24 z-10 hidden items-center gap-2 md:flex lg:left-10"
@@ -736,16 +720,11 @@ export function Hero() {
         transition={{ delay: 1.6, duration: 0.8 }}
         aria-hidden="true"
       >
-        <Image
-          src={SOPRANOS_ASSETS.logoWhite}
-          alt=""
-          width={28}
-          height={28}
-          className="opacity-80"
-          style={{ width: "auto", height: "auto" }}
-        />
+        <span className="font-display text-base font-bold uppercase tracking-[0.22em] text-gold">
+          Interfood<span className="text-cream">.</span>
+        </span>
         <span className="font-display text-[11px] uppercase tracking-[0.22em] text-cream/70">
-          Est. Michigan
+          С 2014 года · Санкт-Петербург
         </span>
       </motion.div>
     </section>
