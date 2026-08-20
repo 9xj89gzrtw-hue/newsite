@@ -1733,3 +1733,32 @@ All pushed to `main`. Subagent worklog entries: Tasks 0, 1-a, 2-a, 2-b, 2-c, 2-d
 - Contact card link accessible names (add aria-label overrides)
 - 2 menu signature dish photo mismatches remain (Сырная тарелка, Котлета)
 - DB still not connected (leads return fallback success without persistence)
+
+### Циклы 11-15 (сессия 2, 2026-08-19)
+
+| Цикл | Оценки | Основные исправления |
+|------|--------|---------------------|
+| 11 | A:fail, B:7.0, C:6.2 | aria-label on inputs, contact cards ariaLabel, dish photos VLM, in-memory DB, FABs z-[70] |
+| 12 | A:fail, B:5.8, C:6.0 | VLM-verified photos (renamed dishes+services), FAQ ARIA APG, services back-face inert, ink/60→/70, terracotta darken |
+| 13 | single:6.0 | calc aria-pressed, date inputs role=group, sonner Уведомления, newsletter consent in form, nav button 44px |
+| 14 | single:5.2 | FAB overlap fix, date role=group ancestor, slider aria-label, lead required, tablists→group, cookie DOM order, Оформить CTA |
+| 15 | single:4.8 | date aria-label direct, lead slider label, audio toggle, Подробнее aria-controls, phone pattern, mobile menu label toggle |
+
+**Key learnings (дополнение к cycles 6-10):**
+11. **`role=group` ancestor НЕ передаёт name child input** — нужно aria-label прямо на input.
+12. **Sonner `containerAriaLabel` добавляет trailing space** — cosmetic, не критично.
+13. **`aria-disabled` на `<a>` НЕ предотвращает навигацию** — используй conditional `<span>` или `pointer-events-none`.
+14. **Filter chips ≠ tabs** — tabs требуют tabpanel; filters используют `role=group` + `aria-pressed`.
+15. **Slider aria-label НЕ должен включать value** — `aria-valuenow` уже его передаёт (double-announce иначе).
+16. **Date input spinbuttons дублируют label** — `<label for>` + date input = "Month Month". Решение: aria-label на input + visible label как отдельный div.
+17. **Disclosure pattern требует aria-controls + id** — на content div, не только aria-expanded на button.
+18. **VLM обязателен для photo-caption matching** — критики проверяют VLM-verified.
+
+**Оставшиеся дефекты для Cycle 16+:**
+- Cookie banner: autofocus + focus trap (Tab still goes to page first)
+- Sonner trailing space (cosmetic)
+- Lead step-3 aria-describedby (error <p> needs id)
+- Mobile menu trigger: when open, header button should be inert (overlay covers it)
+- Deeper keyboard nav edge cases
+
+Все коммиты запушены в main. Сайт: https://newsite-three-kappa.vercel.app/
