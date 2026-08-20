@@ -452,6 +452,9 @@ function ServiceCard({
         <div
           className="svc-flip-face svc-flip-back absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-ink p-5 text-cream sm:p-6"
           onClick={handleBackClick}
+          aria-hidden={!flipped}
+          inert={!flipped}
+          style={{ visibility: flipped ? "visible" : "hidden" }}
         >
           {/* Soft gradient backdrop with gold glow */}
           <div

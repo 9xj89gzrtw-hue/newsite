@@ -88,14 +88,14 @@ export function SnackBoxDelivery() {
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
-              <p className="mt-5 max-w-md text-base leading-relaxed text-ink/60 font-display">
+              <p className="mt-5 max-w-md text-base leading-relaxed text-ink/70 font-display">
                 Готовые наборы закусок для мероприятий любого формата — канапе,
                 брускетты, салаты, горячее. Индивидуальная упаковка, удобная
                 подача. Доставка по Санкт-Петербургу.
               </p>
             </Reveal>
             <Reveal delay={0.3}>
-              <div className="mt-6 flex items-center gap-3 text-sm text-ink/60 bg-white/70 inline-flex px-4 py-2 rounded-full">
+              <div className="mt-6 flex items-center gap-3 text-sm text-ink/70 bg-white/70 inline-flex px-4 py-2 rounded-full">
                 <Truck className="size-5 text-gold" />
                 <span>Доставка по СПб · от 10 порций · от 1 дня</span>
               </div>

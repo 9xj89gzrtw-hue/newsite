@@ -102,7 +102,7 @@ export function InstagramVideo() {
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
-              <p className="mt-5 max-w-md text-base leading-relaxed text-ink/60 font-display italic">
+              <p className="mt-5 max-w-md text-base leading-relaxed text-ink/70 font-display italic">
                 Свежие события, процессы на кухне, новые блюда и закулисье
                 мероприятий — в нашем Instagram. Подписывайтесь, чтобы не
                 пропустить сезонные меню и акции.

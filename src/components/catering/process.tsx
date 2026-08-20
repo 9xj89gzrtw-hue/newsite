@@ -114,7 +114,7 @@ export function Process() {
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mt-5 text-base leading-relaxed text-ink/60">
+            <p className="mt-5 text-base leading-relaxed text-ink/70">
               От первого звонка до последнего гостя — каждый этап ведёт команда,
               которая любит своё дело.
             </p>
@@ -228,7 +228,7 @@ function DesktopStep({
         </h3>
 
         {/* Description */}
-        <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink/60 md:mx-auto">
+        <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink/70 md:mx-auto">
           {step.desc}
         </p>
 
@@ -290,7 +290,7 @@ function MobileStep({
         <h3 aria-hidden="true" className="font-display text-xl text-ink">{step.title}</h3>
       </div>
 
-      <p className="mt-2 text-sm text-ink/60">{step.desc}</p>
+      <p className="mt-2 text-sm text-ink/70">{step.desc}</p>
 
       <ExpandableDetails items={step.details} />
     </motion.li>
@@ -335,7 +335,7 @@ function ExpandableDetails({ items }: { items: string[] }) {
         }}
       >
         <div className="overflow-hidden">
-          <ul className="mt-3 space-y-1.5 text-xs text-ink/60">
+          <ul className="mt-3 space-y-1.5 text-xs text-ink/70">
             {items.map((item, i) => (
               <li key={i} className="flex items-start gap-2">
                 <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-gold" />

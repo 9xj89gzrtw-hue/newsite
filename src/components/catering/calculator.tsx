@@ -186,7 +186,7 @@ export function Calculator() {
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mx-auto mt-4 max-w-lg text-base text-ink/60">
+            <p className="mx-auto mt-4 max-w-lg text-base text-ink/70">
               Предварительная оценка. Точная смета — после короткой консультации.
             </p>
           </Reveal>
@@ -197,7 +197,7 @@ export function Calculator() {
           <Reveal className="rounded-2xl border border-border-line bg-white p-6 shadow-lg shadow-ink/5 md:p-8">
             {/* ═══ Type selector — Visual Cards ═══ */}
             <div>
-              <label className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium flex items-center gap-2">
+              <label className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
                 <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">1</span>
                 Тип мероприятия
               </label>
@@ -231,7 +231,7 @@ export function Calculator() {
                       <div className={`relative flex size-12 items-center justify-center rounded-xl transition-all duration-300 ${
                         isSelected 
                           ? "bg-gradient-to-br from-gold to-terracotta text-white shadow-md" 
-                          : "bg-white text-ink/60 group-hover:text-gold group-hover:bg-gold/10"
+                          : "bg-white text-ink/70 group-hover:text-gold group-hover:bg-gold/10"
                       }`}>
                         {IconComponent && <IconComponent className="size-5" />}
                         {/* Pulse ring on selected */}
@@ -277,7 +277,7 @@ export function Calculator() {
 
             {/* ═══ Guests Slider — Enhanced ═══ */}
             <div className="mt-8">
-              <label className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium flex items-center justify-between">
+              <label className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">2</span>
                   Количество гостей
@@ -395,7 +395,7 @@ export function Calculator() {
 
             {/* ═══ Addons — Enhanced Cards ═══ */}
             <div className="mt-8">
-              <label className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium flex items-center gap-2">
+              <label className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
                 <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">3</span>
                 Доп. услуги
                 {addons.length > 0 && (
@@ -479,7 +479,7 @@ export function Calculator() {
 
             {/* ═══ Date picker ═══ */}
             <div className="mt-8">
-              <label htmlFor="calc-date" className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium flex items-center gap-2">
+              <label htmlFor="calc-date" className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
                 <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">4</span>
                 Дата мероприятия
                 <span className="font-normal text-ink/70">(необязательно)</span>
@@ -622,7 +622,7 @@ export function Calculator() {
               <motion.button
                 onClick={shareLink}
                 data-cursor="ссылка"
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-line px-5 py-3 text-xs font-medium uppercase tracking-wider text-ink/60 hover:border-gold hover:text-gold transition-colors active:scale-[0.98] min-h-[44px]"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-border-line px-5 py-3 text-xs font-medium uppercase tracking-wider text-ink/70 hover:border-gold hover:text-gold transition-colors active:scale-[0.98] min-h-[44px]"
                 whileTap={{ scale: 0.97 }}
               >
                 <Share2 className="size-3.5" />
@@ -646,7 +646,7 @@ export function Calculator() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Поделиться сметой в Telegram (откроется в новой вкладке)"
-                  className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/60 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
+                  className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/70 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
                 >
                   <TelegramIcon className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                   Telegram
@@ -656,7 +656,7 @@ export function Calculator() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Поделиться сметой в WhatsApp (откроется в новой вкладке)"
-                  className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/60 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
+                  className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/70 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
                 >
                   <MessageCircle className="size-3.5 transition-transform group-hover:scale-110" />
                   WhatsApp
@@ -695,7 +695,7 @@ function Row({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.15 + index * 0.08, duration: 0.3 }}
     >
-      <span className={highlight || warning ? 'font-medium' : 'text-ink/60'}>{label}</span>
+      <span className={highlight || warning ? 'font-medium' : 'text-ink/70'}>{label}</span>
       <span className={`font-mono ${highlight ? 'font-semibold text-gold' : warning ? 'font-semibold text-terracotta' : 'font-medium text-ink'}`}>
         {value}
       </span>

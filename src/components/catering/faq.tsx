@@ -287,7 +287,7 @@ export function Faq() {
             >
               Частые вопросы
             </h2>
-            <p className="mt-4 text-base text-ink/60">
+            <p className="mt-4 text-base text-ink/70">
               Ответы на популярные вопросы о нашем кейтеринге
             </p>
           </div>
@@ -397,6 +397,9 @@ export function Faq() {
                     <button
                       onClick={() => toggle(item.originalIndex)}
                       aria-expanded={isOpen ? "true" : "false"}
+                      aria-controls={`faq-panel-${item.originalIndex}`}
+                      id={`faq-trigger-${item.originalIndex}`}
+                      type="button"
                       className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left group"
                     >
                       <span className="flex items-center gap-3 font-display text-lg text-ink pr-4">
@@ -422,6 +425,9 @@ export function Faq() {
                       </motion.span>
                     </button>
                     <div
+                      id={`faq-panel-${item.originalIndex}`}
+                      role="region"
+                      aria-labelledby={`faq-trigger-${item.originalIndex}`}
                       className={`grid transition-all duration-300 ${
                         isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                       }`}
@@ -451,7 +457,7 @@ export function Faq() {
             <p className="font-display text-lg text-ink">
               Не нашли ответ на свой вопрос?
             </p>
-            <p className="mt-1 text-sm text-ink/60">
+            <p className="mt-1 text-sm text-ink/70">
               Позвоните нам — подскажем за минуту
             </p>
             <a

@@ -84,7 +84,7 @@ function NewsletterSignup() {
         <Sparkles className="size-4 text-gold" />
         <span className="font-display text-lg text-ink">Сезонное меню и спецпредложения</span>
       </div>
-      <p className="mb-4 text-sm text-ink/60">
+      <p className="mb-4 text-sm text-ink/70">
         Раз в месяц — свежая коллекция блюд, гастро-тренды и сезонные акции.
         Без спама, отписка в один клик.
       </p>
@@ -147,22 +147,22 @@ function NewsletterSignup() {
             )}
           </AnimatePresence>
         </button>
+        <label className="mt-3 flex min-h-[44px] items-start gap-2 text-[11px] text-ink/70">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            required
+            className="mt-0.5 size-4 shrink-0 accent-gold"
+            aria-label="Согласие на обработку персональных данных"
+          />
+          <span>
+            Я согласен на обработку персональных данных согласно{" "}
+            <a href="/privacy" className="text-bordeaux hover:underline">политике конфиденциальности</a>{" "}
+            (152-ФЗ).
+          </span>
+        </label>
       </form>
-      <label className="mt-3 flex min-h-[44px] items-start gap-2 text-[11px] text-ink/70">
-        <input
-          type="checkbox"
-          checked={consent}
-          onChange={(e) => setConsent(e.target.checked)}
-          required
-          className="mt-0.5 size-4 shrink-0 accent-gold"
-          aria-label="Согласие на обработку персональных данных"
-        />
-        <span>
-          Я согласен на обработку персональных данных согласно{" "}
-          <a href="/privacy" className="text-bordeaux hover:underline">политике конфиденциальности</a>{" "}
-          (152-ФЗ).
-        </span>
-      </label>
     </div>
   );
 }
@@ -278,7 +278,7 @@ export function SiteFooter() {
               <a
                 key={link.href}
                 href={link.href}
-                className="min-h-[44px] flex items-center text-ink/60 font-medium hover-underline hover:text-ink transition-colors"
+                className="min-h-[44px] flex items-center text-ink/70 font-medium hover-underline hover:text-ink transition-colors"
               >
                 {link.label}
               </a>

@@ -420,7 +420,7 @@ export function EventsGallery() {
             </Reveal>
           </div>
           <Reveal delay={0.2}>
-            <p className="max-w-xs text-base text-ink/60 font-display italic">
+            <p className="max-w-xs text-base text-ink/70 font-display italic">
               Реальные мероприятия нашей команды. Нажмите на фото, чтобы рассмотреть.
             </p>
           </Reveal>

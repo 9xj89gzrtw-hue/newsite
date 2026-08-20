@@ -440,7 +440,7 @@ export function Pillars() {
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mt-5 text-base leading-relaxed text-ink/60">
+            <p className="mt-5 text-base leading-relaxed text-ink/70">
               Идеальный праздник рождается, когда безупречная еда встречает
               безупречную подачу. Мы отвечаем за обе половины.
             </p>

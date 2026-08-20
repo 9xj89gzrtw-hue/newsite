@@ -377,7 +377,7 @@ export function About() {
 
             <Reveal delay={0.3}>
               <motion.p 
-                className="mt-5 max-w-lg text-base leading-relaxed text-ink/60"
+                className="mt-5 max-w-lg text-base leading-relaxed text-ink/70"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

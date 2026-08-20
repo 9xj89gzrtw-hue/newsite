@@ -32,7 +32,7 @@ export function MarqueeBand() {
         {items.map((t, i) => (
           <span
             key={i}
-            className="font-display uppercase text-ink/60"
+            className="font-display uppercase text-ink/70"
             style={{
               fontSize: "clamp(1.8rem, 4.5vw, 4.5rem)",
               lineHeight: 1,

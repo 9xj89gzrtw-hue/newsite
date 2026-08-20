@@ -735,7 +735,7 @@ export function Hero() {
             interval={2600}
           />
           <span>.</span>
-          <span className="mt-2 block text-base not-italic text-ink/60 md:text-lg">
+          <span className="mt-2 block text-base not-italic text-ink/70 md:text-lg">
             Выездной кейтеринг полного цикла — от канапе до банкета на 500 гостей.
           </span>
         </motion.p>
@@ -841,7 +841,7 @@ export function Hero() {
         transition={{ delay: 2.6, duration: 0.8 }}
       >
         <motion.span 
-          className="font-mono text-[10px] uppercase tracking-[0.4em] text-ink/60 block"
+          className="font-mono text-[10px] uppercase tracking-[0.4em] text-ink/70 block"
           animate={{ opacity: [0.4, 0.8, 0.4] }}
           transition={{ duration: 2, repeat: Infinity }}
         >

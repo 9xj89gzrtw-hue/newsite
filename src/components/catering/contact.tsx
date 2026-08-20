@@ -771,7 +771,7 @@ export function Contact() {
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-ink/60">
+            <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-ink/70">
               Позвоните, напишите в WhatsApp или оставьте заявку — ответим быстро и составим смету под ваш бюджет.
             </p>
           </Reveal>
@@ -899,7 +899,7 @@ export function Contact() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6 }}
-                      className="mt-2 text-sm text-ink/60"
+                      className="mt-2 text-sm text-ink/70"
                     >
                       Мы перезвоним в течение 15 минут
                     </motion.p>
@@ -958,7 +958,7 @@ export function Contact() {
                       {/* Step 0: Event type selection */}
                       {step === 0 && (
                         <fieldset className="space-y-3">
-                          <legend className="mb-2 font-mono text-xs uppercase tracking-wider text-ink/60">
+                          <legend className="mb-2 font-mono text-xs uppercase tracking-wider text-ink/70">
                             Тип мероприятия
                           </legend>
                           <div className="grid grid-cols-2 gap-2">
@@ -995,7 +995,7 @@ export function Contact() {
                           <div>
                             <label
                               htmlFor="lead-guests"
-                              className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-ink/60"
+                              className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-ink/70"
                             >
                               <Users className="size-3.5" />
                               Количество гостей
@@ -1007,7 +1007,7 @@ export function Contact() {
                                   set("guests", Math.max(1, data.guests - 10))
                                 }
                                 aria-label="Уменьшить на 10"
-                                className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line text-ink/60 transition-all hover:border-gold hover:bg-gold/10 hover:text-gold"
+                                className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line text-ink/70 transition-all hover:border-gold hover:bg-gold/10 hover:text-gold"
                               >
                                 <ChevronLeft className="size-5" />
                               </button>
@@ -1031,7 +1031,7 @@ export function Contact() {
                                   set("guests", data.guests + 10)
                                 }
                                 aria-label="Увеличить на 10"
-                                className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line text-ink/60 transition-all hover:border-gold hover:bg-gold/10 hover:text-gold"
+                                className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line text-ink/70 transition-all hover:border-gold hover:bg-gold/10 hover:text-gold"
                               >
                                 <ChevronRight className="size-5" />
                               </button>
@@ -1051,7 +1051,7 @@ export function Contact() {
                           <div>
                             <label
                               htmlFor="lead-date"
-                              className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-ink/60"
+                              className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-ink/70"
                             >
                               <Calendar className="size-3.5" />
                               Желаемая дата
@@ -1128,7 +1128,7 @@ export function Contact() {
                       {/* Step 3: Review & Submit */}
                       {step === 3 && (
                         <fieldset className="space-y-5">
-                          <legend className="mb-2 font-mono text-xs uppercase tracking-wider text-ink/60">
+                          <legend className="mb-2 font-mono text-xs uppercase tracking-wider text-ink/70">
                             Проверьте заявку
                           </legend>
                           <ul className="divide-y divide-border-line rounded-xl border border-border-line bg-cream/40">
@@ -1155,7 +1155,7 @@ export function Contact() {
                           </ul>
 
                           {/* Consent checkbox */}
-                          <label className="flex cursor-pointer items-start gap-3 text-sm text-ink/60">
+                          <label className="flex cursor-pointer items-start gap-3 text-sm text-ink/70">
                             <input
                               type="checkbox"
                               id="consent"
@@ -1285,7 +1285,7 @@ export function Contact() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Яндекс.Карты (откроется в новой вкладке)"
-              className="flex items-center gap-2 text-sm text-ink/60 font-medium hover:text-gold transition-colors group"
+              className="flex items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors group"
             >
               <MapPin className="size-4 transition-transform group-hover:scale-110" />
               {YANDEX_MAPS.address} — открыть в Яндекс.Картах →

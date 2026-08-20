@@ -82,14 +82,14 @@ const SIGNATURE_DISHES: Record<string, Array<{
   ],
   banquet: [
     {
-      name: "Стейк филе-миньон",
-      chefNote: "Говяжья вырезка с ягодным соусом — мясо, которому не нужно шоу.",
+      name: "Мясное ассорти и деликатесы",
+      chefNote: "Паштеты, сыровяленое мясо и фирменные закуски — для торжественного банкета.",
       price: "от 6 970 ₽ / чел",
       image: "/media/concorde-boardroom.webp",
     },
     {
-      name: "Дорада с вялеными томатами",
-      chefNote: "Средиземноморское море на тарелке — простота и характер.",
+      name: "Сервировка банкета в шатре",
+      chefNote: "Полная сервировка, текстиль и флористика — атмосфера торжественного вечера.",
       price: "от 6 970 ₽ / чел",
       image: "/media/ridgewells-gala.jpg",
     },
@@ -102,8 +102,8 @@ const SIGNATURE_DISHES: Record<string, Array<{
       image: "/media/menu-snack-box.jpg",
     },
     {
-      name: "Брускетта с палтусом",
-      chefNote: "Бородинский хлеб и копчёное масло — питерский характер.",
+      name: "Мини-сэндвичи ассорти",
+      chefNote: "Краб, лосось и овощи в миниатюрных булочках — питерский характер в каждом укусе.",
       price: "690 ₽ / шт",
       image: "/media/concorde-handhelds.jpg",
     },
@@ -138,16 +138,16 @@ const SIGNATURE_DISHES: Record<string, Array<{
   ],
   bbq: [
     {
-      name: "Шашлык из лосося на кедровой доске",
-      chefNote: "Фарерский лосось, бешамель и красная икра — огонь и море.",
+      name: "Люля-кебаб на углях",
+      chefNote: "Баранина с зирой и кинзой — дым и специи на открытом огне.",
       price: "от 3 500 ₽ / чел",
-      image: "/media/event-06.jpg",
+      image: "/media/event-08.jpg",
     },
     {
-      name: "Шашлык из свиной вырезки",
-      chefNote: "Горчица, розмарин и ночь в маринаде — простой и верный рецепт.",
+      name: "Сосиски-гриль ручной работы",
+      chefNote: "Классические сосиски на углях — простой и верный рецепт для уличного барбекю.",
       price: "от 2 200 ₽ / чел",
-      image: "/media/event-07.jpg",
+      image: "/media/event-08.jpg",
     },
   ],
   "office-lunch": [
@@ -424,7 +424,7 @@ export function Menu() {
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
-              <p className="mt-3 font-display italic text-lg text-ink/60 max-w-xl">
+              <p className="mt-3 font-display italic text-lg text-ink/70 max-w-xl">
                 Пакеты с реальными блюдами и ценами. Скачайте PDF, чтобы показать команде.
               </p>
             </Reveal>
@@ -616,11 +616,11 @@ export function Menu() {
                 <Sparkles className="size-3 relative z-10" />
                 <span className="relative z-10">от {formatRUB(current.perGuest)} {priceUnit}</span>
               </span>
-              <span className="rounded-full bg-ink/5 px-4 py-2 font-mono text-xs text-ink/60">
+              <span className="rounded-full bg-ink/5 px-4 py-2 font-mono text-xs text-ink/70">
                 мин. {current.minGuests} гостей
               </span>
               <span className="hidden text-ink/30 sm:inline">·</span>
-              <span className="hidden max-w-xs text-xs text-ink/60 sm:inline">{current.short}</span>
+              <span className="hidden max-w-xs text-xs text-ink/70 sm:inline">{current.short}</span>
             </motion.div>
 
             {/* Packages carousel/grid with enhanced cards */}
@@ -981,7 +981,7 @@ function PackageCarousel({
 
               <div className="flex flex-1 flex-col p-5">
                 <motion.p 
-                  className="text-sm leading-relaxed text-ink/60"
+                  className="text-sm leading-relaxed text-ink/70"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.25 + idx * 0.05 }}

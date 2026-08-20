@@ -358,7 +358,7 @@ function TestimonialCard({
             )}
           </div>
 
-          <p className="mt-3 text-sm text-ink/60 font-medium not-italic">
+          <p className="mt-3 text-sm text-ink/70 font-medium not-italic">
             {testimonial.author}
           </p>
         </div>
@@ -527,7 +527,7 @@ export function Testimonials() {
             </div>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mt-5 max-w-lg mx-auto text-base leading-relaxed text-ink/60">
+            <p className="mt-5 max-w-lg mx-auto text-base leading-relaxed text-ink/70">
               Благодарственные письма от компаний, с которыми мы работаем годами.
               Каждый отзыв — результат слаженной команды и любви к своему делу.
             </p>
@@ -626,7 +626,7 @@ export function Testimonials() {
                 <h3 className="mt-3 font-display text-xl text-ink md:text-2xl">
                   Покажем реальные кейсы под ваш формат
                 </h3>
-                <p className="mt-2 text-sm text-ink/60">
+                <p className="mt-2 text-sm text-ink/70">
                   Пришлём портфолио мероприятий вашего типа: фуршеты, банкеты,
                   корпоративы. Включаем фотоотчёт, сметы и отзывы заказчиков.
                 </p>
@@ -672,7 +672,7 @@ export function Testimonials() {
                   }}
                   className="group flex items-center justify-center rounded-xl border border-border-line bg-white px-4 py-5 transition-all duration-300 hover:border-gold/30 hover:shadow-lg hover:-translate-y-1"
                 >
-                  <span className="font-display text-center text-sm text-ink/60 transition-colors duration-300 group-hover:text-gold md:text-base font-medium">
+                  <span className="font-display text-center text-sm text-ink/70 transition-colors duration-300 group-hover:text-gold md:text-base font-medium">
                     {client}
                   </span>
                 </motion.div>
@@ -684,7 +684,7 @@ export function Testimonials() {
         {/* CTA */}
         <Reveal delay={0.25}>
           <div className="mt-16 text-center">
-            <p className="text-ink/60 text-base">
+            <p className="text-ink/70 text-base">
               Хотите такой же уровень сервиса?{" "}
               <a
                 href="#contact"

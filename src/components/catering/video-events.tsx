@@ -72,7 +72,7 @@ const VIDEO_CATALOG: VideoItem[] = [
     title: "Выездное барбекю",
     desc: "Гриль на свежем воздухе, скандинавский стиль",
     source: "Выездной гриль-кейтеринг",
-    poster: "/media/ridgewells-scallops.jpg",
+    poster: "/media/event-08.jpg",
     // Real catering video from GG Catering (Vimeo embed).
     // iframe-based — uses YouTubeEmbed-style pattern but for Vimeo.
     // The vimeoEmbedId is read by YouTubeEmbed component (which renders
@@ -139,7 +139,7 @@ export function VideoEvents() {
             </Reveal>
           </div>
           <Reveal delay={0.2}>
-            <p className="max-w-xs text-base font-display italic text-ink/60">
+            <p className="max-w-xs text-base font-display italic text-ink/70">
               Видео наших мероприятий — подача блюд, сервировка, атмосфера.
             </p>
           </Reveal>
@@ -328,7 +328,7 @@ function VideoCard({
       <div className="flex items-start justify-between gap-3 p-5">
         <div>
           <h3 className="font-display text-lg text-ink font-medium">{title}</h3>
-          <p className="mt-1 text-sm text-ink/60">{desc}</p>
+          <p className="mt-1 text-sm text-ink/70">{desc}</p>
           <p className="mt-2 font-mono text-xs uppercase tracking-wider text-gold/70">
             {source}
           </p>
