@@ -11,6 +11,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       containerAriaLabel="Уведомления"
+      hotkey={[]}
       style={
         {
           "--normal-bg": "var(--popover)",
