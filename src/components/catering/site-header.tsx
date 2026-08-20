@@ -193,7 +193,7 @@ export function SiteHeader() {
               height={48}
               priority
               className="h-9 w-auto md:h-11"
-              style={{ width: "auto", height: "2.25rem" }}
+              style={{ width: "auto", height: "auto" }}
             />
           </a>
 
@@ -268,7 +268,7 @@ export function SiteHeader() {
                 width={180}
                 height={54}
                 className="h-12 w-auto"
-                style={{ width: "auto", height: "3rem" }}
+                style={{ width: "auto", height: "auto" }}
               />
               <button
                 ref={closeBtnRef}
