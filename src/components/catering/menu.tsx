@@ -68,14 +68,14 @@ const SIGNATURE_DISHES: Record<string, Array<{
 }>> = {
   buffet: [
     {
-      name: "Лосось шеф-посол",
-      chefNote: "Творожный сыр, каперсы и красная икра — чистый вкус холодного моря.",
+      name: "Канапе-ассорти с морепродуктами",
+      chefNote: "Крабовое мясо, лосось и творожный сыр — миниатюры холодного моря.",
       price: "от 5 350 ₽ / чел",
       image: "/media/concorde-handhelds.jpg",
     },
     {
-      name: "Тигровая креветка в цукини",
-      chefNote: "Икра летучей рыбы и хрустящий слайс — текстура в каждом укусе.",
+      name: "Обжаренные гребешки с цветной капустой",
+      chefNote: "Три гребешка, фиолетовая цветная капуста и микрозелень — текстура в каждом укусе.",
       price: "от 5 350 ₽ / чел",
       image: "/media/ridgewells-scallops.jpg",
     },
@@ -323,7 +323,7 @@ function FeaturedSpotlight({
                     aria-selected={i === idx}
                     aria-label={`Блюдо ${i + 1}`}
                     onClick={() => setIdx(i)}
-                    className="min-h-[44px] min-w-[24px] flex items-center justify-center px-1"
+                    className="min-h-[44px] min-w-[44px] flex items-center justify-center px-1"
                   >
                     <span className={`h-1.5 rounded-full transition-all duration-300 ${
                       i === idx

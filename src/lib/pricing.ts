@@ -195,7 +195,7 @@ export const MENU_TYPES: MenuType[] = [
     short: "Мобильный фуршет в коробках",
     perGuest: 660,
     minGuests: 10,
-    priceUnit: "за набор",
+    priceUnit: "/чел",
     description: "Готовые наборы закусок в индивидуальной упаковке. Доставка по СПб.",
     included: [
       "Обслуживание — сборка и упаковка",

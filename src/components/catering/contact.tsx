@@ -980,8 +980,7 @@ export function Contact() {
                                     {m.label}
                                   </span>
                                   <span className="font-mono text-[11px] text-ink/70">
-                                    от {m.perGuest.toLocaleString("ru-RU")} ₽
-                                    {m.priceUnit ?? "/чел"}
+                                    от {m.perGuest.toLocaleString("ru-RU")} ₽ {m.priceUnit ?? "/чел"}
                                   </span>
                                 </button>
                               );
@@ -1063,7 +1062,6 @@ export function Contact() {
                               value={data.date}
                               min={new Date().toISOString().split("T")[0]}
                               onChange={(e) => set("date", e.target.value)}
-                              aria-label="Желаемая дата мероприятия"
                               className="mt-2 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none transition-all focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 focus:shadow-[0_0_20px_rgba(196,149,106,0.15)]"
                             />
                             <p className="mt-2 text-xs text-ink/70">

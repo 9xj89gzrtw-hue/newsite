@@ -557,6 +557,8 @@ export function Testimonials() {
           className="relative mt-16"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
+          onFocus={() => setPaused(true)}
+          onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setPaused(false); }}
           aria-roledescription="carousel"
           aria-label="Отзывы клиентов"
         >

@@ -44,6 +44,7 @@ export function CookieConsent() {
       {show && (
         <motion.div
           role="dialog"
+          aria-modal="false"
           aria-label="Согласие на использование cookies"
           className="fixed bottom-0 inset-x-0 z-[60] backdrop-blur-xl bg-cream/85 border-t border-gold/20 shadow-[0_-8px_24px_rgba(0,0,0,0.06)]"
           initial={prefersReducedMotion ? { opacity: 0 } : { y: 100, opacity: 0 }}

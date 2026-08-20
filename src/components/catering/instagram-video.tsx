@@ -155,7 +155,6 @@ export function InstagramVideo() {
                       data-instgrm-captioned
                       data-instgrm-version="14"
                       title={`Instagram видео ${activeIdx + 1} от Interfood Catering (@nilov_catering)`}
-                      role="img"
                       style={{
                         background: "#FAF8F5",
                         border: 0,

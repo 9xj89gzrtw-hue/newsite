@@ -14,12 +14,12 @@ const SERVICE_PHOTOS: Record<string, string> = {
   Truck: "/media/event-09.jpg",
   UtensilsCrossed: "/media/event-03.jpg",
   ChefHat: "/media/event-10.jpg",
-  Flower2: "/media/event-01.png",
+  Flower2: "/media/ridgewells-gala.jpg",
   Cake: "/media/concorde-dessert.jpg",
   Wine: "/media/event-11.jpg",
   PartyPopper: "/media/event-02.jpg",
-  Droplets: "/media/ridgewells-gala.jpg",
-  Flame: "/media/event-06.jpg",
+  Droplets: "/media/event-08.jpg",
+  Flame: "/media/event-08.jpg",
 };
 
 // Category tags for each service index
@@ -276,8 +276,9 @@ function ServiceCard({
     >
       <motion.div
         ref={cardRef}
-        role="button"
-        tabIndex={0}
+        role="group"
+        aria-label={`${service.title}`}
+        tabIndex={-1}
         onClick={handleFrontClick}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -286,8 +287,6 @@ function ServiceCard({
           }
         }}
         data-cursor="подробнее"
-        aria-label={`${service.title} — открыть описание`}
-        aria-pressed={flipped}
         className="svc-flip-inner group relative block aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-2xl bg-cream text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
         style={{
           boxShadow: isHovered 

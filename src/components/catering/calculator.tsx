@@ -482,7 +482,7 @@ export function Calculator() {
               <label htmlFor="calc-date" className="font-mono text-xs uppercase tracking-wider text-ink/60 font-medium flex items-center gap-2">
                 <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">4</span>
                 Дата мероприятия
-                <span className="font-normal text-ink/35">(необязательно)</span>
+                <span className="font-normal text-ink/70">(необязательно)</span>
               </label>
               <input
                 type="date"
@@ -490,7 +490,6 @@ export function Calculator() {
                 name="eventDate"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                aria-label="Дата мероприятия (необязательно)"
                 className="mt-3 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 transition-all"
               />
               {date && seasonMultiplier(date) > 1 && (
