@@ -342,19 +342,24 @@ export function SnackBoxDelivery() {
                         Сбросить
                       </button>
                     )}
+                    {hasAny ? (
                     <a
                       href="#contact"
                       data-cursor="оформить"
-                      aria-disabled={!hasAny}
-                      className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold shadow-lg transition-all ${
-                        hasAny
-                          ? "bg-gradient-to-r from-gold to-terracotta text-white shadow-gold/25 hover:shadow-xl hover:-translate-y-0.5"
-                          : "cursor-not-allowed bg-ink/10 text-ink/70 shadow-none"
-                      }`}
+                      className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold shadow-lg transition-all bg-gradient-to-r from-gold to-terracotta text-white shadow-gold/25 hover:shadow-xl hover:-translate-y-0.5 min-h-[44px]`}
                     >
                       Оформить: {formatRUB(totalRub)}
                       <ArrowUpRight className="size-3.5" />
                     </a>
+                    ) : (
+                      <span
+                        aria-disabled="true"
+                        className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold shadow-lg cursor-not-allowed bg-ink/10 text-ink/70 shadow-none min-h-[44px]`}
+                      >
+                        Оформить: {formatRUB(totalRub)}
+                        <ArrowUpRight className="size-3.5" />
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

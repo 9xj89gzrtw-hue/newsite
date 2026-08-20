@@ -314,13 +314,12 @@ function FeaturedSpotlight({
             </motion.span>
 
             {dishes.length > 1 && (
-              <div className="flex items-center gap-2" role="tablist" aria-label="Авторские блюда">
+              <div className="flex items-center gap-2" role="group" aria-label="Авторские блюда">
                 {dishes.map((_, i) => (
                   <button
                     key={i}
                     type="button"
-                    role="tab"
-                    aria-selected={i === idx}
+                    aria-pressed={i === idx}
                     aria-label={`Блюдо ${i + 1}`}
                     onClick={() => setIdx(i)}
                     className="min-h-[44px] min-w-[44px] flex items-center justify-center px-1"

@@ -362,7 +362,7 @@ export function Calculator() {
                     aria-valuenow={guests}
                     aria-valuemin={5}
                     aria-valuemax={500}
-                    aria-label={`Количество гостей: ${guests}`}
+                    aria-label="Количество гостей"
                     className="relative z-10 h-12 w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-7 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-gold [&::-webkit-slider-thumb]:to-terracotta [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-gold/40 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:size-7 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-gradient-to-r [&::-moz-range-thumb]:from-gold [&::-moz-range-thumb]:to-terracotta [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:shadow-gold/40"
                   />
                 </div>
@@ -480,8 +480,8 @@ export function Calculator() {
             </div>
 
             {/* ═══ Date picker ═══ */}
-            <div className="mt-8">
-              <div role="group" aria-label="Дата мероприятия (необязательно)" className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
+            <div role="group" aria-label="Дата мероприятия (необязательно)" className="mt-8">
+              <div className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
                 <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">4</span>
                 Дата мероприятия
                 <span className="font-normal text-ink/70">(необязательно)</span>

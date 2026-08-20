@@ -168,10 +168,10 @@ export default function RootLayout({
         <AmbientAudio />
         <GrainOverlay />
         <ChapterNav />
+        <CookieConsent />
         <NuqsAdapter>
           <LenisProvider>{children}</LenisProvider>
         </NuqsAdapter>
-        <CookieConsent />
         <Toaster />
         <noscript>
           <div style={{ padding: '2rem', fontFamily: 'sans-serif', textAlign: 'center' }}>

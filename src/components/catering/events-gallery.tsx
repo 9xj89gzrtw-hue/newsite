@@ -429,7 +429,7 @@ export function EventsGallery() {
         {/* Enhanced Category Filter — animated underline + count badges */}
         <Reveal delay={0.15}>
           <div
-            role="tablist"
+            role="group"
             aria-label="Фильтр событий по типу"
             className="mt-12 flex flex-wrap items-center gap-1 sm:gap-2"
           >
@@ -440,8 +440,7 @@ export function EventsGallery() {
               return (
                 <button
                   key={cat}
-                  role="tab"
-                  aria-selected={isActive}
+                  aria-pressed={isActive}
                   onClick={() => {
                     setCategory(cat);
                     setOpen(null);

@@ -133,6 +133,7 @@ function FloatingInput({
   icon: Icon,
   validate,
   ariaLabelText,
+  required,
 }: {
   id: string;
   name?: string;
@@ -145,6 +146,7 @@ function FloatingInput({
   icon?: React.ComponentType<{ className?: string }>;
   validate?: (value: string) => boolean;
   ariaLabelText?: string;
+  required?: boolean;
 }) {
   const [focused, setFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
@@ -200,6 +202,8 @@ function FloatingInput({
           aria-invalid={error ? "true" : "false"}
           aria-describedby={error ? `error-${id}` : undefined}
           aria-label={ariaLabelText || placeholder}
+          aria-required={required ? "true" : undefined}
+          required={required}
           className={`w-full rounded-xl px-${Icon ? '11' : '4'} py-3.5 ${showValidCheck ? 'pr-12' : 'pr-4'} text-ink outline-none transition-all placeholder:text-transparent ${
             Icon ? 'pl-11' : ''
           }`}
@@ -1048,10 +1052,8 @@ export function Contact() {
                             />
                           </div>
 
-                          <div>
+                          <div role="group" aria-label="Желаемая дата мероприятия">
                             <div
-                              role="group"
-                              aria-label="Желаемая дата мероприятия"
                               className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-ink/70"
                             >
                               <Calendar className="size-3.5" />
@@ -1083,6 +1085,7 @@ export function Contact() {
                             onChange={(e) => set("name", e.target.value)}
                             placeholder="Как к вам обращаться"
                             ariaLabelText="Ваше имя"
+                            required
                             error={validationErrors.name}
                             icon={Users}
                             validate={(v) => v.trim().length >= 2}
@@ -1097,6 +1100,7 @@ export function Contact() {
                             onChange={(e) => set("phone", e.target.value)}
                             placeholder="+7 (___) ___-__-__"
                             ariaLabelText="Номер телефона"
+                            required
                             error={validationErrors.phone}
                             icon={Phone}
                             validate={(v) => /^(\+7|8)[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/.test(v.replace(/[^+0-9]/g, ""))}
