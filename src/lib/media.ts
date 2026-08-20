@@ -71,34 +71,34 @@ export const MEDIA = {
   //   - gamma-private-event (Private Event Catering)
   //   - gamma-table-birds-eye (TCZ Restaurant Table Salad Rosé Wine Bird's-eye view)
   events: [
-    { src: "/media/event-01.png", caption: "Свадебный фуршет на крыше", category: "Свадьбы" },
-    { src: "/media/event-02.jpg", caption: "Корпоратив в офисе", category: "Корпоративы" },
-    { src: "/media/event-03.jpg", caption: "Банкет на корабле", category: "Банкеты" },
-    { src: "/media/event-04.jpg", caption: "Выездная регистрация", category: "Свадьбы" },
-    { src: "/media/event-05.jpg", caption: "Праздничный фуршет на воздухе", category: "Корпоративы" },
-    { src: "/media/event-06.jpg", caption: "Банкет в шатре на природе", category: "Банкеты" },
-    { src: "/media/event-07.jpg", caption: "Кофе-брейк на конференции", category: "Кофе-брейки" },
-    { src: "/media/event-08.jpg", caption: "Выездное барбекю — гриль на углях", category: "Барбекю" },
-    { src: "/media/event-09.jpg", caption: "Новогодний корпоратив", category: "Корпоративы" },
-    { src: "/media/event-10.jpg", caption: "Сезонный банкет", category: "Банкеты" },
-    { src: "/media/event-11.jpg", caption: "Фуршет для гостей", category: "Фуршеты" },
-    { src: "/media/event-12.jpg", caption: "Праздничная сервировка", category: "Банкеты" },
-    { src: "/media/gamma-wedding.webp", caption: "Свадебный кейтеринг (Швейцария)", category: "Свадьбы" },
-    { src: "/media/gamma-corporate.webp", caption: "Корпоративное мероприятие", category: "Корпоративы" },
-    { src: "/media/gamma-private-event.webp", caption: "Частное торжество", category: "Банкеты" },
-    { src: "/media/gamma-table-birds-eye.webp", caption: "Сервировка стола — вид сверху", category: "Фуршеты" },
+    { src: "/media/event-01.png", caption: "Wedding rooftop reception", category: "Weddings" },
+    { src: "/media/event-02.jpg", caption: "Corporate office event", category: "Corporate" },
+    { src: "/media/event-03.jpg", caption: "Banquet on a boat", category: "Banquets" },
+    { src: "/media/event-04.jpg", caption: "Outdoor ceremony", category: "Weddings" },
+    { src: "/media/event-05.jpg", caption: "Outdoor holiday reception", category: "Corporate" },
+    { src: "/media/event-06.jpg", caption: "Tented outdoor banquet", category: "Banquets" },
+    { src: "/media/event-07.jpg", caption: "Conference coffee break", category: "Coffee Breaks" },
+    { src: "/media/event-08.jpg", caption: "Live-fire BBQ grilling", category: "BBQ" },
+    { src: "/media/event-09.jpg", caption: "New Year corporate party", category: "Corporate" },
+    { src: "/media/event-10.jpg", caption: "Seasonal banquet", category: "Banquets" },
+    { src: "/media/event-11.jpg", caption: "Guest reception", category: "Receptions" },
+    { src: "/media/event-12.jpg", caption: "Holiday table setting", category: "Banquets" },
+    { src: "/media/gamma-wedding.webp", caption: "Wedding catering", category: "Weddings" },
+    { src: "/media/gamma-corporate.webp", caption: "Corporate event", category: "Corporate" },
+    { src: "/media/gamma-private-event.webp", caption: "Private celebration", category: "Banquets" },
+    { src: "/media/gamma-table-birds-eye.webp", caption: "Table setting — bird's eye view", category: "Receptions" },
   ],
 };
 
 /** Event categories for the gallery filter (A5 — filterable gallery). */
 export const EVENT_CATEGORIES = [
-  "Все",
-  "Свадьбы",
-  "Корпоративы",
-  "Банкеты",
-  "Фуршеты",
-  "Кофе-брейки",
-  "Барбекю",
+  "All",
+  "Weddings",
+  "Corporate",
+  "Banquets",
+  "Receptions",
+  "Coffee Breaks",
+  "BBQ",
 ] as const;
 
 // Contacts — re-exported from config.ts (single source of truth).
