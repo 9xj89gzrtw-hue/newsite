@@ -237,3 +237,266 @@ export const YANDEX_MAPS = {
   address: "ул. Большая Морская, д. 18, офис 33, Санкт-Петербург",
 };
 
+// ============================================================================
+// SOPRANOS CATERING ASSETS & CONTENT — copied from sopranoscatering.com 2026-08-20
+// ============================================================================
+
+/**
+ * Sopranos brand assets — logos (black + white variants), award badges,
+ * small icons (dinner, apple, gallery), social icons (white SVGs).
+ * All downloaded locally from Webflow CDN, served from /public/media/sopranos/.
+ */
+export const SOPRANOS_ASSETS = {
+  logoBlack: "/media/sopranos/logo-black.png",       // For light backgrounds
+  logoWhite: "/media/sopranos/logo-white.png",       // For dark backgrounds (hero, footer)
+  badge: "/media/sopranos/badge.png",                // 1-Sopranos-badge.png
+  voteBest: "/media/sopranos/vote-best.png",         // Vote-4-The-Best.png
+  inverse: "/media/sopranos/inverse.png",            // Inverse award
+  dinnerIcon: "/media/sopranos/dinner-icon.png",     // Dinner icon (decorative)
+  appleIcon: "/media/sopranos/apple-icon.png",       // Apple icon (decorative)
+  gallery04: "/media/sopranos/gallery-04.jpg",       // Hero gallery image
+  // Social icons
+  facebook: "/media/sopranos/facebook-icon.svg",
+  instagram: "/media/sopranos/instagram-icon.svg",
+  call: "/media/sopranos/call-icon.svg",
+  arrowDown: "/media/sopranos/arrow-down.svg",
+  arrowUp: "/media/sopranos/arrow-up.svg",
+  bell: "/media/sopranos/bell-icon.svg",
+  preloader: "/media/sopranos/preloader.svg",
+} as const;
+
+/**
+ * Sopranos hero slider images — uses existing project media (high-quality
+ * catering photos) because Sopranos original Webflow slider images aren't
+ * publicly accessible without JS rendering. These match the dark/moody/warm
+ * mood of Sopranos hero (food photography on rustic tables).
+ */
+export const SOPRANOS_HERO_SLIDES = [
+  {
+    src: "/media/ridgewells-hero.jpg",
+    alt: "Catered dinner table at sunset — Soprano's Catering",
+    caption: "Eastern Market • Old World Way",
+  },
+  {
+    src: "/media/menu-banquet.jpg",
+    alt: "Banquet table with seasonal dishes — Soprano's Catering",
+    caption: "Hand-picked produce • Made from scratch",
+  },
+  {
+    src: "/media/event-wedding-light.jpg",
+    alt: "Wedding reception catering — Soprano's Catering",
+    caption: "Weddings • Corporate • Social Events",
+  },
+  {
+    src: "/media/concorde-boardroom.webp",
+    alt: "Corporate catering setup — Soprano's Catering",
+    caption: "Professional Service • Competitive Prices",
+  },
+] as const;
+
+/**
+ * Sopranos top-level navigation — copied from sopranoscatering.com.
+ * Used by site-header for the desktop nav.
+ */
+export const SOPRANOS_NAV = [
+  {
+    label: "Home",
+    href: "#main-content",
+  },
+  {
+    label: "Corporate",
+    href: "#services",
+    mega: {
+      title: "Corporate Events",
+      items: [
+        { label: "Breakfast & Brunch", href: "#services" },
+        { label: "Boxed Lunches", href: "#services" },
+        { label: "Meetings & Breaks", href: "#services" },
+        { label: "Build Your Own Buffet", href: "#menu" },
+        { label: "Grill & BBQ", href: "#services" },
+        { label: "Themed Cuisine", href: "#menu" },
+        { label: "By The Tray", href: "#snack-box" },
+        { label: "Late Night Snacks", href: "#menu" },
+      ],
+    },
+  },
+  {
+    label: "Social",
+    href: "#services",
+    mega: {
+      title: "Social Events",
+      items: [
+        { label: "Build Your Own Buffet", href: "#menu" },
+        { label: "Grill & BBQ", href: "#services" },
+        { label: "Themed Cuisine", href: "#menu" },
+        { label: "By The Tray", href: "#snack-box" },
+        { label: "Breakfast & Brunch", href: "#menu" },
+        { label: "Late Night Snacks", href: "#menu" },
+      ],
+    },
+  },
+  { label: "Weddings", href: "#about" },
+  { label: "Grill & BBQ", href: "#services" },
+  { label: "By The Tray", href: "#snack-box" },
+  { label: "Venues & Vendors", href: "#pillars" },
+  { label: "Contact", href: "#contact" },
+] as const;
+
+/**
+ * Sopranos service cards — six main service categories with photos.
+ * Inspired by Sopranos "OUR SERVICES" section structure.
+ */
+export const SOPRANOS_SERVICES = [
+  {
+    title: "Corporate Events",
+    desc: "Breakfast, brunch, boxed lunches, meetings & breaks. Full-service or pick-up and drop-off for offices large and small.",
+    image: "/media/concorde-boardroom.webp",
+    icon: "Briefcase",
+    href: "#services",
+  },
+  {
+    title: "Social Events",
+    desc: "Build your own buffet, themed cuisine, late night snacks. From intimate gatherings to large celebrations.",
+    image: "/media/event-11.jpg",
+    icon: "PartyPopper",
+    href: "#services",
+  },
+  {
+    title: "Weddings",
+    desc: "Our chefs understand the importance of your wedding day. Every detail considered, every expectation exceeded.",
+    image: "/media/event-wedding-light.jpg",
+    icon: "Heart",
+    href: "#about",
+  },
+  {
+    title: "Grill & BBQ",
+    desc: "Live-fire grilling on site. Smoked brisket, baby back ribs, hand-crafted sausages and seasonal vegetables.",
+    image: "/media/event-08.jpg",
+    icon: "Flame",
+    href: "#services",
+  },
+  {
+    title: "By The Tray",
+    desc: "Pick-up and drop-off catering by the tray. Perfect for small get-togethers and office meetings.",
+    image: "/media/snack-1.jpg",
+    icon: "UtensilsCrossed",
+    href: "#snack-box",
+  },
+  {
+    title: "Venues & Vendors",
+    desc: "Proudly recommend partners who share our passion for excellence. Venues, florists, photographers and more.",
+    image: "/media/event-06.jpg",
+    icon: "MapPin",
+    href: "#pillars",
+  },
+] as const;
+
+/**
+ * Sopranos service styles — pick-up, drop-off, full-service options.
+ * From "SERVICE STYLES" section.
+ */
+export const SOPRANOS_SERVICE_STYLES = [
+  {
+    title: "Pick Up",
+    desc: "Place your order and pick up at our Clinton Township kitchen. Freshly prepared, packaged for transport.",
+    icon: "ShoppingBag",
+  },
+  {
+    title: "Drop Off",
+    desc: "We deliver to your venue, set up disposable serving ware, and leave you to enjoy the event.",
+    icon: "Truck",
+  },
+  {
+    title: "Full Service",
+    desc: "Complete catering experience — chefs, servers, equipment, set-up and clean-up. For weddings and large events.",
+    icon: "UtensilsCrossed",
+  },
+] as const;
+
+/**
+ * Sopranos venue & vendor partners — "VENUES & VENDORS" section.
+ */
+export const SOPRANOS_PARTNERS = [
+  {
+    name: "The Vault",
+    type: "Venue",
+    desc: "Historic Detroit bank vault transformed into a stunning event space.",
+    image: "/media/event-02.jpg",
+  },
+  {
+    name: "Birmingham Bloomfield",
+    type: "Venue",
+    desc: "Elegant banquet hall for weddings and corporate galas in Bloomfield Hills.",
+    image: "/media/event-06.jpg",
+  },
+  {
+    name: "Lake St. Clair",
+    type: "Venue",
+    desc: "Waterfront venue with panoramic views for ceremonies and receptions.",
+    image: "/media/event-04.jpg",
+  },
+  {
+    name: "Bellissimo Floral",
+    type: "Vendor",
+    desc: "Award-winning floral design studio specializing in wedding and event florals.",
+    image: "/media/event-12.jpg",
+  },
+] as const;
+
+/**
+ * Sopranos Proudly Serving — Southeast Michigan cities list.
+ * From the footer "Proudly Catering to..." section.
+ */
+export const SOPRANOS_CITIES = [
+  "Armada", "Auburn Hills", "Birmingham", "Bloomfield Hills", "Centerline",
+  "Chesterfield", "Clarkston", "Clinton Township", "Detroit", "Fraser",
+  "Grosse Pointe", "Lenox", "Macomb County", "Macomb Township", "Mount Clemens",
+  "New Haven", "Oakland County", "Oakland Township", "Orion Township",
+  "Ray Township", "Richmond", "Rochester", "Rochester Hills", "Romeo",
+  "Roseville", "Royal Oak", "Shelby Township", "St. Clair County",
+  "St. Clair Shores", "Sterling Heights", "Troy", "Utica", "Warren",
+  "Washington Township", "West Bloomfield",
+] as const;
+
+/**
+ * Sopranos awards — real badges downloaded from sopranoscatering.com.
+ */
+export const SOPRANOS_AWARDS = [
+  {
+    title: "1-Sopranos Badge",
+    image: "/media/sopranos/badge.png",
+    alt: "Sopranos Catering — Award Badge",
+  },
+  {
+    title: "Vote 4 The Best",
+    image: "/media/sopranos/vote-best.png",
+    alt: "Vote 4 The Best — Sopranos Catering Award",
+  },
+  {
+    title: "Inverse Award",
+    image: "/media/sopranos/inverse.png",
+    alt: "Sopranos Catering — Recognition Award",
+  },
+] as const;
+
+/**
+ * Sopranos Winter Specials — "NEW WINTER SPECIALS" section content.
+ */
+export const SOPRANOS_WINTER_SPECIALS = [
+  {
+    title: "Hearty Winter Buffet",
+    desc: "Slow-braised short ribs, root vegetable mash, winter greens, crusty bread. $24/guest.",
+    image: "/media/menu-buffet.jpg",
+  },
+  {
+    title: "Holiday Hors d'Oeuvres",
+    desc: "Cranberry brie bites, smoked salmon blinis, spiced meatballs. $18/guest (12-piece min).",
+    image: "/media/concorde-handhelds.jpg",
+  },
+  {
+    title: "Hot Cocoa & Dessert Bar",
+    desc: "Gourmet hot cocoa station with toppings, plus seasonal dessert table. $15/guest.",
+    image: "/media/concorde-dessert.jpg",
+  },
+] as const;
+

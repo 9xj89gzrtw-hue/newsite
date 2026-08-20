@@ -19,7 +19,7 @@ import {
  * Phase 9 P2 wow-factor: when hovering an element with `data-cursor-image`
  * attribute (URL to an image), the cursor ring expands to 120px and shows
  * the image inside via spring-tracked motion.div. Useful for #menu CTA
- * hover-preview (shows a signature dish photo when user hovers "Меню" link).
+ * hover-preview (shows a signature dish photo when user hovers "Menu" link).
  *
  * Animation rule (RULES §5): only transform/opacity — never width/height.
  * The ring is a fixed 70px element that scales 0.5 → 1 on hover (visible
@@ -160,7 +160,7 @@ export function CustomCursor() {
           >
             <Image
               src={previewImage}
-              alt="Превью блюда"
+              alt="Dish preview"
               fill
               sizes="120px"
               className="object-cover"

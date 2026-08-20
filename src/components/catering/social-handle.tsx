@@ -11,16 +11,16 @@ import { Instagram, ArrowUpRight } from "lucide-react";
  * Ridgewells dedicates a 425px section to "@RidgewellsDC" at 82px as the
  * headline, with a "FOLLOW US" eyebrow above and a brand hashtag below.
  *
- * We adapt: "@nilov_catering" (our Instagram handle) as the giant headline,
- * "Следите за нами" eyebrow, "#ЕдаКакИскусство" hashtag. Links to IG.
+ * We adapt: "@sopranoscatering" (our Instagram handle) as the giant headline,
+ * "Follow Us" eyebrow, "#MadeWithLove" hashtag. Links to IG.
  *
  * Placement: right before <SiteFooter /> — closes the page on a branded,
  * memorable note (Ridgewells places it as the last content section).
  */
 
 const EASE = [0.4, 0, 0.2, 1] as const;
-const INSTAGRAM_URL = "https://www.instagram.com/nilov_catering";
-const HASHTAG = "#ЕдаКакИскусство";
+const INSTAGRAM_URL = "https://www.instagram.com/sopranoscatering";
+const HASHTAG = "#MadeWithLove";
 
 export function SocialHandle() {
   const reduce = useReducedMotion();
@@ -56,7 +56,7 @@ export function SocialHandle() {
           className="inline-flex items-center gap-3"
         >
           <Instagram className="size-5 text-bordeaux" aria-hidden="true" />
-          <span className="eyebrow-wide text-bordeaux">Следите за нами</span>
+          <span className="eyebrow-wide text-bordeaux">Follow Us</span>
         </motion.div>
 
         {/* Giant handle headline — the wow moment */}
@@ -73,10 +73,10 @@ export function SocialHandle() {
             target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex items-center transition-colors hover:text-bordeaux"
-            aria-label="Interfood Catering в Instagram — @nilov_catering"
+            aria-label="Soprano's Catering on Instagram — @sopranoscatering"
           >
-            <span className="italic">@nilov</span>
-            <span className="not-italic">_catering</span>
+            <span className="italic">@sopranos</span>
+            <span className="not-italic">catering</span>
             <ArrowUpRight
               className="ml-3 size-[0.6em] text-gold transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
               aria-hidden="true"
@@ -107,7 +107,7 @@ export function SocialHandle() {
             href="#events"
             className="font-sans text-[0.78rem] font-semibold uppercase tracking-[0.2em] text-ink underline-offset-[6px] transition-colors hover:text-bordeaux hover:underline"
           >
-            Смотреть фотоотчёты событий
+            View Event Photo Galleries
           </Link>
         </motion.div>
       </div>

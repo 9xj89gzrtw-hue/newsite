@@ -1,28 +1,25 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Phone, MessageCircle, ChevronDown, Calculator } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Calendar, Mail } from "lucide-react";
 import { CONTACTS } from "@/lib/media";
-import { SERVICES } from "@/lib/media";
-import { MENU_TYPES } from "@/lib/pricing";
+import { SOPRANOS_NAV, SOPRANOS_ASSETS } from "@/lib/media";
 import { AnnouncementBar } from "./announcement-bar";
 
+// Build NAV from Sopranos nav structure (copied from sopranoscatering.com)
 type NavItem = {
   href: string;
   label: string;
-  mega?: "menu" | "services";
+  mega?: "corporate" | "social";
 };
 
-const NAV: NavItem[] = [
-  { href: "#about", label: "О нас" },
-  { href: "#menu", label: "Меню", mega: "menu" },
-  { href: "#services", label: "Услуги", mega: "services" },
-  { href: "#events", label: "События" },
-  { href: "#snack-box", label: "Доставка" },
-  { href: "#calculator", label: "Калькулятор" },
-  { href: "#contact", label: "Контакты" },
-];
+const NAV: NavItem[] = SOPRANOS_NAV.map((n) => ({
+  href: n.href,
+  label: n.label,
+  mega: n.label === "Corporate" ? "corporate" : n.label === "Social" ? "social" : undefined,
+})) as NavItem[];
 
 /**
  * The header theme is set per-section via `data-header-theme` attributes
@@ -183,12 +180,21 @@ export function SiteHeader() {
             scrolled ? "py-3" : "py-5"
           }`}
         >
-          {/* Logo — stylish minimal «Interfood.» */}
+          {/* Sopranos logo — white variant on dark/transparent, black on light */}
           <a
             href="#main-content"
-            className={`min-h-[44px] flex items-center font-display text-xl tracking-tight transition-colors duration-300 md:text-2xl hover-underline ${themeClasses.text}`}
+            className={`min-h-[44px] flex items-center transition-opacity duration-300 hover:opacity-80 ${themeClasses.text}`}
+            aria-label="Soprano's Catering — Home"
           >
-            Interfood<span className="text-gold">.</span>
+            <Image
+              src={theme === "light" ? SOPRANOS_ASSETS.logoBlack : SOPRANOS_ASSETS.logoWhite}
+              alt="Soprano's Catering"
+              width={160}
+              height={48}
+              priority
+              className="h-9 w-auto md:h-11"
+              style={{ width: "auto", height: "2.25rem" }}
+            />
           </a>
 
           {/* Desktop Navigation with mega-menus */}
@@ -208,40 +214,29 @@ export function SiteHeader() {
             )}
           </nav>
 
-          {/* Right side actions — Ridgewells micro-label CTAs + gradient primary.
-              Ridgewells uses wide-tracked uppercase text links (INQUIRE/ORDER)
-              at 11-13px, ls 2-2.5px, no button container. We mirror with
-              "ЗАКАЗАТЬ" (→ #contact) as a text micro-label, keeping the
-              gradient "Рассчитать" as the primary CTA. */}
+          {/* Right side actions — Sopranos phone + Reserve CTA + Check Your Date */}
           <div className="flex items-center gap-4 md:gap-5">
             <a
               href={CONTACTS.phoneHref}
-              className={`min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 text-sm font-medium transition-colors hover:text-gold md:gap-2 ${themeClasses.text} opacity-80 hover:opacity-100`}
-              aria-label="Позвонить"
+              className={`min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 transition-colors hover:text-gold md:gap-2 ${themeClasses.text} opacity-85 hover:opacity-100`}
+              aria-label={`Call ${CONTACTS.phone}`}
             >
               <Phone className="size-5 shrink-0" />
-              <span className="hidden md:inline">{CONTACTS.phone}</span>
+              <span className="hidden md:inline font-display text-sm font-medium uppercase tracking-wide">{CONTACTS.phone}</span>
             </a>
-            {/* Ridgewells micro-label CTA — wide-tracked uppercase text link */}
+            {/* Sopranos primary CTA — "Check Your Date" gold pill */}
             <a
               href="#contact"
-              className={`hidden xl:inline-flex min-h-[44px] items-center eyebrow-wide ${themeClasses.text} opacity-75 transition-opacity duration-300 hover:opacity-100 hover-underline`}
-              style={{ fontSize: "0.72rem" }}
+              className="group min-h-[44px] inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-2.5 font-display text-xs font-semibold uppercase tracking-wider text-white shadow-md shadow-gold/20 transition-all duration-300 hover:shadow-lg hover:shadow-gold/30 hover:-translate-y-0.5 sm:px-6 sm:text-sm"
             >
-              Заказать
-            </a>
-            <a
-              href="#calculator"
-              className="group min-h-[44px] inline-flex items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-md shadow-gold/20 transition-all duration-300 hover:shadow-lg hover:shadow-gold/30 hover:-translate-y-0.5 sm:px-6 sm:text-sm"
-            >
-              <span className="hidden sm:inline">Рассчитать</span>
-              <span className="sm:hidden">Расчёт</span>
+              <Calendar className="size-4 shrink-0" />
+              <span>Check Your Date</span>
             </a>
             <button
               ref={triggerRef}
               onClick={() => setOpen(true)}
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors duration-300 lg:hidden ${themeClasses.text}`}
-              aria-label={open ? "Закрыть меню" : "Открыть меню"}
+              aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open ? "true" : "false"}
               aria-controls="mobile-menu"
             >
@@ -267,14 +262,19 @@ export function SiteHeader() {
             onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); if (e.key === "Tab") { const menu = e.currentTarget; const focusable = menu.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])'); if (focusable.length === 0) return; const first = focusable[0]; const last = focusable[focusable.length - 1]; if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } } }}
           >
             <div className="flex items-center justify-between">
-              <span className="font-display text-2xl text-ink">
-                Interfood<span className="text-gold">.</span>
-              </span>
+              <Image
+                src={SOPRANOS_ASSETS.logoBlack}
+                alt="Soprano's Catering"
+                width={180}
+                height={54}
+                className="h-12 w-auto"
+                style={{ width: "auto", height: "3rem" }}
+              />
               <button
                 ref={closeBtnRef}
                 onClick={() => setOpen(false)}
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 text-ink"
-                aria-label="Закрыть меню"
+                aria-label="Close menu"
                 aria-expanded={open ? "true" : "false"}
                 aria-controls="mobile-menu"
               >
@@ -308,28 +308,28 @@ export function SiteHeader() {
                 {CONTACTS.phone}
               </a>
               <a
-                href={CONTACTS.whatsappHref}
+                href={`mailto:${CONTACTS.email}`}
                 className="flex min-h-[44px] items-center gap-3 py-2 text-sm text-ink/70 hover:text-gold transition-colors"
               >
-                <MessageCircle className="size-4" />
-                WhatsApp: {CONTACTS.whatsapp}
+                <Mail className="size-4" />
+                {CONTACTS.email}
               </a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Mobile FABs — phone (bottom) + calculate (above) */}
+      {/* Mobile FABs — phone (bottom) + Check Your Date (above) */}
       <a
-        href="#calculator"
-        aria-label="Рассчитать стоимость"
+        href="#contact"
+        aria-label="Check Your Date"
         className="fixed bottom-60 right-6 z-[70] flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-lg shadow-gold/30 transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
       >
-        <Calculator className="size-6" />
+        <Calendar className="size-6" />
       </a>
       <a
         href={CONTACTS.phoneHref}
-        aria-label="Позвонить"
+        aria-label="Call Soprano's Catering"
         className="fixed bottom-44 right-6 z-[70] flex size-14 items-center justify-center rounded-full border-2 border-gold/40 bg-white/90 text-gold shadow-lg shadow-gold/20 backdrop-blur-sm transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
       >
         <Phone className="size-6" />
@@ -339,10 +339,9 @@ export function SiteHeader() {
 }
 
 /**
- * MegaMenu — hover/focus dropdown for nav items with sub-content.
- * Opens on mouseenter/focus, closes on mouseleave/blur (150ms delay to allow
- * diagonal mouse travel). Keyboard: Enter/Space toggles, Esc closes.
- * Clicking a sub-item dispatches the matching CustomEvent and scrolls.
+ * MegaMenu — Sopranos Catering dropdowns for Corporate and Social nav items.
+ * Opens on mouseenter/focus, closes on mouseleave/blur (150ms delay).
+ * Uses SOPRANOS_NAV mega items + featured photo card per Sopranos design.
  */
 function MegaMenu({ item }: { item: NavItem }) {
   const [open, setOpen] = useState(false);
@@ -373,19 +372,25 @@ function MegaMenu({ item }: { item: NavItem }) {
 
   const go = (href: string) => {
     document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const selectMenu = (id: string) => {
-    window.dispatchEvent(new CustomEvent("catering:menu-select", { detail: id }));
-    go("#menu");
     setOpen(false);
   };
 
-  const selectService = (index: number) => {
-    window.dispatchEvent(new CustomEvent("catering:service-open", { detail: index }));
-    go("#services");
-    setOpen(false);
-  };
+  // Pull the Sopranos nav mega items for this label
+  const navEntry = SOPRANOS_NAV.find((n) => n.label === item.label) as
+    | (typeof SOPRANOS_NAV)[number]
+    | undefined;
+  const megaItems =
+    navEntry && "mega" in navEntry && navEntry.mega ? navEntry.mega.items : [];
+  const megaTitle =
+    navEntry && "mega" in navEntry && navEntry.mega ? navEntry.mega.title : item.label;
+
+  const featuredImage =
+    item.mega === "corporate"
+      ? "/media/concorde-boardroom.webp"
+      : "/media/event-11.jpg";
+  const featuredEyebrow = item.mega === "corporate" ? "Corporate Catering" : "Social Events";
+  const featuredTitle = item.mega === "corporate" ? "Office lunches & meetings" : "Celebrate every moment";
+  const featuredCta = "View all options →";
 
   return (
     <div
@@ -394,7 +399,6 @@ function MegaMenu({ item }: { item: NavItem }) {
       onMouseLeave={closeSoon}
       onFocus={openNow}
       onBlur={(e) => {
-        // Close only when focus leaves the whole dropdown subtree.
         if (!e.currentTarget.contains(e.relatedTarget as Node)) closeSoon();
       }}
     >
@@ -404,7 +408,7 @@ function MegaMenu({ item }: { item: NavItem }) {
         aria-expanded={open ? "true" : "false"}
         onKeyDown={onTriggerKey}
         onClick={() => go(item.href)}
-        className="group flex min-h-[44px] items-center gap-1 text-sm font-medium opacity-70 transition-opacity duration-300 hover:opacity-100"
+        className="group flex min-h-[44px] items-center gap-1 font-display text-sm font-medium uppercase tracking-wide opacity-80 transition-opacity duration-300 hover:opacity-100"
       >
         {item.label}
         <ChevronDown
@@ -424,114 +428,57 @@ function MegaMenu({ item }: { item: NavItem }) {
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
           >
-            {item.mega === "menu" ? (
-              <div className="grid grid-cols-[1fr_1fr] gap-0">
-                <div className="p-4">
-                  <p className="px-2 pb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-                    Типы меню
-                  </p>
-                  <ul className="grid grid-cols-1 gap-0.5">
-                    {MENU_TYPES.map((m) => (
-                      <li key={m.id}>
-                        <button
-                          type="button"
-                          role="menuitem"
-                          onClick={() => selectMenu(m.id)}
-                          className="group flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition-colors hover:bg-gold/8"
-                        >
-                          <span className="text-sm font-medium text-ink/80 group-hover:text-gold">
-                            {m.label}
-                          </span>
-                          <span className="font-mono text-[11px] text-ink/70">
-                            от {m.perGuest.toLocaleString("ru-RU")} ₽
-                            {m.priceUnit ?? "/чел"}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                {/* Featured card */}
-                <a
-                  href="#menu"
-                  role="menuitem"
-                  onClick={() => setOpen(false)}
-                  className="group relative block overflow-hidden rounded-l-2xl"
-                >
-                  <img
-                    src="/media/concorde-boardroom.webp"
-                    alt=""
-                    aria-hidden="true"
-                    className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
-                  <div className="relative flex h-full min-h-[16rem] flex-col justify-end p-5">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-                      Сезон {new Date().getFullYear()}
-                    </span>
-                    <p className="mt-2 font-display text-xl text-white">
-                      Свадебное банкетное меню
-                    </p>
-                    <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-cream/90 transition-colors group-hover:text-gold">
-                      Смотреть меню →
-                    </span>
-                  </div>
-                </a>
+            <div className="grid grid-cols-[1fr_1fr] gap-0">
+              <div className="p-4">
+                <p className="px-2 pb-2 font-display text-[10px] uppercase tracking-[0.3em] text-gold">
+                  {megaTitle}
+                </p>
+                <ul className="grid grid-cols-1 gap-0.5">
+                  {megaItems.map((m, idx) => (
+                    <li key={`${m.label}-${idx}`}>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => go(m.href)}
+                        className="group flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition-colors hover:bg-gold/8"
+                      >
+                        <span className="text-sm font-medium text-ink/80 group-hover:text-gold">
+                          {m.label}
+                        </span>
+                        <ChevronDown className="size-3 -rotate-90 text-ink/30 group-hover:text-gold transition-colors" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            ) : (
-              <div className="grid grid-cols-[1fr_1fr] gap-0">
-                <div className="p-4">
-                  <p className="px-2 pb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-                    Услуги под ключ
+              {/* Featured card */}
+              <a
+                href={item.href}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+                className="group relative block overflow-hidden rounded-l-2xl"
+              >
+                <img
+                  src={featuredImage}
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
+                <div className="relative flex h-full min-h-[16rem] flex-col justify-end p-5">
+                  <span className="font-display text-[10px] uppercase tracking-[0.3em] text-gold">
+                    {featuredEyebrow}
+                  </span>
+                  <p className="mt-2 font-display text-xl text-white">
+                    {featuredTitle}
                   </p>
-                  <ul className="grid grid-cols-1 gap-0.5">
-                    {SERVICES.map((s, i) => (
-                      <li key={s.title}>
-                        <button
-                          type="button"
-                          role="menuitem"
-                          onClick={() => selectService(i)}
-                          className="group flex w-full flex-col items-start rounded-lg px-2 py-2 text-left transition-colors hover:bg-gold/8"
-                        >
-                          <span className="text-sm font-medium text-ink/80 group-hover:text-gold">
-                            {s.title}
-                          </span>
-                          <span className="text-[11px] text-ink/70">{s.short}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-cream/90 transition-colors group-hover:text-gold">
+                    {featuredCta}
+                  </span>
                 </div>
-                {/* Featured card */}
-                <a
-                  href="#services"
-                  role="menuitem"
-                  onClick={() => setOpen(false)}
-                  className="group relative block overflow-hidden rounded-l-2xl"
-                >
-                  <img
-                    src="/media/concept-crew.jpg"
-                    alt=""
-                    aria-hidden="true"
-                    className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
-                  <div className="relative flex h-full min-h-[16rem] flex-col justify-end p-5">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-                      Open kitchen
-                    </span>
-                    <p className="mt-2 font-display text-xl text-white">
-                      Выездной ресторан с шефом
-                    </p>
-                    <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-cream/90 transition-colors group-hover:text-gold">
-                      Все услуги →
-                    </span>
-                  </div>
-                </a>
-              </div>
-            )}
+              </a>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

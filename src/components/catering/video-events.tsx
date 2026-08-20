@@ -9,7 +9,7 @@ import { Reveal } from "./reveal";
 /**
  * VideoEvents — LIGHT THEME
  *
- * Видео-секция мероприятий. Phase 6 architecture (no Mux):
+ * Video section for events. Phase 6 architecture (no Mux):
  * 1. Direct external MP4 URL — preferred (RULES §3 — no .mp4 in /public,
  *    always stream from CDN). Uses native <video> via DirectVideoEmbed.
  *    Set `videoSrc` in VIDEO_CATALOG to enable. Sources: Pexels videos CDN,
@@ -19,9 +19,9 @@ import { Reveal } from "./reveal";
  *    stub message telling user to migrate to videoSrc. Kept for backward
  *    compat with any existing data.
  * 3. YouTube embed — legacy fallback when no direct MP4 URL set.
- * 4. Poster-only with play button — lazy-load pattern: пользователь видит
- *    постер до клика, видео подгружается по клику. Сохраняет пропускную
- *    способность (4× iframe initial load saved).
+ * 4. Poster-only with play button — lazy-load pattern: user sees a
+ *    poster until click, video loads on click. Saves bandwidth
+ *    (4× iframe initial load saved).
  *
  * P1 patterns (REFERENCE-SITES-ANALYSIS.md §653 Lazy Loading + §1261 Swiper):
  *  - Lazy-load videos on click: posters only until interaction
@@ -50,9 +50,9 @@ type VideoItem = {
 
 const VIDEO_CATALOG: VideoItem[] = [
   {
-    title: "Свадебный банкет",
-    desc: "Подача блюд, сервировка, атмосфера торжества",
-    source: "Роскошный кейтеринг",
+    title: "Wedding Reception",
+    desc: "Course plating, table service, and the atmosphere of celebration",
+    source: "Luxury Wedding Catering",
     poster: "/media/ridgewells-wedding.webp",
     // Real catering video from Wolfgang Puck Catering (HubSpot CDN, CORS-enabled).
     // "Power Of Food" hero loop, silent, 16MB MP4. Same URL as MEDIA.hero.videoSrc
@@ -62,16 +62,16 @@ const VIDEO_CATALOG: VideoItem[] = [
     // (Times are estimates since the video is silent — actual chapters may
     //  need adjustment once video is played. Click chapter to seek.)
     chapters: [
-      { label: "Пролог", time: 0 },
-      { label: "Подача", time: 4 },
-      { label: "Сервировка", time: 8 },
-      { label: "Гости", time: 12 },
+      { label: "Prologue", time: 0 },
+      { label: "Plating", time: 4 },
+      { label: "Service", time: 8 },
+      { label: "Guests", time: 12 },
     ],
   },
   {
-    title: "Выездное барбекю",
-    desc: "Гриль на свежем воздухе, скандинавский стиль",
-    source: "Выездной гриль-кейтеринг",
+    title: "Outdoor BBQ",
+    desc: "Live-fire grilling, Scandinavian style",
+    source: "On-site Grill Catering",
     poster: "/media/event-08.jpg",
     // Real catering video from GG Catering (Vimeo embed).
     // iframe-based — uses YouTubeEmbed-style pattern but for Vimeo.
@@ -80,18 +80,18 @@ const VIDEO_CATALOG: VideoItem[] = [
     youtubeEmbedId: undefined, // Vimeo video ID — YouTubeEmbed auto-detects Vimeo
   },
   {
-    title: "Кофе-брейк на конференции",
-    desc: "Корпоративное обслуживание, деловые мероприятия",
-    source: "Корпоративный кофе-брейк",
+    title: "Conference Coffee Break",
+    desc: "Corporate service, business events",
+    source: "Corporate Coffee Break",
     poster: "/media/concorde-avo-toast.jpg",
     // Real catering video from Cut and Taste Las Vegas (Vimeo embed).
     // iframe-based — Vimeo video ID 692388530.
     youtubeEmbedId: undefined, // Vimeo video ID — YouTubeEmbed auto-detects Vimeo
   },
   {
-    title: "Фуршет на банкете",
-    desc: "Канапе, брускетты, подача официантами",
-    source: "Обслуживание фуршета",
+    title: "Banquet Reception",
+    desc: "Canapés, bruschetta, table-side service",
+    source: "Reception Service",
     poster: "/media/concorde-dessert.jpg",
     // Real catering video from Elegant Affairs NY (direct MP4 URL).
     // WordPress wp-content uploads — 533KB MP4, no CORS but <video> element
@@ -99,10 +99,10 @@ const VIDEO_CATALOG: VideoItem[] = [
     videoSrc: undefined,
     // Phase 10 chapters — short clip (~8s based on file size 533KB at typical bitrate).
     chapters: [
-      { label: "Открытие", time: 0 },
-      { label: "Панорама", time: 2 },
-      { label: "Детали", time: 4 },
-      { label: "Финал", time: 6 },
+      { label: "Opening", time: 0 },
+      { label: "Pan", time: 2 },
+      { label: "Details", time: 4 },
+      { label: "Finale", time: 6 },
     ],
   },
 ];
@@ -124,7 +124,7 @@ export function VideoEvents() {
             <Reveal>
               <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
                 <Play className="size-3" />
-                Видео
+                Video
               </span>
             </Reveal>
             <Reveal delay={0.1}>
@@ -132,15 +132,15 @@ export function VideoEvents() {
                 className="mt-5 font-display text-ink"
                 style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.05 }}
               >
-                Как это выглядит{" "}
+                How it looks{" "}
                 <br className="hidden sm:block" />
-                <span className="gradient-text italic">в движении</span>
+                <span className="gradient-text italic">in motion</span>
               </h2>
             </Reveal>
           </div>
           <Reveal delay={0.2}>
             <p className="max-w-xs text-base font-display italic text-ink/70">
-              Видео наших мероприятий — подача блюд, сервировка, атмосфера.
+              Videos from our events — course plating, table service, atmosphere.
             </p>
           </Reveal>
         </div>
@@ -156,7 +156,7 @@ export function VideoEvents() {
 
         <Reveal delay={0.3}>
           <p className="mt-8 text-center font-mono text-xs text-ink/70">
-            Кликните на превью, чтобы воспроизвести видео
+            Click any thumbnail to play the video
           </p>
         </Reveal>
       </div>
@@ -215,7 +215,7 @@ function VideoCard({
               key="poster"
               type="button"
               onClick={handlePlay}
-              aria-label={`Воспроизвести: ${title}`}
+              aria-label={`Play: ${title}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -289,7 +289,7 @@ function VideoCard({
             >
               <Loader2 className="size-8 animate-spin text-gold" />
               <span className="ml-3 font-mono text-xs uppercase tracking-wider text-cream/70">
-                Загрузка…
+                Loading…
               </span>
             </motion.div>
           )}
@@ -316,7 +316,7 @@ function VideoCard({
                 <YouTubeEmbed embedId={youtubeEmbedId} title={title} />
               ) : (
                 <div className="flex h-full items-center justify-center text-cream/60 text-sm">
-                  Нет источника видео
+                  No video source available
                 </div>
               )}
             </motion.div>
@@ -337,7 +337,7 @@ function VideoCard({
           <button
             type="button"
             onClick={handlePlay}
-            aria-label={`Воспроизвести: ${title}`}
+            aria-label={`Play: ${title}`}
             className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold transition-colors hover:bg-gold/25 min-h-[44px] min-w-[44px]"
           >
             <Play className="size-5 ml-0.5" />
@@ -554,7 +554,7 @@ function CinemaVideoEmbed({
                 key={`tick-${i}`}
                 type="button"
                 onClick={() => seekTo(ch.time)}
-                aria-label={`Глава ${i + 1}: ${ch.label}`}
+                aria-label={`Chapter ${i + 1}: ${ch.label}`}
                 className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full border-2 border-cream bg-gold/60 transition-all hover:scale-125 hover:bg-gold"
                 style={{ left: `calc(${(ch.time / duration) * 100}% - 5px)` }}
               />

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Oswald, Karla, Great_Vibes, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { LenisProvider } from "@/components/catering/lenis-provider";
@@ -12,14 +12,28 @@ import { ChapterNav } from "@/components/catering/chapter-nav";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 
-const geistSans = Geist({
-  variable: "--font-sans",
-  subsets: ["latin", "cyrillic"],
+// Sopranos Catering typography — Oswald (display/condensed uppercase),
+// Karla (body, humanist sans), Great Vibes (script accent for "Welcome to").
+// All loaded via next/font/google — self-hosted at runtime, no external requests.
+const oswald = Oswald({
+  variable: "--font-display",
+  subsets: ["latin", "latin-ext"],
+  weight: ["200", "300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-mono",
+const karla = Karla({
+  variable: "--font-sans",
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
+const greatVibes = Great_Vibes({
+  variable: "--font-script",
   subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
 });
 
 const playfair = Playfair_Display({
@@ -41,37 +55,39 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   title: {
-    default: "Interfood Catering — Кейтеринг в Санкт-Петербурге от 2450₽/чел",
-    template: "%s | Interfood Catering",
+    default: "Soprano's Catering — Premier Catering Service for Southeast Michigan",
+    template: "%s | Soprano's Catering",
   },
   description:
-    "«Еда как искусство» — выездной кейтеринг полного цикла в СПб. Фуршет, банкет, кофе-брейк, барбекю от 2450₽/чел. Рассчитайте стоимость онлайн за 30 секунд.",
+    "Soprano's caters to all of Southeast Michigan for weddings, corporate events, and social events large and small. From hand-picking our own produce at Eastern Market to making our own salad dressing — Soprano's does everything the old world way.",
   keywords: [
-    "кейтеринг",
-    "кейтеринг СПб",
-    "кейтеринг Санкт-Петербург",
-    "фуршет",
-    "банкет",
-    "выездной ресторан",
-    "Interfood",
-    "nilov catering",
+    "catering",
+    "Michigan catering",
+    "Southeast Michigan catering",
+    "wedding catering Michigan",
+    "corporate catering Detroit",
+    "Clinton Township catering",
+    "Soprano's Catering",
+    "Eastern Market",
+    "party trays",
+    "drop off catering",
   ],
-  authors: [{ name: "Interfood Catering" }],
-  alternates: { canonical: "/", languages: { "ru-RU": "/", "x-default": "/" } },
+  authors: [{ name: "Soprano's Catering" }],
+  alternates: { canonical: "/", languages: { "en-US": "/", "x-default": "/" } },
   openGraph: {
-    title: "Interfood Catering — Кейтеринг в Санкт-Петербурге",
+    title: "Soprano's Catering — Premier Catering Service for Southeast Michigan",
     description:
-      "Выездной кейтеринг полного цикла. Видео, фото, интерактивный калькулятор стоимости.",
+      "From hand-picking our own produce directly from Eastern Market, to making our own salad dressing, Soprano's does everything the old world way. Weddings, corporate events, social events.",
     type: "website",
-    locale: "ru_RU",
+    locale: "en_US",
     url: siteUrl,
-    siteName: "Interfood Catering",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Interfood Catering — банкет в Санкт-Петербурге" }],
+    siteName: "Soprano's Catering",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Soprano's Catering — Michigan premier catering service" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Interfood Catering — Кейтеринг в Санкт-Петербурге",
-    description: "Выездной кейтеринг полного цикла. Рассчитайте стоимость онлайн.",
+    title: "Soprano's Catering — Premier Catering Service for Southeast Michigan",
+    description: "From hand-picking our own produce at Eastern Market to making our own salad dressing — Soprano's does everything the old world way.",
     images: ["/og-image.jpg"],
   },
   manifest: "/manifest.json",
@@ -90,74 +106,66 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fcfbf8" },
-    { media: "(prefers-color-scheme: dark)", color: "#101010" },
+    { media: "(prefers-color-scheme: light)", color: "#F9FAFB" },
+    { media: "(prefers-color-scheme: dark)", color: "#1F2937" },
   ],
 };
 
-/** JSON-LD structured data for Yandex/Google (LocalBusiness + Restaurant) */
+/** JSON-LD structured data for Google (LocalBusiness + CateringService) */
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "CateringService",
   "@id": siteUrl + "#organization",
-  name: "Interfood Catering",
-  alternateName: "NILOV CATERING",
-  description: "«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Фуршет, банкет, кофе-брейк, барбекю от 2450₽/чел.",
+  name: "Soprano's Catering",
+  alternateName: "Sopranos Catering",
+  description: "Premier catering service for Southeast Michigan. From hand-picking our own produce directly from Eastern Market, to making our own salad dressing, Soprano's does everything the old world way.",
   url: siteUrl,
   image: siteUrl + "/og-image.jpg",
   logo: siteUrl + "/logo.svg",
   telephone: CONTACTS.phone,
   email: CONTACTS.email,
-  priceRange: "₽₽₽",
-  currenciesAccepted: "RUB",
-  paymentAccepted: "Наличные, Безналичный расчёт, Банковский перевод",
+  priceRange: "$$$",
+  currenciesAccepted: "USD",
+  paymentAccepted: "Cash, Credit Card, Check",
   sameAs: [
-    "https://www.instagram.com/nilov_catering",
-    "https://wa.me/79119417205",
-    "https://vk.com/nilovcatering",
-    "https://t.me/+79119417205",
+    "https://www.instagram.com/sopranoscatering",
+    "https://www.facebook.com/sopranoscatering",
   ],
   address: {
     "@type": "PostalAddress",
-    addressCountry: "RU",
-    addressRegion: "Санкт-Петербург",
-    addressLocality: "Санкт-Петербург",
-    postalCode: "197198",
-    streetAddress: "ул. Большая Морская, д. 18, офис 33",
+    addressCountry: "US",
+    addressRegion: "MI",
+    addressLocality: "Clinton Township",
+    postalCode: "48038",
+    streetAddress: "17600 Clinton River Road",
   },
-  geo: { "@type": "GeoCoordinates", latitude: 59.939495, longitude: 30.315785 },
+  geo: { "@type": "GeoCoordinates", latitude: 42.5867, longitude: -82.8821 },
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-      opens: "09:00", closes: "19:00",
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: "Saturday",
-      opens: "10:00", closes: "16:00",
+      opens: "09:00", closes: "18:00",
     },
   ],
-  founder: { "@type": "Person", name: "Нилов Дмитрий Игоревич" },
-  foundingDate: "2014-04-14",
-  areaServed: { "@type": "City", name: "Санкт-Петербург" },
+  areaServed: { "@type": "State", name: "Michigan" },
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Preconnect hints for external domains */}
         <link rel="preconnect" href="https://www.instagram.com" />
-        <link rel="preconnect" href="https://yandex.ru" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased bg-background text-foreground`}
+        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} antialiased bg-background text-foreground`}
       >
         <a href="#main-content" className="skip-link">
-          Перейти к содержанию
+          Skip to content
         </a>
         <script
           type="application/ld+json"
@@ -175,9 +183,9 @@ export default function RootLayout({
         <Toaster />
         <noscript>
           <div style={{ padding: '2rem', fontFamily: 'sans-serif', textAlign: 'center' }}>
-            <h1>Interfood.</h1>
-            <p>Для работы сайта необходимо включить JavaScript.</p>
-            <p style={{ marginTop: '1rem' }}>Позвоните: <a href="tel:+78129195911">+7 (812) 919-59-11</a></p>
+            <h1>Soprano's Catering.</h1>
+            <p>This site requires JavaScript to be enabled.</p>
+            <p style={{ marginTop: '1rem' }}>Call us: <a href="tel:+18009322837">1 (800) WE-CATER</a></p>
           </div>
         </noscript>
       </body>

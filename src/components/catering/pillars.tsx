@@ -18,7 +18,7 @@ import { Reveal } from "./reveal";
 /**
  * Pillars — dual brand-pillar content section (Salt Block pattern:
  * "CHEF CRAFTED" / "FARM FRESH"). Adapted to:
- *   «ШЕФ-КРАФТ»  vs  «ВЫЕЗД-СЕРВИС».
+ *   «CHEF CRAFT»  vs  «FIELD SERVICE».
  *
  * Two equal cards contrasting the two halves of the value proposition:
  * the craft of the kitchen vs. the logistics of field service.
@@ -35,28 +35,28 @@ import { Reveal } from "./reveal";
 const PILLARS = [
   {
     icon: ChefHat,
-    eyebrow: "Кухня",
-    title: "Шеф-крафт",
-    desc: "Сезонные продукты с фермерских хозяйств, авторские рецепты, ручная сборка каждого блюда. Открытая кухня на мероприятии — гости видят процесс.",
-    points: ["Сезонное меню", "Фермерские продукты", "Открытая кухня", "Авторская подача"],
+    eyebrow: "Kitchen",
+    title: "Chef Craft",
+    desc: "Hand-picked seasonal produce from Eastern Market, time-honored family recipes, every dish assembled by hand. An open kitchen on site — guests see the craft unfold.",
+    points: ["Seasonal menu", "Eastern Market produce", "Open kitchen", "Handcrafted plating"],
     accent: "from-gold/15 to-terracotta/10",
     image: "/media/concorde-boardroom.webp",
     stats: [
-      { value: 16, suffix: "", label: "шеф-поваров" },
-      { value: 2400, suffix: "+", label: "событий" },
+      { value: 16, suffix: "", label: "executive chefs" },
+      { value: 10000, suffix: "+", label: "events" },
     ],
   },
   {
     icon: Truck,
-    eyebrow: "Сервис",
-    title: "Выезд-сервис",
-    desc: "Полная логистика под ключ: мебель, посуда, текстиль, техника, доставка и монтаж. Команда официантов и сомелье — на месте с утра до последнего гостя.",
-    points: ["Мебель и текстиль", "Фарфор и стекло", "Доставка и монтаж", "Официанты и сомелье"],
+    eyebrow: "Service",
+    title: "Field Service",
+    desc: "Full-service logistics: tables, china, glassware, linens, equipment, delivery, and setup. Our team of servers and sommeliers is on site from morning until the last guest leaves.",
+    points: ["Tables & linens", "China & glassware", "Delivery & setup", "Servers & sommeliers"],
     accent: "from-sage/15 to-gold/10",
     image: "/media/concorde-handhelds.jpg",
     stats: [
-      { value: 12, suffix: "", label: "кейтеринг-машин" },
-      { value: 50000, suffix: "+", label: "гостей" },
+      { value: 12, suffix: "", label: "catering trucks" },
+      { value: 500000, suffix: "+", label: "guests" },
     ],
   },
 ];
@@ -94,10 +94,10 @@ function CountUp({
   const [inViewFallback, setInViewFallback] = useState(false);
   const effectiveInView = inView || inViewFallback;
 
-  // ru-RU thousand separator (space) for big numbers like 50 000.
+  // en-US thousand separator (comma) for big numbers like 50,000.
   const formatted = useTransform(mv, (latest) => {
     const rounded = Math.round(latest);
-    return `${rounded.toLocaleString("ru-RU")}${suffix}`;
+    return `${rounded.toLocaleString("en-US")}${suffix}`;
   });
 
   // Manual IntersectionObserver fallback (handles SSR / hydration edge cases).
@@ -273,7 +273,7 @@ function PinnedScrollStack({
                     {p.stats.map((stat: StatDef) => (
                       <div key={stat.label} className="flex flex-col">
                         <span className="font-display text-3xl leading-none text-cream md:text-4xl tabular-nums">
-                          {stat.value.toLocaleString("ru-RU")}
+                          {stat.value.toLocaleString("en-US")}
                           {stat.suffix}
                         </span>
                         <span className="mt-1 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/55">
@@ -343,7 +343,7 @@ function ProgressDot({
       ref={ref}
       type="button"
       className="group flex items-center gap-2 min-h-[44px] min-w-[44px] px-2 py-2"
-      aria-label={`Показать «${label}»`}
+      aria-label={`Show “${label}”`}
       onClick={() => {
         // Scroll to this pillar's position in the pinned section
         const section = document.querySelector('[data-pillars-pinned="true"]');
@@ -417,7 +417,7 @@ export function Pillars() {
   return (
     <section
       ref={sectionRef}
-      aria-label="Наши принципы"
+      aria-label="Our principles"
       data-header-theme="light"
       className="section-light relative overflow-hidden bg-white py-24 md:py-32"
     >
@@ -427,7 +427,7 @@ export function Pillars() {
           <Reveal>
             <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
               <span className="size-1.5 rounded-full bg-gold animate-pulse" />
-              Два начала
+              Two Foundations
             </span>
           </Reveal>
           <Reveal delay={0.1}>
@@ -435,14 +435,14 @@ export function Pillars() {
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.05 }}
             >
-              Кухня и сервис —{" "}
-              <span className="gradient-text italic">одно целое</span>
+              Kitchen and service —{" "}
+              <span className="gradient-text italic">one whole</span>
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mt-5 text-base leading-relaxed text-ink/70">
-              Идеальный праздник рождается, когда безупречная еда встречает
-              безупречную подачу. Мы отвечаем за обе половины.
+              The perfect event happens when flawless food meets flawless
+              service. We own both halves of that promise.
             </p>
           </Reveal>
         </div>
@@ -532,7 +532,7 @@ export function Pillars() {
                           href="#services"
                           className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-ink transition-colors duration-300 hover:text-gold"
                         >
-                          Узнать больше
+                          Learn More
                           <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
                         </a>
                       </div>

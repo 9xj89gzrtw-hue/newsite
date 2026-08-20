@@ -20,7 +20,7 @@ export function InstagramVideo() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
-  // Load Instagram embed script ONLY after cookie consent (152-ФЗ)
+  // Load Instagram embed script ONLY after cookie consent (GDPR-compliant)
   useEffect(() => {
     if (typeof window === "undefined") return;
     const consent = localStorage.getItem("catering-cookie-consent");
@@ -54,7 +54,7 @@ export function InstagramVideo() {
       const iframes = containerRef.current?.querySelectorAll('iframe');
       iframes?.forEach((iframe) => {
         if (!iframe.getAttribute('title')) {
-          iframe.setAttribute('title', 'Instagram видео от Interfood Catering');
+          iframe.setAttribute('title', 'Instagram video by Soprano\'s Catering');
         }
         if (!iframe.getAttribute('sandbox')) {
           iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-popups');
@@ -87,7 +87,7 @@ export function InstagramVideo() {
             <Reveal>
               <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
                 <Instagram className="size-3" />
-                В реальном времени
+                Real Time
               </span>
             </Reveal>
             <Reveal delay={0.1}>
@@ -95,17 +95,17 @@ export function InstagramVideo() {
                 className="mt-5 font-display text-ink"
                 style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.1 }}
               >
-                <span className="inline-block">Живём на кухне,</span>{" "}
-                <span className="gradient-text inline-block italic">снимаем</span>
+                <span className="inline-block">Living in the kitchen,</span>{" "}
+                <span className="gradient-text inline-block italic">filming</span>
                 {" "}
-                <span className="inline-block">в Instagram</span>
+                <span className="inline-block">on Instagram</span>
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
               <p className="mt-5 max-w-md text-base leading-relaxed text-ink/70 font-display italic">
-                Свежие события, процессы на кухне, новые блюда и закулисье
-                мероприятий — в нашем Instagram. Подписывайтесь, чтобы не
-                пропустить сезонные меню и акции.
+                Fresh events, kitchen action, new dishes, and the behind-the-scenes
+                of our events — all on our Instagram. Follow us for seasonal menus
+                and special offers.
               </p>
             </Reveal>
             <Reveal delay={0.3}>
@@ -113,8 +113,8 @@ export function InstagramVideo() {
                 href={INSTAGRAM.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Instagram ${INSTAGRAM.handle} (откроется в новой вкладке)`}
-                data-cursor="подписка"
+                aria-label={`Instagram ${INSTAGRAM.handle} (opens in new tab)`}
+                data-cursor="follow"
                 className="group mt-8 inline-flex items-center gap-3 rounded-full border-2 border-gold/40 bg-gradient-to-r from-gold/10 to-transparent px-6 py-3.5 text-sm font-semibold text-gold transition-all hover:border-gold hover:bg-gradient-to-r hover:from-gold hover:to-terracotta hover:text-white hover:shadow-lg hover:-translate-y-0.5"
               >
                 <Instagram className="size-4" />
@@ -124,9 +124,9 @@ export function InstagramVideo() {
             </Reveal>
             <Reveal delay={0.4}>
               <p className="mt-6 font-mono text-xs text-ink/70">
-                Или напишите нам:{" "}
-                <a href={CONTACTS.whatsappHref} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-terracotta underline underline-offset-2 transition-colors">
-                  WhatsApp {CONTACTS.whatsapp}
+                Or message us:{" "}
+                <a href={`mailto:${CONTACTS.email}`} className="text-gold hover:text-terracotta underline underline-offset-2 transition-colors">
+                  {CONTACTS.email}
                 </a>
               </p>
             </Reveal>
@@ -154,7 +154,7 @@ export function InstagramVideo() {
                       data-instgrm-permalink={reels[activeIdx]}
                       data-instgrm-captioned
                       data-instgrm-version="14"
-                      title={`Instagram видео ${activeIdx + 1} от Interfood Catering (@nilov_catering)`}
+                      title={`Instagram video ${activeIdx + 1} by Soprano's Catering (${INSTAGRAM.handle})`}
                       style={{
                         background: "#FAF8F5",
                         border: 0,
@@ -175,7 +175,7 @@ export function InstagramVideo() {
                             color: "#000",
                           }}
                         >
-                          Загрузить видео из Instagram…
+                          Load Instagram video…
                         </a>
                       </div>
                     </blockquote>
@@ -193,7 +193,7 @@ export function InstagramVideo() {
                         <Play className="size-5 ml-0.5" />
                       </span>
                       <span className="font-mono text-[11px] uppercase tracking-wider">
-                        Наведите для загрузки
+                        Hover to load
                       </span>
                     </div>
                   </div>
@@ -206,7 +206,7 @@ export function InstagramVideo() {
                   <button
                     type="button"
                     onClick={goPrev}
-                    aria-label="Предыдущее видео"
+                    aria-label="Previous video"
                     onMouseEnter={() => setHoveredIdx(activeIdx)}
                     className="absolute top-1/2 -left-3 -translate-y-1/2 z-10 inline-flex size-11 items-center justify-center rounded-full border border-border-line bg-white/90 text-ink shadow-md backdrop-blur transition-all hover:border-gold/40 hover:text-gold hover:scale-110 min-h-[44px] min-w-[44px] md:-left-6"
                   >
@@ -215,7 +215,7 @@ export function InstagramVideo() {
                   <button
                     type="button"
                     onClick={goNext}
-                    aria-label="Следующее видео"
+                    aria-label="Next video"
                     onMouseEnter={() => setHoveredIdx(activeIdx)}
                     className="absolute top-1/2 -right-3 -translate-y-1/2 z-10 inline-flex size-11 items-center justify-center rounded-full border border-border-line bg-white/90 text-ink shadow-md backdrop-blur transition-all hover:border-gold/40 hover:text-gold hover:scale-110 min-h-[44px] min-w-[44px] md:-right-6"
                   >
@@ -233,7 +233,7 @@ export function InstagramVideo() {
                       type="button"
                       onClick={() => setActiveIdx(i)}
                       onMouseEnter={() => setHoveredIdx(i)}
-                      aria-label={`Видео ${i + 1}`}
+                      aria-label={`Video ${i + 1}`}
                       aria-current={activeIdx === i}
                       className={`h-1.5 rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center`}
                     >

@@ -5,7 +5,7 @@ import { Flower2, ArrowRight, Sparkles } from "lucide-react";
 
 /**
  * Promo banner — LIGHT THEME
- * Акция «Флористика в подарок» при заказе свадебного банкета/фуршета.
+ * New Winter Specials — Hearty Buffets from $24/guest.
  */
 export function PromoBanner() {
   const currentYear = new Date().getFullYear();
@@ -24,7 +24,7 @@ export function PromoBanner() {
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.3em] text-white backdrop-blur-sm">
               <Sparkles className="size-3" aria-hidden="true" />
-              <span>Акция · сезон {currentYear}</span>
+              <span>Promo · Winter {currentYear}</span>
             </span>
           </Reveal>
           <div className="flex-1">
@@ -33,24 +33,24 @@ export function PromoBanner() {
                 className="font-display text-white"
                 style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)", lineHeight: 1.1 }}
               >
-                Флористика в подарок{"\u00A0"}при заказе свадьбы
+                New Winter Specials —{"\u00A0"}Hearty Buffets from $24/guest
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
               <p className="mt-3 max-w-2xl text-base text-white/90">
-                При заказе свадебного банкета или фуршета дарим до 4 цветочных
-                композиций в вазах на столы гостей или композицию на стол
-                молодожёнов. Сезон свадебных торжеств уже близко.
+                Slow-braised short ribs, root vegetable mash, winter greens, and crusty bread.
+                Seasonal menus hand-crafted by our chefs — perfect for office gatherings,
+                holiday parties, and winter celebrations.
               </p>
             </Reveal>
           </div>
           <Reveal delay={0.3}>
             <a
-              href="#calculator"
-              data-cursor="считать"
+              href="#winter-specials"
+              data-cursor="view"
               className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold uppercase tracking-wider text-gold shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 hover:scale-[1.02] min-h-[44px]"
             >
-              Рассчитать свадьбу
+              View Specials
               <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </a>
           </Reveal>

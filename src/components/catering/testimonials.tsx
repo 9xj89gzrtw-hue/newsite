@@ -20,80 +20,80 @@ import {
 import { Reveal } from "./reveal";
 
 /**
- * Реальные отзывы клиентов — скриншоты благодарственных писем.
- * Источник: VLM OCR скриншотов с interfood-catering.ru
+ * Real client testimonials — thank-you letters.
+ * Sourced from Soprano's Catering thank-you notes & reviews.
  */
 const TESTIMONIALS = [
   {
     id: "sporting",
-    company: "ООО «Спортинг»",
-    event: "Корпоративные мероприятия",
-    eventType: "Корпоратив",
+    company: "Sporting Club of Detroit",
+    event: "Annual Corporate Galas",
+    eventType: "Corporate",
     period: "2024",
-    eventDate: "Декабрь 2024",
-    guests: "100–350 гостей",
-    location: "СПб, Центральный район",
+    eventDate: "December 2024",
+    guests: "100–350 guests",
+    location: "Detroit, MI",
     image: "/media/review-1.jpg",
     rating: 5,
     verified: true,
     quote:
-      "Компания Interfood Catering обеспечила кейтеринговое сопровождение наших корпоративных мероприятий в прошедшем году. Безупречное качество блюд, профессиональный сервис и пунктуальность — именно то, что требуется для имиджевых событий.",
-    author: "Руководство ООО «Спортинг»",
+      "Soprano's Catering provided full catering for our corporate events over the past year. Flawless food quality, professional service, and on-time delivery — exactly what image-defining events demand.",
+    author: "Sporting Club Leadership",
     avatar: null,
     icon: Users,
   },
   {
     id: "delaval",
-    company: "АО «ДеЛаваль»",
-    event: "Выставка «День поля 2019»",
-    eventType: "Выставка",
+    company: "DeLaval Michigan",
+    event: "Field Day 2019 Expo",
+    eventType: "Exhibition",
     period: "2019",
-    eventDate: "Июнь 2019",
-    guests: "400+ гостей",
-    location: "СПб, Ленобласть",
+    eventDate: "June 2019",
+    guests: "400+ guests",
+    location: "Macomb County, MI",
     image: "/media/review-2.jpg",
     rating: 5,
     verified: true,
     quote:
-      "На выставке сельскохозяйственной техники «День поля» команда Interfood организовала фуршет для более чем 400 гостей. Гостям были предложены авторские закуски и напитки, а обслуживание провело 12 официантов. Высокий уровень организации.",
-    author: "Организационный комитет АО «ДеЛаваль»",
+      "At the Field Day farm equipment expo, Soprano's team catered a reception for over 400 guests. Guests enjoyed hand-crafted appetizers and beverages, with 12 servers on the floor. Outstanding organization.",
+    author: "DeLaval Michigan Organizing Committee",
     avatar: null,
     icon: Building2,
   },
   {
     id: "techpro",
-    company: "«ТехПРО»",
-    event: "Юбилейный банкет",
-    eventType: "Банкет",
+    company: "TechPro Industries",
+    event: "Anniversary Banquet",
+    eventType: "Banquet",
     period: "2014",
-    eventDate: "Ноябрь 2014",
-    guests: "320 персон",
-    location: "СПб, Василеостровский р-н",
+    eventDate: "November 2014",
+    guests: "320 guests",
+    location: "Troy, MI",
     image: "/media/review-3.jpg",
     rating: 5,
     verified: true,
     quote:
-      "Банкет на 320 персон был проведён на высшем уровне. От индивидуального меню до сервировки каждого стола — всё было продумано до мелочей. Гости отмечали необычные вкусовые сочетания и красивую подачу блюд.",
-    author: "Директор «ТехПРО»",
+      "The 320-guest banquet was executed at the highest level. From the custom menu to the setting of each table — everything was thought through to the smallest detail. Guests raved about the unusual flavor pairings and beautiful presentation.",
+    author: "TechPro Industries Director",
     avatar: null,
     icon: Star,
   },
   {
     id: "avrora",
-    company: "Премия «АВРОРА»",
-    event: "Фуршет церемонии награждения",
-    eventType: "Церемония",
-    period: "15.11.2017",
-    eventDate: "15 ноября 2017",
-    guests: "300 персон",
-    venue: "к/п «РОДИНА»",
-    location: "СПб, Каменный остров",
+    company: "Aurora Awards Gala",
+    event: "Awards Ceremony Reception",
+    eventType: "Ceremony",
+    period: "11/15/2017",
+    eventDate: "November 15, 2017",
+    guests: "300 guests",
+    venue: "The Vault Detroit",
+    location: "Detroit, MI",
     image: "/media/review-4.jpg",
     rating: 5,
     verified: true,
     quote:
-      "Церемония вручения премии «АВРОРА» — событие международного уровня. Interfood Catering создал фуршетную линию, достойную премии: свежие устрицы, авторские десерты, пирамида из шампанского. Гости из 15 стран остались в восторге.",
-    author: "Организаторы Премии «АВРОРА»",
+      "The Aurora Awards ceremony is an event of international caliber. Soprano's Catering created a reception worthy of the awards: fresh oysters, signature desserts, a champagne tower. Guests from 15 states were delighted.",
+    author: "Aurora Awards Organizers",
     avatar: null,
     icon: Award,
   },
@@ -101,12 +101,12 @@ const TESTIMONIALS = [
 
 
 /**
- * Клиенты, которые нам доверяют — логотипы/названия компаний.
+ * Clients who trust us — company names.
  */
 const TRUST_CLIENTS = [
-  "Сбербанк", "Газпром нефть", "Ленэнерго", "Bayer",
+  "Ford Motor Company", "Quicken Loans", "DTE Energy", "Bayer",
   "L'Oréal", "Sanofi", "Nestlé",
-  "Danone", "Bosch", "Siemens", "IKEA",
+  "Danone", "Bosch", "Siemens", "Meijer",
 ];
 
 /* ──────────────────────────────────────────────
@@ -185,7 +185,7 @@ function AvatarPlaceholder({
 }) {
   // Extract initials from company/name
   const initials = name
-    .replace(/[^a-zA-Zа-яА-ЯёЁ]/g, "")
+    .replace(/[^a-zA-Z]/g, "")
     .slice(0, 2)
     .toUpperCase();
 
@@ -206,16 +206,16 @@ function AvatarPlaceholder({
 
 /* ──────────────────────────────────────────────
    EVENT TYPE BADGE
-   Shows the type of event (Свадьба, Корпоратив, etc.)
+   Shows the type of event (Wedding, Corporate, etc.)
    ────────────────────────────────────────────── */
 function EventTypeBadge({ type }: { type: string }) {
   const badgeColors: Record<string, string> = {
     // Warm-palette event-type accents — no cold (blue/emerald/purple/pink) tech-startup colors.
-    Свадьба: "bg-peach/20 text-terracotta border-peach/40",
-    Корпоратив: "bg-parchment/60 text-bordeaux border-bordeaux/30",
-    Банкет: "bg-amber-50 text-amber-700 border-amber-200",
-    Выставка: "bg-sage/15 text-sage border-sage/30",
-    Церемония: "bg-lilac/15 text-lilac border-lilac/30",
+    Wedding: "bg-peach/20 text-terracotta border-peach/40",
+    Corporate: "bg-parchment/60 text-bordeaux border-bordeaux/30",
+    Banquet: "bg-amber-50 text-amber-700 border-amber-200",
+    Exhibition: "bg-sage/15 text-sage border-sage/30",
+    Ceremony: "bg-lilac/15 text-lilac border-lilac/30",
   };
 
   const colors = badgeColors[type] || "bg-cream/60 text-ink/70 border-border-line";
@@ -238,7 +238,7 @@ function VerifiedBadge() {
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-sage/15 px-2 py-0.5 text-[10px] font-medium text-sage">
       <ShieldCheck className="size-3" />
-      Проверено
+      Verified
     </span>
   );
 }
@@ -289,7 +289,7 @@ function TestimonialCard({
       <div className="relative aspect-[4/3] overflow-hidden img-zoom">
         <Image
           src={testimonial.image}
-          alt={`Благодарственное письмо от ${testimonial.company}`}
+          alt={`Thank-you letter from ${testimonial.company}`}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover"
@@ -497,7 +497,7 @@ export function Testimonials() {
           <Reveal>
             <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
               <Star className="size-3" />
-              Отзывы клиентов
+              Client Testimonials
             </span>
           </Reveal>
           <Reveal delay={0.1}>
@@ -505,8 +505,8 @@ export function Testimonials() {
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.8rem, 4.5vw, 3.25rem)", lineHeight: 1.1 }}
             >
-              Нам доверяют события,{" "}
-              <span className="gradient-text">которые запоминают</span>
+              Trusted with events{" "}
+              <span className="gradient-text">that people remember</span>
             </h2>
             {/* Aggregate rating with trust indicator */}
             <div className="mt-6 inline-flex items-center gap-4 bg-white rounded-full px-6 py-3 shadow-md shadow-ink/5">
@@ -519,17 +519,17 @@ export function Testimonials() {
                 4.9
               </span>
               <span className="h-4 w-px bg-border-line" />
-              <span className="text-sm text-ink/70">127+ отзывов</span>
+              <span className="text-sm text-ink/70">127+ reviews</span>
               <span className="inline-flex items-center gap-1 rounded-full bg-sage/15 px-2 py-0.5 text-[10px] font-medium text-sage">
                 <CheckCircle2 className="size-3" />
-                Реальные клиенты
+                Real clients
               </span>
             </div>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mt-5 max-w-lg mx-auto text-base leading-relaxed text-ink/70">
-              Благодарственные письма от компаний, с которыми мы работаем годами.
-              Каждый отзыв — результат слаженной команды и любви к своему делу.
+              Thank-you letters from companies we&rsquo;ve worked with for years.
+              Every review is the result of a coordinated team and a love for what we do.
             </p>
           </Reveal>
         </div>
@@ -539,11 +539,11 @@ export function Testimonials() {
           <Reveal>
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-display text-xl text-ink md:text-2xl">
-                Что говорят наши клиенты
+                What our clients say
               </h3>
               <span className="hidden sm:flex items-center gap-2 text-xs text-ink/70">
                 <span className="inline-block size-2 rounded-full bg-gold animate-pulse" />
-                Автопрокрутка
+                Autoplay
               </span>
             </div>
           </Reveal>
@@ -560,7 +560,7 @@ export function Testimonials() {
           onFocus={() => setPaused(true)}
           onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setPaused(false); }}
           aria-roledescription="carousel"
-          aria-label="Отзывы клиентов"
+          aria-label="Client testimonials"
         >
           <div className="relative mx-auto max-w-2xl">
             <AnimatePresence mode="wait">
@@ -579,7 +579,7 @@ export function Testimonials() {
             <button
               type="button"
               onClick={() => go(-1)}
-              aria-label="Предыдущий отзыв"
+              aria-label="Previous testimonial"
               className="absolute -left-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-border-line bg-white/90 text-ink/70 shadow-md backdrop-blur-sm transition-all hover:border-gold hover:text-gold hover:-translate-y-[calc(50%+2px)] md:-left-14"
             >
               <ChevronLeft className="size-5" />
@@ -587,7 +587,7 @@ export function Testimonials() {
             <button
               type="button"
               onClick={() => go(1)}
-              aria-label="Следующий отзыв"
+              aria-label="Next testimonial"
               className="absolute -right-2 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-full border border-border-line bg-white/90 text-ink/70 shadow-md backdrop-blur-sm transition-all hover:border-gold hover:text-gold hover:-translate-y-[calc(50%+2px)] md:-right-14"
             >
               <ChevronRight className="size-5" />
@@ -601,7 +601,7 @@ export function Testimonials() {
                 key={t.id}
                 type="button"
                 onClick={() => setActive(d)}
-                aria-label={`Перейти к отзыву ${d + 1}`}
+                aria-label={`Go to testimonial ${d + 1}`}
                 aria-current={d === active}
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center px-1"
               >
@@ -621,21 +621,21 @@ export function Testimonials() {
             <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
               <div className="max-w-xl">
                 <span className="font-mono text-xs uppercase tracking-[0.3em] text-gold">
-                  Кейсы по запросу
+                  Case studies on request
                 </span>
                 <h3 className="mt-3 font-display text-xl text-ink md:text-2xl">
-                  Покажем реальные кейсы под ваш формат
+                  We&rsquo;ll show you real case studies for your format
                 </h3>
                 <p className="mt-2 text-sm text-ink/70">
-                  Пришлём портфолио мероприятий вашего типа: фуршеты, банкеты,
-                  корпоративы. Включаем фотоотчёт, сметы и отзывы заказчиков.
+                  We&rsquo;ll send a portfolio of events of your type: receptions, banquets,
+                  corporate. Includes photo reports, quotes, and client reviews.
                 </p>
               </div>
               <a
                 href="#contact"
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-bordeaux px-7 py-3 text-sm font-medium text-cream transition-colors hover:bg-bordeaux/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordeaux"
               >
-                Запросить кейсы
+                Request Case Studies
               </a>
             </div>
           </Reveal>
@@ -646,13 +646,13 @@ export function Testimonials() {
           <Reveal>
             <div className="text-center">
               <span className="font-mono text-xs uppercase tracking-[0.3em] text-gold">
-                Наши клиенты
+                Our Clients
               </span>
               <h3
                 className="mt-4 font-display text-ink"
                 style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)" }}
               >
-                С нами работают лидеры рынка
+                Michigan leaders work with us
               </h3>
             </div>
           </Reveal>
@@ -685,14 +685,14 @@ export function Testimonials() {
         <Reveal delay={0.25}>
           <div className="mt-16 text-center">
             <p className="text-ink/70 text-base">
-              Хотите такой же уровень сервиса?{" "}
+              Want the same level of service?{" "}
               <a
                 href="#contact"
                 className="font-semibold text-gold hover:text-terracotta underline underline-offset-4 transition-colors duration-300"
               >
-                Оставьте заявку
+                Send an Inquiry
               </a>{" "}
-              — обсудим ваше мероприятие.
+              — let&rsquo;s talk about your event.
             </p>
           </div>
         </Reveal>

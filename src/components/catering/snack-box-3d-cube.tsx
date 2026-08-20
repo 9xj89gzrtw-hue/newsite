@@ -20,12 +20,12 @@ import { motion, useReducedMotion } from "framer-motion";
  * and opacity only).
  */
 const FACE_IMAGES = [
-  { src: "/media/concorde-handhelds.jpg", alt: "Канапе и закуски ручной подачи — передняя грань", position: "front" },
-  { src: "/media/ridgewells-scallops.jpg", alt: "Морские гребешки на гриле — задняя грань", position: "back" },
-  { src: "/media/concorde-avo-toast.jpg", alt: "Тост с авокадо — правая грань", position: "right" },
-  { src: "/media/ridgewells-veg-mosaic.jpg", alt: "Овощная мозаика — левая грань", position: "left" },
-  { src: "/media/concorde-dessert.jpg", alt: "Десертное ассорти — верхняя грань", position: "top" },
-  { src: "/media/concept-banquet-table.jpg", alt: "Банкетный стол — нижняя грань", position: "bottom" },
+  { src: "/media/concorde-handhelds.jpg", alt: "Handheld canapés and appetizers — front face", position: "front" },
+  { src: "/media/ridgewells-scallops.jpg", alt: "Seared diver scallops — back face", position: "back" },
+  { src: "/media/concorde-avo-toast.jpg", alt: "Avocado toast — right face", position: "right" },
+  { src: "/media/ridgewells-veg-mosaic.jpg", alt: "Vegetable mosaic — left face", position: "left" },
+  { src: "/media/concorde-dessert.jpg", alt: "Dessert assortment — top face", position: "top" },
+  { src: "/media/concept-banquet-table.jpg", alt: "Banquet table — bottom face", position: "bottom" },
 ] as const;
 
 // Cube edge length in px (cube is responsive via CSS clamp on container).
@@ -111,7 +111,7 @@ export function SnackBoxCube3D() {
 
       {/* Caption */}
       <p className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center font-mono text-[10px] uppercase tracking-wider text-ink/70">
-        {isHovered ? "Вращение замедлено" : "Шесть блюд в одном кубе"}
+        {isHovered ? "Rotation slowed" : "Six dishes in one cube"}
       </p>
     </div>
   );

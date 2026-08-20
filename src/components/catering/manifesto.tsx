@@ -11,10 +11,10 @@ import {
 } from "framer-motion";
 
 /**
- * Manifesto — the signature scroll moment: «Манифест-as-Window» (LIGHT THEME).
+ * Manifesto — the signature scroll moment: «Manifesto-as-Window» (LIGHT THEME).
  *
  * A pinned ~250vh section where:
- *   1. A giant Playfair Display word «ПИР» fills the viewport, its letters
+ *   1. A giant Playfair Display word «LOVE» fills the viewport, its letters
  *      filled with a slow Ken-Burns food photo (SVG clipPath).
  *   2. Three dish-image layers crossfade through the word as the user scrolls
  *      (Task 2-b §4): dish-1 → dish-2 → dish-3 over [0, 0.66] of scroll progress.
@@ -26,27 +26,27 @@ import {
  *   5. After the pinned scroll-space ends, a 50vh chapter-divider gradient
  *      (cream→charcoal→cream) bridges the manifesto into the next section,
  *      using stacked-opacity divs (NOT framer-motion backgroundColor interpolation,
- *      per AGENTS.md §12 грабли #4).
+ *      per AGENTS.md §12 gotcha #4).
  */
 
 const MANIFESTO_IMG = "/media/event-12.jpg";
-const MANIFESTO_IMG_ALT = "Праздничная сервировка банкета — Interfood Catering";
+const MANIFESTO_IMG_ALT = "Festive banquet table setting — Soprano's Catering";
 
-// Three dish photos that crossfade through the «ПИР» letters as the user scrolls.
+// Three dish photos that crossfade through the «LOVE» letters as the user scrolls.
 // Layer 1 is visible at the start; layer 2 peaks at 33% scroll; layer 3 settles
 // in by 66% and stays visible through the end of the pinned section.
 // NOTE: skipped /media/menu-bbq.jpg because that file is actually an HTML 404
 // page (file extension is .jpg but content is text/html — would fail to render
-// as an SVG <image>). Using /media/event-06.jpg (Скандинавское барбекю) instead.
+// as an SVG <image>). Using /media/event-06.jpg (Scandinavian BBQ) instead.
 const MANIFESTO_DISHES = [
-  { src: "/media/concorde-handhelds.jpg", alt: "Фуршетная линия — Interfood Catering" },
-  { src: "/media/concorde-boardroom.webp", alt: "Банкетная сервировка — Interfood Catering" },
-  { src: "/media/event-06.jpg", alt: "Выездное барбекю — Interfood Catering" },
+  { src: "/media/concorde-handhelds.jpg", alt: "Reception line — Soprano's Catering" },
+  { src: "/media/concorde-boardroom.webp", alt: "Banquet table setting — Soprano's Catering" },
+  { src: "/media/event-06.jpg", alt: "Outdoor BBQ — Soprano's Catering" },
 ] as const;
 
 // Single poetic line, split into words for scroll-colorize + underline draw-in.
 const MANIFESTO_WORDS =
-  "Пир начинается задолго до первой подачи — с рук повара, с сезона, с тишины перед застольем".split(
+  "Culinary innovation and impeccable service is the cornerstone of Soprano's Catering — committed to long term relationships based on personal service and exceptional quality.".split(
     " ",
   );
 
@@ -66,7 +66,7 @@ export function Manifesto() {
     [0, 1],
   );
 
-  // The «ПИР» word-as-window animation values
+  // The «LOVE» word-as-window animation values
   const wordOpacity = useTransform(
     scrollYProgress,
     [0.0, 0.12, 0.96],
@@ -84,7 +84,7 @@ export function Manifesto() {
 
   // Three-dish crossfade opacities (Task 2-b §4). Each layer is clipped by
   // the existing #manifesto-pir-clip SVG clipPath so the dishes appear
-  // INSIDE the «ПИР» letters. Together they create a continuous dish-morph:
+  // INSIDE the «LOVE» letters. Together they create a continuous dish-morph:
   //   layer 1: [0, 0.33] → [1, 0] (visible at start, fades out)
   //   layer 2: [0, 0.33, 0.66] → [0, 1, 0] (fades in to peak at 33%, fades out by 66%)
   //   layer 3: [0.33, 0.66] → [0, 1] (fades in by 66%, stays at 1 through end)
@@ -130,7 +130,7 @@ export function Manifesto() {
               letterSpacing: "-0.03em",
             }}
           >
-            ПИР
+            LOVE
           </h2>
           <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-ink/70">
             {MANIFESTO_WORDS.join(" ")}
@@ -178,17 +178,17 @@ export function Manifesto() {
             style={{ opacity: eyebrowOpacity }}
             className="absolute left-1/2 top-[14vh] -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.5em] text-gold/60 md:text-xs"
           >
-            03 · Манифест
+            03 · Manifesto
           </motion.span>
 
           {/* sr-only heading for document outline / screen readers */}
-          <h2 className="sr-only">Пир — манифест Interfood Catering</h2>
+          <h2 className="sr-only">Made with Love — Soprano's Catering Manifesto</h2>
 
-          {/* The word-as-window: «ПИР» as SVG with multi-dish crossfade layers (Task 2-b §4). */}
+          {/* The word-as-window: «LOVE» as SVG with multi-dish crossfade layers (Task 2-b §4). */}
           <motion.div
             style={{ opacity: wordOpacity, scale: wordScale, y: wordY }}
             className="relative flex w-full items-center justify-center px-4"
-            aria-label="Пир"
+            aria-label="Love"
             role="img"
           >
             <svg
@@ -210,11 +210,11 @@ export function Manifesto() {
                       letterSpacing: "-10px",
                     }}
                   >
-                    ПИР
+                    LOVE
                   </text>
                 </clipPath>
               </defs>
-              {/* The original background food photo, clipped to the ПИР glyphs. */}
+              {/* The original background food photo, clipped to the LOVE glyphs. */}
               <image
                 href={MANIFESTO_IMG}
                 x="0"
@@ -226,7 +226,7 @@ export function Manifesto() {
               />
               {/*
                 Three-dish crossfade layers (Task 2-b §4) — each clipped by the
-                same #manifesto-pir-clip so the dishes appear INSIDE the ПИР letters.
+                same #manifesto-pir-clip so the dishes appear INSIDE the LOVE letters.
                 Opacity is driven by per-layer MotionValues attached to each
                 <motion.image> via the style prop. Together they create a
                 continuous dish-morph as the user scrolls.
@@ -247,7 +247,7 @@ export function Manifesto() {
             </svg>
           </motion.div>
 
-          {/* The colorizing manifesto line — each word also draws an underline (Task 2-b §4). */}
+          {/* The colorizing Manifesto line — each word also draws an underline (Task 2-b §4). */}
           <motion.div
             style={{ opacity: paragraphOpacity }}
             className="absolute bottom-[14vh] left-1/2 max-w-3xl -translate-x-1/2 px-6 text-center"
@@ -277,7 +277,7 @@ export function Manifesto() {
             style={{ opacity: sublineOpacity }}
             className="absolute bottom-[6vh] left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.4em] text-gold/60 md:text-xs"
           >
-            Переходим к меню →
+            On to the menu →
           </motion.span>
         </div>
       </div>
@@ -286,7 +286,7 @@ export function Manifesto() {
         Chapter-divider hand-off zone (Task 2-b §4) — 50vh gradient that eases
         cream → charcoal → cream as a "breath" between manifesto and the next
         section. Implemented as stacked-opacity divs (NOT framer-motion
-        backgroundColor interpolation per AGENTS.md §12 грабли #4):
+        backgroundColor interpolation per AGENTS.md §12 gotcha #4):
           - bg-cream base layer (always full opacity)
           - bg-ink overlay with vertical CSS mask that creates the
             transparent → opaque → transparent fade from top to bottom

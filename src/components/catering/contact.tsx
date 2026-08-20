@@ -29,10 +29,10 @@ import { Reveal } from "./reveal";
 import { CONTACTS, YANDEX_MAPS } from "@/lib/media";
 import { MENU_TYPES } from "@/lib/pricing";
 
-const STEPS = ["Тип события", "Гости и дата", "Контакты", "Отправка"];
+const STEPS = ["Event Type", "Guests & Date", "Contact", "Submit"];
 const DRAFT_KEY = "catering-lead-draft";
 
-const PHONE_REGEX = /^(\+7|8)[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+const PHONE_REGEX = /^(\+1|1)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{4}$/;
 
 type LeadData = {
   eventType: string;
@@ -60,10 +60,10 @@ const EMPTY: LeadData = {
 
 // Office hours configuration
 const OFFICE_HOURS = {
-  weekdays: "Пн–Пт: 9:00–19:00",
-  saturday: "Сб: 10:00–16:00",
-  sunday: "Вс: выходной",
-  note: "Экстренные заявки принимаем круглосуточно",
+  weekdays: "Mon–Fri: 9:00 AM – 7:00 PM",
+  saturday: "Sat: 10:00 AM – 4:00 PM",
+  sunday: "Sun: Closed",
+  note: "Emergency inquiries accepted 24/7",
 };
 
 /**
@@ -95,16 +95,16 @@ function useOfficeStatus() {
       const day = wd.toLowerCase();
       let open = false;
       let nextLabel = "";
-      if (["пн", "вт", "ср", "чт", "пт"].includes(day)) {
+      if (["mon", "tue", "wed", "thu", "fri"].includes(day)) {
         open = time >= 9 * 60 && time < 19 * 60;
-        nextLabel = open ? "до 19:00" : (time < 9 * 60 ? "откроемся в 9:00" : "откроемся в пн в 9:00");
-      } else if (day === "сб") {
+        nextLabel = open ? "until 7:00 PM" : (time < 9 * 60 ? "opens at 9:00 AM" : "opens Mon at 9:00 AM");
+      } else if (day === "sat") {
         open = time >= 10 * 60 && time < 16 * 60;
-        nextLabel = open ? "до 16:00" : (time < 10 * 60 ? "откроемся в 10:00" : "откроемся в пн в 9:00");
+        nextLabel = open ? "until 4:00 PM" : (time < 10 * 60 ? "opens at 10:00 AM" : "opens Mon at 9:00 AM");
       } else {
         // Sun
         open = false;
-        nextLabel = "откроемся в пн в 9:00";
+        nextLabel = "opens Mon at 9:00 AM";
       }
       setStatus({ open, nextLabel });
     };
@@ -251,7 +251,7 @@ function FloatingInput({
             className="mt-1.5 flex items-center gap-1.5 text-xs text-bordeaux"
           >
             <AlertCircle className="size-3" />
-            Проверьте поле «{placeholder}»
+            Please check the "{placeholder}" field
           </motion.p>
         )}
       </AnimatePresence>
@@ -496,7 +496,7 @@ function OfficeHours() {
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Clock className="size-4 text-gold" />
-          <span className="text-sm font-medium text-ink">Часы работы</span>
+          <span className="text-sm font-medium text-ink">Office Hours</span>
         </div>
         {/* Live "open/closed" badge */}
         <span
@@ -513,7 +513,7 @@ function OfficeHours() {
             animate={status.open ? { opacity: [1, 0.4, 1] } : { opacity: 1 }}
             transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
           />
-          {status.open ? "Открыто" : "Закрыто"}
+          {status.open ? "Open" : "Closed"}
         </span>
       </div>
       <ul className="space-y-1.5 text-sm text-ink/70">
@@ -562,7 +562,7 @@ function SocialProofBadge() {
         <span className="absolute -right-1 -top-1 size-2 rounded-full bg-sage animate-pulse" />
       </div>
       <span className="text-sm font-medium text-ink/80">
-        Ответим в течение <span className="text-gold font-semibold">15 минут</span>
+        Reply within <span className="text-gold font-semibold">15 minutes</span>
       </span>
     </motion.div>
   );
@@ -682,7 +682,7 @@ export function Contact() {
     e.preventDefault();
     
     if (!data.consent) {
-      toast.error("Необходимо согласие на обработку персональных данных");
+      toast.error("Consent to process personal data is required");
       return;
     }
 
@@ -700,17 +700,17 @@ export function Contact() {
           eventType: data.eventType || undefined,
           guests: data.guests,
           message: [
-            data.date && `Предпочтительная дата: ${data.date}`,
-            data.preferredTime && `Удобное время для звонка: ${data.preferredTime}`,
+            data.date && `Preferred date: ${data.date}`,
+            data.preferredTime && `Preferred callback time: ${data.preferredTime}`,
           ].filter(Boolean).join("\n") || undefined,
           consentAccepted: true,
         }),
       });
 
-      if (!res.ok) throw new Error("Ошибка отправки");
+      if (!res.ok) throw new Error("Submission failed");
 
       setFormStatus("success");
-      toast.success("Заявка отправлена! Перезвоним в течение 15 минут.");
+      toast.success("Inquiry submitted! We\u2019ll call back within 15 minutes.");
       
       // Reset after showing success state
       setTimeout(() => {
@@ -727,11 +727,11 @@ export function Contact() {
       setFormStatus("error");
       
       if (err instanceof TypeError && err.message.includes("fetch")) {
-        toast.error("Нет соединения с сервером. Проверьте интернет.");
+        toast.error("No connection to server. Check your internet.");
       } else if (err instanceof Error) {
         toast.error(err.message);
       } else {
-        toast.error("Не удалось отправить. Позвоните нам напрямую.");
+        toast.error("Could not submit. Please call us directly.");
       }
       
       setTimeout(() => setFormStatus("idle"), 2000);
@@ -765,7 +765,7 @@ export function Contact() {
           <Reveal>
             <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
               <span className="size-1.5 rounded-full bg-gold animate-pulse" />
-              Контакты
+              Contact
             </span>
           </Reveal>
           <Reveal delay={0.1}>
@@ -773,13 +773,13 @@ export function Contact() {
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.1 }}
             >
-              Поговорим о вашем{" "}
-              <span className="gradient-text italic">событии</span>
+              Let&rsquo;s talk about your{" "}
+              <span className="gradient-text italic">event</span>
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-ink/70">
-              Позвоните, напишите в WhatsApp или оставьте заявку — ответим быстро и составим смету под ваш бюджет.
+              Call, email, or submit an inquiry — we respond quickly and build a quote that fits your budget.
             </p>
           </Reveal>
         </div>
@@ -795,44 +795,34 @@ export function Contact() {
                   icon={Phone}
                   href={CONTACTS.phoneHref}
                   label={CONTACTS.phone}
-                  ariaLabel={`Позвонить: ${CONTACTS.phone}`}
-                  tooltip="📞 Звоните!"
+                  ariaLabel={`Call: ${CONTACTS.phone}`}
+                  tooltip="📞 Call us!"
                   highlight
                 />
 
-                {/* WhatsApp */}
-                <ContactCard
-                  icon={MessageCircle}
-                  href={CONTACTS.whatsappHref}
-                  label={CONTACTS.whatsapp}
-                  ariaLabel={`Написать в WhatsApp: ${CONTACTS.whatsapp}`}
-                  badge="WhatsApp"
-                  tooltip="💬 Написать в WhatsApp"
-                  external
-                />
-
+                {/* WhatsApp removed — Sopranos uses phone + email only */}
                 {/* Instagram - prominent handle */}
                 <ContactCard
                   icon={Instagram}
                   href={CONTACTS.instagramHref}
-                  label="@nilov_catering"
-                  ariaLabel="Instagram: @nilov_catering"
+                  label={CONTACTS.instagram}
+                  ariaLabel={`Instagram: ${CONTACTS.instagram}`}
                   sublabel="Instagram"
-                  tooltip="✨ Смотреть портфолио"
+                  tooltip="✨ View portfolio"
                   external
                 />
 
                 {/* Secondary contacts in compact row */}
                 <div className="pt-2">
                   <p className="mb-3 font-mono text-xs uppercase tracking-wider text-ink/70">
-                    Другие способы связи
+                    Other ways to reach us
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     <ContactCard
                       icon={Telegram}
                       href={CONTACTS.telegramHref}
                       label={CONTACTS.telegram}
-                      ariaLabel={`Написать в Telegram: ${CONTACTS.telegram}`}
+                      ariaLabel={`Instagram: ${CONTACTS.instagram}`}
                       sublabel="Telegram"
                       external
                     />
@@ -840,8 +830,8 @@ export function Contact() {
                       icon={VkIcon}
                       href={CONTACTS.vkHref}
                       label="nilovcatering"
-                      ariaLabel="ВКонтакте: nilovcatering"
-                      sublabel="ВКонтакте"
+                      ariaLabel={`Email: ${CONTACTS.email}`}
+                      sublabel="Instagram"
                       external
                     />
                   </div>
@@ -853,7 +843,7 @@ export function Contact() {
                     icon={Mail}
                     href={`mailto:${CONTACTS.email}`}
                     label="Email"
-                    sublabel="Написать"
+                    sublabel="Email"
                   />
                   <ContactCard
                     icon={MapPin}
@@ -880,7 +870,7 @@ export function Contact() {
             <form
               ref={formRef}
               onSubmit={submit}
-              aria-label="Многошаговая форма заявки на кейтеринг"
+              aria-label="Multi-step catering inquiry form"
               className="relative overflow-hidden rounded-3xl border border-border-line bg-white p-6 shadow-xl shadow-ink/5 md:p-9"
             >
               {/* Success overlay */}
@@ -900,7 +890,7 @@ export function Contact() {
                       transition={{ delay: 0.4 }}
                       className="mt-4 text-center font-display text-xl text-ink"
                     >
-                      Заявка отправлена!
+                      Inquiry submitted!
                     </motion.p>
                     <motion.p
                       initial={{ opacity: 0, y: 10 }}
@@ -908,7 +898,7 @@ export function Contact() {
                       transition={{ delay: 0.6 }}
                       className="mt-2 text-sm text-ink/70"
                     >
-                      Мы перезвоним в течение 15 минут
+                      We&rsquo;ll call back within 15 minutes
                     </motion.p>
                   </motion.div>
                 ) : null}
@@ -925,9 +915,9 @@ export function Contact() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-display text-2xl text-ink">Оставить заявку</h3>
+                    <h3 className="font-display text-2xl text-ink">Send an Inquiry</h3>
                     <p className="mt-1 text-sm text-ink/70">
-                      Шаг {step + 1} из {STEPS.length} — {STEPS[step]}
+                      Step {step + 1} of {STEPS.length} — {STEPS[step]}
                     </p>
                   </div>
                   <span
@@ -966,7 +956,7 @@ export function Contact() {
                       {step === 0 && (
                         <fieldset className="space-y-3">
                           <legend className="mb-2 font-mono text-xs uppercase tracking-wider text-ink/70">
-                            Тип мероприятия
+                            Event Type
                           </legend>
                           <div className="grid grid-cols-2 gap-2">
                             {MENU_TYPES.map((m) => {
@@ -987,7 +977,7 @@ export function Contact() {
                                     {m.label}
                                   </span>
                                   <span className="font-mono text-[11px] text-ink/70">
-                                    от {m.perGuest.toLocaleString("ru-RU")} ₽{m.priceUnit ?? "/чел"}
+                                    from {m.perGuest.toLocaleString("en-US")}${m.priceUnit ?? "/guest"}
                                   </span>
                                 </button>
                               );
@@ -1005,7 +995,7 @@ export function Contact() {
                               className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-ink/70"
                             >
                               <Users className="size-3.5" />
-                              Количество гостей
+                              Number of Guests
                             </label>
                             <div className="mt-3 flex items-center gap-3">
                               <button
@@ -1013,7 +1003,7 @@ export function Contact() {
                                 onClick={() =>
                                   set("guests", Math.max(1, data.guests - 10))
                                 }
-                                aria-label="Уменьшить на 10"
+                                aria-label="Decrease by 10"
                                 className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line text-ink/70 transition-all hover:border-gold hover:bg-gold/10 hover:text-gold"
                               >
                                 <ChevronLeft className="size-5" />
@@ -1037,7 +1027,7 @@ export function Contact() {
                                 onClick={() =>
                                   set("guests", data.guests + 10)
                                 }
-                                aria-label="Увеличить на 10"
+                                aria-label="Increase by 10"
                                 className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line text-ink/70 transition-all hover:border-gold hover:bg-gold/10 hover:text-gold"
                               >
                                 <ChevronRight className="size-5" />
@@ -1051,28 +1041,28 @@ export function Contact() {
                               value={Math.min(data.guests, 500)}
                               onChange={(e) => set("guests", Number(e.target.value))}
                               className="mt-4 w-full accent-gold"
-                              aria-label="Количество гостей"
+                              aria-label="Number of guests"
                             />
                           </div>
 
-                          <div role="group" aria-label="Желаемая дата мероприятия">
+                          <div role="group" aria-label="Preferred event date">
                             <div
                               className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-ink/70"
                             >
                               <Calendar className="size-3.5" />
-                              Желаемая дата
+                              Preferred Date
                             </div>
                             <input
                               id="lead-date"
                               type="date"
                               value={data.date}
                               min={new Date().toISOString().split("T")[0]}
-                              aria-label="Желаемая дата мероприятия"
+                              aria-label="Preferred event date"
                               onChange={(e) => set("date", e.target.value)}
                               className="mt-2 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none transition-all focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 focus:shadow-[0_0_20px_rgba(196,149,106,0.15)]"
                             />
                             <p className="mt-2 text-xs text-ink/70">
-                              Необязательно — можно уточнить в звонке.
+                              Optional — we can finalize on the call.
                             </p>
                           </div>
                         </fieldset>
@@ -1087,8 +1077,8 @@ export function Contact() {
                             autoComplete="name"
                             value={data.name}
                             onChange={(e) => set("name", e.target.value)}
-                            placeholder="Как к вам обращаться"
-                            ariaLabelText="Ваше имя"
+                            placeholder="Your name"
+                            ariaLabelText="Your name"
                             required
                             error={validationErrors.name}
                             icon={Users}
@@ -1104,7 +1094,7 @@ export function Contact() {
                             value={data.phone}
                             onChange={(e) => set("phone", e.target.value)}
                             placeholder="+7 (___) ___-__-__"
-                            ariaLabelText="Номер телефона"
+                            ariaLabelText="Phone number"
                             required
                             error={validationErrors.phone}
                             icon={Phone}
@@ -1118,7 +1108,7 @@ export function Contact() {
                             autoComplete="email"
                             value={data.email}
                             onChange={(e) => set("email", e.target.value)}
-                            placeholder="Email (необязательно)"
+                            placeholder="Email (optional)"
                             icon={Mail}
                             validate={(v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
                           />
@@ -1129,7 +1119,7 @@ export function Contact() {
                             name="preferredTime"
                             value={data.preferredTime}
                             onChange={(e) => set("preferredTime", e.target.value)}
-                            placeholder="Удобное время для звонка (необязательно)"
+                            placeholder="Preferred callback time (optional)"
                             icon={Clock}
                           />
                         </fieldset>
@@ -1139,17 +1129,17 @@ export function Contact() {
                       {step === 3 && (
                         <fieldset className="space-y-5">
                           <legend className="mb-2 font-mono text-xs uppercase tracking-wider text-ink/70">
-                            Проверьте заявку
+                            Review Your Inquiry
                           </legend>
                           <ul className="divide-y divide-border-line rounded-xl border border-border-line bg-cream/40">
-                            <SummaryRow icon={PartyPopper} label="Тип" value={menuLabel} />
-                            <SummaryRow icon={Users} label="Гостей" value={String(data.guests)} />
+                            <SummaryRow icon={PartyPopper} label="Type" value={menuLabel} />
+                            <SummaryRow icon={Users} label="Guests" value={String(data.guests)} />
                             <SummaryRow
                               icon={Calendar}
-                              label="Дата"
-                              value={data.date || "уточним в звонке"}
+                              label="Date"
+                              value={data.date || "we\u2019ll finalize on the call"}
                             />
-                            <SummaryRow icon={Phone} label="Телефон" value={data.phone} />
+                            <SummaryRow icon={Phone} label="Phone" value={data.phone} />
                             <SummaryRow
                               icon={Mail}
                               label="Email"
@@ -1158,7 +1148,7 @@ export function Contact() {
                             {data.preferredTime && (
                               <SummaryRow
                                 icon={Clock}
-                                label="Звонок"
+                                label="Call"
                                 value={data.preferredTime}
                               />
                             )}
@@ -1176,14 +1166,14 @@ export function Contact() {
                               required
                             />
                             <span>
-                              Я соглашаюсь на обработку персональных данных в соответствии с{" "}
+                              I agree to the processing of my personal data in accordance with the{" "}
                               <a
                                 href="/privacy"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-gold underline underline-offset-2 hover:text-terracotta transition-colors"
                               >
-                                Политикой конфиденциальности
+                                Privacy Policy
                               </a>
                               .
                             </span>
@@ -1205,7 +1195,7 @@ export function Contact() {
                       className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-border-line px-5 py-3 text-sm font-medium text-ink/70 transition-all hover:border-gold hover:bg-gold/5 hover:text-gold"
                     >
                       <ChevronLeft className="size-4" />
-                      Назад
+                      Back
                     </motion.button>
                   )}
 
@@ -1219,7 +1209,7 @@ export function Contact() {
                       whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                       className="group flex min-h-[44px] min-w-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
                     >
-                      Далее
+                      Next
                       <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                     </motion.button>
                   ) : (
@@ -1227,7 +1217,7 @@ export function Contact() {
                       type="submit"
                       disabled={formStatus !== "idle" || !data.consent}
                       aria-disabled={formStatus !== "idle" || !data.consent}
-                      data-cursor="отправить"
+                      data-cursor="submit"
                       whileHover={!prefersReducedMotion && formStatus === "idle" ? { y: -2 } : undefined}
                       whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                       className="group relative flex min-h-[44px] min-w-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
@@ -1235,11 +1225,11 @@ export function Contact() {
                       {formStatus === "loading" ? (
                         <>
                           <Loader2 className="size-4 animate-spin" />
-                          Отправляем…
+                          Submitting…
                         </>
                       ) : (
                         <>
-                          Отправить заявку
+                          Submit Inquiry
                           <Send className="size-4 transition-transform group-hover:translate-x-0.5" />
                         </>
                       )}
@@ -1266,7 +1256,7 @@ export function Contact() {
                 {/* Security notice */}
                 <p className="mt-3 flex items-center justify-center gap-1.5 font-mono text-xs text-ink/70">
                   <ShieldCheck className="size-3.5 text-sage" />
-                  Данные защищены · 152-ФЗ
+                  Data protected · GDPR-compliant
                 </p>
               </motion.div>
             </form>
@@ -1280,7 +1270,7 @@ export function Contact() {
           <div className="overflow-hidden rounded-2xl border border-border-line shadow-lg shadow-ink/5">
             <iframe
               src={YANDEX_MAPS.embedSrc}
-              title="Interfood Catering на карте — Санкт-Петербург"
+              title="Soprano's Catering on the map — Clinton Township, MI"
               className="h-[360px] w-full md:h-[440px]"
               loading="lazy"
               sandbox="allow-scripts allow-same-origin allow-presentation"
@@ -1293,11 +1283,11 @@ export function Contact() {
               href={YANDEX_MAPS.href}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Яндекс.Карты (откроется в новой вкладке)"
+              aria-label="Google Maps (opens in new tab)"
               className="flex items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors group"
             >
               <MapPin className="size-4 transition-transform group-hover:scale-110" />
-              {YANDEX_MAPS.address} — открыть в Яндекс.Картах →
+              {YANDEX_MAPS.address} — open in Google Maps →
             </a>
             <span className="font-mono text-xs text-ink/70">
               {CONTACTS.city} · {CONTACTS.phone}

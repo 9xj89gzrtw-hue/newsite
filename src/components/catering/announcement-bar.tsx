@@ -72,18 +72,18 @@ export function AnnouncementBar() {
       >
         <Sparkles className="size-3.5 shrink-0 text-gold" aria-hidden="true" />
         <p className="text-xs font-medium tracking-wide text-cream/90 md:text-sm">
-          <span className="hidden sm:inline">Сезонные свадебные меню {currentYear} — </span>
+          <span className="hidden sm:inline">New Winter Specials {currentYear} — </span>
           <a
-            href="#menu"
+            href="#winter-specials"
             className="font-semibold text-cream underline underline-offset-2 hover:text-peach transition-colors"
           >
-            смотреть меню →
+            view seasonal menu →
           </a>
         </p>
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Закрыть объявление"
+          aria-label="Close announcement"
           className="absolute right-3 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream min-h-[44px] min-w-[44px]"
         >
           <X className="size-4" />
@@ -111,18 +111,18 @@ export function AnnouncementBar() {
             <div className="flex items-center justify-center gap-3 px-10 py-2.5 text-center">
               <Sparkles className="size-3.5 shrink-0 text-gold" aria-hidden="true" />
               <p className="text-xs font-medium tracking-wide text-cream/90 md:text-sm">
-                <span className="hidden sm:inline">Сезонные свадебные меню {currentYear} — </span>
+                <span className="hidden sm:inline">New Winter Specials {currentYear} — </span>
                 <a
-                  href="#menu"
+                  href="#winter-specials"
                   className="font-semibold text-cream underline underline-offset-2 hover:text-peach transition-colors"
                 >
-                  смотреть меню →
+                  view seasonal menu →
                 </a>
               </p>
               <button
                 type="button"
                 onClick={dismiss}
-                aria-label="Закрыть объявление"
+                aria-label="Close announcement"
                 className="absolute right-3 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full text-cream/60 transition-colors hover:bg-white/10 hover:text-cream min-h-[44px] min-w-[44px]"
               >
                 <X className="size-4" />

@@ -62,10 +62,10 @@ export function Preloader() {
                     transition={{ delay: 0.3, duration: 0.6 }}
                   >
                     <span className="font-display text-3xl md:text-5xl gradient-text">
-                      Interfood
+                      Soprano&rsquo;s
                     </span>
                     <span className="mt-2 block font-mono text-xs uppercase tracking-[0.4em] text-gold/60">
-                      Кейтеринг
+                      Catering
                     </span>
                   </motion.div>
                 )}

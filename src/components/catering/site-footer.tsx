@@ -1,20 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Phone,
-  MessageCircle,
-  Instagram,
-  Send as Telegram,
-  Users as VkIcon,
   Mail,
+  MapPin,
   ArrowRight,
+  Heart,
   CheckCircle2,
   Loader2,
   Sparkles,
+  ChevronRight,
 } from "lucide-react";
-import { CONTACTS } from "@/lib/media";
+import {
+  SOPRANOS_CITIES,
+  SOPRANOS_AWARDS,
+  SOPRANOS_ASSETS,
+  CONTACTS,
+} from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
 import { toast } from "sonner";
 
@@ -32,9 +37,9 @@ function useCurrentYear() {
 }
 
 /**
- * NewsletterSignup — gold-CTA email signup with success state.
+ * NewsletterSignup — dark-themed Sopranos email signup.
  * Posts to /api/newsletter (Prisma Subscriber model).
- * Glassmorphism card on dark background to feel premium.
+ * Glassmorphism card on the dark navy footer.
  */
 function NewsletterSignup() {
   const [email, setEmail] = useState("");
@@ -45,12 +50,12 @@ function NewsletterSignup() {
     e.preventDefault();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setStatus("error");
-      toast.error("Введите корректный email");
+      toast.error("Please enter a valid email address");
       return;
     }
     if (!consent) {
       setStatus("error");
-      toast.error("Необходимо согласие на обработку персональных данных");
+      toast.error("Please accept the privacy policy to subscribe");
       return;
     }
     setStatus("loading");
@@ -64,29 +69,31 @@ function NewsletterSignup() {
       if (!res.ok) {
         if (data?.code === "ALREADY_SUBSCRIBED") {
           setStatus("done");
-          toast.info("Вы уже подписаны — спасибо!");
+          toast.info("You're already subscribed — thank you!");
           return;
         }
-        throw new Error(data?.error || "Не удалось подписаться");
+        throw new Error(data?.error || "Subscription failed");
       }
       setStatus("done");
       setEmail("");
-      toast.success("Подписка оформлена! Сезонное меню и акции — у вас в почте.");
+      toast.success("You're subscribed! Seasonal menus & specials on the way.");
     } catch (err) {
       setStatus("error");
-      toast.error(err instanceof Error ? err.message : "Ошибка сети, попробуйте позже");
+      toast.error(err instanceof Error ? err.message : "Network error, try again later");
     }
   };
 
   return (
-    <div className="rounded-2xl border border-gold/20 bg-gradient-to-br from-white to-cream/40 p-5 shadow-sm">
+    <div className="rounded-2xl border border-cream/10 bg-cream/5 p-5 backdrop-blur-sm sm:p-6">
       <div className="mb-3 flex items-center gap-2">
-        <Sparkles className="size-4 text-gold" />
-        <span className="font-display text-lg text-ink">Сезонное меню и спецпредложения</span>
+        <Sparkles className="size-4 text-gold" aria-hidden="true" />
+        <span className="font-display text-lg uppercase tracking-wide text-cream">
+          Seasonal Menu &amp; Specials
+        </span>
       </div>
-      <p className="mb-4 text-sm text-ink/70">
-        Раз в месяц — свежая коллекция блюд, гастро-тренды и сезонные акции.
-        Без спама, отписка в один клик.
+      <p className="mb-4 text-sm text-cream/70">
+        Once a month — fresh seasonal dishes, gourmet trends, and exclusive
+        catering offers. No spam, one-click unsubscribe.
       </p>
       <form onSubmit={onSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-start">
         <div className="relative flex-1">
@@ -97,18 +104,18 @@ function NewsletterSignup() {
               setEmail(e.target.value);
               if (status === "error" || status === "done") setStatus("idle");
             }}
-            placeholder="Ваш email"
-            aria-label="Email для подписки"
+            placeholder="Your email address"
+            aria-label="Email address for newsletter subscription"
             name="email"
             required
             disabled={status === "loading" || status === "done"}
-            className="w-full rounded-full border border-border-line bg-cream/60 px-4 py-3 text-sm text-ink placeholder:text-ink/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors disabled:opacity-60 min-h-[44px]"
+            className="w-full rounded-full border border-cream/20 bg-ink/50 px-4 py-3 text-sm text-cream placeholder:text-cream/50 focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors disabled:opacity-60 min-h-[44px]"
           />
         </div>
         <button
           type="submit"
           disabled={status === "loading" || status === "done"}
-          className="inline-flex items-center justify-center gap-2 rounded-full cta-gradient-punchy bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 min-h-[44px]"
+          className="cta-gradient-punchy inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 min-h-[44px]"
         >
           <AnimatePresence mode="wait" initial={false}>
             {status === "loading" ? (
@@ -119,8 +126,8 @@ function NewsletterSignup() {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-2"
               >
-                <Loader2 className="size-4 animate-spin" />
-                Подписка…
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                Subscribing…
               </motion.span>
             ) : status === "done" ? (
               <motion.span
@@ -130,8 +137,8 @@ function NewsletterSignup() {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-2"
               >
-                <CheckCircle2 className="size-4" />
-                Готово!
+                <CheckCircle2 className="size-4" aria-hidden="true" />
+                Done!
               </motion.span>
             ) : (
               <motion.span
@@ -141,13 +148,13 @@ function NewsletterSignup() {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-2"
               >
-                Подписаться
-                <ArrowRight className="size-4" />
+                Subscribe
+                <ArrowRight className="size-4" aria-hidden="true" />
               </motion.span>
             )}
           </AnimatePresence>
         </button>
-        <label className="mt-3 flex min-h-[44px] items-start gap-2 text-[11px] text-ink/70">
+        <label className="mt-3 flex min-h-[44px] items-start gap-2 text-[11px] text-cream/70 sm:mt-2">
           <input
             type="checkbox"
             checked={consent}
@@ -156,9 +163,11 @@ function NewsletterSignup() {
             className="mt-0.5 size-4 shrink-0 accent-gold"
           />
           <span>
-            Я согласен на обработку персональных данных согласно{" "}
-            <a href="/privacy" className="text-bordeaux hover:underline">политике конфиденциальности</a>{" "}
-            (152-ФЗ).
+            I agree to the processing of my personal data according to the{" "}
+            <a href="/privacy" className="text-gold hover:underline">
+              privacy policy
+            </a>
+            .
           </span>
         </label>
       </form>
@@ -166,155 +175,350 @@ function NewsletterSignup() {
   );
 }
 
+/** Footer navigation — Sopranos footer nav links. */
+const FOOTER_NAV = [
+  { label: "Home", href: "#main-content" },
+  { label: "Weddings", href: "#about" },
+  { label: "Corporate Events", href: "#services" },
+  { label: "Social Events", href: "#services" },
+  { label: "Grill & BBQ", href: "#services" },
+  { label: "By The Tray", href: "#snack-box" },
+  { label: "Apps & Enhancements", href: "#menu" },
+  { label: "Contact", href: "#contact" },
+] as const;
+
+/** Stagger reveal container variant — columns fade up one after another. */
+const columnVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      delay: i * 0.05,
+      ease: [0.4, 0, 0.2, 1] as const,
+    },
+  }),
+};
+
+/** One pass of the cities list for the marquee. */
+function CitiesTrack({ trackId = '' }: { trackId?: string }) {
+  return (
+    <div className="flex items-center gap-6 px-3" aria-hidden="true">
+      {SOPRANOS_CITIES.map((city, i) => (
+        <span
+          key={`${trackId}-${city}-${i}`}
+          className="flex items-center gap-3 font-display text-sm uppercase tracking-widest text-gold/80"
+        >
+          <span className="text-gold/60" aria-hidden="true">
+            •
+          </span>
+          <span>{city}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 /**
- * SiteFooter — LIGHT THEME with elegant warm styling
+ * SiteFooter — SOPRANOS CATERING dark navy footer.
  *
- * Inspired by MyRadish and Ridgewells:
- * - Warm cream background
- * - Giant stacked brand name (Concept-style) with slow horizontal drift on scroll
- * - Gold accent links
- * - Newsletter signup (P1 — Prisma Subscriber-backed)
- * - Clean organized layout
+ * Layout (matching sopranoscatering.com):
+ * 1. "Made with Love" intro band (Great Vibes script + subtext)
+ * 2. Newsletter signup (dark glass card)
+ * 3. Three-column main content: Contact Info / Navigation / Our Awards
+ * 4. "Proudly Serving" cities marquee (Southeast Michigan)
+ * 5. Copyright bar
+ *
+ * Design tokens: bg-ink (#1F2937), text-cream, gold accent, Oswald display,
+ * Great Vibes script, Karla body. Respects prefers-reduced-motion.
  */
 export function SiteFooter() {
   const year = useCurrentYear();
+  const reduce = useReducedMotion();
+  const motionProps = reduce
+    ? { initial: false, animate: { opacity: 1, y: 0 } }
+    : { initial: "hidden", whileInView: "visible", viewport: { once: true, margin: "-80px" } };
+
   return (
     <footer
       role="contentinfo"
-      data-header-theme="light"
-      className="section-light relative border-t border-border-line bg-cream mt-auto"
+      data-header-theme="dark"
+      aria-label="Site footer"
+      className="grain relative mt-auto overflow-hidden bg-ink text-cream"
     >
-      {/* Giant stacked brand name (Concept-style) — scales down on mobile */}
-      <div className="mx-auto max-w-7xl overflow-hidden px-5 md:px-8 py-12">
+      {/* Decorative top gold rule */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent" aria-hidden="true" />
+
+      {/* ============ Section 1 — "Made with Love" intro band ============ */}
+      <div className="mx-auto max-w-7xl px-5 pt-16 pb-10 text-center md:px-8 md:pt-20">
         <motion.div
-          className="font-display uppercase leading-[0.85] text-gold/10 whitespace-nowrap select-none"
-          style={{ fontSize: "clamp(3rem, 18vw, 12rem)" }}
-          aria-hidden
-          initial={{ x: "-1%" }}
-          whileInView={{ x: "1%" }}
-          viewport={{ once: false, margin: "-100px" }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
+          {...motionProps}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex flex-col items-center"
         >
-          Interfood<span className="text-gold">.</span>
+          <motion.div
+            {...motionProps}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+            className="flex items-center gap-3"
+          >
+            <span
+              className="font-script text-gold"
+              style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)" }}
+            >
+              Made with Love
+            </span>
+            <Heart
+              className="size-7 fill-gold text-gold"
+              aria-hidden="true"
+              style={{ marginBottom: "0.4rem" }}
+            />
+          </motion.div>
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-cream/80 md:text-base">
+            Whether you are having a small family gathering or celebrating a
+            holiday, Soprano&apos;s Catering wants you to be able to enjoy the
+            day with your family and friends and leave the cooking to us. At
+            Soprano&apos;s Catering, we are here to serve you!
+          </p>
         </motion.div>
       </div>
 
+      {/* ============ Section 2 — Newsletter signup band ============ */}
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        {/* Newsletter signup band */}
-        <div className="border-t border-border-line pt-8">
-          <NewsletterSignup />
-        </div>
+        <NewsletterSignup />
+      </div>
 
-        {/* Main footer content */}
-        <div className="mt-8 flex flex-col gap-8 border-t border-border-line pt-8 md:flex-row md:items-center md:justify-between">
-          {/* Contact links */}
-          <div className="flex flex-wrap items-center gap-5">
-            <a
-              href={CONTACTS.phoneHref}
-              className="group min-h-[44px] flex items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors"
+      {/* ============ Section 3 — Three-column main content ============ */}
+      <div className="mx-auto max-w-7xl px-5 py-14 md:px-8">
+        <div className="grid gap-10 md:grid-cols-3 md:gap-8">
+          {/* ---- Column 1: Contact Info ---- */}
+          <motion.section
+            {...motionProps}
+            custom={0}
+            variants={columnVariants}
+            aria-labelledby="footer-contact-heading"
+            className="flex flex-col gap-4"
+          >
+            <h2
+              id="footer-contact-heading"
+              className="eyebrow-wide text-sm text-gold"
             >
-              <Phone className="size-4 group-hover:rotate-12 transition-transform" />
-              {CONTACTS.phone}
-            </a>
-            <a
-              href={CONTACTS.whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="WhatsApp (откроется в новой вкладке)"
-              className="group min-h-[44px] flex items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors"
-            >
-              <MessageCircle className="size-4 group-hover:scale-110 transition-transform" />
-              WhatsApp
-            </a>
-            <a
-              href={CONTACTS.telegramHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Telegram (откроется в новой вкладке)"
-              className="group min-h-[44px] flex items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors"
-            >
-              <Telegram className="size-4 group-hover:rotate-12 transition-transform" />
-              Telegram
-            </a>
-            <a
-              href={CONTACTS.instagramHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram (откроется в новой вкладке)"
-              className="group min-h-[44px] flex items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors"
-            >
-              <Instagram className="size-4 group-hover:scale-110 transition-transform" />
-              Instagram
-            </a>
-            <a
-              href={CONTACTS.vkHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="ВКонтакте (откроется в новой вкладке)"
-              className="group min-h-[44px] flex items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors"
-            >
-              <VkIcon className="size-4 group-hover:scale-110 transition-transform" />
-              VK
-            </a>
-            <a
-              href={`mailto:${CONTACTS.email}`}
-              className="group min-h-[44px] flex items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors"
-            >
-              <Mail className="size-4 group-hover:rotate-12 transition-transform" />
-              Email
-            </a>
-          </div>
+              Contact Info
+            </h2>
 
-          {/* Navigation */}
-          <nav aria-label="Навигация по сайту" className="flex flex-wrap gap-6 text-sm">
-            {[
-              { href: "#menu", label: "Меню" },
-              { href: "#services", label: "Услуги" },
-              { href: "#calculator", label: "Калькулятор" },
-              { href: "#instagram", label: "Instagram" },
-              { href: "#contact", label: "Контакты" },
-            ].map((link) => (
+            <Image
+              src={SOPRANOS_ASSETS.logoWhite}
+              alt="Soprano's Catering — white logo"
+              width={180}
+              height={54}
+              sizes="180px"
+              className="max-w-[180px]"
+              style={{ width: "auto", height: "auto" }}
+              priority={false}
+            />
+
+            <address className="not-italic text-sm leading-relaxed text-cream/80">
+              Sopranos Catering
+              <br />
+              17600 Clinton River Road
+              <br />
+              Clinton Township, MI 48038
+            </address>
+
+            <div className="flex flex-col gap-2 text-sm">
               <a
-                key={link.href}
-                href={link.href}
-                className="min-h-[44px] flex items-center text-ink/70 font-medium hover-underline hover:text-ink transition-colors"
+                href={`mailto:${CONTACTS.email}`}
+                className="group inline-flex items-center gap-2 text-cream/80 transition-colors hover:text-gold min-h-[44px]"
               >
-                {link.label}
+                <Mail
+                  className="size-4 text-gold/70 transition-transform group-hover:rotate-12"
+                  aria-hidden="true"
+                />
+                {CONTACTS.email}
               </a>
-            ))}
-          </nav>
-        </div>
+              <a
+                href={CONTACTS.phoneHref}
+                className="group inline-flex items-center gap-2 text-lg font-semibold text-cream transition-colors hover:text-gold min-h-[44px]"
+              >
+                <Phone
+                  className="size-4 text-gold/70 transition-transform group-hover:rotate-12"
+                  aria-hidden="true"
+                />
+                {CONTACTS.phone}
+              </a>
+            </div>
 
-        {/* Legal info — 152-ФЗ + ЗОПП */}
-        <div className="mt-8 grid gap-6 border-t border-border-line pt-8 md:grid-cols-2">
-          <div className="space-y-1.5 text-xs text-ink/70">
-            <p className="text-ink/80 font-medium">
-              {LEGAL_INFO.legalForm} {LEGAL_INFO.legalName}
+            {/* Social icons row */}
+            <div className="mt-2 flex items-center gap-3">
+              <a
+                href="https://www.facebook.com/sopranoscatering"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Soprano's Catering on Facebook (opens in new tab)"
+                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+              >
+                <img
+                  src={SOPRANOS_ASSETS.facebook}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="size-5"
+                  aria-hidden="true"
+                />
+              </a>
+              <a
+                href={CONTACTS.instagramHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Soprano's Catering on Instagram (opens in new tab)"
+                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+              >
+                <img
+                  src={SOPRANOS_ASSETS.instagram}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="size-5"
+                  aria-hidden="true"
+                />
+              </a>
+            </div>
+          </motion.section>
+
+          {/* ---- Column 2: Navigation ---- */}
+          <motion.nav
+            {...motionProps}
+            custom={1}
+            variants={columnVariants}
+            aria-labelledby="footer-nav-heading"
+            className="flex flex-col gap-4"
+          >
+            <h2
+              id="footer-nav-heading"
+              className="eyebrow-wide text-sm text-gold"
+            >
+              Navigation
+            </h2>
+            <ul className="flex flex-col gap-1">
+              {FOOTER_NAV.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className="group inline-flex items-center gap-1.5 py-1.5 text-sm text-cream/80 transition-colors hover:text-gold min-h-[44px]"
+                  >
+                    <ChevronRight
+                      className="size-3 text-gold/60 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5"
+                      aria-hidden="true"
+                    />
+                    <span>{link.label}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </motion.nav>
+
+          {/* ---- Column 3: Our Awards ---- */}
+          <motion.section
+            {...motionProps}
+            custom={2}
+            variants={columnVariants}
+            aria-labelledby="footer-awards-heading"
+            className="flex flex-col gap-4"
+          >
+            <h2
+              id="footer-awards-heading"
+              className="eyebrow-wide text-sm text-gold"
+            >
+              Our Awards
+            </h2>
+            <div className="flex flex-wrap items-center gap-4">
+              {SOPRANOS_AWARDS.map((award) => (
+                <a
+                  key={award.title}
+                  href="#awards"
+                  className="group block transition-transform duration-300 hover:scale-110 hover:rotate-3"
+                  aria-label={award.alt}
+                >
+                  <Image
+                    src={award.image}
+                    alt={award.alt}
+                    width={100}
+                    height={100}
+                    sizes="100px"
+                    className="size-[100px] object-contain drop-shadow-lg"
+                  />
+                </a>
+              ))}
+            </div>
+            <p className="text-xs text-cream/60">
+              Recognized by Southeast Michigan&apos;s most prestigious catering
+              awards.
             </p>
-            <p>ИНН: {LEGAL_INFO.inn} · ОГРНИП: {LEGAL_INFO.ogrn}</p>
-            <p>{LEGAL_INFO.legalAddress}</p>
-            <p>{CONTACTS.city} · {SITE_CONFIG.currency}</p>
-          </div>
-          <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs md:justify-end">
-            <a
-              href="/privacy"
-              className="min-h-[44px] flex items-center text-ink/70 hover:text-gold transition-colors"
-            >
-              Политика конфиденциальности
-            </a>
-            <a
-              href="/offer"
-              className="min-h-[44px] flex items-center text-ink/70 hover:text-gold transition-colors"
-            >
-              Публичная оферта
-            </a>
-          </div>
+          </motion.section>
         </div>
+      </div>
 
-        {/* Copyright bar */}
-        <div className="mt-6 flex flex-col gap-3 text-xs text-ink/70 md:flex-row md:justify-between pb-8">
-          <p>© {year ?? 2025} {SITE_CONFIG.brandName} · {CONTACTS.city}</p>
-          <p>152-ФЗ · ЗОПП · Данные хранятся на территории РФ</p>
+      {/* ============ Section 4 — "Proudly Serving" cities marquee ============ */}
+      <div className="border-t border-cream/10 bg-ink/60">
+        <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
+          <div className="mb-4 flex flex-col items-center text-center">
+            <h2 className="eyebrow-wide text-sm text-gold">Proudly Serving</h2>
+            <p className="mt-2 text-sm text-cream/70">
+              Proudly Catering to Southeast Michigan
+            </p>
+          </div>
+
+          {reduce ? (
+            // Reduced motion: static wrap of cities, no animation
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+              {SOPRANOS_CITIES.map((city, i) => (
+                <span
+                  key={`static-${city}-${i}`}
+                  className="flex items-center gap-2 font-display text-xs uppercase tracking-widest text-gold/80"
+                >
+                  <span className="text-gold/60" aria-hidden="true">
+                    •
+                  </span>
+                  <span>{city}</span>
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="marquee-pause relative flex overflow-hidden"
+              role="presentation"
+            >
+              {/* Edge fade masks */}
+              <div
+                className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-ink to-transparent md:w-24"
+                aria-hidden="true"
+              />
+              <div
+                className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-ink to-transparent md:w-24"
+                aria-hidden="true"
+              />
+              {/* Duplicated track — translateX(-50%) loops seamlessly */}
+              <div className="marquee-track-logos flex">
+                <CitiesTrack trackId="a" />
+                <CitiesTrack trackId="b" />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ============ Section 5 — Copyright bar ============ */}
+      <div className="border-t border-cream/10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-xs text-cream/50 md:flex-row md:px-8">
+          <p className="text-center md:text-left">
+            © {year ?? 2025} {SITE_CONFIG.brandName}, All Rights Reserved
+          </p>
+          <a
+            href={CONTACTS.phoneHref}
+            className="font-display tracking-wide text-cream/60 transition-colors hover:text-gold min-h-[44px] flex items-center"
+          >
+            {CONTACTS.phone}
+          </a>
         </div>
       </div>
     </footer>

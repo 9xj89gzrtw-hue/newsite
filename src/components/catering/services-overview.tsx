@@ -19,11 +19,11 @@ import { SectionHeader } from "./section-header";
  * "what we do" before the detailed interactive cards. The existing grid
  * remains for the wow-factor 3D flip + modal experience.
  *
- * 4 categories mapped to Ridgewells' Corporate/Weddings/Social/Major:
- *   1. Свадебный банкет (Weddings)
- *   2. Корпоративы (Corporate)
- *   3. Частные мероприятия (Social/Private)
- *   4. Крупные события (Major Events)
+ * 4 categories mapped to Sopranos' Weddings/Corporate/Social/Major Events:
+ *   1. Weddings
+ *   2. Corporate Events
+ *   3. Social Events
+ *   4. Major Events
  */
 
 const EASE = [0.4, 0, 0.2, 1] as const;
@@ -40,35 +40,35 @@ type OverviewCard = {
 
 const CARDS: OverviewCard[] = [
   {
-    title: "Свадьбы",
-    tag: "Торжество под ключ",
-    body: "Полное сопровождение свадебного торжества: индивидуальное меню, welcome-зона с канапе и игристым, сервировка под концепцию, официанты и сомелье.",
+    title: "Weddings",
+    tag: "Made with Love",
+    body: "Full-service wedding catering: custom menu, welcome zone with canapés and sparkling wine, table settings tailored to your concept, servers and sommeliers on site.",
     image: "/media/event-04.jpg",
-    alt: "Свадебный банкет — сервированный стол с цветочной композицией",
-    href: "#services",
+    alt: "Wedding reception — beautifully set table with floral centerpiece",
+    href: "#about",
   },
   {
-    title: "Корпоративы",
-    tag: "Имиджевые события",
-    body: "Кейтеринг для гал, презентаций, новогодних корпоративов и пикников. Безупречное качество блюд и сервис, пунктуальность — для имиджевых событий.",
+    title: "Corporate Events",
+    tag: "Image-Defining Moments",
+    body: "Catering for galas, product launches, holiday parties, and corporate picnics. Impeccable food quality and service, punctual delivery — for events that define your brand.",
     image: "/media/event-02.jpg",
-    alt: "Корпоративное мероприятие — фуршетная линия для гостей",
+    alt: "Corporate event — reception line for guests",
     href: "#services",
   },
   {
-    title: "Частные приёмы",
-    tag: "Душевные собрания",
-    body: "От камерных ужинов до масштабных праздников: дни рождения, юбилеи, домашние вечеринки, загородные пикники. Привозим ресторан к вам.",
+    title: "Social Events",
+    tag: "Heartfelt Gatherings",
+    body: "From intimate dinners to large celebrations: birthdays, anniversaries, home parties, backyard picnics. We bring the restaurant to you.",
     image: "/media/event-03.jpg",
-    alt: "Частный приём — накрытый стол для ужина дома",
+    alt: "Private gathering — table set for an intimate dinner at home",
     href: "#services",
   },
   {
-    title: "Крупные события",
-    tag: "Масштаб и точность",
-    body: "Банкеты на 300+ гостей, выставки, премии, городские праздники. Точность логистики, скорость подачи и уровень гостеприимства международного класса.",
+    title: "Major Events",
+    tag: "Scale & Precision",
+    body: "Banquets for 300+ guests, exhibitions, award ceremonies, city-wide festivals. Logistics precision, plating speed, and hospitality at an international standard.",
     image: "/media/event-09.jpg",
-    alt: "Крупное событие — банкетный зал с сотнями гостей",
+    alt: "Major event — banquet hall with hundreds of guests",
     href: "#services",
   },
 ];
@@ -117,7 +117,7 @@ function OverviewCardItem({ card, index }: { card: OverviewCard; index: number }
         <p className="mt-5 max-w-md text-[1.02rem] leading-[1.55] text-ink/70">{card.body}</p>
         <div className="mt-7 text-ink">
           <OutlineButton href={card.href} variant="light">
-            Смотреть подробнее
+            View Details
           </OutlineButton>
         </div>
       </div>
@@ -138,15 +138,15 @@ export function ServicesOverview() {
       <div className="mx-auto max-w-7xl px-6 md:px-10">
         {/* Section header — Ridgewells editorial rhythm */}
         <SectionHeader
-          eyebrow="Что мы делаем"
+          eyebrow="What We Do"
           headline={
             <>
-              Кейтеринг полного цикла
+              Full-service catering
               <br />
-              <span className="italic text-bordeaux">для любого события.</span>
+              <span className="italic text-bordeaux">for any occasion.</span>
             </>
           }
-          lead="От фуршета на 20 человек до банкета на 500 гостей — мы привозим всё: посуду, мебель, текстиль, обслуживание. Ниже — четыре направления, в которых мы работаем чаще всего."
+          lead="From a reception for 20 to a banquet for 500 — we bring it all: china, glassware, linens, and service. Below are the four directions we cater most often."
           tone="light"
           align="left"
           className="mb-14 max-w-3xl"
@@ -159,7 +159,7 @@ export function ServicesOverview() {
           ))}
         </div>
 
-        {/* Closing CTA — "Все услуги" link to the detailed interactive grid */}
+        {/* Closing CTA — "All services" link to the detailed interactive grid */}
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 20 }}
           whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
@@ -171,7 +171,7 @@ export function ServicesOverview() {
             href="#services"
             className="font-sans text-[0.85rem] font-semibold uppercase tracking-[0.22em] text-ink underline-offset-[6px] transition-colors hover:text-bordeaux hover:underline"
           >
-            Смотреть все 11 услуг
+            View All Services
           </Link>
         </motion.div>
       </div>

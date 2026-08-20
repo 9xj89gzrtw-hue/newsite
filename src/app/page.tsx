@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
 import { Hero } from "@/components/catering/hero";
+import { WinterSpecials } from "@/components/catering/winter-specials";
 import { EditorialIntro } from "@/components/catering/editorial-intro";
 import { MarqueeBand } from "@/components/catering/marquee-band";
 import { LogoMarquee } from "@/components/catering/logo-marquee";
@@ -34,10 +35,13 @@ export default function Home() {
   return (
     <main id="main-content" role="main" tabIndex={-1} className="flex min-h-screen flex-col bg-cream outline-none">
       <SiteHeader />
+      {/* Hero — Sopranos full-viewport photo slider + Eastern Market story + sticky Check Your Date */}
       <Hero />
+      {/* WinterSpecials — Sopranos "NEW WINTER SPECIALS" dark navy band (Cycle 22) */}
+      <WinterSpecials />
       {/* EditorialIntro — Ridgewells WOW #1: painterly radial-gradient intro */}
       <EditorialIntro />
-      {/* MarqueeBand — Ridgewells WOW #2: solid-bordeaux infinite marquee */}
+      {/* MarqueeBand — solid-bordeaux infinite marquee */}
       <MarqueeBand />
       {/* Infinite client-logo marquee (Gamma / Creative Edge pattern) */}
       <LogoMarquee />
@@ -74,7 +78,7 @@ export default function Home() {
       <Testimonials />
       {/* FAQ: frequently asked questions about catering */}
       <Faq />
-      {/* Awards strip — premium trust signals before footer */}
+      {/* Awards strip — real Sopranos badges (Cycle 22) */}
       <AwardsStrip />
       <Contact />
       {/* SocialHandle — Ridgewells giant @nilov_catering closer (Cycle 21) */}

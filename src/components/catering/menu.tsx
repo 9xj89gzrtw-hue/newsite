@@ -18,19 +18,19 @@ import { toast } from "sonner";
 function getDietaryTags(name: string): string[] {
   const lower = name.toLowerCase();
   // Fish / seafood (counts as non-veg/non-vegan)
-  const fishRe = /(лосос|креветк|палтус|тунец|осьминог|гребешок|морепродукт|икра|мидии|устриц|раков|краб|дорад|сибас|карпаччо|форел|осётр|осетр|рыб|угорь|гольц|сельд)/i;
+  const fishRe = /(salmon|shrimp|halibut|tuna|octopus|scallop|seafood|caviar|mussel|oyster|crab|dorado|seabass|carpaccio|trout|sturgeon|fish|eel|char|herring)/i;
   // Meat (mammal + bird, no fish)
-  const meatRe = /(свин|говяж|говядин|куриц|курин|барани|язык|буженин|бекон|ветчин|хамон|пармск|ростбиф|мяс|шашлык|бефстроган|котлет|салями|паштет|фрикадел|фарш|кебаб|люля|гусин|утин|утка|жаркое|сосиск|колбас|чоризо|печён|печен|рулет|тёпл|тепл|вырезк|бедро|грудк|фарш|шниц|бифштекс|рагу|стейк.*говядин|медальон)/i;
+  const meatRe = /(pork|beef|chicken|lamb|tongue|ham|bacon|prosciutto|parma|roast|meat|kebab|stroganoff|cutlet|salami|pate|meatball|sausage|chorizo|duck|goose|stew|hot dog|bratwurst|medallion|steak|brisket|rib)/i;
   // Gluten sources
-  const glutenRe = /(брускетт|круассан|маффин|эклер|кекс|торт|пирож|бургер|лепёшк|лепешк|хлеб|крутон|гренк|тарталетк|песочн|бисквит|понч|пирог|багет|чиабат|лаваш|панчетт|спринг-ролл|блин)/i;
+  const glutenRe = /(bruschetta|croissant|muffin|eclair|cake|burger|flatbread|bread|crouton|tartlet|shortbread|biscuit|donut|pie|baguette|ciabatta|pancake|crêpe|wrap|pita)/i;
   // Pork explicitly
-  const porkRe = /(свин|бекон|буженин|ветчин|хамон|салями|сосиск|колбас|чоризо|люля.*баран|рулет.*свин)/i;
+  const porkRe = /(pork|bacon|ham|prosciutto|salami|sausage|chorizo|pancetta)/i;
   // Dairy (milk, cheese, cream, butter)
-  const dairyRe = /(сыр|творожн|слив|рикотт|моцарелл|пармезан|бри|дор-блю|дорбл|фета|маскарпон|чеддер|сливочн|масл|сметан|йогурт|бешамель|крем|молок|сливк)/i;
+  const dairyRe = /(cheese|ricotta|mozzarella|parmesan|brie|blue cheese|feta|mascarpone|cheddar|cream|butter|sour cream|yogurt|bechamel|milk)/i;
   // Eggs
-  const eggRe = /(яйц|перепелин)/i;
+  const eggRe = /(egg|quail egg)/i;
   // Honey
-  const honeyRe = /(мёд|медов)/i;
+  const honeyRe = /(honey)/i;
 
   const hasFish = fishRe.test(lower);
   const hasMeat = meatRe.test(lower) || hasFish;
@@ -50,10 +50,10 @@ function getDietaryTags(name: string): string[] {
 
 /** All dietary chip definitions shown to the user. */
 const DIETARY_CHIPS = [
-  { id: "veg", label: "Вег", icon: Leaf },
-  { id: "vegan", label: "Веган", icon: Vegan },
-  { id: "gf", label: "Без глютена", icon: Wheat },
-  { id: "halal", label: "Халяль", icon: Star },
+  { id: "veg", label: "Veg", icon: Leaf },
+  { id: "vegan", label: "Vegan", icon: Vegan },
+  { id: "gf", label: "Gluten-Free", icon: Wheat },
+  { id: "halal", label: "Halal", icon: Star },
 ] as const;
 
 /**
@@ -68,99 +68,99 @@ const SIGNATURE_DISHES: Record<string, Array<{
 }>> = {
   buffet: [
     {
-      name: "Канапе-ассорти с морепродуктами",
-      chefNote: "Крабовое мясо, лосось и творожный сыр — миниатюры холодного моря.",
-      price: "от 5 350 ₽ / чел",
+      name: "Seafood Canapé Assortment",
+      chefNote: "Crab meat, salmon, and cream cheese — miniature bites of the cold sea.",
+      price: "from $24 / guest",
       image: "/media/concorde-handhelds.jpg",
     },
     {
-      name: "Обжаренные гребешки с цветной капустой",
-      chefNote: "Три гребешка, фиолетовая цветная капуста и микрозелень — текстура в каждом укусе.",
-      price: "от 5 350 ₽ / чел",
+      name: "Seared Scallops with Cauliflower",
+      chefNote: "Three scallops, purple cauliflower, and microgreens — texture in every bite.",
+      price: "from $24 / guest",
       image: "/media/ridgewells-scallops.jpg",
     },
   ],
   banquet: [
     {
-      name: "Мясное ассорти и деликатесы",
-      chefNote: "Паштеты, сыровяленое мясо и фирменные закуски — для торжественного банкета.",
-      price: "от 6 970 ₽ / чел",
+      name: "Charcuterie & Cured Meats",
+      chefNote: "Pâtés, house-cured meats, and signature appetizers — for a celebratory banquet.",
+      price: "from $32 / guest",
       image: "/media/concorde-boardroom.webp",
     },
     {
-      name: "Сервировка банкета в шатре",
-      chefNote: "Полная сервировка, текстиль и флористика — атмосфера торжественного вечера.",
-      price: "от 6 970 ₽ / чел",
+      name: "Tented Banquet Setup",
+      chefNote: "Full table service, linens, and florals — the atmosphere of a celebratory evening.",
+      price: "from $32 / guest",
       image: "/media/ridgewells-gala.jpg",
     },
   ],
   "snack-box": [
     {
-      name: "Канапе с лососем и сливочным сыром",
-      chefNote: "Миниатюра, в которой умещается весь банк.",
-      price: "660 ₽ / шт",
+      name: "Smoked Salmon & Cream Cheese Canapés",
+      chefNote: "A bite-size morsel that packs the whole party into one.",
+      price: "$4 / piece",
       image: "/media/menu-snack-box.jpg",
     },
     {
-      name: "Мини-сэндвичи ассорти",
-      chefNote: "Краб, лосось и овощи в миниатюрных булочках — питерский характер в каждом укусе.",
-      price: "690 ₽ / шт",
+      name: "Mini Sandwich Assortment",
+      chefNote: "Crab, salmon, and vegetables in miniature rolls — Michigan character in every bite.",
+      price: "$4 / piece",
       image: "/media/concorde-handhelds.jpg",
     },
   ],
   "coffee-break": [
     {
-      name: "Капучино на 100% арабике",
-      chefNote: "Бразильское зерно, температура 67°C — бариста-станция прямо на месте.",
-      price: "от 2 200 ₽ / чел",
+      name: "100% Arabica Cappuccino",
+      chefNote: "Brazilian beans, milk steamed to 145°F — a barista station right on site.",
+      price: "from $12 / guest",
       image: "/media/menu-coffee-break.jpg",
     },
     {
-      name: "Сырная тарелка",
-      chefNote: "Бри, пармезан, дор-блю и мёд — медленная пауза между сессиями.",
-      price: "от 2 200 ₽ / чел",
+      name: "Artisan Cheese Board",
+      chefNote: "Brie, parmesan, blue cheese, and honey — a slow pause between sessions.",
+      price: "from $12 / guest",
       image: "/media/menu-coffee-break.jpg",
     },
   ],
   vegetarian: [
     {
-      name: "Овощное рагу в тыкве",
-      chefNote: "Нут, карри и сезонные овощи — тёплое блюдо, которое хочется неспешно.",
-      price: "от 3 250 ₽ / чел",
+      name: "Pumpkin-Stuffed Vegetable Stew",
+      chefNote: "Chickpeas, curry, and seasonal vegetables — a hearty dish to be savored slowly.",
+      price: "from $18 / guest",
       image: "/media/ridgewells-veg-mosaic.jpg",
     },
     {
-      name: "Веганский шоколадный мусс",
-      chefNote: "Бельгийский шоколад и ягоды — десерт без единого продукта животного происхождения.",
-      price: "от 3 250 ₽ / чел",
+      name: "Vegan Chocolate Mousse",
+      chefNote: "Belgian chocolate and berries — a dessert with no animal products whatsoever.",
+      price: "from $18 / guest",
       image: "/media/concorde-dessert.jpg",
     },
   ],
   bbq: [
     {
-      name: "Люля-кебаб на углях",
-      chefNote: "Баранина с зирой и кинзой — дым и специи на открытом огне.",
-      price: "от 3 500 ₽ / чел",
+      name: "Adana Kebab over Charcoal",
+      chefNote: "Lamb with cumin and cilantro — smoke and spice over an open flame.",
+      price: "from $20 / guest",
       image: "/media/event-08.jpg",
     },
     {
-      name: "Сосиски-гриль ручной работы",
-      chefNote: "Классические сосиски на углях — простой и верный рецепт для уличного барбекю.",
-      price: "от 2 200 ₽ / чел",
+      name: "Hand-Crafted Grilled Sausages",
+      chefNote: "Classic sausages on the coals — a simple, true recipe for outdoor BBQ.",
+      price: "from $12 / guest",
       image: "/media/event-08.jpg",
     },
   ],
   "office-lunch": [
     {
-      name: "Борщ классический",
-      chefNote: "Долго, медленно, по-домашнему — обед, после которого работают лучше.",
-      price: "от 950 ₽ / порция",
+      name: "Classic Michigan Chili",
+      chefNote: "Slow, simmered, home-style — a lunch that makes the afternoon go better.",
+      price: "from $9 / plate",
       image: "/media/menu-office-lunch.jpg",
     },
     {
-      name: "Котлета по-киевски",
-      chefNote: "Сочное куриное бедро, масло с травами внутри — классика жанра.",
-      price: "от 950 ₽ / порция",
+      name: "Chicken Kiev",
+      chefNote: "Juicy chicken thigh, herb butter inside — a classic for a reason.",
+      price: "from $9 / plate",
       image: "/media/menu-office-lunch.jpg",
     },
   ],
@@ -215,7 +215,7 @@ function FeaturedSpotlight({
 
   return (
     <div
-      aria-label="Авторское блюдо"
+      aria-label="Signature dish"
       className="relative mt-12 h-[60vh] min-h-[420px] w-full overflow-hidden rounded-3xl border border-border-line/60 bg-ink shadow-2xl shadow-ink/20 md:h-[80vh] md:min-h-[540px]"
     >
       <AnimatePresence mode="wait">
@@ -254,7 +254,7 @@ function FeaturedSpotlight({
             transition={{ delay: 0.1, duration: 0.6 }}
           >
             <Sparkles className="size-3" />
-            Авторское блюдо · {idx + 1} из {dishes.length}
+            Signature dish · {idx + 1} of {dishes.length}
           </motion.span>
 
           <AnimatePresence mode="wait">
@@ -291,7 +291,7 @@ function FeaturedSpotlight({
             >
               «{dish.chefNote}»
               <span className="mt-2 block font-sans text-[11px] not-italic uppercase tracking-[0.25em] text-gold/80">
-                — шеф-повар
+                — the chef
               </span>
             </motion.p>
           </AnimatePresence>
@@ -314,13 +314,13 @@ function FeaturedSpotlight({
             </motion.span>
 
             {dishes.length > 1 && (
-              <div className="flex items-center gap-2" role="group" aria-label="Авторские блюда">
+              <div className="flex items-center gap-2" role="group" aria-label="Signature dishes">
                 {dishes.map((_, i) => (
                   <button
                     key={i}
                     type="button"
                     aria-pressed={i === idx}
-                    aria-label={`Блюдо ${i + 1}`}
+                    aria-label={`Dish ${i + 1}`}
                     onClick={() => setIdx(i)}
                     className="min-h-[44px] min-w-[44px] flex items-center justify-center px-1"
                   >
@@ -336,9 +336,9 @@ function FeaturedSpotlight({
                     type="button"
                     onClick={() => setIdx(nextDishIdx)}
                     className="ml-2 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-cream/25 bg-cream/5 px-4 py-2 text-[11px] uppercase tracking-wider text-cream/80 transition-colors hover:bg-cream/15 hover:text-cream"
-                    aria-label="Следующее блюдо"
+                    aria-label="Next dish"
                   >
-                    Далее
+                    Next
                     <ArrowUpRight className="size-3" />
                   </button>
                 )}
@@ -361,7 +361,7 @@ export function Menu() {
   const [expandedPackage, setExpandedPackage] = useState<string | null>(null);
   const [dietary, setDietary] = useState<string[]>([]);
   const current = MENU_TYPES.find((m) => m.id === active) ?? MENU_TYPES[0];
-  const priceUnit = current.priceUnit ?? "/чел";
+  const priceUnit = current.priceUnit ?? "/guest";
   const prefersReducedMotion = useReducedMotion();
 
   const toggleDietary = (id: string) => {
@@ -388,10 +388,10 @@ export function Menu() {
       await generateMenuPdf(typeId);
       const isCatalog = typeId === "all";
       const t = MENU_TYPES.find((m) => m.id === typeId);
-      toast.success(isCatalog ? "Каталог скачан" : `Меню «${t?.label}» скачано`);
+      toast.success(isCatalog ? "Catalog downloaded" : `Menu “${t?.label}” downloaded`);
     } catch (e) {
       // Silently fail - user sees toast error above
-      toast.error("Не удалось сгенерировать PDF. Попробуйте ещё раз.");
+      toast.error("Could not generate PDF. Please try again.");
     } finally {
       setDownloading(null);
     }
@@ -410,7 +410,7 @@ export function Menu() {
             <Reveal>
               <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-                Меню
+                Menu
               </span>
             </Reveal>
             <Reveal delay={0.1}>
@@ -418,13 +418,13 @@ export function Menu() {
                 className="mt-5 font-display text-ink"
                 style={{ fontSize: "clamp(2rem, 5.5vw, 4rem)", lineHeight: 1 }}
               >
-                Меню{"\u00A0"}
-                <span className="gradient-text italic">мероприятий</span>
+                Event{"\u00A0"}
+                <span className="gradient-text italic">menus</span>
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
               <p className="mt-3 font-display italic text-lg text-ink/70 max-w-xl">
-                Пакеты с реальными блюдами и ценами. Скачайте PDF, чтобы показать команде.
+                Packages with real dishes and real prices. Download the PDF to share with your team.
               </p>
             </Reveal>
           </div>
@@ -434,7 +434,7 @@ export function Menu() {
         <Reveal delay={0.15}>
           <div
             role="tablist"
-            aria-label="Типы меню"
+            aria-label="Menu types"
             className="mt-12 flex flex-wrap justify-center gap-3 md:gap-4"
           >
             {MENU_TYPES.map((m) => {
@@ -498,7 +498,7 @@ export function Menu() {
                     <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-2 py-0.5 shadow-sm">
                       <Sparkles className={`size-2.5 ${isActive ? "text-gold" : "text-ink/70"} transition-colors`} />
                       <span className={`font-mono text-[10px] font-bold leading-none ${isActive ? "text-ink" : "text-ink/70"}`}>
-                        от {formatRUB(m.perGuest)}
+                        from {formatRUB(m.perGuest)}
                       </span>
                     </div>
                   </div>
@@ -540,11 +540,11 @@ export function Menu() {
         <Reveal delay={0.1}>
           <div
             role="toolbar"
-            aria-label="Фильтр по диетическим предпочтениям"
+            aria-label="Filter by dietary preferences"
             className="mt-10 flex flex-wrap items-center justify-center gap-2 md:gap-3"
           >
             <span className="mr-2 font-mono text-[11px] uppercase tracking-[0.25em] text-ink/70">
-              Фильтр:
+              Filter:
             </span>
             {DIETARY_CHIPS.map(({ id, label, icon: Icon }) => {
               const pressed = dietary.includes(id);
@@ -554,7 +554,7 @@ export function Menu() {
                   pressed={pressed}
                   onPressedChange={() => toggleDietary(id)}
                   size="sm"
-                  aria-label={`Фильтр: ${label}`}
+                  aria-label={`Filter: ${label}`}
                   className={`gap-1.5 inline-flex min-h-[44px] items-center rounded-full border px-4 py-2 text-xs font-medium transition-all duration-300 ${
                     pressed
                       ? "border-gold/40 bg-gold/15 text-ink shadow-sm shadow-gold/15"
@@ -572,7 +572,7 @@ export function Menu() {
                 onClick={() => setDietary([])}
                 className="ml-1 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 underline-offset-4 transition-colors hover:text-bordeaux hover:underline"
               >
-                Сбросить
+                Reset
               </button>
             )}
           </div>
@@ -613,10 +613,10 @@ export function Menu() {
                   />
                 )}
                 <Sparkles className="size-3 relative z-10" />
-                <span className="relative z-10">от {formatRUB(current.perGuest)} {priceUnit}</span>
+                <span className="relative z-10">from {formatRUB(current.perGuest)} {priceUnit}</span>
               </span>
               <span className="rounded-full bg-ink/5 px-4 py-2 font-mono text-xs text-ink/70">
-                мин. {current.minGuests} гостей
+                min. {current.minGuests} guests
               </span>
               <span className="hidden text-ink/30 sm:inline">·</span>
               <span className="hidden max-w-xs text-xs text-ink/70 sm:inline">{current.short}</span>
@@ -639,7 +639,7 @@ export function Menu() {
               <div className="mt-8 rounded-2xl border border-border-line bg-white p-5 md:p-6 shadow-sm">
                 <h4 className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-gold font-medium">
                   <Check className="size-4" />
-                  Включено во все пакеты
+                  Included in all packages
                 </h4>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {current.included.map((item) => (
@@ -658,7 +658,7 @@ export function Menu() {
                 onClick={() => downloadPdf(current.id)}
                 disabled={downloading !== null}
                 aria-busy={downloading === current.id}
-                aria-label={`Скачать меню «${current.label}» в PDF`}
+                aria-label={`Download menu "${current.label}" as PDF`}
                 whileHover={!prefersReducedMotion ? { scale: 1.03, y: -2 } : undefined}
                 whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                 className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3 text-xs font-semibold text-white shadow-lg shadow-gold/25 transition-all disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm min-h-[48px]"
@@ -672,24 +672,24 @@ export function Menu() {
                   />
                 )}
                 {downloading === current.id ? (
-                  <><Loader2 className="size-4 animate-spin relative z-10" /> Готовим PDF…</>
+                  <><Loader2 className="size-4 animate-spin relative z-10" /> Preparing PDF…</>
                 ) : (
-                  <><Download className="size-4 group-hover:animate-bounce relative z-10" /> Скачать меню</>
+                  <><Download className="size-4 group-hover:animate-bounce relative z-10" /> Download Menu</>
                 )}
               </motion.button>
               <motion.button
                 onClick={() => downloadPdf("all")}
                 disabled={downloading !== null}
                 aria-busy={downloading === "all"}
-                aria-label="Скачать полный каталог всех меню в PDF"
+                aria-label="Download full catalog of all menus as PDF"
                 whileHover={!prefersReducedMotion ? { scale: 1.03, y: -2 } : undefined}
                 whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                 className="group flex items-center gap-2 rounded-full border-2 border-border-line bg-white px-6 py-3 text-xs font-medium text-ink/70 transition-all hover:border-gold hover:bg-gold/5 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm min-h-[48px]"
               >
                 {downloading === "all" ? (
-                  <><Loader2 className="size-4 animate-spin" /> Готовим…</>
+                  <><Loader2 className="size-4 animate-spin" /> Preparing…</>
                 ) : (
-                  <><Download className="size-4 transition-transform group-hover:-translate-y-0.5" /> Полный каталог</>
+                  <><Download className="size-4 transition-transform group-hover:-translate-y-0.5" /> Full Catalog</>
                 )}
               </motion.button>
             </div>
@@ -804,7 +804,7 @@ function PriceBadge({ price, unit }: { price: number; unit: string }) {
       />
       
       <Sparkles className="size-3 relative z-10 animate-pulse" />
-      <span className="relative z-10">от {formatRUB(price)}{unit}</span>
+      <span className="relative z-10">from {formatRUB(price)}{unit}</span>
     </motion.span>
   );
 }
@@ -953,7 +953,7 @@ function PackageCarousel({
                           transition={{ delay: 0.1 + idx * 0.05 }}
                         >
                           {isPremium && <Sparkles className="size-2.5" />}
-                          Пакет {idx + 1}
+                          Package {idx + 1}
                         </motion.span>
                         <motion.h3 
                           className="mt-1.5 font-display text-xl text-white font-semibold leading-tight truncate"
@@ -1052,7 +1052,7 @@ function PackageCarousel({
                       className="rounded-xl border border-dashed border-border-line bg-cream/40 px-4 py-6 text-center text-xs text-ink/70"
                       role="status"
                     >
-                      В этом пакете нет блюд, удовлетворяющих выбранным фильтрам.
+                      No dishes in this package match the selected filters.
                     </li>
                   )}
                 </ul>
@@ -1067,7 +1067,7 @@ function PackageCarousel({
                     whileHover={!prefersReducedMotion ? { scale: 1.02 } : undefined}
                     whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                   >
-                    <span>{isExpanded ? "Свернуть" : `Показать ещё ${hiddenCount}`}</span>
+                    <span>{isExpanded ? "Collapse" : `Show ${hiddenCount} more`}</span>
                     <motion.span
                       animate={{ rotate: isExpanded ? 180 : 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -1084,7 +1084,7 @@ function PackageCarousel({
                   whileHover={!prefersReducedMotion ? { scale: 1.03, y: -2 } : undefined}
                   whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                 >
-                  <span>Рассчитать стоимость</span>
+                  <span>Get a Quote</span>
                   <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </motion.button>
               </div>

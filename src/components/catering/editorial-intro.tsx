@@ -82,7 +82,7 @@ export function EditorialIntro() {
           className="eyebrow-wide"
           style={{ color: "#E8B889" }}
         >
-          Авторская кухня. Безупречный сервис. Незабываемые впечатления.
+          Soprano&rsquo;s Catering. Author cuisine. Impeccable service. Unforgettable impressions.
         </motion.p>
 
         {/* Headline — huge Playfair, manual line break for poetic rhythm
@@ -97,12 +97,12 @@ export function EditorialIntro() {
           className="display-headline-xl mt-7 tinted-headline"
           style={{ textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}
         >
-          У каждого события
+          Every event has its
           <br />
           <span className="italic" style={{ color: "#E8B889" }}>
-            своя история
+            own story
           </span>{" "}
-          застолья.
+          at the table.
         </motion.h2>
 
         {/* Lead paragraph — Ridgewells uses 18px Gotham Book, lh 1.4 */}
@@ -113,13 +113,13 @@ export function EditorialIntro() {
           transition={{ duration: 0.8, delay: 0.35, ease: EASE }}
           className="mx-auto mt-9 max-w-xl text-[1.05rem] leading-[1.6] text-cream/90 md:text-[1.15rem]"
         >
-          Interfood Catering — петербургская команда, которая превращает любое
-          мероприятие в ритуал застолья. Сезонные продукты, руки поваров и
-          выездная магия — от фуршета на 20 человек до банкета на 500 гостей.
+          Soprano&rsquo;s Catering is a Michigan family that turns every event into
+          a celebration of the table. Hand-picked seasonal produce, our chefs&rsquo;
+          hands, and the magic of catering — from a reception for 20 to a banquet for 500.
         </motion.p>
 
         {/* Dual CTA — Ridgewells uses two outline buttons (INQUIRE + ORDER).
-           We mirror with "Смотреть меню" + "Рассчитать стоимость". */}
+           We mirror with "View Menu" + "Get a Quote". */}
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 20 }}
           whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
@@ -128,10 +128,10 @@ export function EditorialIntro() {
           className="mt-12 flex flex-wrap items-center justify-center gap-4 text-cream"
         >
           <OutlineButton href="#menu" variant="dark">
-            Смотреть меню
+            View Menu
           </OutlineButton>
           <OutlineButton href="#calculator" variant="dark" icon={false}>
-            Рассчитать стоимость
+            Get a Quote
           </OutlineButton>
         </motion.div>
 

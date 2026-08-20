@@ -11,13 +11,13 @@ import { formatRUB } from "@/lib/pricing";
 /**
  * SnackBoxDelivery — LIGHT THEME
  *
- * Доставка закусок — отдельная услуга (мобильный фуршет в коробках).
+ * By The Tray — pick-up & drop-off catering by the tray.
  *
  * Task 2-c additions:
  *  - Inline qty stepper (`- 1 +`) per row, opens via AnimatePresence.
  *    Plus/minus buttons have whileTap scale.
  *  - Running total pill (sticky) in the price-list card footer that
- *    shows `Σ N порций · X₽` and pulses on qty change.
+ *    shows `Σ N items · $X` and pulses on qty change.
  */
 export function SnackBoxDelivery() {
   const prefersReducedMotion = useReducedMotion();
@@ -74,7 +74,7 @@ export function SnackBoxDelivery() {
             <Reveal>
               <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
                 <Truck className="size-3" />
-                Доставка закусок
+                By The Tray
               </span>
             </Reveal>
             <Reveal delay={0.1}>
@@ -82,31 +82,31 @@ export function SnackBoxDelivery() {
                 className="mt-5 font-display text-ink"
                 style={{ fontSize: "clamp(1.8rem, 4vw, 3.25rem)", lineHeight: 1.05 }}
               >
-                Мобильный фуршет{" "}
+                Pick-up & drop-off{" "}
                 <br className="hidden sm:block" />
-                <span className="gradient-text italic">в индивидуальной упаковке</span>
+                <span className="gradient-text italic">by the tray</span>
               </h2>
             </Reveal>
             <Reveal delay={0.2}>
               <p className="mt-5 max-w-md text-base leading-relaxed text-ink/70 font-display">
-                Готовые наборы закусок для мероприятий любого формата — канапе,
-                брускетты, салаты, горячее. Индивидуальная упаковка, удобная
-                подача. Доставка по Санкт-Петербургу.
+                Ready-to-serve trays for events of any size — appetizers,
+                bruschetta, salads, hot dishes. Individual packaging, easy
+                serving. Delivery across Southeast Michigan.
               </p>
             </Reveal>
             <Reveal delay={0.3}>
               <div className="mt-6 flex items-center gap-3 text-sm text-ink/70 bg-white/70 inline-flex px-4 py-2 rounded-full">
                 <Truck className="size-5 text-gold" />
-                <span>Доставка по СПб · от 10 порций · от 1 дня</span>
+                <span>Southeast Michigan · 10-piece min · 1-day turnaround</span>
               </div>
             </Reveal>
             <Reveal delay={0.4}>
               <a
                 href="#contact"
-                data-cursor="заказать"
+                data-cursor="order"
                 className="group mt-8 inline-flex items-center gap-2 rounded-full cta-gradient-punchy bg-gradient-to-r from-gold to-terracotta px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:-translate-y-0.5"
               >
-                Заказать доставку
+                Order Trays
                 <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </a>
             </Reveal>
@@ -126,9 +126,9 @@ export function SnackBoxDelivery() {
           <Reveal>
             <div className="overflow-hidden rounded-2xl border border-border-line bg-white shadow-lg shadow-ink/5">
               <div className="relative flex items-center justify-between bg-gradient-to-r from-gold to-terracotta px-6 py-4">
-                <h3 className="font-display text-lg text-white">Прайс-лист</h3>
+                <h3 className="font-display text-lg text-white">Price List</h3>
                 <span className="font-mono text-xs uppercase tracking-wider text-white/80">
-                  {SNACK_BOX_ITEMS.length} позиций
+                  {SNACK_BOX_ITEMS.length} items
                 </span>
 
                 {/* Sticky running-total pill — pulses on qty change */}
@@ -155,7 +155,7 @@ export function SnackBoxDelivery() {
                       >
                         <span aria-hidden="true">Σ</span>
                         <span className="tabular-nums">{totalPortions}</span>
-                        <span className="text-cream/60">порций</span>
+                        <span className="text-cream/60">items</span>
                         <span aria-hidden="true" className="text-cream/40">·</span>
                         <span className="tabular-nums">{formatRUB(totalRub)}</span>
                       </motion.span>
@@ -186,7 +186,7 @@ export function SnackBoxDelivery() {
                           className="flex flex-1 items-center gap-3 text-left min-h-[44px]"
                           aria-expanded={isOpen}
                           aria-controls={`stepper-${i}`}
-                          aria-label={`${item.name}, добавить в заказ`}
+                          aria-label={`${item.name}, add to order`}
                         >
                           <span className="font-mono text-xs text-ink/70 w-6 shrink-0">
                             {String(i + 1).padStart(2, "0")}
@@ -240,7 +240,7 @@ export function SnackBoxDelivery() {
                                       decrement(item.name);
                                     }}
                                     disabled={n === 0}
-                                    aria-label={`Уменьшить: ${item.name}`}
+                                    aria-label={`Decrease: ${item.name}`}
                                     className="flex size-11 items-center justify-center rounded-full border border-border-line bg-white text-ink/70 transition-colors hover:border-gold/40 hover:text-gold disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px] min-w-[44px]"
                                     whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
                                   >
@@ -265,7 +265,7 @@ export function SnackBoxDelivery() {
                                       e.stopPropagation();
                                       increment(item.name);
                                     }}
-                                    aria-label={`Увеличить: ${item.name}`}
+                                    aria-label={`Increase: ${item.name}`}
                                     className="flex size-11 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-sm shadow-gold/25 transition-transform hover:scale-105 min-h-[44px] min-w-[44px]"
                                     whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
                                   >
@@ -281,7 +281,7 @@ export function SnackBoxDelivery() {
                                     setOpenRow(item.name);
                                     increment(item.name);
                                   }}
-                                  aria-label={`Добавить: ${item.name}`}
+                                  aria-label={`Add: ${item.name}`}
                                   className="flex size-11 items-center justify-center rounded-full border border-border-line bg-white text-ink/70 transition-colors hover:border-gold/40 hover:text-gold hover:bg-gold/5 min-h-[44px] min-w-[44px]"
                                   whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
                                   initial={{ opacity: 0, scale: 0.9 }}
@@ -309,7 +309,7 @@ export function SnackBoxDelivery() {
                           >
                             <div className="mt-3 flex items-center justify-between rounded-lg bg-gold/8 px-3 py-2 text-xs text-ink/65">
                               <span>
-                                В заказе: <span className="font-semibold text-ink">{n} × {formatRUB(item.price)}</span>
+                                In order: <span className="font-semibold text-ink">{n} × {formatRUB(item.price)}</span>
                               </span>
                               <span className="font-mono font-semibold text-gold">
                                 = {formatRUB(n * item.price)}
@@ -327,7 +327,7 @@ export function SnackBoxDelivery() {
               <div className="border-t border-border-line bg-parchment/50 px-6 py-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="text-xs text-ink/70">
-                    * Мин. заказ — от 10 порций. Финальная стоимость зависит от объёма.
+                    * 10-piece minimum. Final pricing depends on volume.
                   </div>
                   <div className="flex items-center gap-3">
                     {hasAny && (
@@ -339,16 +339,16 @@ export function SnackBoxDelivery() {
                         }}
                         className="rounded-full px-3 py-2.5 text-xs font-medium text-ink/70 transition-colors hover:text-bordeaux hover:underline min-h-[44px]"
                       >
-                        Сбросить
+                        Reset
                       </button>
                     )}
                     {hasAny ? (
                     <a
                       href="#contact"
-                      data-cursor="оформить"
+                      data-cursor="checkout"
                       className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold shadow-lg transition-all bg-gradient-to-r from-gold to-terracotta text-white shadow-gold/25 hover:shadow-xl hover:-translate-y-0.5 min-h-[44px]`}
                     >
-                      Оформить: {formatRUB(totalRub)}
+                      Checkout: {formatRUB(totalRub)}
                       <ArrowUpRight className="size-3.5" />
                     </a>
                     ) : (
@@ -356,7 +356,7 @@ export function SnackBoxDelivery() {
                         aria-disabled="true"
                         className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold shadow-lg cursor-not-allowed bg-ink/10 text-ink/70 shadow-none min-h-[44px]`}
                       >
-                        Оформить: {formatRUB(totalRub)}
+                        Checkout: {formatRUB(totalRub)}
                         <ArrowUpRight className="size-3.5" />
                       </span>
                     )}

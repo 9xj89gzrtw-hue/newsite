@@ -11,18 +11,18 @@ import { Reveal } from "./reveal";
  * the global animation-duration override in globals.css.
  */
 const CLIENTS = [
-  "Сбербанк",
-  "Газпром нефть",
-  "Ленэнерго",
-  "Bayer",
-  "Porsche Russia",
-  "L'Oréal",
-  "Sanofi",
-  "Nestlé",
-  "Danone",
-  "Bosch",
-  "Siemens",
-  "IKEA",
+  "Ford Motor Company",
+  "Quicken Loans",
+  "Blue Cross Blue Shield",
+  "General Motors",
+  "DTE Energy",
+  "Comerica Bank",
+  "Henry Ford Health",
+  "Rocket Companies",
+  "Wayne State University",
+  "Detroit Medical Center",
+  "Ilitch Holdings",
+  "Meijer",
 ];
 
 export function LogoMarquee() {
@@ -31,14 +31,14 @@ export function LogoMarquee() {
 
   return (
     <section
-      aria-label="Клиенты, которые нам доверяют"
+      aria-label="Trusted by Michigan's finest"
       data-header-theme="light"
       className="relative border-y border-border-line bg-cream py-10 md:py-14"
     >
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal>
           <p className="mb-7 text-center font-mono text-xs uppercase tracking-[0.35em] text-ink/70">
-            Нам доверяют лидеры рынка
+            Trusted by Michigan&rsquo;s Finest
           </p>
         </Reveal>
       </div>

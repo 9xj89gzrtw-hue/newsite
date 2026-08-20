@@ -4,14 +4,15 @@ import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, HelpCircle, Search, X, ThumbsUp, ThumbsDown, Check } from "lucide-react";
 import { Reveal } from "./reveal";
+import { CONTACTS } from "@/lib/media";
 
 type FaqCategory = "ordering" | "logistics" | "menu" | "payment";
 
 const CATEGORIES: { id: FaqCategory; label: string }[] = [
-  { id: "ordering", label: "Заказ" },
-  { id: "logistics", label: "Логистика" },
-  { id: "menu", label: "Меню" },
-  { id: "payment", label: "Оплата" },
+  { id: "ordering", label: "Ordering" },
+  { id: "logistics", label: "Logistics" },
+  { id: "menu", label: "Menu" },
+  { id: "payment", label: "Payment" },
 ];
 
 const faqItems: {
@@ -21,51 +22,51 @@ const faqItems: {
 }[] = [
   {
     category: "ordering",
-    question: "За какое время нужно заказать кейтеринг?",
+    question: "How far in advance should I book catering?",
     answer:
-      "Рекомендуем делать заказ минимум за 3–5 дней до мероприятия. Для крупных событий (от 100 человек) лучше заказать за 1–2 недели. Экстренные заказы рассматриваем индивидуально — позвоните нам, и мы постараемся помочь.",
+      "We recommend booking at least 3–5 days before your event. For larger events (100+ guests), it's best to book 1–2 weeks ahead. Last-minute requests are handled case by case — give us a call and we'll do our best to help.",
   },
   {
     category: "payment",
-    question: "Какая минимальная сумма заказа?",
+    question: "What is the minimum order amount?",
     answer:
-      "Минимальная сумма заказа зависит от формата: для фуршета — от 49 000 ₽ (от 20 гостей × 2 450 ₽), для кофе-брейка — от 13 500 ₽ (от 15 гостей × 900 ₽), для банкета — от 134 100 ₽ (от 30 гостей × 4 470 ₽). Точную стоимость рассчитает наш менеджер под ваши задачи.",
+      "The minimum order depends on the format: receptions start at $490 (from 20 guests × $24/guest), coffee breaks start at $270 (from 15 guests × $18/guest), and banquets start at $1,350 (from 30 guests × $45/guest). Our team will quote exact pricing for your specific needs.",
   },
   {
     category: "logistics",
-    question: "Выезжаете ли вы за пределы Санкт-Петербурга?",
+    question: "Do you travel outside Southeast Michigan?",
     answer:
-      "Да, мы работаем по всему Санкт-Петербургу и Ленинградской области (в радиусе 50 км включено в стоимость). Для более удалённых локаций (Выборг, Тихвин, Лодейное Поле) рассчитывается дополнительная логистическая надбавка.",
+      "Yes — we serve the entire Southeast Michigan region (Macomb, Oakland, Wayne, and St. Clair counties included at no extra charge). For locations further out (Lansing, Ann Arbor, Flint), we add a modest mileage fee to cover logistics.",
   },
   {
     category: "logistics",
-    question: "Предоставляете ли вы посуду, сервировку и персонал?",
+    question: "Do you provide china, table service, and staff?",
     answer:
-      "Да, это наша стандартная услуга. В стоимость входит одноразовая или многоразовая посуда (на выбор), сервировка стола, а также обслуживающий персонал (официанты, бармены, шеф-повар). Для премиум-мероприятий предлагаем декор и флористику.",
+      "Yes, that's standard for our service. The package includes disposable or reusable china (your choice), full table setting, and front-of-house staff (servers, bartenders, executive chef). For premium events we offer decor and floral design as well.",
   },
   {
     category: "menu",
-    question: "Можно ли учесть пищевые ограничения (аллергии, веганство)?",
+    question: "Can you accommodate dietary restrictions (allergies, vegan)?",
     answer:
-      "Обязательно! Мы готовим меню с учётом любых пищевых ограничений: без глютена, лактозы, орехов, а также halal, kosher, вегетарианские и веганские опции. Укажите ограничения при заказе — мы адаптируем меню.",
+      "Always! We prepare menus to accommodate any dietary restrictions: gluten-free, dairy-free, nut-free, halal, kosher, vegetarian, and vegan options. Just let us know the restrictions when you book — we'll adapt the menu accordingly.",
   },
   {
     category: "payment",
-    question: "Как происходит оплата?",
+    question: "How does payment work?",
     answer:
-      "Работаем как с юридическими, так и с физическими лицами. Оплата возможна безналичным расчётом (с НДС и без), наличными или банковским переводом. Условия предоплаты: обычно 30–50 % при заключении договора, остаток — после мероприятия.",
+      "We work with both businesses and individuals. Payment can be made by credit card, check, or bank transfer. Deposit terms: typically 30–50% at contract signing with the balance due after the event. Net-15 invoicing available for established corporate accounts.",
   },
   {
     category: "menu",
-    question: "Готовите ли вы блюда по индивидуальному меню?",
+    question: "Can you prepare a custom menu?",
     answer:
-      "Да, наш шеф-повар составит индивидуальное меню под ваши предпочтения, бюджет и стилистику мероприятия. Можно согласовать дегустацию перед заказом — это стандартная практика для банкетов и свадеб.",
+      "Yes — our executive chef will craft a custom menu tailored to your preferences, budget, and event style. A tasting can be arranged before booking, which is standard practice for banquets and weddings.",
   },
   {
     category: "ordering",
-    question: "Можно ли скорректировать заказ после его оформления?",
+    question: "Can I change my order after booking?",
     answer:
-      "Да, изменения можно вносить бесплатно за 48 часов до мероприятия. Позже — по согласованию с менеджером, возможна доплата за срочную закупку продуктов.",
+      "Yes, changes can be made at no charge up to 48 hours before the event. After that, changes are subject to manager approval and may incur a small fee for expedited ingredient sourcing.",
   },
 ];
 
@@ -105,7 +106,7 @@ function highlightMatch(text: string, query: string) {
 }
 
 const VOTE_KEY = "faq-votes";
-const POSITIVE_THRESHOLD = 5; // show "Спасибо за отзыв!" after this many aggregate votes (localStorage-only)
+const POSITIVE_THRESHOLD = 5; // show "Thanks for your feedback!" after this many aggregate votes (localStorage-only)
 
 /**
  * Read all faq votes from localStorage. Returns map of question → "up"|"down".
@@ -165,8 +166,8 @@ function WasHelpful({ question }: { question: string }) {
         if (vote === "up") setTotalUp((n) => Math.max(0, n - 1));
         else setTotalDown((n) => Math.max(0, n - 1));
       }
-      // Phase 8: also POST to /api/faq-vote for server-side aggregate (152-ФЗ
-      // compliant — captures IP + User-Agent as consent proof). Fire-and-forget
+      // Phase 8: also POST to /api/faq-vote for server-side aggregate (GDPR-compliant
+      // — captures IP + User-Agent as consent proof). Fire-and-forget
       // (no await) — UI doesn't block on server response. localStorage remains
       // the source of truth for instant UI feedback.
       fetch("/api/faq-vote", {
@@ -185,12 +186,12 @@ function WasHelpful({ question }: { question: string }) {
 
   return (
     <div className="flex items-center gap-3 text-xs text-ink/70">
-      <span>Помог ответ?</span>
+      <span>Was this answer helpful?</span>
       <button
         type="button"
         onClick={() => onVote("up")}
         aria-pressed={vote === "up"}
-        aria-label="Да, помог"
+        aria-label="Yes, helpful"
         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[44px] min-w-[44px] ${
           vote === "up"
             ? "border-sage/40 bg-sage/15 text-sage"
@@ -198,7 +199,7 @@ function WasHelpful({ question }: { question: string }) {
         }`}
       >
         <ThumbsUp className="size-3" />
-        Да
+        Yes
         {totalUp >= POSITIVE_THRESHOLD && (
           <span className="font-mono text-[10px] opacity-70">{totalUp}</span>
         )}
@@ -207,7 +208,7 @@ function WasHelpful({ question }: { question: string }) {
         type="button"
         onClick={() => onVote("down")}
         aria-pressed={vote === "down"}
-        aria-label="Нет, не помог"
+        aria-label="No, not helpful"
         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all min-h-[44px] min-w-[44px] ${
           vote === "down"
             ? "border-bordeaux/30 bg-bordeaux/5 text-bordeaux"
@@ -215,7 +216,7 @@ function WasHelpful({ question }: { question: string }) {
         }`}
       >
         <ThumbsDown className="size-3" />
-        Нет
+        No
         {totalDown >= POSITIVE_THRESHOLD && (
           <span className="font-mono text-[10px] opacity-70">{totalDown}</span>
         )}
@@ -231,7 +232,7 @@ function WasHelpful({ question }: { question: string }) {
             className="inline-flex items-center gap-1 text-sage"
           >
             <Check className="size-3" />
-            Спасибо за отзыв!
+            Thanks for your feedback!
           </motion.span>
         )}
       </AnimatePresence>
@@ -285,10 +286,10 @@ export function Faq() {
               className="mt-4 font-display text-ink"
               style={{ fontSize: "clamp(1.75rem, 4.5vw, 2.75rem)", lineHeight: 1.2 }}
             >
-              Частые вопросы
+              Frequently Asked Questions
             </h2>
             <p className="mt-4 text-base text-ink/70">
-              Ответы на популярные вопросы о нашем кейтеринге
+              Answers to common questions about our catering
             </p>
           </div>
         </Reveal>
@@ -305,15 +306,15 @@ export function Faq() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Поиск по вопросам…"
-                aria-label="Поиск по частым вопросам"
+                placeholder="Search questions…"
+                aria-label="Search frequently asked questions"
                 className="w-full rounded-full border border-border-line bg-cream/60 pl-12 pr-12 py-3.5 text-base text-ink placeholder:text-ink/70 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors min-h-[44px]"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
-                  aria-label="Очистить поиск"
+                  aria-label="Clear search"
                   className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex size-11 items-center justify-center rounded-full text-ink/70 hover:bg-ink/5 hover:text-ink transition-colors min-h-[44px] min-w-[44px]"
                 >
                   <X className="size-4" />
@@ -336,7 +337,7 @@ export function Faq() {
                   : "border-border-line bg-cream/40 text-ink/70 hover:border-gold/30 hover:text-ink"
               }`}
             >
-              Все
+              All
               <span className="font-mono text-[10px] text-ink/70">
                 {faqItems.length}
               </span>
@@ -369,8 +370,8 @@ export function Faq() {
         {/* Items count */}
         <div className="mb-4 text-center font-mono text-xs uppercase tracking-wider text-ink/70">
           {filtered.length === 0
-            ? "Ничего не найдено"
-            : `Показано ${filtered.length} из ${faqItems.length}`}
+            ? "No results found"
+            : `Showing ${filtered.length} of ${faqItems.length}`}
         </div>
 
         {/* Items list with AnimatePresence layout animation */}
@@ -455,16 +456,16 @@ export function Faq() {
         <Reveal delay={0.2}>
           <div className="mt-10 rounded-2xl border border-gold/20 bg-gradient-to-br from-cream to-cream/40 p-6 text-center">
             <p className="font-display text-lg text-ink">
-              Не нашли ответ на свой вопрос?
+              Didn&rsquo;t find your answer?
             </p>
             <p className="mt-1 text-sm text-ink/70">
-              Позвоните нам — подскажем за минуту
+              Give us a call — we&rsquo;ll sort it out in a minute
             </p>
             <a
-              href="tel:+78129195911"
+              href={CONTACTS.phoneHref}
               className="mt-4 inline-flex items-center gap-2 rounded-full cta-gradient-punchy bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.03] active:scale-[0.98] min-h-[44px]"
             >
-              +7 (812) 919-59-11
+              {CONTACTS.phone}
             </a>
           </div>
         </Reveal>

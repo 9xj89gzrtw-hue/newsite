@@ -10,14 +10,14 @@ import { motion, useScroll, useSpring } from "framer-motion";
  * Shows a thin track + per-section dots; the current section dot fills gold.
  */
 const SECTIONS = [
-  { id: "home", label: "Герой" },
-  { id: "about", label: "О компании" },
-  { id: "manifesto", label: "Манифест" },
-  { id: "menu", label: "Меню" },
-  { id: "services", label: "Услуги" },
-  { id: "events", label: "События" },
-  { id: "calculator", label: "Калькулятор" },
-  { id: "contact", label: "Контакты" },
+  { id: "home", label: "Hero" },
+  { id: "about", label: "About" },
+  { id: "manifesto", label: "Manifesto" },
+  { id: "menu", label: "Menu" },
+  { id: "services", label: "Services" },
+  { id: "events", label: "Events" },
+  { id: "calculator", label: "Calculator" },
+  { id: "contact", label: "Contact" },
 ];
 
 export function ChapterNav() {
@@ -49,7 +49,7 @@ export function ChapterNav() {
 
   return (
     <nav
-      aria-label="Быстрая навигация по разделам"
+      aria-label="Quick navigation by section"
       className="pointer-events-none fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 lg:block"
     >
       <ul className="pointer-events-auto flex flex-col items-end gap-3">
@@ -60,7 +60,7 @@ export function ChapterNav() {
               <button
                 onClick={() => scrollTo(s.id)}
                 className="group flex items-center gap-2.5 min-h-[44px] min-w-[44px] px-2 py-2"
-                aria-label={`Перейти к разделу: ${s.label}`}
+                aria-label={`Jump to section: ${s.label}`}
                 aria-current={isActive ? "true" : undefined}
               >
                 <span

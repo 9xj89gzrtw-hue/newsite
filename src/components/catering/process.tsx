@@ -8,13 +8,13 @@ import type { LucideIcon } from "lucide-react";
 
 /**
  * Process — emotional process timeline (Creative Edge pattern:
- * 01-DREAM → 02-BUILD → 03-SAVOR). Adapted to catering journey:
- * 01 МЕЧТА → 02 ПРОЕКТ → 03 ПОДАЧА → 04 ПРАЗДНИК.
+ * 01-DREAM → 02-BUILD → 03-SAVOR). Adapted to Soprano's catering journey:
+ * 01 INQUIRY → 02 MENU TASTING → 03 EVENT DAY → 04 FOLLOW-UP.
  *
  * Desktop: horizontal 4-step grid with scroll-driven gold progress-fill on
  * the connecting line + active-step highlighting via useInView (Task 2-b §5).
  * Mobile: vertical spine timeline with gold dot-spine (md:hidden).
- * Each step has an expandable "Подробнее" block (gridTemplateRows 0fr→1fr,
+ * Each step has an expandable "Read more" block (gridTemplateRows 0fr→1fr,
  * FAQ pattern) listing what's included at that stage.
  */
 const STEPS: Array<{
@@ -27,49 +27,49 @@ const STEPS: Array<{
   {
     num: "01",
     icon: Sparkles,
-    title: "Мечта",
-    desc: "Знакомимся, слушаем вашу идею праздника, подбираем формат и площадку под бюджет и повод.",
+    title: "Inquiry",
+    desc: "We get to know you, listen to your vision for the event, and recommend a format and venue that fit your occasion and budget.",
     details: [
-      "Бесплатная консультация 30 минут",
-      "Подбор формата: фуршет / банкет / кофе-брейк",
-      "Подбор площадки под ваш бюджет",
-      "Предварительная смета в течение 1 дня",
+      "Free 30-minute consultation",
+      "Format selection: buffet / banquet / coffee break",
+      "Venue recommendations within your budget",
+      "Preliminary quote within 1 business day",
     ],
   },
   {
     num: "02",
     icon: PenTool,
-    title: "Проект",
-    desc: "Составляем индивидуальное меню и смету. Дегустация по запросу. Фиксируем дату и детали.",
+    title: "Menu Tasting",
+    desc: "We craft a custom menu and detailed quote. Tasting available on request. We lock in the date and finalize every detail.",
     details: [
-      "Индивидуальное меню под повод и сезон",
-      "Смета с прозрачной детализацией",
-      "Дегустация блюд (по запросу)",
-      "Договор и фиксация даты",
+      "Custom menu tailored to your occasion and season",
+      "Quote with transparent line-item detail",
+      "Optional menu tasting with our chefs",
+      "Signed agreement and date hold",
     ],
   },
   {
     num: "03",
     icon: Utensils,
-    title: "Подача",
-    desc: "В день мероприятия: доставка, монтаж, открытая кухня, официанты и сомелье на месте.",
+    title: "Event Day",
+    desc: "Delivery, setup, open kitchen if you'd like one, and our team of servers and sommeliers on site until the last guest leaves.",
     details: [
-      "Доставка за 3–4 часа до начала",
-      "Монтаж оборудования и сервировка",
-      "Открытая кухня с шеф-поваром",
-      "Официанты и сомелье на месте",
+      "Delivery 3–4 hours before start time",
+      "Equipment setup and full table service",
+      "Open kitchen with our executive chef",
+      "Servers and sommeliers on site",
     ],
   },
   {
     num: "04",
     icon: PartyPopper,
-    title: "Праздник",
-    desc: "Подаём блюда в ритме торжества. Убираем за собой — вы наслаждаетесь моментом и гостями.",
+    title: "Follow-Up",
+    desc: "We plate in the rhythm of your celebration and clean up after — you enjoy the moment with your guests. We check in after the event.",
     details: [
-      "Подача блюд в ритме торжества",
-      "Сомелье и бармен на месте",
-      "Демонтаж и уборка после мероприятия",
-      "Отчётные документы на следующий день",
+      "Courses paced with the flow of your event",
+      "Sommelier and bartender on site",
+      "Breakdown and cleanup after the event",
+      "Final invoice and follow-up next day",
     ],
   },
 ];
@@ -91,7 +91,7 @@ export function Process() {
     <section
       id="process"
       ref={sectionRef}
-      aria-label="Как мы работаем"
+      aria-label="How we work"
       data-header-theme="light"
       className="section-light relative overflow-hidden bg-cream py-24 md:py-32"
     >
@@ -101,7 +101,7 @@ export function Process() {
           <Reveal>
             <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
               <span className="size-1.5 rounded-full bg-gold animate-pulse" />
-              Как мы работаем
+              How We Work
             </span>
           </Reveal>
           <Reveal delay={0.1}>
@@ -109,14 +109,14 @@ export function Process() {
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.05 }}
             >
-              Четыре шага{"\u00A0"}
-              <span className="gradient-text italic">до праздника</span>
+              Four steps{"\u00A0"}
+              <span className="gradient-text italic">to your event</span>
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mt-5 text-base leading-relaxed text-ink/70">
-              От первого звонка до последнего гостя — каждый этап ведёт команда,
-              которая любит своё дело.
+              From the first call to the last guest — every step is led by a team
+              that loves what they do.
             </p>
           </Reveal>
         </div>
@@ -162,7 +162,7 @@ export function Process() {
               href="#calculator"
               className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-gold transition-all duration-300 hover:bg-gold/20 hover:border-gold/50 hover:-translate-y-0.5"
             >
-              Рассчитать мой праздник
+              Plan My Event
             </a>
           </div>
         </Reveal>
@@ -298,7 +298,7 @@ function MobileStep({
 }
 
 /**
- * ExpandableDetails — "Подробнее" button toggles a grid-rows 0fr → 1fr
+ * ExpandableDetails — "Read more" button toggles a grid-rows 0fr → 1fr
  * animation (FAQ pattern, RULES §5-compliant: gridTemplateRows is explicitly
  * allowed). ChevronDown rotates 180° when open.
  */
@@ -315,7 +315,7 @@ function ExpandableDetails({ items, stepNum }: { items: string[]; stepNum: strin
         aria-controls={`step-content-${stepNum}`}
         className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-gold transition-colors duration-200 hover:text-bordeaux min-h-[44px] px-2"
       >
-        Подробнее
+        Read More
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: reduce ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}

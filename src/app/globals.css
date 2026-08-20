@@ -15,6 +15,9 @@
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
+  /* Sopranos-style fonts: Oswald (display), Great Vibes (script) */
+  --font-display: var(--font-display);
+  --font-script: var(--font-script);
 
   --color-cream: var(--cream);
   --color-cream-2: var(--cream-2);
@@ -87,38 +90,38 @@
   --radius-2xl: 2rem;
   --radius-full: 9999px;
 
-  /* ===== LIGHT THEME PALETTE ===== */
-  /* Warm ivory/cream surfaces — inviting, premium feel */
-  --cream: #FAF8F5;
-  --cream-2: #F5F1EB;
+  /* ===== SOPRANOS CATERING LIGHT THEME PALETTE ===== */
+  /* Off-white/Cream surfaces — Sopranos clean airy editorial */
+  --cream: #F9FAFB;
+  --cream-2: #F3F4F6;
   --parchment: #EDE8E1;
   --beige: #E8DDD4;
   
-  /* Soft darks — gentle contrast, not harsh */
-  --night: #1A1A1A;
-  --night-2: #2D2A26;
+  /* Soft darks — Sopranos dark navy */
+  --night: #1F2937;
+  --night-2: #111827;
   --moss: #3D4A3F;
   --olive: #4A4D42;
-  --charcoal: #3A3835;
+  --charcoal: #1F2937;
 
   /* Text — warm blacks for elegance */
-  --ink: #1A1A1A;
-  --ink-soft: #6B6560;
-  --paper: #FAF8F5;
+  --ink: #1F2937;
+  --ink-soft: #4B5563;
+  --paper: #F9FAFB;
   --paper-soft: #B8B2A9;
 
-  /* Luxury accents — gold, terracotta, warm tones */
+  /* Luxury accents — Sopranos gold #D4A373 + warm tones */
   --bordeaux: #7A4A1F;
   --sage: #7D8470;
   --sage-light: #9BA490;
   --orange: #D4915A;
-  --terracotta: #9A4F2A;
+  --terracotta: #C19B76;
   --peach: #E8B889;
   --lilac: #9E86A8;
-  --gold: #8B6534;
+  --gold: #D4A373;
 
   /* Borders — warm, subtle */
-  --border-line: #E5DED5;
+  --border-line: #E5E7EB;
   --border-line-dark: #D4CCC2;
 
   /* shadcn aliases (LIGHT THEME DEFAULT) */
@@ -241,12 +244,42 @@ html.lenis body {
   scrollbar-width: none;
 }
 
-/* Display headings */
+/* Display headings — Oswald (Sopranos-style condensed uppercase) */
 .font-display {
-  font-family: var(--font-serif);
+  font-family: var(--font-display), "Oswald", system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+/* Script accent — Great Vibes (Sopranos "Welcome to" decorative) */
+.font-script {
+  font-family: var(--font-script), "Great Vibes", cursive;
   font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  line-height: 1.2;
+}
+
+/* Sopranos eyebrow — wide-tracked uppercase Oswald micro-label */
+.eyebrow-wide {
+  font-family: var(--font-display), "Oswald", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+}
+
+/* Sopranos hero headline — Oswald extrabold condensed */
+.headline-oswald {
+  font-family: var(--font-display), "Oswald", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+/* Sopranos body — Karla humanist sans */
+.body-karla {
+  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  line-height: 1.65;
 }
 
 /* Marquee track */

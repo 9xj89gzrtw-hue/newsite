@@ -129,7 +129,7 @@ function GalleryItem({
       <motion.button
         layout
         onClick={onClick}
-        data-cursor="смотреть"
+        data-cursor="view"
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         className="group relative block w-full overflow-hidden rounded-xl card-lift"
@@ -191,7 +191,7 @@ function GalleryItem({
           {/* Featured indicator */}
           {isFeatured && (
             <div className="absolute right-3 top-3 z-20 rounded-full bg-gold/90 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-white backdrop-blur-sm">
-              Избранное
+              Featured
             </div>
           )}
         </div>
@@ -229,14 +229,14 @@ function ThumbnailStrip({
       ref={stripRef}
       className="flex gap-2 overflow-x-auto hide-scrollbar py-2 px-1 max-w-full"
       role="tablist"
-      aria-label="Миниатюры галереи"
+      aria-label="Gallery thumbnails"
     >
       {items.map((item, i) => (
         <button
           key={`${item.src}-${i}`}
           role="tab"
           aria-selected={i === currentIndex}
-          aria-label={`Перейти к фото ${i + 1}`}
+          aria-label={`Go to photo ${i + 1}`}
           onClick={() => onSelect(i)}
           className={`relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden transition-all duration-300 ${
             i === currentIndex 
@@ -295,7 +295,7 @@ function AnimatedCounter({ current, total }: { current: number; total: number })
  */
 export function EventsGallery() {
   const [open, setOpen] = useState<number | null>(null);
-  const [category, setCategory] = useState<Category>("Все");
+  const [category, setCategory] = useState<Category>("All");
   const [showKeyboardHint, setShowKeyboardHint] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [visibleCount, setVisibleCount] = useState(8);
@@ -307,7 +307,7 @@ export function EventsGallery() {
   const all = MEDIA.events;
   const items = useMemo(
     () =>
-      category === "Все"
+      category === "All"
         ? all
         : all.filter((e) => e.category === category),
     [all, category],
@@ -328,7 +328,7 @@ export function EventsGallery() {
 
   // Category counts for badges
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { "Все": all.length };
+    const counts: Record<string, number> = { "All": all.length };
     EVENT_CATEGORIES.slice(1).forEach(cat => {
       counts[cat] = all.filter(e => e.category === cat).length;
     });
@@ -407,7 +407,7 @@ export function EventsGallery() {
           <div>
             <Reveal>
               <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
-                📸 События
+                📸 Events
               </span>
             </Reveal>
             <Reveal delay={0.1}>
@@ -415,13 +415,13 @@ export function EventsGallery() {
                 className="mt-5 font-display text-ink"
                 style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.05 }}
               >
-                Чем мы живём
+                What we do
               </h2>
             </Reveal>
           </div>
           <Reveal delay={0.2}>
             <p className="max-w-xs text-base text-ink/70 font-display italic">
-              Реальные мероприятия нашей команды. Нажмите на фото, чтобы рассмотреть.
+              Real events catered by our team. Click any photo for a closer look.
             </p>
           </Reveal>
         </div>
@@ -430,7 +430,7 @@ export function EventsGallery() {
         <Reveal delay={0.15}>
           <div
             role="group"
-            aria-label="Фильтр событий по типу"
+            aria-label="Filter events by type"
             className="mt-12 flex flex-wrap items-center gap-1 sm:gap-2"
           >
             {EVENT_CATEGORIES.map((cat) => {
@@ -439,7 +439,7 @@ export function EventsGallery() {
               
               return (
                 <button
-                  key={cat}
+                  key={`cat-${cat}`}
                   aria-pressed={isActive}
                   onClick={() => {
                     setCategory(cat);
@@ -508,7 +508,7 @@ export function EventsGallery() {
               className="col-span-full py-20 text-center"
             >
               <p className="font-display text-xl text-ink/70 italic">
-                Нет фотографий в этой категории
+                No photos in this category
               </p>
             </motion.div>
           )}
@@ -528,14 +528,14 @@ export function EventsGallery() {
               onClick={() => setVisibleCount((n) => n + 8)}
               className="group inline-flex items-center gap-2 rounded-full border-2 border-gold/40 bg-gradient-to-r from-gold/10 to-transparent px-7 py-3.5 text-sm font-semibold text-gold transition-all hover:border-gold hover:from-gold hover:to-terracotta hover:text-white hover:shadow-lg hover:-translate-y-0.5 min-h-[44px]"
             >
-              Показать ещё
+              Show More
               <span className="font-mono text-[11px] opacity-70">
                 +{remainingCount}
               </span>
               <ChevronRight className="size-4 transition-transform group-hover:translate-x-1" />
             </button>
             <p className="font-mono text-[11px] uppercase tracking-wider text-ink/70">
-              Показано {visibleItems.length} из {items.length}
+              Showing {visibleItems.length} of {items.length}
             </p>
           </motion.div>
         )}
@@ -569,7 +569,7 @@ export function EventsGallery() {
               <button
                 className="flex size-11 items-center justify-center rounded-full bg-white/10 text-white/80 hover:bg-white/20 hover:text-white transition-all duration-300 hover:scale-110"
                 onClick={close}
-                aria-label="Закрыть (Esc)"
+                aria-label="Close (Esc)"
               >
                 <X className="size-5" />
               </button>
@@ -589,9 +589,9 @@ export function EventsGallery() {
                     <kbd className="rounded bg-white/20 px-1.5 py-0.5 font-mono text-[10px]">←</kbd>
                     {" "}
                     <kbd className="rounded bg-white/20 px-1.5 py-0.5 font-mono text-[10px]">→</kbd>
-                    {" "}навигация ·{" "}
+                    {" "}navigation ·{" "}
                     <kbd className="rounded bg-white/20 px-1.5 py-0.5 font-mono text-[10px]">Esc</kbd>
-                    {" "}закрыть
+                    {" "}close
                   </span>
                 </motion.div>
               )}
@@ -600,14 +600,14 @@ export function EventsGallery() {
             {/* Mobile swipe hint */}
             <div className="absolute bottom-28 left-1/2 z-30 -translate-x-1/2 flex md:hidden items-center gap-2 rounded-full bg-white/10 px-4 py-2 backdrop-blur-md">
               <MousePointer className="size-4 text-white/60" />
-              <span className="text-[10px] text-white/60">Свайп для навигации</span>
+              <span className="text-[10px] text-white/60">Swipe to navigate</span>
             </div>
 
             {/* Navigation buttons */}
             <button
               className="absolute left-3 z-20 flex size-12 items-center justify-center rounded-full bg-white/10 text-white/80 hover:bg-white/20 hover:text-white transition-all duration-300 hover:scale-110 md:left-6"
               onClick={(e) => { e.stopPropagation(); prev(); }}
-              aria-label="Предыдущее (←)"
+              aria-label="Previous (←)"
             >
               <ChevronLeft className="size-7" />
             </button>
@@ -660,7 +660,7 @@ export function EventsGallery() {
             <button
               className="absolute right-3 z-20 flex size-12 items-center justify-center rounded-full bg-white/10 text-white/80 hover:bg-white/20 hover:text-white transition-all duration-300 hover:scale-110 md:right-6"
               onClick={(e) => { e.stopPropagation(); next(); }}
-              aria-label="Следующее (→)"
+              aria-label="Next (→)"
             >
               <ChevronRight className="size-7" />
             </button>
@@ -732,14 +732,14 @@ function Phase9PinnedHorizontalGallery({
         <div className="mx-auto mb-6 max-w-7xl px-5 md:px-8">
           <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
             <MousePointer className="size-3" />
-            Прокрутите вниз — события движутся вбок
+            Scroll down — events move sideways
           </span>
           <h3
             className="mt-3 font-display text-cream"
             style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.5rem)", lineHeight: 1.1 }}
           >
-            Горизонтальная лента{" "}
-            <span className="gradient-text italic">событий</span>
+            Horizontal feed{" "}
+            <span className="gradient-text italic">of events</span>
           </h3>
         </div>
 

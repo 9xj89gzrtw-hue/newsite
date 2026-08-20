@@ -12,9 +12,8 @@ import Image from "next/image";
  * (#F1EBF5 — not pure white, for tonal cohesion with the purple bg).
  *
  * We adapt: solid bordeaux bg, headline in warm-tinted cream (#F7EFE6),
- * one strong real client quote (from our TESTIMONIALS data — Премия «АВРОРА»,
- * 300 гостей, международный уровень), 3 gold star icons as decorative
- * bullets, client logo placeholder.
+ * one strong Soprano's quote about the old world way of cooking, 3 gold star
+ * icons as decorative bullets, client logo placeholder.
  *
  * Placement: interstitial between Services and Gallery — gives a "premium
  * trust beat" before the visual portfolio. NOT a replacement for the
@@ -25,10 +24,10 @@ const EASE = [0.4, 0, 0.2, 1] as const;
 
 const FEATURED_QUOTE = {
   quote:
-    "Церемония вручения премии «АВРОРА» — событие международного уровня. Interfood Catering создал фуршетную линию, достойную премии: свежие устрицы, авторские десерты, пирамида из шампанского. Гости из 15 стран остались в восторге.",
-  client: "Премия «АВРОРА»",
-  event: "Фуршет церемонии награждения · 300 гостей · к/п «РОДИНА»",
-  date: "15 ноября 2017",
+    "Soprano's does everything the old world way. From hand-picking our own produce at Eastern Market, to making our own salad dressing — every detail is made with love.",
+  client: "The Soprano Family",
+  event: "Founders · Soprano's Catering · Clinton Township, MI",
+  date: "Est. 1985",
   image: "/media/review-4.jpg",
 };
 
@@ -38,7 +37,7 @@ export function QuoteBand() {
   return (
     <section
       data-header-theme="dark"
-      aria-label="Отзыв клиента — Премия АВРОРА"
+      aria-label="Customer testimonial — The Soprano Family"
       className="section-bordeaux relative overflow-hidden py-24 md:py-36"
     >
       {/* Subtle painterly depth — bordeaux blooms on bordeaux base */}
@@ -75,7 +74,7 @@ export function QuoteBand() {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.7, ease: EASE }}
               className="mb-7 flex items-center gap-2"
-              aria-label="Оценка 5 из 5"
+              aria-label="Rated 5 out of 5"
             >
               {[0, 1, 2].map((i) => (
                 <motion.svg
@@ -95,7 +94,7 @@ export function QuoteBand() {
                 </motion.svg>
               ))}
               <span className="ml-3 font-sans text-[0.78rem] font-semibold uppercase tracking-[0.2em] text-cream/80">
-                4.9 / 5 · 127+ отзывов
+                4.9 / 5 · 127+ reviews
               </span>
             </motion.div>
 
@@ -107,9 +106,9 @@ export function QuoteBand() {
               transition={{ duration: 0.9, delay: 0.1, ease: EASE }}
               className="display-headline tinted-headline"
             >
-              Что говорят
+              What our
               <br />
-              <span className="italic">наши клиенты.</span>
+              <span className="italic">clients say.</span>
             </motion.h2>
 
             {/* The quote — with oversized gold marks flanking (mobile shows inline).
@@ -157,7 +156,7 @@ export function QuoteBand() {
             >
               <Image
                 src={FEATURED_QUOTE.image}
-                alt={`Благодарственное письмо — ${FEATURED_QUOTE.client}`}
+                alt={`Thank-you letter from ${FEATURED_QUOTE.client}`}
                 fill
                 sizes="(max-width: 768px) 80vw, 360px"
                 className="object-cover"
