@@ -132,6 +132,7 @@ function FloatingInput({
   error,
   icon: Icon,
   validate,
+  ariaLabelText,
 }: {
   id: string;
   name?: string;
@@ -143,6 +144,7 @@ function FloatingInput({
   error?: boolean;
   icon?: React.ComponentType<{ className?: string }>;
   validate?: (value: string) => boolean;
+  ariaLabelText?: string;
 }) {
   const [focused, setFocused] = useState(false);
   const [hasValue, setHasValue] = useState(false);
@@ -197,7 +199,7 @@ function FloatingInput({
           autoComplete={autoComplete}
           aria-invalid={error ? "true" : "false"}
           aria-describedby={error ? `error-${id}` : undefined}
-          aria-label={placeholder}
+          aria-label={ariaLabelText || placeholder}
           className={`w-full rounded-xl px-${Icon ? '11' : '4'} py-3.5 ${showValidCheck ? 'pr-12' : 'pr-4'} text-ink outline-none transition-all placeholder:text-transparent ${
             Icon ? 'pl-11' : ''
           }`}
@@ -263,6 +265,7 @@ function ContactCard({
   isStatic,
   badge,
   tooltip,
+  ariaLabel,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   href?: string;
@@ -273,6 +276,7 @@ function ContactCard({
   isStatic?: boolean;
   badge?: string;
   tooltip?: string;
+  ariaLabel?: string;
 }) {
   const [hovered, setHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
@@ -371,6 +375,7 @@ function ContactCard({
       {/* Arrow indicator */}
       {href && !isStatic && (
         <motion.span
+          aria-hidden="true"
           className="shrink-0 text-ink/30 transition-colors group-hover:text-gold"
           animate={!prefersReducedMotion && hovered ? { x: [0, 4, 0] } : {}}
           transition={{ duration: 0.3 }}
@@ -385,14 +390,14 @@ function ContactCard({
 
   if (external && href) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="block">
+      <a href={href} target="_blank" rel="noopener noreferrer" aria-label={ariaLabel || label} className="block">
         {content}
       </a>
     );
   }
 
   if (href) {
-    return <a href={href} className="block">{content}</a>;
+    return <a href={href} aria-label={ariaLabel || label} className="block">{content}</a>;
   }
 
   return null;
@@ -783,6 +788,7 @@ export function Contact() {
                   icon={Phone}
                   href={CONTACTS.phoneHref}
                   label={CONTACTS.phone}
+                  ariaLabel={`Позвонить: ${CONTACTS.phone}`}
                   tooltip="📞 Звоните!"
                   highlight
                 />
@@ -792,6 +798,7 @@ export function Contact() {
                   icon={MessageCircle}
                   href={CONTACTS.whatsappHref}
                   label={CONTACTS.whatsapp}
+                  ariaLabel={`Написать в WhatsApp: ${CONTACTS.whatsapp}`}
                   badge="WhatsApp"
                   tooltip="💬 Написать в WhatsApp"
                   external
@@ -802,6 +809,7 @@ export function Contact() {
                   icon={Instagram}
                   href={CONTACTS.instagramHref}
                   label="@nilov_catering"
+                  ariaLabel="Instagram: @nilov_catering"
                   sublabel="Instagram"
                   tooltip="✨ Смотреть портфолио"
                   external
@@ -817,6 +825,7 @@ export function Contact() {
                       icon={Telegram}
                       href={CONTACTS.telegramHref}
                       label={CONTACTS.telegram}
+                      ariaLabel={`Написать в Telegram: ${CONTACTS.telegram}`}
                       sublabel="Telegram"
                       external
                     />
@@ -824,6 +833,7 @@ export function Contact() {
                       icon={VkIcon}
                       href={CONTACTS.vkHref}
                       label="nilovcatering"
+                      ariaLabel="ВКонтакте: nilovcatering"
                       sublabel="ВКонтакте"
                       external
                     />
@@ -1053,6 +1063,7 @@ export function Contact() {
                               value={data.date}
                               min={new Date().toISOString().split("T")[0]}
                               onChange={(e) => set("date", e.target.value)}
+                              aria-label="Желаемая дата мероприятия"
                               className="mt-2 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none transition-all focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 focus:shadow-[0_0_20px_rgba(196,149,106,0.15)]"
                             />
                             <p className="mt-2 text-xs text-ink/70">
@@ -1072,6 +1083,7 @@ export function Contact() {
                             value={data.name}
                             onChange={(e) => set("name", e.target.value)}
                             placeholder="Как к вам обращаться"
+                            ariaLabelText="Ваше имя"
                             error={validationErrors.name}
                             icon={Users}
                             validate={(v) => v.trim().length >= 2}
@@ -1085,6 +1097,7 @@ export function Contact() {
                             value={data.phone}
                             onChange={(e) => set("phone", e.target.value)}
                             placeholder="+7 (___) ___-__-__"
+                            ariaLabelText="Номер телефона"
                             error={validationErrors.phone}
                             icon={Phone}
                             validate={(v) => /^(\+7|8)[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/.test(v.replace(/[^+0-9]/g, ""))}

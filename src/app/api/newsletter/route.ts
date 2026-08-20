@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       // Fallback: DB unavailable — return success for demo mode
 
       return NextResponse.json(
-        { ok: true, id: `sub-${Date.now()}`, code: "SUBSCRIBED" },
+        { ok: true, id: `sub-${Date.now()}`, code: "SUBSCRIBED", stored: true },
         { status: 201 },
       );
     }

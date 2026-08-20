@@ -119,7 +119,7 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Сырная тарелка",
       chefNote: "Бри, пармезан, дор-блю и мёд — медленная пауза между сессиями.",
       price: "от 2 200 ₽ / чел",
-      image: "/media/concorde-dessert.jpg",
+      image: "/media/menu-coffee-break.jpg",
     },
   ],
   vegetarian: [
@@ -161,7 +161,7 @@ const SIGNATURE_DISHES: Record<string, Array<{
       name: "Котлета по-киевски",
       chefNote: "Сочное куриное бедро, масло с травами внутри — классика жанра.",
       price: "от 950 ₽ / порция",
-      image: "/media/concept-banquet-table.jpg",
+      image: "/media/menu-office-lunch.jpg",
     },
   ],
 };

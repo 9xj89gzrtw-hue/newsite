@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { memoryLeadStore } from "@/lib/lead-store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     const consentIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
     const userAgent = req.headers.get("user-agent") || null;
 
-    // Try to save to DB, fallback to demo mode on failure
+    // Try to save to DB; fall back to in-memory store on failure.
     try {
       const lead = await db.lead.create({
         data: {
@@ -70,15 +71,23 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return NextResponse.json({ ok: true, id: lead.id }, { status: 201 });
+      return NextResponse.json({ ok: true, id: String(lead.id) }, { status: 201 });
     } catch (dbError) {
-      // Fallback: DB unavailable — return success for demo mode
-
-      // Return success in demo/fallback mode so the form works without DB
-      return NextResponse.json(
-        { ok: true, id: `lead-${Date.now()}` },
-        { status: 201 },
-      );
+      // In-memory fallback — persists within server process lifetime.
+      const lead = memoryLeadStore.create({
+        name,
+        phone,
+        email,
+        eventType,
+        guests,
+        budget,
+        message,
+        consentAccepted: true,
+        consentDate: new Date(),
+        consentIp,
+        userAgent,
+      });
+      return NextResponse.json({ ok: true, id: String(lead.id) }, { status: 201 });
     }
   } catch (e) {
     return NextResponse.json(
