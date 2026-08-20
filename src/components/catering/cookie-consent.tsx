@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Cookie } from "lucide-react";
@@ -22,6 +22,8 @@ const STORAGE_KEY = "catering-cookie-consent";
 export function CookieConsent() {
   const [show, setShow] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const bannerRef = useRef<HTMLDivElement>(null);
+  const rejectBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -33,6 +35,13 @@ export function CookieConsent() {
     if (stored === "accepted") loadAnalytics();
   }, []);
 
+  // Autofocus + focus trap when banner is shown
+  useEffect(() => {
+    if (!show || !bannerRef.current) return;
+    const t = setTimeout(() => rejectBtnRef.current?.focus(), 300);
+    return () => clearTimeout(t);
+  }, [show]);
+
   const decide = (choice: "accepted" | "rejected") => {
     localStorage.setItem(STORAGE_KEY, choice);
     setShow(false);
@@ -43,9 +52,11 @@ export function CookieConsent() {
     <AnimatePresence>
       {show && (
         <motion.div
+          ref={bannerRef}
           role="dialog"
-          aria-modal="false"
+          aria-modal="true"
           aria-label="Согласие на использование cookies"
+          onKeyDown={(e) => { if (e.key === "Escape") setShow(false); if (e.key === "Tab" && bannerRef.current) { const focusable = bannerRef.current.querySelectorAll<HTMLElement>('button, [href]'); if (focusable.length === 0) return; const first = focusable[0]; const last = focusable[focusable.length - 1]; if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } } }}
           className="fixed bottom-0 inset-x-0 z-[60] backdrop-blur-xl bg-cream/85 border-t border-gold/20 shadow-[0_-8px_24px_rgba(0,0,0,0.06)]"
           initial={prefersReducedMotion ? { opacity: 0 } : { y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -67,6 +78,7 @@ export function CookieConsent() {
             </div>
             <div className="flex shrink-0 gap-2">
               <button
+                ref={rejectBtnRef}
                 onClick={() => decide("rejected")}
                 className="min-h-[44px] rounded-full border border-border-line px-3 py-1.5 text-xs font-medium text-ink/70 transition-all hover:border-gold hover:bg-gold/5 sm:px-4 sm:py-2"
               >

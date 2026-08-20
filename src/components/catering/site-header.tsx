@@ -171,6 +171,8 @@ export function SiteHeader() {
         role="banner"
         data-theme={theme}
         data-scrolled={scrolled ? "true" : "false"}
+        inert={open}
+        aria-hidden={open}
         className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${themeClasses.bg} ${themeClasses.text}`}
       >
         {/* Dismissible seasonal announcement bar (Salt Block pattern) */}
