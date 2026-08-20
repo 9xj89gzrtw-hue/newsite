@@ -897,7 +897,7 @@ export function Services() {
           <div className="flex-1 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {SERVICES.map((s, i) => (
               <div
-                key={`${s.title}-${i}`}
+                key={`grid-${i}`}
                 ref={(el) => {
                   cardRefs.current[i] = el;
                 }}
@@ -945,7 +945,7 @@ export function Services() {
                 {SERVICES.map((s, i) => {
                   const isActive = activeIdx === i;
                   return (
-                    <li key={`${s.title}-${i}`}>
+                    <li key={`toc-${i}`}>
                       <button
                         type="button"
                         onClick={() => scrollToService(i)}

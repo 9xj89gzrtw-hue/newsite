@@ -742,6 +742,7 @@ export function Hero() {
           width={28}
           height={28}
           className="opacity-80"
+          style={{ width: "auto", height: "auto" }}
         />
         <span className="font-display text-[11px] uppercase tracking-[0.22em] text-cream/70">
           Est. Michigan
