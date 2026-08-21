@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
 import { TottHero } from "@/components/catering/tott-hero";
+import { TottBestCatering } from "@/components/catering/tott-best-catering";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
-import { CepClientMarquee } from "@/components/catering/cep-client-marquee";
 import { CepSimpleBrilliant } from "@/components/catering/cep-simple-brilliant";
 import { CepRedStats } from "@/components/catering/cep-red-stats";
 import { CepWhyUs } from "@/components/catering/cep-why-us";
@@ -170,10 +170,15 @@ export default function Home() {
           Do / Lato) + burgundy/olive/cream palette introduced here. */}
       <TottHero />
 
-      {/* 2. CepClientMarquee — "ИЗБРАННЫЕ КЛИЕНТЫ" 17 RU corporate giants
-          (СБЕР • ГАЗПРОМ • ЯНДЕКС • …) scrolling with red bullets + edge-fade
-          mask. Social proof immediately after the brand promise. */}
-      <CepClientMarquee />
+      {/* 2. TottBestCatering — Cycle 30 task-v3 NEW. Replaces CepClientMarquee
+          (black "ИЗБРАННЫЕ КЛИЕНТЫ" strip — Interfood's loudest, lowest-info
+          block). White-bg brand-positioning statement mirroring talkofthetown
+          rows 1-4: eyebrow "Лучший кейтеринг Санкт-Петербурга" + h1
+          "Петербург / кейтеринг с душой" + h2 "декаданс блюд · безупречная
+          подача" + body + "Смотреть меню" CTA. Better client journey: after
+          the hero brand promise, the next beat is WHO we are + WHY best —
+          not a logo parade. */}
+      <TottBestCatering />
 
       {/* 3. CepSimpleBrilliant — "ПРОСТО / И БЛЕСТЯЩЕ." 200px headline over
           0.5× slow-mo food b-roll. Brand positioning insistence — a film

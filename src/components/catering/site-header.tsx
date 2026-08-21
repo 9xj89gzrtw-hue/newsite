@@ -101,7 +101,12 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  // Docked (transparent over hero) vs sticky (solid WHITE).
+  // Docked (white bar at bottom of hero) vs sticky (white bar at top).
+  // Per task v3: "хеадер (меню) идет сразу внизу херо и оно идет на белом
+  // фоне" — the menu bar is ALWAYS on white background (both docked at the
+  // bottom edge of the hero and when stuck to the top on scroll). Mirrors
+  // talkofthetownatlanta.com where <header> sits below #sliders-container
+  // on a solid white bar and becomes sticky on scroll.
   const docked = !scrolled;
 
   return (
@@ -111,10 +116,8 @@ export function SiteHeader() {
         data-tott-state={docked ? "docked" : "sticky"}
         inert={open}
         aria-hidden={open}
-        className={`fixed inset-x-0 z-50 transition-all duration-500 ${
-          docked
-            ? "bottom-0 bg-transparent text-white"
-            : "top-0 border-b border-border-line bg-white text-ink shadow-[0_6px_24px_-14px_rgba(0,0,0,0.16)] backdrop-blur-md"
+        className={`fixed inset-x-0 z-50 border-b border-border-line bg-white text-ink shadow-[0_6px_24px_-14px_rgba(0,0,0,0.16)] backdrop-blur-md transition-all duration-500 ${
+          docked ? "bottom-0" : "top-0"
         }`}
       >
         <div
@@ -166,9 +169,7 @@ export function SiteHeader() {
             {/* Mobile: phone icon only */}
             <a
               href={CONTACTS.phoneHref}
-              className={`min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors sm:hidden ${
-                docked ? "text-white" : "text-tott-burgundy"
-              }`}
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center text-tott-burgundy transition-colors sm:hidden"
               aria-label={`Позвонить ${CONTACTS.phone}`}
             >
               <Phone className="size-6" />
@@ -177,9 +178,7 @@ export function SiteHeader() {
             <button
               ref={triggerRef}
               onClick={() => setOpen(true)}
-              className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors lg:hidden ${
-                docked ? "text-white" : "text-ink"
-              }`}
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 text-ink transition-colors lg:hidden"
               aria-label={open ? "Закрыть меню" : "Открыть меню"}
               aria-expanded={open ? "true" : "false"}
               aria-controls="mobile-menu"

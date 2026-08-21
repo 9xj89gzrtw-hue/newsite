@@ -127,9 +127,14 @@ export function TottHero() {
         food as art
       </motion.p>
 
-      {/* Centered brand stack. */}
+      {/* Centered wordmark ONLY — mirrors talkofthetown hero which shows
+          just the white logo overlay (+ script). No subtitle, no cities,
+          no CTAs on the hero (per task v3: "на самом херо только надпись
+          Interfood. food is art также как на том сайте в двух разных
+          шрифтах"). The "Лучший кейтеринг" message moves to the white
+          section below (TottBestCatering, replaces CepClientMarquee). */}
       <motion.div
-        className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 pt-24 text-center"
+        className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 text-center"
         initial={showStatic ? false : "hidden"}
         animate={showStatic ? undefined : "visible"}
         variants={container}
@@ -139,27 +144,10 @@ export function TottHero() {
         <motion.h1
           variants={rise}
           className="tott-display text-white"
-          style={{ fontSize: "clamp(3.5rem, 11vw, 9rem)", lineHeight: 0.92, letterSpacing: "-0.01em" }}
+          style={{ fontSize: "clamp(3.5rem, 12vw, 10rem)", lineHeight: 0.92, letterSpacing: "-0.01em" }}
         >
           Interfood<span style={{ color: "var(--gold)" }}>.</span>
         </motion.h1>
-
-        {/* Subtitle — "лучший кейтеринг Санкт-Петербурга" (RU, Lato via
-            Karla fallback). Tracked uppercase editorial tagline below the
-            wordmark. Olive divider accent on either side mirrors their
-            section-eyebrow device. */}
-        <motion.div
-          variants={rise}
-          className="mt-6 flex items-center gap-4"
-        >
-          <span className="hidden h-px w-10 bg-tott-olive sm:block" aria-hidden="true" />
-          <p
-            className="tott-body text-[12px] font-bold uppercase tracking-[0.32em] text-white/90 sm:text-sm md:text-[15px]"
-          >
-            Лучший кейтеринг Санкт-Петербурга
-          </p>
-          <span className="hidden h-px w-10 bg-tott-olive sm:block" aria-hidden="true" />
-        </motion.div>
       </motion.div>
 
       {/* Scroll cue bottom-center (sits above the docked nav). */}
