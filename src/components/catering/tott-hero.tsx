@@ -130,12 +130,14 @@ export function TottHero() {
         variants={container}
       >
         {/* Wordmark — Prata (high-contrast serif). Gold dot accent. Massive,
-            dominates the viewport. */}
+            dominates the viewport. Mobile min raised so "food as art" is
+            always smaller (task v11): wordmark floor 4rem vs script floor
+            2.25rem keeps the hierarchy on narrow screens. */}
         <motion.h1
           variants={rise}
           className="tott-display text-white"
           style={{
-            fontSize: "clamp(3.5rem, 13vw, 9.5rem)",
+            fontSize: "clamp(4rem, 14vw, 9.5rem)",
             lineHeight: 0.92,
             letterSpacing: "-0.02em",
             textShadow: "0 2px 30px rgba(0,0,0,0.45)",
@@ -146,13 +148,17 @@ export function TottHero() {
 
         {/* Script tagline — Nothing You Could Do. Nestles tight under the
             wordmark (negative mt) for a signature/underline feel. Per task
-            v10: "сделай food as art побольше" — bumped from clamp(1.75rem,
-            4.5vw, 3.5rem) to clamp(3rem, 8vw, 6rem). */}
+            v11: "food as art чуть поменьше" + "чтобы на мобильной версии он
+            всегда был меньше надписи interfood" — reduced from clamp(3rem,
+            8vw, 6rem) to clamp(2.25rem, 6vw, 4.5rem). The smaller vw + lower
+            floor guarantees the script stays narrower than the wordmark on
+            mobile (Nothing You Could Do glyphs read large for their px
+            size, so a lower px floor keeps the visual hierarchy). */}
         <motion.p
           variants={rise}
           className="tott-script text-white/95"
           style={{
-            fontSize: "clamp(3rem, 8vw, 6rem)",
+            fontSize: "clamp(2.25rem, 6vw, 4.5rem)",
             lineHeight: 1,
             marginTop: "-0.5rem",
             textShadow: "0 2px 30px rgba(0,0,0,0.45)",
