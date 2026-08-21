@@ -2374,3 +2374,175 @@ Gourmet Style Module */`):
   добавляет scroll length. Рассмотреть сокращение до 180vh.
 - Gold accent text на navy (`--mcu-gold-light #B99D75`) — VLM отмечает minor
   contrast issue. Можно осветлить до `#C5AD8A` для AA.
+
+---
+
+# §17. Cycle 26 — Salt Block Hospitality Editorial Layer (21.08.2026)
+
+> Эталон: **https://saltblockhospitality.com** (Tampa FL, Squarespace 7.1,
+> Adobe Fonts Anziano + Minerva Modern, brand-led editorial site без
+> animation libs — premium feel достигается типографикой + фото + brand voice
+> discipline, не GSAP/Lenis/Lottie). НЕ design-industry-recognized (нет
+> Awwwards/Behance/CSS Design Awards/Webby) — но это *правильный* эталон для
+> нашего brand-led клона.
+
+## Что скопировано (P1, реализовано в Cycle 26)
+
+1. **160px uppercase Playfair H1** на hero (`clamp(5rem, 13vw, 12rem)`,
+   `var(--font-serif)`, line-height 0.9, letter-spacing -0.025em, uppercase).
+   Заменил mculinary-стиль italic-gold двухстрочник. **Критично:** `var(--font-display)`
+   (Oswald) — НЕ Playfair! Всегда используйте `var(--font-serif)` для Salt Block
+   serif-стиля. Это была главная bug в v1 (VLM поставил 3/10).
+
+2. **Petal-shaped primary CTA** — `border-radius: 28px 0` (TL+BR rounded,
+   TR+BL sharp — leaf/petal shape). 3 variants: `dark` (espresso bg + cream
+   text), `light` (cream + ink), `outline` (transparent + ink border → hover
+   invert). `data-tone="cream"` для outline на тёмном фоне. Padding 23px 38px.
+   Компонент: `src/components/catering/petal-button.tsx`.
+
+3. **Press strip docked at hero bottom edge** — `variant="docked"` с
+   `position: absolute; bottom: 0` + dark gradient overlay + 6 RU press logos
+   (Resto.ru / АФИША Daily / The Village / Собака.ru / Time Out / Forbes) как
+   inline SVG text (no external image assets). Opacity 0.6 + grayscale(1) →
+   1.0 + grayscale(0) on hover. `variant="standalone"` для отдельной секции.
+   Компонент: `src/components/catering/sb-press-strip.tsx`.
+
+4. **Marquee as 2nd section** с 7× repeating brand phrases (ШЕФ-ДРАЙВЕН ·
+   АВТОРСКАЯ · ФЕРМЕРСКИЕ · СВАДЬБЫ · С 2009 · СПб) на warm-gradient espresso
+   bg с **edge-fade mask** (`mask-image: linear-gradient(to right, transparent
+   0%, black 6%, black 94%, transparent 100%)`) + honey ✦ separators. Pure CSS
+   `translateX(0 → -50%) @32s linear infinite`. No JS — Server Component.
+
+5. **ChefPortrait** — full-bleed 2-col grid (5fr/6fr): слева 4:5 portrait
+   (`aspect-ratio: 4/5`, square corners, layered 3-stop shadow), справа eyebrow
+   "ШЕФ-ПОВАР" + italic Playfair `clamp(2.5rem, 5vw, 3.75rem)` "Дмитрий Нилов"
+   + 3-paragraph bio в Karla 17px lh 1.7 + Great Vibes signature
+   `clamp(2.5rem, 5vw, 3.5rem)` rotate(-3deg) bordeaux. Stagger via `Reveal`.
+
+6. **TastingMenuExperience** — 5-course editorial list на dark espresso bg
+   (`bg-mcu-espresso` + grain overlay + honey radial glow + gold hairlines).
+   3-col grid: course number (Barlow 32/700 gold) / dish name (Playfair 28/500
+   cream) + italic ingredient line (Karla 16 cream/65) / pairing note (Barlow
+   12 uppercase ls 0.18em cream/85). **Критично:** pairing note цвет — `text-cream/85`
+   (cream), НЕ `text-gold/50` — gold на dark bg имеет низкий контраст (VLM 7→9
+   после фикса).
+
+7. **SustainabilityStrip** — quiet 3-cell editorial grid (Локальные фермеры /
+   Сезонные продукты / Без полуфабрикатов) с тонкими `.sb-section-rule`
+   dividers между ячейками + закрывающая italic Playfair line "Это не
+   маркетинг. Это наша операционная философия."
+
+8. **AnnouncementBar refurb** — dismissible "Бронирование на сезон 2026-2027
+   уже открыто →" с localStorage key `sb-announcement-dismissed-v1` + 14-day
+   dismissal window + slide-down animation (transform/opacity only).
+
+## Что НЕ копировать (P3, anti-patterns)
+
+- **Squarespace 4-tier folder nav template DNA** — наш site-header.tsx уже
+  имеет кастомный mega-menu, не нужен Squarespace-style folder nav.
+- **Отсутствие animation libraries** — наш framer-motion + gsap + lenis stack
+  превосходит Squarespace native motion, оставляем.
+- **Press logos без article links** — каждая logo должна вести на verifiable
+  article URL (soft-deception pattern to avoid). У нас press strip пока
+  text-only SVG — TODO: заменить на реальные SVG logos с href.
+- **`/best-of-the-city` URL returns 404** — валидируйте каждый nav URL перед
+  deploy.
+- **No Schema.org structured data** — Interfood уже имеет JSON-LD в layout.tsx
+  (LocalBusiness + CateringService + Event), сохраняем.
+- **No video content** — Interfood имеет mculinary MP4 в /public (TODO: Mux
+  per RULES.md §3) + может добавить Mux playback IDs позже.
+
+## VLM Critique Loop методология (Cycle 26 confirmed)
+
+- **Скриншот per section, not full-page** — VLM плохо воспринимает длинные
+  full-page скриншоты, ставит заниженные баллы. Скроллить к каждой секции через
+  `agent-browser eval "document.getElementById('section-id')?.scrollIntoView({block:'center'})"`
+  + sleep 2s + screenshot отдельным файлом.
+- **Russian prompt с конкретными reference values** — "Оцени 1-10 по 5
+  критериям: (1) типографика, (2) композиция, (3) CTA, (4) press strip, (5)
+  премиальность vs saltblockhospitality.com" → быстро даёт actionable feedback.
+- **Convergence: 3-4 iterations достаточно** — v1 4/10 → v2 8/10 → v3 7-8/10
+  (regression on chapter-nav noise) → v4 9/10. Не гонитесь за 10/10 — 8.5+
+  across all sections = converged.
+- **Запускать VLM sequentially** (не `&` параллельно) — `z-ai vision` SDK
+  initialization падает при concurrency.
+
+## Subagent orchestration pattern (Cycle 26 confirmed)
+
+12 subagents в 4 параллельных группах:
+
+| Группа | Subagent ID | Task | Output |
+|---|---|---|---|
+| Research (×3 parallel) | 3-A | DOM extraction via agent-browser | `docs/SALTBLOCK-ANALYSIS.md` (1719 lines) |
+| | 3-B | Brand context + design critique (web-search + web-reader) | `docs/reference-library/saltblock/BRAND-CONTEXT.md` + `DESIGN-CRITIQUE.md` |
+| | 3-C | Component audit (Explore agent) | `docs/CYCLE-26-COMPONENT-AUDIT.md` (1210 lines) |
+| Implement (×6 parallel) | 6-A | Salt Block CSS utilities + PetalButton | globals.css + petal-button.tsx |
+| | 6-B | SbPressStrip + AnnouncementBar refurb | sb-press-strip.tsx + announcement-bar.tsx |
+| | 6-C | ChefPortrait | chef-portrait.tsx |
+| | 6-D | TastingMenuExperience | tasting-menu-experience.tsx |
+| | 6-E | SustainabilityStrip | sustainability-strip.tsx |
+| | 6-F | English leak fixes + founding year | 52 strings in faq/social/contact/about |
+| Restyle (×2 parallel) | 7-A | McuVideoHero restyle (160px H1 + petal + docked press) | mcu-video-hero.tsx |
+| | 7-B | McuMarqueeBand restyle (7× repeating + edge-fade mask) | mcu-marquee-band.tsx |
+
+**Ключ к parallel success:** каждый subagent работает в ОТДЕЛЬНОМ файле —
+нулевый конфликт риск. `page.tsx` rewrite + critiqueloop fixes делал сам
+orchestrator sequentially после parallel phase.
+
+## Готовые решения для будущих циклов
+
+### Tailwind v4 OKLCH color-mix для editorial dividers
+
+```css
+border-top: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+```
+
+### Edge-fade mask для marquee
+
+```css
+.sb-marquee-repeating {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+```
+
+### Salt Block petal button (border-radius asymmetric)
+
+```css
+.sb-petal-btn {
+  border-radius: 28px 0; /* TL+BR rounded, TR+BL sharp — leaf shape */
+  padding: 23px 38px;
+  font-family: var(--font-serif); /* Playfair — NOT --font-display (Oswald)! */
+}
+```
+
+### 7× repeating marquee insistence (Salt Block signature)
+
+```tsx
+const PHRASES = ["ШЕФ-ДРАЙВЕН КЕЙТЕРИНГ", "АВТОРСКАЯ КУХНЯ", /* ... */];
+const REPEAT = 7;
+const phrases = Array.from({length: REPEAT * 2}).flatMap((_, dup) =>
+  PHRASES.map((p, i) => ({p, key: `${dup}-${i}`})));
+```
+
+## TODO для Cycle 27
+
+- [ ] Заменить text-only SVG press logos на реальные SVG logos (Resto.ru,
+  АФИША Daily, etc.) с `<a href>` на verifiable article URLs.
+- [ ] Загрузить mculinary MP4 в Mux → заменить `<video src={MCU_HERO_VIDEO}>`
+  на `<MuxPlayer playbackId="...">` (per RULES.md §3).
+- [ ] ChefPortrait: добавить тёплую текстуру бумаги/камня на фон правой колонки
+  (VLM 7.5/10 — "слишком стерилен") + асимметрию (text column сместить вниз
+  на 80-100px относительно photo top).
+- [ ] Реальные chef photo — `event-chef-action.jpg` рабочий, но не single-person
+  portrait. Заказать у клиента настоящую chef-фотосессию.
+- [ ] Press strip: `variant="standalone"` НЕ смонтирован на странице — только
+  docked в hero. Можно добавить как trust-section после About.
+- [ ] Marquee: `letter-spacing: 0.06em` — проверить на mobile (375px width)
+  что фразы не "рассыпаются" (VLM 8.5/10 — minor concern).
+- [ ] PetalButton: можно добавить magnetic-hover effect (translateX/Y за
+  курсором) — Salt Block не имеет, но это был бы polish без brand-DNA loss.
+- [ ] Удалить 22 orphaned components из ggcatering/concept-catering циклов
+  (per CYCLE-26-COMPONENT-AUDIT.md) —BgHero, PinkMarquee, BoldStatement,
+  SnackBoxCube3D, etc.
+

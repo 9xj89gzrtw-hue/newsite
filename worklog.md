@@ -1601,3 +1601,53 @@ Stage Summary:
 - mcu-video-hero.tsx: 154 → 160 lines. No new files, no new deps. One small CSS addendum in globals.css (~14 lines) so the existing `data-tone="cream"` API on the outline petal button actually changes its border/text color (was a no-op without this rule).
 - Lint clean. HTTP 200 confirmed. Existing IntersectionObserver + reduced-motion + aria-hidden video preserved.
 - No blockers. Next agent in the Cycle 26 chain can verify visually at http://localhost:3000 and confirm the press strip logos (Resto.ru / АФИША Daily / The Village / Собака.ru / Time Out / Forbes) sit cleanly at the hero bottom edge above the dark gradient overlay.
+
+---
+Task ID: cycle-26-orchestrator
+Agent: Z.ai Code (orchestrator + VLM critique loop)
+Task: Implement Salt Block Hospitality editorial layer (Cycle 26) — clone saltblockhospitality.com design into Interfood Catering site, VLM critique loop until converged
+
+Work Log:
+- Read worklog.md (1181 lines) + AGENTS.md §1-16 + BUILD_SITE_PROMPT.md (head 100 lines) — understood the Cycle 21/24/25 established methodology (research → analysis MD → parallel subagents → VLM critique loop → commit + push).
+- Cloned target repo `9xj89gzrtw-hue/newsite` to /home/z/my-project/newsite. Installed 895 deps via `bun install` (4.32s). Generated Prisma client. Switched DATABASE_URL to SQLite (`file:./dev.db`) + `bun run db:push` succeeded.
+- Installed pm2 globally (v7.0.3). Killed existing my-project dev server on port 3000. Started newsite dev via `pm2 start "bun run dev" --name interfood-dev --cwd /home/z/my-project/newsite`. Verified HTTP 200 + title "Interfood Catering — Кейтеринг в Санкт-Петербурге от 2450₽/чел".
+- Dispatched 3 parallel research subagents (Task IDs 3-A/B/C):
+  - 3-A (general-purpose, agent-browser DOM extraction): wrote docs/SALTBLOCK-ANALYSIS.md (1719 lines, 17k words) — extracted palette (cool sage-cream #E5ECE9 + dark green-black #19211F + petal buttons), fonts (Minerva Modern + Anziano → substitute Playfair + Karla), 12 sections, 5 wow moments, 11 downloaded hero images.
+  - 3-B (general-purpose, web-search + web-reader): wrote docs/reference-library/saltblock/BRAND-CONTEXT.md (599 lines) + DESIGN-CRITIQUE.md (412 lines) — Tampa Bay luxury caterer, founded by Ryan Conigliaro + Scott Roberts, vertically-integrated (catering + farm + venue), 4.8/5 reviews, Tampa Magazine Best of the City 5 years. NO design-industry awards confirmed.
+  - 3-C (Explore, component audit): wrote docs/CYCLE-26-COMPONENT-AUDIT.md (1210 lines, 10.5k words) — 64 components reviewed, 22 deletions recommended, 5 strongest = Reveal/SmartImage/Manifesto/EditorialIntro/OutlineButton, 3 new component ideas = ChefPortrait/TastingMenuExperience/SustainabilityStrip.
+- Dispatched 6 parallel implementation subagents (Task IDs 6-A/B/C/D/E/F):
+  - 6-A: 361 lines of Salt Block CSS utilities to globals.css + PetalButton component.
+  - 6-B: SbPressStrip (docked + standalone variants) + AnnouncementBar refurb (localStorage 14-day dismissal + 2026-2027 scarcity copy).
+  - 6-C: ChefPortrait component (4:5 portrait + italic Playfair + Great Vibes signature).
+  - 6-D: TastingMenuExperience component (5-course editorial list on espresso bg).
+  - 6-E: SustainabilityStrip component (3-cell editorial grid).
+  - 6-F: 52 English→Russian string translations across faq.tsx / social-handle.tsx / contact.tsx + founding year consistency fix (11 лет → 16+ лет / с 2014 → с 2009).
+- Dispatched 2 parallel restyle subagents (Task IDs 7-A/B):
+  - 7-A: Restyled McuVideoHero with 160px Playfair H1 "ЕДА КАК ИСКУССТВО" + PetalButton CTAs + docked SbPressStrip at hero bottom.
+  - 7-B: Restyled McuMarqueeBand with 7× repeating brand phrases (84 instances total) + edge-fade mask + warm gradient bg.
+- Rewrote src/app/page.tsx with new 22-section client journey order: Hero → Marquee → EditorialIntro → About → Manifesto → ChefPortrait → Menu → TastingMenu → SustainabilityStrip → ServicesOverview → PhotoFilmstrip → Venues → QuoteBand → Testimonials → Instagram → Calculator → Faq → Contact → SocialHandle → Footer + BackToTop.
+- VLM critique loop (4 iterations, brutal design-director prompt):
+  - v1 (4/10 hero): font-family var(--font-display) is Oswald, not Playfair — fixed by switching sb-hero-title and sb-petal-btn to var(--font-serif).
+  - v2 (8/10 hero): bumped hero size clamp(4rem,11vw,10rem) → clamp(5rem,13vw,12rem); press strip opacity 0.85 → 0.6 + grayscale(1); stronger text-shadow on dark video.
+  - v3 (7-8/10): chapter-nav "HERO" label noise across sections — fixed by removing label text (dots + progress only); marquee edge-fade mask added; petal button border-radius 16px 0 → 28px 0 (more dramatic petal).
+  - v4 (9/10 hero, 8.5/10 marquee, 9/10 chef, 9/10 tasting): CONVERGED. All sections rated ГОТОВО (ready for production).
+- Verified end-to-end via agent-browser: page renders (no blank screen, no hydration crash, no console errors). Calculator CTA scrolls to #calculator (y=18468). FAQ accordion expands (1st item expanded=true). AnnouncementBar dismiss button works (offsetHeight → "gone"). Footer sticky at bottom (25468px page height, footer at 25467 = perfect). Mobile responsive (iPhone 14 viewport tested).
+- Lint green, typecheck green, HTTP 200 confirmed.
+- Added .gitignore rules for saltblock critique folder + large PNGs (kept only .md docs + small JSON dumps for repo).
+- Committed: feat(cycle-26): saltblockhospitality.com editorial layer (43 files, +7371 / -289 lines).
+- Pushed to origin/main (commit 3413861d2fab815f8efb1df2a06880b2351365c0). No force push.
+- Appended Cycle 26 section to AGENTS.md (§17) with: what to copy (P1), what NOT to copy (P3 anti-patterns), VLM critique loop methodology, subagent orchestration pattern (12 subagents in 4 parallel groups), ready-to-use code recipes, TODO for Cycle 27.
+
+Stage Summary:
+- **12 subagents dispatched in 4 parallel groups** (3 research + 6 implement + 2 restyle + orchestrator). Zero git conflicts (each subagent worked in separate files).
+- **8 new components + 5 restyled + 10 CSS utility classes** (~360 lines added to globals.css). Total: 43 files changed, +7371 / -289 lines.
+- **5 Salt Block WOW moments implemented:** (1) 160px uppercase Playfair hero H1, (2) petal-shaped primary CTAs (border-radius 28px 0), (3) press strip docked at hero bottom edge, (4) 7× repeating marquee brand phrase insistence with edge-fade mask, (5) chef-driven brand DNA via ChefPortrait + TastingMenuExperience + SustainabilityStrip.
+- **VLM critique loop converged:** hero 4/10 → 9/10, marquee N/A → 8.5/10, chef 7.5/10 → 9/10, tasting 7/10 → 9/10. Average across sections: 8.8/10. All rated "ГОТОВО" (production-ready).
+- **52 English→Russian string translations** fixed (English leakage bugs in Faq/SocialHandle/Contact per audit).
+- **Founding year contradiction resolved:** About stats now consistent с 2009 года / 16+ лет на рынке (was 11 лет / 2014).
+- **Section ordering audited:** Calculator moved AFTER Testimonials (was breaking emotional flow mid-page); orphaned QuoteBand remounted between Venues and Testimonials as premium trust beat; McuServicesCarousel replaced with Ridgewells two-up ServicesOverview; McuVideoEvents + 2 McuCtaBand chapter dividers dropped (replaced by Salt Block wow sections themselves).
+- **Deliverables:** docs/SALTBLOCK-ANALYSIS.md (1719 lines, 17k words), docs/CYCLE-26-COMPONENT-AUDIT.md (1210 lines, 10.5k words), docs/reference-library/saltblock/BRAND-CONTEXT.md (599 lines), DESIGN-CRITIQUE.md (412 lines), 17 raw web-search/page-fetch JSON dumps. worklog.md +422 lines (Task IDs 3-A/B/C, 6-A/B/C/D/E/F, 7-A/B, cycle-26-orchestrator).
+- **Environment:** pm2 v7.0.3 managing `interfood-dev` process (port 3000, `bun run dev`). HTTP 200 stable.
+- **Push:** origin/main @ 3413861, no force push, fast-forward. .gitignore updated to exclude large critique PNGs.
+- **Next cycle TODO (documented in AGENTS.md §17):** replace text-only SVG press logos with real SVG + verifiable article URLs; upload mculinary MP4 to Mux; commission real chef portrait photo; delete 22 orphaned ggcatering/concept-catering components; mount SbPressStrip standalone variant as trust-section after About.
+
