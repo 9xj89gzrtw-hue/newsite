@@ -108,45 +108,32 @@ export function TottHero() {
       {/* 5px white border decorative frame — talkofthetown SR7 signature. */}
       <span className="tott-border-frame z-[3]" aria-hidden="true" />
 
-      {/* CENTERED brand stack — per task v7: user showed a reference
-          screenshot of an earlier hero version they preferred. Composition
-          (from screenshot, no dividers — hierarchy via font contrast + scale
-          + whitespace only):
-            1. eyebrow "INTERFOOD CATERING" — small sans-serif (Lato) uppercase
-               tracked, generous gap above the wordmark
-            2. wordmark "Interfood." — massive high-contrast serif (Prata),
-               gold dot accent
-            3. "food as art" — handwritten script (Nothing You Could Do),
-               nestled directly below the wordmark (tight gap, signature feel)
-            4. RU body "Еда как искусство — выездной кейтеринг полного цикла
-               в Санкт-Петербурге. Фуршет, банкет, кофе-брейк от 2450₽/чел."
-               — sans-serif (Lato via Karla Cyrillic fallback), readable,
-               max-width constrained, generous line-height
-            5. locations "САНКТ-ПЕТЕРБУРГ | МОСКВА | ВСЯ РОССИЯ" — small sans
-               caps with pipe separators, wide tracking
-          All centered H+V. translateY(-40px) optical centering (compensates
-          for sticky header in normal flow below the hero). Text-shadow on
-          white text for video-bg legibility. */}
+      {/* CENTERED brand stack — per task v8: keep ONLY the 3 lines the user
+          asked for, in the style of the earlier hero (massive serif wordmark
+          + handwritten script tagline + RU script tagline). NO eyebrow, NO
+          body paragraph, NO cities strip — just the 3 lines, centered H+V,
+          hierarchy via font contrast + scale + whitespace (no dividers).
+          Composition:
+            1. "Interfood." — massive high-contrast serif (Prata), gold dot
+            2. "food as art" — handwritten script (Nothing You Could Do),
+               nestled tight below the wordmark (signature/underline feel)
+            3. "Лучший кейтеринг Санкт-Петербурга" — Cyrillic handwritten
+               script (Marck Script), matching the "food as art" script feel
+               for the Russian tagline
+          translateY(-40px) optical centering (compensates for sticky header
+          in normal flow below the hero). Text-shadow on white text for
+          video-bg legibility. */}
       <motion.div
         className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center [transform:translateY(-40px)]"
         initial={showStatic ? false : "hidden"}
         animate={showStatic ? undefined : "visible"}
         variants={container}
       >
-        {/* Eyebrow — small sans uppercase tracked (Lato). */}
-        <motion.p
-          variants={fade}
-          className="tott-body text-[11px] font-bold uppercase tracking-[0.4em] text-white/85 sm:text-[13px]"
-          style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}
-        >
-          Interfood Catering
-        </motion.p>
-
         {/* Wordmark — Prata (high-contrast serif). Gold dot accent. Massive,
             dominates the viewport. */}
         <motion.h1
           variants={rise}
-          className="tott-display mt-8 text-white"
+          className="tott-display text-white"
           style={{
             fontSize: "clamp(3.5rem, 12vw, 9rem)",
             lineHeight: 0.92,
@@ -171,27 +158,21 @@ export function TottHero() {
           food as art
         </motion.p>
 
-        {/* RU body — sans-serif readable paragraph (Lato via Karla Cyrillic
-            fallback), max-width constrained, generous line-height. */}
+        {/* RU script tagline — Marck Script (Cyrillic handwritten). Matches
+            the "food as art" script feel for the Russian tagline. Slightly
+            smaller (92% of the Latin script) for optical parity since Marck
+            Script glyphs are wider/heavier than Nothing You Could Do. */}
         <motion.p
           variants={rise}
-          className="tott-body mt-8 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg"
-          style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}
+          className="mt-2 text-white/95"
+          style={{
+            fontFamily: "var(--font-marck), var(--font-nothing), cursive",
+            fontSize: "clamp(2rem, 5.5vw, 4rem)",
+            lineHeight: 1.1,
+            textShadow: "0 2px 30px rgba(0,0,0,0.45)",
+          }}
         >
-          Еда как искусство — выездной кейтеринг полного цикла в Санкт-Петербурге.
-          Фуршет, банкет, кофе-брейк от 2450&#8381;/чел.
-        </motion.p>
-
-        {/* Locations strip — small sans caps, pipe separators, wide tracking. */}
-        <motion.p
-          variants={fade}
-          className="tott-body mt-10 text-[12px] font-bold uppercase tracking-[0.3em] text-white/70 sm:text-sm"
-        >
-          Санкт-Петербург
-          <span className="mx-3 text-white/30" aria-hidden="true">|</span>
-          Москва
-          <span className="mx-3 text-white/30" aria-hidden="true">|</span>
-          Вся Россия
+          Лучший кейтеринг Санкт-Петербурга
         </motion.p>
       </motion.div>
 
