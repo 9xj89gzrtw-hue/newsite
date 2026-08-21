@@ -1953,3 +1953,109 @@ grep -r '[А-Яа-яЁё]' src/components/catering/ --include="*.tsx" \
 
 ---
 *Cycle 22 complete. Site: https://newsite-three-kappa.vercel.app — Sopranos Catering redesign live.*
+
+---
+
+## 12. Concept-Catering.de «wow»-слой (Cycle 23, 21.08.2026)
+
+**Задача:** скопировать стиль/анимации/wow-эффекты с `https://www.concept-catering.de/`
+и реализовать на нашем сайте Interfood. Главный запрос — **«эффект поднимающихся
+фоток»**.
+
+**Коммит:** `db7ccbb` (push в main).
+
+### Реверс-инжиниринг concept-catering.de (Webflow)
+
+Исследовано через `agent-browser` + VLM (скриншоты + computed CSS + outerHTML):
+
+- **Палитра:** фон `#101010` (near-black), текст белый, акцент розовый `#f087b5`
+  (band `text-scroling-section`), шрифт `Barlow Semi Condensed` (ультра-жирный
+  конденсированный all-caps). Также есть Bariol/Cynzia/PT Sans, но computed
+  font-family = Barlow Semi Condensed.
+- **Секции:** `hero` (split-screen, logo + paragraph + button + lightbox с
+  sticker-play-icon) → `text-scroling-section` (розовая ~83px marquee-полоса)
+  → `section-no-padding` (тёмный statement) → `services` (image-grid + dual
+  buttons «Jetzt anfragen»/«Mehr erfahren») → **`works`** (RISING PHOTOS) →
+  `big-footer`.
+- **«Эффект поднимающихся фоток» (works) — ТОЧНАЯ механика (чистый CSS, без JS):**
+  ```
+  .works   { position: relative; height: N × 100vh }   /* N = число проектов */
+  .project { position: sticky; top: 0; height: 100vh; overflow: hidden }
+  ```
+  Каждый `.project` sticky at top:0, следующий в DOM paints поверх → следующее
+  фото **поднимается и перекрывает** предыдущее при скролле. Внутри: `.image-absolute`
+  (bg cover) + `.works-overlay` (linear-gradient rgba(0,0,0,.2)→.2 + сильный
+  bottom-gradient) + `.category` (top-left label) + `.text-animation-wrapper`
+  (нижняя горизонтальная marquee: название сервиса 4× через `•` точки,
+  `overflow:hidden`, CSS keyframe translateX 0→-50%, контент дублирован 2× для
+  seamless-loop). Высота marquee ~115px, шрифт огромный.
+
+### Что реализовано (new components в `src/components/catering/`)
+
+| Файл | Что | Тип |
+|---|---|---|
+| `rising-photos.tsx` | **Центр**: sticky-stacked full-viewport фото (4 сервиса Interfood: Корпоративы/Свадьбы/Гриль/Фуршет), pink tagline top-left, нижняя marquee названия, parallax scale+y (framer-motion useScroll, отключён под reduced-motion), «Подробнее» pill | client |
+| `pink-marquee.tsx` | Розовая #f087b5 полоса (~80px) с infinite marquee ключевых слов (Barlow, white, • separators), `reverse` prop, reduced-motion via CSS @media | server |
+| `bold-statement.tsx` | Тёмный editorial statement: огромный Barlow заголовок «НЕВЕРОЯТНО ВКУСНЫЙ КЕЙТЕРИНГ» (вкусный = pink), subtext + 2 pill CTA, Reveal stagger | server |
+
+### Инфраструктура
+
+- **Шрифт:** `Barlow_Semi_Condensed` (next/font/google, weights 400-800) →
+  `--font-barlow` в `layout.tsx`, helper `.font-barlow` в `globals.css`.
+- **Токены (globals.css `:root` + `@theme inline`):** `--cc-dark: #101010`,
+  `--cc-dark-2: #1a1a1a`, `--cc-pink: #f087b5`, `--cc-pink-soft: #f5a8c8`,
+  `--cc-cream: #f4efe8`. Tailwind классы: `bg-cc-dark`, `text-cc-pink`, etc.
+- **CSS (globals.css):** `@keyframes cc-marquee-x { 0→-50% }`, `.cc-marquee-track`
+  (inline-flex, linear infinite, `--cc-marquee-duration` var, `.cc-reverse`),
+  `.cc-project` (sticky top:0 h:100vh overflow:hidden), `@media (prefers-reduced-motion)`
+  отключает анимацию.
+- **Интеграция (page.tsx):** `<BoldStatement/>`+`<PinkMarquee/>` после
+  `WinterSpecials`; `<RisingPhotos/>`+`<PinkMarquee reverse/>` после `PromoBanner`.
+  Существующие секции НЕ удалены.
+
+### Грабли этого цикла (добавить к §«Грабли»)
+
+8. **Dev-сервер не выживает между bash-вызовами:** `nohup`/`setsid`/`disown`
+   бессильны — sandbox-инструмент убивает process-group. **Решение: `pm2`**
+   (`npm i -g pm2; pm2 start "bun run dev" --name interfood-dev --cwd /home/z/my-project/newsite`).
+   pm2-демон переживает cleanup. НЕ запускать `next` напрямую — `next: command not found`
+   в pm2-окружении (PATH); только через `bun run dev`.
+9. **VLM путает горизонтальную marquee с «обрезкой»**: в статичном скриншоте
+   виден кусок слова → VLM пишет «text cut off». Проверять через
+   `getComputedStyle(el).animationName === 'cc-marquee-x'` и `transform: matrix(...)`
+   (есть translateX = анимация живёт). Не «лечить» несуществующую обрезку.
+10. **Pink label на светлом фото — низкий контраст.** Решение: arbitrary
+    `[text-shadow:0_2px_10px_rgba(0,0,0,0.9)]` (Tailwind v4 поддерживает).
+    Проверять: `getComputedStyle(lbl).textShadow` ≠ none.
+11. **Mobile FAB-стек** (`fixed bottom-60 right-6` + `bottom-44 right-6`, z-[70],
+    phone/calendar) **перекрывает** правую кнопку секции. Решение: мобильную
+    кнопку ставить `left-6` (`md:left-auto md:right-12`), десктоп — справа.
+12. **Mobile header ~125px** перекрывает `top-24` (96px) label. Решение:
+    `top-32 md:top-28` (128px mobile / 112px desktop).
+13. **`data-header-theme="dark"` на тёмных секциях** — существующий site-header
+    IntersectionObserver сам переключает тему хедера (dark bg + white text).
+    Просто ставь атрибут, CSS писать не надо.
+14. **Hero `CheckYourDateSidebar`** (`fixed right-4 top-1/2 hidden lg:block`)
+    коллапсирует в компактный tab после `scrollY > 0.7*heroHeight` — НЕ перекрывает
+    дальние секции (works). Не трогать.
+
+### Эталоны для копирования (дополнить §«Эталоны»)
+
+- **Concept Catering Crew**: https://www.concept-catering.de/ (Webflow, Barlow
+  Semi Condensed, #101010 + #f087b5, sticky-stacked rising photos, pink marquee
+  bands). Полный реверс-инжиниринг — в этом §12.
+- **VLM-скриншоты эталона:** `cc-home-full.png`, `cc-scroll-1..4.png` (gitignored,
+  пересоздаются через agent-browser).
+
+### Команды проверки concept-catering слоя
+
+```bash
+cd /home/z/my-project/newsite
+bun run lint && bun run typecheck          # оба зелёные
+pm2 list                                   # interfood-dev online
+# Визуально: открыть / в Preview Panel, скролл к #works — 4 фото поднимаются
+# друг за другом, pink marquee крутится, хедер становится тёмным.
+```
+
+---
+*Cycle 23 complete. Concept-Catering.de wow-layer live: rising photos + pink marquee + bold statement. Commit db7ccbb on main.*
