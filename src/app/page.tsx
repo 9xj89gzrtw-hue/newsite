@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
-import { Hero } from "@/components/catering/hero";
+import GgHero from "@/components/catering/gg-hero";
+import GgWhoWeAre from "@/components/catering/gg-who-we-are";
+import GgVideoShowcase from "@/components/catering/gg-video-showcase";
+import GgFeatureCollage from "@/components/catering/gg-feature-collage";
 import { WinterSpecials } from "@/components/catering/winter-specials";
 import { BoldStatement } from "@/components/catering/bold-statement";
 import { PinkMarquee } from "@/components/catering/pink-marquee";
@@ -41,8 +44,19 @@ export default function Home() {
   return (
     <main id="main-content" role="main" tabIndex={-1} className="flex min-h-screen flex-col bg-cream outline-none">
       <SiteHeader />
-      {/* Hero — Sopranos full-viewport photo slider + Eastern Market story + sticky Check Your Date */}
-      <Hero />
+      {/* GgHero — Cycle 22: ggcatering.com multi-tile asymmetric image collage
+          + "Кейтеринг с [ИЗЮМИНКОЙ]" rotating-text wow effect (replaces Sopranos hero). */}
+      <GgHero />
+      {/* GgWhoWeAre — Cycle 22: ggcatering.com rotating adjectives + stat count-up
+          + soft pastel SVG collage + vertical-line eyebrow. */}
+      <GgWhoWeAre />
+      {/* GgVideoShowcase — Cycle 22: ggcatering.com aspect-video player with
+          autoplay-muted-loop teaser + click-to-fullscreen modal. TEMPORARY video
+          from ggcatering.com (will be replaced with own showreel). */}
+      <GgVideoShowcase />
+      {/* GgFeatureCollage — Cycle 22: ggcatering.com 3 alternating dark/light
+          text+image editorial blocks (Фишка / Опыт / Еда и напитки). */}
+      <GgFeatureCollage />
       {/* WinterSpecials — Sopranos "NEW WINTER SPECIALS" dark navy band (Cycle 22) */}
       <WinterSpecials />
       {/* BoldStatement — Concept-Catering.de dark editorial statement (wow layer) */}

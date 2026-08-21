@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed } from "next/font/google";
+import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { LenisProvider } from "@/components/catering/lenis-provider";
@@ -50,6 +50,19 @@ const barlow = Barlow_Semi_Condensed({
   variable: "--font-barlow",
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+// Global Gourmet (ggcatering.com) — Montserrat as Poppins-replacement.
+// Poppins on Google Fonts does NOT ship a Cyrillic subset, so for the Russian
+// interfood site we substitute Montserrat — a geometric sans nearly identical
+// to Poppins in x-height/letterforms, but with full Cyrillic + italic coverage.
+// Variable name `--font-poppins` is kept for CSS compat with gg-* components.
+const poppins = Montserrat({
+  variable: "--font-poppins",
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -178,7 +191,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://yandex.ru" />
       </head>
       <body
-        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} antialiased bg-background text-foreground`}
+        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} antialiased bg-background text-foreground`}
       >
         <a href="#main-content" className="skip-link">
           Перейти к содержанию

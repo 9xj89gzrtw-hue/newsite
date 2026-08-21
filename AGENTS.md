@@ -2137,3 +2137,129 @@ pm2 list                                   # interfood-dev online
 6. Implement: new components (ADD only) + careful modifications (preserve existing features) + CSS utilities block in globals.css
 7. VLM critique loop: screenshot each new section + reference, `z-ai vision` brutal critique, fix top 2 defects per iteration, repeat until all sections ≥7/10
 8. `bun run lint` + `bun run typecheck` + HTTP 200 verification before commit
+
+---
+
+## 18. «Cycle 22 — ggcatering.com Replication» — Multi-tile collage + rotating text + video showcase (21.08.2026)
+
+> **Цель:** Перенести на interfood стилистику/анимации/wow-эффекты с
+> https://www.ggcatering.com/ (Global Gourmet Catering — Bay Area).
+
+### Что сделано (коммит предстоящ)
+
+**Новые компоненты** (4 файла в `src/components/catering/`):
+1. `gg-hero.tsx` (370 строк) — Multi-tile asymmetric image collage (10×10 grid:
+   5 фото из `/public/media/` + 3 inline SVG: lime circle, light-yellow
+   triangle, blush zigzag) + foreground headline «Кейтеринг / с [ROTATING]»
+   где ROTATING цикл из 10 русских instrumental-синонимов (ИЗЮМИНКОЙ, шиком,
+   размахом, вкусом, классом, душой, огоньком, стилем, смыслом, страстью)
+   через `AnimatePresence mode="wait"` + `motion.span` с translateY 100%→0→-100%.
+   CTA pills «Рассчитать стоимость» / «Смотреть видео» + scroll cue ChevronDown.
+2. `gg-who-we-are.tsx` (262 строк) — «Кто мы» tagline eyebrow с
+   `.gg-vertical-line` reveal (height 0→80px), `GgRotatingAdjective` цикл из
+   22 русских прилагательных (text-4xl→7xl), manifesto-параграф, 3-up
+   `GgStat` count-up статистика (11 лет / 2400+ / 98%).
+3. `gg-video-showcase.tsx` (235 строк) — aspect-video 16:9 контейнер с
+   `<video autoplay muted loop playsInline preload="auto" poster="...">`
+   тизер + click-to-fullscreen modal (Escape / клик вне / X — закрытие).
+   Капшен «Interfood Catering Showreel · 2026» + дисклеймер «Видео временно
+   использовано с сайта-эталона».
+4. `gg-feature-collage.tsx` (272 строк) — 3 чередующихся dark/light блока
+   (Фишка → Опыт → Еда и напитки) с 2×2 image-collage (aspect-3/4 + aspect-square
+   с y-offset для editorial feel) + `gg-heading-two` с `.gg-italic` lime accent.
+
+**Дизайн-токены** (`src/app/globals.css` +269 строк в `/* Cycle 22 — Global
+Gourmet Style Module */`):
+- Палитра: `--gg-lime: #5DE680` (theme-color ggcatering), `--gg-light-yellow:
+  #F5E6A3`, `--gg-blush: #FCE4E4`, `--gg-charcoal-dark: #1A1A1A`, `--gg-ash:
+  #6B6B6B`, `--gg-cream: #FAFAF7`.
+- Классы: `.gg-poppins`, `.gg-tagline`, `.gg-heading-two`, `.gg-hero-headline`,
+  `.gg-rotating-text-wrap` (с `min-height: 1em` чтобы не коллапсировал во
+  время AnimatePresence exit/enter gap), `.gg-italic`, `.gg-enter-init/in`,
+  `.gg-enter-image-init/in`, `.gg-stagger-1..6`, `.gg-shape-lime/yellow/blush`,
+  `.gg-vertical-line`, `.gg-btn`, `.gg-btn-primary/ghost`, `.gg-video-frame`,
+  `.gg-video-play-btn`, `.gg-video-play-icon` (96px с box-shadow glow).
+
+**Шрифт** (`src/app/layout.tsx`):
+- **Montserrat** (НЕ Poppins — у Poppins нет Cyrillic subset в Google Fonts).
+  Variable `--font-poppins` сохранён для совместимости с CSS-классами.
+  Montserrat визуально идентичен Poppins (геометрический sans, тот же x-height).
+
+**Page.tsx** — заменил `<Hero />` (Sopranos) на 4 новых gg-* компонента в
+порядке: GgHero → GgWhoWeAre → GgVideoShowcase → GgFeatureCollage →
+остальные секции без изменений (WinterSpecials, BoldStatement, …).
+
+**Видео-плейсхолдер** (`/public/media/ggcatering/gg-hero-video.mp4`):
+- Временно скачан тизер с ggcatering.com (Vimeo progressive_redirect URL)
+- Сжат ffmpeg: 33MB → 11MB (720p H.264, 66 секунд, без аудио)
+- Дисклеймер в UI: «Видео временно использовано с сайта-эталона.
+  Будет заменено на собственный шоурил.»
+- **TODO для следующего цикла:** пользователь даст своё видео →
+  заменить файл + убрать дисклеймер + (опционально) вынести на Mux/Cloudflare.
+
+### PM2 + dev-сервер
+
+- Установлен `pm2` глобально (`npm install -g pm2` → v7.0.3).
+- `pm2 start --name newsite-dev "npx next dev -p 3001"` — sandbox держит
+  my-project на 3000, newsite-превью на 3001.
+- `pm2 save` — сохранён process list для авто-рестарта.
+- `ecosystem.config.js` уже был в репо (production на 3000 через standalone).
+
+### Превью для пользователя
+
+- URL: `https://[gateway]/?XTransformPort=3001` (sandbox gateway маршрутизирует
+  на порт 3001). Либо `http://localhost:3001/` локально.
+- Preview panel показывает порт 3000 (my-project) — чтобы увидеть newsite,
+  используйте кнопку "Open in New Tab" или добавьте `?XTransformPort=3001`.
+
+### Грабли (зафиксировать для будущего)
+
+1. **next/font/google `subsets: ["cyrillic"]`** валидируется TypeScript-типом
+   `Subsets` — Poppins имеет только `latin | latin-ext | devanagari`,
+   Montserrat имеет `latin | latin-ext | cyrillic | vietnamese`. **Всегда
+   проверяй доступные subsets перед добавлением шрифта.**
+2. **`AnimatePresence mode="wait"`** оставляет зазор 0.5s между exit и enter,
+   в течение которого `.gg-rotating-text-wrap` коллапсирует в 0 высоты.
+   **Фикс: `min-height: 1em` + `line-height: 1.15` на wrap.**
+3. **`<video autoPlay controls>` без `muted`** — браузеры блокируют autoplay
+   со звуком. В тизер-видео всегда `muted`, в модальном — либо `muted`+controls
+   (юзер unmute через controls), либо `poster`+`controls` без autoplay.
+4. **SiteHeader theme switching** — секции с белым фоном должны ставить
+   `data-header-theme="light"`, иначе header остаётся в "transparent" теме с
+   `text-cream` (невидимо на белом).
+5. **next/image lazy-loaded** — при скриншоте сразу после scrollIntoView
+   картинки могут быть ещё в состоянии blur-placeholder. **Фикс для VLM:
+   ждать 5-7s перед скриншотом, ИЛИ отключить lazy-load через `priority` на
+   важных картинках.**
+6. **agent-browser viewport по умолчанию 1280×720** (577px inner height
+   после chrome) — для валидации «что увидит юзер на десктопе» ставь
+   `agent-browser set viewport 1920 1080`.
+7. **33MB MP4 в git** — ужать ffmpeg до 720p H.264 CRF 28 ≈ 11MB (33% от
+   оригинала, визуально идентично для web).
+8. **Subagent'ы создают default export** — оркестратор должен импортировать
+   как `import Foo from "..."` а не `import { Foo }`. Унифицировать в промптах
+   subagent'ов: указывать «named export `Foo`» (без слова «default»).
+
+### Скиллы, оказавшиеся полезны в этом цикле
+
+- **agent-browser** — fullscreen-скриншоты секций по scrollIntoView + eval
+  для проверки readyState/paused/currentTime у `<video>`.
+- **VLM (`z-ai vision`)** — brutal critique по 4 скриншотам за раз, выявление
+  «dev tool overlay vs real bug» (6 issues badge — не баг).
+- **Task → full-stack-developer subagent ×4 (параллельно)** — каждый собрал
+  200-370 строк кода за один вызов, tsc/eslint чистые, worklog приложен.
+- **ffmpeg** — сжатие видео 33MB→11MB без потери web-качества.
+- **pm2** — держит dev-сервер newsite на 3001 устойчиво (sandbox-механизм).
+
+### Что можно улучшить дальше (next cycle)
+
+- ~~Заменить временное видео с ggcatering на собственный шоурил юзера~~
+  (ожидает пользовательский контент).
+- Перенести видео на Mux/Cloudflare Stream (правило RULES.md §3 — не класть
+  .mp4 в /public на проде).
+- Добавить poster-генерацию из первого кадра видео (вместо ridgewells-hero.jpg).
+- На мобильных проверить, что rotating-text не ломает layout при длинных
+  русских словах («беспрецедентные» в `GgRotatingAdjective` — 18 символов).
+- VLM-критика FEATURES показала «image misalignment» — это намерерный
+  editorial offset (translate-y-0/+8/-4/+4), но можно сделать менее резким.
+- Добавить signature CTA-секцию перед footer (ggcatering «Let's Party» button).
