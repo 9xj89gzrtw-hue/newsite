@@ -108,20 +108,23 @@ export function TottHero() {
       {/* 5px white border decorative frame — talkofthetown SR7 signature. */}
       <span className="tott-border-frame z-[3]" aria-hidden="true" />
 
-      {/* CENTERED brand stack — per task v9: 3 lines, the 3rd in the style
-          of the "INTERFOOD CATERING" eyebrow (uppercase, small, tracked,
-          sans-serif Lato) — NOT a script font. Composition:
+      {/* CENTERED brand stack — per task v10: 3 lines, shifted DOWN for
+          better optical balance (translateY +60px instead of -40px), "food
+          as art" made larger, and the eyebrow label wraps cleanly on mobile
+          ("Лучший кейтеринг" / "Санкт-Петербурга") via an explicit <br> that
+          only shows on small screens (hidden sm:inline).
+          Composition:
             1. "Interfood." — massive high-contrast serif (Prata), gold dot
             2. "food as art" — handwritten script (Nothing You Could Do),
                nestled tight below the wordmark (negative margin, signature)
-            3. "ЛУЧШИЙ КЕЙТЕРИНГ САНКТ-ПЕТЕРБУРГА" — small uppercase tracked
-               sans-serif eyebrow (Lato via Karla Cyrillic fallback), generous
-               editorial whitespace below the script pair.
-          translateY(-40px) optical centering (compensates for sticky header
-          in normal flow below the hero). Text-shadow on white text for
-          video-bg legibility. */}
+            3. "ЛУЧШИЙ КЕЙТЕРИНГ" / "САНКТ-ПЕТЕРБУРГА" — small uppercase
+               tracked sans-serif eyebrow (Lato via Karla Cyrillic fallback),
+               wraps to 2 lines on mobile (break after "кейтеринг"), single
+               line on sm+ screens. Generous editorial whitespace below the
+               script pair.
+          Text-shadow on white text for video-bg legibility. */}
       <motion.div
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center [transform:translateY(-40px)]"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center [transform:translateY(60px)]"
         initial={showStatic ? false : "hidden"}
         animate={showStatic ? undefined : "visible"}
         variants={container}
@@ -142,14 +145,16 @@ export function TottHero() {
         </motion.h1>
 
         {/* Script tagline — Nothing You Could Do. Nestles tight under the
-            wordmark (negative mt) for a signature/underline feel. */}
+            wordmark (negative mt) for a signature/underline feel. Per task
+            v10: "сделай food as art побольше" — bumped from clamp(1.75rem,
+            4.5vw, 3.5rem) to clamp(3rem, 8vw, 6rem). */}
         <motion.p
           variants={rise}
           className="tott-script text-white/95"
           style={{
-            fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)",
+            fontSize: "clamp(3rem, 8vw, 6rem)",
             lineHeight: 1,
-            marginTop: "-0.25rem",
+            marginTop: "-0.5rem",
             textShadow: "0 2px 30px rgba(0,0,0,0.45)",
           }}
         >
@@ -157,10 +162,13 @@ export function TottHero() {
         </motion.p>
 
         {/* Eyebrow label — Lato (sans-serif, .tott-body) ALL CAPS, small,
-            wide letter-spacing. Per task v9: "в стиле как ты писала INTERFOOD
-            CATERING заглавными буквами и маленьким размером, чтобы стильно
-            смотрелось". Generous editorial whitespace below the script pair
-            (mt-10). padding-left optically centers the tracked label. */}
+            wide letter-spacing. Per task v10: "сделай чтобы на мобильных
+            версиях переносился лучший кейтеринг а следующая строга Санкт-
+            Петербурга" — explicit <br className="sm:hidden"> after "кейтеринг"
+            forces the wrap on mobile only; on sm+ screens the <br> is hidden
+            so the label renders as one line. Generous editorial whitespace
+            below the script pair (mt-10). padding-left optically centers
+            the tracked label. */}
         <motion.p
           variants={fade}
           className="tott-body text-white/85"
@@ -175,7 +183,9 @@ export function TottHero() {
             textShadow: "0 2px 20px rgba(0,0,0,0.4)",
           }}
         >
-          Лучший кейтеринг Санкт-Петербурга
+          Лучший кейтеринг
+          <br className="sm:hidden" />
+          {" "}Санкт-Петербурга
         </motion.p>
       </motion.div>
 
