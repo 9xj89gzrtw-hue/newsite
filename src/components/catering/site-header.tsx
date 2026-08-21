@@ -47,11 +47,12 @@ const NAV: NavItem[] = [
 ];
 
 export function SiteHeader() {
-  const [scrolled, setScrolled] = useState(false);
+  const [stuck, setStuck] = useState(false);
   const [open, setOpen] = useState(false);
   const [cepMenuOpen, setCepMenuOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
   // Focus management for mobile menu dialog
   const prevOpen = useRef(false);
@@ -64,13 +65,16 @@ export function SiteHeader() {
     prevOpen.current = open;
   }, [open]);
 
-  // Dock-at-bottom vs sticky-top: toggle when scrolled past the hero.
-  // Hero is 100vh, so threshold ≈ window.innerHeight. We subtract a small
-  // buffer (40px) so the switch happens just before the hero fully exits.
+  // Sticky detection: header is "stuck" when its top reaches 0 (i.e. the
+  // hero has scrolled past). Uses getBoundingClientRect for precision (works
+  // regardless of hero height / dynamic viewport). Per task v5: "после того
+  // как он поднимается до верха экрана то остается там и становится немного
+  // прозрачным" — when stuck, switch to translucent white + blur.
   useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
     const onScroll = () => {
-      const threshold = (typeof window !== "undefined" ? window.innerHeight : 800) - 40;
-      setScrolled(window.scrollY > threshold);
+      setStuck(header.getBoundingClientRect().top <= 0);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -101,29 +105,31 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  // Docked (white bar at bottom of hero) vs sticky (white bar at top).
-  // Per task v3: "хеадер (меню) идет сразу внизу херо и оно идет на белом
-  // фоне" — the menu bar is ALWAYS on white background (both docked at the
-  // bottom edge of the hero and when stuck to the top on scroll). Mirrors
-  // talkofthetownatlanta.com where <header> sits below #sliders-container
-  // on a solid white bar and becomes sticky on scroll.
-  const docked = !scrolled;
+  // Header is `position: sticky; top: 0` and sits in normal flow AFTER the
+  // 100vh hero (see page.tsx). Per task v5: "хеадер сначала находится внизу
+  // секции херо и его даже не видно, потом херо вместе с ним мотается вверх и
+  // после того как он поднимается до верха экрана то остается там и становится
+  // немного прозрачным" — initially below the fold (not visible), scrolls up
+  // with the hero, sticks at top, then becomes slightly translucent.
+  // Background: solid white when scrolling into view; translucent white +
+  // backdrop-blur when stuck (Avada sticky-header feel).
 
   return (
     <>
       <header
+        ref={headerRef}
         role="banner"
-        data-tott-state={docked ? "docked" : "sticky"}
+        data-tott-state={stuck ? "stuck" : "flow"}
         inert={open}
         aria-hidden={open}
-        className={`fixed inset-x-0 z-50 border-b border-border-line bg-white text-ink shadow-[0_6px_24px_-14px_rgba(0,0,0,0.16)] backdrop-blur-md transition-all duration-500 ${
-          docked ? "bottom-0" : "top-0"
+        className={`sticky top-0 z-50 border-b border-border-line text-ink transition-colors duration-500 ${
+          stuck
+            ? "bg-white/85 shadow-[0_6px_24px_-14px_rgba(0,0,0,0.18)] backdrop-blur-md"
+            : "bg-white"
         }`}
       >
         <div
-          className={`mx-auto flex max-w-7xl items-center justify-between px-5 transition-all duration-500 md:px-8 ${
-            docked ? "py-4" : "py-3"
-          }`}
+          className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 transition-all duration-500 md:px-8"
         >
           {/* Logo LEFT — Prata wordmark (their display serif). */}
           <a
@@ -173,6 +179,17 @@ export function SiteHeader() {
             >
               <Phone className="size-4 shrink-0" />
               <span>{CONTACTS.phone}</span>
+            </a>
+            {/* Заказать — square burgundy button (task v5: "справа от телефона
+                сделать кнопку заказать в квадратике"). Solid burgundy bg,
+                white text, square corners, hover darken. → #contact */}
+            <a
+              href="#contact"
+              className="tott-body hidden min-h-[44px] items-center justify-center bg-tott-burgundy px-5 text-[13px] font-700 uppercase tracking-[0.08em] text-white transition-colors duration-300 hover:bg-tott-burgundy-deep sm:inline-flex"
+              style={{ fontWeight: 700, borderRadius: 0 }}
+              aria-label="Заказать кейтеринг"
+            >
+              Заказать
             </a>
             {/* Mobile: phone icon only */}
             <a

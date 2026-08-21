@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed, Montserrat, Prata, Nothing_You_Could_Do, Lato } from "next/font/google";
+import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed, Montserrat, Prata, Nothing_You_Could_Do, Lato, Marck_Script } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -119,6 +119,20 @@ const lato = Lato({
   variable: "--font-lato",
   subsets: ["latin", "latin-ext"],
   weight: ["300", "400", "700"],
+  display: "swap",
+});
+
+// Marck Script — Cyrillic-capable handwritten script (task v5). Nothing You
+// Could Do (the reference site's script font) is Latin-only and CANNOT
+// render Cyrillic, so "Лучший кейтеринг Санкт-Петербурга" would fall back to
+// the browser's generic `cursive` (Comic-Sans-like) — which is why the user
+// saw "вообще никакого шрифта нету". Marck Script is a casual handwritten
+// brush script with FULL Cyrillic support, the closest visual analog to
+// Nothing You Could Do for Russian text. Used via `.tott-script-ru` helper.
+const marck = Marck_Script({
+  variable: "--font-marck",
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  weight: ["400"],
   display: "swap",
 });
 
@@ -247,7 +261,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://yandex.ru" />
       </head>
       <body
-        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} ${prata.variable} ${nothingYouCouldDo.variable} ${lato.variable} antialiased bg-background text-foreground`}
+        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} ${prata.variable} ${nothingYouCouldDo.variable} ${lato.variable} ${marck.variable} antialiased bg-background text-foreground`}
       >
         <a href="#main-content" className="skip-link">
           Перейти к содержанию

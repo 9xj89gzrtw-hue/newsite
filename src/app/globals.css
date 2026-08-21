@@ -3592,6 +3592,10 @@ header[data-scrolled="true"] [data-mega-panel] {
 .tott-display { font-family: var(--font-prata), var(--font-serif), Georgia, serif; }
 /* Nothing You Could Do — script accent (Latin-only — English accent phrases) */
 .tott-script  { font-family: var(--font-nothing), var(--font-script), cursive; }
+/* Marck Script — Cyrillic-capable handwritten script (task v5). Nothing You
+   Could Do is Latin-only so RU text fell back to generic cursive (no font).
+   Marck Script is the closest Cyrillic analog for Russian script accents. */
+.tott-script-ru { font-family: var(--font-marck), var(--font-nothing), var(--font-script), cursive; }
 /* Lato — body + nav menu (has Cyrillic → RU copy safe) */
 .tott-body    { font-family: var(--font-lato), var(--font-sans), system-ui, sans-serif; }
 

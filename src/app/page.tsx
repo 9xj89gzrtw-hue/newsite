@@ -155,20 +155,24 @@ export default function Home() {
       tabIndex={-1}
       className="flex min-h-screen flex-col bg-cream outline-none"
     >
-      <SiteHeader />
-
       {/* ── ACT I: BRAND PROMISE & POSITIONING ── */}
 
       {/* 1. TottHero — Cycle 30 Talk of the Town (talkofthetownatlanta.com)
-          hero graft. Full-viewport background VIDEO (ea-hero-video.mp4 —
-          cinematic motion replaces their static hero photo per task brief)
-          + 5px white border frame (their SR7 signature) + centered Prata
-          "Interfood." wordmark + Nothing-You-Could-Do script accent
-          "food as art" + Lato RU subhead. The SiteHeader docks at the
-          BOTTOM of this 100vh hero (menu-at-bottom per task brief), then
-          sticks to top on scroll. Their fonts (Prata / Nothing You Could
-          Do / Lato) + burgundy/olive/cream palette introduced here. */}
+          hero graft. Full-viewport background VIDEO (mculinary crostini food)
+          + 5px white border frame (their SR7 signature) + top-left stack:
+          Prata "Interfood." wordmark + Nothing-You-Could-Do "food as art"
+          script centered beneath it. The SiteHeader sits in normal flow
+          AFTER this 100vh hero (below the fold, not visible at top), scrolls
+          up with it, and sticks at top:0 with translucent white bg. */}
       <TottHero />
+
+      {/* SiteHeader — rendered AFTER TottHero so it starts below the fold
+          (not visible at scrollY=0), scrolls up naturally with the hero, and
+          sticks at top:0 via position:sticky when scrolled past. Per task v5:
+          "хеадер сначала находится внизу секции херо и его даже не видно, потом
+          херо вместе с ним мотается вверх и после того как он поднимается до
+          верха экрана то остается там и становится немного прозрачным". */}
+      <SiteHeader />
 
       {/* 2. TottBestCatering — Cycle 30 task-v3 NEW. Replaces CepClientMarquee
           (black "ИЗБРАННЫЕ КЛИЕНТЫ" strip — Interfood's loudest, lowest-info

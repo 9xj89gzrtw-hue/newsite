@@ -59,10 +59,11 @@ export function TottBestCatering() {
       style={{ paddingTop: "100px", paddingBottom: "60px" }}
     >
       <motion.h2
-        className="tott-display mx-auto max-w-4xl px-6 text-center text-black"
+        className="mx-auto max-w-4xl px-6 text-center text-black"
         style={{
-          fontSize: "clamp(18px, 2.2vw, 22px)",
-          lineHeight: 1.5,
+          fontFamily: "var(--font-marck), var(--font-nothing), cursive",
+          fontSize: "clamp(2rem, 5vw, 3.5rem)",
+          lineHeight: 1.2,
           fontWeight: 400,
         }}
         initial={animate ? { opacity: 0, x: -20 } : false}

@@ -109,16 +109,17 @@ export function TottHero() {
       <span className="tott-border-frame z-[3]" aria-hidden="true" />
 
       {/* TOP-LEFT brand stack — mirrors talkofthetownatlanta.com hero where
-          ALL overlay text sits top-left (their white logo overlay + their
-          "bacon & bluecheese tartlet" script overlay are both top-left
-          positioned via SR7 absolute coordinates). Per task v4: "на херо все
-          надписи вверху слева, нету ничего посередине как у нас".
+          ALL overlay text sits top-left. Per task v5: "food as art" посередине
+          надписи "Interfood." → the script tagline is CENTERED relative to
+          the wordmark (items-center on the flex-col so the narrower script
+          sits horizontally centered beneath the wider Prata wordmark). Both
+          stay top-left positioned; nothing in the screen center.
 
-          Two lines, two fonts (per task v3): Prata for the wordmark, Nothing
-          You Could Do for the script tagline — exactly as the reference site
-          pairs their Prata logo + Nothing-You-Could-Do script overlay. */}
+          Two lines, two fonts: Prata for "Interfood.", Nothing You Could Do
+          for "food as art" — exactly as the reference site pairs their Prata
+          logo + Nothing-You-Could-Do script overlay. */}
       <motion.div
-        className="absolute left-8 top-10 z-10 flex flex-col gap-1 md:left-14 md:top-14"
+        className="absolute left-8 top-10 z-10 flex flex-col items-center gap-1 md:left-14 md:top-14"
         initial={showStatic ? false : "hidden"}
         animate={showStatic ? undefined : "visible"}
         variants={container}
@@ -134,7 +135,8 @@ export function TottHero() {
         </motion.h1>
 
         {/* Script tagline — Nothing You Could Do (their hero script overlay
-            font). English phrase because the face is Latin-only. */}
+            font). CENTERED beneath the wordmark (items-center on parent).
+            English phrase because the face is Latin-only. */}
         <motion.p
           variants={rise}
           className="tott-script m-0 text-white/95"
