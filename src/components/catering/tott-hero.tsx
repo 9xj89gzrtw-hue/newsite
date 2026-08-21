@@ -108,18 +108,15 @@ export function TottHero() {
       {/* 5px white border decorative frame — talkofthetown SR7 signature. */}
       <span className="tott-border-frame z-[3]" aria-hidden="true" />
 
-      {/* CENTERED brand stack — per task v8: keep ONLY the 3 lines the user
-          asked for, in the style of the earlier hero (massive serif wordmark
-          + handwritten script tagline + RU script tagline). NO eyebrow, NO
-          body paragraph, NO cities strip — just the 3 lines, centered H+V,
-          hierarchy via font contrast + scale + whitespace (no dividers).
-          Composition:
+      {/* CENTERED brand stack — per task v9: 3 lines, the 3rd in the style
+          of the "INTERFOOD CATERING" eyebrow (uppercase, small, tracked,
+          sans-serif Lato) — NOT a script font. Composition:
             1. "Interfood." — massive high-contrast serif (Prata), gold dot
             2. "food as art" — handwritten script (Nothing You Could Do),
-               nestled tight below the wordmark (signature/underline feel)
-            3. "Лучший кейтеринг Санкт-Петербурга" — Cyrillic handwritten
-               script (Marck Script), matching the "food as art" script feel
-               for the Russian tagline
+               nestled tight below the wordmark (negative margin, signature)
+            3. "ЛУЧШИЙ КЕЙТЕРИНГ САНКТ-ПЕТЕРБУРГА" — small uppercase tracked
+               sans-serif eyebrow (Lato via Karla Cyrillic fallback), generous
+               editorial whitespace below the script pair.
           translateY(-40px) optical centering (compensates for sticky header
           in normal flow below the hero). Text-shadow on white text for
           video-bg legibility. */}
@@ -135,41 +132,47 @@ export function TottHero() {
           variants={rise}
           className="tott-display text-white"
           style={{
-            fontSize: "clamp(3.5rem, 12vw, 9rem)",
+            fontSize: "clamp(3.5rem, 13vw, 9.5rem)",
             lineHeight: 0.92,
             letterSpacing: "-0.02em",
-            textShadow: "0 4px 40px rgba(0,0,0,0.5)",
+            textShadow: "0 2px 30px rgba(0,0,0,0.45)",
           }}
         >
-          Interfood<span style={{ color: "var(--gold)" }}>.</span>
+          Interfood<span style={{ color: "var(--gold)", marginLeft: "0.05em" }}>.</span>
         </motion.h1>
 
-        {/* Script tagline — Nothing You Could Do. Nestled directly below the
-            wordmark (tight mt-2), signature/underline feel. */}
+        {/* Script tagline — Nothing You Could Do. Nestles tight under the
+            wordmark (negative mt) for a signature/underline feel. */}
         <motion.p
           variants={rise}
-          className="tott-script mt-2 text-white/95"
+          className="tott-script text-white/95"
           style={{
-            fontSize: "clamp(2.2rem, 6vw, 4.5rem)",
+            fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)",
             lineHeight: 1,
+            marginTop: "-0.25rem",
             textShadow: "0 2px 30px rgba(0,0,0,0.45)",
           }}
         >
           food as art
         </motion.p>
 
-        {/* RU script tagline — Marck Script (Cyrillic handwritten). Matches
-            the "food as art" script feel for the Russian tagline. Slightly
-            smaller (92% of the Latin script) for optical parity since Marck
-            Script glyphs are wider/heavier than Nothing You Could Do. */}
+        {/* Eyebrow label — Lato (sans-serif, .tott-body) ALL CAPS, small,
+            wide letter-spacing. Per task v9: "в стиле как ты писала INTERFOOD
+            CATERING заглавными буквами и маленьким размером, чтобы стильно
+            смотрелось". Generous editorial whitespace below the script pair
+            (mt-10). padding-left optically centers the tracked label. */}
         <motion.p
-          variants={rise}
-          className="mt-2 text-white/95"
+          variants={fade}
+          className="tott-body text-white/85"
           style={{
-            fontFamily: "var(--font-marck), var(--font-nothing), cursive",
-            fontSize: "clamp(2rem, 5.5vw, 4rem)",
-            lineHeight: 1.1,
-            textShadow: "0 2px 30px rgba(0,0,0,0.45)",
+            fontSize: "clamp(11px, 1.2vw, 14px)",
+            lineHeight: 1.4,
+            letterSpacing: "0.35em",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            marginTop: "2.5rem",
+            paddingLeft: "0.35em",
+            textShadow: "0 2px 20px rgba(0,0,0,0.4)",
           }}
         >
           Лучший кейтеринг Санкт-Петербурга
