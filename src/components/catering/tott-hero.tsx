@@ -108,46 +108,40 @@ export function TottHero() {
       {/* 5px white border decorative frame — talkofthetown SR7 signature. */}
       <span className="tott-border-frame z-[3]" aria-hidden="true" />
 
-      {/* TOP-LEFT script accent — mirrors talkofthetown's hero top-left
-          script overlay (their "bacon & bluecheese tartlet" in Nothing You
-          Could Do). Ours: "food as art" — the Interfood brand tagline in
-          their script font (Latin-only face, so English phrase). Positioned
-          absolute top-left, inside the border frame. Sits above the
-          bottom-docked header. */}
-      <motion.p
-        className="tott-script absolute left-8 top-8 z-10 text-white/95 md:left-14 md:top-12"
-        style={{ fontSize: "clamp(1.5rem, 3vw, 2.4rem)", lineHeight: 1 }}
-        initial={showStatic ? false : { opacity: 0, x: -20 }}
-        animate={
-          showStatic
-            ? undefined
-            : { opacity: 1, x: 0, transition: { delay: 0.6, duration: 0.8, ease: "easeOut" as const } }
-        }
-      >
-        food as art
-      </motion.p>
+      {/* TOP-LEFT brand stack — mirrors talkofthetownatlanta.com hero where
+          ALL overlay text sits top-left (their white logo overlay + their
+          "bacon & bluecheese tartlet" script overlay are both top-left
+          positioned via SR7 absolute coordinates). Per task v4: "на херо все
+          надписи вверху слева, нету ничего посередине как у нас".
 
-      {/* Centered wordmark ONLY — mirrors talkofthetown hero which shows
-          just the white logo overlay (+ script). No subtitle, no cities,
-          no CTAs on the hero (per task v3: "на самом херо только надпись
-          Interfood. food is art также как на том сайте в двух разных
-          шрифтах"). The "Лучший кейтеринг" message moves to the white
-          section below (TottBestCatering, replaces CepClientMarquee). */}
+          Two lines, two fonts (per task v3): Prata for the wordmark, Nothing
+          You Could Do for the script tagline — exactly as the reference site
+          pairs their Prata logo + Nothing-You-Could-Do script overlay. */}
       <motion.div
-        className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 text-center"
+        className="absolute left-8 top-10 z-10 flex flex-col gap-1 md:left-14 md:top-14"
         initial={showStatic ? false : "hidden"}
         animate={showStatic ? undefined : "visible"}
         variants={container}
       >
-        {/* Wordmark — Prata (their display serif). Gold dot = Interfood brand
-            signature (kept across all cycles). */}
+        {/* Wordmark — Prata (their display serif). Gold dot = Interfood
+            brand signature. */}
         <motion.h1
           variants={rise}
-          className="tott-display text-white"
-          style={{ fontSize: "clamp(3.5rem, 12vw, 10rem)", lineHeight: 0.92, letterSpacing: "-0.01em" }}
+          className="tott-display m-0 text-white"
+          style={{ fontSize: "clamp(2.8rem, 8vw, 6rem)", lineHeight: 0.95, letterSpacing: "-0.01em" }}
         >
           Interfood<span style={{ color: "var(--gold)" }}>.</span>
         </motion.h1>
+
+        {/* Script tagline — Nothing You Could Do (their hero script overlay
+            font). English phrase because the face is Latin-only. */}
+        <motion.p
+          variants={rise}
+          className="tott-script m-0 text-white/95"
+          style={{ fontSize: "clamp(1.6rem, 4vw, 3rem)", lineHeight: 1 }}
+        >
+          food as art
+        </motion.p>
       </motion.div>
 
       {/* Scroll cue bottom-center (sits above the docked nav). */}

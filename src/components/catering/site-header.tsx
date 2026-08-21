@@ -156,11 +156,19 @@ export function SiteHeader() {
             ))}
           </nav>
 
-          {/* CTA RIGHT — burgundy phone button (their fusion-menu-item-button). */}
+          {/* Phone — mirrors their nav `fusion-menu-item-button`: a simple
+              text + phone-icon link styled as the LAST nav menu item (NOT a
+              heavy gradient CTA). Theirs: `<span class="menu-text fusion-button
+              button-default button-medium"><span class="button-icon-divider-left">
+              <i class="fa-phone-alt"></i></span><span>404-334-4935</span></span>`.
+              Per task v4: "кнопка заказать у них в какой стилистике? почему у
+              нас так стремно выглядит" → strip the burgundy gradient, use a
+              quiet text+icon link matching the nav items' typographic weight. */}
           <div className="flex items-center gap-3">
             <a
               href={CONTACTS.phoneHref}
-              className="tott-cta-btn hidden sm:inline-flex min-h-[44px]"
+              className="tott-body hidden min-h-[44px] items-center gap-2 text-[15px] font-700 uppercase tracking-[0.04em] text-ink opacity-85 transition-all duration-300 hover:opacity-100 hover:text-tott-burgundy sm:inline-flex"
+              style={{ fontWeight: 700 }}
               aria-label={`Позвонить ${CONTACTS.phone}`}
             >
               <Phone className="size-4 shrink-0" />
