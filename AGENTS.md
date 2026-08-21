@@ -2899,3 +2899,126 @@ ecosystem.dev.js                                  (new, pm2 dev config)
 `typecheck` зелёные. Brand "Interfood Catering" сохранён, palette
 cream/espresso/EA-red/blush (NO indigo/blue, NO copyrighted content — design
 patterns only). VLM-верификация через `z-ai vision` CLI.
+
+---
+
+## 18. «Talk of the Town» — graft talkofthetownatlanta.com design DNA (Cycle 30, 22.08.2026)
+
+**Задача:** скопировать дизайн/анимации/WOW-эффекты/шрифты talkofthetownatlanta.com,
+сделать такой же хедер с меню ВНИЗУ, заменить их hero-фото на лучшее видео/фото,
+скопировать их шрифты. Не ломать клиентский путь (33-секционный homepage).
+
+### Что сделано
+
+1. **Анализ эталона.** Уже была выгрузка `docs/footer-library/site6_talkofthetown.json`
+   (504 KB, полная HTML/CSS homepage) + `talkofthetown-404.json` + sitemap. Субагент
+   (Explore) намайнил: 3 Google Fonts (Prata / Nothing You Could Do / Lato, все
+   weight 400), header со sticky-меню ПОД hero-слайдером, hero bg `hero-2.jpg` +
+   white-logo overlay + script-оверлей, палитра burgundy `#8B1F1C` + olive `#A0CE4E`
+   + cream `#F1EAE0`, анимации SR7 char-split (GSAP power3.inOut 300ms) + 41× Avada
+   fadeInLeft + 16× CSS-parallax (`background-attachment: fixed`). Видео на сайте
+   НЕТ (только фото). Отчёты: `docs/talkofthetown-MINED-EXTRACTION.md`,
+   `docs/_live-snapshots/` (header/hero/footer HTML + avada CSS).
+
+2. **Шрифты.** `layout.tsx`: добавлены Prata (`--font-prata`), Nothing You Could Do
+   (`--font-nothing`), Lato (`--font-lato`) через next/font/google. **Грабли #30-1:**
+   `next/font` Prata НЕ принимает `latin-ext` (только `latin`), а Lato НЕ имеет
+   `cyrillic` subset в type-defs next/font — кириллица падает на Karla через
+   fallback-цепочку `.tott-body`. Latin-текст (логотип, "food as art", "bon appétit")
+   рендерится в нужном шрифте. RU-копия → Playfair (display) / Karla (body).
+
+3. **Хедер с меню внизу** (`site-header.tsx`, REWRITE). Паттерн "dock-at-bottom +
+   sticky-on-scroll": когда `scrollY < window.innerHeight` — `fixed bottom-0`,
+   transparent bg, white text (поверх hero-видео). Когда проскроллили hero —
+   `fixed top-0`, cream bg, dark text, shadow. Лого Prata слева + 5 пунктов Lato
+   по центру (Меню/Услуги/События/О нас/Контакты) + burgundy `tott-cta-btn`
+   телефон-CTA справа. Убраны AnnouncementBar (не у эталона) и desktop MENU-кнопка
+   (пункты теперь видны напрямую, как у эталона). Mobile: hamburger → full-screen.
+
+4. **Hero** (`tott-hero.tsx`, NEW — заменяет CepEggHero). 100vh video bg + poster
+   (next/image priority для LCP) + 5px white border frame (`.tott-border-frame`,
+   их SR7-сигнатура) + Prata "Interfood." + Nothing-You-Could-Do "food as art"
+   script + Lato RU-сабхед + locations strip + scroll cue. **Грабли #30-2:**
+   сначала взяли `ea-hero-video.mp4` (2400×860) — VLM через `z-ai vision` показал,
+   что это стилизованный cityscape с вертолётом, НЕ еда. Заменили на
+   `mculinary-hero.mp4` (1280×720, реальные crostini). **Урок: всегда проверяй
+   СОДЕРЖАНИЕ медиа через VLM, не только размеры.** `gg-hero-video.mp4` тоже мимо
+   (сетка букв "g"). Poster = `hero-premium/hero-premium-6.jpg` (Unsplash
+   candlelit dinner, 3000×2003).
+
+5. **CSS-parallax quote band** (`tott-parallax-band.tsx`, NEW). Их 16× Avada-parallax
+   + SR7 char-split в одном блоке: olive-trees bg (`background-attachment: fixed`)
+   + `.tott-border-frame--cream` + Nothing-You-Could-Do "bon appétit" + char-split
+   headline "Еда — это ритуал." (TottReveal `variant="split"`) + olive-divider
+   eyebrow. Вставлен как editorial-pause между Act II (EaVenueNetwork) и Act III
+   (testimonials). `tott-reveal.tsx` (NEW) — IntersectionObserver-компонент для
+   char-split / fadeInLeft, reduced-motion-aware.
+
+6. **Палитра + утилиты** (`globals.css`, +~150 LOC). Токены: `--tott-burgundy #8B1F1C`,
+   `--tott-burgundy-deep #6B0202`, `--tott-olive #A0CE4E`, `--tott-olive-deep #7AAB36`,
+   `--tott-cream #F1EAE0`, `--tott-paper`, `--tott-ink`. Утилиты: `.tott-cta-btn`
+   (burgundy gradient button), `.tott-border-frame` (5px white border),
+   `.tott-split-reveal` + `.tott-char` (char-split с `--tott-char-i` stagger),
+   `.tott-fade-left/right` (Avada fadeInLeft), `.tott-parallax`
+   (`background-attachment: fixed` + touch-fallback), `.tott-eyebrow` (olive divider),
+   `.tott-band-burgundy/cream`, `.tott-display/script/body` (font helpers).
+
+7. **Медиа эталона.** 42 актива talkofthetown → `public/media/talkofthetown/`
+   (hero, food-фото, olive-trees bg, logo, badge). 10 premium hero images →
+   `public/media/hero-premium/` (image-search). Olive-trees bg используется в
+   parallax band; остальное доступно для будущих циклов.
+
+### Запуск + верификация
+
+- **pm2** (как просил пользователь): `pm2 start ./node_modules/.bin/next --name
+  interfood-dev --cwd /home/z/my-project/newsite -- dev -p 3001`. Auto-restart,
+  стабильнее чем `nohup` (который умирал каждые ~2 мин в sandbox).
+- **Agent Browser** на `http://localhost:3001`: header `data-tott-state` docked→sticky
+  переключается на scroll; computed fontFamily = "Nothing You Could Do" / "Prata";
+  char-split: 17 chars, все `.is-visible` после scroll-into-view; 133 секции рендерятся;
+  `eslint` 0 ошибок; console = только Cloudflare Turnstile + HMR warnings.
+- **VLM** (`z-ai vision` CLI): hero = real food + border + logo + script + nav-at-bottom;
+  parallax band = olive-trees + border + "bon appétit" + "Еда — это ритуал" + cinematic.
+
+### Грабли этого цикла (для будущих агентов)
+
+- **#30-1 next/font subset-ограничения**: Prata = только `latin`; Lato = `latin` +
+  `latin-ext` (NO `cyrillic` в type-defs, хотя Google Fonts Lato реально имеет
+  Cyrillic). Решение: RU-копия падает через fallback-цепочку на Karla/Playfair
+  (оба с Cyrillic). НЕ пытайся передать `cyrillic` в Lato — будет TS2322.
+- **#30-2 VLM-проверка медиа обязательна**: размеры/aspect видео ничего не говорят
+  о содержании. `ea-hero-video.mp4` (2400×860) оказался citycape, не еда. Всегда
+  `ffmpeg -ss 3 -i video.mp4 -frames:v 1 frame.jpg` → `z-ai vision -p "..." -i frame.jpg`.
+- **#30-3 z-index слоёв в hero**: video z-[1] ДОЛЖЕН быть ниже overlays z-[2] и
+  border-frame z-[3], иначе gradient/border прячутся за видео. Image-poster z-0.
+- **#30-4 Agent Browser `screenshot --full` крашится** на длинных страницах (33 секции)
+  с "CDP response channel closed". Используй viewport-скриншоты + scroll, не `--full`.
+- **#30-5 pm2 вместо nohup**: `setsid nohup next dev &` умирал в sandbox каждые ~2 мин.
+  pm2 (установлен через `npm i -g pm2`) держит процесс стабильно. ecosystem.config.js
+  — для production (standalone), для dev используй CLI `pm2 start ... -- dev -p PORT`.
+- **#30-6 git `grep | head &&` false-positive**: `grep pattern | head -3 && echo FOUND`
+  ВСЕГДА печатает FOUND (head exit 0 даже без совпадений). Проверяй `grep -c` или
+  `grep ... && echo` БЕЗ pipe через head.
+
+### Файлы этого цикла
+```
+src/app/layout.tsx                                  (+3 Google Fonts: Prata/Nothing/Lato)
+src/app/globals.css                                 (+tott palette +~150 LOC utilities)
+src/app/page.tsx                                    (CepEggHero→TottHero, +TottParallaxBand §20b)
+src/components/catering/site-header.tsx             (REWRITE: dock-at-bottom + sticky)
+src/components/catering/tott-hero.tsx               (new, ~190 lines)
+src/components/catering/tott-parallax-band.tsx      (new, ~120 lines)
+src/components/catering/tott-reveal.tsx             (new, ~110 lines)
+public/media/talkofthetown/                         (new, 42 reference assets)
+public/media/hero-premium/                          (new, 10 premium hero images)
+docs/talkofthetown-MINED-EXTRACTION.md              (new, reference analysis)
+docs/HERO-MEDIA-OPTIONS.md                           (new, hero media sourcing report)
+docs/_live-snapshots/                               (new, header/hero/footer HTML + avada CSS)
+```
+
+**TL;DR (Cycle 30):** Graft talkofthetownatlanta.com завершён. Хедер с меню ВНИЗУ
+hero (dock→sticky), hero с реальным food-видео + 5px border + Prata/Nothing-You-
+Could-Do/Lato шрифты, CSS-parallax quote band с char-split headline, burgundy/
+olive/cream палитра, 42 фото эталона скачаны. VLM + Agent Browser верифицированы.
+`lint` зелёный. Brand "Interfood Catering" + cream/espresso/EA-red палитра сохранены
+(NO indigo/blue). Коммит `13676bd` запушен в main → Vercel auto-deploy.
