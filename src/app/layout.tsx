@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed, Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { LenisProvider } from "@/components/catering/lenis-provider";
@@ -63,6 +64,26 @@ const poppins = Montserrat({
   subsets: ["latin", "latin-ext", "cyrillic"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Cycle 27 — Creative Edge Parties (creativeedgeparties.com) self-hosted
+// Neutraface 2 fonts (downloaded from their Squarespace CDN). These carry the
+// brand identity: Neutra2Display-Light for ALL headings (uppercase, tight -2%
+// tracking, hero H1 at ~244px), Neutra2Text_Book for body copy. NOTE: these
+// are Latin-only faces (no Cyrillic) — used for the CEP English-language
+// signature headlines ("THE EGG", "SIMPLE & BRILLIANT", "WHY US?"). Russian
+// copy in the same sections falls back to Montserrat (geometric, matching
+// x-height) via the .cep-ru utility class.
+const neutraDisplay = localFont({
+  src: "../../public/fonts/Neutra2Display-Light.woff2",
+  variable: "--font-neutra-display",
+  display: "swap",
+});
+
+const neutraText = localFont({
+  src: "../../public/fonts/Neutra2Text_book.woff2",
+  variable: "--font-neutra-text",
   display: "swap",
 });
 
@@ -191,7 +212,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://yandex.ru" />
       </head>
       <body
-        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} antialiased bg-background text-foreground`}
+        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} antialiased bg-background text-foreground`}
       >
         <a href="#main-content" className="skip-link">
           Перейти к содержанию

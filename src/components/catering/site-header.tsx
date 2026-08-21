@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone, ChevronDown, Calendar, Mail } from "lucide-react";
 import { CONTACTS, SOPRANOS_NAV } from "@/lib/media";
 import { AnnouncementBar } from "./announcement-bar";
+import { CepOverlayMenu } from "./cep-overlay-menu";
 
 // Build NAV from Sopranos nav structure (copied from sopranoscatering.com)
 type NavItem = {
@@ -58,6 +59,7 @@ const THEME_CLASSES: Record<HeaderTheme, { bg: string; text: string; linkHover: 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [cepMenuOpen, setCepMenuOpen] = useState(false);
   // Default theme = transparent (over hero).
   const [theme, setTheme] = useState<HeaderTheme>("transparent");
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -189,22 +191,19 @@ export function SiteHeader() {
             </span>
           </a>
 
-          {/* Desktop Navigation with mega-menus */}
-          <nav role="navigation" className="hidden items-center gap-x-6 lg:flex xl:gap-x-7">
-            {NAV.map((n, i) =>
-              n.mega ? (
-                <MegaMenu key={n.label + i} item={n} />
-              ) : (
-                <a
-                  key={n.label + i}
-                  href={n.href}
-                  className={`group relative inline-flex min-h-[44px] items-center px-2 text-sm font-medium opacity-70 transition-opacity duration-300 hover:opacity-100 hover-underline ${themeClasses.text}`}
-                >
-                  {n.label}
-                </a>
-              ),
-            )}
-          </nav>
+          {/* Desktop Navigation — Cycle 27 CEP overlay menu trigger.
+              Replaces the mega-menu nav with a single "MENU" button (CEP style:
+              Logo left | MENU center | CTA right). Opens the full-screen
+              CepOverlayMenu with 54px staggered items. */}
+          <button
+            onClick={() => setCepMenuOpen(true)}
+            className={`hidden lg:inline-flex min-h-[44px] items-center gap-2 cep-nav-link transition-opacity duration-300 hover:opacity-70 ${themeClasses.text}`}
+            aria-label="Открыть меню"
+            aria-expanded={cepMenuOpen ? "true" : "false"}
+          >
+            <span className="text-[17px] font-light uppercase tracking-[-0.02em]">Меню</span>
+            <Menu className="size-5" />
+          </button>
 
           {/* Right side actions — телефон + CTA «Проверить дату» */}
           <div className="flex items-center gap-4 md:gap-5">
@@ -322,6 +321,9 @@ export function SiteHeader() {
       >
         <Phone className="size-6" />
       </a>
+
+      {/* Cycle 27 — CEP full-screen overlay menu (desktop MENU trigger) */}
+      <CepOverlayMenu isOpen={cepMenuOpen} onClose={() => setCepMenuOpen(false)} />
     </>
   );
 }

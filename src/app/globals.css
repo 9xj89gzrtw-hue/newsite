@@ -82,6 +82,16 @@
   --color-border-line: var(--border-line);
   --color-border-line-dark: var(--border-line-dark);
 
+  /* Creative Edge Parties (Cycle 27) — black/cream/red palette + Neutra2 fonts */
+  --color-cep-black: var(--cep-black);
+  --color-cep-cream: var(--cep-cream);
+  --color-cep-cream-warm: var(--cep-cream-warm);
+  --color-cep-red: var(--cep-red);
+  --color-cep-red-deep: var(--cep-red-deep);
+  --color-cep-white: var(--cep-white);
+  --font-neutra-display: var(--font-neutra-display);
+  --font-neutra-text: var(--font-neutra-text);
+
   /* shadcn-compatible aliases (so existing ui/* components keep working) */
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -196,6 +206,19 @@
      from the Sopranos CTA gold used in site-header. */
   --espresso: #1A1B1A;          /* announcement bar dark bg */
   --honey: #E0A94E;             /* arrow / link accent on dark */
+
+  /* ===== CREATIVE EDGE PARTIES (creativeedgeparties.com) TOKENS — Cycle 27 =====
+     The most minimal + dramatic palette of any reference: pure black + warm
+     cream + one screaming accent red (#FF360A, HSL 10.78 100% 51.96% — almost
+     glows). Red is used as a section bg exactly ONCE (the stats band) — that
+     restraint is what makes it pop. Neutra2Display-Light handles ALL headings
+     (uppercase, tight -2% tracking, hero H1 at clamp up to 244px). */
+  --cep-black: #000000;         /* hero bg, footer bg, half of sections */
+  --cep-cream: #EFEFE7;         /* body bg, cream sections (warm off-white hsl 52.5 20% 92%) */
+  --cep-cream-warm: #EFEDE7;    /* subtle alt for layering */
+  --cep-red: #FF360A;           /* the ONLY accent — stats band bg, outline CTA borders, bullets */
+  --cep-red-deep: #E22E08;      /* hover/pressed state for red elements */
+  --cep-white: #FFFFFF;         /* text on black, testimonial cards */
 
   /* shadcn aliases (LIGHT THEME DEFAULT) */
   --background: var(--cream);
@@ -2929,4 +2952,314 @@ header[data-scrolled="true"] [data-mega-panel] {
     transform: none;
     box-shadow: none;
   }
+}
+
+/* =====================================================================
+   CREATIVE EDGE PARTIES (creativeedgeparties.com) STYLE LAYER — Cycle 27
+   =====================================================================
+   Replicated design DNA:
+   - Pure black #000 + warm cream #EFEFE7 + one screaming accent red #FF360A
+   - Neutra2Display-Light for ALL headings (uppercase, tight -2% tracking)
+   - Hero H1 at clamp up to 244px, section H2s at 60–142px
+   - Full-bleed sections, alternating black/cream rhythm
+   - Square corners (border-radius: 0) — NO rounded buttons/cards
+   - Outline-only CTAs (1px solid red, transparent bg, red text)
+   - Edge-fade marquee masks
+   - Auto-scrolling testimonial carousel (peeking, no controls)
+   - Massive section headings — typography IS the design
+   ===================================================================== */
+
+/* --- Neutra2 font helpers ------------------------------------------------ */
+.cep-display {
+  font-family: var(--font-neutra-display), var(--font-poppins), Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;        /* -2% tracking — CEP signature */
+  line-height: 0.92;              /* tight, no leading — poster feel */
+}
+.cep-text {
+  font-family: var(--font-neutra-text), var(--font-sans), Arial, sans-serif;
+  font-weight: 400;
+}
+/* Russian copy in CEP sections: Neutra2 has no Cyrillic, fall back to
+   Montserrat (geometric, matching x-height) then Karla. */
+.cep-ru {
+  font-family: var(--font-poppins), var(--font-neutra-display), var(--font-sans), Arial, sans-serif;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: -0.015em;
+  line-height: 0.92;
+}
+
+/* --- Massive headline scale (vw-based, responsive) ---------------------- */
+.cep-hero-h1 {
+  font-family: var(--font-neutra-display), var(--font-poppins), Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+  line-height: 0.88;
+  font-size: clamp(4.5rem, 17vw, 15.5rem);   /* up to ~244px at 1440 viewport */
+}
+.cep-section-h2 {
+  font-family: var(--font-neutra-display), var(--font-poppins), Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  font-size: clamp(3rem, 9vw, 9rem);          /* up to ~142px */
+}
+.cep-section-h2-xl {
+  font-family: var(--font-neutra-display), var(--font-poppins), Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  font-size: clamp(3.5rem, 13vw, 12.5rem);    /* up to ~200px — "SIMPLE & BRILLIANT" */
+}
+.cep-stat-number {
+  font-family: var(--font-neutra-display), var(--font-poppins), Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-size: clamp(3rem, 5.5vw, 4.5rem);      /* ~68px */
+}
+.cep-eyebrow {
+  font-family: var(--font-neutra-display), var(--font-poppins), Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+.cep-nav-link {
+  font-family: var(--font-poppins), var(--font-neutra-text), Arial, sans-serif;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: 1.0625rem;                       /* 17px Manrope-equivalent */
+}
+
+/* --- Outline-only CTA button (CEP signature) ---------------------------- */
+.cep-outline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.95rem 2.2rem;
+  border: 1px solid var(--cep-red);
+  border-radius: 0;                            /* square — CEP rule */
+  background: transparent;
+  color: var(--cep-red);
+  font-family: var(--font-neutra-text), var(--font-poppins), Arial, sans-serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+}
+.cep-outline-btn:hover,
+.cep-outline-btn:focus-visible {
+  background: var(--cep-red);
+  color: var(--cep-white);
+  outline: none;
+}
+.cep-outline-btn--invert {
+  border-color: var(--cep-white);
+  color: var(--cep-white);
+}
+.cep-outline-btn--invert:hover,
+.cep-outline-btn--invert:focus-visible {
+  background: var(--cep-white);
+  color: var(--cep-black);
+}
+
+/* --- Edge-fade marquee mask (CEP signature) ----------------------------- */
+.cep-marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+}
+.cep-marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: cep-marquee-scroll 38s linear infinite;
+  will-change: transform;
+}
+.cep-marquee-track--reverse {
+  animation-direction: reverse;
+}
+@keyframes cep-marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.cep-marquee-item {
+  font-family: var(--font-neutra-text), var(--font-poppins), Arial, sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.cep-marquee-bullet {
+  color: var(--cep-red);
+  margin: 0 0.9em;
+  font-size: 1.1em;
+}
+
+/* --- Section rhythm helpers --------------------------------------------- */
+.cep-section-black {
+  background: var(--cep-black);
+  color: var(--cep-white);
+}
+.cep-section-cream {
+  background: var(--cep-cream);
+  color: var(--cep-black);
+}
+.cep-section-red {
+  background: var(--cep-red);
+  color: var(--cep-white);
+}
+
+/* --- Ken-Burns / parallax zoom on bg images (Squarespace .background-image-fx) --- */
+.cep-bg-zoom {
+  animation: cep-kenburns 18s ease-out infinite alternate;
+}
+@keyframes cep-kenburns {
+  from { transform: scale(1) translate(0, 0); }
+  to   { transform: scale(1.08) translate(-1.5%, -1%); }
+}
+
+/* --- Scroll-triggered fade+slide (CEP global animation system) ---------- */
+.cep-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: var(--cep-reveal-delay, 0s);
+}
+.cep-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Testimonial carousel (auto-scroll, peeking, no controls) ----------- */
+.cep-carousel-viewport {
+  overflow: hidden;
+}
+.cep-carousel-track {
+  display: flex;
+  gap: 3.75rem;                                /* 60px gap per CEP */
+  will-change: transform;
+}
+.cep-carousel-slide {
+  flex: 0 0 calc((100% - 7.5rem) / 3);         /* 3 cards w/ gap, peek 4th */
+  background: var(--cep-white);
+  padding: 1.9rem;
+  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+}
+@media (max-width: 1024px) {
+  .cep-carousel-slide {
+    flex: 0 0 calc((100% - 3.75rem) / 2);
+  }
+}
+@media (max-width: 640px) {
+  .cep-carousel-slide {
+    flex: 0 0 85%;
+  }
+}
+
+/* --- Full-screen overlay menu (54px items, staggered slide-in) ---------- */
+.cep-overlay-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--cep-black);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+.cep-overlay-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+.cep-overlay-menu__item {
+  font-family: var(--font-neutra-display), var(--font-poppins), Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: clamp(2rem, 5vw, 3.375rem);       /* up to 54px */
+  color: var(--cep-white);
+  text-decoration: none;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.5s ease, transform 0.5s ease, color 0.2s ease;
+  line-height: 1.1;
+}
+.cep-overlay-menu.is-open .cep-overlay-menu__item {
+  opacity: 1;
+  transform: translateY(0);
+}
+.cep-overlay-menu.is-open .cep-overlay-menu__item:nth-child(1) { transition-delay: 0.12s; }
+.cep-overlay-menu.is-open .cep-overlay-menu__item:nth-child(2) { transition-delay: 0.18s; }
+.cep-overlay-menu.is-open .cep-overlay-menu__item:nth-child(3) { transition-delay: 0.24s; }
+.cep-overlay-menu.is-open .cep-overlay-menu__item:nth-child(4) { transition-delay: 0.30s; }
+.cep-overlay-menu.is-open .cep-overlay-menu__item:nth-child(5) { transition-delay: 0.36s; }
+.cep-overlay-menu.is-open .cep-overlay-menu__item:nth-child(6) { transition-delay: 0.42s; }
+.cep-overlay-menu__item:hover {
+  color: var(--cep-red);
+}
+
+/* --- Contact form (transparent inputs, bottom-border only) -------------- */
+.cep-input {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid color-mix(in oklch, var(--cep-white) 40%, transparent);
+  border-radius: 0;
+  color: var(--cep-white);
+  font-family: var(--font-neutra-text), var(--font-sans), Arial, sans-serif;
+  font-size: 1.0625rem;
+  padding: 0.85rem 0;
+  width: 100%;
+  transition: border-color 0.3s ease;
+}
+.cep-input::placeholder {
+  color: color-mix(in oklch, var(--cep-white) 50%, transparent);
+}
+.cep-input:focus {
+  outline: none;
+  border-bottom-color: var(--cep-red);
+}
+.cep-input-label {
+  font-family: var(--font-neutra-text), var(--font-sans), Arial, sans-serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: color-mix(in oklch, var(--cep-white) 65%, transparent);
+  margin-bottom: 0.35rem;
+  display: block;
+}
+
+/* --- Process step number (01/02/03) ------------------------------------- */
+.cep-step-number {
+  font-family: var(--font-neutra-display), var(--font-poppins), Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: clamp(3rem, 5.5vw, 4.5rem);
+  line-height: 1;
+}
+
+/* --- Reduced motion: kill all CEP animations ---------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .cep-marquee-track { animation: none; }
+  .cep-bg-zoom { animation: none; }
+  .cep-reveal { opacity: 1; transform: none; transition: none; }
+  .cep-overlay-menu__item { transition: none; }
 }
