@@ -1,0 +1,371 @@
+/* ============================================================================
+   ea-careers-block — Cycle 28 (Elegant Affairs editorial layer)
+   First-class careers / recruitment section. Fills gap P0-3 (no careers
+   section in the 33-section homepage flow). Pattern adapted from Wolfgang
+   Puck's "Now Hiring" alternating CTA block (WOLFGANG-PUCK-DESIGN-
+   ANALYSIS.md §8) — transposed to Interfood's EA editorial language:
+   espresso dark surface, cream text, EA red accents, italic-as-fragment
+   trailing-phrase headline, parallax-y photo on the RIGHT (mirrors the
+   L-R-L-R alternating image rhythm — founder [8], chef [11], tasting [14]
+   all photo-LEFT; this block flips to photo-RIGHT).
+   Self-contained scope: `.ea-careers__*`. Does NOT touch globals.css.
+   ============================================================================ */
+
+.ea-careers {
+  /* Espresso bg — warm dark coffee-black (slightly warmer than --ea-black
+     #000 to give the dark beat a roasted warmth distinct from the pure-black
+     bookend sections [29] philosophy quote + [33] final CTA). */
+  --ea-careers-bg: #1A1411;
+  --ea-careers-cream: var(--ea-cream);
+  --ea-careers-cream-75: color-mix(in oklab, var(--ea-cream) 78%, transparent);
+  --ea-careers-cream-60: color-mix(in oklab, var(--ea-cream) 60%, transparent);
+  --ea-careers-rule: color-mix(in oklab, var(--ea-cream) 18%, transparent);
+
+  background: var(--ea-careers-bg);
+  color: var(--ea-careers-cream);
+  padding-block: clamp(5rem, 10vw, 8rem);
+}
+
+/* — — — — — Subtle warm red bloom (painterly depth, never distracting) — — — — — */
+
+.ea-careers__bloom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 12% 18%, rgba(231, 29, 58, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 92% 88%, rgba(231, 29, 58, 0.06) 0%, transparent 60%);
+  background-repeat: no-repeat;
+  opacity: 0.7;
+}
+
+/* — — — — — Top + bottom hairline rules — EA editorial divider discipline — — — — — */
+
+.ea-careers__hairline {
+  position: absolute;
+  inset-inline: 8%;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--ea-careers-rule),
+    transparent
+  );
+}
+
+.ea-careers__hairline--top { top: 2.5rem; }
+.ea-careers__hairline--bot { bottom: 2.5rem; }
+
+/* — — — — — 2-col 50/50 grid — text LEFT, image RIGHT (desktop) — — — — — */
+
+.ea-careers__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2.5rem, 5vw, 5rem);
+  align-items: center;
+}
+
+/* — — — — — Text column — — — — — */
+
+.ea-careers__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 36rem;
+}
+
+.ea-careers__eyebrow {
+  /* .ea-eyebrow shared utility already sets Barlow / 0.18em / red — no
+     override needed on dark (red #E71D3A on espresso ≈ 5.0:1 — passes AA
+     Large for the 14px+ uppercase letter-spaced eyebrow per WCAG 1.4.3). */
+}
+
+/* H2 — Playfair Display, oversized, cream, italic-as-fragment trailing phrase.
+   The `.ea-section-h2` shared utility sets Playfair / line-height 1.08 /
+   letter-spacing -0.018em; we override color to cream and tighten to 3rem
+   for this dark editorial beat. */
+.ea-careers__h2 {
+  margin-top: 0.85rem;
+  font-family: var(--ea-font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+  color: var(--ea-careers-cream);
+}
+
+.ea-careers__h2 i,
+.ea-careers__h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ea-red);
+}
+
+.ea-careers__divider {
+  margin-top: 1.75rem;
+}
+
+/* Lead paragraph — Montserrat 1.0625rem, cream/82, lh 1.7 */
+.ea-careers__lead {
+  margin-top: 1.75rem;
+  max-width: 34rem;
+  font-family: var(--ea-font-body);
+  font-size: clamp(1rem, 1.1vw, 1.0625rem);
+  line-height: 1.7;
+  color: color-mix(in oklab, var(--ea-cream) 82%, transparent);
+}
+
+/* — — — — — Benefits list — square bullets in EA red — — — — — */
+
+.ea-careers__benefits {
+  list-style: none;
+  margin: 2.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.ea-careers__benefit {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  font-family: var(--ea-font-body);
+  font-size: 0.975rem;
+  line-height: 1.55;
+  color: color-mix(in oklab, var(--ea-cream) 80%, transparent);
+}
+
+/* Square bullet — 8px × 8px solid red, vertically centered to the x-height */
+.ea-careers__bullet {
+  flex-shrink: 0;
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin-top: 0.55em;
+  background: var(--ea-red);
+}
+
+/* — — — — — CTA row — primary solid-red + secondary cream-outline — — — — — */
+
+.ea-careers__cta-row {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Primary: reuse shared .ea-solid-btn (red bg + white text + square corners).
+   Min-height 44px for touch (padding 1.1em × 2.4em ≈ 48px). */
+.ea-careers__btn-primary {
+  min-height: 44px;
+}
+
+/* Secondary: cream-outline variant (cream border + cream text, cream fill on
+   hover → text flips to espresso). Distinct from the primary red CTA so the
+   pair reads as solid-red + ghost-cream on the espresso bg. */
+.ea-careers__btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ea-careers-cream);
+  background: transparent;
+  border: 1px solid color-mix(in oklab, var(--ea-cream) 65%, transparent);
+  border-radius: var(--ea-radius-square);
+  padding: 1.1em 2.4em;
+  min-height: 44px;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition: color 240ms ease, border-color 240ms ease;
+  z-index: 0;
+}
+
+.ea-careers__btn-outline::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ea-careers-cream);
+  transform: translateY(101%);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: -1;
+}
+
+.ea-careers__btn-outline:hover,
+.ea-careers__btn-outline:focus-visible {
+  color: var(--ea-careers-bg);
+  border-color: var(--ea-careers-cream);
+  outline: none;
+}
+
+.ea-careers__btn-outline:hover::before,
+.ea-careers__btn-outline:focus-visible::before {
+  transform: translateY(0);
+}
+
+/* — — — — — Stat strip — 3 inline stats, red numbers, red dividers — — — — — */
+
+.ea-careers__stats {
+  margin-top: 3rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+}
+
+.ea-careers__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  position: relative;
+  padding-right: 1.25rem;
+}
+
+.ea-careers__stat-num {
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ea-red);
+}
+
+.ea-careers__stat-label {
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ea-careers-cream-60);
+}
+
+/* Thin vertical cream divider between stats (right edge of each except last).
+   Cream/25 (softer than red) so it doesn't compete with the primary red CTA.
+   (VLM critique loop 1: red dividers competed with the CTA — softened.) */
+.ea-careers__stat-divider {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 2.4rem;
+  background: color-mix(in oklab, var(--ea-cream) 25%, transparent);
+}
+
+/* — — — — — Image column — — — — — */
+
+.ea-careers__image-wrap {
+  /* Outer wrapper receives the entrance fade-up; inner frame holds aspect +
+     overflow + parallax layer. */
+  position: relative;
+  width: 100%;
+}
+
+.ea-careers__image-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #0E0907; /* inky underlay in case image is slow to load */
+  box-shadow:
+    0 30px 80px -28px rgba(0, 0, 0, 0.65),
+    0 8px 24px -8px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(247, 245, 245, 0.06);
+}
+
+/* Parallax layer — extends 8% beyond the frame so translateY(±5%) stays
+   covered. The parallax transform is applied via Motion `style={{ y }}`;
+   this element also serves as the positioning context for SmartImage `fill`. */
+.ea-careers__image-parallax {
+  position: absolute;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  will-change: transform;
+}
+
+.ea-careers__image {
+  object-fit: cover;
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Subtle hover zoom (1.04) — combined with parallax, no transform conflict
+   (hover scale lives on the <img>, parallax translateY lives on the parent). */
+@media (hover: hover) {
+  .ea-careers__image-frame:hover .ea-careers__image {
+    transform: scale(1.04);
+  }
+}
+
+/* Tonal wash at the bottom of the image — keeps the photo reading as part of
+   the dark espresso section (mirrors EaFounderStory's blush tonal wash). */
+.ea-careers__image-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(26, 20, 17, 0) 60%,
+    rgba(26, 20, 17, 0.28) 100%
+  );
+}
+
+/* — — — — — Mobile: image below text, full-width, 16:10 — — — — — */
+
+@media (max-width: 768px) {
+  .ea-careers__grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  /* DOM order is text → image; on mobile that produces text-then-image stack
+     naturally. No `order` flip needed. */
+
+  .ea-careers__text {
+    max-width: none;
+  }
+
+  .ea-careers__image-frame {
+    aspect-ratio: 16 / 10;
+  }
+
+  /* Tighter stat row on small phones — wraps to 2 lines if needed. */
+  .ea-careers__stats {
+    gap: 0.75rem 1.25rem;
+  }
+}
+
+/* — — — — — Reduced motion overrides — — — — — */
+
+@media (prefers-reduced-motion: reduce) {
+  /* The parallax motion.div is rendered without a `style.y` prop when
+     reduced-motion is on (handled in TSX), so it sits static. The hover
+     zoom on the image is suppressed here too for full vestibular safety. */
+  .ea-careers__image,
+  .ea-careers__btn-outline::before,
+  .ea-careers__btn-outline,
+  .ea-careers__btn-primary {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Ensure reveal elements are visible even though Motion is disabled. */
+  .ea-careers__text > *,
+  .ea-careers__stats,
+  .ea-careers__image-wrap {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

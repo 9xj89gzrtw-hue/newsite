@@ -15,8 +15,9 @@ import { Menu } from "@/components/catering/menu";
 import { TastingMenuExperience } from "@/components/catering/tasting-menu-experience";
 import { EaTastingCta } from "@/components/catering/ea-tasting-cta";
 import { SustainabilityStrip } from "@/components/catering/sustainability-strip";
-import { EaServicesGrid } from "@/components/catering/ea-services-grid";
-import { ServicesOverview } from "@/components/catering/services-overview";
+import { EaServiceTabs } from "@/components/catering/ea-service-tabs";
+import { EaSeasonalTabs } from "@/components/catering/ea-seasonal-tabs";
+import { EaCareersBlock } from "@/components/catering/ea-careers-block";
 import { EaEventsPortfolio } from "@/components/catering/ea-events-portfolio";
 import { EaVenuesSpotlight } from "@/components/catering/ea-venues-spotlight";
 import { EaVenueNetwork } from "@/components/catering/ea-venue-network";
@@ -222,6 +223,17 @@ export default function Home() {
           espresso bg with honey gold accents. Desire / showcase. */}
       <TastingMenuExperience />
 
+      {/* 13b. EaSeasonalTabs — Cycle 29 NEW. Wolfgang Puck «seasonal inspiration»
+          pattern (5 tabs: Лето · Осень · Зима · Весна · Праздничная). Each tab
+          swaps a seasonal dish image + 2-sentence copy with SPECIFIC Russian
+          seasonal ingredients (white asparagus, porcini, pumpkin, berries,
+          Olivier, herring under fur coat) + «3 блюда сезона» list + «Смотреть
+          меню» CTA → #menu. Праздничная (Holiday/New Year) is the 5th tab —
+          Russia's biggest catering season (Nov-Jan corporate banquet peak),
+          equivalent to WP's «Awards» seasonal hook. Gives Interfood a recurring
+          content refresh cadence + Holiday Season conversion window. */}
+      <EaSeasonalTabs />
+
       {/* 14. EaTastingCta — Cycle 28 NEW mid-page "Book a Tasting" CTA.
           Blush bg + 4:5 photo LEFT + "Хотите попробовать *до* заказа?" RIGHT.
           6 блюд за 45 мин, 3500₽/чел, returns при заказе от 50 гостей →
@@ -232,14 +244,16 @@ export default function Home() {
           farmers / seasonal / no semi-finished. Why us, quietly. */}
       <SustainabilityStrip />
 
-      {/* 16. EaServicesGrid — Cycle 28 NEW. 4-col minimal services teaser
-          (Свадьбы / Корпоратив / Банкеты / Фуршеты) above the deeper
-          ServicesOverview. EA §3.11 category-card pattern, minimal. */}
-      <EaServicesGrid />
-
-      {/* 17. ServicesOverview — Ridgewells two-up 50/50 split. 4 service
-          categories with hover-zoom images. What services we provide. */}
-      <ServicesOverview />
+      {/* 16-17. EaServiceTabs — Cycle 29 REPLACES EaServicesGrid +
+          ServicesOverview (two separate grid sections → one premium tabbed
+          module). Wolfgang Puck «service tabs» pattern: 5 tabs (Свадьбы ·
+          Корпоратив · Банкеты · Фуршеты · Выездной Шеф), click a tab to swap
+          image + copy + bullet list + contextual CTA in place. Cuts ~1800px
+          of scroll vs the two grids it replaces. Contextual CTAs (P0-4): each
+          tab has a service-context-specific verb (ЗАКАЗАТЬ СВАДЬБУ / ЗАКАЗАТЬ
+          КОРПОРАТИВ / ЗАКАЗАТЬ БАНКЕТ / ЗАКАЗАТЬ ФУРШЕТ / ВЫЕЗДНОЙ ШЕФ К ВАМ)
+          → #calculator or #contact. ARIA tabs pattern + arrow-key nav. */}
+      <EaServiceTabs />
 
       {/* 18. EaEventsPortfolio — Cycle 28 REPLACES McuPhotoFilmstrip (was
           Embla filmstrip, broken under React 19). Magazine horizontal-scroll
@@ -294,6 +308,15 @@ export default function Home() {
           Forbes · Ресторановед · Gastronomika). Text-only Playfair italic
           logos + small taglines. Restored per AGENTS.md §17 TODO. */}
       <EaPressStrip />
+
+      {/* 27b. EaCareersBlock — Cycle 29 NEW. Wolfgang Puck «Now Hiring»
+          pattern: careers elevated to a first-class homepage section.
+          Espresso bg + photo RIGHT (alternates L-R rhythm after 3 photo-LEFT
+          blocks) + «Работайте с *лучшими*.» + 3 benefits + 2-CTA pair
+          (ОТКЛИКНУТЬСЯ + СМОТРЕТЬ ВАКАНСИИ → #contact) + stat strip (180+ /
+          16+ / 2400+). Catering is labor-intensive — recruitment traffic can
+          equal inquiry traffic. Also linked from top-nav РАБОТА (overlay menu). */}
+      <EaCareersBlock />
 
       {/* 28. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play
           icons. Follow-along social proof. */}

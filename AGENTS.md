@@ -2786,3 +2786,116 @@ Transitively orphaned (only referenced by other orphans, deleted to close the lo
 - [ ] EaNamedTestimonials: replace placeholder testimonials with real Interfood client testimonials (with permission). Currently realistic but fictional.
 - [ ] Replace ea-founder-story.tsx image `/media/event-chef-action.jpg` with a real single-person chef portrait of Дмитрий Нилов (per Cycle 26 §17 TODO — carried over).
 - [ ] EaPhilosophyQuote: consider a subtle Ken-Burns zoom on the quote text (very subtle, 1.0→1.02 over 8s) to add life to the static black section.
+
+---
+
+## 18. Cycle 29 — Wolfgang Puck design-pattern graft (21.08.2026)
+
+> **Задача:** сравнить interfood с wolfgangpuckcatering.com, перенять
+> дизайн-паттерны (НЕ контент), заполнить P0-пробелы. Полный анализ —
+> [`docs/WOLFGANG-PUCK-DESIGN-ANALYSIS.md`](docs/WOLFGANG-PUCK-DESIGN-ANALYSIS.md)
+> (653 строки, 17 секций, IP-compliant: только структурный анализ, никакого
+> копирования фото/видео/текста).
+
+### Главные находки (корректируют prior brief)
+- **Акцент WP — тёмно-зелёный `#1D462E`, НЕ золото** (prior brief `patterns.md`
+  ошибался — «золото» это тёплый тон food-фотографии, не UI chrome).
+- **3-цветная палитра**: black + white + dark green. Каждый зелёный элемент = CTA.
+- **Restraint как бренд-сигнал**: hero = silent video, no scrim, single H1, single
+  CTA, zero GSAP/parallax.
+- **«AWARDS» как 5-й сезонный таб** — изобретение категории (рекуррентный сезонный hook).
+
+### Что сделано (P0 — все 4 закрыты)
+1. **P0-1 — EaServiceTabs** (`ea-service-tabs.tsx` + `.css`) — REPLACES
+   `EaServicesGrid` + `ServicesOverview` (две сетки → один таб-модуль). 5 табов
+   (Свадьбы/Корпоратив/Банкеты/Фуршеты/Выездной Шеф) + контекстные CTA
+   (ЗАКАЗАТЬ СВАДЬБУ / ... / ВЫЕЗДНОЙ ШЕФ К ВАМ). ARIA tabs + arrow-key nav.
+   Сжимает ~1800px скролла.
+2. **P0-2 — EaSeasonalTabs** (`ea-seasonal-tabs.tsx` + `.css`) — 5 сезонных
+   табов (Лето/Осень/Зима/Весна/**Праздничная**). Праздничная = Nov-Jan
+   корпоратив-пик (эквивалент WP «Awards»). Конкретные русские сезонные
+   ингредиенты (белая спаржа, белые грибы, тыква, оливье, сельдь под шубой).
+3. **P0-3 — EaCareersBlock** (`ea-careers-block.tsx` + `.css`) — first-class
+   careers секция (espresso bg, фото RIGHT для L-R-L-R ритма, 3 benefits,
+   2-CTA pair, stat strip). + `РАБОТА` в CepOverlayMenu навигацию.
+4. **P0-4 — Контекстные CTA** — каждый таб сервис-модуля имеет глагол под
+   mental model пользователя (не generic «ОБСУДИТЬ»).
+
+### VLM /loop критика (3 итерации)
+- Loop 1: service 4.5→6.5, seasonal 4.5→6.5, careers 6.5 (image bug = early
+  screenshot; fixes: stronger active-tab state, body contrast /75→/80, stat
+  dividers red→cream/25).
+- Loop 2: active-tab → SOLID blush fill + font-weight 800 + hover bg tint.
+- Loop 3: service 7/10, seasonal — VLM противоречит (service: «убери fill»,
+  seasonal: «добавь fill» при том же fill). **Стоп /loop**: VLM-совет стал
+  contradictory → шум. Финальная правка: `--ea-blush` → `--ea-blush-deep`
+  (#DECBCB) для видимости active-tab на cream bg.
+
+### Грабли (зафиксировать для будущего)
+1. **VLM critique-loop сходится к шуму после 2-3 итераций** — совет начинает
+   противоречить сам себе между секциями (одна говорит «убери fill», другая
+   «добавь fill» при том же паттерне). Решение: 2 итерации VLM-критики
+   максимум, потом стоп — субъективные правки дают убывающую отдачу.
+2. **`--ea-blush` (#F1ECEC) слишком близок к `--cream` bg для active-tab
+   fill** — на cream-секции blush-fill почти не читается. Использовать
+   `--ea-blush-deep` (#DECBCB) для заливок active-состояний.
+3. **next/image оптимизация = 1-3s на первом запросе** — первый скриншот
+   после `scrollIntoView` может поймать пустой image column (image ещё
+   оптимизируется). Решение: перед скриншотом ждать `img.complete` через
+   `Promise.all(Array.from(imgs).map(img => img.complete ? resolve() :
+   img.addEventListener('load', resolve)))` + 2s sleep.
+4. **pm2 + `bun run dev`** надёжнее чем `node_modules/.bin/next` (pm2 не
+   подхватывает next binary корректно). `pm2 start "bun run dev" --name X
+   --cwd <dir>` работает.
+5. **Sandbox dev server (port 3000) убивается через `kill <next-server-pid>`**
+   — sandbox watchdog НЕ перезапускает его (dev.sh только start-once). После
+   kill — port свободен для newsite pm2 процесса.
+
+### Скиллы, оказавшиеся полезны
+- **`agent-browser`**: scrollIntoView + `Promise.all(img.complete)` wait + screenshot.
+  КРИТИЧНО: eval-скрипт ждать загрузки изображений перед скриншотом.
+- **`VLM` (z-ai vision CLI, glm-5v-turbo)**: brutal-honesty критика. ДЕТАЛЬНЫЙ
+  prompt = конкретные score + fix recommendations. НО: после 2 итераций совет
+  становится contradictory — стоп.
+- **`web-search` + `web-reader`**: глубокий research design-паттернов WP
+  (через субагента — параллельно с разработкой).
+- **`Task` (full-stack-developer субагент)**: 3 новых компонента построены
+  параллельно за один вызов (3 Task в одном сообщении). Каждый читал
+  существующие EA-компоненты для style consistency.
+
+### Что можно улучшить дальше (Cycle 30+)
+- [ ] P1-1: `ЛОКАЦИИ` mega-menu в SiteHeader (SPb districts + Moscow + All-Russia).
+- [ ] P1-2: mailing-list signup в SiteFooter (single-field email → API).
+- [ ] P1-3: palette audit — consolidate accents (pick ONE red; reserve blush
+  for founder story only; reserve espresso for TastingMenuExperience only).
+- [ ] P1-4: stagger EaFounderStory/ChefPortrait/EaTastingCta/EaCareersBlock
+  в строгий L-R-L-R alternating ритм (careers уже RIGHT — проверить остальные).
+- [ ] P1-5: EaVenueNetwork venue cards — контекстные CTA per venue.
+- [ ] P2-1: visible accessibility toggle (Доступность floating button).
+- [ ] P2-2: `РЕЦЕПТЫ` content-marketing nav + landing.
+- [ ] VLM critique на careers секцию — image-disconnect feedback (bleed image
+  behind text with gradient mask). P3 — careers уже 6.5/10.
+- [ ] CepOverlayMenu: 9 пунктов теперь (было 6) — проверить staggered CSS
+  nth-child delays для пунктов 7-9 (могут не иметь slide-in delay).
+
+### Файлы этого цикла
+```
+src/components/catering/ea-service-tabs.tsx       (new, ~290 lines)
+src/components/catering/ea-service-tabs.css       (new, ~280 lines)
+src/components/catering/ea-seasonal-tabs.tsx       (new)
+src/components/catering/ea-seasonal-tabs.css       (new, ~350 lines)
+src/components/catering/ea-careers-block.tsx       (new, ~260 lines)
+src/components/catering/ea-careers-block.css       (new, ~370 lines)
+src/components/catering/cep-overlay-menu.tsx       (+3 items: УСЛУГИ/СЕЗОНЫ/РАБОТА)
+src/app/page.tsx                                  (replaced 16-17, added 13b + 27b)
+docs/WOLFGANG-PUCK-DESIGN-ANALYSIS.md             (new, 653 lines, IP-compliant)
+docs/reference-library/our-site/cycle29/          (new, 11 verification screenshots)
+ecosystem.dev.js                                  (new, pm2 dev config)
+```
+
+**TL;DR (Cycle 29):** Закрыты все 4 P0-пробела из Wolfgang Puck gap analysis
+(service tabs, seasonal rotation, careers, contextual CTAs). 3 новых EA-компонента
++ nav update + VLM /loop (3 итерации, стоп на contradictory-advise). `lint` +
+`typecheck` зелёные. Brand "Interfood Catering" сохранён, palette
+cream/espresso/EA-red/blush (NO indigo/blue, NO copyrighted content — design
+patterns only). VLM-верификация через `z-ai vision` CLI.

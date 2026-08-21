@@ -1,0 +1,361 @@
+/* ============================================================================
+   ea-seasonal-tabs — Cycle 28 (Elegant Affairs editorial layer)
+   5-tab seasonal menu rotation. Self-contained scope: `.ea-seasonal__*`.
+   Does NOT touch globals.css.
+   ============================================================================ */
+
+.ea-seasonal {
+  position: relative;
+  overflow: hidden;
+}
+
+/* — — — — — Subtle painterly radial bloom (light, mirrors .painterly-bg-warm)
+   Uses only EA blush tokens — no new accent surface introduced. — — — — — */
+.ea-seasonal__bloom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(
+      ellipse 70% 50% at 12% 8%,
+      color-mix(in oklch, var(--ea-blush-deep) 38%, transparent) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 88% 92%,
+      color-mix(in oklch, var(--ea-blush) 70%, transparent) 0%,
+      transparent 60%
+    );
+}
+
+.ea-seasonal__inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* — — — — — Header — — — — — */
+
+.ea-seasonal__head {
+  max-width: 44rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.ea-seasonal__h2 {
+  margin-top: 0.85rem;
+}
+
+.ea-seasonal__lead {
+  margin-top: 1.1rem;
+  font-family: var(--ea-font-body);
+  font-size: clamp(1rem, 1.1vw, 1.0625rem);
+  line-height: 1.6;
+  color: color-mix(in oklch, var(--ea-ink) 70%, transparent);
+  max-width: 38rem;
+}
+
+/* — — — — — Tab list — — — — — */
+
+.ea-seasonal__tabs-wrap {
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+  position: relative;
+}
+
+/* Tab list — sits on a subtle blush-tinted surface so the tabs read as a
+   grounded "control deck" rather than stranded text in white space.
+   (VLM critique loop 1: tabs felt stranded in a void — added a soft surface.) */
+.ea-seasonal__tablist {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  border-bottom: 1px solid
+    color-mix(in oklch, var(--ea-mauve) 28%, transparent);
+  position: relative;
+  padding-inline: clamp(0.5rem, 1.5vw, 1.25rem);
+  background: color-mix(in oklch, var(--ea-blush) 35%, transparent);
+  border-radius: 6px 6px 0 0;
+}
+
+.ea-seasonal__tab {
+  /* Reset button chrome */
+  appearance: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  /* Touch target ≥ 44px height */
+  padding: 1.1rem 1.1rem;
+  min-height: 44px;
+  /* Type — Barlow Semi Condensed Bold uppercase, loop 2 bumped size+tracking */
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(0.84rem, 1.15vw, 0.98rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--ea-ink) 65%, transparent);
+  position: relative;
+  border-radius: 8px 8px 0 0;
+  transition: color 220ms ease, background 220ms ease;
+}
+
+.ea-seasonal__tab:hover {
+  color: var(--ea-ink);
+  background: color-mix(in oklch, var(--ea-blush) 30%, transparent);
+}
+
+/* Animated red underline — scaleX(0) → scaleX(1) on active. */
+.ea-seasonal__tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ea-red);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ea-seasonal__tab:hover,
+.ea-seasonal__tab:focus-visible {
+  color: var(--ea-ink);
+  outline: none;
+}
+
+.ea-seasonal__tab:hover::after,
+.ea-seasonal__tab:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Active-tab indicator: SOLID blush-deep filled (loop 2 — VLM said tint was
+   too weak). Active season now reads as a solid filled control. */
+.ea-seasonal__tab--active {
+  color: var(--ea-ink);
+  background: var(--ea-blush-deep);
+  font-weight: 800;
+}
+
+.ea-seasonal__tab--active::after {
+  transform: scaleX(1);
+  height: 3px;
+}
+
+/* — — — — — Праздничная tab — subtle gold accent (premium conversion
+   window). Kept within the 3-color discipline via the existing --gold token;
+   no NEW accent introduced. — — — — — */
+
+.ea-seasonal__tab--holiday {
+  /* Holiday gets a tiny gold dot above the label as a festive accent. */
+  position: relative;
+}
+
+.ea-seasonal__tab--holiday::before {
+  content: "";
+  position: absolute;
+  top: 0.45rem;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  transform: translateX(-50%) scale(0);
+  opacity: 0;
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
+}
+
+.ea-seasonal__tab--holiday.ea-seasonal__tab--active::before {
+  transform: translateX(-50%) scale(1);
+  opacity: 0.85;
+}
+
+.ea-seasonal__tab--holiday.ea-seasonal__tab--active::after {
+  background: var(--gold);
+}
+
+/* — — — — — Tab panel — — — — — */
+
+.ea-seasonal__panel {
+  position: relative;
+  outline: none;
+}
+
+/* Visible focus ring when keyboard-navigating into the panel. */
+.ea-seasonal__panel:focus-visible {
+  outline: 2px solid var(--ea-red);
+  outline-offset: 6px;
+}
+
+.ea-seasonal__panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+/* — — — — — LEFT — seasonal dish image (50%) — — — — — */
+
+.ea-seasonal__media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: color-mix(in oklch, var(--ea-blush-deep) 50%, transparent);
+  /* Subtle inset shadow for editorial depth — keeps image as the focal point. */
+  box-shadow: var(--ea-shadow-cream);
+}
+
+/* next/image with `fill` sets position:absolute; width/height:100%. We just
+   need to set object-fit here. */
+.ea-seasonal__img {
+  object-fit: cover;
+}
+
+/* — — — — — RIGHT — content (50%) — — — — — */
+
+.ea-seasonal__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(0.5rem, 2vw, 1.5rem) 0;
+}
+
+.ea-seasonal__title {
+  font-family: var(--ea-font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 1.9rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--ea-ink);
+  margin: 0 0 1rem;
+}
+
+.ea-seasonal__copy {
+  font-family: var(--ea-font-body);
+  font-size: clamp(0.95rem, 1.1vw, 1.0625rem);
+  line-height: 1.65;
+  color: color-mix(in oklch, var(--ea-ink) 78%, transparent);
+  margin: 0 0 1.75rem;
+  max-width: 36rem;
+}
+
+/* — — — — — 3 блюда сезона list (red square bullets) — — — — — */
+
+.ea-seasonal__dishes {
+  margin-bottom: 1.75rem;
+}
+
+.ea-seasonal__dishes-label {
+  display: block;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--ea-ink) 55%, transparent);
+  margin-bottom: 0.85rem;
+}
+
+.ea-seasonal__dishes-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.ea-seasonal__dish {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  font-family: var(--ea-font-body);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--ea-ink);
+}
+
+/* Red square bullet — 7px × 7px, raised to baseline. */
+.ea-seasonal__dish-marker {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: var(--ea-red);
+  flex-shrink: 0;
+  transform: translateY(1px);
+}
+
+.ea-seasonal__dish-text {
+  flex: 1 1 auto;
+}
+
+/* — — — — — CTA — — — — — */
+
+.ea-seasonal__cta {
+  margin-top: 0.5rem;
+}
+
+/* — — — — — Mobile: stacked layout + horizontal scroll-snap tabs — — — — — */
+
+@media (max-width: 768px) {
+  .ea-seasonal__panel-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .ea-seasonal__media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .ea-seasonal__content {
+    padding: 0;
+  }
+
+  /* Horizontal scroll-snap tab strip — bleeds to viewport edges for the
+     magazine scroll feel, mirrors the EA editorial horizontal-read signature. */
+  .ea-seasonal__tablist {
+    display: flex;
+    gap: 1.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.5rem;
+    /* Bleed to viewport edges (compensates for `.ea-container` padding) */
+    margin-inline: calc(-1 * clamp(1.25rem, 4vw, 3rem));
+    padding-inline: clamp(1.25rem, 4vw, 3rem);
+  }
+
+  .ea-seasonal__tablist::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ea-seasonal__tab {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+}
+
+/* — — — — — Reduced motion overrides — — — — — */
+
+@media (prefers-reduced-motion: reduce) {
+  .ea-seasonal__tab,
+  .ea-seasonal__tab::after,
+  .ea-seasonal__tab::before,
+  .ea-seasonal__panel {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Underline + gold dot still appear immediately when active. */
+  .ea-seasonal__tab--active::after {
+    transform: scaleX(1) !important;
+  }
+  .ea-seasonal__tab--holiday.ea-seasonal__tab--active::before {
+    transform: translateX(-50%) scale(1) !important;
+    opacity: 0.85 !important;
+  }
+}

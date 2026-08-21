@@ -44,7 +44,10 @@ const MENU_ITEMS: MenuItem[] = [
   { label: "ГЛАВНАЯ", href: "#home" },
   { label: "О НАС", href: "#about" },
   { label: "МЕНЮ", href: "#menu" },
+  { label: "УСЛУГИ", href: "#ea-service-tabs" },
+  { label: "СЕЗОНЫ", href: "#ea-seasonal" },
   { label: "КАЛЬКУЛЯТОР", href: "#calculator" },
+  { label: "РАБОТА", href: "#careers" },
   { label: "ВОПРОСЫ", href: "#faq" },
   { label: "КОНТАКТЫ", href: "#contact" },
 ];

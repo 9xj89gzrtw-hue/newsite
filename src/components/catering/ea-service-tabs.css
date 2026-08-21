@@ -1,0 +1,280 @@
+/* ============================================================================
+   ea-service-tabs — Cycle 29 (EA editorial layer · P0-1)
+   ------------------------------------------------------------------
+   Tabbed service module. REPLACES EaServicesGrid + ServicesOverview with
+   ONE premium ARIA-tabs interface (5 tabs · Свадьбы · Корпоратив · Банкеты
+   · Фуршеты · Выездной Шеф). Each tab swaps image + headline + body +
+   bullet list + contextual CTA in place — no scroll cost.
+
+   Self-contained scope: `.ea-svc-tabs__*`. Does NOT touch globals.css.
+   Mirrors the structure of `./ea-services-grid.css`.
+   ============================================================================ */
+
+.ea-svc-tabs__head {
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+  max-width: 44rem;
+}
+
+.ea-svc-tabs__h2 {
+  margin-top: 0.85rem;
+}
+
+/* — — — — — Tab list (horizontal row, scroll-snap on mobile) — — — — — */
+
+.ea-svc-tabs__tablist {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: 1px solid color-mix(in oklch, var(--ea-mauve) 35%, transparent);
+  /* Hide scrollbar — horizontal scroll on mobile is touch-driven, not chrome. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.ea-svc-tabs__tablist::-webkit-scrollbar {
+  display: none;
+}
+
+/* — — — — — Tab button — — — — — */
+
+/* Active-tab indicator: SOLID blush-deep filled pill (loop 2 — VLM said the
+   tint+underline was still too weak). Active tab is now a filled pill with
+   3px red bottom accent, so the selected service reads as a solid control. */
+.ea-svc-tabs__tab {
+  flex: 0 0 auto;
+  appearance: none;
+  background: transparent;
+  border: none;
+  position: relative;
+  padding: 1.1rem 1.6rem 1.25rem;
+  min-height: 44px;
+  min-width: 96px;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(0.82rem, 1.4vw, 0.98rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--ea-ink) 65%, transparent);
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  outline-offset: -1px;
+  border-radius: 8px 8px 0 0;
+}
+
+.ea-svc-tabs__tab:hover {
+  color: var(--ea-ink);
+  background: color-mix(in oklch, var(--ea-blush) 25%, transparent);
+}
+
+.ea-svc-tabs__tab:focus-visible {
+  outline: 2px solid var(--ea-red);
+  outline-offset: -3px;
+  color: var(--ea-ink);
+}
+
+.ea-svc-tabs__tab[aria-selected="true"] {
+  color: var(--ea-ink);
+  background: var(--ea-blush-deep);
+  font-weight: 800;
+}
+
+.ea-svc-tabs__tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  background: var(--ea-red);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ea-svc-tabs__tab[aria-selected="true"]::after {
+  transform: scaleX(1);
+}
+
+/* — — — — — Panel container (ARIA tabpanel) — — — — — */
+
+.ea-svc-tabs__panel {
+  outline: none;
+}
+
+.ea-svc-tabs__panel:focus-visible {
+  outline: 2px solid var(--ea-red);
+  outline-offset: 8px;
+}
+
+/* — — — — — 2-col layout: image LEFT 55% / text RIGHT 45% — — — — — */
+
+.ea-svc-tabs__grid {
+  display: grid;
+  grid-template-columns: 55fr 45fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: stretch;
+}
+
+/* — — — — — Image column — — — — — */
+
+.ea-svc-tabs__media {
+  position: relative;
+  aspect-ratio: 5 / 4;
+  overflow: hidden;
+  border-radius: var(--ea-radius-soft);
+  /* Layered blush-tinted shadow — same recipe used across EA editorial. */
+  box-shadow: var(--ea-shadow-blush);
+  background: var(--ea-blush);
+}
+
+.ea-svc-tabs__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* Transform-only hover zoom (AGENTS.md §5 #5 — transform/opacity only). */
+.ea-svc-tabs__media:hover .ea-svc-tabs__img,
+.ea-svc-tabs__media:focus-within .ea-svc-tabs__img {
+  transform: scale(1.03);
+}
+
+/* — — — — — Text column — — — — — */
+
+.ea-svc-tabs__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 0.5rem;
+}
+
+.ea-svc-tabs__title {
+  font-family: var(--ea-font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--ea-ink);
+  margin: 0 0 1rem;
+}
+
+.ea-svc-tabs__body {
+  font-family: var(--ea-font-body);
+  font-size: clamp(0.95rem, 1.1vw, 1.0625rem);
+  line-height: 1.65;
+  color: color-mix(in oklch, var(--ea-ink) 80%, transparent);
+  margin: 0 0 1.75rem;
+}
+
+/* — — — — — Feature list — red square bullets — — — — — */
+
+.ea-svc-tabs__features {
+  list-style: none;
+  margin: 0 0 2.25rem;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.ea-svc-tabs__features li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-family: var(--ea-font-body);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ea-ink);
+}
+
+.ea-svc-tabs__features li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 7px;
+  height: 7px;
+  background: var(--ea-red);
+  /* Square bullet — slight rotation gives a tasteful diamond edge. */
+  transform: rotate(45deg);
+}
+
+/* — — — — — Contextual CTA — red pill button — — — — — */
+
+.ea-svc-tabs__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  align-self: flex-start;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(0.78rem, 1vw, 0.95rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ea-white, #fff);
+  background: var(--ea-red);
+  border: 1px solid var(--ea-red);
+  border-radius: 999px;          /* PILL — overrides EA's default square */
+  padding: 1.05em 2.2em;
+  min-height: 44px;              /* touch-target guarantee */
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 220ms ease, transform 240ms ease;
+}
+
+.ea-svc-tabs__cta:hover,
+.ea-svc-tabs__cta:focus-visible {
+  background: var(--ea-red-deep);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.ea-svc-tabs__cta:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ea-red) 35%, transparent);
+}
+
+/* — — — — — Mobile: stacked grid + horizontal scroll tabs — — — — — */
+
+@media (max-width: 768px) {
+  .ea-svc-tabs__grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  /* Image becomes shorter on mobile — 4/3 keeps face/hand detail legible. */
+  .ea-svc-tabs__media {
+    aspect-ratio: 4 / 3;
+  }
+  .ea-svc-tabs__tab {
+    padding: 1rem 1.1rem 1.1rem;
+    min-width: 88px;
+  }
+  .ea-svc-tabs__tab::after {
+    left: 1.1rem;
+    right: 1.1rem;
+  }
+}
+
+/* — — — — — Reduced motion overrides — — — — — */
+
+@media (prefers-reduced-motion: reduce) {
+  .ea-svc-tabs__head,
+  .ea-svc-tabs__panel,
+  .ea-svc-tabs__img,
+  .ea-svc-tabs__tab,
+  .ea-svc-tabs__tab::after,
+  .ea-svc-tabs__cta {
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .ea-svc-tabs__head {
+    opacity: 1 !important;
+  }
+}
