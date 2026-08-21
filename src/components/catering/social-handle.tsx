@@ -56,7 +56,7 @@ export function SocialHandle() {
           className="inline-flex items-center gap-3"
         >
           <Instagram className="size-5 text-bordeaux" aria-hidden="true" />
-          <span className="eyebrow-wide text-bordeaux">Follow Us</span>
+          <span className="eyebrow-wide text-bordeaux">Следите за нами</span>
         </motion.div>
 
         {/* Giant handle headline — the wow moment */}
@@ -107,7 +107,7 @@ export function SocialHandle() {
             href="#events"
             className="font-sans text-[0.78rem] font-semibold uppercase tracking-[0.2em] text-ink underline-offset-[6px] transition-colors hover:text-bordeaux hover:underline"
           >
-            View Event Photo Galleries
+            Смотреть фотоотчёты мероприятий
           </Link>
         </motion.div>
       </div>

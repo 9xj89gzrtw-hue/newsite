@@ -2,30 +2,58 @@ import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
 import { McuVideoHero } from "@/components/catering/mcu-video-hero";
 import { McuMarqueeBand } from "@/components/catering/mcu-marquee-band";
+import { EditorialIntro } from "@/components/catering/editorial-intro";
 import { About } from "@/components/catering/about";
-import { McuPhotoFilmstrip } from "@/components/catering/mcu-photo-filmstrip";
 import { Manifesto } from "@/components/catering/manifesto";
-import { McuServicesCarousel } from "@/components/catering/mcu-services-carousel";
-import { McuCtaBand } from "@/components/catering/mcu-cta-band";
+import { ChefPortrait } from "@/components/catering/chef-portrait";
 import { Menu } from "@/components/catering/menu";
-import { McuVideoEvents } from "@/components/catering/mcu-video-events";
+import { TastingMenuExperience } from "@/components/catering/tasting-menu-experience";
+import { SustainabilityStrip } from "@/components/catering/sustainability-strip";
+import { ServicesOverview } from "@/components/catering/services-overview";
+import { McuPhotoFilmstrip } from "@/components/catering/mcu-photo-filmstrip";
 import { McuVenues } from "@/components/catering/mcu-venues";
-import { Calculator } from "@/components/catering/calculator";
+import { QuoteBand } from "@/components/catering/quote-band";
 import { McuTestimonials } from "@/components/catering/mcu-testimonials";
 import { McuInstagram } from "@/components/catering/mcu-instagram";
 import { Faq } from "@/components/catering/faq";
+import { Calculator } from "@/components/catering/calculator";
 import { Contact } from "@/components/catering/contact";
 import { SocialHandle } from "@/components/catering/social-handle";
 import { SiteFooter } from "@/components/catering/site-footer";
 import { BackToTop } from "@/components/catering/back-to-top";
 
-// Cycle 25 — mculinary.com editorial layer.
-// Curated from 30+ overlapping wow-sections (Cycles 16-24) down to a cohesive
-// mculinary-inspired flow: navy + cream + gold premium catering. Hero swapped
-// to mculinary video; auto-advancing carousels (photos / services / videos)
-// added; testimonials + instagram rebuilt in mculinary style. Strongest
-// existing sections (About count-up, Manifesto ПИР, Menu, Calculator, Contact)
-// retained as informational anchors.
+// Cycle 26 — Salt Block Hospitality editorial layer.
+//
+// Client journey logic (luxury catering):
+//  1. Hero (160px H1 + petal CTA + docked press strip) → emotional brand promise
+//  2. MarqueeBand (7× repeating phrase) → brand positioning insistence
+//  3. EditorialIntro (painterly bloom) → editorial pause, "Every event has a story"
+//  4. About (count-up stats) → credibility (16+ лет, 2400+ событий)
+//  5. Manifesto (pinned "ПИР" scroll wow) → signature brand moment
+//  6. ChefPortrait → humanize the brand — who's the chef?
+//  7. Menu (7 menu types) → what we offer
+//  8. TastingMenuExperience (5-course premium) → desire / showcase
+//  9. SustainabilityStrip → why us: local · seasonal · no semi-finished
+// 10. ServicesOverview (Ridgewells two-up) → what services we provide
+// 11. McuPhotoFilmstrip → event photos (social proof)
+// 12. McuVenues → where we work
+// 13. QuoteBand (solid bordeaux testimonial) → premium trust beat
+// 14. McuTestimonials → social proof carousel
+// 15. McuInstagram → social gallery proof
+// 16. Calculator → interactive price calculator (commit moment)
+// 17. Faq → resolve objections
+// 18. Contact → lead form (final CTA)
+// 19. SocialHandle → giant @nilov_catering closer
+// 20. SiteFooter + BackToTop
+//
+// Salt Block wow moments layered on top:
+//  - 160px uppercase Playfair H1 (Salt Block signature)
+//  - Petal-shaped CTAs (border-radius: 16px 0)
+//  - Press strip docked at hero bottom edge ("as featured in")
+//  - 7× repeating marquee brand phrase insistence
+//  - ChefPortrait moment (Salt Block's chef-driven brand DNA)
+//  - TastingMenuExperience editorial list (Salt Block menu page pattern)
+//  - SustainabilityStrip (Salt Block's "Clean Catering, Without Compromise" voice)
 export const dynamic = "force-dynamic";
 
 export default function Home() {
@@ -38,73 +66,89 @@ export default function Home() {
     >
       <SiteHeader />
 
-      {/* McuVideoHero — mculinary.com cinematic autoplay video hero
-          (navy overlay + oversized Playfair "Еда как искусство" + gold CTA). */}
+      {/* 1. McuVideoHero — Salt Block WOW trio: 160px uppercase Playfair H1
+          "ЕДА КАК ИСКУССТВО" on looping video bg + petal CTA + docked press
+          strip at hero bottom edge ("as featured in" with 6 RU press logos). */}
       <McuVideoHero />
 
-      {/* McuMarqueeBand — slow infinite auto-scroll band (gold ✦ separators). */}
+      {/* 2. McuMarqueeBand — Salt Block WOW #3: marquee as 2nd section, 7×
+          repeating brand positioning phrases (ШЕФ-ДРАЙВЕН · АВТОРСКАЯ ·
+          ФЕРМЕРСКИЕ · СВАДЬБЫ · С 2009 ГОДА · САНКТ-ПЕТЕРБУРГ) on espresso bg
+          with honey ✦ separators. Pure CSS animation, ~32s linear infinite. */}
       <McuMarqueeBand />
 
-      {/* About — count-up statistics (16 лет, 2400+ событий…). Kept as the
-          informational anchor after the hero (mculinary places stats here too). */}
+      {/* 3. EditorialIntro — Ridgewells painterly bloom intro (10-layer
+          radial-gradient "digital watercolor"). Salt Block has no equivalent,
+          but this is the editorial pause that bridges hero → about. Kept. */}
+      <EditorialIntro />
+
+      {/* 4. About — count-up statistics (16+ лет, 2400+ событий, 14 поваров).
+          Informational anchor. Salt Block does the same — credibility stats
+          immediately after the brand intro. */}
       <About />
 
-      {/* McuPhotoFilmstrip — variable-width centerMode filmstrip, auto-advances
-          every 3.5s, pause-on-hover. 18 event photos from mculinary. */}
-      <McuPhotoFilmstrip />
-
-      {/* Manifesto — signature pinned scroll moment «ПИР» (Cycle 16 wow). */}
+      {/* 5. Manifesto — signature pinned scroll moment «ПИР» (Cycle 16 wow).
+          The strongest existing wow — keeps its place mid-page. */}
       <Manifesto />
 
-      {/* McuServicesCarousel — 3-up autoplay (5s, pause-on-hover) services
-          with hover-zoom + dots. Replaces the older Services grid. */}
-      <McuServicesCarousel />
+      {/* 6. ChefPortrait — Salt Block chef-driven brand DNA. Full-bleed 4:5
+          portrait + italic Playfair "Дмитрий Нилов" + Great Vibes signature
+          SVG + 3-paragraph bio. Humanizes the brand after the manifesto. */}
+      <ChefPortrait />
 
-      {/* Navy chapter-divider CTA band (magazine-style section break). */}
-      <McuCtaBand
-        eyebrow="ГОТОВЫ НАЧАТЬ?"
-        title="Обсудим ваше мероприятие"
-        href="#calculator"
-        cta="Рассчитать стоимость"
-      />
-
-      {/* Menu — 7 menu types with interactive list + real dishes + PDF. */}
+      {/* 7. Menu — 7 menu types with interactive list + real dishes + PDF.
+          Salt Block's /menus page pattern adapted as a single-section grid. */}
       <Menu />
 
-      {/* McuVideoEvents — autoplay-muted-loop video cards carousel (4.5s
-          auto-advance). Portrait 9:16 cards on navy-deep bg. */}
-      <McuVideoEvents />
+      {/* 8. TastingMenuExperience — Salt Block WOW: 5-course editorial
+          tasting-menu list on espresso bg with honey gold accents + cream
+          typography. Course number / dish name / pairing note columns. */}
+      <TastingMenuExperience />
 
-      {/* McuVenues — 3 square (1:1) venue cards with hover-zoom. */}
+      {/* 9. SustainabilityStrip — Salt Block's "Clean Catering, Without
+          Compromise" voice. 3 quiet statements (Локальные фермеры /
+          Сезонные продукты / Без полуфабрикатов) with editorial restraint. */}
+      <SustainabilityStrip />
+
+      {/* 10. ServicesOverview — Ridgewells two-up 50/50 split (replaces the
+          weaker 3-up McuServicesCarousel). 4 service categories with
+          hover-zoom images + serif titles + outline buttons. */}
+      <ServicesOverview />
+
+      {/* 11. McuPhotoFilmstrip — variable-width centerMode filmstrip,
+          auto-advances every 3.5s, pause-on-hover. Event photos. */}
+      <McuPhotoFilmstrip />
+
+      {/* 12. McuVenues — 3 square (1:1) venue cards with hover-zoom. */}
       <McuVenues />
 
-      {/* Second chapter-divider CTA band — different copy. */}
-      <McuCtaBand
-        eyebrow="СВАДЬБЫ И КРУПНЫЕ СОБЫТИЯ"
-        title="Кейтеринг под вашу площадку"
-        href="#contact"
-        cta="Связаться"
-      />
+      {/* 13. QuoteBand — Ridgewells WOW #3: solid bordeaux single-quote
+          moment with tinted-cream headline + oversized gold quote mark.
+          Premium trust beat before the testimonials carousel. */}
+      <QuoteBand />
 
-      {/* Calculator uses nuqs (useSearchParams) — must be in <Suspense>. */}
+      {/* 14. McuTestimonials — single-slide autoplay (5s, stops on
+          interaction) with big gold quote-mark + 5★ rating. */}
+      <McuTestimonials />
+
+      {/* 15. McuInstagram — 6×2 grid of Instagram tiles on navy bg. */}
+      <McuInstagram />
+
+      {/* 16. Calculator — interactive price calculator (nuqs state). User
+          has read all brand proof → ready to commit. Sits right before FAQ
+          + Contact so the lead form follows naturally. */}
       <Suspense fallback={null}>
         <Calculator />
       </Suspense>
 
-      {/* McuTestimonials — single-slide autoplay (5s, stops on interaction)
-          with big gold quote-mark + 5★ rating. Replaces old testimonials. */}
-      <McuTestimonials />
-
-      {/* McuInstagram — 6×2 grid of Instagram tiles on navy bg. */}
-      <McuInstagram />
-
-      {/* FAQ — catering questions + accordion. */}
+      {/* 17. Faq — catering questions + accordion. Resolves objections
+          before the contact form. */}
       <Faq />
 
-      {/* Contact — form → POST /api/lead → Prisma Lead → toast. */}
+      {/* 18. Contact — form → POST /api/lead → Prisma Lead → toast. */}
       <Contact />
 
-      {/* SocialHandle — giant @nilov_catering closer (Cycle 21). */}
+      {/* 19. SocialHandle — giant @nilov_catering closer (Cycle 21). */}
       <SocialHandle />
 
       <SiteFooter />

@@ -216,7 +216,7 @@ function WasHelpful({ question }: { question: string }) {
         }`}
       >
         <ThumbsDown className="size-3" />
-        No
+        Нет
         {totalDown >= POSITIVE_THRESHOLD && (
           <span className="font-mono text-[10px] opacity-70">{totalDown}</span>
         )}
@@ -232,7 +232,7 @@ function WasHelpful({ question }: { question: string }) {
             className="inline-flex items-center gap-1 text-sage"
           >
             <Check className="size-3" />
-            Thanks for your feedback!
+            Спасибо за ваш отзыв!
           </motion.span>
         )}
       </AnimatePresence>
@@ -337,7 +337,7 @@ export function Faq() {
                   : "border-border-line bg-cream/40 text-ink/70 hover:border-gold/30 hover:text-ink"
               }`}
             >
-              All
+              Все
               <span className="font-mono text-[10px] text-ink/70">
                 {faqItems.length}
               </span>
@@ -456,10 +456,10 @@ export function Faq() {
         <Reveal delay={0.2}>
           <div className="mt-10 rounded-2xl border border-gold/20 bg-gradient-to-br from-cream to-cream/40 p-6 text-center">
             <p className="font-display text-lg text-ink">
-              Didn&rsquo;t find your answer?
+              Не нашли ответ?
             </p>
             <p className="mt-1 text-sm text-ink/70">
-              Give us a call — we&rsquo;ll sort it out in a minute
+              Позвоните нам — решим за минуту
             </p>
             <a
               href={CONTACTS.phoneHref}

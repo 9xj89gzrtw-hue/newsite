@@ -9,7 +9,7 @@ import { MEDIA } from "@/lib/media";
 import { Sparkles, Award, Users, Calendar, ChefHat } from "lucide-react";
 
 const STATS = [
-  { value: 11, suffix: "+", label: "лет на рынке", icon: Award },
+  { value: 16, suffix: "+", label: "лет на рынке", icon: Award },
   { value: 2500, suffix: "+", label: "проведённых событий", icon: Calendar },
   { value: 75000, suffix: "+", label: "гостей обслужено", icon: Users },
   { value: 35, suffix: "+", label: "членов команды", icon: ChefHat },
@@ -22,7 +22,7 @@ const VALUE_PROPS = [
   "Готовим с нуля",
   "Авторская кухня",
   "Сделано с любовью",
-  "С 2014 года",
+  "С 2009 года",
 ];
 
 function CountUp({ to, suffix }: { to: number; suffix: string }) {
@@ -291,7 +291,7 @@ export function About() {
                     <Award size={20} />
                   </motion.div>
                   <div>
-                    <div className="font-display text-xl font-semibold text-ink">С 2014 года</div>
+                    <div className="font-display text-xl font-semibold text-ink">С 2009 года</div>
                     <div className="font-mono text-xs text-ink/70 uppercase tracking-wider">Санкт-Петербург</div>
                   </div>
                 </div>

@@ -63,15 +63,7 @@ export function ChapterNav() {
                 aria-label={`Jump to section: ${s.label}`}
                 aria-current={isActive ? "true" : undefined}
               >
-                <span
-                  className={`font-mono text-[10px] uppercase tracking-wider transition-all duration-300 ${
-                    isActive
-                      ? "text-gold font-semibold opacity-100"
-                      : "text-ink/70 opacity-0 group-hover:opacity-100"
-                  }`}
-                >
-                  {s.label}
-                </span>
+                <span className="sr-only">{s.label}</span>
                 <span
                   className={`block rounded-full transition-all duration-300 ${
                     isActive

@@ -2,37 +2,42 @@
 
 import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { ChevronDown } from "lucide-react";
 import { MCU_HERO_VIDEO, MCU_HERO_POSTER } from "@/lib/mculinary-media";
+import { PetalButton } from "./petal-button";
+import { SbPressStrip } from "./sb-press-strip";
 
 /**
- * McuVideoHero — mculinary WOW #1 cinematic video hero.
+ * McuVideoHero — Salt Block WOW #1 cinematic video hero (Cycle 26 restyle).
  *
- * Full-bleed autoplay muted loop video (clamp 560-765px tall) with a dark
- * gradient overlay, eyebrow + oversized two-line serif headline (visually
- * `mcu-h1`, semantically `<h2>` — the site `<header>` already owns the
- * page `<h1>` per GgHero pattern), supporting body line, and two CTAs
- * (gold solid + gold-outline pill).
+ * Full-bleed autoplay muted loop video (clamp 640-880px tall) with a dark
+ * gradient overlay. Cycle 26 restyle replaces the previous mculinary-era
+ * multi-line italic gold headline + dual gold pill CTAs with the Salt Block
+ * signature trio:
+ *   1. 160px-uppercase Playfair Display H1 — `ЕДА КАК ИСКУССТВО`
+ *      (rendered via `.sb-hero-title[data-tone="cream"]`, clamp 4-10rem).
+ *   2. Petal-shaped primary + outline CTAs (`.sb-petal-btn`) — `dark` for
+ *      the calculator, `outline data-tone="cream"` for the menu (cream so
+ *      the outline reads on the dark video bg).
+ *   3. Docked press strip at the hero bottom edge (`SbPressStrip` variant=
+ *      `docked`) — 4-6 publication logos sitting on a gradient overlay.
  *
- * Animation: staggered fade-in-up on eyebrow → h2 → body → CTAs (0.1s
- * steps). Uses `animate` (mount-based), not `whileInView` — the hero is
- * above the fold.
+ * Semantically `<h2>` (the site `<header>` already owns the page `<h1>`
+ * per GgHero pattern). Animation: staggered fade-in-up on eyebrow → h2 →
+ * body → CTAs (0.1s steps). Uses `animate` (mount-based), not `whileInView`.
  *
  * Performance: an IntersectionObserver on the `<section>` pauses the
  * `<video>` when it scrolls out of view and resumes `play()` when it
  * re-enters (`.catch(()=>{})` guards autoplay-policy rejections).
  *
  * Accessibility: `<video aria-hidden>` (decorative — the headline carries
- * meaning), `<h2>` for the headline (avoids duplicate `<h1>`), `aria-label`
- * on the section, `preload="metadata"` + `poster` fallback.
+ * meaning), `aria-label` on the section, `preload="metadata"` + poster
+ * fallback.
  *
  * Reduced motion: `useReducedMotion()` — when true, motion.* components
  * render static (no initial/animate). The video still autoplays (it's not
- * a motion animation — and mculinary's reference also keeps the video
- * under reduced-motion; the reduced-motion media query in globals.css
- * only disables the marquee + reveal transitions, not the hero video).
+ * a motion animation).
  *
- * @see /docs/reference-library/mculinary/MCULINARY-ANALYSIS.md §5 §3, §7 wow #1 #2
+ * @see /docs/SALTBLOCK-ANALYSIS.md §10 (WOW moments), §9.2 (petal button)
  */
 
 type FadeUpFn = (delay: number) => Record<string, unknown>;
@@ -77,7 +82,7 @@ export function McuVideoHero() {
     <section
       ref={sectionRef}
       className="relative w-full"
-      style={{ height: "clamp(560px, 85vh, 765px)" }}
+      style={{ height: "clamp(640px, 92vh, 880px)" }}
       aria-label="Interfood Catering — премиальный кейтеринг"
     >
       <video
@@ -94,7 +99,9 @@ export function McuVideoHero() {
       />
       <div className="mcu-hero-overlay" />
 
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center text-white">
+      {/* Hero content — vertically centered; pb-32 reserves ~128px for the
+          docked press strip at the bottom edge. */}
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 pb-32 text-center text-white">
         <motion.p
           className="mcu-eyebrow-lg mb-6 font-light tracking-wide text-white/95"
           style={{ textShadow: "0 2px 12px rgba(0,0,0,0.5)" }}
@@ -103,50 +110,49 @@ export function McuVideoHero() {
           Кейтеринг в Санкт-Петербурге с 2009 года
         </motion.p>
 
+        {/* WOW #1 — 160px max Playfair Display uppercase H1 (.sb-hero-title). */}
         <motion.h2
-          className="mcu-h1 text-white"
-          style={{ textShadow: "0 4px 32px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.4)" }}
+          className="sb-hero-title"
+          data-tone="cream"
           {...fadeUp(0.1)}
         >
-          Еда как
+          ЕДА КАК
           <br />
-          <span
-            className="italic"
-            style={{
-              color: "var(--mcu-gold)",
-              textShadow:
-                "0 4px 32px rgba(0,0,0,0.5), 0 0 28px rgba(175,148,105,0.45)",
-            }}
-          >
-            искусство
-          </span>
+          ИСКУССТВО
         </motion.h2>
 
         <motion.p
-          className="mcu-body mt-8 max-w-xl font-normal text-white/90"
+          className="mcu-body mt-8 mb-8 max-w-xl text-base font-normal text-cream/80 md:text-lg"
           style={{ textShadow: "0 2px 12px rgba(0,0,0,0.5)" }}
           {...fadeUp(0.2)}
         >
-          Премиальный кейтеринг для свадеб, корпоративов и крупных событий. От
-          дегустации до последнего гостя — безупречно.
+          Выездной кейтеринг полного цикла в Санкт-Петербурге. Свадьбы,
+          банкеты, фуршеты — от 2450 ₽/чел. Создаём ритуал, а не просто меню.
         </motion.p>
 
+        {/* WOW #2 — Petal-shaped CTAs (dark + cream outline). */}
         <motion.div
-          className="mt-12 flex flex-wrap items-center justify-center gap-5"
+          className="flex flex-wrap items-center justify-center gap-4"
           {...fadeUp(0.3)}
         >
-          <a href="#calculator" className="mcu-btn-gold">
+          <PetalButton href="#calculator" variant="dark" size="lg">
             Рассчитать стоимость
-          </a>
-          <a href="#contact" className="mcu-btn-pill">
-            Связаться с нами
-          </a>
+          </PetalButton>
+          <PetalButton
+            href="#menu"
+            variant="outline"
+            size="lg"
+            data-tone="cream"
+          >
+            Смотреть меню
+          </PetalButton>
         </motion.div>
       </div>
 
-      <div className="pointer-events-none absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-white/70">
-        <ChevronDown className="h-6 w-6 animate-bounce" aria-hidden="true" />
-      </div>
+      {/* WOW #3 — Press strip docked at hero bottom edge. Must be the LAST
+          child of <section> so .sb-press-strip[data-variant="docked"]
+          (absolute bottom-0) sits flush against the hero bottom. */}
+      <SbPressStrip variant="docked" />
     </section>
   );
 }

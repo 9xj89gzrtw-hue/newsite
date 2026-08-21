@@ -1,61 +1,91 @@
 /**
- * McuMarqueeBand — slow continuous auto-scrolling marquee band.
+ * McuMarqueeBand — Salt Block signature repeating brand-phrase marquee.
  *
- * A thin navy band with gold-light italic Playfair text scrolling infinitely.
- * mculinary doesn't have one, but the user explicitly wants "wow effects" and
- * "auto-moving" elements (per Cycle 25 brief). This is the "Кейтеринг без
- * границ" band of signature phrases: Свадбы / Корпоративы / Фуршеты / etc.
+ * Restyled for Cycle 26 (Salt Block editorial layer, WOW #3): the band sits
+ * as the SECOND section right after the hero. Single line of large Barlow
+ * Semi Condensed Bold cream text on deep ink-black (var(--espresso)),
+ * scrolling horizontally via pure CSS translateX(0 → -50%) over 32s linear
+ * infinite. The phrase set is repeated **7×** inline to evoke Salt Block's
+ * rhetorical insistence pattern (see DESIGN-CRITIQUE.md §4 #1).
  *
- * Pure CSS animation via `.mcu-marquee` (translateX 0 → -50% over 40s linear
- * infinite, see globals.css). The content is duplicated twice (the [0,1] map)
- * so the loop is seamless; the second copy is `aria-hidden` for screen
- * readers. Hover pauses the animation (`.mcu-marquee:hover` rule).
+ * Layout
+ *   <section.sb-marquee-repeating>           (overflow hidden, flex center)
+ *     <div.sb-marquee-track>                 (animates translateX 0→-50%)
+ *       <div flex> [first half, 7×PHRASES]  </div>
+ *       <div flex> [duplicate half, 7×PHRASES, aria-hidden] </div>
  *
- * No JS animation — this is a Server Component. Respects prefers-reduced-
- * motion: the reduced-motion media query in globals.css disables the
- * animation entirely (`.mcu-marquee { animation: none }`), so the band shows
- * the phrases statically.
+ * The duplicate half is what makes the loop seamless: when the track has
+ * scrolled -50% of its own width, the second half is exactly where the
+ * first was at 0%, so the visual repeats without a visible jump. Both
+ * halves contain the same 7×PHRASES = 42 phrase instances, totalling 84
+ * rendered phrases (Salt Block's "show the phrase 7×" insistence taken
+ * literally and doubled for the seamless loop).
  *
- * @see /docs/reference-library/mculinary/MCULINARY-ANALYSIS.md §7 wow #1 #8
+ * Pure CSS animation → Server Component (no `'use client'`). Respects
+ * prefers-reduced-motion: globals.css disables the animation entirely so
+ * the band shows the phrases statically.
+ *
+ * @see /docs/SALTBLOCK-ANALYSIS.md §10 (WOW #3) + §11 (marquee insistence)
+ * @see /docs/reference-library/saltblock/DESIGN-CRITIQUE.md §4 #1
  */
 
-const PHRASES: readonly string[] = [
-  "Свадьбы",
-  "Корпоративы",
-  "Фуршеты",
-  "Банкеты",
-  "Дегустации",
-  "Кейтеринг на выезд",
+const PHRASES = [
+  "ШЕФ-ДРАЙВЕН КЕЙТЕРИНГ",
+  "АВТОРСКАЯ КУХНЯ",
+  "ФЕРМЕРСКИЕ ПРОДУКТЫ",
+  "СВАДЬБЫ И БАНКЕТЫ",
+  "С 2009 ГОДА",
+  "САНКТ-ПЕТЕРБУРГ",
 ] as const;
 
+// Salt Block rhetorical insistence: repeat the phrase set 7× inline so the
+// brand-positioning message is drummed in visually as the band scrolls past.
+const REPEAT = 7;
+
+type PhraseInstance = { phrase: string; key: string };
+
+/** Build the 7×PHRASES set used in each half of the track. */
+function buildPhraseSet(prefix: string): PhraseInstance[] {
+  return Array.from({ length: REPEAT * PHRASES.length }).map((_, i) => ({
+    phrase: PHRASES[i % PHRASES.length],
+    key: `${prefix}-${i}`,
+  }));
+}
+
 export function McuMarqueeBand() {
+  const firstHalf = buildPhraseSet("a");
+  const duplicateHalf = buildPhraseSet("b");
+
   return (
     <section
-      className="mcu-section-navy overflow-hidden py-6"
-      aria-label="Кейтеринг без границ"
+      aria-label="Позиционирование бренда"
+      className="sb-marquee-repeating"
     >
-      <div className="mcu-marquee">
-        {[0, 1].map((dup) => (
-          <div
-            key={dup}
-            className="flex items-center gap-8 pr-8"
-            aria-hidden={dup === 1 ? true : undefined}
-          >
-            {PHRASES.map((phrase, i) => (
-              <span key={i} className="flex items-center gap-8">
-                <span className="mcu-h3 whitespace-nowrap italic text-white/90">
-                  {phrase}
-                </span>
-                <span
-                  className="text-2xl text-[var(--mcu-gold)]"
-                  aria-hidden="true"
-                >
-                  ✦
-                </span>
+      <div className="sb-marquee-track">
+        {/* First half — visible during translateX(0 → -50%) */}
+        <div className="flex items-center">
+          {firstHalf.map(({ phrase, key }) => (
+            <span key={key} className="sb-marquee-phrase">
+              <span>{phrase}</span>
+              <span className="sb-marquee-sep" aria-hidden="true">
+                ✦
               </span>
-            ))}
-          </div>
-        ))}
+            </span>
+          ))}
+        </div>
+        {/* Duplicate half — clones the first half so the -50% position lines
+            up seamlessly with the 0% position. Hidden from screen readers to
+            avoid reading the phrases twice. */}
+        <div className="flex items-center" aria-hidden={true}>
+          {duplicateHalf.map(({ phrase, key }) => (
+            <span key={key} className="sb-marquee-phrase">
+              <span>{phrase}</span>
+              <span className="sb-marquee-sep" aria-hidden="true">
+                ✦
+              </span>
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );

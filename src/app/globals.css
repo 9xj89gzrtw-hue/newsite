@@ -188,6 +188,15 @@
   --mcu-espresso: #1A1B1A;      /* primary body text on light */
   --mcu-sage: #53624E;          /* rare decorative accent */
 
+  /* ===== SALT BLOCK CYCLE 26 TOKENS =====
+     Editorial restraint palette — used by sb-press-strip + announcement-bar.
+     `--espresso` is a deep coffee-black (warmer than --night, distinct from
+     --mcu-espresso which is a text color); `--honey` is a warm amber accent
+     distinct from --gold so the announcement bar can theme independently
+     from the Sopranos CTA gold used in site-header. */
+  --espresso: #1A1B1A;          /* announcement bar dark bg */
+  --honey: #E0A94E;             /* arrow / link accent on dark */
+
   /* shadcn aliases (LIGHT THEME DEFAULT) */
   --background: var(--cream);
   --foreground: var(--ink);
@@ -1444,6 +1453,181 @@ header[data-scrolled="true"] [data-mega-panel] {
   font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
 }
 
+/* === SALT BLOCK EDITORIAL LAYER (Cycle 26) ===
+   Salt Block brand-voice restraint: thin quiet rules that divide editorial
+   cells. Used as both vertical (between grid columns) and horizontal (between
+   blocks) dividers — apply size + orientation via Tailwind utilities on the
+   element (e.g. `w-px h-full` for vertical, `w-full h-px border-0` for hr). */
+.sb-section-rule {
+  display: block;
+  background-color: var(--border-line-dark);
+  border: 0;
+}
+.sb-section-rule--soft {
+  background-color: color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+/* === SB PRESS STRIP (Cycle 26 — Salt Block "as featured in" press strip) ===
+   REFERENCE: docs/SALTBLOCK-ANALYSIS.md §6.2 + §13.8 (press strip docked at
+   hero bottom — "a tiny cheap wow that signals authority").
+   Docked variant: absolute bottom 0, full-width, gradient overlay to dark,
+   cream logos at 85% opacity, 100% on hover. */
+.sb-press-strip[data-variant="docked"] {
+  background:
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--espresso) 78%, transparent) 0%,
+      color-mix(in srgb, var(--espresso) 42%, transparent) 55%,
+      transparent 100%
+    );
+}
+.sb-press-strip[data-variant="docked"] .sb-press-strip__logo {
+  color: var(--cream);
+  opacity: 0.6;
+  filter: grayscale(1) brightness(1.4);
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+.sb-press-strip[data-variant="docked"] .sb-press-strip__logo:hover,
+.sb-press-strip[data-variant="docked"] .sb-press-strip__logo:focus-visible {
+  opacity: 1;
+  filter: grayscale(0) brightness(1);
+}
+.sb-press-strip[data-variant="standalone"] .sb-press-strip__logo {
+  color: var(--ink);
+  opacity: 0.55;
+  filter: grayscale(1) brightness(1.05);
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+.sb-press-strip[data-variant="standalone"] .sb-press-strip__logo:hover,
+.sb-press-strip[data-variant="standalone"] .sb-press-strip__logo:focus-visible {
+  opacity: 1;
+  filter: grayscale(0) brightness(1);
+}
+
+/* --- ChefPortrait editorial primitives (Cycle 26, Task 6-C) ---
+   Used by src/components/catering/chef-portrait.tsx.
+   Voice: Salt Block editorial restraint — Barlow micro-eyebrows, italic
+   Playfair display, Great Vibes script signature. */
+
+/* Salt Block eyebrow — 11px Barlow Semi Condensed, bordeaux, ls 0.28em.
+   Sits above italic Playfair display headlines in editorial cells. */
+.sb-eyebrow {
+  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--bordeaux);
+  line-height: 1;
+  margin: 0;
+}
+
+/* Chef portrait frame — 4:5 aspect, square corners, dramatic layered shadow
+   (ink drop + warm bordeaux glow + thin top highlight).
+   Parent of a next/image fill child. */
+.sb-chef-portrait-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  overflow: hidden;
+  background: var(--ink);
+  border-radius: 0;
+  box-shadow:
+    0 32px 64px -20px rgba(31, 41, 55, 0.45),
+    0 12px 24px -10px rgba(122, 74, 31, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+}
+.sb-chef-portrait-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* Italic Playfair display headline for chef name.
+   clamp(2.5rem, 5vw, 3.75rem), weight 500, lh 1.04. */
+.sb-chef-headline {
+  font-family: var(--font-serif), "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: balance;
+}
+
+/* Small-caps subtitle — Karla 500 16px, opacity 0.7, ls 0.1em uppercase. */
+.sb-chef-subtitle {
+  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.7;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Chef bio body — Karla 17px, lh 1.7, ink. */
+.sb-chef-body p {
+  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* Signature — Great Vibes (var(--font-script)), bordeaux, rotated -3deg.
+   clamp(2.5rem, 5vw, 3.5rem), inline-block for transform. */
+.sb-signature {
+  font-family: var(--font-script), "Great Vibes", cursive;
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--bordeaux);
+  transform: rotate(-3deg);
+  transform-origin: bottom left;
+  display: inline-block;
+  margin: 0;
+  /* Fallback for users with no Great Vibes loaded (graceful). */
+  text-rendering: optimizeLegibility;
+}
+
+/* Attribution under signature — Karla italic 14px, ink 0.6. */
+.sb-signature-attribution {
+  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+  opacity: 0.6;
+  margin: 0.25rem 0 0;
+}
+
+/* Chef stats row — Barlow 14px uppercase ls 0.2em, bordeaux, inline with
+   · separators. Rendered as a flex list with hidden · decorators. */
+.sb-chef-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bordeaux);
+}
+.sb-chef-stats > li { margin: 0; }
+.sb-chef-stats [aria-hidden="true"] { opacity: 0.5; }
+
 /* === JOELS.COM STYLE LAYER (Cycle 24) ===
    Source: docs/JOELS-ANALYSIS.md §TL;DR, §9, §10, §14.
    All tokens map to our existing palette (sage/ink/cream/gold).
@@ -2351,4 +2535,398 @@ header[data-scrolled="true"] [data-mega-panel] {
   .mcu-service-card-img img,
   .mcu-venue-card img,
   .mcu-insta-cell img { transition: none; }
+}
+
+/* === Salt Block (Cycle 26, Task 6-A) ===
+   Salt Block Hospitality editorial layer — petal buttons, oversized Playfair
+   display H1, repeating marquee, press strip, editorial dividers, chef
+   portrait frames, tasting menu rows, script signatures, sustainability cells.
+   Source: docs/SALTBLOCK-ANALYSIS.md §3 (palette), §4 (typography),
+   §9 (WOW moments), §13.1 (petal recipe), §13.7 (cream bg).
+
+   NOTE — overlap with prior Cycle 26 tasks:
+   The following classes were already declared earlier in this file by prior
+   agents and are RE-DECLARED here per Task 6-A spec. Later declarations win
+   the cascade for shared properties, so behavior on existing components
+   (ChefPortrait from 6-C, SustainabilityStrip from 6-E, press-strip from 6-E)
+   may shift slightly. Orchestrator should consolidate during Cycle 26 wrap-up:
+     - .sb-eyebrow                  (Task 6-C @ L1510 → redeclared @ L2734)
+     - .sb-section-rule             (Task 6-E @ L1461 → redeclared @ L2749)
+     - .sb-chef-portrait-frame      (Task 6-C @ L1524 → redeclared @ L2758)
+     - .sb-signature                (Task 6-C @ L1582 → redeclared @ L2828)
+     - .sb-press-strip[data-variant="docked"]
+                                    (Task 6-E @ L1475 → redeclared @ L2716)
+   Pure-new in this block (no prior conflict):
+     - .sb-petal-btn + __icon + size variants  (Task 6-A — primary deliverable)
+     - .sb-hero-title + data-tone              (Task 6-A)
+     - .sb-marquee-repeating + track/phrase/sep + @keyframes  (Task 6-A)
+     - .sb-press-strip (BASE — flex layout — complements existing [data-variant])
+     - .sb-tasting-row + __num/__dish/__ingredients/__pairing  (Task 6-A)
+     - .sb-sustainability-cell                  (Task 6-A) */
+:root {
+  /* Salt Block color tokens — declared locally so sb-* utilities resolve even
+     before the broader palette migration. Values mirror Salt Block's
+     dark-green-black #192121 (→ our espresso #101010) + honey accent.
+     NOTE: --espresso is also referenced by Task 6-E's sb-press-strip gradient
+     (L1479) — defining it here retroactively makes that gradient render
+     correctly (it was previously an undefined var). */
+  --espresso: #101010;
+  --honey: #EAA259;
+}
+
+/* --- 1. sb-petal-btn — primary CTA petal button -------------------------
+   Petal shape: border-radius 16px 0 16px 0 (top-left + bottom-right rounded,
+   top-right + bottom-left sharp). 23px/38px padding, Playfair Display Bold
+   19.2px (Salt Block spec uses Minerva Modern/Anziano — Playfair is our free
+   high-contrast serif substitute). Three variants via data-variant:
+     dark (default): espresso bg + cream text → hover ink bg + lift
+     light:          cream bg + ink text     → hover #FFF bg + lift
+     outline:        transparent + ink border → hover ink fill + cream text */
+.sb-petal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 23px 38px;
+  border-radius: 28px 0;
+  background-color: var(--espresso);
+  color: var(--cream);
+  font-family: var(--font-serif), "Playfair Display", Georgia, serif;
+  font-size: 19.2px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.4s ease,
+    border-color 0.3s ease;
+  will-change: transform;
+}
+.sb-petal-btn:hover,
+.sb-petal-btn:focus-visible {
+  background-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.4);
+  outline: none;
+}
+.sb-petal-btn[data-variant="light"] {
+  background-color: var(--cream);
+  color: var(--ink);
+  border-color: transparent;
+}
+.sb-petal-btn[data-variant="light"]:hover,
+.sb-petal-btn[data-variant="light"]:focus-visible {
+  background-color: #FFFFFF;
+  color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.18);
+}
+.sb-petal-btn[data-variant="outline"] {
+  background-color: transparent;
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.sb-petal-btn[data-variant="outline"]:hover,
+.sb-petal-btn[data-variant="outline"]:focus-visible {
+  background-color: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.32);
+}
+
+/* `data-tone="cream"` on outline — swaps ink → cream for border + text so
+   the outline CTA reads on dark backgrounds (e.g. McuVideoHero dark video).
+   Hover inverts to cream fill + ink text. — Task 7-A */
+.sb-petal-btn[data-variant="outline"][data-tone="cream"] {
+  color: var(--cream);
+  border-color: var(--cream);
+}
+.sb-petal-btn[data-variant="outline"][data-tone="cream"]:hover,
+.sb-petal-btn[data-variant="outline"][data-tone="cream"]:focus-visible {
+  background-color: var(--cream);
+  color: var(--ink);
+  border-color: var(--cream);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.32);
+}
+
+/* Size variants (data-size on .sb-petal-btn) */
+.sb-petal-btn[data-size="sm"] {
+  padding: 12px 22px;
+  font-size: 14px;
+}
+.sb-petal-btn[data-size="lg"] {
+  padding: 28px 48px;
+  font-size: 22px;
+}
+
+/* Trailing icon nudges 4px on hover */
+.sb-petal-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  transform: translateX(0);
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.sb-petal-btn:hover .sb-petal-btn__icon,
+.sb-petal-btn:focus-visible .sb-petal-btn__icon {
+  transform: translateX(4px);
+}
+
+/* --- 2. sb-hero-title — 160px max Playfair uppercase hero H1 ------------
+   Salt Block "RAISE THE BAR" hero spec: clamp(4rem, 11vw, 10rem), line-height
+   0.92, letter-spacing -0.02em, uppercase, text-wrap balance. Subtle shadow
+   for legibility on video. data-tone controls light/dark context. */
+.sb-hero-title {
+  font-family: var(--font-serif), "Playfair Display", Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(5rem, 13vw, 12rem);
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--cream);
+  text-wrap: balance;
+  text-shadow: 0 4px 48px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.35);
+  margin: 0;
+}
+.sb-hero-title[data-tone="dark"] {
+  color: var(--ink);
+  text-shadow: none;
+}
+.sb-hero-title[data-tone="cream"] {
+  color: var(--cream);
+}
+
+/* --- 3. sb-marquee-repeating — Salt Block brand-phrase insistence -------
+   Single phrase repeated 7× inline; track animates translateX(0 → -50%) over
+   32s. Pause-on-hover. Gold ✦ separator between phrases.
+   Task 7-B restyle: deep ink-black bg (var(--espresso)) + clamp height
+   (80–144px, 11vh) + Barlow Semi Condensed Bold cream phrases + honey ✦. */
+.sb-marquee-repeating {
+  overflow: hidden;
+  width: 100%;
+  height: clamp(80px, 11vh, 144px);
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, #0a0908 0%, #12100e 50%, #0a0908 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+.sb-marquee-repeating .sb-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: sb-marquee-scroll 32s linear infinite;
+}
+.sb-marquee-repeating:hover .sb-marquee-track {
+  animation-play-state: paused;
+}
+.sb-marquee-repeating .sb-marquee-phrase {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cream);
+  white-space: nowrap;
+}
+.sb-marquee-repeating .sb-marquee-sep {
+  display: inline-block;
+  margin-left: 1.5rem;
+  color: var(--honey);
+  font-size: 1.25em;
+  line-height: 1;
+}
+@keyframes sb-marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* --- 4. sb-press-strip — "as featured in" logo row ---------------------
+   Default: flex row of grayscale logos. data-variant="docked" pins to bottom
+   of hero section with a darkening gradient backdrop. */
+.sb-press-strip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 1.5rem 0;
+  opacity: 0.85;
+}
+.sb-press-strip img,
+.sb-press-strip svg {
+  filter: grayscale(1) brightness(1.1);
+  transition: filter 0.4s ease, opacity 0.4s ease;
+  max-height: 56px;
+  width: auto;
+}
+.sb-press-strip img:hover,
+.sb-press-strip svg:hover {
+  filter: grayscale(0);
+  opacity: 1;
+}
+.sb-press-strip[data-variant="docked"] {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 1.5rem 2rem 1.25rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+}
+.sb-press-strip[data-variant="docked"] img,
+.sb-press-strip[data-variant="docked"] svg {
+  filter: grayscale(1) brightness(1.4);
+}
+
+/* --- 5. sb-eyebrow — thin uppercase micro-label above each section H2 --
+   Salt Block has NO eyebrows (every heading is uppercase), but our adaptation
+   uses a tiny 11px Barlow label as a section pre-header. data-tone="light"
+   flips to honey for dark backgrounds. */
+.sb-eyebrow {
+  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--bordeaux);
+  display: inline-block;
+}
+.sb-eyebrow[data-tone="light"] {
+  color: var(--honey);
+}
+
+/* --- 6. sb-section-rule — 1px editorial divider between sections -------- */
+.sb-section-rule {
+  border: 0;
+  border-top: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+  margin: 0;
+}
+
+/* --- 7. sb-chef-portrait-frame — 4/5 portrait, square corners -----------
+   Salt Block uses square corners (no radius) on portrait photography.
+   Heavy soft drop-shadow gives the "framed-on-paper" feel. */
+.sb-chef-portrait-frame {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 0;
+  box-shadow: 0 40px 80px -32px rgba(0, 0, 0, 0.35);
+}
+.sb-chef-portrait-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- 8. sb-tasting-row — tasting menu row (course / dish / pairing) -----
+   3-col grid: course number (Barlow 14px bordeaux) | dish name (Playfair 28px)
+   + italic ingredient line (Karla 16px, opacity 0.7) | pairing note (mono
+   13px, opacity 0.6). Collapses to single column on mobile. */
+.sb-tasting-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 200px;
+  gap: 1.5rem;
+  align-items: baseline;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink) 10%, transparent);
+}
+.sb-tasting-row > .sb-tasting-row__num {
+  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  color: var(--bordeaux);
+  text-transform: uppercase;
+}
+.sb-tasting-row > .sb-tasting-row__dish {
+  font-family: var(--font-serif), "Playfair Display", serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.sb-tasting-row > .sb-tasting-row__dish .sb-tasting-row__ingredients {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-style: italic;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  opacity: 0.7;
+  color: var(--ink);
+}
+.sb-tasting-row > .sb-tasting-row__pairing {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.6;
+  color: var(--ink);
+}
+@media (max-width: 768px) {
+  .sb-tasting-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .sb-tasting-row > .sb-tasting-row__num {
+    display: inline-block;
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* --- 9. sb-signature — chef's signature in Great Vibes script ----------- */
+.sb-signature {
+  font-family: var(--font-script), "Great Vibes", cursive;
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  color: var(--bordeaux);
+  transform: rotate(-3deg);
+  display: inline-block;
+  margin-top: 0.5rem;
+  line-height: 1;
+}
+
+/* --- 10. sb-sustainability-cell — SustainabilityStrip cell --------------
+   Vertical flex cell with right-edge divider. Last-child drops the border.
+   Collapses to bottom-border on mobile. */
+.sb-sustainability-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 2rem;
+  border-right: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+}
+.sb-sustainability-cell:last-child {
+  border-right: 0;
+}
+@media (max-width: 768px) {
+  .sb-sustainability-cell {
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+    padding-bottom: 1.5rem;
+  }
+  .sb-sustainability-cell:last-child {
+    border-bottom: 0;
+  }
+}
+
+/* --- Salt Block reduced-motion: stop marquee, drop transforms ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sb-marquee-repeating .sb-marquee-track { animation: none; }
+  .sb-petal-btn,
+  .sb-petal-btn:hover,
+  .sb-petal-btn:focus-visible,
+  .sb-petal-btn__icon,
+  .sb-petal-btn:hover .sb-petal-btn__icon {
+    transition: none;
+    transform: none;
+    box-shadow: none;
+  }
 }

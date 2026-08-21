@@ -91,3 +91,14 @@ docs/reference-library/mculinary/*-v2.png
 docs/reference-library/mculinary/*-v3*.png
 # Screenshots (.png) in reference-library are large — keep only analysis .md
 docs/reference-library/mculinary/*.png
+
+# Cycle 26 — Salt Block verification artifacts (large screenshots, regenerated each run)
+# Keep only the analysis .md docs + small JSON dumps; gitignore large PNGs.
+docs/reference-library/saltblock/critique/
+docs/reference-library/saltblock/*.png
+docs/reference-library/saltblock/images/
+docs/reference-library/saltblock/homepage-full.png
+docs/reference-library/saltblock/hero-top.png
+docs/reference-library/saltblock/mobile-top.png
+docs/reference-library/saltblock/section-*.png
+docs/reference-library/saltblock/hover-*.png
