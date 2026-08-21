@@ -101,7 +101,7 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  // Docked (transparent over hero) vs sticky (solid cream).
+  // Docked (transparent over hero) vs sticky (solid WHITE).
   const docked = !scrolled;
 
   return (
@@ -114,7 +114,7 @@ export function SiteHeader() {
         className={`fixed inset-x-0 z-50 transition-all duration-500 ${
           docked
             ? "bottom-0 bg-transparent text-white"
-            : "top-0 bg-cream/95 text-ink shadow-[0_6px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur-md"
+            : "top-0 border-b border-border-line bg-white text-ink shadow-[0_6px_24px_-14px_rgba(0,0,0,0.16)] backdrop-blur-md"
         }`}
       >
         <div
@@ -190,11 +190,11 @@ export function SiteHeader() {
         </div>
       </header>
 
-      {/* Full-screen mobile menu — cream theme */}
+      {/* Full-screen mobile menu — WHITE theme */}
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[60] flex flex-col bg-cream px-6 py-6 lg:hidden"
+            className="fixed inset-0 z-[60] flex flex-col bg-white px-6 py-6 lg:hidden"
             id="mobile-menu"
             role="dialog"
             aria-modal="true"

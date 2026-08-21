@@ -18,14 +18,14 @@ import { useMounted } from "@/hooks/use-mounted";
  *   - Layered dark gradient overlay so the centered white wordmark reads.
  *   - 5px white border decorative frame inset (their SR7 border shape —
  *     `.tott-border-frame` utility).
- *   - Centered stack:
- *       • eyebrow "INTERFOOD CATERING" (Lato, tracked)
- *       • wordmark "Interfood." (Prata — their display font, Latin-only)
- *       • script accent "food as art" (Nothing You Could Do — their hero
- *         overlay script font; English because the face is Latin-only)
- *       • RU subhead "Еда как искусство — выездной кейтеринг полного цикла"
- *   - Bottom locations strip "САНКТ-ПЕТЕРБУРГ | МОСКВА | ВСЯ РОССИЯ".
+ *   - TOP-LEFT script accent (Nothing You Could Do) — mirrors their hero
+ *     top-left script overlay ("bacon & bluecheese tartlet"). Ours:
+ *     "food as art" — the Interfood brand tagline in their script font.
+ *   - Centered stack: wordmark "Interfood." (Prata) + subtitle
+ *     "лучший кейтеринг Санкт-Петербурга" (Lato, tracked uppercase).
  *   - Scroll cue bottom-center (animated line + "SCROLL" eyebrow).
+ *   - NO cities strip, NO long subhead (per task v2: лишняя информация
+ *     и города там не нужны).
  *
  * Animation: framer-motion staggered reveal (opacity + 40px rise, 0.8s ease),
  * respecting `useReducedMotion()` + SSR mount gate (no hydration mismatch).
@@ -108,6 +108,25 @@ export function TottHero() {
       {/* 5px white border decorative frame — talkofthetown SR7 signature. */}
       <span className="tott-border-frame z-[3]" aria-hidden="true" />
 
+      {/* TOP-LEFT script accent — mirrors talkofthetown's hero top-left
+          script overlay (their "bacon & bluecheese tartlet" in Nothing You
+          Could Do). Ours: "food as art" — the Interfood brand tagline in
+          their script font (Latin-only face, so English phrase). Positioned
+          absolute top-left, inside the border frame. Sits above the
+          bottom-docked header. */}
+      <motion.p
+        className="tott-script absolute left-8 top-8 z-10 text-white/95 md:left-14 md:top-12"
+        style={{ fontSize: "clamp(1.5rem, 3vw, 2.4rem)", lineHeight: 1 }}
+        initial={showStatic ? false : { opacity: 0, x: -20 }}
+        animate={
+          showStatic
+            ? undefined
+            : { opacity: 1, x: 0, transition: { delay: 0.6, duration: 0.8, ease: "easeOut" as const } }
+        }
+      >
+        food as art
+      </motion.p>
+
       {/* Centered brand stack. */}
       <motion.div
         className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 pt-24 text-center"
@@ -115,53 +134,32 @@ export function TottHero() {
         animate={showStatic ? undefined : "visible"}
         variants={container}
       >
-        <motion.p
-          variants={fade}
-          className="tott-body text-[11px] font-bold uppercase tracking-[0.4em] text-white/85 sm:text-[13px]"
-        >
-          Interfood Catering
-        </motion.p>
-
         {/* Wordmark — Prata (their display serif). Gold dot = Interfood brand
             signature (kept across all cycles). */}
         <motion.h1
           variants={rise}
-          className="tott-display mt-4 text-white"
+          className="tott-display text-white"
           style={{ fontSize: "clamp(3.5rem, 11vw, 9rem)", lineHeight: 0.92, letterSpacing: "-0.01em" }}
         >
           Interfood<span style={{ color: "var(--gold)" }}>.</span>
         </motion.h1>
 
-        {/* Script accent — Nothing You Could Do (their hero overlay font).
-            English phrase because the face is Latin-only. */}
-        <motion.p
+        {/* Subtitle — "лучший кейтеринг Санкт-Петербурга" (RU, Lato via
+            Karla fallback). Tracked uppercase editorial tagline below the
+            wordmark. Olive divider accent on either side mirrors their
+            section-eyebrow device. */}
+        <motion.div
           variants={rise}
-          className="tott-script mt-2 text-white/95"
-          style={{ fontSize: "clamp(2.2rem, 6vw, 4.2rem)", lineHeight: 1 }}
+          className="mt-6 flex items-center gap-4"
         >
-          food as art
-        </motion.p>
-
-        {/* RU subhead — Lato (their body font, has Cyrillic). */}
-        <motion.p
-          variants={rise}
-          className="tott-body mt-7 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg"
-        >
-          Еда как искусство — выездной кейтеринг полного цикла в Санкт-Петербурге.
-          Фуршет, банкет, кофе-брейк от 2450&#8381;/чел.
-        </motion.p>
-
-        {/* Locations strip — mirrors their "ATLANTA" hero footer. */}
-        <motion.p
-          variants={fade}
-          className="tott-body mt-8 text-[12px] font-bold uppercase tracking-[0.3em] text-white/70 sm:text-sm"
-        >
-          Санкт-Петербург
-          <span className="mx-3 text-white/30" aria-hidden="true">|</span>
-          Москва
-          <span className="mx-3 text-white/30" aria-hidden="true">|</span>
-          Вся Россия
-        </motion.p>
+          <span className="hidden h-px w-10 bg-tott-olive sm:block" aria-hidden="true" />
+          <p
+            className="tott-body text-[12px] font-bold uppercase tracking-[0.32em] text-white/90 sm:text-sm md:text-[15px]"
+          >
+            Лучший кейтеринг Санкт-Петербурга
+          </p>
+          <span className="hidden h-px w-10 bg-tott-olive sm:block" aria-hidden="true" />
+        </motion.div>
       </motion.div>
 
       {/* Scroll cue bottom-center (sits above the docked nav). */}
