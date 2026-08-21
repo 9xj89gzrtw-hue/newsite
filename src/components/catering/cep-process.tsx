@@ -125,7 +125,10 @@ function ProcessStep({ step }: { step: Step }): ReactNode {
   return (
     <>
       {/* Big step number — .cep-step-number clamps to ~68px. */}
-      <div className="cep-step-number mb-6 text-cep-black">{step.num}</div>
+      <div className="cep-step-number mb-4 text-cep-black">{step.num}</div>
+      {/* Thin red accent line under the number — anchors the "Creative Edge"
+          branding and breaks the whitespace (VLM critique fix). */}
+      <div className="mb-6 h-px w-10 bg-cep-red" aria-hidden="true" />
 
       {/* Step title — .cep-display (uppercase Neutra2Display) with
           inline font-size override matching CEP's measured 37.448px

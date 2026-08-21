@@ -67,11 +67,12 @@ export function CepWhyUs() {
             <motion.div
               key={phrase}
               // Thin vertical red hairline between props on desktop only.
-              className={
+              // Hover: hairline shifts to full-opacity red + phrase letter-spacing expands.
+              className={`group/prop cursor-default transition-colors ${
                 i > 0
-                  ? "md:border-l md:border-cep-red/30 md:pl-6"
+                  ? "md:border-l md:border-cep-red/30 md:pl-6 hover:md:border-cep-red"
                   : ""
-              }
+              }`}
               initial={animate ? { opacity: 0, y: 24 } : false}
               whileInView={animate ? { opacity: 1, y: 0 } : undefined}
               viewport={{ once: true, margin: "-10% 0px" }}
@@ -82,19 +83,21 @@ export function CepWhyUs() {
               }}
             >
               <h3
-                className="cep-display text-white"
+                className="cep-display text-white transition-[letter-spacing,color] duration-500 group-hover/prop:text-cep-red"
                 style={{
                   fontSize: "clamp(1.5rem, 2.6vw, 2.4rem)",
                   letterSpacing: "-0.02em",
                   lineHeight: 1.05,
                 }}
               >
-                {phrase.split("\n").map((line, idx, arr) => (
-                  <span key={idx}>
-                    {line}
-                    {idx < arr.length - 1 && <br />}
-                  </span>
-                ))}
+                <span className="inline-block transition-[transform] duration-500 group-hover/prop:[transform:translateX(6px)]">
+                  {phrase.split("\n").map((line, idx, arr) => (
+                    <span key={idx}>
+                      {line}
+                      {idx < arr.length - 1 && <br />}
+                    </span>
+                  ))}
+                </span>
               </h3>
             </motion.div>
           ))}
