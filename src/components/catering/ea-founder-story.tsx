@@ -215,6 +215,8 @@ export function EaFounderStory() {
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.02]"
+                  // Loop cycle 1: VLM flagged head cropped → anchor to upper-body framing.
+                  style={{ objectPosition: "center 25%" }}
                 />
                 {/* Tonal wash to keep the photo reading as part of the blush section */}
                 <div

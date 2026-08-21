@@ -49,6 +49,10 @@
   /* Hide default scrollbar — replaced by custom progress bar below. */
   scrollbar-width: none;
   -ms-overflow-style: none;
+  /* Loop cycle 1: VLM flagged right edge cut off → add edge-fade mask so
+     the cut card reads as intentional overflow, not broken layout. */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 3%, black 92%, transparent 100%);
 }
 
 .ea-evt-portfolio__scroller::-webkit-scrollbar {

@@ -134,21 +134,22 @@ export function EaCapabilityStrip() {
               <motion.div
                 variants={cardVariants}
                 custom={i}
-                className={`flex flex-1 flex-col items-center px-4 text-center md:px-6 ea-capability-strip__card${i % 2 === 1 ? " ea-capability-strip__card--alt" : ""}`}
+                className={`group/cap flex flex-1 flex-col items-center px-4 text-center md:px-6 ea-capability-strip__card${i % 2 === 1 ? " ea-capability-strip__card--alt" : ""}${i === 0 ? " ea-capability-strip__card--hero" : ""}`}
               >
-                {/* Top: red 2px × 24px vertical bar — appears on hover/focus
-                    only, to preserve EA restraint principle (one accent
-                    moment per block, not 5 red bars across a row). */}
+                {/* Top: red 2px × 24px vertical bar. Loop cycle 1: VLM wanted
+                    "filling" hover effect → bar grows from 24px → 56px on
+                    hover/focus, opacity 0.4 → 1.0. The hero card (i===0)
+                    starts at opacity 1.0 + height 56px (visual anchor). */}
                 <span
                   aria-hidden
                   className="ea-capability-strip__bar"
                   style={{
                     display: "block",
                     width: "2px",
-                    height: "24px",
+                    height: i === 0 ? "56px" : "24px",
                     background: "var(--ea-red)",
-                    transition: "opacity 280ms ease, transform 320ms ease",
-                    opacity: 0.4,
+                    transition: "opacity 280ms ease, transform 320ms ease, height 320ms cubic-bezier(0.22, 1, 0.36, 1)",
+                    opacity: i === 0 ? 1 : 0.4,
                   }}
                 />
                 {/* Title */}

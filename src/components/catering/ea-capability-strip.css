@@ -44,9 +44,34 @@
 }
 
 /* Red accent bar — full opacity + slight grow on hover/focus only,
- * to preserve EA restraint (one accent moment per block). */
+ * to preserve EA restraint (one accent moment per block).
+ * Loop cycle 1: VLM wanted "filling" hover → bar grows height on hover. */
 .ea-capability-strip__card:hover .ea-capability-strip__bar,
 .ea-capability-strip__card:focus-within .ea-capability-strip__bar {
   opacity: 1 !important;
+  height: 56px !important;
   transform: scaleY(1.15);
+}
+
+/* Hero card (first capability "Аварийный 24/7") — Loop cycle 1: VLM wanted
+ * F-pattern anchor → hero card has a subtle red glow ring + slightly larger
+ * title, signaling "this is the strongest capability". */
+.ea-capability-strip__card--hero {
+  position: relative;
+}
+
+.ea-capability-strip__card--hero::before {
+  content: "";
+  position: absolute;
+  inset: -1px -8px;
+  border: 1px solid color-mix(in oklch, var(--ea-red) 20%, transparent);
+  border-radius: 4px;
+  pointer-events: none;
+  transition: border-color 320ms ease, inset 320ms ease;
+}
+
+.ea-capability-strip__card--hero:hover::before,
+.ea-capability-strip__card--hero:focus-within::before {
+  border-color: color-mix(in oklch, var(--ea-red) 50%, transparent);
+  inset: -2px -10px;
 }

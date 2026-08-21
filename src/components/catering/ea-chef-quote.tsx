@@ -112,12 +112,13 @@ export function EaChefQuote() {
       />
 
       {/* Dark gradient overlay — left-heavy so left-aligned quote is legible.
-          65% → 30% → 5% across the width, per spec. */}
+          Loop cycle 1: VLM flagged right-shoulder readability issue →
+          strengthen the left-to-right gradient (85% → 35% → transparent). */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.05) 100%)",
+            "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.05) 100%)",
         }}
         aria-hidden="true"
       />
