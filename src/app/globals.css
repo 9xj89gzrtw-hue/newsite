@@ -220,6 +220,25 @@
   --cep-red-deep: #E22E08;      /* hover/pressed state for red elements */
   --cep-white: #FFFFFF;         /* text on black, testimonial cards */
 
+  /* ===== ELEGANT AFFAIRS (elegantaffairscaterers.com) TOKENS — Cycle 28 =====
+     A graft-layer: EA's CONTENT ARCHITECTURE (founder-forward, named clients,
+     60-venue network, named institutional testimonials, capability-as-brand-proof,
+     mid-page tasting CTA) wrapped in Interfood's already-cinematic editorial design.
+     EA's signature red #E71D3A used as a SECONDARY accent (after CEP #FF360A and
+     Salt Block honey) — only in eyebrows, arrows, quote marks, dividers.
+     Fraunces (variable serif w/ WONK + SOFT axes) replaces Reckless TRIAL for the
+     italic-as-fragment trailing-phrase device ("Cooking is love made *visible.*").
+     Blush #F1ECEC + Cream #F7F5F5 surfaces alternate for editorial two-tone rhythm. */
+  --ea-red:        #E71D3A;   /* signature accent — eyebrows, arrows, hovers, quote marks, dividers */
+  --ea-red-deep:   #B91431;   /* hover/pressed state */
+  --ea-mauve:      #A18A8A;   /* dividers, button text, carousel dots, meta (warm taupe grey) */
+  --ea-blush:      #F1ECEC;   /* premium-section bg (founder story, philosophy quote, secret ingredient) */
+  --ea-blush-deep: #DECBCB;   /* journal badge bg, card hover bg */
+  --ea-cream:      #F7F5F5;   /* image-shadow tint, testimonial card bg */
+  --ea-black:      #000000;   /* philosophy quote bg, final CTA bg */
+  --ea-white:      #FFFFFF;   /* text on black, press strip bg */
+  --ea-ink:        #1A1A1A;   /* body text on cream/blush (slightly warmer than pure black) */
+
   /* shadcn aliases (LIGHT THEME DEFAULT) */
   --background: var(--cream);
   --foreground: var(--ink);
@@ -3262,4 +3281,272 @@ header[data-scrolled="true"] [data-mega-panel] {
   .cep-bg-zoom { animation: none; }
   .cep-reveal { opacity: 1; transform: none; transition: none; }
   .cep-overlay-menu__item { transition: none; }
+}
+
+/* ============================================================================
+   ELEGANT AFFAIRS (elegantaffairscaterers.com) — Cycle 28 shared utilities
+   Each ea-* component appends its own scoped section below. Do NOT modify
+   these shared primitives — they are the design language foundation.
+   ============================================================================ */
+
+/* — — — — — EA shared design tokens (used by all ea-* components) — — — — — */
+
+:root {
+  --ea-font-display: var(--font-serif);    /* Playfair Display (italic-capable) — Fraunces upgrade TODO */
+  --ea-font-body: var(--font-poppins);      /* Montserrat for body — neutral grotesque */
+  --ea-font-eyebrow: var(--font-barlow);   /* Barlow Semi Condensed Bold — uppercase eyebrows */
+  --ea-radius-square: 0;
+  --ea-radius-soft: 4px;
+  --ea-shadow-cream: 0 30px 60px -20px rgba(0, 0, 0, 0.12);
+  --ea-shadow-blush: 0 30px 80px -24px rgba(168, 138, 138, 0.22);
+}
+
+/* — — — — — EA shared utilities — — — — — */
+
+.ea-eyebrow {
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ea-red);
+  display: inline-block;
+}
+
+.ea-section-h2 {
+  font-family: var(--ea-font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5.5vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+  color: var(--ea-ink);
+}
+
+.ea-section-h2 i,
+.ea-section-h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ea-red);
+}
+
+/* Italic-as-fragment trailing phrase device (EA signature) */
+.ea-italic-fragment {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ea-red);
+}
+
+.ea-body {
+  font-family: var(--ea-font-body);
+  font-size: clamp(1rem, 1.1vw, 1.0625rem);
+  line-height: 1.7;
+  color: var(--ea-ink);
+  opacity: 0.82;
+}
+
+.ea-divider {
+  width: 100%;
+  height: 1px;
+  background: color-mix(in oklch, var(--ea-mauve) 35%, transparent);
+}
+
+.ea-divider-red {
+  width: 64px;
+  height: 2px;
+  background: var(--ea-red);
+  display: block;
+}
+
+/* Text + animated arrow link (EA signature — no fill, no border, animated red arrow) */
+.ea-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ea-ink);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5em 0;
+  position: relative;
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.ea-text-link:hover,
+.ea-text-link:focus-visible {
+  color: var(--ea-red);
+  outline: none;
+}
+
+.ea-text-link__arrow {
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ea-text-link:hover .ea-text-link__arrow,
+.ea-text-link:focus-visible .ea-text-link__arrow {
+  transform: translateX(6px);
+}
+
+.ea-text-link__arrow path {
+  stroke: currentColor;
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* EA outline CTA (transparent bg, 1px solid red border, square corners) */
+.ea-outline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ea-red);
+  background: transparent;
+  border: 1px solid var(--ea-red);
+  border-radius: var(--ea-radius-square);
+  padding: 1.1em 2.4em;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition: color 240ms ease;
+  z-index: 0;
+}
+
+.ea-outline-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ea-red);
+  transform: translateY(101%);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: -1;
+}
+
+.ea-outline-btn:hover,
+.ea-outline-btn:focus-visible {
+  color: var(--ea-white);
+  outline: none;
+}
+
+.ea-outline-btn:hover::before,
+.ea-outline-btn:focus-visible::before {
+  transform: translateY(0);
+}
+
+/* EA solid red CTA (used in forms, cookie banner, final CTA) */
+.ea-solid-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ea-white);
+  background: var(--ea-red);
+  border: 1px solid var(--ea-red);
+  border-radius: var(--ea-radius-square);
+  padding: 1.1em 2.4em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 200ms ease, transform 240ms ease;
+}
+
+.ea-solid-btn:hover,
+.ea-solid-btn:focus-visible {
+  background: var(--ea-red-deep);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+/* EA section wrapper */
+.ea-section {
+  position: relative;
+  padding-block: clamp(5rem, 9vw, 8rem);
+}
+
+.ea-section--blush { background: var(--ea-blush); }
+.ea-section--cream { background: var(--ea-cream); }
+.ea-section--white { background: var(--ea-white); }
+.ea-section--black {
+  background: var(--ea-black);
+  background-image:
+    radial-gradient(ellipse 60% 50% at 18% 12%, rgba(231, 29, 58, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 88% 92%, rgba(255, 255, 255, 0.025) 0%, transparent 65%);
+  background-repeat: no-repeat;
+}
+
+.ea-container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+}
+
+.ea-container--narrow {
+  max-width: 880px;
+}
+
+.ea-container--wide {
+  max-width: 1440px;
+}
+
+/* EA reveal-on-scroll (subtle fade-up, IntersectionObserver-driven via Motion) */
+.ea-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 720ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.ea-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ea-reveal,
+  .ea-text-link__arrow,
+  .ea-outline-btn::before,
+  .ea-solid-btn {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+  .ea-reveal {
+    opacity: 1;
+  }
+}
+
+/* Sparkle decoration utility (EA signature — small star/sparkle on key headlines) */
+.ea-sparkles {
+  position: absolute;
+  top: -0.6em;
+  right: -1.2em;
+  width: 5rem;
+  height: 3rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 48'%3E%3Cg fill='none' stroke='%23E71D3A' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M10 24 L40 24 M40 24 L40 12 M40 24 L40 36 M40 24 L70 24'/%3E%3Cpath d='M18 14 L26 14 M54 14 L62 14 M18 34 L26 34 M54 34 L62 34'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  opacity: 0.7;
 }

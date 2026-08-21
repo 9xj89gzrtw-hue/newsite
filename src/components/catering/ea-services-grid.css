@@ -1,0 +1,129 @@
+/* ============================================================================
+   ea-services-grid — Cycle 28 (Elegant Affairs editorial layer)
+   4-column minimal service cards teaser. Sits ABOVE ServicesOverview.
+   Self-contained scope: `.ea-svc-grid__*`. Does NOT touch globals.css.
+   ============================================================================ */
+
+.ea-svc-grid__head {
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  max-width: 44rem;
+}
+
+.ea-svc-grid__h2 {
+  margin-top: 0.85rem;
+}
+
+/* — — — — — 4-column grid (2×2 on mobile) — — — — — */
+
+.ea-svc-grid__row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 0;
+  column-gap: 0;
+}
+
+/* — — — — — Card (no bg, no border — minimalist) — — — — — */
+
+.ea-svc-grid__card {
+  position: relative;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Vertical hairline dividers between cards — desktop only (≥769px). */
+@media (min-width: 769px) {
+  .ea-svc-grid__card:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    background: color-mix(in oklch, var(--ea-blush-deep) 85%, transparent);
+  }
+}
+
+/* — — — — — Top: red vertical line + mauve 01/02/03/04 number — — — — — */
+
+.ea-svc-grid__num-block {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1.25rem;
+}
+
+.ea-svc-grid__line {
+  display: block;
+  width: 2px;
+  height: 32px;
+  background: var(--ea-red);
+  flex-shrink: 0;
+}
+
+.ea-svc-grid__num {
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  color: var(--ea-mauve);
+  line-height: 1;
+}
+
+/* — — — — — Title (Barlow Semi Condensed Bold, uppercase, ink) — — — — — */
+
+.ea-svc-grid__title {
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ea-ink);
+  margin: 0;
+}
+
+/* — — — — — Body (Montserrat 0.9rem, ink/75) — — — — — */
+
+.ea-svc-grid__body {
+  font-family: var(--ea-font-body);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0.85rem 0 1.5rem;
+  color: color-mix(in oklch, var(--ea-ink) 75%, transparent);
+  /* Clamp to 2 lines — keeps the row visually balanced. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* — — — — — Bottom: ea-text-link "Подробнее →" pinned to card bottom — — — — — */
+
+.ea-svc-grid__link {
+  margin-top: auto;
+}
+
+/* — — — — — Mobile: 2×2 grid, no vertical dividers — — — — — */
+
+@media (max-width: 768px) {
+  .ea-svc-grid__row {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 2rem;
+  }
+  .ea-svc-grid__card {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+/* — — — — — Reduced motion overrides — — — — — */
+
+@media (prefers-reduced-motion: reduce) {
+  .ea-svc-grid__card,
+  .ea-svc-grid__head {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

@@ -102,3 +102,11 @@ docs/reference-library/saltblock/hero-top.png
 docs/reference-library/saltblock/mobile-top.png
 docs/reference-library/saltblock/section-*.png
 docs/reference-library/saltblock/hover-*.png
+
+# Cycle 28 — Elegant Affairs critique media (per AGENTS.md §17 convention:
+# keep .md docs + small content .jpg/.webp/.svg/.mp4 in repo, gitignore large
+# critique .png screenshots that are only referenced in EA-ANALYSIS.md).
+/public/media/ea/ea-section-*.png
+/public/media/ea/ea-hero.png
+/public/media/ea/ea-hero-shot.png
+/public/media/ea/ea-full-page.png

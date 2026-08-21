@@ -7,7 +7,7 @@ import { LenisProvider } from "@/components/catering/lenis-provider";
 import { CustomCursor } from "@/components/catering/cursor";
 import { AmbientAudio } from "@/components/catering/ambient-audio";
 import { Preloader } from "@/components/catering/preloader";
-import { CookieConsent } from "@/components/catering/cookie-consent";
+import { EaCookieBanner } from "@/components/catering/ea-cookie-banner";
 import { GrainOverlay } from "@/components/catering/grain";
 import { PageBorders } from "@/components/catering/page-borders";
 import { ChapterNav } from "@/components/catering/chapter-nav";
@@ -227,7 +227,7 @@ export default function RootLayout({
         <GrainOverlay />
         <PageBorders />
         <ChapterNav />
-        <CookieConsent />
+        <EaCookieBanner />
         <NuqsAdapter>
           <LenisProvider>{children}</LenisProvider>
         </NuqsAdapter>

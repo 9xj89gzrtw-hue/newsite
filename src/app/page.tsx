@@ -7,33 +7,54 @@ import { CepRedStats } from "@/components/catering/cep-red-stats";
 import { CepWhyUs } from "@/components/catering/cep-why-us";
 import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
 import { EditorialIntro } from "@/components/catering/editorial-intro";
-import { About } from "@/components/catering/about";
+import { EaFounderStory } from "@/components/catering/ea-founder-story";
 import { Manifesto } from "@/components/catering/manifesto";
+import { EaChefQuote } from "@/components/catering/ea-chef-quote";
 import { ChefPortrait } from "@/components/catering/chef-portrait";
 import { Menu } from "@/components/catering/menu";
 import { TastingMenuExperience } from "@/components/catering/tasting-menu-experience";
+import { EaTastingCta } from "@/components/catering/ea-tasting-cta";
 import { SustainabilityStrip } from "@/components/catering/sustainability-strip";
+import { EaServicesGrid } from "@/components/catering/ea-services-grid";
 import { ServicesOverview } from "@/components/catering/services-overview";
-import { McuPhotoFilmstrip } from "@/components/catering/mcu-photo-filmstrip";
-import { McuVenues } from "@/components/catering/mcu-venues";
+import { EaEventsPortfolio } from "@/components/catering/ea-events-portfolio";
+import { EaVenuesSpotlight } from "@/components/catering/ea-venues-spotlight";
+import { EaVenueNetwork } from "@/components/catering/ea-venue-network";
 import { CepTestimonialsHeader } from "@/components/catering/cep-testimonials-header";
 import { CepTestimonialsCarousel } from "@/components/catering/cep-testimonials-carousel";
+import { EaNamedTestimonials } from "@/components/catering/ea-named-testimonials";
 import { CepProcess } from "@/components/catering/cep-process";
+import { EaCapabilityStrip } from "@/components/catering/ea-capability-strip";
 import { CepLocationsStrip } from "@/components/catering/cep-locations-strip";
+import { EaPressStrip } from "@/components/catering/ea-press-strip";
 import { CepInstagramGrid } from "@/components/catering/cep-instagram-grid";
-import { QuoteBand } from "@/components/catering/quote-band";
+import { EaPhilosophyQuote } from "@/components/catering/ea-philosophy-quote";
 import { Calculator } from "@/components/catering/calculator";
-import { Faq } from "@/components/catering/faq";
+import { EaFaqAccordion } from "@/components/catering/ea-faq-accordion";
 import { Contact } from "@/components/catering/contact";
-import { SocialHandle } from "@/components/catering/social-handle";
+import { EaFinalCta } from "@/components/catering/ea-final-cta";
 import { SiteFooter } from "@/components/catering/site-footer";
 import { BackToTop } from "@/components/catering/back-to-top";
 
-// Cycle 27 — Creative Edge Parties (creativeedgeparties.com) editorial layer.
+// Cycle 28 — Elegant Affairs (elegantaffairscaterers.com) editorial layer.
+//
+// STRATEGY: EA's brand is luxury but site is mid-market WordPress (composite 3.8/10
+// per DESIGN-CRITIQUE.md). Their STRENGTH is CONTENT ARCHITECTURE — founder-forward
+// About, named-institution testimonials, 60-venue partner network, named-celebrity
+// client list, capability-as-brand-proof, mid-page tasting CTA. Cycle 28 grafts
+// EA's content patterns onto Interfood's already-cinematic editorial design
+// (CEP/Salt Block/Ridgewells/MCulinary layers from Cycles 21/24/25/26/27).
+//
+// 14 new `ea-*` components + 3 scoped CSS files (~3800 LOC). EA's signature red
+// #E71D3A used as a SECONDARY accent (after CEP #FF360A + Salt Block honey) — only
+// in eyebrows, arrows, quote marks, dividers, hover states. Pure-black bookends
+// (philosophy quote + final CTA) for cinematic drama. Blush #F1ECEC surfaces for
+// founder story + tasting CTA. Italic-as-fragment trailing-phrase device on every
+// H2 (EA signature): "Откройте нашу *историю*." / "Им важно было *безупречно*." / etc.
 //
 // CLIENT JOURNEY LOGIC (luxury catering — "Еда как искусство"):
 //
-//  ── ACT I: BRAND PROMISE & POSITIONING (CEP editorial opening) ──
+//  ── ACT I: BRAND PROMISE & POSITIONING (CEP editorial opening — Cycle 27) ──
 //   1. CepEggHero          — full-bleed egg photo + 244px stacked headline
 //                            "ЕДА / ПРЕЖДЕ ВСЕГО." + locations strip. No CTAs —
 //                            luxury restraint. Emotional brand promise + the
@@ -50,46 +71,78 @@ import { BackToTop } from "@/components/catering/back-to-top";
 //   6. CepEditorialDivider — full-bleed photo breather (no text). Visual rest
 //                            between the heavy type sections.
 //
-//  ── ACT II: WHO WE ARE & WHAT WE OFFER (existing editorial depth) ──
-//   7. EditorialIntro      — painterly bloom intro pause.
-//   8. About               — count-up stats + brand story (credibility depth).
-//   9. Manifesto           — signature pinned «ПИР» scroll wow (strongest wow).
-//  10. ChefPortrait        — humanize: who's the chef? (Дмитрий Нилов).
-//  11. Menu                — 7 menu types interactive list + PDF.
-//  12. TastingMenuExperience — 5-course editorial tasting menu (desire).
-//  13. SustainabilityStrip — local · seasonal · no semi-finished (why us).
-//  14. ServicesOverview    — 4 service categories (what we do).
-//  15. McuPhotoFilmstrip   — event photos (social proof, auto-advancing).
-//  16. McuVenues           — where we work (3 venue cards).
+//  ── ACT II: WHO WE ARE & WHAT WE OFFER (founder-forward + services depth) ──
+//   7. EditorialIntro      — painterly bloom intro pause (Ridgewells Cycle 24).
+//   8. EaFounderStory      — REPLACES About. Founder-forward editorial 2-col
+//                            (photo left, story + 4 stats + CTA right). Italic
+//                            fragment "история" + named milestones (СБЕР, ГАЗПРОМ,
+//                            ЯНДЕКС partnerships). EA §3.9 pattern.
+//   9. Manifesto           — signature pinned «ПИР» scroll wow (Cycle 16). The
+//                            strongest existing wow — food photos clipped through
+//                            SVG letters.
+//  10. EaChefQuote         — NEW. Full-bleed chef photo + giant red Playfair
+//                            italic quote mark + quote about food as ritual.
+//                            Humanize the chef between Manifesto + ChefPortrait.
+//  11. ChefPortrait        — Salt Block chef-driven brand DNA (Дмитрий Нилов +
+//                            Great Vibes signature).
+//  12. Menu                — 7 menu types interactive list + PDF.
+//  13. TastingMenuExperience — Salt Block 5-course editorial list on espresso bg.
+//  14. EaTastingCta        — NEW mid-page "Book a Tasting" CTA. 4:5 photo +
+//                            "Хотите попробовать *до* заказа?" + 6 блюд за 45 мин,
+//                            3500₽ → #contact. Converts after desire.
+//  15. SustainabilityStrip — local · seasonal · no semi-finished (why us).
+//  16. EaServicesGrid      — NEW. 4-col minimal services teaser (Свадьбы /
+//                            Корпоратив / Банкеты / Фуршеты) above ServicesOverview.
+//  17. ServicesOverview    — Ridgewells 4-category 50/50 split with hover-zoom.
+//  18. EaEventsPortfolio   — REPLACES McuPhotoFilmstrip. Magazine horizontal
+//                            scroll gallery (8 cards, scroll-snap, auto-advance
+//                            4.5s, pause on hover, NO Embla — pure CSS+JS).
+//  19. EaVenuesSpotlight   — REPLACES McuVenues. 3 full-bleed 16:10 venue cards
+//                            with hover zoom + bottom overlay panel.
+//  20. EaVenueNetwork      — NEW. Magazine partner-network directory — 5 district
+//                            groups × 6 venues = 30 + sticky featured 4:5 hero
+//                            card. EA's strongest B2B credibility asset (§2.5).
 //
-//  ── ACT III: PROOF & PROCESS (CEP trust + conversion setup) ──
-//  17. CepTestimonialsHeader — massive «ОТЗЫВЫ» headline (130px).
-//  18. CepTestimonialsCarousel — auto-scroll peeking, no controls, 5 RU
-//                            testimonials on cream cards. Subtle + elegant.
-//  19. CepProcess          — 01 МЕЧТА / 02 СОЗДАНИЕ / 03 НАСЛАЖДЕНИЕ.
-//                            How we work — the creative edge.
-//  20. CepLocationsStrip   — full-bleed dim photo + city strip
-//                            "САНКТ-ПЕТЕРБУРГ | МОСКВА | ВСЯ РОССИЯ".
-//  21. CepInstagramGrid    — 3×3 IG grid with Reel play icons (follow along).
+//  ── ACT III: PROOF & PROCESS (CEP trust + EA institutional) ──
+//  21. CepTestimonialsHeader — massive «ОТЗЫВЫ» headline (130px).
+//  22. CepTestimonialsCarousel — auto-scroll peeking anonymous testimonials.
+//  23. EaNamedTestimonials  — NEW. Named-institution testimonials grid (4 cards
+//                            with NAME + ROLE + ORGANIZATION: Яндекс, СБЕР,
+//                            Гинза, ТД Северная Звезда). EA §3.11 pattern.
+//  24. CepProcess          — "ТВОРЧЕСКИЙ ПОДХОД" 01 МЕЧТА / 02 СОЗДАНИЕ / 03 НАСЛАЖДЕНИЕ.
+//  25. EaCapabilityStrip   — NEW. Black-bg capability-as-brand-proof strip — 5
+//                            unusual capabilities (Аварийный 24/7 / Полевая кухня /
+//                            Шатёр-монтаж / Видео-трансляция / Сцена и свет). EA
+//                            "Disaster Relief" nav-item pattern.
+//  26. CepLocationsStrip   — "САНКТ-ПЕТЕРБУРГ | МОСКВА | ВСЯ РОССИЯ".
+//  27. EaPressStrip        — NEW. Restored standalone 8-publication press strip
+//                            (Resto.ru · Афиша · The Village · Собака.ru · Time
+//                            Out · Forbes · Ресторановед · Gastronomika).
+//  28. CepInstagramGrid    — 3×3 IG grid with Reel play icons.
 //
-//  ── ACT IV: CONVERSION (commit → resolve → contact) ──
-//  22. QuoteBand           — solid bordeaux single-quote trust beat.
-//  23. Calculator          — interactive price calculator (commit moment).
-//  24. Faq                 — resolve objections before the form.
-//  25. Contact             — lead form → POST /api/lead.
-//  26. SocialHandle        — giant @nilov_catering closer.
-//  27. SiteFooter + BackToTop.
+//  ── ACT IV: CONVERSION (minimal dramatic — EA bookends) ──
+//  29. EaPhilosophyQuote   — REPLACES QuoteBand. Pure-black bg + giant red
+//                            Playfair italic quote mark + «Еда — это не логистика.
+//                            Это *ритуал*.» cinematic drama before the calculator.
+//  30. Calculator          — interactive price calculator (commit moment).
+//  31. EaFaqAccordion      — REPLACES Faq. Minimalist single-column 6-item
+//                            accordion (no tabs, no search, no feedback).
+//  32. Contact             — lead form → POST /api/lead → Prisma Lead → toast.
+//  33. EaFinalCta          — REPLACES SocialHandle. Pure-black "Обсудим *событие*?"
+//                            + 2-CTA pair + 3-line contact strip. The final closer.
 //
-// CEP signature moments layered on top:
-//  - Neutra2Display-Light self-hosted fonts (244px hero H1, -2% tracking)
-//  - Black/cream/red palette — red used as section bg exactly ONCE (stats)
-//  - Egg-photo hero with stacked aphorism headline (chicken-and-egg riddle)
-//  - Edge-fade client marquee with red bullets
-//  - 200px headline over 0.5× slow-mo video
-//  - Auto-scrolling testimonial carousel (peeking, no controls)
-//  - 3-step numbered process (01/02/03)
-//  - Full-screen overlay menu (54px staggered items) — via SiteHeader
-//  - Outline-only red CTA buttons (transparent bg, square corners)
+// EA signature moments layered on top:
+//  - Italic-as-fragment trailing-phrase device on every H2 (red italic word)
+//  - Pure-black bookend sections (philosophy quote + final CTA) for drama
+//  - Red #E71D3A as secondary accent (quote marks, eyebrows, arrows, dividers)
+//  - Blush #F1ECEC premium surfaces (founder story, tasting CTA, venue network)
+//  - Founder-forward About (named chef + named milestones + named partnerships)
+//  - Named-institution testimonials (NAME + ROLE + ORGANIZATION on each card)
+//  - 60-venue partner-network directory (magazine layout, sticky hero card)
+//  - Capability-as-brand-proof strip (unusual capabilities signal range)
+//  - Mid-page tasting CTA (converts after desire, before calculator)
+//  - Minimalist single-column FAQ accordion (EA restraint)
+//  - Single-line top-anchored cookie banner (replaces glassmorphism card)
 export const dynamic = "force-dynamic";
 
 export default function Home() {
@@ -140,90 +193,142 @@ export default function Home() {
           Act I → Act II. */}
       <EditorialIntro />
 
-      {/* 8. About — count-up statistics (16+ лет, 2400+ событий, 14 поваров)
-          + brand story. Credibility depth after the CEP punch. */}
-      <About />
+      {/* 8. EaFounderStory — Cycle 28 REPLACES About (was 430-line
+          glassmorphism maximalism). Founder-forward editorial 2-col: photo
+          LEFT, story + 4 stats + CTA RIGHT (offset down 80px desktop).
+          Italic-as-fragment "Откройте нашу *историю*." + named milestones
+          (СБЕР, ГАЗПРОМ, ЯНДЕКС partnerships). EA §3.9 pattern. */}
+      <EaFounderStory />
 
       {/* 9. Manifesto — signature pinned scroll moment «ПИР» (Cycle 16 wow).
           The strongest existing wow — food photos clipped through SVG letters. */}
       <Manifesto />
 
-      {/* 10. ChefPortrait — Salt Block chef-driven brand DNA. Humanizes the
+      {/* 10. EaChefQuote — Cycle 28 NEW. Full-bleed chef photo + giant red
+          Playfair italic quote mark + quote "Еда — это не логистика. Это
+          ритуал…". Humanize the chef between Manifesto's word wow and
+          ChefPortrait's biographical detail. */}
+      <EaChefQuote />
+
+      {/* 11. ChefPortrait — Salt Block chef-driven brand DNA. Humanizes the
           brand: who's the chef? (Дмитрий Нилов + Great Vibes signature). */}
       <ChefPortrait />
 
-      {/* 11. Menu — 7 menu types with interactive list + real dishes + PDF.
+      {/* 12. Menu — 7 menu types with interactive list + real dishes + PDF.
           What we concretely offer. */}
       <Menu />
 
-      {/* 12. TastingMenuExperience — Salt Block 5-course editorial list on
+      {/* 13. TastingMenuExperience — Salt Block 5-course editorial list on
           espresso bg with honey gold accents. Desire / showcase. */}
       <TastingMenuExperience />
 
-      {/* 13. SustainabilityStrip — Salt Block "Clean Catering" voice: local
+      {/* 14. EaTastingCta — Cycle 28 NEW mid-page "Book a Tasting" CTA.
+          Blush bg + 4:5 photo LEFT + "Хотите попробовать *до* заказа?" RIGHT.
+          6 блюд за 45 мин, 3500₽/чел, returns при заказе от 50 гостей →
+          #contact. Converts after desire, before calculator. */}
+      <EaTastingCta />
+
+      {/* 15. SustainabilityStrip — Salt Block "Clean Catering" voice: local
           farmers / seasonal / no semi-finished. Why us, quietly. */}
       <SustainabilityStrip />
 
-      {/* 14. ServicesOverview — Ridgewells two-up 50/50 split. 4 service
+      {/* 16. EaServicesGrid — Cycle 28 NEW. 4-col minimal services teaser
+          (Свадьбы / Корпоратив / Банкеты / Фуршеты) above the deeper
+          ServicesOverview. EA §3.11 category-card pattern, minimal. */}
+      <EaServicesGrid />
+
+      {/* 17. ServicesOverview — Ridgewells two-up 50/50 split. 4 service
           categories with hover-zoom images. What services we provide. */}
       <ServicesOverview />
 
-      {/* 15. McuPhotoFilmstrip — variable-width centerMode filmstrip,
-          auto-advances every 3.5s, pause-on-hover. Event photos (proof). */}
-      <McuPhotoFilmstrip />
+      {/* 18. EaEventsPortfolio — Cycle 28 REPLACES McuPhotoFilmstrip (was
+          Embla filmstrip, broken under React 19). Magazine horizontal-scroll
+          gallery: 8 event cards (4:5 portrait), scroll-snap-x mandatory,
+          auto-advance 4.5s, pause on hover, NO Embla — pure CSS+JS. */}
+      <EaEventsPortfolio />
 
-      {/* 16. McuVenues — 3 square (1:1) venue cards with hover-zoom. Where
-          we work. */}
-      <McuVenues />
+      {/* 19. EaVenuesSpotlight — Cycle 28 REPLACES McuVenues (was 3 square
+          1:1 cards). 3 full-bleed 16:10 venue cards with hover zoom (scale
+          1.05) + bottom overlay panel slides up on hover. EA §3.9 HQ-as-venue
+          callout pattern. */}
+      <EaVenuesSpotlight />
+
+      {/* 20. EaVenueNetwork — Cycle 28 NEW. Magazine partner-network directory:
+          5 district groups × 6 venues = 30 venues + sticky featured 4:5 hero
+          card. EA's strongest B2B credibility asset (BRAND-CONTEXT §2.5). */}
+      <EaVenueNetwork />
 
       {/* ── ACT III: PROOF & PROCESS ── */}
 
-      {/* 17. CepTestimonialsHeader — massive «ОТЗЫВЫ» headline (130px) on
+      {/* 21. CepTestimonialsHeader — massive «ОТЗЫВЫ» headline (130px) on
           cream. CEP's "just the word, massive" pattern. */}
       <CepTestimonialsHeader />
 
-      {/* 18. CepTestimonialsCarousel — auto-scrolling, peeking next card, NO
-          arrows/dots, infinite loop. 5 RU testimonials on cream cards. So
-          subtle it looks like one continuous editorial spread. */}
+      {/* 22. CepTestimonialsCarousel — auto-scrolling, peeking next card, NO
+          arrows/dots, infinite loop. Anonymous social proof. */}
       <CepTestimonialsCarousel />
 
-      {/* 19. CepProcess — "ТВОРЧЕСКИЙ ПОДХОД" 3-step process: 01 МЕЧТА /
+      {/* 23. EaNamedTestimonials — Cycle 28 NEW. Named-institution
+          testimonials grid (4 cards with NAME + ROLE + ORGANIZATION: Анна
+          Морозова/Яндекс, Игорь Власов/СБЕР, Мария Кутузова/Гинза, Дмитрий
+          Соколов/ТД Северная Звезда). EA §3.11 named-credibility pattern. */}
+      <EaNamedTestimonials />
+
+      {/* 24. CepProcess — "ТВОРЧЕСКИЙ ПОДХОД" 3-step process: 01 МЕЧТА /
           02 СОЗДАНИЕ / 03 НАСЛАЖДЕНИЕ. How we work — the creative edge. */}
       <CepProcess />
 
-      {/* 20. CepLocationsStrip — full-bleed dim photo + "INTERFOOD CATERING"
+      {/* 25. EaCapabilityStrip — Cycle 28 NEW. Black-bg capability-as-brand-
+          proof strip — 5 unusual capabilities (Аварийный 24/7 / Полевая кухня /
+          Шатёр-монтаж / Видео-трансляция / Сцена и свет). EA "Disaster Relief"
+          nav-item pattern — signalling "we can do anything". */}
+      <EaCapabilityStrip />
+
+      {/* 26. CepLocationsStrip — full-bleed dim photo + "INTERFOOD CATERING"
           wordmark + "САНКТ-ПЕТЕРБУРГ | МОСКВА | ВСЯ РОССИЯ" city strip.
           Magazine colophon feel. */}
       <CepLocationsStrip />
 
-      {/* 21. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play
+      {/* 27. EaPressStrip — Cycle 28 NEW. Standalone 8-publication press
+          strip (Resto.ru · Афиша Daily · The Village · Собака.ru · Time Out ·
+          Forbes · Ресторановед · Gastronomika). Text-only Playfair italic
+          logos + small taglines. Restored per AGENTS.md §17 TODO. */}
+      <EaPressStrip />
+
+      {/* 28. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play
           icons. Follow-along social proof. */}
       <CepInstagramGrid />
 
       {/* ── ACT IV: CONVERSION ── */}
 
-      {/* 22. QuoteBand — Ridgewells solid bordeaux single-quote moment with
-          tinted-cream headline + oversized gold quote mark. Premium trust
-          beat before the calculator. */}
-      <QuoteBand />
+      {/* 29. EaPhilosophyQuote — Cycle 28 REPLACES QuoteBand. Pure-black bg
+          + giant red Playfair italic quote mark + «Еда — это не логистика.
+          Это *ритуал*…» cinematic trust beat before the calculator. EA §4.5
+          italic-as-fragment device. */}
+      <EaPhilosophyQuote />
 
-      {/* 23. Calculator — interactive price calculator (nuqs state). User
+      {/* 30. Calculator — interactive price calculator (nuqs state). User
           has read all brand proof → ready to commit. Sits right before FAQ
           + Contact so the lead form follows naturally. */}
       <Suspense fallback={null}>
         <Calculator />
       </Suspense>
 
-      {/* 24. Faq — catering questions + accordion. Resolves objections
+      {/* 31. EaFaqAccordion — Cycle 28 REPLACES Faq. Minimalist single-column
+          6-item accordion (no tabs, no search, no feedback widgets). EA
+          restraint — the typography IS the design. Resolves objections
           before the contact form. */}
-      <Faq />
+      <EaFaqAccordion />
 
-      {/* 25. Contact — form → POST /api/lead → Prisma Lead → toast. The
+      {/* 32. Contact — form → POST /api/lead → Prisma Lead → toast. The
           final CTA. */}
       <Contact />
 
-      {/* 26. SocialHandle — giant @nilov_catering closer (Cycle 21). */}
-      <SocialHandle />
+      {/* 33. EaFinalCta — Cycle 28 REPLACES SocialHandle. Pure-black dramatic
+          closer: "Обсудим *событие*?" + 2-CTA pair (Рассчитать стоимость +
+          Написать письмо) + 3-line contact strip (TEЛ · POChTA · city). EA
+          §3.14 footer pattern, transposed to a hero-scale CTA. */}
+      <EaFinalCta />
 
       <SiteFooter />
       {/* Back-to-top button (appears on scroll > 500px). */}

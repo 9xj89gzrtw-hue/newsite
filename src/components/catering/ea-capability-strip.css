@@ -1,0 +1,52 @@
+/*
+ * EaCapabilityStrip scoped CSS — Cycle 28, Task 4-C.
+ *
+ * Self-contained overrides for the EA shared `.ea-text-link` utility when
+ * rendered on the black (--ea-black) background of the capability strip.
+ *
+ * The global `.ea-text-link` rule (globals.css) hard-codes
+ * `color: var(--ea-ink)` (#1A1A1A) — invisible on a black section. We
+ * cannot edit globals.css (parallel agents depend on its stability), so we
+ * declare a scoped `--on-dark` variant here that:
+ *   - Sets the resting link colour to cream.
+ *   - Preserves the red hover + arrow-translate behaviour defined globally
+ *     by scoping under the same selector chain (higher specificity wins).
+ *
+ * Imported by ea-capability-strip.tsx only.
+ */
+
+.ea-capability-strip__link.ea-text-link {
+  color: var(--ea-cream);
+}
+
+.ea-capability-strip__link.ea-text-link:hover,
+.ea-capability-strip__link.ea-text-link:focus-visible {
+  color: var(--ea-red);
+}
+
+/* Cream-coloured eyebrow override (default is red — invisible on black).
+ * Specificity: .ea-capability-strip__eyebrow.ea-eyebrow > .ea-eyebrow. */
+.ea-capability-strip__eyebrow.ea-eyebrow {
+  color: var(--ea-cream);
+}
+
+/* Cream H2 override (default is --ea-ink — invisible on black). */
+.ea-capability-strip__h2.ea-section-h2 {
+  color: var(--ea-cream);
+}
+
+/* Magazine asymmetric offset — odd cards (2nd, 4th) pushed down ~24px on
+ * desktop to break the flat-grid feel and give the strip editorial rhythm. */
+@media (min-width: 769px) {
+  .ea-capability-strip__card.ea-capability-strip__card--alt {
+    transform: translateY(24px);
+  }
+}
+
+/* Red accent bar — full opacity + slight grow on hover/focus only,
+ * to preserve EA restraint (one accent moment per block). */
+.ea-capability-strip__card:hover .ea-capability-strip__bar,
+.ea-capability-strip__card:focus-within .ea-capability-strip__bar {
+  opacity: 1 !important;
+  transform: scaleY(1.15);
+}
