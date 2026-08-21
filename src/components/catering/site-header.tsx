@@ -180,12 +180,12 @@ export function SiteHeader() {
               <Phone className="size-4 shrink-0" />
               <span>{CONTACTS.phone}</span>
             </a>
-            {/* Заказать — BLACK square button (task v6: "кнопку заказать в
-                черном квадратике на хедере на белом фоне как на сайте"). Solid
-                black bg, white text, square corners, hover darken. → #contact */}
+            {/* Заказать — BLACK OUTLINE button (task v7: "кнопка заказать в
+                черной рамке а не черном квадрате"). Transparent bg, black
+                border, black text, square corners, hover fills black. → #contact */}
             <a
               href="#contact"
-              className="tott-body hidden min-h-[44px] items-center justify-center bg-black px-5 text-[13px] font-700 uppercase tracking-[0.08em] text-white transition-colors duration-300 hover:bg-ink/85 sm:inline-flex"
+              className="tott-body hidden min-h-[44px] items-center justify-center border-2 border-black bg-transparent px-5 text-[13px] font-700 uppercase tracking-[0.08em] text-black transition-colors duration-300 hover:bg-black hover:text-white sm:inline-flex"
               style={{ fontWeight: 700, borderRadius: 0 }}
               aria-label="Заказать кейтеринг"
             >
