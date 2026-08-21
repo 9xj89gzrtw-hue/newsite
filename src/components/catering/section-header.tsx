@@ -25,6 +25,10 @@ type SectionHeaderProps = {
   tone?: "light" | "dark" | "bordeaux";
   /** Size of the headline. */
   size?: "default" | "xl";
+  /** Visual variant — `default` keeps the Ridgewells editorial rhythm,
+   *  `joels` switches to the joels.com rhythm (sage 0.4em eyebrow + 50px
+   *  Playfair headline). Backward-compatible — default unchanged. */
+  variant?: "default" | "joels";
   /** Extra className for the wrapper. */
   className?: string;
   /** Override the default stagger delays (ms). */
@@ -60,6 +64,7 @@ export function SectionHeader({
   align = "left",
   tone = "light",
   size = "default",
+  variant = "default",
   className = "",
   headlineDelay = 0.15,
   leadDelay = 0.3,
@@ -67,7 +72,19 @@ export function SectionHeader({
   const reduce = useReducedMotion();
   const tones = TONE_CLASSES[tone];
   const alignCls = align === "center" ? "items-center text-center mx-auto" : "items-start text-left";
-  const headlineCls = size === "xl" ? "display-headline-xl" : "display-headline";
+  const headlineCls =
+    variant === "joels"
+      ? "joel-section-title"
+      : size === "xl"
+        ? "display-headline-xl"
+        : "display-headline";
+  // Joels eyebrow: sage, 0.4em tracking, 11px, Karla 500, uppercase.
+  // Default eyebrow keeps the existing `.eyebrow` class behaviour.
+  const eyebrowCls = variant === "joels" ? "joel-eyebrow" : `eyebrow ${tones.eyebrow}`;
+  // In joels variant, the headline uses the joels color (ink) regardless of tone
+  // — the .joel-section-title class hardcodes color: var(--ink). We still
+  // pass tones.headline for the default variant.
+  const headlineColorCls = variant === "joels" ? "" : tones.headline;
 
   const baseTransition = { duration: 0.8, ease: EASE };
 
@@ -79,7 +96,7 @@ export function SectionHeader({
           whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ ...baseTransition, duration: 0.6 }}
-          className={`eyebrow ${tones.eyebrow}`}
+          className={eyebrowCls}
         >
           {eyebrow}
         </motion.p>
@@ -90,7 +107,7 @@ export function SectionHeader({
         whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ ...baseTransition, delay: headlineDelay }}
-        className={`${headlineCls} ${tones.headline}`}
+        className={`${headlineCls} ${headlineColorCls}`}
       >
         {headline}
       </motion.h2>

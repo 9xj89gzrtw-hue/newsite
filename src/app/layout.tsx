@@ -8,6 +8,7 @@ import { AmbientAudio } from "@/components/catering/ambient-audio";
 import { Preloader } from "@/components/catering/preloader";
 import { CookieConsent } from "@/components/catering/cookie-consent";
 import { GrainOverlay } from "@/components/catering/grain";
+import { PageBorders } from "@/components/catering/page-borders";
 import { ChapterNav } from "@/components/catering/chapter-nav";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
@@ -190,6 +191,7 @@ export default function RootLayout({
         <CustomCursor />
         <AmbientAudio />
         <GrainOverlay />
+        <PageBorders />
         <ChapterNav />
         <CookieConsent />
         <NuqsAdapter>

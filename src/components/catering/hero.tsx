@@ -37,6 +37,7 @@ import {
   SOPRANOS_HERO_SLIDES,
   CONTACTS,
 } from "@/lib/media";
+import { ScrollCue } from "./scroll-cue";
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
@@ -185,18 +186,28 @@ function ScrollIndicator({ reduce }: { reduce: boolean | null }) {
 function CheckYourDateSidebar({ reduce }: { reduce: boolean | null }) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  // collapsed = compact floating tab; expanded = full form panel
-  const [collapsed, setCollapsed] = useState(false);
+  // collapsed = compact floating tab; expanded = full form panel.
+  // Cycle 24 (joels.com layer): default to COLLAPSED so the hero is editorially
+  // clean on first paint (joels.com has NO form in the hero — pure typography +
+  // photography). Users click the discreet gold tab to expand the lead-gen form.
+  // The auto-collapse-on-scroll logic below keeps it collapsed as the user scrolls.
+  const [collapsed, setCollapsed] = useState(true);
   // Auto-collapse when user scrolls past ~70% of hero viewport.
-  // Re-expands only on explicit click of the tab.
+  // Cycle 24 fix: ONLY collapse via scroll — NEVER auto-expand. Expanding
+  // happens only on explicit click of the tab. This keeps the hero editorially
+  // clean on first paint (collapsed=true default) and prevents the scroll
+  // handler from re-expanding the form on mount (which was overriding the
+  // collapsed default and re-cluttering the hero).
   useEffect(() => {
     if (typeof window === "undefined") return;
     const onScroll = () => {
       const threshold = Math.max(400, window.innerHeight * 0.7);
-      setCollapsed(window.scrollY > threshold);
+      if (window.scrollY > threshold) {
+        setCollapsed(true);
+      }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    // Intentionally do NOT call onScroll() on mount — respect the collapsed=true default.
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -595,84 +606,47 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col items-center justify-center px-6 pt-20 pb-28 text-center md:px-8 lg:items-start lg:justify-center lg:text-left lg:pl-12 lg:pr-[380px]">
         <div className="flex max-w-3xl flex-col items-center lg:items-start lg:text-left">
 
-          {/* "Добро пожаловать в" — Great Vibes script, gold */}
+          {/* Eyebrow — brand name as small uppercase label (joels.com
+              "NEW ORLEANS' PREMIER CATERER" pattern). Demotes the Oswald brand
+              headline to an editorial eyebrow so the italic Playfair below can
+              be the sole large headline (Cycle 24 VLM critique fix). */}
           <motion.p
-            className="font-script text-gold"
-            style={{ fontSize: "clamp(2rem, 5vw, 3rem)" }}
+            className="joel-eyebrow mt-1"
+            style={{ color: "rgba(255,255,255,0.82)" }}
             initial={shouldAnimate ? { opacity: 0, y: 12 } : false}
             animate={shouldAnimate ? { opacity: 1, y: 0 } : undefined}
             transition={{ delay: 0.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            Добро пожаловать в
+            Interfood Catering · Санкт-Петербург
           </motion.p>
 
-          {/* Massive headline — Oswald uppercase, stagger-in per word */}
-          <h1 className="mt-1 md:mt-2">
-            <span className="sr-only">Interfood Catering</span>
-            <span
-              aria-hidden="true"
-              className="flex flex-col items-center gap-1 md:flex-row md:gap-4"
-            >
-              {HEADLINE_WORDS.map((word, i) => (
-                <motion.span
-                  key={word}
-                  className="font-display text-cream"
-                  style={{
-                    fontSize: "clamp(2.5rem, 6.5vw, 5.5rem)",
-                    fontWeight: 700,
-                    letterSpacing: "-0.01em",
-                    lineHeight: 0.95,
-                    textTransform: "uppercase",
-                  }}
-                  initial={shouldAnimate ? { opacity: 0, y: 24 } : false}
-                  animate={shouldAnimate ? { opacity: 1, y: 0 } : undefined}
-                  transition={{
-                    delay: 0.5 + i * 0.25,
-                    duration: 0.7,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </span>
-          </h1>
-
-          {/* Decorative divider with gold dot */}
-          <motion.div
-            className="mt-6 flex items-center gap-3"
-            initial={shouldAnimate ? { opacity: 0 } : false}
-            animate={shouldAnimate ? { opacity: 1 } : undefined}
-            transition={{ delay: 1.1, duration: 0.6 }}
-            aria-hidden="true"
-          >
-            <span className="h-px w-10 bg-gold/50" />
-            <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-            <span className="h-px w-10 bg-gold/50" />
-          </motion.div>
-
-          {/* Еда как искусство — Interfood brand story */}
-          <motion.p
-            className="mt-6 max-w-2xl text-[15px] leading-relaxed text-cream/80 md:text-base"
-            initial={shouldAnimate ? { opacity: 0, y: 12 } : false}
+          {/* joels.com signature italic Playfair hero H1 (Cycle 24).
+              Promoted to h1 — the SOLE large headline, mirroring joels.com
+              "Indulge in Excellence" at 110px italic Playfair. Fade-up
+              translateY(50→0) over 800ms @ 250ms delay, ease cubic-bezier(0.4,0,0.2,1). */}
+          <motion.h1
+            className="joel-hero-h1 mt-3 md:mt-5"
+            initial={shouldAnimate ? { opacity: 0, y: 50 } : false}
             animate={shouldAnimate ? { opacity: 1, y: 0 } : undefined}
-            transition={{ delay: 1.3, duration: 0.7 }}
+            transition={{ delay: 0.25, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
           >
-            «Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге.
-            Свадебные банкеты, корпоративы, фуршеты, кофе-брейки и барбекю от
-            2450 ₽/чел. Рассчитайте стоимость онлайн за 30 секунд.
-          </motion.p>
+            Еда как искусство
+          </motion.h1>
+          <span className="sr-only">
+            Interfood Catering — выездной кейтеринг полного цикла в Санкт-Петербурге от 2450 ₽/чел.
+          </span>
 
-          {/* CTA + phone */}
+          {/* CTA + phone — follows immediately after the headline (joels.com
+              hero has headline → CTA → scroll cue, no body paragraph). */}
           <motion.div
             className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:gap-6"
             initial={shouldAnimate ? { opacity: 0, y: 12 } : false}
             animate={shouldAnimate ? { opacity: 1, y: 0 } : undefined}
-            transition={{ delay: 1.5, duration: 0.7 }}
+            transition={{ delay: 1.0, duration: 0.7 }}
           >
             <a
               href="#contact"
-              className="font-display inline-flex min-h-[44px] items-center justify-center rounded-full bg-gold px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white transition hover:scale-105 hover:shadow-xl hover:shadow-gold/30"
+              className="joel-button-filled inline-flex min-h-[44px] items-center justify-center"
             >
               Связаться с нами
             </a>
@@ -702,8 +676,19 @@ export function Hero() {
         </div>
       </div>
 
-      {/* ── Scroll indicator (bottom-center) ──────────────────────────── */}
-      <ScrollIndicator reduce={reduce} />
+      {/* ── Scroll indicator (bottom-center, joels.com signature) ──────
+          Replaces the previous bouncing ArrowDown indicator — the joels.com
+          signature scroll cue: 1px×94px sage vertical line that retracts
+          and re-extends via the @keyframes joel-scroll-cue animation, with
+          "SCROLL" text below. Entrance: fade-in @ 1.37s (per joels timing).
+          Click-to-scroll behavior preserved (links to #editorial-intro). */}
+      <a
+        href="#editorial-intro"
+        aria-label="Прокрутить к следующему разделу"
+        className="absolute bottom-24 left-1/2 z-20 -translate-x-1/2 md:bottom-28"
+      >
+        <ScrollCue />
+      </a>
 
       {/* ── Sticky sidebar (desktop ≥ lg) ─────────────────────────────── */}
       <CheckYourDateSidebar reduce={reduce} />

@@ -9,6 +9,9 @@ import { EditorialIntro } from "@/components/catering/editorial-intro";
 import { MarqueeBand } from "@/components/catering/marquee-band";
 import { LogoMarquee } from "@/components/catering/logo-marquee";
 import { About } from "@/components/catering/about";
+import { JoelsAbout } from "@/components/catering/joels-about";
+import { JoelsCuisine } from "@/components/catering/joels-cuisine";
+import { JoelsContactCta } from "@/components/catering/joels-contact-cta";
 import { Manifesto } from "@/components/catering/manifesto";
 import { Process } from "@/components/catering/process";
 import { Menu } from "@/components/catering/menu";
@@ -53,6 +56,9 @@ export default function Home() {
       {/* Infinite client-logo marquee (Gamma / Creative Edge pattern) */}
       <LogoMarquee />
       <About />
+      {/* JoelsAbout — Cycle 24: joels.com stacked-parallax About wow layer,
+          parallel to the existing stat-card About above. */}
+      <JoelsAbout />
       {/* Manifesto: signature pinned scroll moment — «Манифест-as-Window» */}
       <Manifesto />
       {/* Process: emotional timeline 01→04 (Creative Edge pattern) */}
@@ -64,6 +70,9 @@ export default function Home() {
       <RisingPhotos />
       {/* PinkMarquee (reverse) — closing pink band for the works section */}
       <PinkMarquee reverse />
+      {/* JoelsCuisine — Cycle 24: joels.com 3-up cuisine card grid (Еда / Напитки / События).
+          Teaser before the full Services overview below. */}
+      <JoelsCuisine />
       {/* ServicesOverview — Ridgewells two-up 50/50 editorial grid (Cycle 21) */}
       <ServicesOverview />
       {/* Services: 4-up image-card grid + modal (existing 3D interactive) */}
@@ -92,6 +101,9 @@ export default function Home() {
       {/* Awards strip — real Sopranos badges (Cycle 22) */}
       <AwardsStrip />
       <Contact />
+      {/* JoelsContactCta — Cycle 24: joels.com final CTA section (60px Playfair headline
+          + 2-column form + square sage button) before the social-handle closer. */}
+      <JoelsContactCta />
       {/* SocialHandle — Ridgewells giant @nilov_catering closer (Cycle 21) */}
       <SocialHandle />
       <SiteFooter />

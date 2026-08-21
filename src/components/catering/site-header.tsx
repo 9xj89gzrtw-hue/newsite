@@ -216,10 +216,11 @@ export function SiteHeader() {
               <Phone className="size-5 shrink-0" />
               <span className="hidden md:inline font-display text-sm font-medium uppercase tracking-wide">{CONTACTS.phone}</span>
             </a>
-            {/* Главная CTA — «Проверить дату» gold pill */}
+            {/* Главная CTA — «Проверить дату» (Cycle 24: joels.com sage square button,
+                replaces the gold→terracotta gradient pill to align with joels palette). */}
             <a
               href="#contact"
-              className="group min-h-[44px] inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-2.5 font-display text-xs font-semibold uppercase tracking-wider text-white shadow-md shadow-gold/20 transition-all duration-300 hover:shadow-lg hover:shadow-gold/30 hover:-translate-y-0.5 sm:px-6 sm:text-sm"
+              className="joel-button-filled group min-h-[44px] inline-flex items-center justify-center gap-2 sm:px-6"
             >
               <Calendar className="size-4 shrink-0" />
               <span>Проверить дату</span>

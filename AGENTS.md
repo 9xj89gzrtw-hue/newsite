@@ -2059,3 +2059,81 @@ pm2 list                                   # interfood-dev online
 
 ---
 *Cycle 23 complete. Concept-Catering.de wow-layer live: rising photos + pink marquee + bold statement. Commit db7ccbb on main.*
+
+---
+
+## 18. «Joels.com Editorial Layer» — Cycle 24 (21.08.2026)
+
+**Reference:** `docs/JOELS-ANALYSIS.md` (1241 lines, 11.4k words) + `docs/reference-library/joels/` (54 raw assets: 25 screenshots + 24 JSON extraction dumps + 5 web-search results).
+
+**Source site:** `https://joels.com/` — Joel Catering, New Orleans premier off-premise caterer (founded 1993 by Chef Joel Dondis). WordPress + Banquet theme (Qode Interactive) + WPBakery + Slider Revolution + jQuery + Swiper. NO GSAP/Lenis/Lottie. Premium feel comes from typography scale + color discipline + page-border framing + restrained hover.
+
+### Brand & palette mapping (1:1 onto our tokens)
+| joels.com | our token | hex |
+|-----------|-----------|-----|
+| olive `#81846A` (primary brand) | `--sage` | `#7D8470` (near-perfect match) |
+| dark olive-brown `#3E3930` | `--ink` | `#1F2937` |
+| charcoal `#4A494A` | `--ink` | `#1F2937` |
+| beige hover `#BDB5AA` | hardcoded `#BDB5AA` (documented exception) | — |
+| white `#FFFFFF` | `--cream` | `#F9FAFB` (kept warm) |
+
+### Typography decisions
+- **Display serif:** joels uses Cormorant Garamond (free Google Font). We use our existing **Playfair Display** (already loaded with italic, `--font-serif`). Playfair italic at 110px is the direct free substitute (both Garaldic/Aldine serifs, high-contrast didone italics). NO new font loaded.
+- **UI sans:** joels uses Montserrat. We use our existing **Karla** (`--font-sans`). The 0.4em tracking works on any geometric humanist sans. NO new font loaded.
+- **Hero H1:** italic Playfair 400, `clamp(50px, 8vw, 110px)`, line-height 0.82, white. This is THE signature joels moment ("Indulge in Excellence" → "Еда как искусство").
+- **Eyebrow:** 11px, 500 weight, `letter-spacing: 0.4em` (NOT 0.2em or px — this is the KEY detail, widest-tracking eyebrow of any reference site analyzed).
+- **Section title:** 50px Playfair 400, line-height 1.1, ink.
+
+### 5 signature joels.com wow moments implemented
+1. **Italic Playfair hero H1** ("Еда как искусство", 110px italic) — sole headline, eyebrow above, sage CTA + scroll cue below. Hero typographic surgery removed the competing Oswald "INTERFOOD CATERING" big headline + Great Vibes script + body paragraph to match joels' single-headline hierarchy.
+2. **1px page-border frame** (`.qodef-page-border--left/right`, fixed, left:149px/right:149px, ink/16 opacity, hidden below lg, z-50, pointer-events-none) — signature editorial frame, site-wide via layout.tsx.
+3. **Stacked parallax images** in `<JoelsAbout>` — framer-motion `useScroll` + `useTransform`, main image y:[30,-30], stacked image y:[-15,15] (opposite directions, different speeds = layered depth). Respects `prefers-reduced-motion`.
+4. **0.4em-tracked sage eyebrows** (`.joel-eyebrow`) + **22px textual links scaling 2.7× on hover** (`.textual-link::before { transform: scaleX(2.7) }`, 0.3s ease-out, transform-origin left) — Joel's signature CTA pattern.
+5. **Square sage buttons with beige desaturation hover** (`.joel-button-filled`, border-radius 0, sage bg → `#BDB5AA` beige on hover) — used in hero CTA, header CTA, contact CTA.
+
+### New components (7)
+| Component | Purpose |
+|-----------|---------|
+| `page-borders.tsx` | Two fixed 1px vertical lines framing content (signature editorial frame) |
+| `textual-link.tsx` | Link with 22px×1px line scaling 2.7× on hover (ink/cream/sage tones) |
+| `scroll-cue.tsx` | 1px×94px sage vertical line keyframe + "SCROLL" text (joels hero bottom) |
+| `stacked-parallax-images.tsx` | framer-motion useScroll + useTransform opposite-direction parallax |
+| `joels-cuisine.tsx` | 3-up card grid (Еда/Напитки/События), 4:3 landscape, 110% hover zoom |
+| `joels-about.tsx` | Parallel About section with stacked parallax + textual link "Кто мы" |
+| `joels-contact-cta.tsx` | Final CTA: 60px Playfair headline + 2-col form + sage square button |
+
+### Modified files (4)
+- `layout.tsx` — added `<PageBorders />` (site-wide editorial frame)
+- `page.tsx` — inserted `<JoelsAbout>`, `<JoelsCuisine>`, `<JoelsContactCta>` in editorial order
+- `section-header.tsx` — added `variant?: "default" | "joels"` prop (backward-compatible; joels variant = 0.4em sage eyebrow + 50px Playfair headline)
+- `hero.tsx` — hero typographic surgery (eyebrow + italic Playfair sole h1 + sage CTA + scroll cue); CheckYourDateSidebar default collapsed=true + useEffect only-collapses-never-expands fix
+- `site-header.tsx` — header CTA "Проверить дату" gold→terracotta gradient pill → joel-button-filled (sage square)
+- `globals.css` — appended ~160 lines "JOELS.COM STYLE LAYER (Cycle 24)": 8 utility classes + 1 keyframe + reduced-motion guards
+
+### VLM critique loop (6 iterations, /loop directive)
+| Iter | Hero | About | Cuisine | Contact | Action |
+|------|------|-------|---------|---------|--------|
+| v1 | 4 | 6 | 5 | 3 | fix cuisine aspect, remove redundant subtitle, hero CTA→sage |
+| v2 | 5 | 6 | 7 | 4 | sidebar default collapsed, cuisine hover 1.1 |
+| v3 | 6 | 7 | 8 | 5 | hero typographic surgery (remove Oswald+script+body) |
+| v4 | 7.5 | 8 | 8.5 | 6.5 | sidebar useEffect only-collapse fix, header CTA→sage |
+| v5 | 8.0 | — | — | 7.5 | converged (VLM confirmed) |
+| v6 | **9.0** | **8.0** | **8.5** | **7.5+** | **CONVERGED — "Ship it"** |
+
+### Key lessons (grabadli / pitfalls)
+1. **`useState(default)` + `useEffect(onScroll())` on mount** — the useEffect's initial call overrides the useState default. Fix: don't call the handler on mount, OR only set state in one direction (collapse-only, never expand).
+2. **agent-browser `scrollIntoView` updates the URL hash** — subsequent `reload` persists the hash, so screenshots capture the WRONG section. Fix: always `open "http://localhost:3000/"` (explicit, no hash) before screenshotting the hero.
+3. **VLM can't see motion in static screenshots** — parallax/scroll animations read as "absent" to the VLM. Don't over-fix based on motion critiques; verify the code is correct instead.
+4. **Landscape images in portrait containers crop badly** — when reference uses portrait cards but your photo library is landscape, switch the card aspect to landscape (4:3) rather than forcing bad crops.
+5. **Multiple competing hero headlines kill editorial luxury** — joels.com uses ONE serif headline + small eyebrow. Don't stack script + sans + serif headlines. Eyebrow → sole italic serif → CTA is the formula.
+6. **Dev-environment artifacts (Next.js dev indicators, cookie consent, a11y widgets) appear in VLM screenshots but NOT in production** — don't chase these as design fixes; they're dev-only overlays.
+
+### Reproduction recipe (for future agents cloning a reference site)
+1. `agent-browser` DOM inspection (10 eval extractions: metrics, fonts, sections, headings, buttons, colors, libs, scripts, images, animations) → save JSON dumps
+2. `web-search` for brand context + tech stack confirmation
+3. Write `docs/<REFERENCE>-ANALYSIS.md` mirroring RIDGEWELLS-ANALYSIS.md structure (14 sections, 600+ lines)
+4. Map reference palette → our OKLCH tokens (1:1 where possible)
+5. Map reference fonts → our existing next/font/google stack (avoid loading new fonts)
+6. Implement: new components (ADD only) + careful modifications (preserve existing features) + CSS utilities block in globals.css
+7. VLM critique loop: screenshot each new section + reference, `z-ai vision` brutal critique, fix top 2 defects per iteration, repeat until all sections ≥7/10
+8. `bun run lint` + `bun run typecheck` + HTTP 200 verification before commit

@@ -1143,3 +1143,39 @@ Stage Summary:
 - `lint` + `typecheck` green. Page HTTP 200, no console errors. Dev server running on port 3000.
 - Pre-existing benign warning: framer-motion "Target ref is defined but not hydrated" on useScroll components (About, EditorialIntro) — non-blocking, page renders correctly.
 - Ready for commit + push. Next: update AGENTS.md §17 with Cycle 21 notes.
+
+---
+
+# Cycle 24 — Joels.com Editorial Layer (21.08.2026)
+
+## Task ID: cycle-24-orchestrator
+**Agent:** Z.ai Code (orchestrator + VLM critique loop)
+**Reference:** https://joels.com/ (Joel Catering, New Orleans)
+**Goal:** Clone joels.com design/animation/wow effects into Interfood Catering — italic Playfair, sage palette, editorial restraint.
+
+## Research (Task 4-research)
+- `agent-browser` DOM inspection of joels.com: 10 eval extractions (metrics, fonts, sections, headings, buttons, colors, libs, scripts, images, animations) + 25 screenshots (full-page 5627px, hero, 10 desktop sections, 9 mobile, 4 hover states).
+- `web-search`: 5 queries (brand context, tech stack, design awards).
+- **Deliverable:** `docs/JOELS-ANALYSIS.md` (1241 lines, 11.4k words) + `docs/reference-library/joels/` (54 assets).
+- **Key findings:** joels.com = WordPress + Banquet theme (Qode) + WPBakery + Slider Revolution + jQuery + Swiper. NO GSAP/Lenis. Palette = olive `#81846A` + charcoal on white (maps 1:1 to our `--sage #7D8470`). Fonts = Cormorant Garamond + Montserrat (both free Google Fonts → we substitute Playfair Display italic + Karla, already loaded). 5 wow moments: italic Playfair hero 110px, 1px page borders, stacked parallax, 0.4em sage eyebrows, 22px textual links scaling 2.7×.
+
+## Implementation (Task 6-implement)
+- **7 new components:** page-borders, textual-link, scroll-cue, stacked-parallax-images, joels-cuisine (3-up), joels-about (stacked parallax), joels-contact-cta (2-col form + sage button).
+- **4 modified files:** layout.tsx (+PageBorders), page.tsx (+3 sections), section-header.tsx (+joels variant), hero.tsx (italic Playfair h1 + scroll cue + sidebar default-collapsed), site-header.tsx (CTA→sage square), globals.css (+160 lines joels CSS utilities).
+- Lint + typecheck clean. HTTP 200.
+
+## VLM Critique Loop (Task 8-critique, /loop directive)
+6 iterations of brutal VLM design-director critique via `z-ai vision` CLI:
+- v1 (3-6/10) → v2 (4-7/10) → v3 (5-8/10) → v4 (6.5-8.5/10) → v5 (7.5-8.5/10, converged) → v6 final (8-9/10).
+- **Key fixes per iteration:** cuisine aspect portrait→landscape; sidebar default collapsed; hero typographic surgery (removed Oswald+script+body, made italic Playfair sole h1); sidebar useEffect only-collapse-never-expand fix; header CTA gold→sage.
+- **Final v6 scores:** Desktop Hero 9/10, Mobile Hero 8.5/10, About 8/10, Cuisine 8.5/10.
+- **VLM verdict:** "YES — authentically feels like joels.com (italic Playfair + sage + editorial restraint). Production-ready. Ship it."
+- Critique artifacts: `docs/reference-library/joels/critique/` (v1-v6 screenshots + 6 VLM JSON critiques).
+
+## Environment (Task 1-setup)
+- PM2 installed globally (v7.0.3). Dev server managed by pm2 (process `interfood-dev`, port 3000, `bun run dev`).
+- `pm2 save` executed — process list persisted.
+
+## Commit
+- Conventional Commits: `feat(cycle-24): joels.com editorial layer — italic Playfair hero, page borders, stacked parallax, sage palette`
+- No force push.
