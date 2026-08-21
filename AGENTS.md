@@ -2546,3 +2546,103 @@ const phrases = Array.from({length: REPEAT * 2}).flatMap((_, dup) =>
   (per CYCLE-26-COMPONENT-AUDIT.md) —BgHero, PinkMarquee, BoldStatement,
   SnackBoxCube3D, etc.
 
+
+---
+
+# Cycle 27 — Creative Edge Parties (creativeedgeparties.com) Editorial Layer
+
+**Date:** 2026-08-22
+**Reference:** https://www.creativeedgeparties.com (Squarespace 7.1, Awwwards SOTD 2015)
+**Commits:** `331c658` (feat) → `35386d1` (polish)
+**Status:** ✅ Complete — VLM critique loop converged (all CEP sections 8–10/10)
+
+## What was replicated
+
+The most minimal + dramatic palette of any reference: **pure black `#000000` + warm cream `#EFEFE7` + one screaming accent red `#FF360A`** (HSL 10.78 100% 51.96% — almost glows). Red is used as a section bg **exactly ONCE** (the stats band) — that restraint is what makes it pop. Plus the actual **Neutra2Display-Light + Neutra2Text_Book woff2 fonts** (downloaded from their Squarespace CDN, self-hosted via `next/font/local`).
+
+## New components (13, all `cep-*` prefixed)
+
+| Component | File | Wow moment |
+|---|---|---|
+| `CepEggHero` | `cep-egg-hero.tsx` | Full-bleed egg photo + 244px stacked "THE EGG / CAME FIRST." + locations strip. No CTAs — luxury restraint. |
+| `CepClientMarquee` | `cep-client-marquee.tsx` | Edge-fade mask + red `•` bullets + 17 RU corporate clients (СБЕР • ГАЗПРОМ • ЯНДЕКС • …). 2× duplicated, pure-CSS pause-on-hover. |
+| `CepSimpleBrilliant` | `cep-simple-brilliant.tsx` | 200px "SIMPLE & BRILLIANT." over 0.5× slow-mo food b-roll (`playbackRate: 0.5` via `useEffect` ref). Film title card. |
+| `CepRedStats` | `cep-red-stats.tsx` | `#FF360A` band, 3 count-up stats (16+ / 2400+ / 180 000+). rAF + easeOutCubic, `useInView` gate. |
+| `CepWhyUs` | `cep-why-us.tsx` | "WHY US?" 4 value props (LIMITLESS CREATIVITY / IMMERSIVE / EXQUISITE / FLAWLESS). Hover: phrase→red + translateX 6px + hairline→full red. |
+| `CepEditorialDivider` | `cep-editorial-divider.tsx` | Full-bleed photo breather, no text. Top/bottom cream gradient blend. |
+| `CepTestimonialsHeader` | `cep-testimonials-header.tsx` | Massive "TESTIMONIALS" headline (130px) + red hairline. |
+| `CepTestimonialsCarousel` | `cep-testimonials-carousel.tsx` | Auto-scroll peeking (4.5s setInterval), NO controls, 5 RU testimonials, cream cards on cream. Duplicated-set technique for seamless infinite loop. |
+| `CepProcess` | `cep-process.tsx` | "THE CREATIVE EDGE" 01 DREAM / 02 BUILD / 03 SAVOR. Red accent line under each number. |
+| `CepLocationsStrip` | `cep-locations-strip.tsx` | Full-bleed dim photo + "INTERFOOD CATERING" + "САНКТ-ПЕТЕРБУРГ \| МОСКВА \| ВСЯ РОССИЯ". |
+| `CepInstagramGrid` | `cep-instagram-grid.tsx` | "FOLLOW ALONG" 3×3 grid, Reel play icons on indices 2/5/8. |
+| `CepOverlayMenu` | `cep-overlay-menu.tsx` | Full-screen 54px staggered slide-in items. Body scroll lock + Escape + backdrop click. Wired into SiteHeader (desktop "MENU" button). |
+| `CepOutlineButton` | `cep-outline-button.tsx` | 1px solid red border, transparent bg, square corners, uppercase. `variant: default \| invert`. |
+
+## Design tokens added (`globals.css`)
+
+```css
+--cep-black: #000000;
+--cep-cream: #EFEFE7;       /* hsl 52.5 20% 92.16% */
+--cep-red: #FF360A;         /* hsl 10.78 100% 51.96% */
+--cep-white: #FFFFFF;
+```
+Plus `--font-neutra-display` / `--font-neutra-text` (local woff2) + ~200 lines of `cep-*` utility classes (`.cep-hero-h1` clamp→244px, `.cep-section-h2-xl` clamp→200px, `.cep-marquee-mask` edge-fade, `.cep-outline-btn`, `.cep-overlay-menu`, `.cep-carousel-slide` 3:4 peeking, etc.).
+
+## Key design decision: English signature headlines
+
+CEP's signature headlines ("THE EGG / CAME FIRST.", "SIMPLE & BRILLIANT.", "WHY US?", "TESTIMONIALS", "THE CREATIVE EDGE", "FOLLOW ALONG") are rendered in **English** so the **Neutra2Display-Light font (Latin-only, no Cyrillic subset)** actually renders the brand signature. Russian copy lives in subheads/body/step-bodies. This matches how premium bilingual luxury brands operate and is the TRUE replication — VLM confirmed Neutra2 rendering (circular O's, geometric architectural sans) on all signature headlines. First VLM pass on a Russian headline scored 6.5/10 ("generic Montserrat, not Neutra2"); switching to English → 8–10/10.
+
+## SiteHeader change
+
+Desktop mega-menu nav (`<nav>` with `MegaMenu` dropdowns) replaced with a single CEP-style **"Меню" button** (Logo left | MENU center | CTA right — CEP's exact layout). Opens `<CepOverlayMenu>`. Mobile hamburger + existing gold mobile menu kept intact (works, has focus management).
+
+## page.tsx — 4-act client journey (26 sections)
+
+```
+ACT I — BRAND PROMISE & POSITIONING (CEP opening)
+  1. CepEggHero          2. CepClientMarquee    3. CepSimpleBrilliant
+  4. CepRedStats         5. CepWhyUs            6. CepEditorialDivider
+ACT II — WHO WE ARE & WHAT WE OFFER (existing depth)
+  7. EditorialIntro      8. About               9. Manifesto
+ 10. ChefPortrait       11. Menu                12. TastingMenuExperience
+ 13. SustainabilityStrip 14. ServicesOverview   15. McuPhotoFilmstrip
+ 16. McuVenues
+ACT III — PROOF & PROCESS (CEP trust)
+ 17. CepTestimonialsHeader  18. CepTestimonialsCarousel  19. CepProcess
+ 20. CepLocationsStrip   21. CepInstagramGrid
+ACT IV — CONVERSION
+ 22. QuoteBand  23. Calculator  24. Faq  25. Contact  26. SocialHandle
+ + SiteFooter + BackToTop
+```
+
+## VLM critique loop results
+
+| Section | Score | Notes |
+|---|---|---|
+| CepEggHero | 8/10 | Neutra2 confirmed, egg monumental (scale-110 + Ken-Burns) |
+| CepClientMarquee | 8.5/10 | Edge-fade mask + red bullets working |
+| CepSimpleBrilliant | 9/10 | 200px headline over 0.5× video |
+| CepRedStats | 9/10 | #FF360A correct, count-up works |
+| CepWhyUs | 9/10 | Hover micro-interactions added (red shift + translateX) |
+| CepProcess | 10/10 | Red accent lines under numbers — "perfect execution" |
+| CepInstagramGrid | 8/10 | 3×3 grid with Reel play icons |
+| CepOverlayMenu | working | 6 items, full-screen, staggered |
+| Mobile (390px) | 8–9/10 | No overflow, clean stacking |
+
+## Conventions learned (for future cycles)
+
+1. **next/font/local for downloaded brand fonts** — when a reference site self-hosts custom fonts (Neutraface, Brand Grotesque, etc.), download the woff2 and load via `next/font/local`. The brand identity lives in the font, not the layout.
+2. **Latin-only display fonts + Cyrillic content** — if the signature font has no Cyrillic subset, render the SIGNATURE headlines in English (matching the reference) and keep Russian for body/subheads. VLM scores jump 6.5→8+ when the actual brand font renders.
+3. **CEP's "red as section bg exactly once" rule** — the restraint is the wow. Don't be tempted to use the accent color on multiple section backgrounds; it kills the punch.
+4. **Edge-fade marquee mask** — `mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)` is the luxury marquee signature. Reuse `.cep-marquee-mask`.
+5. **Auto-scroll carousel without Embla** — Embla v8.6.0 wrapper is broken under React 19. Use manual `setInterval` + duplicated-set technique for seamless infinite loop (see `cep-testimonials-carousel.tsx`).
+6. **Massive section headings as design** — CEP's "TESTIMONIALS" is just the word at 130px. Don't over-decorate; the typography IS the design.
+
+## TODO for Cycle 28
+
+- [ ] License Neutraface 2 properly (House Industries ~$200/face) or evaluate Spectral/Cormorant as free humanist alternative for the body text.
+- [ ] CepSimpleBrilliant: shoot/license own food b-roll (currently uses mculinary-hero.mp4 — adequate but not CEP's actual footage).
+- [ ] CepOverlayMenu items are RU (Cyrillic) → fall back to Montserrat. Could render English items (HOME/ABOUT/MENU/CALCULATOR/FAQ/CONTACT) for full Neutra2 consistency, but RU is more user-friendly for the target audience. Decision: keep RU.
+- [ ] Cookie consent banner visual weight — VLM flagged on hero (existing `cookie-consent.tsx` component, not CEP-specific). Consider a thinner single-line treatment.
+- [ ] CepInstagramGrid: 9 images are CEP's actual IG photos — replace with @nilov_catering's real IG feed via Instagram Graph API (or curate own event photos).
+- [ ] Delete the 22 orphaned components still pending from Cycle 26 (BgHero, PinkMarquee, BoldStatement, SnackBoxCube3D, etc.).
