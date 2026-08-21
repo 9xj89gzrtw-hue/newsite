@@ -2,6 +2,9 @@ import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
 import { Hero } from "@/components/catering/hero";
 import { WinterSpecials } from "@/components/catering/winter-specials";
+import { BoldStatement } from "@/components/catering/bold-statement";
+import { PinkMarquee } from "@/components/catering/pink-marquee";
+import { RisingPhotos } from "@/components/catering/rising-photos";
 import { EditorialIntro } from "@/components/catering/editorial-intro";
 import { MarqueeBand } from "@/components/catering/marquee-band";
 import { LogoMarquee } from "@/components/catering/logo-marquee";
@@ -39,6 +42,10 @@ export default function Home() {
       <Hero />
       {/* WinterSpecials — Sopranos "NEW WINTER SPECIALS" dark navy band (Cycle 22) */}
       <WinterSpecials />
+      {/* BoldStatement — Concept-Catering.de dark editorial statement (wow layer) */}
+      <BoldStatement />
+      {/* PinkMarquee — Concept-Catering.de pink band with infinite keyword marquee */}
+      <PinkMarquee />
       {/* EditorialIntro — Ridgewells WOW #1: painterly radial-gradient intro */}
       <EditorialIntro />
       {/* MarqueeBand — solid-bordeaux infinite marquee */}
@@ -53,6 +60,10 @@ export default function Home() {
       {/* Menu: tabs + interactive list + real dishes + inline PDF download */}
       <Menu />
       <PromoBanner />
+      {/* RisingPhotos — Concept-Catering.de "works": sticky-stacked full-viewport photos that rise over each other on scroll (centerpiece) */}
+      <RisingPhotos />
+      {/* PinkMarquee (reverse) — closing pink band for the works section */}
+      <PinkMarquee reverse />
       {/* ServicesOverview — Ridgewells two-up 50/50 editorial grid (Cycle 21) */}
       <ServicesOverview />
       {/* Services: 4-up image-card grid + modal (existing 3D interactive) */}

@@ -71,3 +71,14 @@ worklog.md
 # Cycle 21 — transient VLM verification screenshots (regenerated each run)
 docs/reference-library/our-site/
 docs/reference-library/our-site-hero.png
+
+# Analysis screenshots (concept-catering reverse-engineering artifacts)
+*.png
+cc-*.png
+if-*.png
+v2-*.png
+r2-*.png
+r3-*.png
+final-*.png
+crit-*.png
+vlm-*.json

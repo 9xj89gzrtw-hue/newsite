@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Oswald, Karla, Great_Vibes, Playfair_Display } from "next/font/google";
+import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { LenisProvider } from "@/components/catering/lenis-provider";
@@ -41,6 +41,15 @@ const playfair = Playfair_Display({
   subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
+});
+
+// Concept-Catering.de aesthetic — Barlow Semi Condensed (ultra-bold condensed
+// all-caps for the dark "wow" layer: bold-statement, pink-marquee, rising-photos).
+const barlow = Barlow_Semi_Condensed({
+  variable: "--font-barlow",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 const siteUrl = SITE_CONFIG.url;
@@ -168,7 +177,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://yandex.ru" />
       </head>
       <body
-        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} antialiased bg-background text-foreground`}
+        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} antialiased bg-background text-foreground`}
       >
         <a href="#main-content" className="skip-link">
           Перейти к содержанию

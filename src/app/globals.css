@@ -43,6 +43,16 @@
   --color-lilac: var(--lilac);
   --color-gold: var(--gold);
 
+  /* Concept-Catering.de accent palette (dark + pink wow layer) */
+  --color-cc-dark: var(--cc-dark);
+  --color-cc-dark-2: var(--cc-dark-2);
+  --color-cc-pink: var(--cc-pink);
+  --color-cc-pink-soft: var(--cc-pink-soft);
+  --color-cc-cream: var(--cc-cream);
+
+  /* Barlow Semi Condensed — concept-catering ultra-bold condensed all-caps */
+  --font-barlow: var(--font-barlow);
+
   --color-border-line: var(--border-line);
   --color-border-line-dark: var(--border-line-dark);
 
@@ -123,6 +133,13 @@
   /* Borders — warm, subtle */
   --border-line: #E5E7EB;
   --border-line-dark: #D4CCC2;
+
+  /* Concept-Catering.de accent palette (dark + pink wow layer) */
+  --cc-dark: #101010;
+  --cc-dark-2: #1a1a1a;
+  --cc-pink: #f087b5;
+  --cc-pink-soft: #f5a8c8;
+  --cc-cream: #f4efe8;
 
   /* shadcn aliases (LIGHT THEME DEFAULT) */
   --background: var(--cream);
@@ -1352,4 +1369,30 @@ header[data-scrolled="true"] [data-mega-panel] {
 .painterly-drift {
   animation: painterly-drift 30s ease-in-out infinite;
   background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+}
+
+/* ── Concept-Catering style: rising photos + marquee ──
+   Reverse-engineered from concept-catering.de (.works / .project pattern).
+   Each .cc-project is sticky at top:0 with height 100vh, so the next photo
+   scrolls UP and COVERS the previous — the "rising photos" effect.
+   Pure CSS sticky stacking (no JS for the rise itself). */
+@keyframes cc-marquee-x {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.cc-marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: cc-marquee-x var(--cc-marquee-duration, 24s) linear infinite;
+  will-change: transform;
+}
+.cc-marquee-track.cc-reverse { animation-direction: reverse; }
+.cc-project { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .cc-marquee-track { animation: none; }
+}
+
+/* Barlow Semi Condensed font-family helper (concept-catering all-caps). */
+.font-barlow {
+  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
 }
