@@ -124,7 +124,7 @@ export function SiteHeader() {
         aria-hidden={open}
         className={`sticky top-0 z-50 border-b border-border-line text-ink transition-colors duration-500 ${
           stuck
-            ? "bg-white/85 shadow-[0_6px_24px_-14px_rgba(0,0,0,0.18)] backdrop-blur-md"
+            ? "bg-white/60 shadow-[0_6px_24px_-14px_rgba(0,0,0,0.14)] backdrop-blur-lg"
             : "bg-white"
         }`}
       >
@@ -180,12 +180,12 @@ export function SiteHeader() {
               <Phone className="size-4 shrink-0" />
               <span>{CONTACTS.phone}</span>
             </a>
-            {/* Заказать — square burgundy button (task v5: "справа от телефона
-                сделать кнопку заказать в квадратике"). Solid burgundy bg,
-                white text, square corners, hover darken. → #contact */}
+            {/* Заказать — BLACK square button (task v6: "кнопку заказать в
+                черном квадратике на хедере на белом фоне как на сайте"). Solid
+                black bg, white text, square corners, hover darken. → #contact */}
             <a
               href="#contact"
-              className="tott-body hidden min-h-[44px] items-center justify-center bg-tott-burgundy px-5 text-[13px] font-700 uppercase tracking-[0.08em] text-white transition-colors duration-300 hover:bg-tott-burgundy-deep sm:inline-flex"
+              className="tott-body hidden min-h-[44px] items-center justify-center bg-black px-5 text-[13px] font-700 uppercase tracking-[0.08em] text-white transition-colors duration-300 hover:bg-ink/85 sm:inline-flex"
               style={{ fontWeight: 700, borderRadius: 0 }}
               aria-label="Заказать кейтеринг"
             >

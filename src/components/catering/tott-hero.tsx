@@ -108,41 +108,79 @@ export function TottHero() {
       {/* 5px white border decorative frame — talkofthetown SR7 signature. */}
       <span className="tott-border-frame z-[3]" aria-hidden="true" />
 
-      {/* TOP-LEFT brand stack — mirrors talkofthetownatlanta.com hero where
-          ALL overlay text sits top-left. Per task v5: "food as art" посередине
-          надписи "Interfood." → the script tagline is CENTERED relative to
-          the wordmark (items-center on the flex-col so the narrower script
-          sits horizontally centered beneath the wider Prata wordmark). Both
-          stay top-left positioned; nothing in the screen center.
-
-          Two lines, two fonts: Prata for "Interfood.", Nothing You Could Do
-          for "food as art" — exactly as the reference site pairs their Prata
-          logo + Nothing-You-Could-Do script overlay. */}
+      {/* CENTERED brand stack — per task v6: "сделай обратно эту надпись по
+          центру херо, так мне больше нравится". All 3 lines centered both H
+          and V in the viewport. Composition (per frontend-styling-expert):
+            - absolute inset-0 flex-col items-center justify-center
+            - translateY(-40px) to optically center (compensates for sticky
+              header that sits below the hero in normal flow)
+            - wordmark (Prata, largest) → gold hairline divider → script pair
+              ("food as art" Nothing You Could Do + "Лучший кейтеринг
+              Санкт-Петербурга" Marck Script, the script pair reads as one
+              phrase with tight 4px gap)
+          The Cyrillic line uses Marck Script (Cyrillic-capable handwritten
+          script) at 92% of the Latin script size — optical parity since
+          Marck Script glyphs are wider/heavier than Nothing You Could Do.
+          Text-shadow added for legibility over the video background. */}
       <motion.div
-        className="absolute left-8 top-10 z-10 flex flex-col items-center gap-1 md:left-14 md:top-14"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center [transform:translateY(-40px)]"
         initial={showStatic ? false : "hidden"}
         animate={showStatic ? undefined : "visible"}
         variants={container}
       >
-        {/* Wordmark — Prata (their display serif). Gold dot = Interfood
-            brand signature. */}
+        {/* Wordmark — Prata (their display serif). Gold dot = Interfood brand
+            signature. Largest line, tight letter-spacing, full opacity. */}
         <motion.h1
           variants={rise}
           className="tott-display m-0 text-white"
-          style={{ fontSize: "clamp(2.8rem, 8vw, 6rem)", lineHeight: 0.95, letterSpacing: "-0.01em" }}
+          style={{
+            fontSize: "clamp(3.5rem, 11vw, 8.5rem)",
+            lineHeight: 1,
+            letterSpacing: "-0.03em",
+            textShadow: "0 2px 30px rgba(0,0,0,0.45)",
+          }}
         >
           Interfood<span style={{ color: "var(--gold)" }}>.</span>
         </motion.h1>
 
-        {/* Script tagline — Nothing You Could Do (their hero script overlay
-            font). CENTERED beneath the wordmark (items-center on parent).
-            English phrase because the face is Latin-only. */}
+        {/* Gold hairline divider — 48px wide, 60% opacity. Ties to the
+            wordmark's gold dot for cohesion; separates wordmark from the
+            script pair. */}
+        <motion.span
+          variants={rise}
+          className="my-6 h-px w-12 bg-[#C9A24B]/60"
+          aria-hidden="true"
+        />
+
+        {/* Script pair — reads as one phrase (tight 4px gap via mt-1).
+            "food as art" in Nothing You Could Do (Latin-only). */}
         <motion.p
           variants={rise}
           className="tott-script m-0 text-white/95"
-          style={{ fontSize: "clamp(1.6rem, 4vw, 3rem)", lineHeight: 1 }}
+          style={{
+            fontSize: "clamp(1.5rem, 4.2vw, 3rem)",
+            lineHeight: 1.15,
+            letterSpacing: "0.01em",
+            textShadow: "0 2px 30px rgba(0,0,0,0.45)",
+          }}
         >
           food as art
+        </motion.p>
+
+        {/* "Лучший кейтеринг Санкт-Петербурга" in Marck Script (Cyrillic
+            handwritten, 92% of Latin script size for optical parity). Tight
+            mt-1 so the script pair reads as one phrase. */}
+        <motion.p
+          variants={rise}
+          className="m-0 mt-1 text-white/95"
+          style={{
+            fontFamily: "var(--font-marck), var(--font-nothing), cursive",
+            fontSize: "clamp(1.4rem, 3.9vw, 2.75rem)",
+            lineHeight: 1.2,
+            textShadow: "0 2px 30px rgba(0,0,0,0.45)",
+          }}
+        >
+          Лучший кейтеринг Санкт-Петербурга
         </motion.p>
       </motion.div>
 
