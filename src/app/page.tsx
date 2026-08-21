@@ -1,127 +1,114 @@
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
-import GgHero from "@/components/catering/gg-hero";
-import GgWhoWeAre from "@/components/catering/gg-who-we-are";
-import GgVideoShowcase from "@/components/catering/gg-video-showcase";
-import GgFeatureCollage from "@/components/catering/gg-feature-collage";
-import { WinterSpecials } from "@/components/catering/winter-specials";
-import { BoldStatement } from "@/components/catering/bold-statement";
-import { PinkMarquee } from "@/components/catering/pink-marquee";
-import { RisingPhotos } from "@/components/catering/rising-photos";
-import { EditorialIntro } from "@/components/catering/editorial-intro";
-import { MarqueeBand } from "@/components/catering/marquee-band";
-import { LogoMarquee } from "@/components/catering/logo-marquee";
+import { McuVideoHero } from "@/components/catering/mcu-video-hero";
+import { McuMarqueeBand } from "@/components/catering/mcu-marquee-band";
 import { About } from "@/components/catering/about";
-import { JoelsAbout } from "@/components/catering/joels-about";
-import { JoelsCuisine } from "@/components/catering/joels-cuisine";
-import { JoelsContactCta } from "@/components/catering/joels-contact-cta";
+import { McuPhotoFilmstrip } from "@/components/catering/mcu-photo-filmstrip";
 import { Manifesto } from "@/components/catering/manifesto";
-import { Process } from "@/components/catering/process";
+import { McuServicesCarousel } from "@/components/catering/mcu-services-carousel";
+import { McuCtaBand } from "@/components/catering/mcu-cta-band";
 import { Menu } from "@/components/catering/menu";
-import { PromoBanner } from "@/components/catering/promo-banner";
-import { ServicesOverview } from "@/components/catering/services-overview";
-import { Services } from "@/components/catering/services";
-import { QuoteBand } from "@/components/catering/quote-band";
-import { Pillars } from "@/components/catering/pillars";
-import { SnackBoxDelivery } from "@/components/catering/snack-box-delivery";
-import { EventsGallery } from "@/components/catering/events-gallery";
-import { VideoEvents } from "@/components/catering/video-events";
+import { McuVideoEvents } from "@/components/catering/mcu-video-events";
+import { McuVenues } from "@/components/catering/mcu-venues";
 import { Calculator } from "@/components/catering/calculator";
-import { InstagramVideo } from "@/components/catering/instagram-video";
-import { Testimonials } from "@/components/catering/testimonials";
-import { PressStrip } from "@/components/catering/press-strip";
-import { AwardsStrip } from "@/components/catering/awards-strip";
+import { McuTestimonials } from "@/components/catering/mcu-testimonials";
+import { McuInstagram } from "@/components/catering/mcu-instagram";
 import { Faq } from "@/components/catering/faq";
 import { Contact } from "@/components/catering/contact";
 import { SocialHandle } from "@/components/catering/social-handle";
 import { SiteFooter } from "@/components/catering/site-footer";
 import { BackToTop } from "@/components/catering/back-to-top";
 
-// Make this page dynamic to avoid SSR issues with window access in client components
+// Cycle 25 — mculinary.com editorial layer.
+// Curated from 30+ overlapping wow-sections (Cycles 16-24) down to a cohesive
+// mculinary-inspired flow: navy + cream + gold premium catering. Hero swapped
+// to mculinary video; auto-advancing carousels (photos / services / videos)
+// added; testimonials + instagram rebuilt in mculinary style. Strongest
+// existing sections (About count-up, Manifesto ПИР, Menu, Calculator, Contact)
+// retained as informational anchors.
 export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
-    <main id="main-content" role="main" tabIndex={-1} className="flex min-h-screen flex-col bg-cream outline-none">
+    <main
+      id="main-content"
+      role="main"
+      tabIndex={-1}
+      className="flex min-h-screen flex-col bg-cream outline-none"
+    >
       <SiteHeader />
-      {/* GgHero — Cycle 22: ggcatering.com multi-tile asymmetric image collage
-          + "Кейтеринг с [ИЗЮМИНКОЙ]" rotating-text wow effect (replaces Sopranos hero). */}
-      <GgHero />
-      {/* GgWhoWeAre — Cycle 22: ggcatering.com rotating adjectives + stat count-up
-          + soft pastel SVG collage + vertical-line eyebrow. */}
-      <GgWhoWeAre />
-      {/* GgVideoShowcase — Cycle 22: ggcatering.com aspect-video player with
-          autoplay-muted-loop teaser + click-to-fullscreen modal. TEMPORARY video
-          from ggcatering.com (will be replaced with own showreel). */}
-      <GgVideoShowcase />
-      {/* GgFeatureCollage — Cycle 22: ggcatering.com 3 alternating dark/light
-          text+image editorial blocks (Фишка / Опыт / Еда и напитки). */}
-      <GgFeatureCollage />
-      {/* WinterSpecials — Sopranos "NEW WINTER SPECIALS" dark navy band (Cycle 22) */}
-      <WinterSpecials />
-      {/* BoldStatement — Concept-Catering.de dark editorial statement (wow layer) */}
-      <BoldStatement />
-      {/* PinkMarquee — Concept-Catering.de pink band with infinite keyword marquee */}
-      <PinkMarquee />
-      {/* EditorialIntro — Ridgewells WOW #1: painterly radial-gradient intro */}
-      <EditorialIntro />
-      {/* MarqueeBand — solid-bordeaux infinite marquee */}
-      <MarqueeBand />
-      {/* Infinite client-logo marquee (Gamma / Creative Edge pattern) */}
-      <LogoMarquee />
+
+      {/* McuVideoHero — mculinary.com cinematic autoplay video hero
+          (navy overlay + oversized Playfair "Еда как искусство" + gold CTA). */}
+      <McuVideoHero />
+
+      {/* McuMarqueeBand — slow infinite auto-scroll band (gold ✦ separators). */}
+      <McuMarqueeBand />
+
+      {/* About — count-up statistics (16 лет, 2400+ событий…). Kept as the
+          informational anchor after the hero (mculinary places stats here too). */}
       <About />
-      {/* JoelsAbout — Cycle 24: joels.com stacked-parallax About wow layer,
-          parallel to the existing stat-card About above. */}
-      <JoelsAbout />
-      {/* Manifesto: signature pinned scroll moment — «Манифест-as-Window» */}
+
+      {/* McuPhotoFilmstrip — variable-width centerMode filmstrip, auto-advances
+          every 3.5s, pause-on-hover. 18 event photos from mculinary. */}
+      <McuPhotoFilmstrip />
+
+      {/* Manifesto — signature pinned scroll moment «ПИР» (Cycle 16 wow). */}
       <Manifesto />
-      {/* Process: emotional timeline 01→04 (Creative Edge pattern) */}
-      <Process />
-      {/* Menu: tabs + interactive list + real dishes + inline PDF download */}
+
+      {/* McuServicesCarousel — 3-up autoplay (5s, pause-on-hover) services
+          with hover-zoom + dots. Replaces the older Services grid. */}
+      <McuServicesCarousel />
+
+      {/* Navy chapter-divider CTA band (magazine-style section break). */}
+      <McuCtaBand
+        eyebrow="ГОТОВЫ НАЧАТЬ?"
+        title="Обсудим ваше мероприятие"
+        href="#calculator"
+        cta="Рассчитать стоимость"
+      />
+
+      {/* Menu — 7 menu types with interactive list + real dishes + PDF. */}
       <Menu />
-      <PromoBanner />
-      {/* RisingPhotos — Concept-Catering.de "works": sticky-stacked full-viewport photos that rise over each other on scroll (centerpiece) */}
-      <RisingPhotos />
-      {/* PinkMarquee (reverse) — closing pink band for the works section */}
-      <PinkMarquee reverse />
-      {/* JoelsCuisine — Cycle 24: joels.com 3-up cuisine card grid (Еда / Напитки / События).
-          Teaser before the full Services overview below. */}
-      <JoelsCuisine />
-      {/* ServicesOverview — Ridgewells two-up 50/50 editorial grid (Cycle 21) */}
-      <ServicesOverview />
-      {/* Services: 4-up image-card grid + modal (existing 3D interactive) */}
-      <Services />
-      {/* QuoteBand — Ridgewells WOW #3: solid-bordeaux client quote */}
-      <QuoteBand />
-      {/* Pillars: dual brand-pillar section (Salt Block pattern) */}
-      <Pillars />
-      {/* Snack-box delivery: standalone service with price list */}
-      <SnackBoxDelivery />
-      {/* Photo events gallery — filterable by category + lightbox */}
-      <EventsGallery />
-      {/* Video events */}
-      <VideoEvents />
-      {/* Calculator uses nuqs (useSearchParams) — must be in <Suspense> */}
+
+      {/* McuVideoEvents — autoplay-muted-loop video cards carousel (4.5s
+          auto-advance). Portrait 9:16 cards on navy-deep bg. */}
+      <McuVideoEvents />
+
+      {/* McuVenues — 3 square (1:1) venue cards with hover-zoom. */}
+      <McuVenues />
+
+      {/* Second chapter-divider CTA band — different copy. */}
+      <McuCtaBand
+        eyebrow="СВАДЬБЫ И КРУПНЫЕ СОБЫТИЯ"
+        title="Кейтеринг под вашу площадку"
+        href="#contact"
+        cta="Связаться"
+      />
+
+      {/* Calculator uses nuqs (useSearchParams) — must be in <Suspense>. */}
       <Suspense fallback={null}>
         <Calculator />
       </Suspense>
-      <InstagramVideo />
-      {/* Press strip: "As seen in" publications (trust signal — 94% adoption) */}
-      <PressStrip />
-      {/* Testimonials: carousel with auto-play + trust badges */}
-      <Testimonials />
-      {/* FAQ: frequently asked questions about catering */}
+
+      {/* McuTestimonials — single-slide autoplay (5s, stops on interaction)
+          with big gold quote-mark + 5★ rating. Replaces old testimonials. */}
+      <McuTestimonials />
+
+      {/* McuInstagram — 6×2 grid of Instagram tiles on navy bg. */}
+      <McuInstagram />
+
+      {/* FAQ — catering questions + accordion. */}
       <Faq />
-      {/* Awards strip — real Sopranos badges (Cycle 22) */}
-      <AwardsStrip />
+
+      {/* Contact — form → POST /api/lead → Prisma Lead → toast. */}
       <Contact />
-      {/* JoelsContactCta — Cycle 24: joels.com final CTA section (60px Playfair headline
-          + 2-column form + square sage button) before the social-handle closer. */}
-      <JoelsContactCta />
-      {/* SocialHandle — Ridgewells giant @nilov_catering closer (Cycle 21) */}
+
+      {/* SocialHandle — giant @nilov_catering closer (Cycle 21). */}
       <SocialHandle />
+
       <SiteFooter />
-      {/* Back-to-top button (appears on scroll > 500px) */}
+      {/* Back-to-top button (appears on scroll > 500px). */}
       <BackToTop />
     </main>
   );

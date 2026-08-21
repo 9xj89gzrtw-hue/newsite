@@ -2263,3 +2263,114 @@ Gourmet Style Module */`):
 - VLM-критика FEATURES показала «image misalignment» — это намерерный
   editorial offset (translate-y-0/+8/-4/+4), но можно сделать менее резким.
 - Добавить signature CTA-секцию перед footer (ggcatering «Let's Party» button).
+
+---
+
+## 17. Cycle 25 — mculinary.com replication + Embla-wrapper bypass (21.08.2026)
+
+> Reference: <https://mculinary.com> (M Culinary Concepts, Arizona). Premium
+> navy+cream+gold editorial catering. Replicated carousels auto-advance per user
+> request ("чтобы они автоматически были также в движении").
+
+### Что сделано
+
+- **9 новых компонентов** (`src/components/catering/mcu-*.tsx`): video-hero,
+  marquee-band, photo-filmstrip, services-carousel, video-events,
+  testimonials, venues, cta-band, instagram.
+- **Дизайн-токены** (globals.css): `--mcu-navy #17364D`, `--mcu-gold #AF9469`,
+  `--mcu-gold-light #B99D75`, `--mcu-cream #F8F5F1`, `--mcu-espresso #1A1B1A`,
+  `--mcu-sage #53624E` + 340 строк `.mcu-*` CSS utilities.
+- **Media registry** (`src/lib/mculinary-media.ts`): hero video (5.16MB MP4),
+  18 event photos, 7 service images, 3 venue images, 5 video slides, 12 Instagram
+  tiles — все в `/public/media/mculinary/` (11MB, 63 файла).
+- **page.tsx** переработан: из 30+ пересекающихся wow-секций (Cycles 16-24)
+  отобрано 20 cohesive mculinary-секций.
+- **4 авто-карусели** (все с auto-advance): photo filmstrip (3.5s), services
+  3-up (5s), video events (4.5s + per-video autoplay), testimonials (5s).
+- VLM critique loop сошёлся: overall 8.5/10 (hero 8.5, testimonials 9, mobile
+  9, dark-section readability 9).
+
+### Грабли (зафиксировать для будущего — КРИТИЧНО)
+
+1. **`embla-carousel-react` v8.6.0 wrapper СЛОМАН под React 19 + Next 16
+   Turbopack.** Wrapper возвращает `[setViewport, emblaApi]` где `setViewport`
+   — это state-setter, используемый как callback-ref (`ref={setViewport}`).
+   В React 19 этот ref-callback НЕ вызывается надёжно → `viewport` state
+   остаётся `undefined` → init-эффект `if (canUseDOM && viewport)` никогда не
+   выполняется → `emblaApi` навсегда `undefined` → container `transform: none`
+   → карусель мёртвая (клики/autoplay no-op). **Решение: НЕ используйте
+   `useEmblaCarousel` из `embla-carousel-react`. Импортируйте core
+   `import EmblaCarousel from "embla-carousel"` и инициализируйте вручную:**
+   ```tsx
+   const viewportRef = useRef<HTMLDivElement>(null);
+   const [emblaApi, setEmblaApi] = useState<EmblaCarouselType>();
+   useEffect(() => {
+     const vp = viewportRef.current; if (!vp) return;
+     const api = EmblaCarousel(vp, { loop: true, align: "center" }, []);
+     setEmblaApi(api);
+     return () => api.destroy();
+   }, []);
+   // JSX: <div ref={viewportRef} className="mcu-embla">...
+   ```
+   Это работает 100%. Wrapper — нет.
+
+2. **ЛЮБАЯ hydration-mismatch ломает ВСЕ клиент-эффекты на странице.**
+   Calculator использовал `typeof window !== "undefined" ? encodeURIComponent(window.location.origin/...) : ""`
+   для share-ссылок Telegram/WhatsApp. На SSR → `""`, на client → реальный URL
+   → `<a href>` не совпадает → React hydration fails → `useEffect` НЕ
+   запускаются ни в Calculator, ни в любом другом компоненте на странице
+   (включая Embla, CookieConsent, BackToTop — все мёртвые). **Решение: любое
+   обращение к `window`/`document` в render — выносить в `useState` + `useEffect`
+   (server + first-client-render получают стабильное значение, real value
+   ставится после mount).** Проверять через `agent-browser eval` что client
+   components отрендерены (cookie banner, back-to-top) и `data-embla-init` /
+   container `transform` не `none`.
+
+3. **`embla-carousel-autoplay` plugin нестабилен** (timing/init issue с React
+   19). **Решение: manual `setInterval` autoplay** (`intervalRef` +
+   `emblaApi.scrollNext()` каждые N ms) + pause-on-hover (`onMouseEnter/Leave`
+   clear/restart interval) + pause-when-offscreen (IntersectionObserver
+   `stopAuto/startAuto`). Проще, надёжнее, нет зависимости от plugin.
+
+4. **Duplicate React keys** в `site-header.tsx` (`key={n.href}` где 2 nav-item
+   имеют одинаковый `href="#services"`) → React warning + potencial reconcile
+   issue. **Решение: `key={n.label + i}`** (label уникален + index для гарантии).
+
+5. **agent-browser eval с object-literal в arrow-function** парсится с
+   `SyntaxError: missing ) after argument list` если использовать `=> ({...})`.
+   **Решение: используйте `var` + `for` + string concatenation** в eval (не
+   arrow+object-literal). Или `JSON.stringify` + `return`.
+
+6. **`z-ai vision` VLM не видит motion в статическом скриншоте** — карусель
+   может корректно auto-advancing, но VLM поставит 6/10 за "static content".
+   **Решение: верифицировать autoplay через `agent-browser eval`** (проверять
+   `is-selected` / dot index меняется ли за 4-6s), а не через VLM-скриншот.
+
+### Скиллы, оказавшиеся полезны
+
+- **`z-ai vision` CLI** (`z-ai vision -p "..." -i img.png`) — brutal design
+  critique по скриншотам. Запускать батчем (4-5 параллельно) для скорости.
+- **`agent-browser`** — DOM eval для проверки `transform`, `paused`,
+  `readyState`, `is-selected`, container width. Ключ к дебагу Embla init.
+- **`Task → full-stack-developer` ×3 (параллельно)** — каждый собрал 2-5
+  компонентов за один вызов, lint+tsc чистые. Давать МАКСИМАЛЬНО детальный
+  промпт (точные CSS-классы, data-структуры, импорты) для консистентности.
+- **`pm2`** — `pm2 start "bun run dev" --name interfood-dev --cwd ...` держит
+  dev-сервер устойчиво (sandbox не убивает). `pm2 save` персистит.
+
+### Что можно улучшить дальше (next cycle)
+
+- Заменить `mculinary-hero.mp4` (5.16MB в /public) на Mux/Cloudflare Stream
+  (RULES.md §3 — не класть .mp4 в /public на проде). Hero готов к Mux через
+  `MUX_TOKEN_*` env vars — нужно загрузить видео в Mux → поставить playback ID.
+- Видео-карусель использует тот же hero MP4 на 5 слайдах с разными `#t=`
+  offsets. Когда пользователь даст свои видео — заменить `MCU_VIDEO_SLIDES` в
+  `mculinary-media.ts` на реальные src (желательно Mux playback IDs).
+- Фото-карусель: можно добавить sprocket-hole border для усиления "filmstrip"
+  метафоры (VLM 6/10 — "weak filmstrip metaphor"). Опционально — mculinary
+  оригинал тоже без sprocket holes.
+- Manifesto (Cycle 16 «ПИР» pinned 250vh) — VLM видит "massive dark void in
+  the middle" в статическом full-page скриншоте. В motion это wow-момент, но
+  добавляет scroll length. Рассмотреть сокращение до 180vh.
+- Gold accent text на navy (`--mcu-gold-light #B99D75`) — VLM отмечает minor
+  contrast issue. Можно осветлить до `#C5AD8A` для AA.

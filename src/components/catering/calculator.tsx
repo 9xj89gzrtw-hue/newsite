@@ -145,13 +145,28 @@ export function Calculator() {
     }
   };
 
-  // Build shareable URLs for Telegram + WhatsApp
+  // Build shareable URLs for Telegram + WhatsApp.
+  // CRITICAL: compute in state set by useEffect (NOT inline during render) —
+  // window.location.origin differs between SSR (undefined → "") and client,
+  // which caused a hydration mismatch on the <a href> that broke hydration for
+  // the WHOLE page (preventing all client effects, incl. Embla carousels, from
+  // running). Server + first client render now both get "" → match → hydrate.
   const shareText = `Catering quote: ${formatRUB(result.total)} — ${current.label}, ${guests} guests. Details:`;
-  const shareUrlEncoded = typeof window !== "undefined"
-    ? encodeURIComponent(`${window.location.origin}/?type=${typeId}&guests=${guests}#calculator`)
-    : "";
-  const telegramShareUrl = `https://t.me/share/url?url=${shareUrlEncoded}&text=${encodeURIComponent(shareText)}`;
-  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`${shareText} ${decodeURIComponent(shareUrlEncoded)}`)}`;
+  const [shareUrls, setShareUrls] = useState({ telegram: "", whatsapp: "" });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const enc = encodeURIComponent(
+      `${window.location.origin}/?type=${typeId}&guests=${guests}#calculator`,
+    );
+    setShareUrls({
+      telegram: `https://t.me/share/url?url=${enc}&text=${encodeURIComponent(shareText)}`,
+      whatsapp: `https://wa.me/?text=${encodeURIComponent(
+        `${shareText} ${decodeURIComponent(enc)}`,
+      )}`,
+    });
+  }, [typeId, guests, shareText]);
+  const telegramShareUrl = shareUrls.telegram;
+  const whatsappShareUrl = shareUrls.whatsapp;
 
   const toggleAddon = useCallback((id: string) =>
     setAddons((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id])),

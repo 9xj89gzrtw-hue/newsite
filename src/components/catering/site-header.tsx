@@ -191,12 +191,12 @@ export function SiteHeader() {
 
           {/* Desktop Navigation with mega-menus */}
           <nav role="navigation" className="hidden items-center gap-x-6 lg:flex xl:gap-x-7">
-            {NAV.map((n) =>
+            {NAV.map((n, i) =>
               n.mega ? (
-                <MegaMenu key={n.href} item={n} />
+                <MegaMenu key={n.label + i} item={n} />
               ) : (
                 <a
-                  key={n.href}
+                  key={n.label + i}
                   href={n.href}
                   className={`group relative inline-flex min-h-[44px] items-center px-2 text-sm font-medium opacity-70 transition-opacity duration-300 hover:opacity-100 hover-underline ${themeClasses.text}`}
                 >
@@ -273,7 +273,7 @@ export function SiteHeader() {
             <nav className="mt-10 flex flex-col gap-1 overflow-y-auto scroll-warm">
               {NAV.map((n, i) => (
                 <motion.a
-                  key={n.href}
+                  key={n.label + i}
                   href={n.href}
                   onClick={() => setOpen(false)}
                   className="group py-4 min-h-[44px] flex items-center justify-between border-b border-border-line/50 font-display text-2xl text-ink transition-colors hover:text-gold"

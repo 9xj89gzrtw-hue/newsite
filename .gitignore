@@ -82,3 +82,12 @@ r3-*.png
 final-*.png
 crit-*.png
 vlm-*.json
+
+# Cycle 25 verification artifacts (large screenshots, not reference material)
+docs/reference-library/mculinary/cycle25-verify/
+docs/reference-library/mculinary/carousel-behavior.webm
+docs/reference-library/mculinary/full-page.png
+docs/reference-library/mculinary/*-v2.png
+docs/reference-library/mculinary/*-v3*.png
+# Screenshots (.png) in reference-library are large — keep only analysis .md
+docs/reference-library/mculinary/*.png
