@@ -2,66 +2,54 @@
 
 import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Phone, ChevronDown, Calendar, Mail } from "lucide-react";
-import { CONTACTS, SOPRANOS_NAV } from "@/lib/media";
-import { AnnouncementBar } from "./announcement-bar";
+import { Menu, X, Phone } from "lucide-react";
+import { CONTACTS } from "@/lib/media";
 import { CepOverlayMenu } from "./cep-overlay-menu";
 
-// Build NAV from Sopranos nav structure (copied from sopranoscatering.com)
-type NavItem = {
-  href: string;
-  label: string;
-  mega?: "corporate" | "social";
-};
-
-const NAV: NavItem[] = SOPRANOS_NAV.map((n) => ({
-  href: n.href,
-  label: n.label,
-  mega: n.label === "Корпоратив" ? "corporate" : n.label === "События" ? "social" : undefined,
-})) as NavItem[];
-
 /**
- * The header theme is set per-section via `data-header-theme` attributes
- * on each `<section>` element. Valid values: "transparent" (over hero),
- * "light" (cream/white sections), "dark" (Manifesto, PromoBanner).
- */
-type HeaderTheme = "transparent" | "light" | "dark";
-
-const THEME_CLASSES: Record<HeaderTheme, { bg: string; text: string; linkHover: string }> = {
-  transparent: {
-    bg: "bg-transparent",
-    text: "text-cream",
-    linkHover: "hover:text-cream",
-  },
-  light: {
-    bg: "bg-cream/85 backdrop-blur-md shadow-sm border-b border-border-line",
-    text: "text-ink",
-    linkHover: "hover:text-ink",
-  },
-  dark: {
-    bg: "bg-ink/85 backdrop-blur-md shadow-lg border-b border-ink/20",
-    text: "text-cream",
-    linkHover: "hover:text-cream",
-  },
-};
-
-/**
- * SiteHeader — theme-switching navigation (transparent → light → dark)
- * based on which section's `data-header-theme` attribute is currently
- * in view at the top of the viewport.
+ * SiteHeader — Talk of the Town (talkofthetownatlanta.com) header graft
+ * (Cycle 30). Reproduces their "hero slider on top, sticky nav bar below"
+ * pattern, adapted so the nav bar DOCKS AT THE BOTTOM of our full-viewport
+ * video hero, then sticks to the top once scrolled past the hero.
  *
- * Includes:
- *  - AnnouncementBar: dismissible seasonal top bar (Salt Block pattern).
- *  - MegaMenu: hover/focus dropdowns for Меню and Услуги (100% adoption pattern).
- *  - Mobile quote CTA: second FAB linking to the calculator (sticky-CTA pattern).
- *  - Section-aware theme switching via IntersectionObserver.
+ * Layout (their fusion-header-wrapper, height ~84px):
+ *   - Logo LEFT  → "Interfood." wordmark in Prata (their display serif),
+ *                  gold dot = Interfood brand signature.
+ *   - Nav CENTER → 5 items in Lato (their body/nav font, has Cyrillic):
+ *                  Меню · Услуги · События · О нас · Контакты.
+ *   - CTA RIGHT  → burgundy gradient phone button (their fusion-menu-item-
+ *                  button pattern → `.tott-cta-btn`).
+ *
+ * Position logic:
+ *   - At top (scrollY < heroHeight): `fixed bottom-0` — nav sits at the
+ *     bottom edge of the 100vh hero (over the video), transparent bg,
+ *     white text. This is the "menu at the bottom" the brief asks for.
+ *   - Scrolled past hero: `fixed top-0` — cream bg, dark text, shadow.
+ *
+ * Mobile: hamburger (right) opens a full-screen motion menu (existing
+ * pattern). Phone FABs preserved. Desktop CepOverlayMenu trigger removed
+ * — nav items are shown directly (talkofthetown shows them inline, not
+ * behind a MENU button).
+ *
+ * @see docs/talkofthetown-MINED-EXTRACTION.md (header structure)
  */
+
+type NavItem = { href: string; label: string };
+
+// 5-item nav matching talkofthetownatlanta.com (Catering · Menus · Venues ·
+// Meet TOTT · Contact) → mapped to Interfood's real section IDs.
+const NAV: NavItem[] = [
+  { href: "#menu", label: "Меню" },
+  { href: "#ea-service-tabs", label: "Услуги" },
+  { href: "#ea-events-portfolio", label: "События" },
+  { href: "#about", label: "О нас" },
+  { href: "#contact", label: "Контакты" },
+];
+
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [cepMenuOpen, setCepMenuOpen] = useState(false);
-  // Default theme = transparent (over hero).
-  const [theme, setTheme] = useState<HeaderTheme>("transparent");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -69,72 +57,28 @@ export function SiteHeader() {
   const prevOpen = useRef(false);
   useEffect(() => {
     if (open && !prevOpen.current) {
-      // Focus close button when menu opens
       setTimeout(() => closeBtnRef.current?.focus(), 100);
     } else if (!open && prevOpen.current) {
-      // Restore focus to trigger when menu closes
       triggerRef.current?.focus();
     }
     prevOpen.current = open;
   }, [open]);
 
+  // Dock-at-bottom vs sticky-top: toggle when scrolled past the hero.
+  // Hero is 100vh, so threshold ≈ window.innerHeight. We subtract a small
+  // buffer (40px) so the switch happens just before the hero fully exits.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => {
+      const threshold = (typeof window !== "undefined" ? window.innerHeight : 800) - 40;
+      setScrolled(window.scrollY > threshold);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // IntersectionObserver: detect which section's `data-header-theme`
-  // attribute is currently overlapping the top of the viewport (where the
-  // header sits). Updates `theme` state. SSR-safe.
+  // Lock body scroll when mobile menu open.
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (typeof IntersectionObserver === "undefined") return;
-
-    // Header occupies roughly the top ~64px of viewport. We collapse the
-    // observer root to a thin band at the very top (negative bottom margin
-    // = -100% reduces root height to 0). A section that has any pixel
-    // overlapping that 0-px band is "intersecting" — exactly what we want.
-    const io = new IntersectionObserver(
-      (entries) => {
-        // Among intersecting entries, pick the topmost (smallest
-        // boundingClientRect.top). Handles edge case where two sections
-        // both touch the 0-line briefly during fast scroll.
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible.length === 0) return;
-        const topEl = visible[0].target as HTMLElement;
-        const next = (topEl.dataset.headerTheme as HeaderTheme | undefined) ?? "transparent";
-        setTheme((cur) => (cur === next ? cur : next));
-      },
-      {
-        // Top 0px = the very top of viewport. We pick a slightly positive
-        // height (top -1px to avoid weird flicker at exact 0).
-        rootMargin: "-1px 0px -100% 0px",
-        threshold: [0, 1],
-      },
-    );
-
-    const observeAll = () => {
-      document.querySelectorAll<HTMLElement>("[data-header-theme]").forEach((el) => {
-        io.observe(el);
-      });
-    };
-    // Run once on mount + re-run after a tick in case sections are still
-    // hydrating/mounting (some are client components that mount late).
-    observeAll();
-    const t = window.setTimeout(observeAll, 600);
-
-    return () => {
-      io.disconnect();
-      window.clearTimeout(t);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Save scroll position before opening menu to prevent jump
     if (open) {
       const scrollY = window.scrollY;
       document.body.style.overflow = "hidden";
@@ -142,15 +86,12 @@ export function SiteHeader() {
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = "100%";
     } else {
-      // Restore scroll position when closing
       const scrollY = document.body.style.top;
       document.body.style.overflow = "";
       document.body.style.position = "";
       document.body.style.top = "";
       document.body.style.width = "";
-      if (scrollY) {
-        window.scrollTo(0, -parseInt(scrollY || "0", 10));
-      }
+      if (scrollY) window.scrollTo(0, -parseInt(scrollY || "0", 10));
     }
     return () => {
       document.body.style.overflow = "";
@@ -160,74 +101,85 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  const themeClasses = THEME_CLASSES[theme];
+  // Docked (transparent over hero) vs sticky (solid cream).
+  const docked = !scrolled;
 
   return (
     <>
       <header
         role="banner"
-        data-theme={theme}
-        data-scrolled={scrolled ? "true" : "false"}
+        data-tott-state={docked ? "docked" : "sticky"}
         inert={open}
         aria-hidden={open}
-        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${themeClasses.bg} ${themeClasses.text}`}
+        className={`fixed inset-x-0 z-50 transition-all duration-500 ${
+          docked
+            ? "bottom-0 bg-transparent text-white"
+            : "top-0 bg-cream/95 text-ink shadow-[0_6px_24px_-12px_rgba(0,0,0,0.18)] backdrop-blur-md"
+        }`}
       >
-        {/* Dismissible seasonal announcement bar (Salt Block pattern) */}
-        <AnnouncementBar />
-
         <div
           className={`mx-auto flex max-w-7xl items-center justify-between px-5 transition-all duration-500 md:px-8 ${
-            scrolled ? "py-3" : "py-5"
+            docked ? "py-4" : "py-3"
           }`}
         >
-          {/* Interfood wordmark — текстовый логотип (gold dot) */}
+          {/* Logo LEFT — Prata wordmark (their display serif). */}
           <a
             href="#main-content"
-            className={`min-h-[44px] flex items-center transition-opacity duration-300 hover:opacity-80 ${themeClasses.text}`}
+            className="min-h-[44px] flex items-center transition-opacity duration-300 hover:opacity-80"
             aria-label="Interfood Catering — главная"
           >
-            <span className="font-display text-2xl md:text-3xl font-bold uppercase tracking-[0.02em]">
-              Interfood<span className="text-gold">.</span>
+            <span
+              className="tott-display text-2xl md:text-[28px]"
+              style={{ letterSpacing: "0.005em", fontWeight: 400 }}
+            >
+              Interfood<span style={{ color: "var(--gold)" }}>.</span>
             </span>
           </a>
 
-          {/* Desktop Navigation — Cycle 27 CEP overlay menu trigger.
-              Replaces the mega-menu nav with a single "MENU" button (CEP style:
-              Logo left | MENU center | CTA right). Opens the full-screen
-              CepOverlayMenu with 54px staggered items. */}
-          <button
-            onClick={() => setCepMenuOpen(true)}
-            className={`hidden lg:inline-flex min-h-[44px] items-center gap-2 cep-nav-link transition-opacity duration-300 hover:opacity-70 ${themeClasses.text}`}
-            aria-label="Открыть меню"
-            aria-expanded={cepMenuOpen ? "true" : "false"}
+          {/* Nav CENTER — 5 items in Lato (hidden on mobile). */}
+          <nav
+            className="hidden lg:flex items-center gap-8"
+            aria-label="Основная навигация"
           >
-            <span className="text-[17px] font-light uppercase tracking-[-0.02em]">Меню</span>
-            <Menu className="size-5" />
-          </button>
+            {NAV.map((n) => (
+              <a
+                key={n.label}
+                href={n.href}
+                className="tott-body min-h-[44px] flex items-center text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 hover:text-tott-burgundy"
+                style={{ fontWeight: 700 }}
+              >
+                {n.label}
+              </a>
+            ))}
+          </nav>
 
-          {/* Right side actions — телефон + CTA «Проверить дату» */}
-          <div className="flex items-center gap-4 md:gap-5">
+          {/* CTA RIGHT — burgundy phone button (their fusion-menu-item-button). */}
+          <div className="flex items-center gap-3">
             <a
               href={CONTACTS.phoneHref}
-              className={`min-h-[44px] min-w-[44px] flex items-center justify-center gap-2 transition-colors hover:text-gold md:gap-2 ${themeClasses.text} opacity-85 hover:opacity-100`}
+              className="tott-cta-btn hidden sm:inline-flex min-h-[44px]"
               aria-label={`Позвонить ${CONTACTS.phone}`}
             >
-              <Phone className="size-5 shrink-0" />
-              <span className="hidden md:inline font-display text-sm font-medium uppercase tracking-wide">{CONTACTS.phone}</span>
+              <Phone className="size-4 shrink-0" />
+              <span>{CONTACTS.phone}</span>
             </a>
-            {/* Главная CTA — «Проверить дату» (Cycle 24: joels.com sage square button,
-                replaces the gold→terracotta gradient pill to align with joels palette). */}
+            {/* Mobile: phone icon only */}
             <a
-              href="#contact"
-              className="joel-button-filled group min-h-[44px] inline-flex items-center justify-center gap-2 sm:px-6"
+              href={CONTACTS.phoneHref}
+              className={`min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors sm:hidden ${
+                docked ? "text-white" : "text-tott-burgundy"
+              }`}
+              aria-label={`Позвонить ${CONTACTS.phone}`}
             >
-              <Calendar className="size-4 shrink-0" />
-              <span>Проверить дату</span>
+              <Phone className="size-6" />
             </a>
+            {/* Mobile menu trigger */}
             <button
               ref={triggerRef}
               onClick={() => setOpen(true)}
-              className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors duration-300 lg:hidden ${themeClasses.text}`}
+              className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors lg:hidden ${
+                docked ? "text-white" : "text-ink"
+              }`}
               aria-label={open ? "Закрыть меню" : "Открыть меню"}
               aria-expanded={open ? "true" : "false"}
               aria-controls="mobile-menu"
@@ -238,11 +190,11 @@ export function SiteHeader() {
         </div>
       </header>
 
-      {/* Full-screen mobile menu — warm gold/cream theme */}
+      {/* Full-screen mobile menu — cream theme */}
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-br from-cream to-parchment px-6 py-6 lg:hidden"
+            className="fixed inset-0 z-[60] flex flex-col bg-cream px-6 py-6 lg:hidden"
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
@@ -251,11 +203,29 @@ export function SiteHeader() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "-100%" }}
             transition={{ duration: 0.5, ease: [0.83, 0, 0.17, 1] }}
-            onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); if (e.key === "Tab") { const menu = e.currentTarget; const focusable = menu.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])'); if (focusable.length === 0) return; const first = focusable[0]; const last = focusable[focusable.length - 1]; if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } } }}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setOpen(false);
+              if (e.key === "Tab") {
+                const menu = e.currentTarget;
+                const focusable = menu.querySelectorAll<HTMLElement>(
+                  'button, [href], input, [tabindex]:not([tabindex="-1"])',
+                );
+                if (focusable.length === 0) return;
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                  e.preventDefault();
+                  last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                  e.preventDefault();
+                  first.focus();
+                }
+              }
+            }}
           >
             <div className="flex items-center justify-between">
-              <span className="font-display text-3xl font-bold uppercase tracking-[0.02em] text-ink">
-                Interfood<span className="text-gold">.</span>
+              <span className="tott-display text-3xl text-ink">
+                Interfood<span style={{ color: "var(--gold)" }}>.</span>
               </span>
               <button
                 ref={closeBtnRef}
@@ -269,19 +239,19 @@ export function SiteHeader() {
               </button>
             </div>
 
-            <nav className="mt-10 flex flex-col gap-1 overflow-y-auto scroll-warm">
+            <nav className="mt-10 flex flex-col gap-1 overflow-y-auto">
               {NAV.map((n, i) => (
                 <motion.a
                   key={n.label + i}
                   href={n.href}
                   onClick={() => setOpen(false)}
-                  className="group py-4 min-h-[44px] flex items-center justify-between border-b border-border-line/50 font-display text-2xl text-ink transition-colors hover:text-gold"
+                  className="tott-body group py-4 min-h-[44px] flex items-center justify-between border-b border-border-line/50 text-2xl font-700 text-ink transition-colors hover:text-tott-burgundy"
+                  style={{ fontWeight: 700 }}
                   initial={{ opacity: 0, x: -30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 + i * 0.06 }}
                 >
                   {n.label}
-                  <ArrowRightIcon className="size-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                 </motion.a>
               ))}
             </nav>
@@ -289,210 +259,28 @@ export function SiteHeader() {
             <div className="mt-auto space-y-3 text-ink">
               <a
                 href={CONTACTS.phoneHref}
-                className="flex min-h-[44px] items-center gap-3 py-2 text-2xl font-display hover:text-gold transition-colors"
+                className="tott-body flex min-h-[44px] items-center gap-3 py-2 text-2xl font-700 hover:text-tott-burgundy"
+                style={{ fontWeight: 700 }}
               >
                 <Phone className="size-5" />
                 {CONTACTS.phone}
               </a>
-              <a
-                href={`mailto:${CONTACTS.email}`}
-                className="flex min-h-[44px] items-center gap-3 py-2 text-sm text-ink/70 hover:text-gold transition-colors"
-              >
-                <Mail className="size-4" />
-                {CONTACTS.email}
-              </a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Mobile FABs — телефон (снизу) + Проверить дату (выше) */}
-      <a
-        href="#contact"
-        aria-label="Проверить дату"
-        className="fixed bottom-60 right-6 z-[70] flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-lg shadow-gold/30 transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
-      >
-        <Calendar className="size-6" />
-      </a>
+      {/* Mobile FABs — phone (bottom) */}
       <a
         href={CONTACTS.phoneHref}
         aria-label="Позвонить Interfood Catering"
-        className="fixed bottom-44 right-6 z-[70] flex size-14 items-center justify-center rounded-full border-2 border-gold/40 bg-white/90 text-gold shadow-lg shadow-gold/20 backdrop-blur-sm transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
+        className="fixed bottom-6 right-6 z-[70] flex size-14 items-center justify-center rounded-full bg-tott-burgundy text-white shadow-lg shadow-tott-burgundy/30 transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
       >
         <Phone className="size-6" />
       </a>
 
-      {/* Cycle 27 — CEP full-screen overlay menu (desktop MENU trigger) */}
+      {/* CepOverlayMenu kept available (triggered programmatically if needed). */}
       <CepOverlayMenu isOpen={cepMenuOpen} onClose={() => setCepMenuOpen(false)} />
     </>
-  );
-}
-
-/**
- * MegaMenu — Sopranos Catering dropdowns for Corporate and Social nav items.
- * Opens on mouseenter/focus, closes on mouseleave/blur (150ms delay).
- * Uses SOPRANOS_NAV mega items + featured photo card per Sopranos design.
- */
-function MegaMenu({ item }: { item: NavItem }) {
-  const [open, setOpen] = useState(false);
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const openNow = () => {
-    if (closeTimer.current) clearTimeout(closeTimer.current);
-    setOpen(true);
-  };
-  const closeSoon = () => {
-    closeTimer.current = setTimeout(() => setOpen(false), 150);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (closeTimer.current) clearTimeout(closeTimer.current);
-    };
-  }, []);
-
-  const onTriggerKey = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
-      e.preventDefault();
-      setOpen((o) => !o);
-    } else if (e.key === "Escape") {
-      setOpen(false);
-    }
-  };
-
-  const go = (href: string) => {
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-    setOpen(false);
-  };
-
-  // Pull the Sopranos nav mega items for this label
-  const navEntry = SOPRANOS_NAV.find((n) => n.label === item.label) as
-    | (typeof SOPRANOS_NAV)[number]
-    | undefined;
-  const megaItems =
-    navEntry && "mega" in navEntry && navEntry.mega ? navEntry.mega.items : [];
-  const megaTitle =
-    navEntry && "mega" in navEntry && navEntry.mega ? navEntry.mega.title : item.label;
-
-  const featuredImage =
-    item.mega === "corporate"
-      ? "/media/concorde-boardroom.webp"
-      : "/media/event-11.jpg";
-  const featuredEyebrow = item.mega === "corporate" ? "Корпоративный кейтеринг" : "Частные события";
-  const featuredTitle = item.mega === "corporate" ? "Бизнес-ланчи и встречи" : "Празднуйте каждый момент";
-  const featuredCta = "Смотреть все опции →";
-
-  return (
-    <div
-      className="relative"
-      onMouseEnter={openNow}
-      onMouseLeave={closeSoon}
-      onFocus={openNow}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) closeSoon();
-      }}
-    >
-      <button
-        type="button"
-        aria-haspopup="true"
-        aria-expanded={open ? "true" : "false"}
-        onKeyDown={onTriggerKey}
-        onClick={() => go(item.href)}
-        className="group flex min-h-[44px] items-center gap-1 font-display text-sm font-medium uppercase tracking-wide opacity-80 transition-opacity duration-300 hover:opacity-100"
-      >
-        {item.label}
-        <ChevronDown
-          className={`size-3.5 transition-transform duration-300 ${open ? "rotate-180 text-gold" : ""}`}
-        />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            role="menu"
-            aria-label={item.label}
-            data-mega-panel=""
-            className="absolute left-1/2 top-full z-50 mt-2 w-[34rem] max-w-[calc(100vw-2rem)] -translate-x-1/2 overflow-hidden rounded-2xl border border-border-line bg-white/97 shadow-2xl shadow-ink/10 backdrop-blur-xl"
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="grid grid-cols-[1fr_1fr] gap-0">
-              <div className="p-4">
-                <p className="px-2 pb-2 font-display text-[10px] uppercase tracking-[0.3em] text-gold">
-                  {megaTitle}
-                </p>
-                <ul className="grid grid-cols-1 gap-0.5">
-                  {megaItems.map((m, idx) => (
-                    <li key={`${m.label}-${idx}`}>
-                      <button
-                        type="button"
-                        role="menuitem"
-                        onClick={() => go(m.href)}
-                        className="group flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition-colors hover:bg-gold/8"
-                      >
-                        <span className="text-sm font-medium text-ink/80 group-hover:text-gold">
-                          {m.label}
-                        </span>
-                        <ChevronDown className="size-3 -rotate-90 text-ink/30 group-hover:text-gold transition-colors" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {/* Featured card */}
-              <a
-                href={item.href}
-                role="menuitem"
-                onClick={() => setOpen(false)}
-                className="group relative block overflow-hidden rounded-l-2xl"
-              >
-                <img
-                  src={featuredImage}
-                  alt=""
-                  aria-hidden="true"
-                  className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
-                <div className="relative flex h-full min-h-[16rem] flex-col justify-end p-5">
-                  <span className="font-display text-[10px] uppercase tracking-[0.3em] text-gold">
-                    {featuredEyebrow}
-                  </span>
-                  <p className="mt-2 font-display text-xl text-white">
-                    {featuredTitle}
-                  </p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-cream/90 transition-colors group-hover:text-gold">
-                    {featuredCta}
-                  </span>
-                </div>
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-/** Simple arrow icon for mobile menu */
-function ArrowRightIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
   );
 }

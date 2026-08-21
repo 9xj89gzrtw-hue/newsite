@@ -92,6 +92,23 @@
   --font-neutra-display: var(--font-neutra-display);
   --font-neutra-text: var(--font-neutra-text);
 
+  /* ===== TALK OF THE TOWN (talkofthetownatlanta.com) TOKENS — Cycle 30 =====
+     Graft layer: their brand palette + 3 Google Fonts. Burgundy #8B1F1C is
+     their primary brand color (Avada awb-color-6); olive #A0CE4E is their
+     accent (awb-color-4); cream #F1EAE0 is their section bg. Used in the new
+     TottHeader (burgundy CTA button), TottHero accents, parallax section
+     backgrounds, and the Nothing-You-Could-Do script-accent overlays. */
+  --color-tott-burgundy: var(--tott-burgundy);
+  --color-tott-burgundy-deep: var(--tott-burgundy-deep);
+  --color-tott-olive: var(--tott-olive);
+  --color-tott-olive-deep: var(--tott-olive-deep);
+  --color-tott-cream: var(--tott-cream);
+  --color-tott-paper: var(--tott-paper);
+  --color-tott-ink: var(--tott-ink);
+  --font-prata: var(--font-prata);
+  --font-nothing: var(--font-nothing);
+  --font-lato: var(--font-lato);
+
   /* shadcn-compatible aliases (so existing ui/* components keep working) */
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -238,6 +255,17 @@
   --ea-black:      #000000;   /* philosophy quote bg, final CTA bg */
   --ea-white:      #FFFFFF;   /* text on black, press strip bg */
   --ea-ink:        #1A1A1A;   /* body text on cream/blush (slightly warmer than pure black) */
+
+  /* ===== TALK OF THE TOWN (talkofthetownatlanta.com) PALETTE — Cycle 30 =====
+     Burgundy + olive + cream editorial palette (Avada theme tokens).
+     Burgundy is the dominant brand color; olive the accent; cream the bg. */
+  --tott-burgundy:      #8B1F1C;   /* primary brand — logo accent, CTA button, section eyebrows */
+  --tott-burgundy-deep: #6B0202;   /* hover/pressed state of burgundy */
+  --tott-olive:         #A0CE4E;   /* accent — dividers, bullets, hover states */
+  --tott-olive-deep:    #7AAB36;   /* olive hover */
+  --tott-cream:         #F1EAE0;   /* warm section background (their awb-color-3) */
+  --tott-paper:         #F6F6F6;   /* off-white card surface */
+  --tott-ink:           #2B2B2B;   /* body text on cream */
 
   /* shadcn aliases (LIGHT THEME DEFAULT) */
   --background: var(--cream);
@@ -3550,3 +3578,149 @@ header[data-scrolled="true"] [data-mega-panel] {
   pointer-events: none;
   opacity: 0.7;
 }
+
+/* ========================================================================
+   TALK OF THE TOWN (talkofthetownatlanta.com) GRAFT — Cycle 30
+   Reference: WordPress + Avada 7.0.4 + Slider Revolution 6.7.58.
+   Their signature animations: GSAP power3.inOut 300ms char-split text reveal;
+   41× Avada fadeInLeft (0.3–0.9s, top-into-view); 16× CSS parallax
+   (background-attachment: fixed); 5px white border decorative frames.
+   These utilities reproduce that motion language for Interfood's RU site.
+   ======================================================================== */
+
+/* Prata display font helpers (Latin-only — for English headlines/wordmark) */
+.tott-display { font-family: var(--font-prata), var(--font-serif), Georgia, serif; }
+/* Nothing You Could Do — script accent (Latin-only — English accent phrases) */
+.tott-script  { font-family: var(--font-nothing), var(--font-script), cursive; }
+/* Lato — body + nav menu (has Cyrillic → RU copy safe) */
+.tott-body    { font-family: var(--font-lato), var(--font-sans), system-ui, sans-serif; }
+
+/* --- Burgundy CTA button (their fusion-menu-item-button gradient) -------- */
+.tott-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  font-family: var(--font-lato), var(--font-sans), sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, var(--tott-burgundy) 0%, var(--tott-burgundy-deep) 100%);
+  border: none;
+  border-radius: 2px;
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.3s ease,
+              filter 0.3s ease;
+  box-shadow: 0 6px 18px -8px rgba(139,31,28,0.55);
+}
+.tott-cta-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 10px 24px -8px rgba(139,31,28,0.7);
+}
+.tott-cta-btn:active { transform: translateY(0); }
+
+/* --- 5px white border decorative frame (their hero SR7 border shape) ----- */
+.tott-border-frame {
+  position: absolute;
+  inset: 1.5rem;
+  border: 5px solid rgba(255,255,255,0.85);
+  pointer-events: none;
+  z-index: 3;
+}
+.tott-border-frame--cream { border-color: rgba(241,234,224,0.7); }
+
+/* --- Char-split text reveal (their SR7 GSAP power3.inOut 300ms split) -----
+   Wrap each char in <span class="tott-char">. Parent gets .tott-split-reveal.
+   On .is-visible each char animates opacity 0→1 + y 18→0 with stagger via
+   --tott-char-i index variable. Respects prefers-reduced-motion (static). */
+.tott-split-reveal .tott-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.45s cubic-bezier(0.22,1,0.36,1),
+              transform 0.45s cubic-bezier(0.22,1,0.36,1);
+  transition-delay: calc(var(--tott-char-i, 0) * 28ms);
+}
+.tott-split-reveal.is-visible .tott-char {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tott-split-reveal .tott-char { opacity: 1; transform: none; transition: none; }
+}
+
+/* --- fadeInLeft (their Avada fusion-animated fadeInLeft, top-into-view) ---
+   41× elements use this on their homepage. Apply to cards/headlines/images. */
+.tott-fade-left {
+  opacity: 0;
+  transform: translateX(-36px);
+  transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1),
+              transform 0.8s cubic-bezier(0.22,1,0.36,1);
+  transition-delay: var(--tott-fade-delay, 0s);
+}
+.tott-fade-left.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.tott-fade-right {
+  opacity: 0;
+  transform: translateX(36px);
+  transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1),
+              transform 0.8s cubic-bezier(0.22,1,0.36,1);
+  transition-delay: var(--tott-fade-delay, 0s);
+}
+.tott-fade-right.is-visible { opacity: 1; transform: translateX(0); }
+@media (prefers-reduced-motion: reduce) {
+  .tott-fade-left, .tott-fade-right { opacity: 1; transform: none; transition: none; }
+}
+
+/* --- CSS parallax (their 16× background-attachment: fixed sections) -------
+   Attach to a full-bleed bg div. Background stays fixed while content scrolls
+   over it — the classic Avada parallax band. Fallback: scroll-behavior on
+   touch devices (background-attachment: fixed is janky on iOS). */
+.tott-parallax {
+  background-attachment: fixed;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+@supports (-webkit-touch-callout: none) and (not (translate: none)) {
+  .tott-parallax { background-attachment: scroll; }
+}
+@media (hover: none) and (pointer: coarse) {
+  .tott-parallax { background-attachment: scroll; }
+}
+
+/* --- Olive divider bullet (their section eyebrow accent) ----------------- */
+.tott-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-lato), var(--font-sans), sans-serif;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--tott-burgundy);
+}
+.tott-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 2rem;
+  height: 2px;
+  background: var(--tott-olive);
+}
+
+/* --- Burgundy section band (their primary brand color as a section bg) --- */
+.tott-band-burgundy {
+  background: var(--tott-burgundy);
+  color: #fff;
+}
+.tott-band-cream {
+  background: var(--tott-cream);
+  color: var(--tott-ink);
+}
+

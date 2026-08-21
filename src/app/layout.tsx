@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed, Montserrat } from "next/font/google";
+import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed, Montserrat, Prata, Nothing_You_Could_Do, Lato } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -84,6 +84,41 @@ const neutraDisplay = localFont({
 const neutraText = localFont({
   src: "../../public/fonts/Neutra2Text_book.woff2",
   variable: "--font-neutra-text",
+  display: "swap",
+});
+
+// ===== TALK OF THE TOWN (talkofthetownatlanta.com) FONTS — Cycle 30 =====
+// Reference site uses 3 Google Fonts (all weight 400):
+//   - Prata              → display serif (h1/h2, logo wordmark). Latin-only.
+//   - Nothing You Could Do → script accent (hero overlay tagline). Latin-only.
+//   - Lato               → body + nav menu. next/font Lato ships latin/latin-ext
+//                          only (no Cyrillic subset), so Russian glyphs fall back
+//                          through .tott-body's chain to Karla (full Cyrillic) —
+//                          Latin runs (logo, English accents) render in Lato.
+// Prata carries the editorial elegance of their burgundy+olive brand;
+// Nothing You Could Do delivers the handwritten script-accent wow (their
+// hero overlay "bacon & bluecheese tartlet"); Lato gives the clean nav/body.
+// Latin-only faces (Prata, Nothing You Could Do) are used for English accent
+// phrases; Russian copy falls back to Playfair (display) / Karla (body) which
+// both ship full Cyrillic coverage.
+const prata = Prata({
+  variable: "--font-prata",
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+});
+
+const nothingYouCouldDo = Nothing_You_Could_Do({
+  variable: "--font-nothing",
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+});
+
+const lato = Lato({
+  variable: "--font-lato",
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "700"],
   display: "swap",
 });
 
@@ -212,7 +247,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://yandex.ru" />
       </head>
       <body
-        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} antialiased bg-background text-foreground`}
+        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} ${prata.variable} ${nothingYouCouldDo.variable} ${lato.variable} antialiased bg-background text-foreground`}
       >
         <a href="#main-content" className="skip-link">
           Перейти к содержанию

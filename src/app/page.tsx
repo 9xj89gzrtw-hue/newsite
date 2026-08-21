@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
-import { CepEggHero } from "@/components/catering/cep-egg-hero";
+import { TottHero } from "@/components/catering/tott-hero";
+import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { CepClientMarquee } from "@/components/catering/cep-client-marquee";
 import { CepSimpleBrilliant } from "@/components/catering/cep-simple-brilliant";
 import { CepRedStats } from "@/components/catering/cep-red-stats";
@@ -158,11 +159,16 @@ export default function Home() {
 
       {/* ── ACT I: BRAND PROMISE & POSITIONING ── */}
 
-      {/* 1. CepEggHero — CEP signature egg hero. Full-bleed egg photo bg +
-          244px stacked headline "ЕДА / ПРЕЖДЕ ВСЕГО." + locations strip.
-          No CTAs — luxury restraint. The chicken-and-egg riddle as brand
-          thesis (food IS the brand, food comes first). */}
-      <CepEggHero />
+      {/* 1. TottHero — Cycle 30 Talk of the Town (talkofthetownatlanta.com)
+          hero graft. Full-viewport background VIDEO (ea-hero-video.mp4 —
+          cinematic motion replaces their static hero photo per task brief)
+          + 5px white border frame (their SR7 signature) + centered Prata
+          "Interfood." wordmark + Nothing-You-Could-Do script accent
+          "food as art" + Lato RU subhead. The SiteHeader docks at the
+          BOTTOM of this 100vh hero (menu-at-bottom per task brief), then
+          sticks to top on scroll. Their fonts (Prata / Nothing You Could
+          Do / Lato) + burgundy/olive/cream palette introduced here. */}
+      <TottHero />
 
       {/* 2. CepClientMarquee — "ИЗБРАННЫЕ КЛИЕНТЫ" 17 RU corporate giants
           (СБЕР • ГАЗПРОМ • ЯНДЕКС • …) scrolling with red bullets + edge-fade
@@ -271,6 +277,15 @@ export default function Home() {
           5 district groups × 6 venues = 30 venues + sticky featured 4:5 hero
           card. EA's strongest B2B credibility asset (BRAND-CONTEXT §2.5). */}
       <EaVenueNetwork />
+
+      {/* 20b. TottParallaxBand — Cycle 30 NEW. Talk of the Town
+          (talkofthetownatlanta.com) parallax quote band — their signature
+          CSS-parallax section (background-attachment: fixed, 16× on their
+          homepage) + char-split headline reveal (their SR7 GSAP power3.inOut)
+          + Nothing-You-Could-Do script accent "bon appétit". Uses their
+          downloaded "Olive Trees" bg. Editorial pause bridging Act II → Act
+          III — a cinematic trust beat before the testimonials. */}
+      <TottParallaxBand />
 
       {/* ── ACT III: PROOF & PROCESS ── */}
 
