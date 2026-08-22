@@ -4,14 +4,10 @@ import { TottHero } from "@/components/catering/tott-hero";
 import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
 import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
-import { EaServiceTabs } from "@/components/catering/ea-service-tabs";
-import { EaEventsPortfolio } from "@/components/catering/ea-events-portfolio";
-import { EaVenuesSpotlight } from "@/components/catering/ea-venues-spotlight";
+import { EaServices } from "@/components/catering/ea-services";
 import { Menu } from "@/components/catering/menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
-import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
 import { CepProcess } from "@/components/catering/cep-process";
-import { DeliveryBlock } from "@/components/catering/delivery-block";
 import { Calculator } from "@/components/catering/calculator";
 import { EaFounderStory } from "@/components/catering/ea-founder-story";
 import { GammaSeparator } from "@/components/catering/gamma-separator";
@@ -138,53 +134,28 @@ export default function Home() {
 
       {/* ── ACT II: WHAT WE OFFER ── */}
 
-      {/* 6. EaServiceTabs — Cycle 29. Wolfgang Puck «service tabs» pattern: 5
-             tabs (Свадьбы · Корпоратив · Банкеты · Фуршеты · Выездной Шеф) with
-             click-to-swap image + copy + bullet list + contextual CTA per tab. */}
-      <EaServiceTabs />
+      {/* 6. EaServices — Cycle 35 NEW. Filterable category grid of 18 catering
+             services (replaces the 5-tab EaServiceTabs pattern which doesn't
+             scale to 18 services). Category chips (Все / Корпоратив / Частные /
+             Фуршет / Спецменю / Логистика) + responsive card grid with hover /
+             tap-to-expand panels. Modern Awwwards / sondaven.com filterable-grid
+             approach. Content rethought from interfood-catering.ru in premium
+             brand tone (docs/SERVICES-CONTENT.md). */}
+      <EaServices />
 
-      {/* 7. EaEventsPortfolio — Cycle 28. Magazine horizontal-scroll gallery: 8
-             event cards (4:5 portrait), scroll-snap-x mandatory, auto-advance
-             4.5s, pause on hover, pure CSS+JS (no Embla). */}
-      <EaEventsPortfolio />
-
-      {/* 8. EaVenuesSpotlight — Cycle 28. 3 full-bleed 16:10 venue cards with
-             hover zoom (scale 1.05) + bottom overlay panel. Section header is
-             "Где мы *работаем*." — exactly the "where we work" block the user
-             asked for. */}
-      <EaVenuesSpotlight />
-
-      {/* 9. Menu — 7 menu types with interactive list + real dishes + PDF. */}
+      {/* 7. Menu — 7 menu types with interactive list + real dishes + PDF. */}
       <Menu />
 
-      {/* 10. TottParallaxBand — PARALLAX BAND. Talk of the Town CSS-parallax bg
-              (background-attachment:fixed) + char-split headline reveal + "bon
-              appétit" script accent. Editorial pause bridging Act II → Act III —
-              a cinematic trust beat before the events video carousel. */}
+      {/* 8. TottParallaxBand — PARALLAX BAND. Talk of the Town CSS-parallax bg
+             (background-attachment:fixed) + char-split headline reveal + "bon
+             appétit" script accent. Editorial pause bridging Act II → Act III. */}
       <TottParallaxBand />
 
-      {/* ── ACT III: PROCESS & LOGISTICS ── */}
+      {/* ── ACT III: PROCESS ── */}
 
-      {/* 11. EventsVideoCarousel — Cycle 32 NEW. Carousel of 4 event-type video
-              tiles with looping muted autoplay teasers + caption panel + center
-              play-pill CTA that opens a fullscreen modal with the full unmuted
-              video + controls. Magazine scroll-snap-x mandatory pattern (forked
-              from EaEventsPortfolio), 5s auto-advance, pause-on-hover, ESC closes
-              the modal. The "events video carousel" the user explicitly requested. */}
-      <EventsVideoCarousel />
-
-      {/* 12. CepProcess — "THE CREATIVE EDGE" 3-step process: 01 DREAM / 02 BUILD /
-              03 SAVOR. The "algorithm of actions" block — how we work, the creative edge. */}
+      {/* 9. CepProcess — "THE CREATIVE EDGE" 3-step process: 01 DREAM / 02 BUILD /
+             03 SAVOR. The "algorithm of actions" block — how we work, the creative edge. */}
       <CepProcess />
-
-      {/* 13. DeliveryBlock — Cycle 32 NEW. 2-col split: delivery photo LEFT +
-              content stack RIGHT (eyebrow "ДОСТАВКА КЕТЕРИНГА" → H2 "Кейтеринг,
-              который *доставляют*." → body paragraph → 5 USPs with custom inline
-              SVG icons → geography row "Санкт-Петербург · Москва · Вся Россия" →
-              2 CTA pills "Заказать доставку" → #contact + "Рассчитать стоимость"
-              → #calculator). Bridges logistics into the conversion flow before
-              the Calculator. */}
-      <DeliveryBlock />
 
       {/* ── ACT IV: CONVERSION ── */}
 

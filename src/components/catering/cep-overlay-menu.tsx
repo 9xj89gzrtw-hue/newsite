@@ -47,8 +47,7 @@ type MenuItem = { label: string; href: string };
 // the page top-to-bottom so the menu doubles as a section index.
 const MENU_ITEMS: MenuItem[] = [
   { label: "ГЛАВНАЯ", href: "#main-content" },
-  { label: "УСЛУГИ", href: "#ea-service-tabs" },
-  { label: "СОБЫТИЯ", href: "#ea-events-portfolio" },
+  { label: "УСЛУГИ", href: "#services" },
   { label: "МЕНЮ", href: "#menu" },
   { label: "КАЛЬКУЛЯТОР", href: "#calculator" },
   { label: "О НАС", href: "#about" },

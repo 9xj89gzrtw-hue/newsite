@@ -189,13 +189,14 @@ function NewsletterSignup() {
   );
 }
 
-/** Навигация футера — ссылки на ключевые разделы. */
+/** Навигация футера — ссылки на ключевые разделы (Cycle 35: убраны
+    «События» — блок удалён; «Свадьбы»/«Корпоративы»/«Гриль» теперь ведут
+    на #services — новую сетку 18 услуг). */
 const FOOTER_NAV = [
   { label: "Главная", href: "#main-content" },
-  { label: "Свадьбы", href: "#ea-service-tabs" },
-  { label: "Корпоративы", href: "#ea-service-tabs" },
-  { label: "События", href: "#ea-events-portfolio" },
-  { label: "Гриль и BBQ", href: "#ea-service-tabs" },
+  { label: "Свадьбы", href: "#services" },
+  { label: "Корпоративы", href: "#services" },
+  { label: "Гриль и BBQ", href: "#services" },
   { label: "Поднос", href: "#menu" },
   { label: "Закуски", href: "#menu" },
   { label: "Контакты", href: "#contact" },

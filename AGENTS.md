@@ -3239,3 +3239,84 @@ EaVenuesSpotlight стал pinned horizontal-scroll map (Sondaven pin_vector).
 cursor. /loop критика в 3 раунда: 3 бага найдены и пофиксены (clip-path→opacity
 pivot — ключевой урок). VLM + Agent Browser верифицировали все блоки. `lint`
 зелёный. Единственная новая зависимость — `split-type` (4kb MIT).
+
+---
+
+## Cycle 35 — реструктуризация секции услуг (18 направлений)
+
+**Дата:** 2026-08-22. **Задача:** удалить блоки события/площадки/доставка;
+расширить секцию услуг до 18 направлений (контент из interfood-catering.ru,
+переосмыслить в современном премиальном тоне).
+
+### Что удалено из page.tsx
+
+- `EaEventsPortfolio` (события — magazine horizontal-scroll gallery)
+- `EaVenuesSpotlight` (площадки — pinned horizontal-scroll map, был Cycle 34 showpiece)
+- `EventsVideoCarousel` (события-видео — carousel of 4 event-type video tiles)
+- `DeliveryBlock` (доставка — 2-col split + 5 USPs)
+- `EaServiceTabs` (старый 5-таб паттерн — не масштабируется на 18 услуг)
+
+Старые `.tsx` файлы оставлены на диске (конвенция проекта — reference).
+
+### Что добавлено
+
+- **`src/components/catering/ea-services.tsx`** + **`ea-services.css`** —
+  новый блок услуг. Filterable category grid (НЕ tabs): 6 чипов категорий
+  (Все / Корпоратив / Частные / Фуршет / Спецменю / Логистика) + адаптивная
+  сетка из 18 карточек. Каждая карточка: lucide line-иконка + title + tagline
+  (всегда видны) + toggle «Подробнее» → description + 4 features + minOrder +
+  CTA «Заказать» → #contact. AnimatePresence `mode="popLayout"` + `layout` для
+  анимации фильтра (transform/opacity only). ARIA radiogroup для чипов,
+  44px touch-targets, reduced-motion fallback.
+- **`docs/SERVICES-CONTENT.md`** — спецификация контента 18 услуг (источник:
+  interfood-catering.ru + переосмысление в бренд-тоне «Еда как искусство»).
+
+### 18 услуг (5 категорий)
+
+- **corporate (5):** кофе-брейки, конференции, презентации, обеды в офис,
+  новогодний корпоратив
+- **private (4):** частные мероприятия, выездной банкет, выездной ресторан,
+  торты на заказ
+- **buffet (4):** доставка закусок, барбекю, шоколадный фонтан, пирамиды
+  из шампанского
+- **special (2):** вегетарианское, халяль
+- **logistics (3):** выездная регистрация, аренда оборудования, оформление зала
+
+### Nav-обновления (4 файла)
+
+- `site-header.tsx`: убран «События», id услуг `#ea-service-tabs` → `#services`
+  (4 пункта: Меню/Услуги/О нас/Контакты)
+- `chapter-nav.tsx`: убран Events dot, Services id → `#services` (7 dots)
+- `cep-overlay-menu.tsx`: убран «СОБЫТИЯ», УСЛУГИ → `#services` (7 пунктов)
+- `site-footer.tsx`: убран «События», ссылки услуг → `#services`
+
+### Грабли (для будущих циклов)
+
+- **#35-1 При удалении блоков ВСЕГДА проверять nav-ссылки в 4 местах:**
+  site-header (NAV array), chapter-nav (SECTIONS array), cep-overlay-menu
+  (MENU_ITEMS array), site-footer (FOOTER_NAV array). Stale-ссылки на
+  удалённые #id → console-free, но UX сломан (клик ведёт в никуда). Grep
+  `ea-events-portfolio|ea-service-tabs` по всему `src/` после удаления —
+  обязательная проверка.
+
+### Файлы этого цикла
+
+```
+docs/SERVICES-CONTENT.md                       (new, 18 services spec)
+src/components/catering/ea-services.tsx          (new, 384 LOC, filterable grid)
+src/components/catering/ea-services.css          (new, 270 LOC)
+src/app/page.tsx                                 (removed 5 blocks, +EaServices)
+src/components/catering/site-header.tsx          (nav: 5→4 items, #services)
+src/components/catering/chapter-nav.tsx          (8→7 dots, #services)
+src/components/catering/cep-overlay-menu.tsx     (8→7 items, #services)
+src/components/catering/site-footer.tsx          (footer nav: removed События)
+```
+
+**TL;DR (Cycle 35):** Удалены 4 блока (события, площадки, доставка,
+events-video) + старый 5-таб услуг. Создан новый блок EaServices —
+filterable category grid из 18 услуг в 5 категориях с line-иконками,
+toggle-раскрытием и анимацией фильтра. Контент переосмыслен с
+interfood-catering.ru в премиальном бренд-тоне. Nav обновлён в 4 файлах.
+Agent Browser + VLM верифицировали: 18 карточек, 6 чипов, фильтр работает,
+раскрытие работает, удалённые блоки отсутствуют, stale-ссылок нет, футер
+прижат. `lint` + `typecheck` зелёные.

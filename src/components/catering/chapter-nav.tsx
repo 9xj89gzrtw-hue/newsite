@@ -11,12 +11,11 @@ import { motion, useScroll, useSpring } from "framer-motion";
  */
 // Cycle 32: updated to match the new 17-section structure. Removed Manifesto
 // (block was deleted). Renamed Services → ea-service-tabs, Events →
-// ea-events-portfolio so every dot resolves to a section id that EXISTS in
-// page.tsx. Added FAQ dot for the new "objections-resolution" beat.
+// page.tsx. Removed Events dot in Cycle 35 (events block deleted). Services
+// id renamed #ea-service-tabs → #services for the new EaServices grid.
 const SECTIONS = [
   { id: "home", label: "Hero" },
-  { id: "ea-service-tabs", label: "Services" },
-  { id: "ea-events-portfolio", label: "Events" },
+  { id: "services", label: "Services" },
   { id: "menu", label: "Menu" },
   { id: "calculator", label: "Calculator" },
   { id: "about", label: "About" },

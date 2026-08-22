@@ -40,8 +40,7 @@ type NavItem = { href: string; label: string };
 // Meet TOTT · Contact) → mapped to Interfood's real section IDs.
 const NAV: NavItem[] = [
   { href: "#menu", label: "Меню" },
-  { href: "#ea-service-tabs", label: "Услуги" },
-  { href: "#ea-events-portfolio", label: "События" },
+  { href: "#services", label: "Услуги" },
   { href: "#about", label: "О нас" },
   { href: "#contact", label: "Контакты" },
 ];

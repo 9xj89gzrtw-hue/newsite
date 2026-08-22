@@ -1,0 +1,332 @@
+/* EaServices — Cycle 35. Filterable category grid of 18 services.
+   Scoped styles (no edits to globals.css). Reuses EA utility classes
+   (.ea-section, .ea-eyebrow, .ea-section-h2, .ea-body, .ea-text-link). */
+
+/* ── Section ──────────────────────────────────────────────────────────── */
+.ea-svc {
+  padding-block: clamp(5rem, 10vw, 9rem);
+}
+
+.ea-svc__head {
+  max-width: 56rem;
+  margin-inline: auto;
+  text-align: center;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.ea-svc__head .ea-eyebrow {
+  display: block;
+  margin-bottom: 1.25rem;
+}
+
+.ea-svc__h2 {
+  /* italic fragment "придумаете" gets red via global .ea-section-h2 i rule */
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.5rem;
+}
+
+.ea-svc__lede {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ea-ink);
+  opacity: 0.75;
+  max-width: 38rem;
+  margin-inline: auto;
+}
+
+/* ── Category chips ───────────────────────────────────────────────────── */
+.ea-svc__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.ea-svc__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px; /* a11y touch target */
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--ea-ink) 15%, transparent);
+  background: transparent;
+  color: var(--ea-ink);
+  font-family: var(--ea-font-eyebrow, var(--font-barlow));
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.ea-svc__chip:hover {
+  background: color-mix(in oklch, var(--gold) 10%, transparent);
+  border-color: color-mix(in oklch, var(--gold) 40%, transparent);
+}
+
+.ea-svc__chip:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.ea-svc__chip--active {
+  background: var(--ea-ink);
+  color: var(--ea-white, #ffffff);
+  border-color: var(--ea-ink);
+}
+
+.ea-svc__chip-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in oklch, currentColor 12%, transparent);
+  font-size: 0.65rem;
+  letter-spacing: 0;
+}
+
+.ea-svc__chip--active .ea-svc__chip-count {
+  background: color-mix(in oklch, var(--gold) 80%, transparent);
+  color: var(--ea-ink);
+}
+
+/* ── Card grid ────────────────────────────────────────────────────────── */
+.ea-svc__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 1.25rem;
+}
+
+.ea-svc-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  background: var(--ea-white, #ffffff);
+  border: 1px solid color-mix(in oklch, var(--ea-ink) 8%, transparent);
+  border-radius: 4px; /* EA 4px radius convention */
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--ea-ink) 4%, transparent);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+  overflow: hidden;
+}
+
+.ea-svc-card:hover {
+  border-color: color-mix(in oklch, var(--gold) 35%, transparent);
+  box-shadow: 0 12px 32px -16px color-mix(in oklch, var(--ea-ink) 18%, transparent);
+  transform: translateY(-2px);
+}
+
+/* Head: icon + title */
+.ea-svc-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.ea-svc-card__icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 4px;
+  background: color-mix(in oklch, var(--gold) 12%, transparent);
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.ea-svc-card__icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.ea-svc-card__title {
+  font-family: var(--ea-font-display, var(--font-serif));
+  font-weight: 400;
+  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+  line-height: 1.15;
+  color: var(--ea-ink);
+  letter-spacing: -0.005em;
+}
+
+/* Tagline */
+.ea-svc-card__tagline {
+  font-family: var(--ea-font-body, var(--font-sans));
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ea-ink);
+  opacity: 0.75;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+/* Toggle button */
+.ea-svc-card__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.4rem 0;
+  background: transparent;
+  border: none;
+  color: var(--ea-red);
+  font-family: var(--ea-font-eyebrow, var(--font-barlow));
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: color 0.2s ease;
+}
+
+.ea-svc-card__toggle:hover {
+  color: var(--ea-ink);
+}
+
+.ea-svc-card__toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.ea-svc-card__toggle-icon {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.3s ease;
+}
+
+/* Expandable panel */
+.ea-svc-card__panel {
+  overflow: hidden;
+}
+
+.ea-svc-card__desc {
+  font-family: var(--ea-font-body, var(--font-sans));
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ea-ink);
+  opacity: 0.8;
+  margin: 1rem 0 1.1rem;
+}
+
+.ea-svc-card__features {
+  list-style: none;
+  margin: 0 0 1.1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ea-svc-card__features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-family: var(--ea-font-body, var(--font-sans));
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ea-ink);
+  opacity: 0.85;
+}
+
+.ea-svc-card__bullet {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-top: 0.5em;
+  border-radius: 999px;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+.ea-svc-card__min {
+  font-family: var(--ea-font-eyebrow, var(--font-barlow));
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ea-red);
+  margin-bottom: 1rem;
+}
+
+/* Card CTA — magnetic-wrapped arrow link */
+.ea-svc-card__magnetic {
+  display: inline-block;
+}
+
+.ea-svc-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: var(--ea-ink);
+  color: var(--ea-white, #ffffff);
+  font-family: var(--ea-font-eyebrow, var(--font-barlow));
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.ea-svc-card__cta:hover {
+  background: var(--ea-red);
+  transform: translateY(-1px);
+}
+
+.ea-svc-card__cta-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+/* ── Footer CTA ───────────────────────────────────────────────────────── */
+.ea-svc__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  text-align: center;
+}
+
+.ea-svc__footer-text {
+  font-size: 0.95rem;
+  opacity: 0.7;
+}
+
+.ea-svc__footer-cta {
+  font-size: 0.85rem;
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ea-svc-card,
+  .ea-svc__chip,
+  .ea-svc-card__toggle,
+  .ea-svc-card__cta,
+  .ea-svc-card__toggle-icon {
+    transition: none;
+  }
+
+  .ea-svc-card:hover {
+    transform: none;
+  }
+}
