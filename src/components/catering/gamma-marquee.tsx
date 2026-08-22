@@ -174,7 +174,7 @@ function PhotoTile({
         fill
         sizes="(max-width: 768px) 280px, 300px"
         className="gamma-marquee__img absolute inset-0 h-full w-full object-cover"
-        loading="lazy"
+        loading="eager"
         // draggable=false so the user can't accidentally trigger the
         // browser's native image-drag gesture over the marquee (which
         // would otherwise interfere with the GSAP-driven motion).

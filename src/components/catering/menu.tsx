@@ -488,6 +488,7 @@ export function Menu() {
                       alt=""
                       fill
                       sizes="160px"
+                      loading="eager"
                       className={`object-cover transition-transform duration-700 ${
                         isActive ? "scale-110 opacity-90" : "scale-100 opacity-70 group-hover:opacity-90 group-hover:scale-105"
                       }`}

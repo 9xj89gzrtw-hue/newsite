@@ -277,6 +277,7 @@ export function EaEventsPortfolio() {
                 fill
                 sizes="(max-width: 768px) 88vw, 380px"
                 className="ea-evt-portfolio__img object-cover"
+                loading="eager"
               />
               <div className="ea-evt-portfolio__overlay">
                 <span className="ea-evt-portfolio__category">
