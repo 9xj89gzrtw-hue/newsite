@@ -3640,71 +3640,116 @@ header[data-scrolled="true"] [data-mega-panel] {
 }
 .tott-border-frame--cream { border-color: rgba(241,234,224,0.7); }
 
-/* --- Vertical "interfoodcatering" LEFT + RIGHT fixed brand labels -----------
-   Gamma-style brand watermark — runs the full site height, fixed. Two
-   instances: LEFT (28px from left edge) and RIGHT (28px from right edge,
-   mirrored). Both read bottom-to-top via writing-mode: vertical-rl +
-   transform: rotate(180deg) (editorial colophon style — tilt head left
-   to read). mix-blend-mode: difference with mid-gray color keeps them
-   legible against both cream (#F9F5EF) sections and dark/black sections.
+/* --- Vertical "INTERFOOD CATERING" left sidebar (gamma-style) ---------------
+   Cycle 31.2 (2026-08-22): rewritten per user request —
+     "оставить только слева полоску, сделать ее на белом фоне и чтобы весь
+      сайт сместился вправо относительно этой полоски как на сайте gamma,
+      сам текст INTERFOOD CATERING сделать больше по размеру и двумя разными
+      цветами"
 
-   Cycle 31.1: labels START FROM THE SECOND SCREEN — they fade in only
-   after the user scrolls past the hero (100vh). The .is-visible class is
-   toggled by a scroll listener in vertical-brand-label.tsx (now a client
-   component). Before scroll, both labels are opacity:0 + pointer-events:none
-   so the hero is pristine. After scroll past hero, labels fade in over 0.6s.
-   Hidden below the lg breakpoint (mobile has no labels). z-index: 60. */
+   The stripe is now a REAL FIXED SIDEBAR (not an overlay): it occupies
+   actual space on the left edge of the viewport, and the whole site
+   content (hero, header, all sections, footer) is shifted RIGHT by the
+   sidebar width via a global `padding-left` on <body> (see below). This
+   matches gamma's behaviour — on gammacatering.com the "GAMMACATERING"
+   vertical text sits in a real left column and the content starts after it.
+
+   Layout:
+     - width: 72px (desktop lg+) — wide enough for the vertical two-word
+       text to read comfortably; narrow enough to not eat content space.
+     - background: white (#FFFFFF) per user request.
+     - position: fixed; left:0; top:0; height:100vh; z-index:60.
+     - Content: centered vertical "INTERFOOD" (ink/charcoal) + "CATERING"
+       (gold), stacked, reading bottom-to-top via writing-mode: vertical-rl
+       + transform: rotate(180deg). Big: clamp(16px, 1.3vw, 22px) per word,
+       letter-spacing 0.3em, Prata (matches the hero wordmark).
+     - A small tick mark above + below the text (1px × 36px) in ink at
+       25% — editorial colophon feel.
+     - A 1px right border in ink@12% separates the sidebar from content.
+
+   Scroll-gating (kept from Cycle 31.1): the sidebar starts opacity:0
+   and fades in (0.6s) only after the user scrolls past the hero
+   (scrollY > 0.85 * innerHeight). This keeps the hero pristine — the
+   sidebar appears as the user scrolls into the second screen. Before
+   scroll, the body padding-left is still applied (so content is already
+   shifted right consistently), but the sidebar itself is invisible.
+
+   Mobile (<1024px): the sidebar is hidden AND the body padding-left is
+   removed so mobile gets the full-width layout. */
 .vertical-brand-label {
   position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 72px;
   z-index: 60;
   pointer-events: none;
+  /* White background per user request. */
+  background: #ffffff;
+  /* 1px right border separates the sidebar from the content area. */
+  border-right: 1px solid color-mix(in oklch, var(--ink, #1f2937) 12%, transparent);
+  /* Center the text block vertically + horizontally. */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  /* Start hidden — fade in after scroll past hero (see .is-visible). */
+  justify-content: center;
+  gap: 18px;
+  /* Start hidden — fade in after scroll past hero (see .is-visible).
+     The body padding-left is applied regardless (see body rule below)
+     so content stays shifted right consistently. */
   opacity: 0;
   transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .vertical-brand-label.is-visible {
   opacity: 1;
 }
-.vertical-brand-label--left {
-  left: 28px;
-}
-.vertical-brand-label--right {
-  right: 28px;
-}
 .vertical-brand-label__tick {
   display: block;
   width: 1px;
   height: 36px;
-  /* mid-gray + difference → ~127 contrast against ANY backdrop (cream, black,
-     white, photo) so the tick reads consistently throughout the whole site. */
-  background: rgba(140,140,140,0.9);
-  mix-blend-mode: difference;
-  opacity: 0.7;
+  background: color-mix(in oklch, var(--ink, #1f2937) 25%, transparent);
 }
 .vertical-brand-label__text {
   font-family: var(--font-prata), "Playfair Display", Georgia, serif;
-  font-size: 13px;
-  letter-spacing: 0.42em;
-  text-transform: lowercase;
-  /* mid-gray (140) + mix-blend-mode: difference gives ~115 contrast against
-     cream (#F9F5EF → ~115 dark navy), ~140 against black, ~115 against white —
-     consistently readable on every section bg (cream, espresso, photo, white)
-     without any JS bg-detection. White-only difference was too faint on cream
-     (gave 6,10,16 — nearly invisible). */
-  color: rgba(140,140,140,0.95);
-  mix-blend-mode: difference;
+  font-size: clamp(16px, 1.3vw, 22px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   white-space: nowrap;
   line-height: 1;
   font-weight: 400;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35em;
 }
+.vertical-brand-label__word {
+  display: inline-block;
+}
+.vertical-brand-label__word--primary {
+  /* "INTERFOOD" — ink/charcoal (the brand primary, same as body text). */
+  color: var(--ink, #1f2937);
+}
+.vertical-brand-label__word--accent {
+  /* "CATERING" — gold (matching the hero wordmark dot + CepLocationsStrip
+     two-color split). */
+  color: var(--gold, #c9a063);
+}
+
+/* Global body padding-left so the whole site content (hero, header,
+   sections, footer) shifts RIGHT by the sidebar width — the sidebar
+   occupies real space on the left, content starts after it, exactly
+   like gamma. Applied on lg+ only (mobile gets full width, sidebar hidden).
+   The padding is applied REGARDLESS of scroll position so the layout
+   is consistent — the sidebar just fades in visually on top of the
+   already-reserved space. */
+@media (min-width: 1024px) {
+  body {
+    padding-left: 72px;
+  }
+}
+
 @media (max-width: 1023px) {
   .vertical-brand-label { display: none; }
 }

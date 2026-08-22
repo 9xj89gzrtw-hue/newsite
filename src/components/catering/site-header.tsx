@@ -132,21 +132,20 @@ export function SiteHeader() {
           className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 transition-all duration-500 md:px-8"
         >
           {/* Logo LEFT — Prata wordmark (their display serif).
-              Cycle 31.1: hidden on desktop (lg:hidden) to avoid duplication
-              with the fixed vertical "interfoodcatering" labels that frame
-              the site from the second screen onward. The home link is
-              preserved as a clickable anchor — on desktop it's an invisible
-              click target (min-w/min-h preserved for accessibility), on
-              mobile (<lg) the full "Interfood." wordmark shows in the
-              mobile menu + this header slot. Per user: "в десктопной версии
-              убери с хеадера надпись interfood чтобы не дублировала". */}
+              Cycle 31.2: RESTORED on desktop. In Cycle 31.1 the wordmark
+              was hidden on lg+ to avoid duplication with the vertical
+              labels. Now the vertical sidebar is a single white column on
+              the far left (72px), and the header wordmark sits in the
+              sticky header area — they don't visually overlap (different
+              positions), so the wordmark comes back for brand
+              consistency. */}
           <a
             href="#main-content"
-            className="min-h-[44px] lg:min-w-[44px] flex items-center transition-opacity duration-300 hover:opacity-80 lg:opacity-0 lg:hover:opacity-30 lg:focus-visible:opacity-60"
+            className="min-h-[44px] flex items-center transition-opacity duration-300 hover:opacity-80"
             aria-label="Interfood Catering — главная"
           >
             <span
-              className="tott-display text-2xl md:text-[28px] lg:hidden"
+              className="tott-display text-2xl md:text-[28px]"
               style={{ letterSpacing: "0.005em", fontWeight: 400 }}
             >
               Interfood<span style={{ color: "var(--gold)" }}>.</span>

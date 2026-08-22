@@ -3,35 +3,33 @@
 import * as React from "react";
 
 /**
- * VerticalBrandLabel — gamma-style LEFT + RIGHT fixed brand watermark.
+ * VerticalBrandLabel — gamma-style LEFT sidebar with the brand name.
  *
- * Cycle 31.1 (2026-08-22): rewritten from a server component to a client
- * component so it can detect scroll position. Per the user's request:
- *   "пускай она у нас будет начинаться со второго экрана, поэтому верни
- *    рамку херо как была"
- * — the labels START FROM THE SECOND SCREEN (below the hero). They fade in
- * only after the user scrolls past the hero (100vh). Before scroll, both
- * labels are opacity:0 so the hero is pristine. The hero frame
- * (.tott-border-frame) was restored to its original uniform inset:1.5rem.
+ * Cycle 31.2 (2026-08-22): rewritten per user request —
+ *   "оставить только слева полоску, сделать ее на белом фоне и чтобы весь
+ *    сайт сместился вправо относительно этой полоски как на сайте gamma,
+ *    сам текст INTERFOOD CATERING сделать больше по размеру и двумя разными
+ *    цветами"
  *
- * Two instances are rendered:
- *   - .vertical-brand-label--left  (left:28px) — the original left watermark
- *   - .vertical-brand-label--right (right:28px) — NEW right mirror stripe,
- *     so the whole site reads as "shifted right relative to it" per the
- *     user: "как бы весь сайт смещен вправо относительно нее". The right
- *     stripe mirrors the left so the content is framed on both edges.
+ * Changes from Cycle 31.1:
+ *   - RIGHT stripe REMOVED — only the LEFT sidebar remains.
+ *   - The sidebar is now a REAL fixed element that occupies space: 72px
+ *     wide, white background, full viewport height. The whole site
+ *     content shifts right via `body { padding-left: 72px }` on lg+
+ *     (see globals.css). This matches gammacatering.com — their
+ *     "GAMMACATERING" vertical text sits in a real left column.
+ *   - The text is BIGGER and TWO-COLOR: "INTERFOOD" in ink/charcoal
+ *     (primary), "CATERING" in gold (accent), both Prata, clamp(16-22px),
+ *     letter-spacing 0.3em, uppercase. Was lowercase 13px single-color.
  *
- * Both read "interfoodcatering" bottom-to-top via writing-mode: vertical-rl
- * + transform: rotate(180deg) (editorial colophon style). mix-blend-mode:
- * difference with mid-gray keeps them legible on every section bg.
+ * Scroll-gating (kept from 31.1): the sidebar starts opacity:0 and
+ * fades in (0.6s) only after the user scrolls past the hero
+ * (scrollY > 0.85 * innerHeight). The body padding-left is applied
+ * regardless so the layout is consistent — the sidebar fades in on top
+ * of the already-reserved space. Hero stays pristine.
  *
- * Scroll detection: a passive scroll listener toggles .is-visible when
- * scrollY > window.innerHeight * 0.85 (85% of the way through the hero).
- * rAF-throttled so it doesn't run more than once per frame. Listener is
- * cleaned up on unmount.
- *
- * Hidden below the lg breakpoint (mobile has no labels — see globals.css
- * @media max-width:1023px).
+ * Hidden below the lg breakpoint (mobile has no sidebar + no body
+ * padding-left — full width).
  *
  * @see .vertical-brand-label in src/app/globals.css
  */
@@ -44,12 +42,12 @@ export function VerticalBrandLabel() {
     let rafId = 0;
     const update = () => {
       rafId = 0;
-      // Fade in when the user has scrolled past ~85% of the hero. The hero
-      // is min-h-screen (100vh), so at scrollY = 0.85 * innerHeight the
-      // hero is mostly out of view and the second screen is coming up.
-      // We use 0.85 (not 1.0) so the labels appear slightly BEFORE the
-      // hero fully exits — feels more responsive than waiting for the
-      // full 100vh.
+      // Fade in when the user has scrolled past ~85% of the hero. The
+      // hero is min-h-screen (100vh), so at scrollY = 0.85 * innerHeight
+      // the hero is mostly out of view and the second screen is coming
+      // up. We use 0.85 (not 1.0) so the sidebar appears slightly BEFORE
+      // the hero fully exits — feels more responsive than waiting for
+      // the full 100vh.
       const threshold = window.innerHeight * 0.85;
       setVisible(window.scrollY > threshold);
     };
@@ -71,32 +69,22 @@ export function VerticalBrandLabel() {
     };
   }, []);
 
-  const labelClass = `vertical-brand-label${visible ? " is-visible" : ""}`;
-
   return (
-    <>
-      {/* LEFT stripe — original gamma-style left watermark. */}
-      <div
-        aria-hidden="true"
-        className={`${labelClass} vertical-brand-label--left`}
-      >
-        <span className="vertical-brand-label__tick" />
-        <span className="vertical-brand-label__text">interfoodcatering</span>
-        <span className="vertical-brand-label__tick" />
-      </div>
-
-      {/* RIGHT stripe — mirror, so the whole site reads as framed by both
-          edges. Per the user: "весь сайт смещен вправо относительно нее" —
-          the right stripe is the fixed column the content scrolls past. */}
-      <div
-        aria-hidden="true"
-        className={`${labelClass} vertical-brand-label--right`}
-      >
-        <span className="vertical-brand-label__tick" />
-        <span className="vertical-brand-label__text">interfoodcatering</span>
-        <span className="vertical-brand-label__tick" />
-      </div>
-    </>
+    <div
+      aria-hidden="true"
+      className={`vertical-brand-label${visible ? " is-visible" : ""}`}
+    >
+      <span className="vertical-brand-label__tick" />
+      <span className="vertical-brand-label__text">
+        <span className="vertical-brand-label__word vertical-brand-label__word--primary">
+          INTERFOOD
+        </span>
+        <span className="vertical-brand-label__word vertical-brand-label__word--accent">
+          CATERING
+        </span>
+      </span>
+      <span className="vertical-brand-label__tick" />
+    </div>
   );
 }
 
