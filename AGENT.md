@@ -770,3 +770,37 @@ GammaSeparator (NEW) → TottParallaxBand → [Act III: testimonials/process/cap
 6. Если CSS не применяется после правок — `rm -rf .next/dev && pm2 restart`
 7. VLM critique: `z-ai vision -p "Plain text only, NO code..." -i screenshot.png`
 8. Dev server: `pm2 start ecosystem.config.js` (НЕ `bun run dev` напрямую)
+
+---
+
+## Cycle 31.1 — gamma refinement (2026-08-22)
+
+> Пользователь посмотрел Cycle 31 и попросил 5 точечных правок.
+
+### Что изменилось
+
+| # | Правка | Файл | Решение |
+|---|--------|------|---------|
+| 1 | Правая вертикальная полоска (зеркало левой) | `vertical-brand-label.tsx` | Компонент переписан как client: рендерит ОБЕ полоски (left:28px + right:28px), `--left` / `--right` модификаторы в CSS |
+| 2 | Полоски начинаются со второго экрана → вернуть рамку херо | `vertical-brand-label.tsx` + `globals.css` | Scroll listener: `scrollY > 0.85*innerHeight` → `.is-visible` fade-in 0.6s. `.tott-border-frame` inset `4.5rem→1.5rem` (uniform) |
+| 3 | Убрать "Interfood" из десктопного хедера | `site-header.tsx` | `lg:hidden` на span + `lg:opacity-0` на anchor (home link сохранён как невидимый click target). Mobile `<lg` сохраняет wordmark |
+| 4 | Горизонтальный "interfoodcatering" больше + два цвета | `cep-locations-strip.tsx` | Eyebrow 12px → Prata display `clamp(2.5rem,6vw,4.5rem)`. "INTERFOOD" cream/white + "CATERING" в `--gold`. City strip перенесён ниже как `<p>` |
+| 5 | Marquee: убрать затухание + drag курсором | `gamma-marquee.tsx` | `maskImage:none` (crisp edges). Pointer drag: down→kill GSAP+capture+record baseX, move→`gsap.set x=baseX+delta` normalized в `[-w,0]` loop, up→normalize+resume auto-scroll. `cursor:grab`, `touch-action:pan-y` |
+
+### Операционные находки для будущих агентов
+
+1. **Scroll-gated fixed overlay**: для фиксированных элементов которые должны появляться только после скролла — `useState(false)` + passive scroll listener + rAF throttle + CSS `opacity:0; transition: opacity 0.6s` → toggle `.is-visible`. Не используй `IntersectionObserver` на `position:fixed` элементах (они не имеют позиции в документе, IO не сработает). Используй `scrollY > threshold`.
+
+2. **Pointer drag на GSAP-driven track**: чтобы добавить drag к уже анимированному GSAP элементу:
+   - `pointerdown`: `gsap.killTweensOf(el)` + `setPointerCapture` + record `startX` + `baseX` (из `getComputedStyle(el).transform` matrix — `values[12]` для matrix3d, `values[4]` для matrix)
+   - `pointermove`: `gsap.set(el, { x: baseX + (clientX - startX) })` + normalize в loop range `[-trackWidth, 0]` через `while (newX > 0) newX -= w; while (newX < -w) newX += w`
+   - `pointerup`: normalize current x + `gsap.to(el, { xPercent: -50, repeat: -1 })` для resume
+   - `touch-action: pan-y` (не `none`!) — иначе вертикальный скролл страницы сломается на touch
+   - `cursor: grab` / `grabbing` для affordance
+   - `select-none` чтобы текст не выделялся при drag
+
+3. **mix-blend-mode: difference**: mid-gray (140) + difference даёт ~115 контраст на cream, ~140 на black, ~115 на white — виден на ЛЮБОМ фоне без JS bg-detection. НЕ white-only (даёт 6-16 на cream — невидим).
+
+4. **Двухцветный wordmark split**: `<h2>INTERFOOD <span style={{color:'var(--gold)'}}>CATERING</span></h2>` — один span для второго слова. Prata (`--font-prata`) для консистентности с hero wordmark "Interfood.".
+
+5. **Header wordmark hide на desktop**: `lg:hidden` на самом span + `lg:opacity-0 lg:hover:opacity-30` на anchor (сохраняет click target 44×44 для accessibility, hint на hover).
