@@ -9,14 +9,18 @@ import { motion, useScroll, useSpring } from "framer-motion";
  * Subtle vertical progress indicator on the right edge (desktop).
  * Shows a thin track + per-section dots; the current section dot fills gold.
  */
+// Cycle 32: updated to match the new 17-section structure. Removed Manifesto
+// (block was deleted). Renamed Services → ea-service-tabs, Events →
+// ea-events-portfolio so every dot resolves to a section id that EXISTS in
+// page.tsx. Added FAQ dot for the new "objections-resolution" beat.
 const SECTIONS = [
   { id: "home", label: "Hero" },
-  { id: "about", label: "About" },
-  { id: "manifesto", label: "Manifesto" },
+  { id: "ea-service-tabs", label: "Services" },
+  { id: "ea-events-portfolio", label: "Events" },
   { id: "menu", label: "Menu" },
-  { id: "services", label: "Services" },
-  { id: "events", label: "Events" },
   { id: "calculator", label: "Calculator" },
+  { id: "about", label: "About" },
+  { id: "faq", label: "FAQ" },
   { id: "contact", label: "Contact" },
 ];
 

@@ -40,14 +40,18 @@ export type CepOverlayMenuProps = {
 
 type MenuItem = { label: string; href: string };
 
+// 8-item overlay menu matching the new Cycle 32 simplified 17-section site
+// structure. Every href resolves to a section id that EXISTS in page.tsx —
+// stale links to removed sections (СЕЗОНЫ → #ea-seasonal, РАБОТА → #careers)
+// were dropped per the user's "остальное убрать с сайта" brief. Order mirrors
+// the page top-to-bottom so the menu doubles as a section index.
 const MENU_ITEMS: MenuItem[] = [
   { label: "ГЛАВНАЯ", href: "#home" },
-  { label: "О НАС", href: "#about" },
-  { label: "МЕНЮ", href: "#menu" },
   { label: "УСЛУГИ", href: "#ea-service-tabs" },
-  { label: "СЕЗОНЫ", href: "#ea-seasonal" },
+  { label: "СОБЫТИЯ", href: "#ea-events-portfolio" },
+  { label: "МЕНЮ", href: "#menu" },
   { label: "КАЛЬКУЛЯТОР", href: "#calculator" },
-  { label: "РАБОТА", href: "#careers" },
+  { label: "О НАС", href: "#about" },
   { label: "ВОПРОСЫ", href: "#faq" },
   { label: "КОНТАКТЫ", href: "#contact" },
 ];

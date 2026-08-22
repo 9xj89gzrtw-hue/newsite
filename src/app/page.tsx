@@ -1,153 +1,94 @@
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
 import { TottHero } from "@/components/catering/tott-hero";
-import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
+import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
 import { GammaMarquee } from "@/components/catering/gamma-marquee";
-import { CepSimpleBrilliant } from "@/components/catering/cep-simple-brilliant";
-import { CepRedStats } from "@/components/catering/cep-red-stats";
-import { CepWhyUs } from "@/components/catering/cep-why-us";
 import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
-import { EditorialIntro } from "@/components/catering/editorial-intro";
-import { EaFounderStory } from "@/components/catering/ea-founder-story";
-import { Manifesto } from "@/components/catering/manifesto";
-import { EaChefQuote } from "@/components/catering/ea-chef-quote";
-import { ChefPortrait } from "@/components/catering/chef-portrait";
-import { Menu } from "@/components/catering/menu";
-import { TastingMenuExperience } from "@/components/catering/tasting-menu-experience";
-import { EaTastingCta } from "@/components/catering/ea-tasting-cta";
-import { SustainabilityStrip } from "@/components/catering/sustainability-strip";
 import { EaServiceTabs } from "@/components/catering/ea-service-tabs";
-import { GammaAccordion } from "@/components/catering/gamma-accordion";
-import { EaSeasonalTabs } from "@/components/catering/ea-seasonal-tabs";
-import { EaCareersBlock } from "@/components/catering/ea-careers-block";
 import { EaEventsPortfolio } from "@/components/catering/ea-events-portfolio";
-import { GammaHaccordion } from "@/components/catering/gamma-haccordion";
 import { EaVenuesSpotlight } from "@/components/catering/ea-venues-spotlight";
-import { EaVenueNetwork } from "@/components/catering/ea-venue-network";
-import { GammaSeparator } from "@/components/catering/gamma-separator";
-import { CepTestimonialsHeader } from "@/components/catering/cep-testimonials-header";
-import { CepTestimonialsCarousel } from "@/components/catering/cep-testimonials-carousel";
-import { EaNamedTestimonials } from "@/components/catering/ea-named-testimonials";
+import { Menu } from "@/components/catering/menu";
+import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
+import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
 import { CepProcess } from "@/components/catering/cep-process";
-import { EaCapabilityStrip } from "@/components/catering/ea-capability-strip";
-import { CepLocationsStrip } from "@/components/catering/cep-locations-strip";
-import { EaPressStrip } from "@/components/catering/ea-press-strip";
-import { CepInstagramGrid } from "@/components/catering/cep-instagram-grid";
-import { EaPhilosophyQuote } from "@/components/catering/ea-philosophy-quote";
+import { DeliveryBlock } from "@/components/catering/delivery-block";
 import { Calculator } from "@/components/catering/calculator";
+import { EaFounderStory } from "@/components/catering/ea-founder-story";
+import { GammaSeparator } from "@/components/catering/gamma-separator";
 import { EaFaqAccordion } from "@/components/catering/ea-faq-accordion";
+import { CepInstagramGrid } from "@/components/catering/cep-instagram-grid";
 import { Contact } from "@/components/catering/contact";
-import { EaFinalCta } from "@/components/catering/ea-final-cta";
 import { SiteFooter } from "@/components/catering/site-footer";
 import { BackToTop } from "@/components/catering/back-to-top";
 
-// Cycle 28 — Elegant Affairs (elegantaffairscaterers.com) editorial layer.
+// Cycle 32 — Simplified 17-section catering site restructure.
 //
-// STRATEGY: EA's brand is luxury but site is mid-market WordPress (composite 3.8/10
-// per DESIGN-CRITIQUE.md). Their STRENGTH is CONTENT ARCHITECTURE — founder-forward
-// About, named-institution testimonials, 60-venue partner network, named-celebrity
-// client list, capability-as-brand-proof, mid-page tasting CTA. Cycle 28 grafts
-// EA's content patterns onto Interfood's already-cinematic editorial design
-// (CEP/Salt Block/Ridgewells/MCulinary layers from Cycles 21/24/25/26/27).
+// STRATEGY: The user explicitly requested a streamlined, conversion-focused
+// structure inspired by gammacatering.com, joels.com, mculinary.com and
+// ggcatering.com. All editorial experiments (CEP/Salt Block/Ridgewells/MCulinary/
+// EA/TOTT/Gamma cycles 21-31) are condensed into a single coherent narrative:
+// hero → header → video → photo carousel → services → events → where-we-work →
+// menu → events video carousel → algorithm → delivery → calculator → about →
+// FAQ → instagram → form → footer. Three parallax photo bands (CepEditorialDivider,
+// TottParallaxBand, GammaSeparator) bridge the major acts for cinematic pacing.
 //
-// 14 new `ea-*` components + 3 scoped CSS files (~3800 LOC). EA's signature red
-// #E71D3A used as a SECONDARY accent (after CEP #FF360A + Salt Block honey) — only
-// in eyebrows, arrows, quote marks, dividers, hover states. Pure-black bookends
-// (philosophy quote + final CTA) for cinematic drama. Blush #F1ECEC surfaces for
-// founder story + tasting CTA. Italic-as-fragment trailing-phrase device on every
-// H2 (EA signature): "Откройте нашу *историю*." / "Им важно было *безупречно*." / etc.
+// SECTION ORDER (per task spec, "остальное убрать с сайта"):
 //
-// CLIENT JOURNEY LOGIC (luxury catering — "Еда как искусство"):
+//   ── ACT I: BRAND PROMISE (hero → header → video → carousel) ──
+//    1. TottHero              — full-viewport bg video + "Interfood." wordmark
+//    2. SiteHeader            — sticky nav, scrolls up with hero, sticks at top:0
+//    3. GgVideoShowcase       — NEW. ggcatering.com-style 16:9 video block:
+//                               looping muted autoplay mp4 + "Кейтеринг как
+//                               *искусство*" overlay + Play pill + 2 CTAs.
+//    4. GammaMarquee          — infinite horizontal photo marquee (14 portrait photos).
+//    5. CepEditorialDivider   — PARALLAX BAND. Full-bleed photo breather, no text.
 //
-//  ── ACT I: BRAND PROMISE & POSITIONING (CEP editorial opening — Cycle 27) ──
-//   1. CepEggHero          — full-bleed egg photo + 244px stacked headline
-//                            "ЕДА / ПРЕЖДЕ ВСЕГО." + locations strip. No CTAs —
-//                            luxury restraint. Emotional brand promise + the
-//                            chicken-and-egg riddle (food IS the brand).
-//   2. CepClientMarquee    — "ИЗБРАННЫЕ КЛИЕНТЫ" — 17 RU corporate giants
-//                            scrolling with red bullets + edge-fade mask.
-//                            Social proof: who already trusts us.
-//   3. CepSimpleBrilliant  — "ПРОСТО / И БЛЕСТЯЩЕ." 200px headline over 0.5×
-//                            slow-mo food b-roll. Brand positioning insistence.
-//   4. CepRedStats         — #FF360A band: 16+ / 2400+ / 180 000+. The ONLY
-//                            color-as-bg moment — credibility punch.
-//   5. CepWhyUs            — 4 value props (creativity / immersion / food /
-//                            execution). Why we're different.
-//   6. CepEditorialDivider — full-bleed photo breather (no text). Visual rest
-//                            between the heavy type sections.
+//   ── ACT II: WHAT WE OFFER (services → events → venues → menu) ──
+//    6. EaServiceTabs        — 5-tab premium services (Свадьбы · Корпоратив ·
+//                               Банкеты · Фуршеты · Выездной Шеф) with contextual CTAs.
+//    7. EaEventsPortfolio    — magazine horizontal-scroll event gallery (8 cards).
+//    8. EaVenuesSpotlight    — 3-up full-bleed venue cards "Где мы *работаем*."
+//    9. Menu                  — 7 menu types interactive list + PDF export.
+//   10. TottParallaxBand      — PARALLAX BAND. CSS-parallax bg + char-split headline
+//                               + "bon appétit" script. Cinematic pause before the
+//                               events video carousel.
 //
-//  ── ACT II: WHO WE ARE & WHAT WE OFFER (founder-forward + services depth) ──
-//   7. EditorialIntro      — painterly bloom intro pause (Ridgewells Cycle 24).
-//   8. EaFounderStory      — REPLACES About. Founder-forward editorial 2-col
-//                            (photo left, story + 4 stats + CTA right). Italic
-//                            fragment "история" + named milestones (СБЕР, ГАЗПРОМ,
-//                            ЯНДЕКС partnerships). EA §3.9 pattern.
-//   9. Manifesto           — signature pinned «ПИР» scroll wow (Cycle 16). The
-//                            strongest existing wow — food photos clipped through
-//                            SVG letters.
-//  10. EaChefQuote         — NEW. Full-bleed chef photo + giant red Playfair
-//                            italic quote mark + quote about food as ritual.
-//                            Humanize the chef between Manifesto + ChefPortrait.
-//  11. ChefPortrait        — Salt Block chef-driven brand DNA (Дмитрий Нилов +
-//                            Great Vibes signature).
-//  12. Menu                — 7 menu types interactive list + PDF.
-//  13. TastingMenuExperience — Salt Block 5-course editorial list on espresso bg.
-//  14. EaTastingCta        — NEW mid-page "Book a Tasting" CTA. 4:5 photo +
-//                            "Хотите попробовать *до* заказа?" + 6 блюд за 45 мин,
-//                            3500₽ → #contact. Converts after desire.
-//  15. SustainabilityStrip — local · seasonal · no semi-finished (why us).
-//  16. EaServicesGrid      — NEW. 4-col minimal services teaser (Свадьбы /
-//                            Корпоратив / Банкеты / Фуршеты) above ServicesOverview.
-//  17. ServicesOverview    — Ridgewells 4-category 50/50 split with hover-zoom.
-//  18. EaEventsPortfolio   — REPLACES McuPhotoFilmstrip. Magazine horizontal
-//                            scroll gallery (8 cards, scroll-snap, auto-advance
-//                            4.5s, pause on hover, NO Embla — pure CSS+JS).
-//  19. EaVenuesSpotlight   — REPLACES McuVenues. 3 full-bleed 16:10 venue cards
-//                            with hover zoom + bottom overlay panel.
-//  20. EaVenueNetwork      — NEW. Magazine partner-network directory — 5 district
-//                            groups × 6 venues = 30 + sticky featured 4:5 hero
-//                            card. EA's strongest B2B credibility asset (§2.5).
+//   ── ACT III: PROCESS & LOGISTICS (video carousel → algorithm → delivery) ──
+//   11. EventsVideoCarousel  — NEW. Carousel of 4 event-type video tiles with
+//                               looping muted autoplay teasers + fullscreen click-to-play
+//                               modal. Magazine scroll-snap pattern, 5s auto-advance.
+//   12. CepProcess           — "THE CREATIVE EDGE" 3-step process (01 DREAM /
+//                               02 BUILD / 03 SAVOR).
+//   13. DeliveryBlock        — NEW. 2-col split: delivery photo + 5 USPs + 2 CTAs.
+//                               "Кейтеринг, который *доставляют*." bridges logistics
+//                               into the conversion flow.
 //
-//  ── ACT III: PROOF & PROCESS (CEP trust + EA institutional) ──
-//  21. CepTestimonialsHeader — massive «ОТЗЫВЫ» headline (130px).
-//  22. CepTestimonialsCarousel — auto-scroll peeking anonymous testimonials.
-//  23. EaNamedTestimonials  — NEW. Named-institution testimonials grid (4 cards
-//                            with NAME + ROLE + ORGANIZATION: Яндекс, СБЕР,
-//                            Гинза, ТД Северная Звезда). EA §3.11 pattern.
-//  24. CepProcess          — "ТВОРЧЕСКИЙ ПОДХОД" 01 МЕЧТА / 02 СОЗДАНИЕ / 03 НАСЛАЖДЕНИЕ.
-//  25. EaCapabilityStrip   — NEW. Black-bg capability-as-brand-proof strip — 5
-//                            unusual capabilities (Аварийный 24/7 / Полевая кухня /
-//                            Шатёр-монтаж / Видео-трансляция / Сцена и свет). EA
-//                            "Disaster Relief" nav-item pattern.
-//  26. CepLocationsStrip   — "САНКТ-ПЕТЕРБУРГ | МОСКВА | ВСЯ РОССИЯ".
-//  27. EaPressStrip        — NEW. Restored standalone 8-publication press strip
-//                            (Resto.ru · Афиша · The Village · Собака.ru · Time
-//                            Out · Forbes · Ресторановед · Gastronomika).
-//  28. CepInstagramGrid    — 3×3 IG grid with Reel play icons.
+//   ── ACT IV: CONVERSION (calculator → about → FAQ → instagram → form → footer) ──
+//   14. Calculator           — interactive price calculator (nuqs state, commit moment).
+//   15. EaFounderStory       — founder-forward 2-col About + 4 count-up stats + CTA.
+//   16. GammaSeparator       — PARALLAX BAND. Full-bleed separator image + "interfood"
+//                               -6° handwritten watermark. Transition into FAQ.
+//   17. EaFaqAccordion       — minimalist 6-item accordion (resolves objections).
+//   18. CepInstagramGrid     — 3×3 IG grid with Reel play icons (social proof).
+//   19. Contact              — 4-step lead form → POST /api/lead → Prisma Lead → toast.
+//   20. SiteFooter           — dark navy footer with newsletter + 3-col + cities marquee.
+//   21. BackToTop            — floating ↑ button with circular scroll-progress ring.
 //
-//  ── ACT IV: CONVERSION (minimal dramatic — EA bookends) ──
-//  29. EaPhilosophyQuote   — REPLACES QuoteBand. Pure-black bg + giant red
-//                            Playfair italic quote mark + «Еда — это не логистика.
-//                            Это *ритуал*.» cinematic drama before the calculator.
-//  30. Calculator          — interactive price calculator (commit moment).
-//  31. EaFaqAccordion      — REPLACES Faq. Minimalist single-column 6-item
-//                            accordion (no tabs, no search, no feedback).
-//  32. Contact             — lead form → POST /api/lead → Prisma Lead → toast.
-//  33. EaFinalCta          — REPLACES SocialHandle. Pure-black "Обсудим *событие*?"
-//                            + 2-CTA pair + 3-line contact strip. The final closer.
+// PARALLAX BAND PLACEMENT (per user: "между некоторыми блоками можно оставить
+// классные фотки с параллакс эффектом, которые уже есть"):
+//   - CepEditorialDivider  between #4 carousel and #5 services — visual breather
+//   - TottParallaxBand    between #8 menu and #9 events video carousel — cinematic pause
+//   - GammaSeparator       between #13 about and #14 FAQ — editorial transition
 //
-// EA signature moments layered on top:
-//  - Italic-as-fragment trailing-phrase device on every H2 (red italic word)
-//  - Pure-black bookend sections (philosophy quote + final CTA) for drama
-//  - Red #E71D3A as secondary accent (quote marks, eyebrows, arrows, dividers)
-//  - Blush #F1ECEC premium surfaces (founder story, tasting CTA, venue network)
-//  - Founder-forward About (named chef + named milestones + named partnerships)
-//  - Named-institution testimonials (NAME + ROLE + ORGANIZATION on each card)
-//  - 60-venue partner-network directory (magazine layout, sticky hero card)
-//  - Capability-as-brand-proof strip (unusual capabilities signal range)
-//  - Mid-page tasting CTA (converts after desire, before calculator)
-//  - Minimalist single-column FAQ accordion (EA restraint)
-//  - Single-line top-anchored cookie banner (replaces glassmorphism card)
+// REMOVED (per user: "остальное убрать с сайта") — these 30+ components remain
+// on disk for reference but are no longer rendered:
+//   CepEggHero, CepClientMarquee, CepRedStats, CepWhyUs, CepSimpleBrilliant,
+//   CepTestimonialsHeader, CepTestimonialsCarousel, EditorialIntro, Manifesto,
+//   EaChefQuote, ChefPortrait, TastingMenuExperience, EaSeasonalTabs,
+//   EaTastingCta, SustainabilityStrip, EaServicesGrid, ServicesOverview,
+//   GammaAccordion, GammaHaccordion, EaVenueNetwork, EaNamedTestimonials,
+//   EaCapabilityStrip, CepLocationsStrip (subsumed by EaVenuesSpotlight),
+//   EaPressStrip, EaCareersBlock, EaPhilosophyQuote, EaFinalCta, TottBestCatering.
 export const dynamic = "force-dynamic";
 
 export default function Home() {
@@ -158,265 +99,133 @@ export default function Home() {
       tabIndex={-1}
       className="flex min-h-screen flex-col bg-cream outline-none"
     >
-      {/* ── ACT I: BRAND PROMISE & POSITIONING ── */}
+      {/* ── ACT I: BRAND PROMISE ── */}
 
-      {/* 1. TottHero — Cycle 30 Talk of the Town (talkofthetownatlanta.com)
-          hero graft. Full-viewport background VIDEO (mculinary crostini food)
-          + 5px white border frame (their SR7 signature) + top-left stack:
-          Prata "Interfood." wordmark + Nothing-You-Could-Do "food as art"
-          script centered beneath it. The SiteHeader sits in normal flow
-          AFTER this 100vh hero (below the fold, not visible at top), scrolls
-          up with it, and sticks at top:0 with translucent white bg. */}
+      {/* 1. TottHero — Cycle 30 Talk of the Town hero graft. Full-viewport
+             background VIDEO (mculinary crostini food) + 5px white border frame +
+             top-left stack: Prata "Interfood." wordmark + Nothing-You-Could-Do
+             "food as art" script. SiteHeader sits in normal flow AFTER this 100vh
+             hero, scrolls up with it, and sticks at top:0 with translucent white bg. */}
       <TottHero />
 
-      {/* SiteHeader — rendered AFTER TottHero so it starts below the fold
-          (not visible at scrollY=0), scrolls up naturally with the hero, and
-          sticks at top:0 via position:sticky when scrolled past. Per task v5:
-          "хеадер сначала находится внизу секции херо и его даже не видно, потом
-          херо вместе с ним мотается вверх и после того как он поднимается до
-          верха экрана то остается там и становится немного прозрачным". */}
+      {/* 2. SiteHeader — rendered AFTER TottHero so it starts below the fold
+             (not visible at scrollY=0), scrolls up naturally with the hero, and
+             sticks at top:0 via position:sticky when scrolled past. */}
       <SiteHeader />
 
-      {/* GammaMarquee — Cycle 31 NEW. gammacatering.com signature infinite
-          horizontal photo marquee (GSAP xPercent:-50, repeat:-1, children
-          duplicated for seamless loop). 14 portrait food/event photos from
-          /media/gamma/. Edge-fade masks. Pure photo scroll — no text overlay,
-          per gamma. First wow moment after hero — gamma places their marquee
-          immediately after the hero. */}
+      {/* 3. GgVideoShowcase — Cycle 32 NEW. ggcatering.com signature video block.
+             16:9 aspect-ratio section (~720px tall at desktop) with looping muted
+             autoplay MP4 + dark gradient overlay + editorial text overlay
+             (eyebrow "НАШ ПОДХОД" → H2 "Кейтеринг как *искусство*" → subtitle →
+             2 CTAs "Смотреть меню" + "Рассчитать стоимость"). A centered "Play" pill
+             toggles mute/controls on the same <video> element. The first big wow
+             moment after the hero, positioned exactly where ggcatering places theirs
+             (right after their hero + "Who we are" intro). */}
+      <GgVideoShowcase />
+
+      {/* 4. GammaMarquee — Cycle 31. gammacatering.com signature infinite
+             horizontal photo marquee (GSAP xPercent:-50, repeat:-1, children
+             duplicated for seamless loop). 14 portrait food/event photos. Pure
+             photo scroll — no text overlay, per gamma. The first wow photo moment
+             after the video block. */}
       <GammaMarquee />
 
-      {/* 3. CepSimpleBrilliant — "ПРОСТО / И БЛЕСТЯЩЕ." 200px headline over
-          0.5× slow-mo food b-roll. Brand positioning insistence — a film
-          title card moment. */}
-      <CepSimpleBrilliant />
-
-      {/* 4. CepRedStats — #FF360A band, 3 giant white numbers (16+ / 2400+ /
-          180 000+). The ONLY place color is used as a section bg — pops so
-          hard it becomes the brand visual signature. Count-up on scroll. */}
-      <CepRedStats />
-
-      {/* 5. CepWhyUs — "ПОЧЕМУ МЫ?" 4 value props in a row (creativity /
-          immersion / food / execution). No body copy — restraint. */}
-      <CepWhyUs />
-
-      {/* 6. CepEditorialDivider — full-bleed photo breather. No text. Visual
-          rest between the heavy type sections of Act I and Act II. */}
+      {/* 5. CepEditorialDivider — PARALLAX BAND. Full-bleed Ken-Burns photo
+             breather, no text. Visual rest between Act I's photo carousel and
+             Act II's services block — gives the eye a moment of pause before the
+             next heavy content beat. */}
       <CepEditorialDivider />
 
-      {/* ── ACT II: WHO WE ARE & WHAT WE OFFER ── */}
+      {/* ── ACT II: WHAT WE OFFER ── */}
 
-      {/* 7. EditorialIntro — Ridgewells painterly bloom intro (10-layer
-          radial-gradient "digital watercolor"). Editorial pause bridging
-          Act I → Act II. */}
-      <EditorialIntro />
-
-      {/* 8. EaFounderStory — Cycle 28 REPLACES About (was 430-line
-          glassmorphism maximalism). Founder-forward editorial 2-col: photo
-          LEFT, story + 4 stats + CTA RIGHT (offset down 80px desktop).
-          Italic-as-fragment "Откройте нашу *историю*." + named milestones
-          (СБЕР, ГАЗПРОМ, ЯНДЕКС partnerships). EA §3.9 pattern. */}
-      <EaFounderStory />
-
-      {/* 9. Manifesto — signature pinned scroll moment «ПИР» (Cycle 16 wow).
-          The strongest existing wow — food photos clipped through SVG letters. */}
-      <Manifesto />
-
-      {/* 10. EaChefQuote — Cycle 28 NEW. Full-bleed chef photo + giant red
-          Playfair italic quote mark + quote "Еда — это не логистика. Это
-          ритуал…". Humanize the chef between Manifesto's word wow and
-          ChefPortrait's biographical detail. */}
-      <EaChefQuote />
-
-      {/* 11. ChefPortrait — Salt Block chef-driven brand DNA. Humanizes the
-          brand: who's the chef? (Дмитрий Нилов + Great Vibes signature). */}
-      <ChefPortrait />
-
-      {/* 12. Menu — 7 menu types with interactive list + real dishes + PDF.
-          What we concretely offer. */}
-      <Menu />
-
-      {/* 13. TastingMenuExperience — Salt Block 5-course editorial list on
-          espresso bg with honey gold accents. Desire / showcase. */}
-      <TastingMenuExperience />
-
-      {/* 13b. EaSeasonalTabs — Cycle 29 NEW. Wolfgang Puck «seasonal inspiration»
-          pattern (5 tabs: Лето · Осень · Зима · Весна · Праздничная). Each tab
-          swaps a seasonal dish image + 2-sentence copy with SPECIFIC Russian
-          seasonal ingredients (white asparagus, porcini, pumpkin, berries,
-          Olivier, herring under fur coat) + «3 блюда сезона» list + «Смотреть
-          меню» CTA → #menu. Праздничная (Holiday/New Year) is the 5th tab —
-          Russia's biggest catering season (Nov-Jan corporate banquet peak),
-          equivalent to WP's «Awards» seasonal hook. Gives Interfood a recurring
-          content refresh cadence + Holiday Season conversion window. */}
-      <EaSeasonalTabs />
-
-      {/* 14. EaTastingCta — Cycle 28 NEW mid-page "Book a Tasting" CTA.
-          Blush bg + 4:5 photo LEFT + "Хотите попробовать *до* заказа?" RIGHT.
-          6 блюд за 45 мин, 3500₽/чел, returns при заказе от 50 гостей →
-          #contact. Converts after desire, before calculator. */}
-      <EaTastingCta />
-
-      {/* 15. SustainabilityStrip — Salt Block "Clean Catering" voice: local
-          farmers / seasonal / no semi-finished. Why us, quietly. */}
-      <SustainabilityStrip />
-
-      {/* 16-17. EaServiceTabs — Cycle 29 REPLACES EaServicesGrid +
-          ServicesOverview (two separate grid sections → one premium tabbed
-          module). Wolfgang Puck «service tabs» pattern: 5 tabs (Свадьбы ·
-          Корпоратив · Банкеты · Фуршеты · Выездной Шеф), click a tab to swap
-          image + copy + bullet list + contextual CTA in place. Cuts ~1800px
-          of scroll vs the two grids it replaces. Contextual CTAs (P0-4): each
-          tab has a service-context-specific verb (ЗАКАЗАТЬ СВАДЬБУ / ЗАКАЗАТЬ
-          КОРПОРАТИВ / ЗАКАЗАТЬ БАНКЕТ / ЗАКАЗАТЬ ФУРШЕТ / ВЫЕЗДНОЙ ШЕФ К ВАМ)
-          → #calculator or #contact. ARIA tabs pattern + arrow-key nav. */}
+      {/* 6. EaServiceTabs — Cycle 29. Wolfgang Puck «service tabs» pattern: 5
+             tabs (Свадьбы · Корпоратив · Банкеты · Фуршеты · Выездной Шеф) with
+             click-to-swap image + copy + bullet list + contextual CTA per tab. */}
       <EaServiceTabs />
 
-      {/* 17b. GammaAccordion — Cycle 31 NEW. gammacatering.com signature
-          vertical accordion (blocks that fold vertically). 4 items: Замысел
-          / Дизайн / Исполнение / Сервис — handwritten Marck Script labels
-          (red, rotated -3°), Playfair titles, smooth grid-rows 0fr→1fr height
-          animation. One open at a time. Sits after EaServiceTabs as a "how we
-          work" depth beat — gamma's concept/design/implementation pattern
-          extended with a 4th Service item. Section header uses the
-          italic-as-fragment device: "Полный цикл — от *замысла* до *сервиса*." */}
-      <GammaAccordion />
-
-      {/* 18. EaEventsPortfolio — Cycle 28 REPLACES McuPhotoFilmstrip (was
-          Embla filmstrip, broken under React 19). Magazine horizontal-scroll
-          gallery: 8 event cards (4:5 portrait), scroll-snap-x mandatory,
-          auto-advance 4.5s, pause on hover, NO Embla — pure CSS+JS. */}
+      {/* 7. EaEventsPortfolio — Cycle 28. Magazine horizontal-scroll gallery: 8
+             event cards (4:5 portrait), scroll-snap-x mandatory, auto-advance
+             4.5s, pause on hover, pure CSS+JS (no Embla). */}
       <EaEventsPortfolio />
 
-      {/* 18b. GammaHaccordion — Cycle 31 NEW. gammacatering.com signature
-          horizontal accordion (blocks that fold horizontally). 4 experience
-          categories: Свадьбы / Корпоратив / Банкеты / Фуршеты — one open wide
-          + 3 narrow vertical spines, click spine to open. Tinted bg per
-          category (warm rose / cool blue / deep gold / warm cream). Desktop:
-          flex side-by-side 70vh. Mobile: vertical stack with horizontal
-          spine headers. Gamma's strongest "experiences" pattern — replaces
-          static grids with an interactive fold. Companion to GammaAccordion
-          (vertical fold, item 17b) — together they cover both fold directions
-          the user explicitly requested. Section header uses the
-          italic-as-fragment device: "Опыт мероприятий для каждого *формата*." */}
-      <GammaHaccordion />
-
-      {/* 19. EaVenuesSpotlight — Cycle 28 REPLACES McuVenues (was 3 square
-          1:1 cards). 3 full-bleed 16:10 venue cards with hover zoom (scale
-          1.05) + bottom overlay panel slides up on hover. EA §3.9 HQ-as-venue
-          callout pattern. */}
+      {/* 8. EaVenuesSpotlight — Cycle 28. 3 full-bleed 16:10 venue cards with
+             hover zoom (scale 1.05) + bottom overlay panel. Section header is
+             "Где мы *работаем*." — exactly the "where we work" block the user
+             asked for. */}
       <EaVenuesSpotlight />
 
-      {/* 20. EaVenueNetwork — Cycle 28 NEW. Magazine partner-network directory:
-          5 district groups × 6 venues = 30 venues + sticky featured 4:5 hero
-          card. EA's strongest B2B credibility asset (BRAND-CONTEXT §2.5). */}
-      <EaVenueNetwork />
+      {/* 9. Menu — 7 menu types with interactive list + real dishes + PDF. */}
+      <Menu />
 
-      {/* 20c. GammaSeparator — Cycle 31 NEW. gammacatering.com signature
-          full-bleed separator image between major sections (their
-          `.full-width-image.has-fixed-ratio` pattern — a cinematic photo
-          breather). Pure visual rest — no CTAs, no body copy, just the
-          downloaded /media/gamma/gamma-catering-separator.jpg photo + a
-          centered -6° handwritten "interfood" watermark (gamma's signature
-          "tilted text effect"). Sits between Act II's partner-network
-          directory (the B2B credibility close) and Act III's parallax
-          quote band (the cinematic trust beat) — gives the eye a full-bleed
-          photo pause between two heavy content beats, exactly where gamma
-          inserts their separator. Height: clamp(280px, 38vw, 480px) — a
-          wide landscape band, shorter than the hero. */}
-      <GammaSeparator />
-
-      {/* 20b. TottParallaxBand — Cycle 30 NEW. Talk of the Town
-          (talkofthetownatlanta.com) parallax quote band — their signature
-          CSS-parallax section (background-attachment: fixed, 16× on their
-          homepage) + char-split headline reveal (their SR7 GSAP power3.inOut)
-          + Nothing-You-Could-Do script accent "bon appétit". Uses their
-          downloaded "Olive Trees" bg. Editorial pause bridging Act II → Act
-          III — a cinematic trust beat before the testimonials. */}
+      {/* 10. TottParallaxBand — PARALLAX BAND. Talk of the Town CSS-parallax bg
+              (background-attachment:fixed) + char-split headline reveal + "bon
+              appétit" script accent. Editorial pause bridging Act II → Act III —
+              a cinematic trust beat before the events video carousel. */}
       <TottParallaxBand />
 
-      {/* ── ACT III: PROOF & PROCESS ── */}
+      {/* ── ACT III: PROCESS & LOGISTICS ── */}
 
-      {/* 21. CepTestimonialsHeader — massive «ОТЗЫВЫ» headline (130px) on
-          cream. CEP's "just the word, massive" pattern. */}
-      <CepTestimonialsHeader />
+      {/* 11. EventsVideoCarousel — Cycle 32 NEW. Carousel of 4 event-type video
+              tiles with looping muted autoplay teasers + caption panel + center
+              play-pill CTA that opens a fullscreen modal with the full unmuted
+              video + controls. Magazine scroll-snap-x mandatory pattern (forked
+              from EaEventsPortfolio), 5s auto-advance, pause-on-hover, ESC closes
+              the modal. The "events video carousel" the user explicitly requested. */}
+      <EventsVideoCarousel />
 
-      {/* 22. CepTestimonialsCarousel — auto-scrolling, peeking next card, NO
-          arrows/dots, infinite loop. Anonymous social proof. */}
-      <CepTestimonialsCarousel />
-
-      {/* 23. EaNamedTestimonials — Cycle 28 NEW. Named-institution
-          testimonials grid (4 cards with NAME + ROLE + ORGANIZATION: Анна
-          Морозова/Яндекс, Игорь Власов/СБЕР, Мария Кутузова/Гинза, Дмитрий
-          Соколов/ТД Северная Звезда). EA §3.11 named-credibility pattern. */}
-      <EaNamedTestimonials />
-
-      {/* 24. CepProcess — "ТВОРЧЕСКИЙ ПОДХОД" 3-step process: 01 МЕЧТА /
-          02 СОЗДАНИЕ / 03 НАСЛАЖДЕНИЕ. How we work — the creative edge. */}
+      {/* 12. CepProcess — "THE CREATIVE EDGE" 3-step process: 01 DREAM / 02 BUILD /
+              03 SAVOR. The "algorithm of actions" block — how we work, the creative edge. */}
       <CepProcess />
 
-      {/* 25. EaCapabilityStrip — Cycle 28 NEW. Black-bg capability-as-brand-
-          proof strip — 5 unusual capabilities (Аварийный 24/7 / Полевая кухня /
-          Шатёр-монтаж / Видео-трансляция / Сцена и свет). EA "Disaster Relief"
-          nav-item pattern — signalling "we can do anything". */}
-      <EaCapabilityStrip />
-
-      {/* 26. CepLocationsStrip — full-bleed dim photo + "INTERFOOD CATERING"
-          wordmark + "САНКТ-ПЕТЕРБУРГ | МОСКВА | ВСЯ РОССИЯ" city strip.
-          Magazine colophon feel. */}
-      <CepLocationsStrip />
-
-      {/* 27. EaPressStrip — Cycle 28 NEW. Standalone 8-publication press
-          strip (Resto.ru · Афиша Daily · The Village · Собака.ru · Time Out ·
-          Forbes · Ресторановед · Gastronomika). Text-only Playfair italic
-          logos + small taglines. Restored per AGENTS.md §17 TODO. */}
-      <EaPressStrip />
-
-      {/* 27b. EaCareersBlock — Cycle 29 NEW. Wolfgang Puck «Now Hiring»
-          pattern: careers elevated to a first-class homepage section.
-          Espresso bg + photo RIGHT (alternates L-R rhythm after 3 photo-LEFT
-          blocks) + «Работайте с *лучшими*.» + 3 benefits + 2-CTA pair
-          (ОТКЛИКНУТЬСЯ + СМОТРЕТЬ ВАКАНСИИ → #contact) + stat strip (180+ /
-          16+ / 2400+). Catering is labor-intensive — recruitment traffic can
-          equal inquiry traffic. Also linked from top-nav РАБОТА (overlay menu). */}
-      <EaCareersBlock />
-
-      {/* 28. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play
-          icons. Follow-along social proof. */}
-      <CepInstagramGrid />
+      {/* 13. DeliveryBlock — Cycle 32 NEW. 2-col split: delivery photo LEFT +
+              content stack RIGHT (eyebrow "ДОСТАВКА КЕТЕРИНГА" → H2 "Кейтеринг,
+              который *доставляют*." → body paragraph → 5 USPs with custom inline
+              SVG icons → geography row "Санкт-Петербург · Москва · Вся Россия" →
+              2 CTA pills "Заказать доставку" → #contact + "Рассчитать стоимость"
+              → #calculator). Bridges logistics into the conversion flow before
+              the Calculator. */}
+      <DeliveryBlock />
 
       {/* ── ACT IV: CONVERSION ── */}
 
-      {/* 29. EaPhilosophyQuote — Cycle 28 REPLACES QuoteBand. Pure-black bg
-          + giant red Playfair italic quote mark + «Еда — это не логистика.
-          Это *ритуал*…» cinematic trust beat before the calculator. EA §4.5
-          italic-as-fragment device. */}
-      <EaPhilosophyQuote />
-
-      {/* 30. Calculator — interactive price calculator (nuqs state). User
-          has read all brand proof → ready to commit. Sits right before FAQ
-          + Contact so the lead form follows naturally. */}
+      {/* 14. Calculator — interactive price calculator (nuqs state, addons, share).
+              The user has read all brand proof → ready to commit. Sits right before
+              About + FAQ so the lead form follows naturally. */}
       <Suspense fallback={null}>
         <Calculator />
       </Suspense>
 
-      {/* 31. EaFaqAccordion — Cycle 28 REPLACES Faq. Minimalist single-column
-          6-item accordion (no tabs, no search, no feedback widgets). EA
-          restraint — the typography IS the design. Resolves objections
-          before the contact form. */}
+      {/* 15. EaFounderStory — Cycle 28 founder-forward 2-col About: photo LEFT,
+              story + 4 count-up stats + CTA RIGHT. Italic-as-fragment "Откройте
+              нашу *историю*." + named milestones (СБЕР, ГАЗПРОМ, ЯНДЕКС partnerships). */}
+      <EaFounderStory />
+
+      {/* 16. GammaSeparator — PARALLAX BAND. Cycle 31 gammacatering.com signature
+              full-bleed separator image between major sections (their
+              `.full-width-image.has-fixed-ratio` pattern). Pure visual rest — no
+              CTAs, no body copy, just the cinematic photo + centered -6° handwritten
+              "interfood" watermark (gamma's signature "tilted text effect"). Sits
+              between the About and FAQ to give the eye a full-bleed photo pause. */}
+      <GammaSeparator />
+
+      {/* 17. EaFaqAccordion — Cycle 28 minimalist single-column 6-item accordion
+              (no tabs, no search, no feedback). EA restraint — the typography IS
+              the design. Resolves objections before the contact form. */}
       <EaFaqAccordion />
 
-      {/* 32. Contact — form → POST /api/lead → Prisma Lead → toast. The
-          final CTA. */}
+      {/* 18. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play icons.
+              Follow-along social proof. */}
+      <CepInstagramGrid />
+
+      {/* 19. Contact — 4-step lead form → POST /api/lead → Prisma Lead → toast.
+              The final CTA — a visitor who has scrolled this far is ready to convert. */}
       <Contact />
 
-      {/* 33. EaFinalCta — Cycle 28 REPLACES SocialHandle. Pure-black dramatic
-          closer: "Обсудим *событие*?" + 2-CTA pair (Рассчитать стоимость +
-          Написать письмо) + 3-line contact strip (TEЛ · POChTA · city). EA
-          §3.14 footer pattern, transposed to a hero-scale CTA. */}
-      <EaFinalCta />
-
+      {/* 20. SiteFooter — dark navy footer with newsletter + 3-col + cities marquee. */}
       <SiteFooter />
-      {/* Back-to-top button (appears on scroll > 500px). */}
+
+      {/* 21. BackToTop — floating ↑ button (appears on scroll > 500px) with
+              circular scroll-progress ring. */}
       <BackToTop />
     </main>
   );
