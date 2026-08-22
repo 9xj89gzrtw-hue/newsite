@@ -1978,3 +1978,31 @@ Stage Summary:
 - All 17 sections + 3 parallax bands verified via Agent Browser + VLM
 - Lint green; typecheck pass for new files (pre-existing errors in unrelated files not my responsibility)
 - Ready for git commit + push (no --force)
+
+---
+Task ID: 37
+Agent: Z.ai Code (main orchestrator)
+Task: Restyle the services block after activetheory.net/work (user request: «сделай блок услуги в такой же стилистике как на этом сайте https://activetheory.net/work»)
+
+Work Log:
+- Read AGENTS.md + worklog.md tail (Cycle 36 state: 10-section page, EaServices filterable grid at #6).
+- Launched research subagent on activetheory.net/work via agent-browser with WebGL-spoof (site redirects to /unsupported under SwiftShader) + app.js bundle analysis + CMS projects.json. Full design system extracted: bg #000/corners #070d0d/core glow #1d6278, text #fff/#c6c6c6/#f4f4f4, terminal cyan #00ffff, NB Architekt Std (Light 110px ls 0.1 lh 1.2 / card titles 100–130px), chat easing cubic-bezier(.17,.4,.02,.99) 0.4s, hover complex (#c6c6c6→#fff + weight swap + translateX(10px) + text-shadow), decode/scramble with digit charset clamp(2·len+50, 500, 1500)ms, video crossfade 500ms easeOutSine delay 300ms, panels scale-in 1200ms easeOutQuint stagger 200ms, workInOut cubic-bezier(.29,.05,.06,.92), per-project uiColor. Artifacts in /tmp/at_research/.
+- Built AtServices (src/components/catering/at-services.tsx 749 LOC + at-services.css 657 LOC): IBM Plex Mono via next/font (cyrillic subset, weights 300-600, var --at-mono scoped to section) since Montserrat/Poppins lack AT technical voice; mega H2 + subtitle + preview title + terminal question all decode-scramble via custom useScramble (rAF, digits, sr-only a11y mirror); terminal filter = role=radiogroup + roving tabindex (Arrow/Home/End) + search input wired to title/tagline substring; 18 services (same data as Cycle 35) as typographic list rows (Montserrat 500 uppercase clamp(1.45rem,3vw,2.5rem)) with per-item uiColor (warm food palette, no blue/indigo); hover complex incl. accent underline sweep scaleX easeOutQuart + cyan index + arrow slide; sticky 4:5 preview with AnimatePresence sync crossfade + per-item blur-glow layer + glass edge hairline; foot stat + glass CTA pill; empty state «-> НИЧЕГО НЕ НАЙДЕНО — НАПИШИТЕ НАМ».
+- Wired into page.tsx position #6 replacing EaServices (kept on disk). Section keeps id="services" (ChapterNav/header anchors intact).
+- Installed pm2 7.0.3 globally; ecosystem.config.js port 3000→3001 with PORT MAP comment (3000 = parent sandbox my-project). pm2 name: interfood-catering-dev.
+- /loop critique rounds:
+  R1 (VLM 8.5/10 desktop + mobile audit): fixed lint react/jsx-no-comment-textnodes (// and -> literals → JSX expressions); touch targets 44px on .at-svc__opt mobile; input font-size 16px on mobile (iOS zoom); contrast bumps #5f5f5f→#6a6a6a, #6f6f6f→#7a7a7a; overflow-wrap:break-word on titles/taglines; preview shade → full-inset dual gradient (top+bottom fade, photo melts into black per AT).
+  R2 (VLM said preview missing): root-caused — `overflow: hidden` on .at-svc created clipped scrollport killing sticky. Removed (vignette is self-contained). Verified sticky: top constant 120px at scrollY 3400→4200. Also root-caused synthetic mouseenter (bubbles:false) not triggering React onMouseEnter → re-verified with real agent-browser mouse move: caption/title transform matrix(…,10,0)/textShadow #c08552/line scaleX(1)/index rgb(0,255,255) ALL confirmed.
+  R3 (image content audit via VLM on source files): furshet-2.jpg = salmon canapés NOT chocolate fountain → swapped to talkofthetown-section-sweet-treats.jpg; ridgewells-servers.webp = waiters not equipment → swapped to gamma event-service-tischeindeckung-gala (porcelain/glass gala setup); menu-vegetarian.jpg = buffet marmites → swapped to cutandtaste-artichoke.webp (artichoke close-up on dark bg — vegetables-as-heroes + AT mood).
+  R4: added decode-scramble to mega H2 itself (AT card-title decode); caught Turbopack ChunkLoadError after hot edits → pm2 restart fixed; viewport reset bug in agent-browser (set viewport must re-apply after open).
+  R5 final: desktop 9/10 «ДЕФЕКТОВ НЕТ», mobile 9/10 «ДЕФЕКТОВ НЕТ» (only out-of-scope notes: site-wide cookie banner, WebGL wishlist).
+- Verified interactivity end-to-end: filter фуршет → 4 rows + hint // 4 / 18 + aria-checked; search «торт» → 1 row «Торты на заказ»; search «zzzz» → empty state; hover/focus row → preview caption + glow crossfade. Zero console errors, zero page errors.
+- bun run lint exit 0; tsc --noEmit 0 errors.
+- git diff reviewed (4 files: 2 new + page.tsx swap + ecosystem port); committed feat(cycle-37); pushed b14e8c0..53b47cc main (no force).
+
+Stage Summary:
+- New: src/components/catering/at-services.tsx (749 LOC) + at-services.css (657 LOC) — AT /work design language on house stack (framer-motion + scoped CSS + SmartImage).
+- Modified: src/app/page.tsx (EaServices → AtServices at #6), ecosystem.config.js (port 3001 + PORT MAP).
+- Dev server: pm2 interfood-catering-dev on :3001 (3000 = parent sandbox). Restart after heavy hot-edits if ChunkLoadError appears.
+- Key pitfalls for future agents: (1) overflow:hidden on a section kills position:sticky descendants — never add it to a section containing sticky elements; (2) agent-browser `set viewport` resets after `open` — always set AFTER navigating; (3) synthetic dispatchEvent(mouseenter) does NOT trigger React onMouseEnter — use real mouse move or .focus(); (4) VLM screenshot claims must be root-caused (2 of 4 "defects" were false alarms); (5) IBM Plex Mono has full cyrillic — the default --font-poppins (Montserrat) carried row titles for brand consistency; (6) image assignments MUST be VLM-audited against service semantics — filenames lie (menu-vegetarian.jpg is a buffet).
+- Loop converged: 2 consecutive «ДЕФЕКТОВ НЕТ» verdicts (desktop 9/10, mobile 9/10). Remaining wishlist (out of scope): WebGL particle scene, cursor-follow glow parallax on preview, kinetic glitch on scroll velocity.

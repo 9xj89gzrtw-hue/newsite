@@ -3320,3 +3320,80 @@ interfood-catering.ru в премиальном бренд-тоне. Nav обн�
 Agent Browser + VLM верифицировали: 18 карточек, 6 чипов, фильтр работает,
 раскрытие работает, удалённые блоки отсутствуют, stale-ссылок нет, футер
 прижат. `lint` + `typecheck` зелёные.
+
+---
+
+## Cycle 37 — блок услуг в стилистике activetheory.net/work
+
+> Запрос пользователя: «сделай блок услуги в такой же стилистике как на
+> этом сайте https://activetheory.net/work». Источник — Active Theory v6
+> (WebGL-сайт; исследован сабагентом через headless-браузер со спуфом
+> GPU-строки + разбор бандла app.js 1.8MB + CMS projects.json).
+
+### Что сделано
+
+- **AtServices** (`at-services.tsx` + `at-services.css`): чёрная AT-сцена с
+  телом-виньеткой (#070d0d углы, #1d6278 ядро), IBM Plex Mono (cyrillic!)
+  как терминальный голос, mega-H2 + decode/scramble reveals (rAF, charset =
+  цифры, sr-only зеркало для SR), терминал-фильтр «ЧТО ВЫ ИЩЕТЕ?» с ->
+  категориями, циановым #00ffff каретом-мигалкой и поиск-пилюлей, 18 услуг
+  типографским списком (Montserrat uppercase) с per-item uiColor, hover-
+  комплекс AT (#c6c6c6→#fff + translateX(10px) + text-shadow свечения +
+  акцентная линия scaleX easeOutQuart), sticky 4:5 превью с crossfade
+  500ms easeOutSine + per-item glow, glass CTA-пилюля. Easing сайта AT:
+  cubic-bezier(.17,.4,.02,.99).
+- Заменил EaServices на позиции #6 в page.tsx (файл оставлен на диске —
+  конвенция репо). `id="services"` сохранён → nav-ссылки 4 файлов живы.
+- ecosystem.config.js: порт 3001 (3000 занят родительским sandbox).
+
+### /loop критика (5 раундов, agent-browser + VLM)
+
+1. lint `react/jsx-no-comment-textnodes` на `//` и `->` литералах → JSX
+   выражения; touch-target 44px опций на мобиле; input 16px (iOS zoom);
+   контраст #5f5f5f→#6a6a6a; preview-shade → двусторонний градиент.
+2. **sticky умирал**: `overflow: hidden` на секции = clipped scrollport →
+   убран (виньетка самодостаточна). Подтверждено: top константен при
+   scrollY 3400→4200. Синтетический `mouseenter` НЕ триггерит React
+   onMouseEnter → проверка реальным mouse move.
+3. VLM-аудит исходных картинок: furshet-2.jpg = лосось (не фонтан!) →
+   sweet-treats; servers.webp = официанты (не оборудование) → gala-table;
+   menu-vegetarian.jpg = мармиты → artichoke (тёмный фон = AT-настроение).
+4. Decode добавлен на сам mega-H2; Turbopack ChunkLoadError после серии
+   hot-edits лечится `pm2 restart`.
+5. Финал: десктоп 9/10 «ДЕФЕКТОВ НЕТ», мобайл 9/10 «ДЕФЕКТОВ НЕТ».
+
+### Грабли (для будущих циклов)
+
+- **#37-1 `overflow: hidden` на секции убивает `position: sticky` внутри**
+  (создаёт clipped scrollport). Если нужен и clip, и sticky — clip на
+  псевдоэлемент/внутреннюю обёртку, НЕ на предка sticky.
+- **#37-2 `dispatchEvent(mouseenter)` не работает с React** (React выводит
+  enter/leave из mouseover-делегации). Тестировать hover реальным
+  `agent-browser mouse move` или `.focus()` (onFocus зеркалит hover).
+- **#37-3 VLM-вердикты по скриншотам требуют root-cause проверки** — 2 из 4
+  «дефектов» в R2 оказались ложными (cookie-фокус = задуманный a11y-trap;
+  «нет превью» = скролл-позиция кадра). Верифицировать геометрией/DOM.
+- **#37-4 Имена файлов врут**: назначение картинки услуге проверять VLM-
+  аудитом исходника (menu-vegetarian.jpg = буфет с мармитами).
+- **#37-5 agent-browser `set viewport` сбрасывается после `open`** —
+  всегда выставлять ПОСЛЕ навигации; CDP-таймауты на тяжёлой странице =
+  пересоздать сессию (`agent-browser close && open`).
+- **#37-6 IBM Plex Mono — единственный Google-моно с полным cyrillic**
+  из проверенных; NB Architekt (шрифт AT) коммерческий, Plex Mono +
+  Montserrat-заголовки = рабочий суррогат для RU-текста.
+
+### Файлы этого цикла
+
+```
+src/components/catering/at-services.tsx          (new, 749 LOC)
+src/components/catering/at-services.css          (new, 657 LOC)
+src/app/page.tsx                                 (EaServices → AtServices, #6)
+ecosystem.config.js                              (порт 3001 + PORT MAP)
+```
+
+**TL;DR (Cycle 37):** Блок услуг перестилизован под activetheory.net/work:
+чёрная сцена, терминал-фильтр с циановыми акцентами и поиском, decode-
+эффекты, 18 услуг крупной типографикой с пер-айтемными цветами свечения,
+sticky-превью с crossfade. 5 раундов /loop: починены sticky (overflow),
+touch-targets, контрасты, 3 картинки после VLM-аудита. Десктоп и мобайл —
+«ДЕФЕКТОВ НЕТ» 9/10. lint/typecheck зелёные. Push 53b47cc (без force).
