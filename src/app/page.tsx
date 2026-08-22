@@ -4,7 +4,7 @@ import { TottHero } from "@/components/catering/tott-hero";
 import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
 import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
-import { EaServices } from "@/components/catering/ea-services";
+import { AtServices } from "@/components/catering/at-services";
 import { Menu } from "@/components/catering/menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
@@ -135,14 +135,17 @@ export default function Home() {
 
       {/* ── ACT II: WHAT WE OFFER ── */}
 
-      {/* 6. EaServices — Cycle 35 NEW. Filterable category grid of 18 catering
-             services (replaces the 5-tab EaServiceTabs pattern which doesn't
-             scale to 18 services). Category chips (Все / Корпоратив / Частные /
-             Фуршет / Спецменю / Логистика) + responsive card grid with hover /
-             tap-to-expand panels. Modern Awwwards / sondaven.com filterable-grid
-             approach. Content rethought from interfood-catering.ru in premium
-             brand tone (docs/SERVICES-CONTENT.md). */}
-      <EaServices />
+      {/* 6. AtServices — Cycle 37 NEW. Services block restyled after
+             activetheory.net/work (researched via headless browser + bundle
+             analysis): near-black stage with teal vignette, IBM Plex Mono
+             terminal filter ("ЧТО ВЫ ИЩЕТЕ?" + -> категории + поиск-пилюля,
+             cyan #00ffff accents, blinking caret), 18 services as a big
+             typographic list (Montserrat uppercase + per-item uiColor glow
+             hover complex: #c6c6c6→#fff, translateX(10px), text-shadow,
+             accent underline sweep), decode/scramble reveals, sticky 4:5
+             preview panel with crossfade + per-item glow. Replaces the
+             Cycle-35 EaServices grid (kept on disk for reference). */}
+      <AtServices />
 
       {/* 7. Menu — 7 menu types with interactive list + real dishes + PDF. */}
       <Menu />

@@ -1,16 +1,20 @@
 // PM2 ecosystem — dev server for Interfood Catering (newsite)
 // Start: pm2 start ecosystem.config.js
 // Save:  pm2 save && pm2 startup
+//
+// PORT MAP (Cycle 37, this machine):
+//   3000 — parent sandbox my-project (DO NOT TOUCH)
+//   3001 — THIS app, interfood-catering-dev (newsite)
 module.exports = {
   apps: [
     {
       name: "interfood-catering-dev",
       script: "node_modules/next/dist/bin/next",
-      args: "dev -p 3000",
+      args: "dev -p 3001",
       cwd: __dirname,
       env: {
         NODE_ENV: "development",
-        PORT: 3000,
+        PORT: 3001,
       },
       instances: 1,
       exec_mode: "fork",

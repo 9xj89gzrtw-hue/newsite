@@ -1,0 +1,656 @@
+/* ==========================================================================
+   AtServices — Cycle 37. Active Theory /work styling (scoped `.at-svc*`).
+   --------------------------------------------------------------------------
+   Design tokens recovered from activetheory.net (bundle + pixel sampling):
+     bg #000 (corners #070d0d, core glow #1d6278) · text #fff / #c6c6c6 /
+     #f4f4f4 · dim #888-#aaa · terminal cyan #00ffff · easing
+     cubic-bezier(.17,.4,.02,.99) · tracking 0.1-0.18em on labels ·
+     card backing #060606 · glass rgba(255,255,255,.1)+border .3
+   Self-contained: no globals.css edits. transform/opacity + paint only.
+   ========================================================================== */
+
+.at-svc {
+  /* AT scene: near-black stage with a faint teal breath at the core. */
+  /* NOTE: no `overflow: hidden` here — it creates a clipped scrollport that
+     kills the sticky preview panel. The vignette is self-contained (radial
+     gradients fade to transparent inside their own box), no bleed. */
+  position: relative;
+  background: #000;
+  color: #fff;
+  font-family: var(--at-mono), ui-monospace, "IBM Plex Mono", monospace;
+  padding-block: clamp(6rem, 12vw, 10rem);
+}
+
+/* Vignette — AT's #070d0d corners / #1d6278 core glow, kept whisper-quiet. */
+.at-svc__vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(52% 42% at 50% 0%, rgba(29, 98, 120, 0.16), transparent 72%),
+    radial-gradient(90% 60% at 50% 115%, rgba(29, 98, 120, 0.1), transparent 70%);
+}
+
+.at-svc__wrap {
+  position: relative;
+  z-index: 1;
+  width: min(1440px, 92vw);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3.5rem, 6vw, 5.5rem);
+}
+
+/* ── HEAD ─────────────────────────────────────────────────────────────── */
+
+.at-svc__head {
+  display: grid;
+  gap: clamp(2.5rem, 4vw, 4rem);
+  align-items: end;
+}
+
+@media (min-width: 1024px) {
+  .at-svc__head {
+    grid-template-columns: minmax(0, 7fr) minmax(300px, 5fr);
+  }
+}
+
+.at-svc__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #c6c6c6;
+}
+
+.at-svc__eyebrow-cy {
+  color: #00ffff;
+}
+
+/* Mega heading — AT "Light 110px lh 1.1" mono voice. */
+.at-svc__h2 {
+  margin: 0.35em 0 0.3em;
+  font-family: var(--at-mono), ui-monospace, monospace;
+  font-size: clamp(3.6rem, 10vw, 8.5rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 0 42px rgba(255, 255, 255, 0.12);
+}
+
+.at-svc__sub {
+  display: block;
+  font-size: clamp(0.68rem, 1.4vw, 0.8rem);
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: #8b8b8b;
+}
+
+/* ── TERMINAL ─────────────────────────────────────────────────────────── */
+
+.at-svc__term {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.at-svc__term-q {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  color: #f4f4f4;
+}
+
+/* Blinking cyan block caret — AT chat 8×12 #00ffff, 1.5s. */
+.at-svc__caret {
+  width: 8px;
+  height: 13px;
+  background: #00ffff;
+  animation: at-caret-blink 1.5s steps(1) infinite;
+}
+
+@keyframes at-caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.at-svc__term-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1.75rem;
+}
+
+/* "-> websites" links — #c6c6c6 bold; hover whitens + loses weight;
+   active shifts 10px with a cyan glow. All on the AT bezier. */
+.at-svc__opt {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.55rem 0.2rem;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #c6c6c6;
+  cursor: pointer;
+  transition:
+    color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    transform 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    text-shadow 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    font-weight 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__opt-arrow {
+  color: #7a7a7a;
+  transition: color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__opt-count {
+  font-size: 0.62rem;
+  font-weight: 300;
+  color: #6a6a6a;
+}
+
+.at-svc__opt:hover,
+.at-svc__opt:focus-visible {
+  color: #fff;
+  font-weight: 400;
+  outline: none;
+}
+
+.at-svc__opt:hover .at-svc__opt-arrow,
+.at-svc__opt:focus-visible .at-svc__opt-arrow {
+  color: #00ffff;
+}
+
+.at-svc__opt.is-sel {
+  color: #fff;
+  transform: translateX(10px);
+  text-shadow: 0 0 7px rgba(0, 255, 255, 0.75);
+}
+
+.at-svc__opt.is-sel .at-svc__opt-arrow {
+  color: #00ffff;
+}
+
+/* Pill input — radius 50px, 2px white-30 border, extends on focus (AT). */
+.at-svc__ask-input {
+  width: min(330px, 100%);
+  padding: 0.85rem 1.6rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.04);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: #fff;
+  transition:
+    width 0.8s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    border-color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    background 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__ask-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.at-svc__ask-input:focus {
+  outline: none;
+  border-color: rgba(0, 255, 255, 0.55);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.at-svc__hint {
+  font-size: 0.68rem;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  color: #6a6a6a;
+}
+
+/* ── BODY: list + preview ─────────────────────────────────────────────── */
+
+.at-svc__body {
+  display: grid;
+  gap: clamp(2.5rem, 4vw, 4rem);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .at-svc__body {
+    grid-template-columns: minmax(0, 7fr) minmax(320px, 5fr);
+  }
+}
+
+.at-svc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Row — hairline dividers like AT's 2px white rules, kept at 1px scale. */
+.at-svc__row {
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.at-svc__row:first-child {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.at-svc__row-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: clamp(0.9rem, 2vw, 1.75rem);
+  align-items: center;
+  min-height: 84px;
+  padding-block: 1.4rem;
+  padding-inline: 0.2rem;
+  text-decoration: none;
+}
+
+.at-svc__row-index {
+  font-size: 0.72rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: #7a7a7a;
+  transition: color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+/* Big list typography — Montserrat (Cyrillic) uppercase, AT scale rhythm. */
+.at-svc__row-title {
+  font-family: var(--font-poppins), var(--at-mono), sans-serif;
+  font-size: clamp(1.45rem, 3vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  color: #e8e8e8;
+  overflow-wrap: break-word;
+  /* AT hover complex: #c6c6c6→#fff + translateX(10px) + hue glow. */
+  transition:
+    color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    transform 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    text-shadow 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__row-tagline {
+  max-width: 52ch;
+  font-size: 0.78rem;
+  font-weight: 300;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  color: #7c7c7c;
+  overflow-wrap: break-word;
+  transition: color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__row-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.at-svc__row-cat {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #9a9a9a;
+  transition: color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__row-min {
+  font-size: 0.68rem;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: #6a6a6a;
+  transition: color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__row-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--ui, #fff);
+  opacity: 0;
+  transform: translate(-10px, 10px);
+  transition:
+    opacity 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    transform 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__row-arrow svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Hover / focus — the full AT complex. */
+.at-svc__row:hover .at-svc__row-link,
+.at-svc__row:focus-within .at-svc__row-link {
+  outline: none;
+}
+
+.at-svc__row:hover .at-svc__row-title,
+.at-svc__row:focus-within .at-svc__row-title {
+  color: #fff;
+  transform: translateX(10px);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--ui, #fff) 62%, transparent);
+}
+
+.at-svc__row:hover .at-svc__row-index,
+.at-svc__row:focus-within .at-svc__row-index {
+  color: #00ffff;
+}
+
+.at-svc__row:hover .at-svc__row-tagline,
+.at-svc__row:focus-within .at-svc__row-tagline {
+  color: #c9c9c9;
+}
+
+.at-svc__row:hover .at-svc__row-cat,
+.at-svc__row:focus-within .at-svc__row-cat {
+  color: #fff;
+}
+
+.at-svc__row:hover .at-svc__row-min,
+.at-svc__row:focus-within .at-svc__row-min {
+  color: #a5a5a5;
+}
+
+.at-svc__row:hover .at-svc__row-arrow,
+.at-svc__row:focus-within .at-svc__row-arrow {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+/* Keyboard ring — cyan hairline, AT terminal voice. */
+.at-svc__row-link:focus-visible {
+  outline: 1px solid #00ffff;
+  outline-offset: 4px;
+}
+
+/* Accent sweep — underline drawing in the item's uiColor (easeOutQuart). */
+.at-svc__row-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--ui, #fff) 0%,
+    color-mix(in srgb, var(--ui, #fff) 45%, transparent) 55%,
+    transparent 90%
+  );
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.165, 0.84, 0.44, 1);
+  pointer-events: none;
+}
+
+.at-svc__row:hover .at-svc__row-line,
+.at-svc__row:focus-within .at-svc__row-line {
+  transform: scaleX(1);
+}
+
+/* Empty state — terminal voice. */
+.at-svc__empty {
+  padding: 2.5rem 0.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  color: #c6c6c6;
+}
+
+.at-svc__empty-arrow {
+  color: #00ffff;
+  margin-right: 0.5rem;
+}
+
+.at-svc__empty-link {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+  transition: transform 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__empty-link:hover {
+  display: inline-block;
+  transform: translateX(6px);
+}
+
+/* ── PREVIEW — sticky portrait panel (lg+ only) ───────────────────────── */
+
+.at-svc__preview {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .at-svc__preview {
+    display: block;
+    position: sticky;
+    top: clamp(96px, 12vh, 132px);
+  }
+}
+
+.at-svc__preview-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #060606;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.85);
+}
+
+/* AT glass edge — thin white hairline like their WorkPane border. */
+.at-svc__preview-edge {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.at-svc__preview-layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* Per-item uiColor glow behind the image — "panel lights up in its hue". */
+.at-svc__preview-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  filter: blur(58px) saturate(1.15);
+  /* Solid color set inline; shape via mask so blur stays inside the frame. */
+  mask-image: radial-gradient(65% 55% at 50% 42%, #000 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(65% 55% at 50% 42%, #000 30%, transparent 78%);
+  transform: scale(1.06);
+}
+
+.at-svc__preview-img {
+  object-fit: cover;
+}
+
+/* Readability block — AT's #060606 card backing under the title. The top
+   fade integrates the photo into the dark scene (AT panels melt into black
+   rather than hard-cropping). */
+.at-svc__preview-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(6, 6, 6, 0.92), rgba(6, 6, 6, 0) 42%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 18%);
+}
+
+.at-svc__preview-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+  padding-inline: 0.2rem;
+}
+
+.at-svc__preview-num {
+  font-size: 0.66rem;
+  font-weight: 300;
+  letter-spacing: 0.16em;
+  color: color-mix(in srgb, var(--ui, #fff) 75%, #ffffff);
+}
+
+.at-svc__preview-title {
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.at-svc__preview-tagline {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 0.76rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #9a9a9a;
+}
+
+.at-svc__preview-min {
+  font-size: 0.68rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: #6f6f6f;
+}
+
+/* ── FOOT ─────────────────────────────────────────────────────────────── */
+
+.at-svc__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.at-svc__stat {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: #7c7c7c;
+}
+
+/* Glass CTA pill — rgba(255,255,255,.1) + border .3 (AT glass language). */
+.at-svc__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 52px;
+  padding: 0.9rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  color: #fff;
+  transition:
+    background 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    border-color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    transform 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99),
+    box-shadow 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
+}
+
+.at-svc__pill svg {
+  width: 18px;
+  height: 18px;
+}
+
+.at-svc__pill:hover,
+.at-svc__pill:focus-visible {
+  background: rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 255, 255, 0.55);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.18);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+/* ── Mobile adjustments ───────────────────────────────────────────────── */
+
+@media (max-width: 1023px) {
+  /* 44px touch targets (AGENTS.md §5 #7) on terminal options. */
+  .at-svc__opt {
+    min-height: 44px;
+    align-items: center;
+  }
+
+  /* 16px prevents iOS Safari auto-zoom on focus. */
+  .at-svc__ask-input {
+    width: 100%;
+    font-size: 16px;
+    padding-block: 0.95rem;
+  }
+
+  .at-svc__row-link {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    min-height: 72px;
+    padding-block: 1.15rem;
+  }
+
+  .at-svc__row-meta {
+    display: none;
+  }
+
+  /* Category + minimum live under the tagline on touch devices. */
+  .at-svc__row-tagline::after {
+    content: " · " attr(data-cat-min);
+    color: #6a6a6a;
+  }
+
+  .at-svc__row-arrow {
+    width: 28px;
+    height: 28px;
+    opacity: 0.55;
+    transform: none;
+  }
+}
+
+/* ── Reduced motion — everything readable, nothing moving ─────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .at-svc *,
+  .at-svc *::before,
+  .at-svc *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .at-svc__caret {
+    opacity: 1;
+  }
+}
