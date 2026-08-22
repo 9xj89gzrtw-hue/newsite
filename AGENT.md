@@ -688,3 +688,85 @@ fromscratchcatering.com, stevenscatering.com, chefbyrequest.com, и др.
 4. Приоритет реализации: P0 (sticky nav, bold hero, counters) → P1 (video, parallax) → P2 (custom cursor, page transitions)
 
 Целевой уровень — **любой из 23 проанализированных сайтов** (Gamma/Wolfgang Puck/Ridgewells tier).
+
+---
+
+## Cycle 31 — gammacatering.com signature effects graft (2026-08-22)
+
+> **Контекст:** пользователь поручил скопировать signature wow-эффекты
+> gammacatering.com в наш сайт: вертикальную надпись слева на протяжении
+> всего сайта, infinite marquee фото, аккордеоны складывающиеся по
+> вертикали И горизонтали, наклонные handwritten-акценты, фото-разделитель.
+> Hero и SiteHeader не трогать. Цикл критики `/loop` до полного исчезновения
+> проблем.
+
+### Что добавлено (6 новых компонентов + 24 фото)
+
+| Компонент | Файл | Эффект |
+|-----------|------|--------|
+| `VerticalBrandLabel` | `src/components/catering/vertical-brand-label.tsx` | Fixed left `interfoodcatering` watermark, mid-gray + `mix-blend-mode: difference` → виден на ЛЮБОМ фоне (cream, espresso, фото, white). `z-index:60`, hidden <1024px. Hero frame left inset `1.5rem→4.5rem` для gutter. |
+| `GammaMarquee` | `src/components/catering/gamma-marquee.tsx` | Infinite horizontal photo marquee. GSAP `xPercent:-50, repeat:-1`, children duplicated. 14 portrait `aspect-[3/4]` фото, 32px gaps, edge-fade masks, top/bottom 1px borders. Первый wow после hero. |
+| `GammaAccordion` | `src/components/catering/gamma-accordion.tsx` | Вертикальный аккордеон (складывается по вертикали). 4 пункта: Замысел/Дизайн/Исполнение/Сервис. Marck Script handwritten labels (red, -3°), Playfair titles, CSS `grid-template-rows: 0fr→1fr` height animation. Open body = card (blush bg + red left border). |
+| `GammaHaccordion` | `src/components/catering/gamma-haccordion.tsx` + `.css` | Горизонтальный аккордеон (складывается по горизонтали). 4 категории: Свадьбы/Корпоратив/Банкеты/Фуршеты. One open `flex-grow:4` + 3 narrow spines (`writing-mode: vertical-rl`, `+` indicator). Tinted bg per category. Desktop 70vh flex, mobile vertical stack. |
+| `GammaSeparator` | `src/components/catering/gamma-separator.tsx` | Full-bleed фото-разделитель между Act II и Act III. `gamma-catering-separator.jpg`, height `clamp(280px,38vw,480px)`, centered -6° handwritten "interfood" watermark. |
+| `TiltedAccent` | `src/components/catering/tilted-accent.tsx` | Reusable -6° tilted handwritten accent. Applied to CepWhyUs ("почему"), CepProcess ("процесс"), EaEventsPortfolio ("события"). |
+
+**24 gamma-фото** скачаны в `public/media/gamma/` (hero fan cards, 14 marquee portraits, 4 haccordion experience photos, separator, CTA band). Файлы reencoded без `-1024x` / `-scaled` суффиксов.
+
+### Новая page.tsx последовательность (Act I-IV + gamma вставки)
+
+```
+TottHero → SiteHeader → GammaMarquee (NEW) → CepSimpleBrilliant → CepRedStats →
+CepWhyUs → CepEditorialDivider → EditorialIntro → EaFounderStory → Manifesto →
+EaChefQuote → ChefPortrait → Menu → TastingMenuExperience → EaSeasonalTabs →
+EaTastingCta → SustainabilityStrip → EaServiceTabs → GammaAccordion (NEW) →
+EaEventsPortfolio → GammaHaccordion (NEW) → EaVenuesSpotlight → EaVenueNetwork →
+GammaSeparator (NEW) → TottParallaxBand → [Act III: testimonials/process/capability/locations/press/careers/ig] →
+[Act IV: philosophy/calculator/faq/contact/final-cta] → SiteFooter → BackToTop
+```
+
+### Операционные находки для будущих агентов
+
+1. **PM2 dev server**: `pm2 start ecosystem.config.js` (в newsite/). Process name `interfood-catering-dev`, port 3000, fork mode, autorestart. `pm2 save` для persistence. Logs в `logs/out-0.log` / `logs/err-0.log`. НЕ используй `bun run dev` напрямую — pm2 держит процесс стабильнее (sandbox может рестартить my-project, но newsite под pm2 выживет).
+
+2. **Turbopack CSS cache trap**: если добавил новые CSS-правила в `globals.css` но они не применяются в браузере (computed style не меняется, CSS bundle hash тот же) — **удали `.next/dev/`** и `pm2 restart`. Turbopack иногда не инвалидирует CSS-бандл при внешних правках файла. Симптом: правило есть в исходнике, в `.next/dev/static/chunks/*globals*.css` его НЕТ. Фикс: `rm -rf .next/dev && pm2 restart interfood-catering-dev`. После перекомпиляции (8-10с) CSS hash меняется и правила применяются.
+
+3. **VLM critique loop** (для `/loop` задач): используй `z-ai vision -p "..." -i "./screenshot.png"` для критики скриншотов. Береги промпт — явно пиши "Plain text only, NO code, NO HTML" иначе модель может вернуть HTML/CSS вместо критики. Делай targeted скриншоты через `agent-browser eval "window.scrollTo(0, Y)"` + `agent-browser screenshot` (точные Y из `getBoundingClientRect()`). 2-3 раунда критики обычно достаточно: раунд 1 находит layout-баги → фикс → раунд 2 подтверждает → раунд 3 проверяет edge cases (разные фоны, mobile).
+
+4. **mix-blend-mode: difference для fixed-overlay**: для текста/меток которые должны быть видны на ЛЮБОМ фоне (cream, black, фото) — используй `color: rgba(140,140,140,0.95); mix-blend-mode: difference;`. Математика: на cream(249) → |140-249|=109 (тёмный navy, виден), на black(0) → 140 (mid-gray, виден), на white(255) → 115 (тёмный, виден). White-only difference на cream даёт (6,10,16) — почти невидимый. **Не используй чисто-white с difference на cream-фонах.**
+
+5. **Параллельные subagents**: для независимых компонентов запускай 3-4 full-stack-developer субагента одновременно (Task tool в одном сообщении). Каждый обязан: (а) прочитать `worklog.md` ДО работы, (б) реализовать компонент, (в) проверить `bun run lint`, (г) дописать запись в `worklog.md` (append, НЕ overwrite). Оркестратор коммитит централизованно в конце — субагенты НЕ коммитят.
+
+6. **gamma media convention**: все gamma-фото в `public/media/gamma/`, имена без `-1024xNNN` / `-scaled` суффиксов (чистые базовые имена). `.webp` файлы с `.webp` расширением (один файл `gamma-catering-erlebnis-privat-events` был без расширения но реально WebP — переименован в `.webp`).
+
+### Файлы Cycle 31 (для ревью будущих агентов)
+
+- `src/components/catering/vertical-brand-label.tsx` — server component
+- `src/components/catering/gamma-marquee.tsx` — client (GSAP)
+- `src/components/catering/gamma-accordion.tsx` — client (useState)
+- `src/components/catering/gamma-haccordion.tsx` + `gamma-haccordion.css` — client (useState)
+- `src/components/catering/gamma-separator.tsx` — server component
+- `src/components/catering/tilted-accent.tsx` — server component
+- `src/app/globals.css` lines 3655-3697 (`.vertical-brand-label`), 3946-3964 (`.tilted-accent`), 3972-4041 (`.gamma-separator`), 3792-3930 (`.gamma-accordion`)
+- `src/app/layout.tsx` — `<VerticalBrandLabel />` после `<PageBorders />`
+- `src/app/page.tsx` — 4 новых `<Gamma*>` JSX с комментариями
+- `ecosystem.config.js` — pm2 dev config (port 3000)
+- `public/media/gamma/` — 24 фото
+
+### Worklog (каноническая запись)
+
+`/home/z/my-project/worklog.md` — общая для всех агентов (newsite + my-project sandbox). Каждая запись начинается с `---` + `Task ID` + `Agent` + `Task` + `Work Log` + `Stage Summary`. Читай перед работой, дописывай после.
+
+---
+
+**TL;DR (обновлено Cycle 31):**
+
+Для **gamma-tier wow-эффектов**:
+1. Вертикальный brand label: `mix-blend-mode: difference` + mid-gray (НЕ white)
+2. Photo marquee: GSAP `xPercent:-50, repeat:-1` + duplicate children + edge-fade masks
+3. Accordion (верт.): CSS `grid-template-rows: 0fr→1fr` (надёжнее AnimatePresence)
+4. Accordion (гориз.): `flex-grow: 1→4` transition + `writing-mode: vertical-rl` spines
+5. Tilted text: `transform: rotate(-6deg)` + Marck Script (Cyrillic) handwritten
+6. Если CSS не применяется после правок — `rm -rf .next/dev && pm2 restart`
+7. VLM critique: `z-ai vision -p "Plain text only, NO code..." -i screenshot.png`
+8. Dev server: `pm2 start ecosystem.config.js` (НЕ `bun run dev` напрямую)
