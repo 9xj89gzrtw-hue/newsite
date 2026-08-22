@@ -48,23 +48,45 @@ export function CepLocationsStrip() {
 
       {/* Foreground content */}
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center px-6 text-center">
-        {/* Wordmark substitute — small eyebrow line in brand voice */}
-        <p className="cep-eyebrow mb-8 tracking-[0.35em] text-black">
-          INTERFOOD CATERING
-        </p>
+        {/* Wordmark — Cycle 31.1: BIGGER and two-color split per user
+            request: "горизонтальную надпись interfoodcatering сделай большего
+            размера и раздели два слова разными цветами". "INTERFOOD" in
+            cream/white (the brand primary), "CATERING" in gold (the accent
+            already used on the hero wordmark dot). Rendered as a single
+            large Prata display wordmark — same font family as the hero
+            "Interfood." — so the brand reads consistently across screens.
+            Was a small 12px eyebrow; now a clamp(2.5rem, 6vw, 4.5rem)
+            display wordmark that anchors the locations strip visually. */}
+        <h2
+          className="tott-display"
+          style={{
+            fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+            lineHeight: 1,
+            letterSpacing: "0.01em",
+            fontWeight: 400,
+            margin: 0,
+            color: "rgba(255,255,255,0.96)",
+            textShadow: "0 2px 24px rgba(0,0,0,0.35)",
+          }}
+        >
+          INTERFOOD{" "}
+          <span style={{ color: "var(--gold)" }}>CATERING</span>
+        </h2>
 
         {/* City strip — 32.8px Neutra2Display-Light, uppercase, tight-tracked,
-            pipe-separated like CEP's "NEW YORK | MIAMI | PALM BEACH | WORLDWIDE" */}
-        <h2
-          className="cep-display text-black"
+            pipe-separated like CEP's "NEW YORK | MIAMI | PALM BEACH | WORLDWIDE".
+            Sits below the wordmark with a top margin. */}
+        <p
+          className="cep-display mt-8 text-white/90"
           style={{
             fontSize: "clamp(1.5rem, 2.4vw, 2.1rem)",
             letterSpacing: "-0.01em",
             lineHeight: 1.05,
+            textShadow: "0 1px 12px rgba(0,0,0,0.4)",
           }}
         >
           САНКТ-ПЕТЕРБУРГ&nbsp;|&nbsp;МОСКВА&nbsp;|&nbsp;ВСЯ&nbsp;РОССИЯ
-        </h2>
+        </p>
       </div>
     </section>
   );

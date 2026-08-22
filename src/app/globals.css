@@ -3627,34 +3627,35 @@ header[data-scrolled="true"] [data-mega-panel] {
 .tott-cta-btn:active { transform: translateY(0); }
 
 /* --- 5px white border decorative frame (their hero SR7 border shape) -----
-   Left inset widened to 4.5rem (72px) to accommodate the fixed vertical
-   "interfoodcatering" brand label (VerticalBrandLabel component) that sits
-   in the frame gutter throughout the site — gamma-style left-side brand
-   watermark. The label lives at left:28px with ~30px wide text (right edge
-   ~58px), leaving a ~14px gap before the frame's left line at 72px. Other
-   sides stay at the original 1.5rem (24px). */
+   Cycle 31.1 (2026-08-22): left inset RESTORED to 1.5rem (was 4.5rem) — the
+   vertical brand labels now start from the SECOND screen (below hero), so
+   the hero frame goes back to its original uniform 1.5rem (24px) on all
+   sides. Hero stays pristine; labels appear after scroll. */
 .tott-border-frame {
   position: absolute;
-  inset: 1.5rem 1.5rem 1.5rem 4.5rem;
+  inset: 1.5rem;
   border: 5px solid rgba(255,255,255,0.85);
   pointer-events: none;
   z-index: 3;
 }
 .tott-border-frame--cream { border-color: rgba(241,234,224,0.7); }
 
-/* --- Vertical "interfoodcatering" left-side fixed brand label ------------
-   Gamma-style left-side brand watermark — runs the full site height, fixed.
-   Sits in the gutter LEFT of the hero frame (.tott-border-frame left inset
-   is widened to 4.5rem above to make room). The text reads bottom-to-top
-   via writing-mode: vertical-rl + transform: rotate(180deg) (editorial
-   colophon style — tilt head left to read). mix-blend-mode: difference with
-   white color keeps it legible against both cream (#F9F5EF) sections (renders
-   dark ~#060A10) and dark/black sections (renders light). Hidden below the
-   lg breakpoint (mobile has no label). z-index: 60 — above page borders
-   (z-50), below modals. pointer-events: none — never blocks interaction. */
+/* --- Vertical "interfoodcatering" LEFT + RIGHT fixed brand labels -----------
+   Gamma-style brand watermark — runs the full site height, fixed. Two
+   instances: LEFT (28px from left edge) and RIGHT (28px from right edge,
+   mirrored). Both read bottom-to-top via writing-mode: vertical-rl +
+   transform: rotate(180deg) (editorial colophon style — tilt head left
+   to read). mix-blend-mode: difference with mid-gray color keeps them
+   legible against both cream (#F9F5EF) sections and dark/black sections.
+
+   Cycle 31.1: labels START FROM THE SECOND SCREEN — they fade in only
+   after the user scrolls past the hero (100vh). The .is-visible class is
+   toggled by a scroll listener in vertical-brand-label.tsx (now a client
+   component). Before scroll, both labels are opacity:0 + pointer-events:none
+   so the hero is pristine. After scroll past hero, labels fade in over 0.6s.
+   Hidden below the lg breakpoint (mobile has no labels). z-index: 60. */
 .vertical-brand-label {
   position: fixed;
-  left: 28px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 60;
@@ -3663,6 +3664,18 @@ header[data-scrolled="true"] [data-mega-panel] {
   flex-direction: column;
   align-items: center;
   gap: 14px;
+  /* Start hidden — fade in after scroll past hero (see .is-visible). */
+  opacity: 0;
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.vertical-brand-label.is-visible {
+  opacity: 1;
+}
+.vertical-brand-label--left {
+  left: 28px;
+}
+.vertical-brand-label--right {
+  right: 28px;
 }
 .vertical-brand-label__tick {
   display: block;

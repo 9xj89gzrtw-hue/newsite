@@ -205,7 +205,132 @@ function PhotoSet({ ariaHidden = false }: { ariaHidden?: boolean }) {
 export function GammaMarquee() {
   const mounted = useMounted();
   const trackRef = React.useRef<HTMLDivElement>(null);
+  const sectionRef = React.useRef<HTMLElement>(null);
   const [reducedMotion, setReducedMotion] = React.useState(false);
+
+  // ── Drag state ──────────────────────────────────────────────────────
+  // Cycle 31.1: the user requested the marquee be draggable by cursor
+  // (like gammacatering.com, which uses Splide `drag: 'free'`). We
+  // implement manual pointer drag on top of the GSAP auto-scroll:
+  //   - pointerdown  → kill the GSAP tween, record startX + current baseX
+  //   - pointermove  → set track x = baseX + (clientX - startX)
+  //   - pointerup    → normalize x into the [-trackWidth/2, 0] loop range,
+  //                    then resume the GSAP auto-scroll from there.
+  // The track's x is driven by GSAP's transform, so during drag we use
+  // gsap.set() to override it. cursor: grab/grabbing + touch-action: none
+  // (via the .gamma-marquee__track--draggable class) so touch devices
+  // don't fight vertical scroll while dragging horizontally.
+  const dragState = React.useRef({
+    active: false,
+    startX: 0,
+    baseX: 0, // track x at pointerdown (in px)
+    trackWidth: 0, // one full set width (half of scrollWidth due to clone)
+  });
+
+  const onPointerDown = React.useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!trackRef.current || reducedMotion) return;
+    // Only respond to primary pointer (left mouse / touch / pen).
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    dragState.current.active = true;
+    dragState.current.startX = e.clientX;
+    // Read current x from the inline transform GSAP set. The track's
+    // transform is `translate3d(Xpx, 0px, 0px)` — extract the X.
+    const cs = getComputedStyle(trackRef.current);
+    const matrix = cs.transform;
+    let currentX = 0;
+    if (matrix && matrix !== "none") {
+      const match = matrix.match(/matrix.*\(([^)]+)\)/);
+      if (match) {
+        const values = match[1].split(",").map((v) => parseFloat(v.trim()));
+        // translate3d / matrix3d: x is values[12]; matrix: x is values[4].
+        currentX = values.length === 16 ? values[12] : values[4] || 0;
+      }
+    }
+    dragState.current.baseX = currentX;
+    // The track is two duplicate sets; one set = half of scrollWidth.
+    dragState.current.trackWidth = trackRef.current.scrollWidth / 2;
+    // Kill the auto-scroll tween so we can take over the transform.
+    (async () => {
+      const { default: gsap } = await import("gsap");
+      gsap.killTweensOf(trackRef.current);
+    })();
+    // Capture pointer so move events keep firing even if cursor leaves
+    // the track bounds during drag.
+    try {
+      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    } catch {
+      /* noop */
+    }
+    if (sectionRef.current) {
+      sectionRef.current.dataset.dragging = "true";
+    }
+  }, [reducedMotion]);
+
+  const onPointerMove = React.useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragState.current.active || !trackRef.current) return;
+    const delta = e.clientX - dragState.current.startX;
+    let newX = dragState.current.baseX + delta;
+    // Normalize into the [-trackWidth, 0] range so dragging past either
+    // edge wraps to the other side (seamless infinite drag). The track
+    // is two duplicate sets, so the visible range is one set width.
+    const w = dragState.current.trackWidth;
+    if (w > 0) {
+      while (newX > 0) newX -= w;
+      while (newX < -w) newX += w;
+    }
+    (async () => {
+      const { default: gsap } = await import("gsap");
+      gsap.set(trackRef.current, { x: newX });
+    })();
+  }, []);
+
+  const onPointerUp = React.useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragState.current.active || !trackRef.current) return;
+    dragState.current.active = false;
+    try {
+      (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+    } catch {
+      /* noop */
+    }
+    if (sectionRef.current) {
+      delete sectionRef.current.dataset.dragging;
+    }
+    // Resume auto-scroll from wherever the user dropped the track.
+    // We normalize the current x (which may be anywhere in [-w, 0]) and
+    // restart the GSAP tween from there. The tween target is xPercent:-50
+    // (relative to the track's own width), so we read the current xPercent
+    // and continue toward -50% with a fresh repeat.
+    (async () => {
+      const { default: gsap } = await import("gsap");
+      if (!trackRef.current) return;
+      const w = dragState.current.trackWidth;
+      const cs = getComputedStyle(trackRef.current);
+      const matrix = cs.transform;
+      let currentX = 0;
+      if (matrix && matrix !== "none") {
+        const match = matrix.match(/matrix.*\(([^)]+)\)/);
+        if (match) {
+          const values = match[1].split(",").map((v) => parseFloat(v.trim()));
+          currentX = values.length === 16 ? values[12] : values[4] || 0;
+        }
+      }
+      // Normalize into [-w, 0].
+      if (w > 0) {
+        while (currentX > 0) currentX -= w;
+        while (currentX < -w) currentX += w;
+      }
+      gsap.set(trackRef.current, { x: currentX });
+      // Restart the infinite tween from here. Duration 40s, same as
+      // initial. The tween goes to xPercent:-50 (one full set width),
+      // then repeats — so the loop continues seamlessly.
+      gsap.to(trackRef.current, {
+        xPercent: -50,
+        ease: "none",
+        duration: 40,
+        repeat: -1,
+      });
+    })();
+  }, []);
 
   // Read prefers-reduced-motion AFTER mount (server has no window) so we
   // don't risk a hydration mismatch. The animation effect below reads
@@ -270,24 +395,17 @@ export function GammaMarquee() {
 
   return (
     <section
+      ref={sectionRef}
       aria-label="Фотогалерея — кейтеринг в движении"
       className="gamma-marquee relative w-full overflow-hidden bg-cream py-5"
       style={{
-        // Edge-fade masks on both sides — gamma's signature soft dissolve
-        // at the marquee edges (same trick as `.cep-marquee-mask` in
-        // globals.css). Implemented inline because the value is unique
-        // to this section and the 5%/95% gamma uses is tighter than
-        // CEP's 12%/88%.
-        maskImage:
-          "linear-gradient(to right, transparent, black 5%, black 95%, transparent)",
-        WebkitMaskImage:
-          "linear-gradient(to right, transparent, black 5%, black 95%, transparent)",
-        // Filmstrip band framing — 1px hairline top + bottom in a very
-        // low-opacity ink so the marquee reads as a deliberate band
-        // rather than a floating strip (VLM critique #3: harsh bottom
-        // cut). color-mix in oklch gives a perceptually-uniform 8% ink
-        // tint that survives light/dark theme swaps. Same hairline on
-        // both edges so the band is symmetric.
+        // Cycle 31.1: edge-fade mask REMOVED per user request: "убери
+        // плавное затухание". The marquee now has crisp edges on both
+        // sides — photos enter/exit hard, matching gamma's marquee
+        // behaviour (gamma uses Splide overflow:hidden with no mask).
+        // Filmstrip band framing kept — 1px hairline top + bottom in a
+        // very low-opacity ink so the marquee reads as a deliberate band
+        // rather than a floating strip.
         borderTop:
           "1px solid color-mix(in oklch, var(--ink) 8%, transparent)",
         borderBottom:
@@ -298,6 +416,13 @@ export function GammaMarquee() {
           track to xPercent:-50, set 1 has fully exited left and set 2 is
           exactly where set 1 started → the loop is seamless.
 
+          Cycle 31.1: the track is now DRAGGABLE by cursor (pointer
+          events). On drag, we kill the GSAP auto-scroll and take over
+          the transform; on release, we resume auto-scroll from the
+          dropped position. cursor: grab / grabbing signals the
+          affordance. touch-action: none on the track prevents the
+          browser from hijacking the gesture for horizontal swipe-back.
+
           Under reduced-motion the track keeps the same markup, but no
           tween runs. Instead we let the wrapper scroll horizontally
           natively (overflow-x-auto + scroll-snap) so users can browse
@@ -305,10 +430,23 @@ export function GammaMarquee() {
           AutoScroll being disabled under reduced-motion. */}
       <div
         ref={trackRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
         className={
           reducedMotion
             ? "gamma-marquee__track gamma-marquee__track--static flex w-max snap-x snap-mandatory overflow-x-auto pb-3"
-            : "gamma-marquee__track flex w-max will-change-transform"
+            : "gamma-marquee__track gamma-marquee__track--draggable flex w-max will-change-transform cursor-grab select-none"
+        }
+        style={
+          reducedMotion
+            ? undefined
+            : {
+                // Prevent browser from interpreting horizontal drag as
+                // swipe-back / scroll. Allow vertical pan for page scroll.
+                touchAction: "pan-y",
+              }
         }
       >
         <PhotoSet />
