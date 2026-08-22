@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { SiteHeader } from "@/components/catering/site-header";
 import { TottHero } from "@/components/catering/tott-hero";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
+import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { CepSimpleBrilliant } from "@/components/catering/cep-simple-brilliant";
 import { CepRedStats } from "@/components/catering/cep-red-stats";
 import { CepWhyUs } from "@/components/catering/cep-why-us";
@@ -16,11 +17,14 @@ import { TastingMenuExperience } from "@/components/catering/tasting-menu-experi
 import { EaTastingCta } from "@/components/catering/ea-tasting-cta";
 import { SustainabilityStrip } from "@/components/catering/sustainability-strip";
 import { EaServiceTabs } from "@/components/catering/ea-service-tabs";
+import { GammaAccordion } from "@/components/catering/gamma-accordion";
 import { EaSeasonalTabs } from "@/components/catering/ea-seasonal-tabs";
 import { EaCareersBlock } from "@/components/catering/ea-careers-block";
 import { EaEventsPortfolio } from "@/components/catering/ea-events-portfolio";
+import { GammaHaccordion } from "@/components/catering/gamma-haccordion";
 import { EaVenuesSpotlight } from "@/components/catering/ea-venues-spotlight";
 import { EaVenueNetwork } from "@/components/catering/ea-venue-network";
+import { GammaSeparator } from "@/components/catering/gamma-separator";
 import { CepTestimonialsHeader } from "@/components/catering/cep-testimonials-header";
 import { CepTestimonialsCarousel } from "@/components/catering/cep-testimonials-carousel";
 import { EaNamedTestimonials } from "@/components/catering/ea-named-testimonials";
@@ -173,6 +177,14 @@ export default function Home() {
           верха экрана то остается там и становится немного прозрачным". */}
       <SiteHeader />
 
+      {/* GammaMarquee — Cycle 31 NEW. gammacatering.com signature infinite
+          horizontal photo marquee (GSAP xPercent:-50, repeat:-1, children
+          duplicated for seamless loop). 14 portrait food/event photos from
+          /media/gamma/. Edge-fade masks. Pure photo scroll — no text overlay,
+          per gamma. First wow moment after hero — gamma places their marquee
+          immediately after the hero. */}
+      <GammaMarquee />
+
       {/* 3. CepSimpleBrilliant — "ПРОСТО / И БЛЕСТЯЩЕ." 200px headline over
           0.5× slow-mo food b-roll. Brand positioning insistence — a film
           title card moment. */}
@@ -259,11 +271,34 @@ export default function Home() {
           → #calculator or #contact. ARIA tabs pattern + arrow-key nav. */}
       <EaServiceTabs />
 
+      {/* 17b. GammaAccordion — Cycle 31 NEW. gammacatering.com signature
+          vertical accordion (blocks that fold vertically). 4 items: Замысел
+          / Дизайн / Исполнение / Сервис — handwritten Marck Script labels
+          (red, rotated -3°), Playfair titles, smooth grid-rows 0fr→1fr height
+          animation. One open at a time. Sits after EaServiceTabs as a "how we
+          work" depth beat — gamma's concept/design/implementation pattern
+          extended with a 4th Service item. Section header uses the
+          italic-as-fragment device: "Полный цикл — от *замысла* до *сервиса*." */}
+      <GammaAccordion />
+
       {/* 18. EaEventsPortfolio — Cycle 28 REPLACES McuPhotoFilmstrip (was
           Embla filmstrip, broken under React 19). Magazine horizontal-scroll
           gallery: 8 event cards (4:5 portrait), scroll-snap-x mandatory,
           auto-advance 4.5s, pause on hover, NO Embla — pure CSS+JS. */}
       <EaEventsPortfolio />
+
+      {/* 18b. GammaHaccordion — Cycle 31 NEW. gammacatering.com signature
+          horizontal accordion (blocks that fold horizontally). 4 experience
+          categories: Свадьбы / Корпоратив / Банкеты / Фуршеты — one open wide
+          + 3 narrow vertical spines, click spine to open. Tinted bg per
+          category (warm rose / cool blue / deep gold / warm cream). Desktop:
+          flex side-by-side 70vh. Mobile: vertical stack with horizontal
+          spine headers. Gamma's strongest "experiences" pattern — replaces
+          static grids with an interactive fold. Companion to GammaAccordion
+          (vertical fold, item 17b) — together they cover both fold directions
+          the user explicitly requested. Section header uses the
+          italic-as-fragment device: "Опыт мероприятий для каждого *формата*." */}
+      <GammaHaccordion />
 
       {/* 19. EaVenuesSpotlight — Cycle 28 REPLACES McuVenues (was 3 square
           1:1 cards). 3 full-bleed 16:10 venue cards with hover zoom (scale
@@ -275,6 +310,20 @@ export default function Home() {
           5 district groups × 6 venues = 30 venues + sticky featured 4:5 hero
           card. EA's strongest B2B credibility asset (BRAND-CONTEXT §2.5). */}
       <EaVenueNetwork />
+
+      {/* 20c. GammaSeparator — Cycle 31 NEW. gammacatering.com signature
+          full-bleed separator image between major sections (their
+          `.full-width-image.has-fixed-ratio` pattern — a cinematic photo
+          breather). Pure visual rest — no CTAs, no body copy, just the
+          downloaded /media/gamma/gamma-catering-separator.jpg photo + a
+          centered -6° handwritten "interfood" watermark (gamma's signature
+          "tilted text effect"). Sits between Act II's partner-network
+          directory (the B2B credibility close) and Act III's parallax
+          quote band (the cinematic trust beat) — gives the eye a full-bleed
+          photo pause between two heavy content beats, exactly where gamma
+          inserts their separator. Height: clamp(280px, 38vw, 480px) — a
+          wide landscape band, shorter than the hero. */}
+      <GammaSeparator />
 
       {/* 20b. TottParallaxBand — Cycle 30 NEW. Talk of the Town
           (talkofthetownatlanta.com) parallax quote band — their signature

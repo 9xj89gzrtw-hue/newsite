@@ -36,6 +36,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
 import type { ReactNode } from "react";
+import { TiltedAccent } from "@/components/catering/tilted-accent";
 
 type Step = {
   num: string;
@@ -85,6 +86,12 @@ export function CepProcess() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7, ease: EASE }}
       >
+        {/* Cycle 31 — gamma-style -6° tilted handwritten accent ABOVE the H2.
+            "процесс" echoes the section's process theme (3-step «ТВОРЧЕСКИЙ
+            ПОДХОД») in Marck Script Cyrillic. Red, rotated -6°, sized to sit
+            between the eyebrow and H2 scales — an editorial marginalia that
+            opens the "how we work" beat with a human handwritten gesture. */}
+        <TiltedAccent text="процесс" className="mb-6 block md:mb-8" />
         <h2 className="cep-section-h2 mb-16 text-cep-black md:mb-24">
           THE CREATIVE EDGE
         </h2>

@@ -110,3 +110,14 @@ docs/reference-library/saltblock/hover-*.png
 /public/media/ea/ea-hero.png
 /public/media/ea/ea-hero-shot.png
 /public/media/ea/ea-full-page.png
+
+# agent-ctx — subagent work records (transient, worklog.md is canonical)
+/agent-ctx/
+
+# verification screenshots (created during VLM critique loops)
+docs/loop*.png
+docs/new-*.png
+docs/gamma-hero-live.png
+docs/gamma-marquee.png
+docs/gamma-accordion.png
+docs/gamma-haccordion.png

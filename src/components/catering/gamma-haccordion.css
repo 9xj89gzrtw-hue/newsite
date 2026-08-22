@@ -1,0 +1,440 @@
+/* ============================================================================
+   gamma-haccordion — Cycle 31 NEW (gammacatering.com signature pattern)
+   ----------------------------------------------------------------------------
+   Horizontal accordion — "blocks that fold horizontally". 4 experience
+   categories side-by-side: ONE open wide (4× flex-grow) + 3 narrow vertical
+   spines (1× flex-grow). Click a spine → it opens, the others fold closed.
+
+   Self-contained scope: `.gamma-hacc__*`. Does NOT touch globals.css.
+   Reuses EA design tokens (--ea-cream, --ea-ink, --ea-red, --ea-font-display,
+   --ea-font-eyebrow, --ea-font-body, --ea-section, --ea-container, .ea-eyebrow,
+   .ea-section-h2, .ea-italic-fragment) for visual continuity with the rest
+   of the editorial layer.
+
+   Layout:
+     DESKTOP (≥1024px):
+       Container: display:flex, height: 70vh (min 520 / max 720)
+       Item:      display:flex, flex: 1 1 0 (closed) | 4 1 0 (open)
+                  transition: flex-grow 0.6s cubic-bezier(0.22,1,0.36,1)
+       Spine:     width:100% (closed) → fills narrow column
+                  width:80px (open) → narrow strip on right edge
+                  writing-mode: vertical-rl; transform: rotate(180deg)
+                  (text reads bottom-to-top — gamma signature)
+       Open panel: flex:1, padding 3rem, stacked: head / media / cta
+                   hidden (HTML `hidden` attr) when closed
+     MOBILE (<1024px):
+       Container: flex-direction: column, height:auto
+       Item:      flex-direction: column, flex:0 0 auto
+       Spine:     writing-mode: horizontal-tb; transform: none
+                  width:100%; height:88px — horizontal header bar
+       Open panel: appears below the spine when open
+
+   Accessibility:
+     - role="button" on spine + tabindex=0 + aria-expanded + aria-controls
+     - Enter / Space → activate
+     - ArrowRight / ArrowDown → focus next CLOSED spine (skip the open)
+     - ArrowLeft  / ArrowUp   → focus prev CLOSED spine
+     - prefers-reduced-motion → instant flex change (no transition)
+
+   Source: docs/advanced-technical/site_21_gamma.html lines 373-440 (HTML)
+           lines 1940-1985 (JS — open/close + arrow-key focus behaviour)
+   ============================================================================ */
+
+/* — — — — — Section shell — reuses EA tokens for visual continuity — — — — — */
+
+.gamma-hacc-section {
+  position: relative;
+  padding-block: clamp(5rem, 9vw, 8rem);
+  background: var(--ea-cream);
+}
+
+.gamma-hacc-section__head {
+  max-width: 56rem;
+  margin-bottom: clamp(2rem, 4vw, 3.25rem);
+}
+
+.gamma-hacc-section__h2 {
+  margin-top: 0.85rem;
+}
+
+/* — — — — — Container (horizontal accordion shell) — — — — — */
+
+.gamma-hacc {
+  display: flex;
+  flex-direction: row;
+  height: 70vh;
+  min-height: 520px;
+  max-height: 720px;
+  width: 100%;
+  /* subtle inner ring keeps the four tinted cards visually grouped */
+  box-shadow: var(--ea-shadow-cream);
+  border-radius: var(--ea-radius-soft);
+  overflow: hidden;
+}
+
+/* — — — — — Item (one experience category) — — — — — */
+
+.gamma-hacc__item {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  transition: flex-grow 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: default;
+  /* Cycle 31 — Task 3-b VLM critique fix: subtle divider between items so
+     the open panel reads as visually separated from the closed spines. */
+  border-right: 1px solid color-mix(in oklch, var(--ea-ink) 6%, transparent);
+}
+
+.gamma-hacc__item:last-child {
+  border-right: 0;
+}
+
+.gamma-hacc__item--open {
+  flex-grow: 4;
+  /* Cycle 31 — Task 3-b VLM critique fix: subtle inner ring lifts the
+     open item forward, distinguishing it from the closed spines. */
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ea-ink) 10%, transparent);
+}
+
+/* — — — — — Open panel (body — head + media + cta) — — — — — */
+
+.gamma-hacc__open {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.5rem, 3vw, 2.75rem);
+  gap: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+/* When the HTML `hidden` attribute is set the browser gives display:none,
+   but we be explicit so the layout doesn't flash on hydration mismatch. */
+.gamma-hacc__open[hidden] {
+  display: none !important;
+}
+
+.gamma-hacc__head {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  flex-wrap: wrap;
+}
+
+.gamma-hacc__teaser {
+  font-family: var(--ea-font-body);
+  /* Cycle 31 — Task 3-b VLM critique fix: bumped up from
+     clamp(0.78rem, 1vw, 0.92rem) → clamp(0.92rem, 1.15vw, 1.08rem) so the
+     teaser is more legible and the jump to the title isn't as jarring. */
+  font-size: clamp(0.92rem, 1.15vw, 1.08rem);
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+  color: var(--ea-ink);
+  opacity: 0.72;
+  margin: 0;
+  /* small caps feel for the "Small and Special" gamma teaser */
+  text-transform: uppercase;
+  /* Cycle 31 — Task 3-b VLM critique fix: reduced from 0.18em to 0.12em
+     (less tracking reads better at the larger size). */
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.gamma-hacc__teaser--end {
+  text-align: right;
+}
+
+.gamma-hacc__title {
+  font-family: var(--ea-font-display);
+  font-weight: 400;
+  /* Cycle 31 — Task 3-b VLM critique fix: reduced from
+     clamp(2.2rem, 4.5vw, 3.5rem) → clamp(1.9rem, 3.8vw, 2.9rem) so the
+     teaser isn't dwarfed next to it (typography hierarchy balance). */
+  font-size: clamp(1.9rem, 3.8vw, 2.9rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--ea-ink);
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gamma-hacc__media {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 200px;
+  border-radius: var(--ea-radius-soft);
+  overflow: hidden;
+  background: var(--ea-blush);
+}
+
+.gamma-hacc__img {
+  /* keep the image filling its frame; object-cover handled by class below */
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.gamma-hacc__item--open:hover .gamma-hacc__img,
+.gamma-hacc__item--open:focus-within .gamma-hacc__img {
+  transform: scale(1.04);
+}
+
+.gamma-hacc__cta-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* — — — — — Spine (the click target — always visible) — — — — — */
+
+.gamma-hacc__spine {
+  /* default = CLOSED state: spine fills the whole narrow column */
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  /* vertical text — gamma signature */
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 1.5rem 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  /* the spine gets a subtle inner-divider when the item is open */
+  transition: background 240ms ease, color 240ms ease;
+}
+
+.gamma-hacc__spine:focus-visible {
+  outline: 2px solid var(--ea-red);
+  outline-offset: -4px;
+}
+
+/* Cycle 31 — Task 3-b VLM critique fix: hover/focus background darkens
+   the closed spine subtly to signal clickability (ambiguous interaction
+   cues — the closed spines didn't look clickable enough). */
+.gamma-hacc__spine:hover,
+.gamma-hacc__spine:focus-visible {
+  background: color-mix(in oklch, var(--ea-ink) 4%, transparent);
+}
+
+/* Cycle 31 — Task 3-b VLM critique fix: decorative "+" indicator at the
+   bottom of each closed spine — signals "click to open". The inner
+   rotate(180deg) counter-rotates the parent's rotate(180deg) so the
+   glyph reads upright. Hidden on the open item (the title is already
+   visible inside the open panel). */
+.gamma-hacc__spine::after {
+  content: "+";
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+  font-family: var(--ea-font-display);
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--ea-red);
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+
+.gamma-hacc__spine:hover::after {
+  opacity: 1;
+}
+
+.gamma-hacc__item--open .gamma-hacc__spine::after {
+  display: none;
+}
+
+.gamma-hacc__spine-title {
+  /* Closed state (default): Barlow Semi Condensed bold, uppercase, wide
+     tracking — reads as a label even when the column is rotated sideways. */
+  font-family: var(--ea-font-eyebrow); /* Barlow Semi Condensed */
+  /* Cycle 31 — Task 3-b VLM critique fix: bumped from 600 to 700 for
+     stronger contrast against the tinted backgrounds. */
+  font-weight: 700;
+  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+  line-height: 1.1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ea-ink);
+  display: inline-block;
+  /* Cycle 31 — Task 3-b VLM critique fix: subtle white text-shadow lifts
+     the title off the tinted background, improving readability. */
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: color 240ms ease, font-style 240ms ease;
+}
+
+/* When the item is OPEN, the spine collapses to a narrow vertical strip
+   on the RIGHT edge of the open panel. We override width + add a divider. */
+.gamma-hacc__item--open .gamma-hacc__spine {
+  flex: 0 0 80px;
+  width: 80px;
+  border-left: 1px solid color-mix(in oklch, var(--ea-ink) 12%, transparent);
+}
+
+.gamma-hacc__item--open .gamma-hacc__spine-title {
+  /* Open → revert to Playfair italic so the spine reads as a label, not a
+     shout. Italic matches the EA italic-fragment voice on the section head. */
+  font-family: var(--ea-font-display);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: clamp(1rem, 1.25vw, 1.2rem);
+  opacity: 0.85;
+}
+
+.gamma-hacc__spine:hover .gamma-hacc__spine-title,
+.gamma-hacc__spine:focus-visible .gamma-hacc__spine-title {
+  color: var(--ea-red);
+}
+
+/* Tiny decorative index number at the top of each closed spine — gamma
+   puts a small "01 / 02 / 03 / 04" mark so users see the count at a glance.
+   We hide it on the OPEN item (the title is already visible inside). */
+.gamma-hacc__spine-index {
+  position: absolute;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--ea-ink);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.gamma-hacc__item--open .gamma-hacc__spine-index {
+  display: none;
+}
+
+/* The spine needs a positioning context for the absolute index number */
+.gamma-hacc__spine {
+  position: relative;
+}
+
+/* — — — — — MOBILE (<1024px) — vertical stack, horizontal headers — — — — — */
+
+@media (max-width: 1023px) {
+  .gamma-hacc {
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .gamma-hacc__item {
+    flex-direction: column;
+    flex: 0 0 auto;
+    flex-grow: 0 !important; /* override the open-state grow on mobile */
+    /* Cycle 31 — Task 3-b VLM critique fix: drop the desktop right border
+       on mobile — items are full-width columns stacked vertically, a
+       right border would just clip the cream bg awkwardly. */
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in oklch, var(--ea-ink) 8%, transparent);
+  }
+
+  .gamma-hacc__item:last-child {
+    border-bottom: 0;
+  }
+
+  /* Spine becomes a horizontal header bar */
+  .gamma-hacc__spine {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 88px;
+    writing-mode: horizontal-tb;
+    transform: none;
+    padding: 0 1.5rem;
+    justify-content: flex-start;
+    gap: 1rem;
+    border-left: 0;
+  }
+
+  .gamma-hacc__item--open .gamma-hacc__spine {
+    flex: 0 0 auto;
+    width: 100%;
+    border-left: 0;
+    border-bottom: 1px solid color-mix(in oklch, var(--ea-ink) 12%, transparent);
+  }
+
+  .gamma-hacc__spine-title {
+    writing-mode: horizontal-tb;
+    transform: none;
+    /* On mobile we use the OPEN styling everywhere (Playfair italic) so the
+       header reads cleanly as a section title bar. */
+    font-family: var(--ea-font-display);
+    font-style: italic;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    opacity: 1;
+  }
+
+  .gamma-hacc__spine-index {
+    position: static;
+    transform: none;
+    opacity: 0.5;
+  }
+
+  /* Cycle 31 — Task 3-b VLM critique fix: hide the desktop "+" indicator on
+     mobile. The horizontal spine bar already has the index + Playfair title
+     for visual weight, and the "+" would render upside-down (the inner
+     rotate(180deg) counter-rotation only makes sense against the desktop
+     rotated vertical-rl spine). */
+  .gamma-hacc__spine::after {
+    display: none;
+  }
+
+  /* Open panel appears below the spine when open */
+  .gamma-hacc__open {
+    flex: 1 1 auto;
+    width: 100%;
+    padding: 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .gamma-hacc__title {
+    font-size: clamp(2rem, 6vw, 2.75rem);
+  }
+
+  .gamma-hacc__media {
+    aspect-ratio: 16 / 10;
+    min-height: 240px;
+    flex: 0 0 auto;
+  }
+}
+
+/* — — — — — Reduced motion — instant flex change, no hover zoom — — — — — */
+
+@media (prefers-reduced-motion: reduce) {
+  .gamma-hacc__item {
+    transition: none !important;
+  }
+  .gamma-hacc__img {
+    transition: none !important;
+  }
+  .gamma-hacc__item--open:hover .gamma-hacc__img,
+  .gamma-hacc__item--open:focus-within .gamma-hacc__img {
+    transform: none;
+  }
+  .gamma-hacc__spine,
+  .gamma-hacc__spine-title {
+    transition: none !important;
+  }
+}

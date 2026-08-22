@@ -10,6 +10,7 @@ import { Preloader } from "@/components/catering/preloader";
 import { EaCookieBanner } from "@/components/catering/ea-cookie-banner";
 import { GrainOverlay } from "@/components/catering/grain";
 import { PageBorders } from "@/components/catering/page-borders";
+import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ChapterNav } from "@/components/catering/chapter-nav";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
@@ -275,6 +276,7 @@ export default function RootLayout({
         <AmbientAudio />
         <GrainOverlay />
         <PageBorders />
+        <VerticalBrandLabel />
         <ChapterNav />
         <EaCookieBanner />
         <NuqsAdapter>

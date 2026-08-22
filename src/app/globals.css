@@ -3626,15 +3626,75 @@ header[data-scrolled="true"] [data-mega-panel] {
 }
 .tott-cta-btn:active { transform: translateY(0); }
 
-/* --- 5px white border decorative frame (their hero SR7 border shape) ----- */
+/* --- 5px white border decorative frame (their hero SR7 border shape) -----
+   Left inset widened to 4.5rem (72px) to accommodate the fixed vertical
+   "interfoodcatering" brand label (VerticalBrandLabel component) that sits
+   in the frame gutter throughout the site — gamma-style left-side brand
+   watermark. The label lives at left:28px with ~30px wide text (right edge
+   ~58px), leaving a ~14px gap before the frame's left line at 72px. Other
+   sides stay at the original 1.5rem (24px). */
 .tott-border-frame {
   position: absolute;
-  inset: 1.5rem;
+  inset: 1.5rem 1.5rem 1.5rem 4.5rem;
   border: 5px solid rgba(255,255,255,0.85);
   pointer-events: none;
   z-index: 3;
 }
 .tott-border-frame--cream { border-color: rgba(241,234,224,0.7); }
+
+/* --- Vertical "interfoodcatering" left-side fixed brand label ------------
+   Gamma-style left-side brand watermark — runs the full site height, fixed.
+   Sits in the gutter LEFT of the hero frame (.tott-border-frame left inset
+   is widened to 4.5rem above to make room). The text reads bottom-to-top
+   via writing-mode: vertical-rl + transform: rotate(180deg) (editorial
+   colophon style — tilt head left to read). mix-blend-mode: difference with
+   white color keeps it legible against both cream (#F9F5EF) sections (renders
+   dark ~#060A10) and dark/black sections (renders light). Hidden below the
+   lg breakpoint (mobile has no label). z-index: 60 — above page borders
+   (z-50), below modals. pointer-events: none — never blocks interaction. */
+.vertical-brand-label {
+  position: fixed;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.vertical-brand-label__tick {
+  display: block;
+  width: 1px;
+  height: 36px;
+  /* mid-gray + difference → ~127 contrast against ANY backdrop (cream, black,
+     white, photo) so the tick reads consistently throughout the whole site. */
+  background: rgba(140,140,140,0.9);
+  mix-blend-mode: difference;
+  opacity: 0.7;
+}
+.vertical-brand-label__text {
+  font-family: var(--font-prata), "Playfair Display", Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 0.42em;
+  text-transform: lowercase;
+  /* mid-gray (140) + mix-blend-mode: difference gives ~115 contrast against
+     cream (#F9F5EF → ~115 dark navy), ~140 against black, ~115 against white —
+     consistently readable on every section bg (cream, espresso, photo, white)
+     without any JS bg-detection. White-only difference was too faint on cream
+     (gave 6,10,16 — nearly invisible). */
+  color: rgba(140,140,140,0.95);
+  mix-blend-mode: difference;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  line-height: 1;
+  font-weight: 400;
+}
+@media (max-width: 1023px) {
+  .vertical-brand-label { display: none; }
+}
 
 /* --- Char-split text reveal (their SR7 GSAP power3.inOut 300ms split) -----
    Wrap each char in <span class="tott-char">. Parent gets .tott-split-reveal.
@@ -3728,3 +3788,261 @@ header[data-scrolled="true"] [data-mega-panel] {
   color: var(--tott-ink);
 }
 
+/* === GAMMA-STYLE VERTICAL ACCORDION (Cycle 31 — Task 2-c) ==================
+   gammacatering.com signature accordion: blocks that fold VERTICALLY.
+   Each row: handwritten Marck Script label (red, rotated -3°) + big Playfair
+   title + Plus chevron that rotates 45° to × when open. Below the row, the
+   panel expands using the grid-template-rows 0fr→1fr trick (most reliable for
+   variable-height content — no JS height measurement, no AnimatePresence).
+   One item open at a time (classic accordion behaviour). */
+
+.gamma-accordion {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.gamma-accordion__item {
+  border-top: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+}
+.gamma-accordion__item:last-child {
+  border-bottom: 1px solid color-mix(in oklch, var(--ink) 12%, transparent);
+}
+
+/* Header row: 3-column grid — handwritten label | big title | chevron */
+.gamma-accordion__header {
+  display: grid;
+  grid-template-columns: minmax(110px, 180px) 1fr auto;
+  align-items: center;
+  column-gap: clamp(1rem, 3vw, 2.5rem);
+  width: 100%;
+  padding-block: clamp(1.25rem, 2.6vw, 2rem);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.gamma-accordion__header:focus-visible {
+  outline: 2px solid var(--ea-red);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+/* Handwritten accent label — Marck Script (Cyrillic-capable analog of Adobe
+   Handwriting), red, rotated -3° for editorial tilt. */
+.gamma-accordion__label {
+  font-family: var(--font-marck), var(--font-script), cursive;
+  font-weight: 400;
+  font-size: clamp(1.45rem, 2.6vw, 2rem);
+  line-height: 1.05;
+  color: var(--ea-red);
+  display: inline-block;
+  transform: rotate(-3deg);
+  transform-origin: left center;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Big title — Playfair Display, ink color. */
+.gamma-accordion__title {
+  font-family: var(--font-serif), "Playfair Display", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.1rem, 5vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.018em;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* Plus chevron — rotates 45° → × when open. */
+.gamma-accordion__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--ea-red);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  flex: 0 0 auto;
+}
+.gamma-accordion__item.is-open .gamma-accordion__chevron {
+  transform: rotate(45deg);
+}
+
+/* Panel — grid-rows 0fr→1fr trick for smooth variable-height expand. */
+.gamma-accordion__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gamma-accordion__item.is-open .gamma-accordion__panel {
+  grid-template-rows: 1fr;
+}
+.gamma-accordion__panel-inner {
+  overflow: hidden;
+  min-height: 0; /* allow children to collapse below content height */
+}
+
+/* Body — 2-col grid matching header so body aligns under the title. */
+.gamma-accordion__body {
+  display: grid;
+  grid-template-columns: minmax(110px, 180px) 1fr;
+  column-gap: clamp(1rem, 3vw, 2.5rem);
+  /* Tightened bottom padding (Cycle 31 — Task 3-b VLM critique fix):
+     was clamp(2rem, 4vw, 3rem) → reduced so the CTA sits closer to the
+     next item's border, removing the excessive whitespace gap. */
+  padding-bottom: clamp(1.25rem, 2.5vw, 2rem);
+}
+.gamma-accordion__body-spacer {
+  /* Empty column under handwritten label — keeps body aligned with title. */
+}
+.gamma-accordion__body-inner {
+  max-width: 640px;
+  /* Visual grouping — open panel body feels like a deliberate "card"
+     belonging to its header (Cycle 31 — Task 3-b VLM critique fix).
+     Subtle warm premium surface (EA blush at 50%) + thin red left
+     border mark the open state, distinguishing the body from the header. */
+  padding: clamp(1.25rem, 2vw, 1.75rem) clamp(1.5rem, 2.5vw, 2rem);
+  background: rgba(241, 236, 236, 0.5);
+  border-left: 2px solid var(--ea-red, #E71D3A);
+  border-radius: 2px;
+}
+.gamma-accordion__text {
+  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-size: clamp(1rem, 1.1vw, 1.125rem);
+  line-height: 1.7;
+  color: color-mix(in oklch, var(--ink) 82%, transparent);
+  /* Tightened bottom margin (Task 3-b VLM critique fix):
+     was 1.75rem → reduced to 1.25rem so the CTA sits closer to the body
+     text, tightening the gap between CTA and the next item. */
+  margin: 0 0 1.25rem 0;
+}
+
+/* Mobile (<640px): stack label above title, drop the body spacer column so
+   body text starts at the left edge. */
+@media (max-width: 639px) {
+  .gamma-accordion__header {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "label  chevron"
+      "title  chevron";
+    row-gap: 0.4rem;
+    column-gap: 1rem;
+  }
+  .gamma-accordion__label { grid-area: label; }
+  .gamma-accordion__title {
+    grid-area: title;
+    font-size: clamp(1.7rem, 8vw, 2.25rem);
+  }
+  .gamma-accordion__chevron { grid-area: chevron; align-self: center; }
+  .gamma-accordion__body {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+  .gamma-accordion__body-spacer { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gamma-accordion__panel { transition: none; }
+  .gamma-accordion__chevron { transition: none; }
+}
+
+/* ============================================================================
+   TiltedAccent — Cycle 31 (gammacatering.com signature -6° tilted handwritten text)
+   Reusable utility class for the .tilted-accent span. The dynamic rotate /
+   color / size values are set via inline style on each instance (see
+   tilted-accent.tsx) — this class only sets the static layout/font rules so
+   inline style stays minimal and overridable.
+   ============================================================================ */
+.tilted-accent {
+  font-family: var(--font-marck), var(--font-script), cursive;
+  display: inline-block;
+  transform-origin: left center;
+  white-space: nowrap;
+  line-height: 1;
+  /* Slight tracking so the handwritten Cyrillic breathes. */
+  letter-spacing: 0.02em;
+  /* Pointer-events off — this is a decorative marginalia, not a target. */
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ============================================================================
+   GammaSeparator — Cycle 31 (gammacatering.com signature full-bleed separator)
+   A cinematic full-bleed photo breather between major sections. Pure visual
+   rest — no CTAs, no body copy, just the image + an optional centered
+   handwritten watermark tilted -6° (gamma's signature tilt).
+   ============================================================================ */
+.gamma-separator {
+  position: relative;
+  width: 100%;
+  /* Wide landscape band, shorter than the hero — a cinematic breather. */
+  height: clamp(280px, 38vw, 480px);
+  overflow: hidden;
+  /* Full-bleed — break out of any parent container padding. */
+  margin: 0;
+  /* Sit in normal flow (no parallax/fixed) so it scrolls naturally between
+     the venue network (end of Act II) and the parallax band (start of
+     Act III). */
+  background-color: var(--ink, #0A0A0A);
+}
+
+/* The next/image is rendered with object-cover via the className prop in
+   the TSX. We just ensure it fills the section. */
+.gamma-separator__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Subtle left-edge + right-edge darkening — depth + a legible backdrop
+   for the centered watermark. Mirrors the gamma overlay spec
+   `from-black/20 via-transparent to-black/20`. */
+.gamma-separator__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(0, 0, 0, 0) 18%,
+    rgba(0, 0, 0, 0) 82%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  pointer-events: none;
+}
+
+/* Gamma-style -6° handwritten watermark — centered, rotated, 70% opacity
+   white Marck Script. Reads like a magazine editor's stamp on the photo. */
+.gamma-separator__watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  /* Combine centering translate with the -6° tilt — order matters: translate
+     first, then rotate around the now-centered origin. */
+  transform: translate(-50%, -50%) rotate(-6deg);
+  transform-origin: center center;
+  font-family: var(--font-marck), var(--font-script), cursive;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  /* Subtle text-shadow so the white watermark reads over both light + dark
+     photo regions. */
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Mobile: keep the watermark but shrink slightly so it never crowds the
+   narrow viewport. The band already scales via the clamp() on height. */
+@media (max-width: 639px) {
+  .gamma-separator__watermark {
+    font-size: clamp(1.5rem, 7vw, 2.25rem);
+  }
+}

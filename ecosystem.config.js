@@ -1,28 +1,25 @@
-// PM2 ecosystem — for Timeweb Cloud (Node.js app) or any VPS with PM2.
-// Start: pm2 start ecosystem.config.js --env production
+// PM2 ecosystem — dev server for Interfood Catering (newsite)
+// Start: pm2 start ecosystem.config.js
 // Save:  pm2 save && pm2 startup
-
 module.exports = {
   apps: [
     {
-      name: "interfood-catering",
-      script: ".next/standalone/server.js",
+      name: "interfood-catering-dev",
+      script: "node_modules/next/dist/bin/next",
+      args: "dev -p 3000",
       cwd: __dirname,
       env: {
-        NODE_ENV: "production",
+        NODE_ENV: "development",
         PORT: 3000,
-        // Set these in Timeweb control panel or .env file:
-        // DATABASE_URL: "postgresql://...",
-        // NEXT_PUBLIC_SITE_URL: "https://your-domain.ru",
-        // NEXT_PUBLIC_YANDEX_METRIKA: "12345678",
       },
       instances: 1,
       exec_mode: "fork",
       autorestart: true,
-      max_memory_restart: "512M",
+      max_memory_restart: "1G",
       error_file: "./logs/err.log",
       out_file: "./logs/out.log",
       log_date_format: "YYYY-MM-DD HH:mm:ss",
+      watch: false,
     },
   ],
 };

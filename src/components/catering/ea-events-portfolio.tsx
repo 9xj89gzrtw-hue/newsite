@@ -36,6 +36,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 
+import { TiltedAccent } from "@/components/catering/tilted-accent";
 import "./ea-events-portfolio.css";
 
 /** EA Easing — quiet cubic-bezier used across the editorial layer. */
@@ -219,6 +220,13 @@ export function EaEventsPortfolio() {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <div className="ea-evt-portfolio__heading-block">
+            {/* Cycle 31 — gamma-style -6° tilted handwritten accent ABOVE the
+                eyebrow. "события" echoes the eyebrow's "События · Избранное"
+                but in Marck Script Cyrillic — a different voice (handwritten
+                vs formal Barlow). Red, rotated -6°, sized to sit between the
+                eyebrow and H2 scales — an editorial marginalia that opens
+                the "what we do best" beat with a human handwritten gesture. */}
+            <TiltedAccent text="события" className="mb-3 block" />
             <span className="ea-eyebrow">События · Избранное</span>
             <h2
               id="ea-events-portfolio-headline"

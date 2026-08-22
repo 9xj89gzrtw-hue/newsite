@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
+import { TiltedAccent } from "@/components/catering/tilted-accent";
 
 /**
  * CepWhyUs — Creative Edge Parties "WHY US?" section replica (Cycle 27).
@@ -43,6 +44,13 @@ export function CepWhyUs() {
       className="cep-section-black px-8 py-24 md:px-14 md:py-32"
     >
       <div className="mx-auto max-w-screen-2xl">
+        {/* Cycle 31 — gamma-style -6° tilted handwritten accent ABOVE the H2.
+            "почему" mirrors the section's question ("ПОЧЕМУ МЫ?") in Marck
+            Script (cyrillic-capable). Red, rotated -6°, sized to sit between
+            the eyebrow and H2 scales — an editorial marginalia, not a
+            headline. Marks the start of the "why us" beat with a human
+            handwritten gesture. */}
+        <TiltedAccent text="почему" className="mb-6 block md:mb-8" />
         <motion.h2
           className="cep-section-h2 mb-16 text-white md:mb-24"
           initial={animate ? { opacity: 0, y: 32 } : false}
