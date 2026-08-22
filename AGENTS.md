@@ -3022,3 +3022,91 @@ Could-Do/Lato шрифты, CSS-parallax quote band с char-split headline, burg
 olive/cream палитра, 42 фото эталона скачаны. VLM + Agent Browser верифицированы.
 `lint` зелёный. Brand "Interfood Catering" + cream/espresso/EA-red палитра сохранены
 (NO indigo/blue). Коммит `13676bd` запушен в main → Vercel auto-deploy.
+
+---
+
+## Cycle 32 — Simplified 17-section site restructure
+
+**Дата:** 22 августа 2026.
+**Коммит:** `e5a57a2` (pushed to `main` without `--force`).
+**Предпосылка:** пользователь запросил полную переделку структуры сайта — оставить
+hero, header, и 15 конкретных блоков (видео как на ggcatering.com, фото-карусель,
+услуги, мероприятия, где работаем, меню, видео мероприятий карусель, алгоритм
+действий, доставка, калькулятор, о нас, FAQ, инстаграм, форма, футер) — «остальное
+убрать с сайта». Референсы: gammacatering.com, joels.com, mculinary.com, ggcatering.com.
+
+### Что сделано
+
+**3 новых компонента (1410 LOC):**
+- `gg-video-showcase.tsx` (282 LOC) — ggcatering.com-style 16:9 видео-блок. looping
+  muted autoplay food b-roll + dark gradient overlay + editorial text (eyebrow
+  «НАШ ПОДХОД» + H2 «Кейтеринг как *искусство*» + subtitle) + 2 CTAs (`#menu`,
+  `#calculator`) + center Play-pill toggle (unmute + show controls).
+- `events-video-carousel.tsx` (395 LOC) + `.css` (334 LOC) — forked scroll-snap
+  паттерн из `ea-events-portfolio.tsx`; 4 event-type tiles (Свадьбы / Корпоратив /
+  Банкеты / Фуршеты) с looping muted autoplay videos + caption panel + center
+  play-pill → открывает fullscreen modal (ESC + click-outside close, body-scroll-lock,
+  native controls, unmuted).
+- `delivery-block.tsx` (399 LOC) — 2-col split: food photo LEFT + content RIGHT.
+  TiltedAccent «доставка» + gold eyebrow + H2 «Кейтеринг, который *доставляют*.» +
+  body + 5 USPs с кастомными 1.5px-stroke gold SVG icons (clock / thermometer /
+  cloche / people / calendar-check) + geography row «Санкт-Петербург · Москва ·
+  Вся Россия» + 2 CTA pills (`#contact`, `#calculator`).
+
+**page.tsx restructured** (423 → 232 LOC): 17 секций в порядке ТЗ + 3 parallax band
+(`CepEditorialDivider` между #4 carousel и #5 services; `TottParallaxBand` между #8
+menu и #9 events video carousel; `GammaSeparator` между #13 about и #14 FAQ).
+30+ компонентов убраны из рендера (но сохранены на диске для reference).
+
+**Nav обновлён:**
+- `cep-overlay-menu.tsx`: 9-item → 8-item (убраны stale `СЕЗОНЫ → #ea-seasonal` и
+  `РАБОТА → #careers`; порядок зеркалит страницу top-to-bottom).
+- `chapter-nav.tsx`: убран `Manifesto` dot, `services → ea-service-tabs`,
+  `events → ea-events-portfolio`, добавлен `faq` dot.
+
+**pm2 + ecosystem.config.js:** порт 3000 → 3001 (parent sandbox my-project
+занимает 3000). `pm2 start ecosystem.config.js` — стабильный dev-сервер
+(process: `interfood-catering-dev`).
+
+### Грабли Cycle 32
+
+- **#32-1 Не используй `/media/ggcatering/gg-hero-video.mp4` в проде** — там
+  в кадре виден логотип ggcatering. Заменить на `/media/mculinary/mculinary-hero.mp4`
+  (food b-roll, no competitor branding). Грабли найдены через VLM-анализ скриншота
+  видео-блока: VLM сказал «виден логотип ggcatering». /loop Round 1 пофиксил.
+- **#32-2 Agent Browser `eval` после `reload` может вернуть about:blank** — после
+  `agent-browser reload` URL сбрасывается. Используй `agent-browser open <url>` +
+  `agent-browser wait --load networkidle` вместо reload.
+- **#32-3 `screenshot --full` всё ещё крашится на длинных страницах** (Cycle 30
+  грабли #30-4 не починились). Workaround: viewport-скриншоты + scroll на нужный Y.
+- **#32-4 Несколько lockfiles (parent `/home/z/my-project/bun.lock` + child
+  `/home/z/my-project/newsite/bun.lock`)** — Next.js Turbopack предупреждает
+  «inferred workspace root may not be correct». Не критично, можно заглушить
+  `turbopack.root` в `next.config.ts`.
+- **#32-5 Subagent `Explore` type отлично подходит для аудита компонентов** —
+  быстро читает все файлы в директории и возвращает структурированную таблицу
+  (component file | LOC | что делает | maps to which section). Использовать
+  для любой задачи типа «что у нас уже есть для X».
+
+### Файлы этого цикла
+
+```
+src/app/page.tsx                                    (423 → 232 LOC, 17-section flow)
+src/components/catering/gg-video-showcase.tsx       (new, 282 LOC)
+src/components/catering/events-video-carousel.tsx    (new, 395 LOC)
+src/components/catering/events-video-carousel.css    (new, 334 LOC)
+src/components/catering/delivery-block.tsx           (new, 399 LOC)
+src/components/catering/cep-overlay-menu.tsx         (8-item nav, stale links removed)
+src/components/catering/chapter-nav.tsx              (8 dots, Manifesto removed)
+ecosystem.config.js                                  (port 3000 → 3001)
+.gitignore                                            (+/research/)
+worklog.md                                           (+subagent +orchestrator entries)
+```
+
+**TL;DR (Cycle 32):** Сайт переупрощён до 17 секций в порядке ТЗ + 3 parallax band.
+3 новых компонента: GgVideoShowcase (видео как ggcatering), EventsVideoCarousel
+(карусель видео мероприятий), DeliveryBlock (доставка с 5 USP + 2 CTAs). Nav
+обновлён до 8 валидных ссылок. pm2 + порт 3001. VLM + Agent Browser верифицированы
+(8/10 рейтинги секций). `lint` зелёный. Коммит `e5a57a2` запушен в `main` без
+`--force`. /loop критика проведена в 2 раунда, 3 issue найдены и пофиксены.
+
