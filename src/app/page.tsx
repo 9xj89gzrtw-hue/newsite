@@ -7,6 +7,7 @@ import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider
 import { EaServices } from "@/components/catering/ea-services";
 import { Menu } from "@/components/catering/menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
+import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
 import { CepProcess } from "@/components/catering/cep-process";
 import { Calculator } from "@/components/catering/calculator";
 import { EaFounderStory } from "@/components/catering/ea-founder-story";
@@ -153,8 +154,17 @@ export default function Home() {
 
       {/* ── ACT III: PROCESS ── */}
 
-      {/* 9. CepProcess — "THE CREATIVE EDGE" 3-step process: 01 DREAM / 02 BUILD /
-             03 SAVOR. The "algorithm of actions" block — how we work, the creative edge. */}
+      {/* 9. EventsVideoCarousel — Cycle 32. RESTORED in Cycle 36. Carousel of 4
+             event-type video tiles with looping muted autoplay teasers + caption
+             panel + center play-pill CTA that opens a fullscreen modal with the
+             full unmuted video + controls. Magazine scroll-snap-x mandatory pattern,
+             5s auto-advance, pause-on-hover, ESC closes the modal. Sits between
+             TottParallaxBand (the editorial pause) and CepProcess (the "how we
+             work" algorithm) — a cinematic trust beat showing the food in motion. */}
+      <EventsVideoCarousel />
+
+      {/* 10. CepProcess — "THE CREATIVE EDGE" 3-step process: 01 DREAM / 02 BUILD /
+              03 SAVOR. The "algorithm of actions" block — how we work, the creative edge. */}
       <CepProcess />
 
       {/* ── ACT IV: CONVERSION ── */}
