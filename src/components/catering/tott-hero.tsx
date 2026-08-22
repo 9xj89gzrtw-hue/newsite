@@ -65,7 +65,7 @@ export function TottHero() {
       id="hero"
       data-header-theme="transparent"
       aria-label="Interfood Catering — премиальный кейтеринг"
-      className="relative min-h-screen w-full overflow-hidden bg-black"
+      className="relative min-h-[100svh] w-full overflow-hidden bg-black"
     >
       {/* Background image — LCP priority (next/image). Sits at z-0 and acts
           as the video poster (the video overlays it once playing). */}
@@ -146,17 +146,19 @@ export function TottHero() {
           Interfood<span style={{ color: "var(--gold)", marginLeft: "0.05em" }}>.</span>
         </motion.h1>
 
-        {/* Script tagline — Nothing You Could Do. Nestles tight under the
-            wordmark (negative mt) for a signature/underline feel. Per task
-            v11: "food as art чуть поменьше" + "чтобы на мобильной версии он
-            всегда был меньше надписи interfood" — reduced from clamp(3rem,
-            8vw, 6rem) to clamp(2.25rem, 6vw, 4.5rem). The smaller vw + lower
-            floor guarantees the script stays narrower than the wordmark on
-            mobile (Nothing You Could Do glyphs read large for their px
-            size, so a lower px floor keeps the visual hierarchy). */}
+        {/* Script tagline — Nothing You Could Do (Latin script font). Nestles tight
+            under the wordmark (negative mt) for a signature/underline feel.
+            Per user: "food as art" stays in English because it is phonetically
+            consonant with the company name "Interfood" (food ↔ Interfood).
+            Tilted -6° (rotate) for a handwritten signature gesture — mirrors
+            gamma's tilted-accent device. The rotation is applied to an inner
+            <span> so framer-motion's `rise` variant (opacity + y) on the
+            outer <motion.p> doesn't clobber the transform.
+            Size kept smaller than the wordmark (floor 2.25rem vs 4rem) so the
+            visual hierarchy holds on narrow screens. */}
         <motion.p
           variants={rise}
-          className="tott-script-ru text-white/95"
+          className="tott-script text-white/95"
           style={{
             fontSize: "clamp(2.25rem, 6vw, 4.5rem)",
             lineHeight: 1,
@@ -164,7 +166,15 @@ export function TottHero() {
             textShadow: "0 2px 30px rgba(0,0,0,0.45)",
           }}
         >
-          еда как искусство
+          <span
+            style={{
+              display: "inline-block",
+              transform: "rotate(-6deg)",
+              transformOrigin: "center",
+            }}
+          >
+            food as art
+          </span>
         </motion.p>
 
         {/* Eyebrow label — Lato (sans-serif, .tott-body) ALL CAPS, small,

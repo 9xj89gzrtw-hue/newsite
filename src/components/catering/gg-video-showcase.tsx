@@ -126,8 +126,16 @@ export function GgVideoShowcase() {
       data-header-theme="dark"
       className="relative w-full bg-black"
     >
-      {/* 16:9 video frame — GGCatering's "div.relative.aspect-video" */}
-      <div className="relative aspect-video w-full">
+      {/* Video frame — GGCatering's 16:9 "aspect-video" on desktop.
+          On mobile the editorial overlay (tilted accent + eyebrow + H2 +
+          body + 2 CTAs ≈ 420px) does NOT fit inside a 16:9 frame (219px at
+          390px width) — `justify-end` then overflows the content UPWARD
+          above the section's top edge, making "НАШ ПОДХОД" / "ИСКУССТВО"
+          bleed into the hero above. Fix: a generous min-height on mobile
+          (560px fits the overlay with breathing room), restoring
+          aspect-video only at md+ where the viewport is wide enough for
+          16:9 to hold the content. */}
+      <div className="relative min-h-[560px] w-full md:aspect-video md:min-h-0">
         {/* Background teaser video — muted autoplay loop, decorative.
             `preload="metadata"` for a fast first-paint; poster fills the
             gap until the mp4 streams in. */}
