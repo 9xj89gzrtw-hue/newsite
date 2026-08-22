@@ -3334,7 +3334,7 @@ header[data-scrolled="true"] [data-mega-panel] {
 .ea-eyebrow {
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
-  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  font-size: clamp(0.8125rem, 1.05vw, 0.95rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--ea-red);

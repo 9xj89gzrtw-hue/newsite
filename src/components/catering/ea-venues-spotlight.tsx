@@ -169,11 +169,11 @@ export function EaVenuesSpotlight() {
                   style={{
                     fontFamily: "var(--ea-font-eyebrow)",
                     fontWeight: 700,
-                    fontSize: "0.75rem",
-                    letterSpacing: "0.18em",
+                    fontSize: "0.8125rem",
+                    letterSpacing: "0.16em",
                     textTransform: "uppercase",
                     color: "var(--ea-cream)",
-                    opacity: 0.85,
+                    opacity: 0.9,
                   }}
                 >
                   {v.capacity} · {v.district}
@@ -198,7 +198,7 @@ export function EaVenuesSpotlight() {
                     on focus-within so keyboard tab → link becomes visible
                     AND clickable. */}
                 <a
-                  href="#ea-venue-network"
+                  href="#ea-events-portfolio"
                   className="mt-3 inline-flex items-center gap-2 opacity-0 transition-opacity duration-500 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto"
                   style={{ color: "var(--ea-red)" }}
                 >
@@ -206,7 +206,7 @@ export function EaVenuesSpotlight() {
                     style={{
                       fontFamily: "var(--ea-font-eyebrow)",
                       fontWeight: 700,
-                      fontSize: "0.75rem",
+                      fontSize: "0.8125rem",
                       letterSpacing: "0.14em",
                       textTransform: "uppercase",
                     }}
@@ -228,10 +228,10 @@ export function EaVenuesSpotlight() {
           ))}
         </div>
 
-        {/* Bottom-of-section — single ea-text-link → #ea-venue-network
-            (the next section in the client journey, EaVenueNetwork). */}
+        {/* Bottom-of-section — single ea-text-link → #contact
+            (inquire about the full 60+ venue network via the lead form). */}
         <div className="mt-12 flex justify-center">
-          <a href="#ea-venue-network" className="ea-text-link">
+          <a href="#contact" className="ea-text-link">
             Смотреть все 60+ площадок
             <svg
               className="ea-text-link__arrow"

@@ -188,11 +188,11 @@ function NewsletterSignup() {
 /** Навигация футера — ссылки на ключевые разделы. */
 const FOOTER_NAV = [
   { label: "Главная", href: "#main-content" },
-  { label: "Свадьбы", href: "#about" },
-  { label: "Корпоративы", href: "#services" },
-  { label: "События", href: "#services" },
-  { label: "Гриль и BBQ", href: "#services" },
-  { label: "Поднос", href: "#snack-box" },
+  { label: "Свадьбы", href: "#ea-service-tabs" },
+  { label: "Корпоративы", href: "#ea-service-tabs" },
+  { label: "События", href: "#ea-events-portfolio" },
+  { label: "Гриль и BBQ", href: "#ea-service-tabs" },
+  { label: "Поднос", href: "#menu" },
   { label: "Закуски", href: "#menu" },
   { label: "Контакты", href: "#contact" },
 ] as const;
@@ -438,7 +438,7 @@ export function SiteFooter() {
                 return (
                   <a
                     key={award.title}
-                    href="#awards"
+                    href="#about"
                     className="group flex flex-col items-center gap-2 transition-transform duration-300 hover:scale-105"
                     aria-label={award.alt}
                   >

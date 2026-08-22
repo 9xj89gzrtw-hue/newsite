@@ -79,7 +79,7 @@ export function TottParallaxBand() {
           className="tott-script mb-4 text-tott-olive"
           text={undefined}
         >
-          <span style={{ fontSize: "clamp(1.8rem, 4vw, 2.6rem)" }}>bon appétit</span>
+          <span style={{ fontSize: "clamp(1.8rem, 4vw, 2.6rem)" }}>приятного аппетита</span>
         </TottReveal>
 
         {/* Char-split headline — their SR7 GSAP power3.inOut signature.
@@ -109,7 +109,7 @@ export function TottParallaxBand() {
           className="tott-eyebrow mt-10 justify-center text-white/70"
           text={undefined}
         >
-          <span style={{ color: "var(--tott-olive)" }}>Interfood · с 2014 года</span>
+          <span style={{ color: "var(--tott-olive)" }}>Interfood · с 2009 года</span>
         </TottReveal>
       </div>
     </section>

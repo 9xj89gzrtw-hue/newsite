@@ -231,7 +231,7 @@ export function DeliveryBlock() {
               }}
               {...reveal({ delay: 0.08 })}
             >
-              ДОСТАВКА КЕТЕРИНГА
+              ДОСТАВКА КЕЙТЕРИНГА
             </motion.p>
 
             {/* H2 — italic-as-fragment trailing phrase device. The `<i>`

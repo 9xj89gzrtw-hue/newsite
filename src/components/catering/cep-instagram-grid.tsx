@@ -76,7 +76,7 @@ export function CepInstagramGrid() {
     >
       {/* Header row — H2 + IG handle link */}
       <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
-        <h2 className="cep-section-h2 text-black">FOLLOW ALONG</h2>
+        <h2 className="cep-section-h2 text-black">СЛЕДИТЕ ЗА НАМИ</h2>
         <a
           href={IG_PROFILE_URL}
           target="_blank"

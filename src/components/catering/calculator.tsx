@@ -187,7 +187,7 @@ export function Calculator() {
           <Reveal>
             <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
               <Sparkles className="size-3" />
-              Calculator
+              Калькулятор
             </span>
           </Reveal>
           <Reveal delay={0.1}>
@@ -195,14 +195,14 @@ export function Calculator() {
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.9rem, 5.5vw, 3.75rem)", lineHeight: 1.05 }}
             >
-              Calculate your cost{" "}
+              Рассчитайте стоимость{" "}
               <br className="hidden sm:block" />
-              <span className="gradient-text italic">in 30 seconds</span>
+              <span className="gradient-text italic">за 30 секунд</span>
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mx-auto mt-4 max-w-lg text-base text-ink/70">
-              Preliminary estimate. Final quote after a short consultation.
+              Предварительная оценка. Итоговая стоимость — после короткой консультации.
             </p>
           </Reveal>
         </div>
@@ -214,7 +214,7 @@ export function Calculator() {
             <div>
               <label className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
                 <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">1</span>
-                Event Type
+                Тип мероприятия
               </label>
               <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 {MENU_TYPES.map((m) => {
@@ -270,7 +270,7 @@ export function Calculator() {
                       
                       {/* Price hint */}
                       <span className="font-mono text-[10px] text-ink/70">
-                        from {formatRUB(m.perGuest)}/guest
+                        от {formatRUB(m.perGuest)}/чел
                       </span>
                     </motion.button>
                   );
@@ -296,11 +296,11 @@ export function Calculator() {
               <label className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center justify-between">
                 <span className="flex items-center gap-2">
                   <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">2</span>
-                  Number of Guests
+                  Количество гостей
                 </span>
                 <span className="flex items-baseline gap-1">
                   <span className="text-xl font-bold text-ink">{guests}</span>
-                  <span className="text-xs text-ink/70">guests</span>
+                  <span className="text-xs text-ink/70">гостей</span>
                 </span>
               </label>
               
@@ -311,7 +311,7 @@ export function Calculator() {
                   className="mt-2 flex items-center gap-1.5 font-mono text-xs text-terracotta bg-terracotta/10 px-3 py-1.5 rounded-full w-fit"
                 >
                   <Sparkles className="size-3" />
-                  Minimum for this type: {current.minGuests} guests
+                  Минимум для этого типа: {current.minGuests} гостей
                 </motion.p>
               )}
 
@@ -377,7 +377,7 @@ export function Calculator() {
                     aria-valuenow={guests}
                     aria-valuemin={5}
                     aria-valuemax={500}
-                    aria-label="Number of guests"
+                    aria-label="Количество гостей"
                     className="relative z-10 h-12 w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-7 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-gold [&::-webkit-slider-thumb]:to-terracotta [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-gold/40 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:size-7 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-gradient-to-r [&::-moz-range-thumb]:from-gold [&::-moz-range-thumb]:to-terracotta [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:shadow-gold/40"
                   />
                 </div>
@@ -387,7 +387,7 @@ export function Calculator() {
                   <button
                     onClick={() => setGuests((g) => Math.max(5, g - 5))}
                     className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-2.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95 min-h-[44px]"
-                    aria-label="Fewer guests"
+                    aria-label="Меньше гостей"
                   >
                     <Minus className="size-3" /> −5
                   </button>
@@ -395,13 +395,13 @@ export function Calculator() {
                   {/* Per-person indicator */}
                   <div className="flex items-center gap-2 text-xs text-ink/70">
                     <TrendingUp className="size-3.5 text-gold/60" />
-                    <span>~{formatRUB(Math.round(result.total / guestsClamped))}/guest</span>
+                    <span>~{formatRUB(Math.round(result.total / guestsClamped))}/чел</span>
                   </div>
                   
                   <button
                     onClick={() => setGuests((g) => Math.min(500, g + 5))}
                     className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-2.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95 min-h-[44px]"
-                    aria-label="More guests"
+                    aria-label="Больше гостей"
                   >
                     +5 <Plus className="size-3" />
                   </button>
@@ -413,7 +413,7 @@ export function Calculator() {
             <div className="mt-8">
               <label className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
                 <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">3</span>
-                Add-ons
+                Дополнительно
                 {addons.length > 0 && (
                   <span className="ml-auto font-normal text-gold">
                     +{formatRUB(ADDONS.filter(a => addons.includes(a.id)).reduce((s, a) => s + a.price, 0))}
@@ -495,18 +495,18 @@ export function Calculator() {
             </div>
 
             {/* ═══ Date picker ═══ */}
-            <div role="group" aria-label="Event date (optional)" className="mt-8">
+            <div role="group" aria-label="Дата мероприятия (необязательно)" className="mt-8">
               <div className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
                 <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">4</span>
-                Event Date
-                <span className="font-normal text-ink/70">(optional)</span>
+                Дата мероприятия
+                <span className="font-normal text-ink/70">(необязательно)</span>
               </div>
               <input
                 type="date"
                 id="calc-date"
                 name="eventDate"
                 value={date}
-                aria-label="Event date (optional)"
+                aria-label="Дата мероприятия (необязательно)"
                 onChange={(e) => setDate(e.target.value)}
                 className="mt-3 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 transition-all"
               />
@@ -517,7 +517,7 @@ export function Calculator() {
                   className="mt-2 flex items-center gap-1.5 font-mono text-xs text-terracotta bg-terracotta/10 px-3 py-1.5 rounded-full w-fit"
                 >
                   <Sparkles className="size-3" />
-                  Seasonal multiplier: +15%
+                  Сезонный коэффициент: +15%
                 </motion.p>
               )}
             </div>
@@ -529,11 +529,11 @@ export function Calculator() {
               {/* Header */}
               <div className="flex items-center justify-between">
                 <span className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium">
-                  Preliminary Quote
+                  Предварительная смета
                 </span>
                 <div className="flex items-center gap-1 text-xs text-sage bg-sage/15 px-2 py-1 rounded-full">
                   <TrendingUp className="size-3" />
-                  Online Estimate
+                  Онлайн-расчёт
                 </div>
               </div>
 
@@ -562,9 +562,9 @@ export function Calculator() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <span>~ {formatRUB(Math.round(result.total / guestsClamped))} / guest</span>
+                  <span>~ {formatRUB(Math.round(result.total / guestsClamped))} / чел</span>
                   <span>·</span>
-                  <span>{guestsClamped} guests</span>
+                  <span>{guestsClamped} гостей</span>
                 </motion.div>
 
                 {/* Per-person range indicator */}
@@ -574,9 +574,9 @@ export function Calculator() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  <span className="text-xs text-ink/70">Range:</span>
+                  <span className="text-xs text-ink/70">Диапазон:</span>
                   <span className="font-mono text-xs font-semibold text-gold">
-                    {formatRUB(perPersonMin)} – {formatRUB(perPersonMax)} / guest
+                    {formatRUB(perPersonMin)} – {formatRUB(perPersonMax)} / чел
                   </span>
                 </motion.div>
               </div>
@@ -584,12 +584,12 @@ export function Calculator() {
               {/* Breakdown with staggered animation */}
               <div className="mt-6 space-y-1 border-t border-border-line pt-5 text-sm">
                 <Row label={current.label} value={`${formatRUB(result.perGuest)} × ${guestsClamped}`} index={0} />
-                <Row label="Subtotal" value={formatRUB(result.subtotal)} index={1} />
+                <Row label="Итого" value={formatRUB(result.subtotal)} index={1} />
                 {result.addonsTotal > 0 && (
-                  <Row label="Add-ons" value={formatRUB(result.addonsTotal)} index={2} highlight />
+                  <Row label="Дополнительно" value={formatRUB(result.addonsTotal)} index={2} highlight />
                 )}
                 {result.season > 1 && (
-                  <Row label="Seasonal multiplier" value={`×${result.season}`} index={3} warning />
+                  <Row label="Сезонный коэффициент" value={`×${result.season}`} index={3} warning />
                 )}
                 
                 {/* Value indicator */}
@@ -601,7 +601,7 @@ export function Calculator() {
                 >
                   <Check className="size-4 text-sage shrink-0" />
                   <span>
-                    Includes: service, china, florals, delivery within 50 miles
+                    Включено: сервис, посуда, флористика, доставка в пределах 50 км
                   </span>
                 </motion.div>
               </div>
@@ -615,7 +615,7 @@ export function Calculator() {
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
-                  Submit Inquiry with this Quote
+                  Отправить заявку с расчётом
                   <Share2 className="size-4 transition-transform group-hover:translate-x-0.5" />
                 </motion.a>
               </Magnetic>
@@ -627,12 +627,12 @@ export function Calculator() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   className="mt-3 flex items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-[11px] font-medium text-gold"
-                  title="Seasonal demand is high — final quote confirmed by our event team"
+                  title="Сезонный спрос высок — итоговая стоимость подтверждается нашим менеджером"
                 >
                   <Gift className="size-3.5" />
-                  Seasonal surcharge +{Math.round((result.season - 1) * 100)}%
+                  Сезонная надбавка +{Math.round((result.season - 1) * 100)}%
                   <span className="text-gold/60">·</span>
-                  <span className="text-gold/70">ask about spring promotions</span>
+                  <span className="text-gold/70">спросите о весенних акциях</span>
                 </motion.div>
               )}
 
@@ -650,10 +650,10 @@ export function Calculator() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-sage"
                   >
-                    ✓ Link copied!
+                    ✓ Ссылка скопирована!
                   </motion.span>
                 ) : (
-                  "Share Quote"
+                  "Поделиться расчётом"
                 )}
               </motion.button>
 
@@ -663,7 +663,7 @@ export function Calculator() {
                   href={telegramShareUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Share quote via Telegram (opens in new tab)"
+                  aria-label="Поделиться расчётом в Telegram (откроется в новой вкладке)"
                   className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/70 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
                 >
                   <TelegramIcon className="size-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -673,7 +673,7 @@ export function Calculator() {
                   href={whatsappShareUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Share quote via WhatsApp (opens in new tab)"
+                  aria-label="Поделиться расчётом в WhatsApp (откроется в новой вкладке)"
                   className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/70 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
                 >
                   <MessageCircle className="size-3.5 transition-transform group-hover:scale-110" />
@@ -682,7 +682,7 @@ export function Calculator() {
               </div>
 
               <p className="mt-3 text-center font-mono text-xs text-ink/70">
-                * Preliminary estimate. Final pricing after consultation.
+                * Предварительная оценка. Итоговая стоимость — после консультации.
               </p>
             </div>
           </Reveal>

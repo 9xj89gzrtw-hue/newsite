@@ -247,6 +247,7 @@ export function EaFounderStory() {
               id="ea-founder-story-headline"
               className="ea-section-h2 mt-6"
               {...reveal(0.08)}
+              aria-label="Откройте нашу историю."
             >
               Откройте нашу{" "}
               <i className="ea-italic-fragment">историю.</i>

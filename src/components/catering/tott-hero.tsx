@@ -156,7 +156,7 @@ export function TottHero() {
             size, so a lower px floor keeps the visual hierarchy). */}
         <motion.p
           variants={rise}
-          className="tott-script text-white/95"
+          className="tott-script-ru text-white/95"
           style={{
             fontSize: "clamp(2.25rem, 6vw, 4.5rem)",
             lineHeight: 1,
@@ -164,7 +164,7 @@ export function TottHero() {
             textShadow: "0 2px 30px rgba(0,0,0,0.45)",
           }}
         >
-          food as art
+          еда как искусство
         </motion.p>
 
         {/* Eyebrow label — Lato (sans-serif, .tott-body) ALL CAPS, small,
@@ -202,8 +202,8 @@ export function TottHero() {
         animate={showStatic ? undefined : { opacity: 1, transition: { delay: 1.3, duration: 0.8 } }}
         aria-hidden="true"
       >
-        <span className="tott-body text-[10px] font-bold uppercase tracking-[0.35em] text-white/60">
-          Scroll
+        <span className="tott-body text-[11px] font-bold uppercase tracking-[0.35em] text-white/60">
+          Листайте
         </span>
         {showStatic ? (
           <span className="block h-[54px] w-px bg-white/40" />

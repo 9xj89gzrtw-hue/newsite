@@ -59,7 +59,7 @@ const BTN_SOLID_CLASS =
 const BTN_BASE_STYLE: CSSProperties = {
   fontFamily: "var(--ea-font-eyebrow)",
   fontWeight: 700,
-  fontSize: "0.75rem",
+  fontSize: "0.8125rem",
   letterSpacing: "0.14em",
   textTransform: "uppercase",
   lineHeight: 1,

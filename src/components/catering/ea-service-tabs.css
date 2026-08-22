@@ -215,7 +215,7 @@
   align-self: flex-start;
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
-  font-size: clamp(0.78rem, 1vw, 0.95rem);
+  font-size: clamp(0.875rem, 1.1vw, 1rem);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ea-white, #fff);

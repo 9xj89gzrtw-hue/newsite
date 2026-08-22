@@ -47,19 +47,19 @@ type Step = {
 const STEPS: Step[] = [
   {
     num: "01",
-    title: "DREAM",
+    title: "ЗАМЫСЕЛ",
     body:
       "Никаких шаблонов. Никаких готовых меню. Каждое событие мы строим с нуля вокруг вашей идеи.",
   },
   {
     num: "02",
-    title: "BUILD",
+    title: "РЕАЛИЗАЦИЯ",
     body:
       "Мы делали всё — от запусков брендов до свадеб на берегу залива. Когда мы говорим, что ваша смелая идея осуществима, это значит, что мы уже реализовали подобное. За спиной — 16 лет реального опыта.",
   },
   {
     num: "03",
-    title: "SAVOR",
+    title: "НАСЛАЖДЕНИЕ",
     body:
       "Мы относимся к вашим гостям с той же точностью, что и к мишленовским блюдам. Каждая деталь выверена — чтобы вы просто наслаждались вечером. Поэтому клиенты возвращаются снова и снова.",
   },
@@ -93,7 +93,7 @@ export function CepProcess() {
             opens the "how we work" beat with a human handwritten gesture. */}
         <TiltedAccent text="процесс" className="mb-6 block md:mb-8" />
         <h2 className="cep-section-h2 mb-16 text-cep-black md:mb-24">
-          THE CREATIVE EDGE
+          Творческий подход
         </h2>
       </motion.div>
 

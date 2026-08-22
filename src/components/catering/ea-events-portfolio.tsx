@@ -238,7 +238,7 @@ export function EaEventsPortfolio() {
             </h2>
           </div>
           <Link
-            href="#services-overview"
+            href="#ea-service-tabs"
             className="ea-text-link ea-evt-portfolio__all-link"
             aria-label="Все события"
           >

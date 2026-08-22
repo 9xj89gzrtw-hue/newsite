@@ -32,7 +32,10 @@ import { MENU_TYPES } from "@/lib/pricing";
 const STEPS = ["Тип мероприятия", "Гости и дата", "Контакты", "Отправить"];
 const DRAFT_KEY = "catering-lead-draft";
 
-const PHONE_REGEX = /^(\+1|1)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{4}$/;
+// Russian phone regex. Matches +7/7/8 prefix + 10 digits, or bare 10/11 digits.
+// The validation in stepValid() strips everything except + and digits first,
+// so this runs against the compact form: "+79991234567" / "89991234567" / "79991234567".
+const PHONE_REGEX = /^(\+7|7|8)?\d{10}$/;
 
 type LeadData = {
   eventType: string;
@@ -233,7 +236,7 @@ function FloatingInput({
             Icon ? 'left-11' : 'left-4'
           } ${
             focused || hasValue
-              ? `-top-2.5 ${Icon ? 'left-8' : 'left-3'} bg-white px-1 text-xs font-medium text-gold`
+              ? `-top-2.5 ${Icon ? 'left-8' : 'left-3'} bg-white px-1 text-sm font-medium text-ink`
               : `text-ink/70 ${Icon ? 'text-ink/70' : ''}`
           }`}
         >
@@ -772,6 +775,7 @@ export function Contact() {
             <h2
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.1 }}
+              aria-label="Поговорим о вашем мероприятии"
             >
               Поговорим о вашем{" "}
               <span className="gradient-text italic">мероприятии</span>
@@ -822,15 +826,15 @@ export function Contact() {
                       icon={Telegram}
                       href={CONTACTS.telegramHref}
                       label={CONTACTS.telegram}
-                      ariaLabel={`Instagram: ${CONTACTS.instagram}`}
+                      ariaLabel={`Telegram: ${CONTACTS.telegram}`}
                       sublabel="Telegram"
                       external
                     />
                     <ContactCard
-                      icon={VkIcon}
-                      href={CONTACTS.vkHref}
-                      label="nilovcatering"
-                      ariaLabel={`Email: ${CONTACTS.email}`}
+                      icon={Instagram}
+                      href={CONTACTS.instagramHref}
+                      label={CONTACTS.instagram}
+                      ariaLabel={`Instagram: ${CONTACTS.instagram}`}
                       sublabel="Instagram"
                       external
                     />

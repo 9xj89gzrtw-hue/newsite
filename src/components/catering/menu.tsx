@@ -410,13 +410,14 @@ export function Menu() {
             <Reveal>
               <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold bg-gold/10 px-3 py-1.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-                Menu
+                Меню
               </span>
             </Reveal>
             <Reveal delay={0.1}>
               <h2
                 className="mt-5 font-display text-ink"
                 style={{ fontSize: "clamp(2rem, 5.5vw, 4rem)", lineHeight: 1 }}
+                aria-label="Сезонные меню"
               >
                 Сезонные{"\u00A0"}
                 <span className="gradient-text italic">меню</span>
@@ -446,6 +447,7 @@ export function Menu() {
                   role="tab"
                   aria-selected={isActive}
                   aria-controls="menu-panel"
+                  aria-label={`${m.label}, от ${formatRUB(m.perGuest)} за человека`}
                   onClick={() => select(m.id)}
                   className={`group relative flex min-h-[72px] sm:min-h-[80px] w-[140px] sm:w-[160px] flex-col items-center overflow-hidden rounded-2xl border-2 transition-all duration-500 ${
                     isActive
@@ -483,7 +485,7 @@ export function Menu() {
                   <div className="relative h-16 w-full overflow-hidden sm:h-20">
                     <Image
                       src={MENU_TYPE_IMAGES[m.id] || "/media/concorde-handhelds.jpg"}
-                      alt={m.label}
+                      alt=""
                       fill
                       sizes="160px"
                       className={`object-cover transition-transform duration-700 ${
@@ -834,6 +836,11 @@ function PackageCarousel({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  // Hydration-safe mobile flag: false on server + first client render, updates after mount.
+  // Replaces the previous `typeof window !== 'undefined' && window.innerWidth < 640`
+  // render-time check which caused a hydration mismatch (server rendered the scroll
+  // container, client rendered the motion.div hint at the same DOM position).
+  const [isMobile, setIsMobile] = useState(false);
 
   const updateScroll = () => {
     const el = scrollRef.current;
@@ -846,9 +853,14 @@ function PackageCarousel({
     const el = scrollRef.current;
     if (!el) return;
     updateScroll();
-    
+
+    // Track viewport size for the mobile scroll-hint indicator (hydration-safe).
+    const syncMobile = () => setIsMobile(window.innerWidth < 640);
+    syncMobile();
+    window.addEventListener("resize", syncMobile, { passive: true });
+
     // Mobile scroll hint animation
-    if (!prefersReducedMotion && typeof window !== 'undefined' && window.innerWidth < 640 && el.scrollWidth > el.clientWidth) {
+    if (!prefersReducedMotion && isMobile && el.scrollWidth > el.clientWidth) {
       const maxScroll = el.scrollWidth - el.clientWidth;
       const hint = Math.min(maxScroll * 0.25, 120);
       const start = Date.now();
@@ -861,9 +873,10 @@ function PackageCarousel({
         requestAnimationFrame(tick);
       };
       const timer = setTimeout(() => requestAnimationFrame(tick), 600);
-      return () => clearTimeout(timer);
+      return () => { clearTimeout(timer); window.removeEventListener("resize", syncMobile); };
     }
-  }, [current.id, prefersReducedMotion]);
+    return () => window.removeEventListener("resize", syncMobile);
+  }, [current.id, prefersReducedMotion, isMobile]);
 
   const gridCols =
     packages.length === 2
@@ -882,10 +895,10 @@ function PackageCarousel({
         <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-10 bg-gradient-to-l from-cream via-cream to-transparent md:hidden" />
       )}
 
-      {/* Mobile scroll hint indicator */}
-      {!prefersReducedMotion && canScrollRight && typeof window !== 'undefined' && window.innerWidth < 640 && (
+      {/* Mobile scroll hint indicator — only rendered after mount to avoid hydration mismatch. */}
+      {!prefersReducedMotion && canScrollRight && isMobile && (
         <motion.div 
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden sm:flex md:hidden"
+          className="pointer-events-none absolute right-4 top-1/2 z-20 -translate-y-1/2"
           animate={{ x: [0, 8, 0], opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         >
