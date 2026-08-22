@@ -3641,41 +3641,48 @@ header[data-scrolled="true"] [data-mega-panel] {
 .tott-border-frame--cream { border-color: rgba(241,234,224,0.7); }
 
 /* --- Vertical "INTERFOOD CATERING" left sidebar (gamma-style) ---------------
-   Cycle 31.2 (2026-08-22): rewritten per user request —
-     "оставить только слева полоску, сделать ее на белом фоне и чтобы весь
-      сайт сместился вправо относительно этой полоски как на сайте gamma,
-      сам текст INTERFOOD CATERING сделать больше по размеру и двумя разными
-      цветами"
+   Cycle 31.3 (2026-08-22): per user request —
+     "убрать белую полоску с херо, она должна начинаться сразу после него.
+      INTERFOOD CATERING сделать в одну строку.
+      сделать чтобы когда кликаю на него перебрасывало на главный экран.
+      INTERFOOD с хедера убрать на декстопной версии"
 
-   The stripe is now a REAL FIXED SIDEBAR (not an overlay): it occupies
-   actual space on the left edge of the viewport, and the whole site
-   content (hero, header, all sections, footer) is shifted RIGHT by the
-   sidebar width via a global `padding-left` on <body> (see below). This
-   matches gamma's behaviour — on gammacatering.com the "GAMMACATERING"
-   vertical text sits in a real left column and the content starts after it.
+   Changes from 31.2:
+     - The sidebar + body padding-left now START AFTER THE HERO. On the
+       hero screen, body padding-left is 0 (hero is full-width, no white
+       stripe). After the user scrolls past the hero, the sidebar fades
+       in AND body padding-left animates from 0 → 72px so the content
+       shifts right smoothly. A body class `has-sidebar` is toggled by
+       the scroll listener in vertical-brand-label.tsx.
+     - The two words are now in ONE VERTICAL LINE (not stacked in two
+       rows). "INTERFOOD CATERING" reads as a single continuous vertical
+       string with a space between words — matches gamma's
+       "GAMMACATERING" single-string vertical colophon. Removed the
+       flex-direction:column stack; the two word spans are now inline
+       inside the single writing-mode:vertical-rl text line.
+     - The sidebar is now CLICKABLE — clicking anywhere on it scrolls to
+       the top (hero). Implemented as an <a href="#hero"> wrapper in the
+       component. cursor:pointer + pointer-events:auto.
+     - Header wordmark "Interfood." hidden on desktop again (lg+), per
+       user request. Kept on mobile. (See site-header.tsx.)
 
    Layout:
-     - width: 72px (desktop lg+) — wide enough for the vertical two-word
-       text to read comfortably; narrow enough to not eat content space.
-     - background: white (#FFFFFF) per user request.
+     - width: 72px (desktop lg+) — sidebar column.
+     - background: white (#FFFFFF).
      - position: fixed; left:0; top:0; height:100vh; z-index:60.
-     - Content: centered vertical "INTERFOOD" (ink/charcoal) + "CATERING"
-       (gold), stacked, reading bottom-to-top via writing-mode: vertical-rl
-       + transform: rotate(180deg). Big: clamp(16px, 1.3vw, 22px) per word,
-       letter-spacing 0.3em, Prata (matches the hero wordmark).
-     - A small tick mark above + below the text (1px × 36px) in ink at
-       25% — editorial colophon feel.
-     - A 1px right border in ink@12% separates the sidebar from content.
+     - Text: single vertical line "INTERFOOD CATERING", Prata, clamp(16-22px),
+       uppercase, letter-spacing 0.3em. "INTERFOOD" ink + "CATERING" gold.
+     - Clickable: <a href="#hero"> wraps the sidebar.
+     - 1px right border in ink@12%.
 
-   Scroll-gating (kept from Cycle 31.1): the sidebar starts opacity:0
-   and fades in (0.6s) only after the user scrolls past the hero
-   (scrollY > 0.85 * innerHeight). This keeps the hero pristine — the
-   sidebar appears as the user scrolls into the second screen. Before
-   scroll, the body padding-left is still applied (so content is already
-   shifted right consistently), but the sidebar itself is invisible.
+   Scroll-gating: sidebar opacity:0 + body.has-sidebar absent at top
+   (hero pristine, full-width). After scrollY > 0.85*innerHeight →
+   body.has-sidebar added (padding-left animates 0→72px over 0.6s) +
+   sidebar .is-visible (opacity 0→1 over 0.6s). Synchronized transitions
+   so the stripe fades in AS the content shifts right — feels like the
+   stripe "pushes" the content right.
 
-   Mobile (<1024px): the sidebar is hidden AND the body padding-left is
-   removed so mobile gets the full-width layout. */
+   Mobile (<1024px): sidebar display:none + body padding-left always 0. */
 .vertical-brand-label {
   position: fixed;
   left: 0;
@@ -3683,7 +3690,9 @@ header[data-scrolled="true"] [data-mega-panel] {
   height: 100vh;
   width: 72px;
   z-index: 60;
-  pointer-events: none;
+  /* Clickable: wraps in <a href="#hero"> in the component. */
+  pointer-events: auto;
+  cursor: pointer;
   /* White background per user request. */
   background: #ffffff;
   /* 1px right border separates the sidebar from the content area. */
@@ -3694,11 +3703,12 @@ header[data-scrolled="true"] [data-mega-panel] {
   align-items: center;
   justify-content: center;
   gap: 18px;
-  /* Start hidden — fade in after scroll past hero (see .is-visible).
-     The body padding-left is applied regardless (see body rule below)
-     so content stays shifted right consistently. */
+  /* Start hidden — fade in after scroll past hero (see .is-visible). */
   opacity: 0;
   transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Anchor link semantics — the whole sidebar is a link to #hero. */
+  text-decoration: none;
+  color: inherit;
 }
 .vertical-brand-label.is-visible {
   opacity: 1;
@@ -3708,44 +3718,52 @@ header[data-scrolled="true"] [data-mega-panel] {
   width: 1px;
   height: 36px;
   background: color-mix(in oklch, var(--ink, #1f2937) 25%, transparent);
+  pointer-events: none;
 }
 .vertical-brand-label__text {
   font-family: var(--font-prata), "Playfair Display", Georgia, serif;
   font-size: clamp(16px, 1.3vw, 22px);
   letter-spacing: 0.3em;
   text-transform: uppercase;
+  /* Single vertical line — writing-mode puts the text on a vertical
+     baseline; the two word spans flow inline (one after another) along
+     that vertical line, separated by a normal whitespace gap. No
+     flex-direction stack — the words are in ONE line, just oriented
+     vertically. Matches gamma's "GAMMACATERING" single-string colophon. */
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   white-space: nowrap;
   line-height: 1;
   font-weight: 400;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35em;
+  /* Keep the text block centered in the 72px sidebar. */
+  display: inline-block;
+  pointer-events: none;
 }
 .vertical-brand-label__word {
-  display: inline-block;
+  display: inline;
 }
 .vertical-brand-label__word--primary {
-  /* "INTERFOOD" — ink/charcoal (the brand primary, same as body text). */
+  /* "INTERFOOD" — ink/charcoal (the brand primary). */
   color: var(--ink, #1f2937);
 }
 .vertical-brand-label__word--accent {
-  /* "CATERING" — gold (matching the hero wordmark dot + CepLocationsStrip
-     two-color split). */
+  /* "CATERING" — gold (the accent). */
   color: var(--gold, #c9a063);
 }
 
-/* Global body padding-left so the whole site content (hero, header,
-   sections, footer) shifts RIGHT by the sidebar width — the sidebar
-   occupies real space on the left, content starts after it, exactly
-   like gamma. Applied on lg+ only (mobile gets full width, sidebar hidden).
-   The padding is applied REGARDLESS of scroll position so the layout
-   is consistent — the sidebar just fades in visually on top of the
-   already-reserved space. */
+/* Global body padding-left toggle. The sidebar occupies real space on
+   the left ONLY AFTER the hero — at the top (hero screen) body has no
+   padding (hero is full-width, no stripe). When the user scrolls past
+   the hero, the JS adds `has-sidebar` to <body>, animating padding-left
+   from 0 → 72px over 0.6s (synchronized with the sidebar's opacity
+   fade-in). Applied on lg+ only. */
 @media (min-width: 1024px) {
   body {
+    /* Default: no padding — hero is full-width. */
+    padding-left: 0;
+    transition: padding-left 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  body.has-sidebar {
     padding-left: 72px;
   }
 }
