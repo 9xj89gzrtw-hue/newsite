@@ -10,6 +10,7 @@ import {
   animate,
   useMotionValue,
 } from "framer-motion";
+import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
 
 /**
  * EaFounderStory — Cycle 28 ea-* editorial layer.
@@ -187,17 +188,19 @@ export function EaFounderStory() {
 
       <div className="ea-container ea-container--wide">
         <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-20 lg:gap-28">
-          {/* LEFT — founder portrait photo -------------------------------- */}
-          <motion.div
+          {/* LEFT — founder portrait photo --------------------------------
+
+              Cycle 34 (sondaven.com graft): portrait now reveals via a
+              directional `clip-path: inset()` mask (bottom→top open) with a
+              subtle inner zoom (1.15 → 1.0) — the Sondaven / Floema signature
+              photo reveal. Replaces the previous fade-up. The existing
+              `group-hover:scale-[1.02]` on the <Image> composes with the
+              clip-reveal's inner scale (reveal scale resolves first, hover
+              scale layers on top). */}
+          <ClipPathReveal
+            direction="bottom"
+            duration={1.1}
             className="order-1"
-            {...(reduce
-              ? {}
-              : {
-                  initial: { opacity: 0, y: 36 } as const,
-                  whileInView: { opacity: 1, y: 0 } as const,
-                  viewport: { once: true, margin: "-80px" } as const,
-                  transition: { duration: 0.9, ease: EASE } as const,
-                })}
           >
             <div className="group relative">
               {/* 4:5 portrait frame — square corners (4px), inner shadow */}
@@ -229,7 +232,7 @@ export function EaFounderStory() {
                 />
               </div>
             </div>
-          </motion.div>
+          </ClipPathReveal>
 
           {/* RIGHT — story column, pushed down 80px on desktop for the EA
               asymmetric vertical offset (see EA-ANALYSIS.md §3.9). */}

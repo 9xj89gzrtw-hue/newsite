@@ -25,6 +25,8 @@ import {
   CONTACTS,
 } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
+import { Magnetic } from "@/components/motion/magnetic";
+import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 import { toast } from "sonner";
 
 const FOOTER_AWARD_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -122,48 +124,50 @@ function NewsletterSignup() {
             className="w-full rounded-full border border-cream/20 bg-ink/50 px-4 py-3 text-sm text-cream placeholder:text-cream/50 focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors disabled:opacity-60 min-h-[44px]"
           />
         </div>
-        <button
-          type="submit"
-          disabled={status === "loading" || status === "done"}
-          className="cta-gradient-punchy inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 min-h-[44px]"
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {status === "loading" ? (
-              <motion.span
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-2"
-              >
-                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                Подписка…
-              </motion.span>
-            ) : status === "done" ? (
-              <motion.span
-                key="done"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-2"
-              >
-                <CheckCircle2 className="size-4" aria-hidden="true" />
-                Готово!
-              </motion.span>
-            ) : (
-              <motion.span
-                key="idle"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-2"
-              >
-                Подписаться
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
+        <Magnetic strength={0.25} className="flex flex-col">
+          <button
+            type="submit"
+            disabled={status === "loading" || status === "done"}
+            className="cta-gradient-punchy inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 min-h-[44px]"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {status === "loading" ? (
+                <motion.span
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2"
+                >
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                  Подписка…
+                </motion.span>
+              ) : status === "done" ? (
+                <motion.span
+                  key="done"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2"
+                >
+                  <CheckCircle2 className="size-4" aria-hidden="true" />
+                  Готово!
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="idle"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2"
+                >
+                  Подписаться
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+        </Magnetic>
         <label className="mt-3 flex min-h-[44px] items-start gap-2 text-[11px] text-cream/70 sm:mt-2">
           <input
             type="checkbox"
@@ -464,7 +468,9 @@ export function SiteFooter() {
       <div className="border-t border-cream/10 bg-ink/60">
         <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
           <div className="mb-4 flex flex-col items-center text-center">
-            <h2 className="eyebrow-wide text-sm text-gold">С гордостью обслуживаем</h2>
+            <SplitTextReveal as="h2" className="eyebrow-wide text-sm text-gold">
+              С гордостью обслуживаем
+            </SplitTextReveal>
             <p className="mt-2 text-sm text-cream/70">
               Выездной кейтеринг в Санкт-Петербурге и области
             </p>
@@ -489,6 +495,12 @@ export function SiteFooter() {
             <div
               className="marquee-pause relative flex overflow-hidden"
               role="presentation"
+              style={{
+                maskImage:
+                  "linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)",
+              }}
             >
               {/* Edge fade masks */}
               <div

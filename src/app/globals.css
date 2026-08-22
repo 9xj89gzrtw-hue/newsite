@@ -310,6 +310,48 @@
   --ring: var(--gold);
 }
 
+/* ===== ThemeFlip tokens (Cycle 34, sondaven.com graft) =====
+   data-theme on <html> swaps --background/--foreground/--accent for cinematic
+   color-flip sections. html gets a 0.6s transition (GPU-cheap, root only).
+   Reduced-motion: transition disabled (instant swap).
+
+   IMPORTANT: these blocks come AFTER `.dark` (next-themes dark-mode toggle)
+   so attribute selector `data-theme` overrides `.dark` class on cascade when
+   both are set. `.dark` and `data-theme` are SEPARATE concerns:
+     - `.dark` is set by next-themes (user prefers-color-scheme: dark toggle)
+     - `data-theme` is set by ThemeFlipProvider (scroll position-driven)
+   They coexist; data-theme wins by source order when both apply.
+
+   NOTE: the bare `:root` is intentionally NOT redeclared here — the original
+   `:root` block (above, line ~136) already sets --background/--foreground/
+   --accent to cream/ink/beige. We only override for the NON-default themes
+   (espresso, terracotta). `:root[data-theme="cream"]` mirrors the default so
+   an explicitly-tagged cream section is identical to no attribute (defensive
+   — avoids edge-case cascade drift). It does NOT redeclare --accent, so the
+   default beige accent (used by shadcn `bg-accent` hover states) is preserved.
+*/
+:root[data-theme="cream"] {
+  --background: var(--cream);
+  --foreground: var(--ink);
+}
+:root[data-theme="espresso"] {
+  --background: var(--night);
+  --foreground: var(--cream);
+  --accent: var(--gold);
+}
+:root[data-theme="terracotta"] {
+  --background: var(--terracotta);
+  --foreground: var(--cream);
+  --accent: var(--espresso, var(--ink));
+}
+html {
+  transition: background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  html { transition: none; }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

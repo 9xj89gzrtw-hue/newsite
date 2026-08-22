@@ -261,6 +261,7 @@ export function EaFaqAccordion() {
                   id={triggerId}
                   onClick={() => toggle(i)}
                   onKeyDown={onKey(i)}
+                  className="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full focus-visible:after:w-full"
                   style={{
                     display: "flex",
                     alignItems: "center",

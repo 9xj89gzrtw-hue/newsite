@@ -11,15 +11,21 @@ import {
 } from "framer-motion";
 
 /**
- * Custom cursor — LIGHT THEME
+ * CustomCursor — BlendMode (Awwwards/Sondaven signature).
  *
  * A small dot + a lagging ring that grows on hover over interactive elements.
- * Gold accent color instead of bordeaux. Hidden on touch / coarse pointers.
+ * Uses `mix-blend-mode: difference` so the cursor inverts whatever color is
+ * beneath it — over a dark espresso background it appears light, over a
+ * cream background it appears dark, over bordeaux it shows its complement.
+ * This pairs perfectly with ThemeFlipProvider sections (color-flip on
+ * scroll) — the cursor always stays visible against the swapped background.
  *
  * Phase 9 P2 wow-factor: when hovering an element with `data-cursor-image`
  * attribute (URL to an image), the cursor ring expands to 120px and shows
- * the image inside via spring-tracked motion.div. Useful for #menu CTA
- * hover-preview (shows a signature dish photo when user hovers "Menu" link).
+ * the image inside via spring-tracked motion.div. The image preview is a
+ * REAL raster image, so it does NOT get `mix-blend-mode: difference` (blend
+ * would distort the image). The dot + ring hide (opacity 0) when the
+ * preview is active; the preview replaces them as the cursor visual.
  *
  * Animation rule (RULES §5): only transform/opacity — never width/height.
  * The ring is a fixed 70px element that scales 0.5 → 1 on hover (visible
@@ -99,15 +105,19 @@ export function CustomCursor() {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[9999] hidden md:block" aria-hidden="true">
-      {/* Dot — fixed 6px, fades + shrinks on hover (transform/opacity only) */}
+      {/* Dot — fixed 6px, fades + shrinks on hover (transform/opacity only).
+          mix-blend-mode: difference inverts whatever is beneath (white over
+          dark = light, white over light = dark). White is the canonical
+          blend-mode cursor color — it inverts cleanly to every theme. */}
       <motion.div
-        className="fixed top-0 left-0 -ml-[3px] -mt-[3px] rounded-full bg-gold"
+        className="fixed top-0 left-0 -ml-[3px] -mt-[3px] rounded-full bg-white"
         style={
           {
             x: dotX,
             y: dotY,
             width: DOT_BASE_SIZE_PX,
             height: DOT_BASE_SIZE_PX,
+            mixBlendMode: "difference",
           } as const
         }
         animate={{
@@ -116,16 +126,22 @@ export function CustomCursor() {
         }}
         transition={{ duration: 0.2 }}
       />
-      {/* Ring — fixed 70px, scales 0.5→1 on hover (transform/opacity only) */}
-      {/* When preview is active, ring hides (opacity 0) — preview takes over */}
+      {/* Ring — fixed 70px, scales 0.5→1 on hover (transform/opacity only).
+          When preview is active, ring hides (opacity 0) — preview takes over.
+          mix-blend-mode: difference applied (matches the dot). Border + text
+          use white instead of gold so the difference blend inverts cleanly
+          against any background color (cream / espresso / terracotta / photo).
+          The hover backgroundColor tint stays gold-tinted rgba(196,149,106,*)
+          — under difference blend it becomes a subtle complementary wash. */}
       <motion.div
-        className="fixed top-0 left-0 flex -ml-[35px] -mt-[35px] items-center justify-center rounded-full border border-gold/60 text-xs uppercase tracking-wider text-gold font-medium overflow-hidden"
+        className="fixed top-0 left-0 flex -ml-[35px] -mt-[35px] items-center justify-center rounded-full border border-white/60 text-xs uppercase tracking-wider text-white font-medium overflow-hidden"
         style={
           {
             x: ringX,
             y: ringY,
             width: RING_BASE_SIZE_PX,
             height: RING_BASE_SIZE_PX,
+            mixBlendMode: "difference",
           } as const
         }
         animate={{

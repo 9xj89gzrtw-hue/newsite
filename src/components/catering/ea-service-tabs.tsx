@@ -46,6 +46,7 @@ import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { SmartImage } from "@/components/media/smart-image";
+import { Magnetic } from "@/components/motion/magnetic";
 import { MEDIA } from "@/lib/media";
 
 import "./ea-service-tabs.css";
@@ -284,19 +285,30 @@ export function EaServiceTabs() {
           {TABS.map((tab, i) => {
             const selected = i === activeIndex;
             return (
-              <button
+              // Magnetic wrapper — subtle 0.2 pull on each tab trigger
+              // (Sondaven/Lando signature). Renders a div around the button;
+              // CSS `.ea-svc-tabs__tab-magnetic` makes the div a flex item
+              // that matches the button's previous layout (flex: 0 0 auto,
+              // align-items: stretch inherited) so ARIA tablist semantics +
+              // roving tabindex + keyboard nav remain intact.
+              <Magnetic
                 key={tab.id}
-                id={tabId(i)}
-                role="tab"
-                type="button"
-                aria-selected={selected}
-                aria-controls={panelId}
-                tabIndex={selected ? 0 : -1}
-                className="ea-svc-tabs__tab"
-                onClick={() => activate(i)}
+                strength={0.2}
+                className="ea-svc-tabs__tab-magnetic"
               >
-                {tab.label}
-              </button>
+                <button
+                  id={tabId(i)}
+                  role="tab"
+                  type="button"
+                  aria-selected={selected}
+                  aria-controls={panelId}
+                  tabIndex={selected ? 0 : -1}
+                  className="ea-svc-tabs__tab"
+                  onClick={() => activate(i)}
+                >
+                  {tab.label}
+                </button>
+              </Magnetic>
             );
           })}
         </div>

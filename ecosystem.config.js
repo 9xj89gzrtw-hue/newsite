@@ -6,11 +6,11 @@ module.exports = {
     {
       name: "interfood-catering-dev",
       script: "node_modules/next/dist/bin/next",
-      args: "dev -p 3001",
+      args: "dev -p 3000",
       cwd: __dirname,
       env: {
         NODE_ENV: "development",
-        PORT: 3001,
+        PORT: 3000,
       },
       instances: 1,
       exec_mode: "fork",

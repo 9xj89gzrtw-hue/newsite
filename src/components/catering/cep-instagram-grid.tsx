@@ -6,6 +6,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Instagram, Play } from "lucide-react";
 import { useMounted } from "@/hooks/use-mounted";
 import { CONTACTS } from "@/lib/config";
+import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
+import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 
 /**
  * CepInstagramGrid — Creative Edge Parties §6.12 "FOLLOW ALONG" grid.
@@ -76,7 +78,20 @@ export function CepInstagramGrid() {
     >
       {/* Header row — H2 + IG handle link */}
       <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
-        <h2 className="cep-section-h2 text-black">СЛЕДИТЕ ЗА НАМИ</h2>
+        {/*
+          Cycle 34 WOW graft — sondaven.com split-line word stagger. The H2
+          "СЛЕДИТЕ ЗА НАМИ" reveals word-by-word (mask + translateY 110%→0%
+          per word, 60ms stagger) instead of fading in as a block. Plain text —
+          no italic-fragment design device here, so SplitTextReveal is safe.
+          The cep-section-h2 + text-black styling is preserved via className.
+        */}
+        <SplitTextReveal
+          as="h2"
+          mode="words"
+          className="cep-section-h2 text-black"
+        >
+          СЛЕДИТЕ ЗА НАМИ
+        </SplitTextReveal>
         <a
           href={IG_PROFILE_URL}
           target="_blank"
@@ -108,13 +123,45 @@ export function CepInstagramGrid() {
               className="group relative block aspect-square overflow-hidden bg-black/5"
               variants={itemVariants}
             >
-              <Image
-                src={src}
-                alt={`Публикация ${i + 1} в Instagram`}
-                fill
-                sizes="(max-width: 768px) 33vw, 22vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              />
+              {/*
+                Cycle 34 WOW graft — sondaven.com staggered alternating
+                directional clip-path reveal across the 3×3 grid. Each tile's
+                image enters with a different clip direction (cycling
+                [bottom, left, top, right] via index%4) and a 50ms-per-tile
+                stagger so the grid reveals as a "shutter wave" sweeping
+                across the 3×3, not a uniform wipe.
+
+                The wrapper div inside ClipPathReveal carries `aspect-square`
+                matching motion.a's aspect-square so next/image `fill`
+                (position:absolute) has a definite containing block — the
+                inner motion.div's height is auto, so this in-flow wrapper
+                establishes it via aspect-ratio.
+
+                The existing CSS hover scale (group-hover:scale-105, was
+                transition-transform duration-700) is upgraded to also animate
+                filter (saturate-150 brightness-105 on group-hover) for the
+                Sondaven hover="card" multiply-wash feel — image deepens on
+                hover. The Reel Play icon overlay stays outside the
+                ClipPathReveal so it remains always-visible (CEP shows it
+                always, not on hover).
+              */}
+              <ClipPathReveal
+                direction="alternate"
+                index={i}
+                duration={0.7}
+                delay={i * 0.05}
+                className="absolute inset-0"
+              >
+                <div className="relative aspect-square w-full">
+                  <Image
+                    src={src}
+                    alt={`Публикация ${i + 1} в Instagram`}
+                    fill
+                    sizes="(max-width: 768px) 33vw, 22vw"
+                    className="object-cover transition-[filter,transform] duration-500 ease-out group-hover:scale-105 group-hover:saturate-150 group-hover:brightness-105"
+                  />
+                </div>
+              </ClipPathReveal>
 
               {/* Reel Play icon — always visible but subtle (CEP shows it always) */}
               {isReel && (

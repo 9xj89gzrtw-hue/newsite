@@ -39,6 +39,19 @@
   display: none;
 }
 
+/* — — — — — Magnetic wrapper around each tab button — — — — — */
+/* `<Magnetic>` renders a motion.div; without this rule the div would be a
+   default block flex item (flex: 0 1 auto) and the button inside would NOT
+   stretch to the tablist row height — breaking the bottom ::after indicator
+   alignment. We make the wrapper a non-growing flex item that itself is a
+   flex container so the button stretches to fill it (default align-items:
+   stretch on the wrapper). Layout matches the pre-wrap behavior 1:1.
+   Reduced-motion: Magnetic returns a plain div — same layout, no transform. */
+.ea-svc-tabs__tab-magnetic {
+  flex: 0 0 auto;
+  display: flex;
+}
+
 /* — — — — — Tab button — — — — — */
 
 /* Active-tab indicator: SOLID blush-deep filled pill (loop 2 — VLM said the

@@ -3110,3 +3110,132 @@ worklog.md                                           (+subagent +orchestrator en
 (8/10 рейтинги секций). `lint` зелёный. Коммит `e5a57a2` запушен в `main` без
 `--force`. /loop критика проведена в 2 раунда, 3 issue найдены и пофиксены.
 
+
+---
+
+## Cycle 34 — sondaven.com + Awwwards SOTM WOW-graft (блоки ниже карусели)
+
+**Дата:** 2026-08-22. **Задача:** внедрить WOW-паттерны с sondaven.com (Awwwards
+SOTM Jul 2026, Food & Drink) и других SOTM-победителей в блоки НИЖЕ фото-карусели
+(GammaMarquee).
+
+### Что сделано
+
+1. **Исследование** (`docs/SONDAVEN-WOW-RESEARCH.md`, 73KB, 38 external refs):
+   разобран sondaven.com (GSAP 3.13 + ScrollTrigger + SplitText + Lenis — идентичный
+   нашему стек) + 5 Awwwards SOTM (Floema, Cartier W&W, Lando Norris, MindMarket,
+   Montfort). Выбрано 6 must-implement эффектов.
+
+2. **Foundation (Wave 1, 2 субагента параллельно):**
+   - `src/components/motion/clip-path-reveal.tsx` — directional photo reveal
+     (top/right/bottom/left/alternate), `relative h-full w-full` inner для
+     next/image `fill`, reduced-motion fallback.
+   - `src/components/motion/split-text-reveal.tsx` — split-type line/word/char
+     stagger + optional gradient mask, ARIA (aria-label + role=heading, split
+     aria-hidden), split-type@0.3.4 (4kb MIT, единственная новая зависимость).
+   - `src/components/motion/magnetic-circle-button.tsx` — Sondaven btn-circle
+     3-tier (bg scales + inner label translates 0.3×), 4 warm-token variants.
+   - `src/components/providers/theme-flip-provider.tsx` + `globals.css`
+     `:root[data-theme="cream|espresso|terracotta"]` — color-flip секций на
+     скролле (IntersectionObserver central-20%-band).
+   - `src/components/media/scroll-bound-video.tsx` — Mux `currentTime` bound to
+     `useScroll` (Apple AirPods / Sondaven `data-scroll-video` pattern).
+   - `src/components/catering/cursor.tsx` — upgraded to `mixBlendMode: 'difference'`
+     (cursor инвертирует цвет под собой — работает на любой theme-flip секции).
+
+3. **Block graft (Wave 2, 6 субагентов + ручные правки):**
+   - **EaVenuesSpotlight (SHOWPIECE):** 3-up static grid → pinned horizontal-scroll
+     map (Sondaven `pin_vector`). CSS-sticky 3-element pin (pin-spacer h-[300vh] /
+     pin-sticky / pin-wrap x=useTransform 0%→-66%). SVG travel-map background
+     (dashed route + 3 pulsing location pins + Cyrillic labels СПб/МСК/RU).
+     Per-card scale pulse at viewport center. Reduced-motion: original 3-up fallback.
+     `data-theme-flip="espresso"`.
+   - **3 parallax bands** (CepEditorialDivider, TottParallaxBand, GammaSeparator):
+     `data-theme-flip` + SplitTextReveal headlines + ClipPathReveal photos +
+     edge-fade mask marquee (Sondaven `.fin-s_title_marquee`).
+   - **2 galleries** (EaEventsPortfolio, CepInstagramGrid): alternating
+     ClipPathReveal per card/tile (directional rhythm) + hover multiply-wash.
+   - **Menu/EaServiceTabs/EaFaqAccordion:** Magnetic tab triggers + Sondaven
+     hover="line" underline reveal on FAQ questions.
+   - **DeliveryBlock:** ClipPathReveal photo (right→left) + MagneticCircleButton
+     CTA (espresso variant, gold rim).
+   - **EaFounderStory:** ClipPathReveal portrait (bottom→top).
+   - **Contact/EventsVideoCarousel/SiteFooter:** Magnetic submit + alternating
+     ClipPathReveal tiles + edge-fade marquee.
+
+### /loop критика (3 раунда, Agent Browser + VLM)
+
+- **Round 1:** BUG — venues eyebrow `opacity:0` застрял (`whileInView` в
+  `position:sticky` не срабатывает). FIX → `animate` (mount-triggered).
+  BUG — venues card images `height:0` (ClipPathReveal inner без height).
+  FIX → `h-full w-full` на inner.
+- **Round 2:** BUG — parallax band photos `clip-path: inset(100%)` застрял +
+  `img.complete=false` (next/image `fill` warning "parent position: static").
+  КОРНЕВАЯ ПРИЧИНА: `clip-path` animation via `whileInView`/`useInView+animate`
+  ненадёжна в этом проекте (motion/react × framer-motion контекст-конфликт +
+  Lenis влияет на IntersectionObserver timing). FIX → заменил `clip-path` на
+  `opacity + directional y/x + scale(1.15→1.0)` reveal (transform/opacity-only,
+  надёжно анимируется `whileInView`). Directional feel сохранён через per-direction
+  initial offsets. Добавил `relative` к inner motion.div (next/image `fill` parent).
+- **Round 3:** VLM подтвердил чистый рендер ВСЕХ блоков, багов нет. Lint+typecheck
+  GREEN.
+
+### Грабли (для будущих циклов)
+
+- **#34-1 `clip-path` animation ненадёжна с `whileInView`/`useInView` в проектах
+  со смешанным motion/react + framer-motion + Lenis.** Симптом: clip-path
+  застревает в `inset(100%)`, image не загружается. Решение: использовать
+  `opacity + transform` reveal (transform/opacity-only) вместо clip-path.
+  Clip-path оставить для GSAP ScrollTrigger `scrub` (там надёжно).
+- **#34-2 `whileInView` внутри `position:sticky` pinned контейнера не
+  срабатывает.** IntersectionObserver для детей sticky элемента даёт
+  ненадёжные enter-callbacks. Решение: заменить `whileInView` на `animate`
+  (mount-triggered) для элементов внутри pinned/sticky секций.
+- **#34-3 next/image `fill` требует `position: relative|absolute|fixed` на
+  непосредственном родителе.** motion.div без `relative` → warning "parent with
+  invalid position: static" + image height:0. Решение: всегда добавлять
+  `relative` на любой motion-div обёртку, содержащую `fill`-image.
+- **#34-4 ThemeFlipProvider central-20%-band rootMargin (`-40% 0px -40% 0px`)
+  ломается на `h-[300vh]` pinned секциях** — тема флипает только в средней
+  трети скролла. Решение: ставить `data-theme-flip` на inner sticky div (не
+  на outer section) — sticky div всегда в central band пока pinned.
+- **#34-5 Параллельные субагенты (5+) падают по context deadline** при сложных
+  задачах. Решение: запускать по 2-3 параллельно, или последовательно для
+  тяжёлых правок. Ручные Edit для точечных обёрток быстрее и надёжнее субагентов.
+
+### Файлы этого цикла
+
+```
+docs/SONDAVEN-WOW-RESEARCH.md                      (new, 73KB, research report)
+src/components/motion/clip-path-reveal.tsx          (new, opacity+scale directional reveal)
+src/components/motion/split-text-reveal.tsx          (new, split-type line/word/char)
+src/components/motion/magnetic-circle-button.tsx    (new, Sondaven btn-circle)
+src/components/providers/theme-flip-provider.tsx    (new, IntersectionObserver theme swap)
+src/components/media/scroll-bound-video.tsx         (new, Mux currentTime scrub)
+src/app/globals.css                                  (+42 LOC ThemeFlip tokens)
+src/app/layout.tsx                                   (+ThemeFlipProvider)
+src/components/catering/cursor.tsx                  (blend-mode difference upgrade)
+src/components/catering/ea-venues-spotlight.tsx     (251→593 LOC, pinned horizontal map)
+src/components/catering/cep-editorial-divider.tsx   (+theme-flip + reveal)
+src/components/catering/tott-parallax-band.tsx      (+theme-flip + reveal)
+src/components/catering/gamma-separator.tsx         (+theme-flip + reveal)
+src/components/catering/ea-events-portfolio.tsx     (+alternating clip-reveal)
+src/components/catering/cep-instagram-grid.tsx      (+alternating clip-reveal + hover)
+src/components/catering/delivery-block.tsx          (+ClipPathReveal + MagneticCircle)
+src/components/catering/ea-founder-story.tsx        (+ClipPathReveal portrait)
+src/components/catering/ea-service-tabs.tsx + .css  (+Magnetic tab triggers)
+src/components/catering/ea-faq-accordion.tsx        (+hover="line" underline)
+src/components/catering/contact.tsx                 (+Magnetic submit)
+src/components/catering/events-video-carousel.tsx   (+clip-reveal tiles + hover)
+src/components/catering/site-footer.tsx             (+edge-fade marquee + Magnetic)
+ecosystem.config.js                                  (port 3001→3000 for preview)
+package.json + bun.lock                              (+split-type@0.3.4)
+```
+
+**TL;DR (Cycle 34):** Внедрены 6 WOW-паттернов с sondaven.com (Awwwards SOTM)
+и других SOTM-победителей в 13 блоков ниже фото-карусели. Showpiece —
+EaVenuesSpotlight стал pinned horizontal-scroll map (Sondaven pin_vector).
+3 новых motion-примитива + ThemeFlipProvider + ScrollBoundVideo + blend-mode
+cursor. /loop критика в 3 раунда: 3 бага найдены и пофиксены (clip-path→opacity
+pivot — ключевой урок). VLM + Agent Browser верифицировали все блоки. `lint`
+зелёный. Единственная новая зависимость — `split-type` (4kb MIT).

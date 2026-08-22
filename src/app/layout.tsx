@@ -12,6 +12,7 @@ import { GrainOverlay } from "@/components/catering/grain";
 import { PageBorders } from "@/components/catering/page-borders";
 import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ChapterNav } from "@/components/catering/chapter-nav";
+import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 
@@ -280,7 +281,16 @@ export default function RootLayout({
         <ChapterNav />
         <EaCookieBanner />
         <NuqsAdapter>
-          <LenisProvider>{children}</LenisProvider>
+          <LenisProvider>
+            {/* ThemeFlipProvider — observes [data-theme-flip] sections and
+                swaps the global --background/--foreground/--accent CSS vars
+                on <html> via the data-theme attribute (cinematic color-flip
+                on scroll). Innermost provider — wraps the page content so
+                it can see all mounted sections. */}
+            <ThemeFlipProvider defaultTheme="cream">
+              {children}
+            </ThemeFlipProvider>
+          </LenisProvider>
         </NuqsAdapter>
         <Toaster />
         <noscript>

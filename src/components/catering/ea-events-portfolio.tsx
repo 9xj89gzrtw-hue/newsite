@@ -37,6 +37,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { TiltedAccent } from "@/components/catering/tilted-accent";
+import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
 import "./ea-events-portfolio.css";
 
 /** EA Easing — quiet cubic-bezier used across the editorial layer. */
@@ -271,14 +272,40 @@ export function EaEventsPortfolio() {
               aria-roledescription="slide"
               aria-label={`Событие ${i + 1} из ${EVENTS.length}: ${event.title}`}
             >
-              <Image
-                src={event.src}
-                alt={event.alt}
-                fill
-                sizes="(max-width: 768px) 88vw, 380px"
-                className="ea-evt-portfolio__img object-cover"
-                loading="eager"
-              />
+              {/*
+                Cycle 34 WOW graft — sondaven.com alternating directional
+                clip-path reveal. Each card's image enters with a different
+                clip direction (cycling [bottom, left, top, right] via index%4)
+                so the 8-card horizontal scroll has rhythm, not a uniform wipe.
+
+                The wrapper div inside ClipPathReveal carries `aspect-[4/5]`
+                matching the card's CSS `.ea-evt-portfolio__card { aspect-ratio:
+                4/5 }` so next/image `fill` (position:absolute) has a definite
+                containing block — the inner motion.div's height is auto, so this
+                in-flow wrapper establishes it via aspect-ratio.
+
+                The existing CSS hover scale (.ea-evt-portfolio__img → scale
+                1.06 on .ea-evt-portfolio__card:hover) keeps working — it lives
+                on the Image element and composes with the inner motion.div's
+                scale(1.15)→(1) reveal animation (different elements).
+              */}
+              <ClipPathReveal
+                direction="alternate"
+                index={i}
+                duration={0.8}
+                className="absolute inset-0"
+              >
+                <div className="relative aspect-[4/5] w-full">
+                  <Image
+                    src={event.src}
+                    alt={event.alt}
+                    fill
+                    sizes="(max-width: 768px) 88vw, 380px"
+                    className="ea-evt-portfolio__img object-cover"
+                    loading="eager"
+                  />
+                </div>
+              </ClipPathReveal>
               <div className="ea-evt-portfolio__overlay">
                 <span className="ea-evt-portfolio__category">
                   {event.category}

@@ -52,6 +52,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { TiltedAccent } from "@/components/catering/tilted-accent";
+import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
 import "./events-video-carousel.css";
 
 /** EA Easing — quiet cubic-bezier used across the editorial layer. */
@@ -283,23 +284,36 @@ export function EventsVideoCarousel() {
           {TILES.map((tile, i) => (
             <li
               key={`${tile.video}-${i}`}
-              className="ea-evt-video__card"
+              className="ea-evt-video__card group"
               role="group"
               aria-roledescription="slide"
               aria-label={`Видео ${i + 1} из ${TILES.length}: ${tile.title}`}
             >
-              {/* Background looping muted autoplay teaser video. */}
-              <video
-                className="ea-evt-video__video"
-                src={tile.video}
-                poster={tile.poster}
-                autoPlay
-                muted
-                playsInline
-                loop
-                preload="metadata"
-                aria-label={tile.videoAlt}
-              />
+              {/* Background looping muted autoplay teaser video.
+                  Wrapped in ClipPathReveal (directional inset mask + inner
+                  zoom — Sondaven photo-reveal signature). The mask sits on an
+                  absolute-inset-0 wrapper so the existing absolute-positioned
+                  <video> (which fills the card via .ea-evt-video__video CSS)
+                  keeps its containing block. `group-hover` wash on the video
+                  adds a cinematic saturate/brightness lift on card hover. */}
+              <ClipPathReveal
+                direction="alternate"
+                index={i}
+                duration={0.8}
+                className="absolute inset-0"
+              >
+                <video
+                  className="ea-evt-video__video transition-[filter,transform] duration-500 group-hover:saturate-150 group-hover:brightness-105"
+                  src={tile.video}
+                  poster={tile.poster}
+                  autoPlay
+                  muted
+                  playsInline
+                  loop
+                  preload="metadata"
+                  aria-label={tile.videoAlt}
+                />
+              </ClipPathReveal>
 
               {/* Bottom gradient overlay — rgba(0,0,0,0.78) → transparent. */}
               <div className="ea-evt-video__overlay" aria-hidden="true" />

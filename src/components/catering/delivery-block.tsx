@@ -5,6 +5,9 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
 import { TiltedAccent } from "@/components/catering/tilted-accent";
+import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
+import { MagneticCircleButton } from "@/components/motion/magnetic-circle-button";
+import { ArrowRight } from "lucide-react";
 
 /**
  * DeliveryBlock — section #11 of the new site structure.
@@ -177,17 +180,19 @@ export function DeliveryBlock() {
           {/* LEFT — full-bleed food photo, portrait aspect, hover-zoom on
               the wrapping `group`. Photo is decorative content (not the
               H2's referent) — alt text describes the scene for screen
-              readers without claiming it as a heading. */}
-          <motion.div
+              readers without claiming it as a heading.
+
+              Cycle 34 (sondaven.com graft): photo now reveals via a
+              directional `clip-path: inset()` mask (right→left open) with a
+              subtle inner zoom (1.15 → 1.0) — the Sondaven / Floema signature
+              photo reveal. Replaces the previous fade-up. The existing
+              `group-hover:scale-[1.03]` on the <Image> composes with the
+              clip-reveal's inner scale (they stack — reveal scale resolves
+              first, then hover scale layers on top). */}
+          <ClipPathReveal
+            direction="right"
+            duration={1.0}
             className="group relative order-1 aspect-[4/5] md:order-1 md:aspect-[3/4]"
-            {...(reduce
-              ? { initial: false as const }
-              : {
-                  initial: { opacity: 0, y: 36 } as const,
-                  whileInView: { opacity: 1, y: 0 } as const,
-                  viewport: { once: true, margin: "-80px" } as const,
-                  transition: { duration: 0.9, ease: EASE } as const,
-                })}
           >
             <Image
               src="/media/menu-office-lunch.jpg"
@@ -206,7 +211,7 @@ export function DeliveryBlock() {
                   "linear-gradient(180deg, rgba(247,245,245,0) 70%, rgba(247,245,245,0.10) 100%)",
               }}
             />
-          </motion.div>
+          </ClipPathReveal>
 
           {/* RIGHT — content stack with its own padded interior (per spec:
               px-6 py-12 on mobile, md:p-16 on desktop). The cream section
@@ -351,7 +356,14 @@ export function DeliveryBlock() {
             {/* CTAs — 2 pills (rounded-full, px-6 py-3). Primary = solid ink
                 bg + white text → #contact. Secondary = 1px ink outline +
                 transparent bg + ink text → #calculator. Both are real <a>
-                links (no JS), so keyboard nav + middle-click + SEO all work. */}
+                links (no JS), so keyboard nav + middle-click + SEO all work.
+
+                Cycle 34 (sondaven.com graft): a circular magnetic CTA is
+                placed alongside the pills — Sondaven `btn-circle` 3-tier
+                magnetic (bg scales + inner label translates 0.3× toward
+                cursor via spring). The espresso-variant gold-rim circle
+                carries the primary "arrow" affordance; the text pills
+                remain for explicit Russian CTA copy. */}
             <motion.div
               className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
               {...reveal({ delay: 0.88 })}
@@ -388,6 +400,15 @@ export function DeliveryBlock() {
               >
                 Рассчитать стоимость
               </a>
+              <MagneticCircleButton
+                href="#contact"
+                ariaLabel="Заказать доставку кейтеринг"
+                variant="espresso"
+                size={64}
+                className="self-start sm:self-center"
+              >
+                <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </MagneticCircleButton>
             </motion.div>
           </div>
         </div>

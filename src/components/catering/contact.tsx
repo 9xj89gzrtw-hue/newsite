@@ -26,6 +26,7 @@ import {
   MessageSquareText,
 } from "lucide-react";
 import { Reveal } from "./reveal";
+import { Magnetic } from "@/components/motion/magnetic";
 import { CONTACTS, YANDEX_MAPS } from "@/lib/media";
 import { MENU_TYPES } from "@/lib/pricing";
 
@@ -1217,6 +1218,7 @@ export function Contact() {
                       <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                     </motion.button>
                   ) : (
+                    <Magnetic strength={0.25} className="flex-1 flex">
                     <motion.button
                       type="submit"
                       disabled={formStatus !== "idle" || !data.consent}
@@ -1224,7 +1226,7 @@ export function Contact() {
                       data-cursor="submit"
                       whileHover={!prefersReducedMotion && formStatus === "idle" ? { y: -2 } : undefined}
                       whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
-                      className="group relative flex min-h-[44px] min-w-[44px] flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                      className="group relative flex min-h-[44px] min-w-[44px] w-full flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl hover:shadow-gold/30 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
                     >
                       {formStatus === "loading" ? (
                         <>
@@ -1254,6 +1256,7 @@ export function Contact() {
                         </motion.span>
                       )}
                     </motion.button>
+                    </Magnetic>
                   )}
                 </div>
 
