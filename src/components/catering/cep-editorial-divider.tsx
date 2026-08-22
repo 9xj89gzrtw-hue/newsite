@@ -33,7 +33,7 @@ export function CepEditorialDivider() {
       }
     >
       <Image
-        src="/media/cep/cep-divider-image.png"
+        src="/media/cep/cep-locations-bg.jpg"
         alt=""
         fill
         sizes="100vw"
