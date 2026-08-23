@@ -174,7 +174,7 @@ export function EaFounderStory() {
     <section
       id="about"
       aria-labelledby="ea-founder-story-headline"
-      className="ea-section ea-section--blush relative overflow-hidden"
+      className="ea-section ea-section--cream relative overflow-hidden"
       data-header-theme="light"
     >
       {/* Subtle warm bloom at the top-right corner — single, restrained, no
@@ -202,16 +202,18 @@ export function EaFounderStory() {
           <ClipPathReveal
             direction="bottom"
             duration={1.1}
-            className="order-1 md:h-full"
+            className="order-1"
           >
-            {/* Cycle 39 fix: frame stretches to full column height on desktop
-                (md:h-full chain) — previously aspect-[4/5] left ~600px of dead
-                space below the photo when the text column was taller. Mobile
-                keeps the aspect-ratio frame. */}
-            <div className="group relative md:h-full">
-              {/* 4:5 portrait frame (mobile) / full-height (desktop) */}
+            {/* Cycle 41 fix: 3:4 portrait frame, vertically centered in the
+                row. The previous full-column stretch cropped ~44% of the
+                photo width; before that aspect-[4/5] left dead space. The
+                3:4 ratio matches the source photo (1920×2560) → zero crop,
+                zero upscale, and self-centering makes the whitespace
+                symmetric (reads as breathing room, not a gap). */}
+            <div className="group relative">
+              {/* 3:4 portrait frame — source-native ratio */}
               <div
-                className="relative aspect-[4/5] w-full overflow-hidden md:aspect-auto md:h-full md:min-h-[560px]"
+                className="relative aspect-[3/4] w-full overflow-hidden md:mx-auto md:max-w-[560px]"
                 style={{
                   borderRadius: "4px",
                   boxShadow:

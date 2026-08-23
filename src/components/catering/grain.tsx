@@ -3,37 +3,28 @@
 import { useEffect, useRef } from "react";
 
 /**
- * GrainOverlay — fixed full-viewport SVG film-grain noise at low opacity with
- * `mix-blend-mode: overlay`. Subtly animates background-position to feel "alive"
- * (shot-on-film register, Awwwards-tier).
+ * GrainOverlay — fixed full-viewport SVG film-grain noise at low opacity.
  *
- * Respects prefers-reduced-motion (static grain, no animation).
+ * Cycle 41 PERF FIX (critical): previously this component animated
+ * `background-position` on a `mix-blend-mode: overlay` full-viewport layer
+ * from a 20fps rAF loop. background-position changes are NOT compositable —
+ * they trigger a full-page repaint every 50ms, and with the blend mode the
+ * whole frame had to be re-blended on the CPU. On software-rendered browsers
+ * (headless Chrome / SwiftShader) this froze the main thread completely
+ * 10–60s after load, killing every interaction on the page.
+ *
+ * The grain is now STATIC (no animation, no blend mode — plain alpha
+ * compositing at 4.5% opacity). Visually near-identical, ~0 runtime cost.
+ *
  * Pointer-events: none — never blocks interaction.
  */
 export function GrainOverlay() {
   const ref = useRef<HTMLDivElement>(null);
 
+  // No-op mount effect kept for API stability (component may be referenced
+  // by tests / future effects). The overlay is fully CSS-static now.
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const el = ref.current;
-    if (!el) return;
-    let raf = 0;
-    let pos = 0;
-    // Throttle to ~20fps for cheap CPU
-    let last = 0;
-    const loop = (t: number) => {
-      if (t - last > 50) {
-        last = t;
-        pos = (pos + 2) % 50;
-        el.style.backgroundPosition = `${-pos}px ${-pos}px`;
-      }
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => {
-      cancelAnimationFrame(raf);
-    };
+    void ref;
   }, []);
 
   // Inline SVG turbulence noise as data URI (no external asset)
@@ -47,7 +38,7 @@ export function GrainOverlay() {
     <div
       ref={ref}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-[100] opacity-[0.05] mix-blend-overlay"
+      className="pointer-events-none fixed inset-0 z-[100] opacity-[0.045]"
       style={{
         backgroundImage: `url("${noise}")`,
         backgroundRepeat: "repeat",

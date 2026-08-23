@@ -158,7 +158,7 @@ export function GgVideoShowcase() {
             aria-label="Видео: как мы работаем"
             className="absolute inset-0 h-full w-full object-cover"
           >
-            <source src="/media/mculinary/mculinary-hero.mp4" type="video/mp4" />
+            <source src="/media/clips/catering-clip-2.mp4" type="video/mp4" />
           </video>
         )}
 
@@ -175,7 +175,7 @@ export function GgVideoShowcase() {
         <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-14 lg:p-20">
           {/* Tilted handwritten accent — gamma signature -6° tilt, sits
               as a small marginalia above the eyebrow. */}
-          <TiltedAccent text="видео" className="mb-4 block" />
+          <TiltedAccent text="видео" className="mb-6 block" />
 
           {/* Eyebrow — Barlow Semi Condensed Bold, uppercase, gold. */}
           <motion.p
@@ -198,7 +198,7 @@ export function GgVideoShowcase() {
               (globals.css `.ea-section-h2 i` colors it `var(--ea-red)`). */}
           <motion.h2
             {...reveal(0.08)}
-            className="ea-section-h2 mb-6 max-w-4xl text-white"
+            className="ea-section-h2 mb-8 mt-2 max-w-4xl text-white"
           >
             Кейтеринг как <i>искусство</i>
           </motion.h2>

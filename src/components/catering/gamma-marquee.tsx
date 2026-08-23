@@ -208,6 +208,11 @@ export function GammaMarquee() {
   const sectionRef = React.useRef<HTMLElement>(null);
   const [reducedMotion, setReducedMotion] = React.useState(false);
 
+  // ── Marquee timing ──────────────────────────────────────────────────
+  /** One full loop (0 → -50% of the track) in seconds. Must match the
+   *  CSS keyframes duration. */
+  const MARQUEE_DURATION_S = 40;
+
   // ── Drag state ──────────────────────────────────────────────────────
   // Cycle 31.1: the user requested the marquee be draggable by cursor
   // (like gammacatering.com, which uses Splide `drag: 'free'`). We
@@ -231,29 +236,28 @@ export function GammaMarquee() {
     if (!trackRef.current || reducedMotion) return;
     // Only respond to primary pointer (left mouse / touch / pen).
     if (e.button !== 0 && e.pointerType === "mouse") return;
+    const track = trackRef.current;
     dragState.current.active = true;
     dragState.current.startX = e.clientX;
-    // Read current x from the inline transform GSAP set. The track's
-    // transform is `translate3d(Xpx, 0px, 0px)` — extract the X.
-    const cs = getComputedStyle(trackRef.current);
+    // Freeze the CSS animation at its current offset: read the computed
+    // transform (the running keyframes apply it), then swap to a static
+    // inline transform so pointermove math has a stable base.
+    const cs = getComputedStyle(track);
     const matrix = cs.transform;
     let currentX = 0;
     if (matrix && matrix !== "none") {
       const match = matrix.match(/matrix.*\(([^)]+)\)/);
       if (match) {
         const values = match[1].split(",").map((v) => parseFloat(v.trim()));
-        // translate3d / matrix3d: x is values[12]; matrix: x is values[4].
         currentX = values.length === 16 ? values[12] : values[4] || 0;
       }
     }
     dragState.current.baseX = currentX;
-    // The track is two duplicate sets; one set = half of scrollWidth.
-    dragState.current.trackWidth = trackRef.current.scrollWidth / 2;
-    // Kill the auto-scroll tween so we can take over the transform.
-    (async () => {
-      const { default: gsap } = await import("gsap");
-      gsap.killTweensOf(trackRef.current);
-    })();
+    // One set = half of the track's scrollWidth (two duplicate sets).
+    dragState.current.trackWidth = track.scrollWidth / 2;
+    // Stop the keyframes animation (inline transform takes over).
+    track.style.animation = "none";
+    track.style.transform = `translate3d(${currentX}px, 0px, 0px)`;
     // Capture pointer so move events keep firing even if cursor leaves
     // the track bounds during drag.
     try {
@@ -271,17 +275,13 @@ export function GammaMarquee() {
     const delta = e.clientX - dragState.current.startX;
     let newX = dragState.current.baseX + delta;
     // Normalize into the [-trackWidth, 0] range so dragging past either
-    // edge wraps to the other side (seamless infinite drag). The track
-    // is two duplicate sets, so the visible range is one set width.
+    // edge wraps to the other side (seamless infinite drag).
     const w = dragState.current.trackWidth;
     if (w > 0) {
       while (newX > 0) newX -= w;
       while (newX < -w) newX += w;
     }
-    (async () => {
-      const { default: gsap } = await import("gsap");
-      gsap.set(trackRef.current, { x: newX });
-    })();
+    trackRef.current.style.transform = `translate3d(${newX}px, 0px, 0px)`;
   }, []);
 
   const onPointerUp = React.useCallback((e: React.PointerEvent<HTMLDivElement>) => {
@@ -295,41 +295,39 @@ export function GammaMarquee() {
     if (sectionRef.current) {
       delete sectionRef.current.dataset.dragging;
     }
-    // Resume auto-scroll from wherever the user dropped the track.
-    // We normalize the current x (which may be anywhere in [-w, 0]) and
-    // restart the GSAP tween from there. The tween target is xPercent:-50
-    // (relative to the track's own width), so we read the current xPercent
-    // and continue toward -50% with a fresh repeat.
-    (async () => {
-      const { default: gsap } = await import("gsap");
-      if (!trackRef.current) return;
-      const w = dragState.current.trackWidth;
-      const cs = getComputedStyle(trackRef.current);
-      const matrix = cs.transform;
-      let currentX = 0;
-      if (matrix && matrix !== "none") {
-        const match = matrix.match(/matrix.*\(([^)]+)\)/);
-        if (match) {
-          const values = match[1].split(",").map((v) => parseFloat(v.trim()));
-          currentX = values.length === 16 ? values[12] : values[4] || 0;
-        }
+    // Resume the CSS keyframes from wherever the user dropped the track.
+    // The keyframes run 0 → -50% (one set width, w px) over 40s. A track
+    // at position X (in [-w, 0]) corresponds to animation progress
+    // t = -X / w of the cycle — resume with a matching negative delay.
+    const track = trackRef.current;
+    const w = dragState.current.trackWidth;
+    const cs = getComputedStyle(track);
+    const matrix = cs.transform;
+    let currentX = 0;
+    if (matrix && matrix !== "none") {
+      const match = matrix.match(/matrix.*\(([^)]+)\)/);
+      if (match) {
+        const values = match[1].split(",").map((v) => parseFloat(v.trim()));
+        currentX = values.length === 16 ? values[12] : values[4] || 0;
       }
-      // Normalize into [-w, 0].
-      if (w > 0) {
-        while (currentX > 0) currentX -= w;
-        while (currentX < -w) currentX += w;
-      }
-      gsap.set(trackRef.current, { x: currentX });
-      // Restart the infinite tween from here. Duration 40s, same as
-      // initial. The tween goes to xPercent:-50 (one full set width),
-      // then repeats — so the loop continues seamlessly.
-      gsap.to(trackRef.current, {
-        xPercent: -50,
-        ease: "none",
-        duration: 40,
-        repeat: -1,
+    }
+    if (w > 0) {
+      while (currentX > 0) currentX -= w;
+      while (currentX < -w) currentX += w;
+    }
+    const progress = w > 0 ? -currentX / w : 0; // 0..1
+    const resumeAt = progress * MARQUEE_DURATION_S;
+    // Drop the inline transform and restart the animation mid-cycle.
+    track.style.transform = "";
+    track.style.animation = "none";
+    // Force a style flush so the animation restarts from scratch with
+    // the negative delay (double rAF is the standard trick).
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        track.style.animation = "";
+        track.style.animationDelay = `${-resumeAt}s`;
       });
-    })();
+    });
   }, []);
 
   // Read prefers-reduced-motion AFTER mount (server has no window) so we
@@ -358,38 +356,22 @@ export function GammaMarquee() {
     };
   }, []);
 
-  // Drive the infinite horizontal scroll with GSAP. The tween runs only
-  // when: (a) the component is mounted (post-hydration), (b) the user
-  // does NOT prefer reduced motion, (c) the track ref is attached. The
-  // dynamic import keeps GSAP out of the server bundle and out of the
-  // client bundle for reduced-motion users. The tween is killed on
-  // cleanup so React Strict Mode's double-invoke in dev doesn't leak
-  // tweens or stack transforms.
+  // Cycle 41 PERF FIX (critical): the infinite scroll is now a pure CSS
+  // keyframes animation (`.gamma-marquee__track--anim`, transform-only →
+  // compositor thread). Previously a GSAP tween updated the inline
+  // transform every frame from JS — combined with the grain overlay's
+  // repaint loop this contributed to full main-thread freezes on
+  // software-rendered browsers. The drag interaction still works: pointer
+  // handlers temporarily pause the animation (`.gamma-marquee__track--drag`
+  // sets animation-play-state: paused) and translate the track inline,
+  // then resume the keyframes from a matched offset.
   React.useEffect(() => {
     if (!mounted || reducedMotion || !trackRef.current) return;
-
-    let tween: { kill: () => void } | undefined;
-    let cancelled = false;
-
-    (async () => {
-      const { default: gsap } = await import("gsap");
-      if (cancelled || !trackRef.current) return;
-      tween = gsap.to(trackRef.current, {
-        xPercent: -50,
-        ease: "none",
-        duration: 40,
-        repeat: -1,
-      });
-    })();
-
+    const track = trackRef.current;
+    track.classList.add("gamma-marquee__track--anim");
     return () => {
-      cancelled = true;
-      tween?.kill();
-      if (trackRef.current) {
-        // Reset inline transform so a remount doesn't start from the
-        // last tween position (defensive — Strict Mode double-invoke).
-        gsapSetTransformIdentity(trackRef.current);
-      }
+      track.classList.remove("gamma-marquee__track--anim");
+      gsapSetTransformIdentity(track);
     };
   }, [mounted, reducedMotion]);
 

@@ -149,7 +149,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   title: {
-    default: "Interfood Catering — Кейтеринг в Санкт-Петербурге от 650₽/чел",
+    default: "Interfood Catering — Кейтеринг в Санкт-Петербурге от 650 ₽/чел",
     template: "%s | Interfood Catering",
   },
   description:
@@ -230,7 +230,7 @@ const jsonLd = {
     addressCountry: "RU",
     addressRegion: "Санкт-Петербург",
     addressLocality: "Санкт-Петербург",
-    postalCode: "191181",
+    postalCode: "191186",
     streetAddress: "ул. Большая Морская, д. 18, офис 33",
   },
   geo: { "@type": "GeoCoordinates", latitude: 59.934862, longitude: 30.316218 },

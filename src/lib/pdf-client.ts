@@ -53,7 +53,10 @@ async function loadFonts(doc: jsPDF): Promise<void> {
     fetch("/fonts/Roboto-Regular.ttf").then((r) => r.arrayBuffer()),
     fetch("/fonts/Roboto-Bold.ttf").then((r) => r.arrayBuffer()),
     fetch("/fonts/Roboto-Italic.ttf").then((r) => r.arrayBuffer()),
-  ]);
+  ]).catch((err) => {
+    fontsLoaded = false; // allow retry on next click
+    throw err;
+  });
   doc.addFileToVFS("Roboto-Regular.ttf", toBase64(regular));
   doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
   doc.addFileToVFS("Roboto-Bold.ttf", toBase64(bold));

@@ -4172,3 +4172,35 @@ header[data-scrolled="true"] [data-mega-panel] {
     font-size: clamp(1.5rem, 7vw, 2.25rem);
   }
 }
+
+
+/* ── Cycle 41: gamma photo-marquee — pure CSS keyframes (compositor thread).
+   Previously a GSAP tween set the inline transform every frame from JS;
+   now the browser runs the loop on the compositor. The drag interaction
+   pauses the animation (inline `animation: none` in the pointer handlers)
+   and resumes it with a matched negative animation-delay. */
+@keyframes gamma-marquee-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+.gamma-marquee__track--anim {
+  animation: gamma-marquee-scroll 40s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gamma-marquee__track--anim {
+    animation: none;
+  }
+}
+
+
+/* ── Cycle 41: while the cookie banner is open (bottom-docked), lift the
+   mobile phone FAB above it so both remain reachable. ── */
+@media (max-width: 1023px) {
+  body.cookie-banner-open a[href^="tel:"][class*="fixed"] {
+    /* banner ≈ 170–250px tall on mobile; 180px clears it with margin */
+    transform: translateY(-180px);
+  }
+}

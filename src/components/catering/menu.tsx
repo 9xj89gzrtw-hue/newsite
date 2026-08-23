@@ -248,7 +248,7 @@ function FeaturedSpotlight({
       <div className="relative z-10 flex h-full flex-col justify-end p-6 md:p-12 lg:p-16">
         <div className="max-w-2xl">
           <motion.span
-            className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.3em] text-gold backdrop-blur-md"
+            className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.3em] text-gold backdrop-blur-md"
             initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -1044,7 +1044,7 @@ function PackageCarousel({
                           data-dietary={tags.join(" ") || undefined}
                           className="group/dish flex items-baseline gap-2.5 text-sm"
                         >
-                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-gold/10 font-mono text-[11px] font-bold text-gold transition-colors group-hover/dish:bg-gold/20">
+                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-gold/10 font-mono text-xs font-bold text-gold transition-colors group-hover/dish:bg-gold/20">
                             {String(i + 1).padStart(2, "0")}
                           </span>
                           <span className="flex-1 text-ink/80 leading-relaxed transition-colors group-hover/dish:text-ink">

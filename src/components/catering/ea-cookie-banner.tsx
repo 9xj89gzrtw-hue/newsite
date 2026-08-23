@@ -134,12 +134,16 @@ export function EaCookieBanner() {
   const [visible, setVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const bannerRef = useRef<HTMLDivElement>(null);
-  const firstFocusRef = useRef<HTMLAnchorElement>(null);
 
   // Mount: clear stale (>14 days) choices, then decide whether to show.
   useEffect(() => {
     clearStaleChoices();
-    setVisible(!hasActiveChoice());
+    const show = !hasActiveChoice();
+    setVisible(show);
+    // Cycle 41: flag on <body> so fixed elements (phone FAB) can shift out
+    // of the banner's footprint while it is open.
+    document.body.classList.toggle("cookie-banner-open", show);
+    return () => document.body.classList.remove("cookie-banner-open");
   }, []);
 
   // Cycle 40 fix: NO programmatic focus on the first link — it painted a
@@ -217,7 +221,7 @@ export function EaCookieBanner() {
           exit={exit}
           transition={transition}
         >
-          <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-3 px-6 py-3 sm:flex-row sm:items-center sm:gap-6 md:px-12">
+          <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-2 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-3 md:px-12">
             <p
               className="m-0 max-w-[68ch] leading-relaxed"
               style={{
@@ -228,7 +232,6 @@ export function EaCookieBanner() {
             >
               Мы используем cookies для аналитики и улучшения сервиса.{" "}
               <a
-                ref={firstFocusRef}
                 href={LINK_PRIVACY_HREF}
                 target="_blank"
                 rel="noopener"
@@ -245,7 +248,7 @@ export function EaCookieBanner() {
               >
                 Условия
               </a>{" "}
-              — по ссылкам.
+              Подробнее:
             </p>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:gap-2 md:gap-3">
               <button
@@ -254,7 +257,7 @@ export function EaCookieBanner() {
                 style={BTN_BASE_STYLE}
                 className={BTN_OUTLINE_CLASS}
               >
-                Отклонять
+                Отклонить
               </button>
               <button
                 type="button"

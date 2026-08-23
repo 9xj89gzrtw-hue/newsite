@@ -77,7 +77,7 @@ export function CepProcess() {
     <section
       aria-label="Творческий подход — как мы работаем"
       data-header-theme="light"
-      className="bg-white px-8 py-24 text-cep-black md:px-14 md:py-36"
+      className="bg-[#F7F5F5] px-8 py-24 text-cep-black md:px-14 md:py-36"
     >
       {/* Section H2 — reveal on scroll. */}
       <motion.div

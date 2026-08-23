@@ -284,26 +284,34 @@ export function EaFaqAccordion() {
                   <PlusGlyph isOpen={isOpen} reduce={reduce} />
                 </div>
 
-                {/* Animated panel — height auto via Motion AnimatePresence. */}
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      key="panel"
-                      id={panelId}
-                      role="region"
-                      aria-labelledby={triggerId}
-                      initial={
-                        reduce ? false : { height: 0, opacity: 0 }
-                      }
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={reduce ? undefined : { height: 0, opacity: 0 }}
-                      transition={
-                        reduce
-                          ? { duration: 0 }
-                          : { duration: 0.34, ease: EASE }
-                      }
-                      style={{ overflow: "hidden" }}
-                    >
+                {/* Cycle 41 SSR fix: the answer is ALWAYS in the DOM
+                    (server-rendered for crawlers + no-JS users) and
+                    collapses via the grid-template-rows 0fr→1fr trick —
+                    no AnimatePresence unmounting. */}
+                <motion.div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={triggerId}
+                  initial={false}
+                  animate={
+                    reduce
+                      ? undefined
+                      : {
+                          gridTemplateRows: isOpen ? "1fr" : "0fr",
+                          opacity: isOpen ? 1 : 0,
+                        }
+                  }
+                  transition={
+                    reduce ? { duration: 0 } : { duration: 0.34, ease: EASE }
+                  }
+                  style={{
+                    display: "grid",
+                    gridTemplateRows: isOpen ? "1fr" : "0fr",
+                    opacity: isOpen ? 1 : 0,
+                  }}
+                >
+                  {/* Grid-row collapse requires the child to clip overflow. */}
+                  <div style={{ overflow: "hidden", minHeight: 0 }}>
                       <p
                         style={{
                           fontFamily: "var(--ea-font-body)",
@@ -317,9 +325,8 @@ export function EaFaqAccordion() {
                       >
                         {item.a}
                       </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    </div>
+                  </motion.div>
               </motion.div>
             );
           })}
