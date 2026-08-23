@@ -214,7 +214,7 @@ function CitiesTrack({ trackId = '' }: { trackId?: string }) {
       {SOPRANOS_CITIES.map((city, i) => (
         <span
           key={`${trackId}-${city}-${i}`}
-          className="flex items-center gap-3 font-display text-sm uppercase tracking-widest text-gold/80"
+          className="flex items-center gap-3 font-display text-sm uppercase tracking-widest text-[#C9A87E]"
         >
           <span className="text-gold/60" aria-hidden="true">
             •
@@ -278,9 +278,9 @@ export function SiteFooter() {
             />
           </motion.div>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-cream/80 md:text-base">
-            Будь то семейное собрание или большой праздник — Interfood Catering
-            хочет, чтобы вы могли наслаждаться днём в кругу семьи и друзей,
-            доверив готовку нам. Мы здесь, чтобы обслужить вас!
+            Семейное торжество или праздник на сотню гостей — доверьте
+            кухню, сервировку и подачу нам, а сами наслаждайтесь днём в
+            кругу близких. Мы позаботимся обо всём.
           </p>
         </motion.div>
       </div>
@@ -474,7 +474,7 @@ export function SiteFooter() {
               {SOPRANOS_CITIES.map((city, i) => (
                 <span
                   key={`static-${city}-${i}`}
-                  className="flex items-center gap-2 font-display text-xs uppercase tracking-widest text-gold/80"
+                  className="flex items-center gap-2 font-display text-xs uppercase tracking-widest text-[#C9A87E]"
                 >
                   <span className="text-gold/60" aria-hidden="true">
                     •

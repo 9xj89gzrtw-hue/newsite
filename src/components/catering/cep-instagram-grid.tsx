@@ -74,7 +74,7 @@ export function CepInstagramGrid() {
     <section
       aria-label="Мы в Instagram"
       data-header-theme="light"
-      className="cep-section-cream w-full px-8 py-24 md:px-14 md:py-32"
+      className="cep-section-cream w-full px-8 py-24 md:px-14 md:py-36"
     >
       {/* Header row — H2 + IG handle link */}
       <div className="mb-12 flex flex-wrap items-end justify-between gap-4">

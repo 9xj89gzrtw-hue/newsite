@@ -123,6 +123,25 @@ interface AtServiceItem {
  * gets a preview photo (existing /public/media assets, no new downloads) and
  * a food-derived accent color (warm palette — house rule: no blue/indigo).
  */
+/**
+ * Cycle 40: service → menu-type mapping for the contact-form prefill.
+ * Clicking a service row dispatches catering:calc-lead so the form's
+ * event-type chip is pre-selected (same mechanism as the calculator CTA).
+ * Services without a natural menu counterpart navigate without a type.
+ */
+const SERVICE_TO_MENU_TYPE: Record<string, string> = {
+  "coffee-breaks": "coffee-break",
+  "snack-delivery": "snack-box",
+  bbq: "bbq",
+  "office-lunch": "office-lunch",
+  vegetarian: "vegetarian",
+  conferences: "banquet",
+  presentations: "buffet",
+  "ny-corporate": "banquet",
+  "private-events": "banquet",
+  "mobile-banquet": "banquet",
+};
+
 const SERVICES: AtServiceItem[] = [
   // ── corporate ───────────────────────────────────────────────────────
   {
@@ -222,7 +241,7 @@ const SERVICES: AtServiceItem[] = [
     title: "Доставка закусок",
     category: "buffet",
     tagline: "Фирменные ланч-боксы: 6–8 видов канапе, упакованных порционно.",
-    minOrder: "от 10 боксов",
+    minOrder: "от 10 человек",
     image: "/media/menu-snack-box.jpg",
     imageAlt: "Ланч-боксы с канапе и мини-закусками",
     ui: "#d4a373",
@@ -263,7 +282,7 @@ const SERVICES: AtServiceItem[] = [
     title: "Вегетарианское",
     category: "special",
     tagline: "Меню без мяса, но не «без». Овощи как главные герои.",
-    minOrder: "от 20 человек",
+    minOrder: "от 15 человек",
     image: "/media/cutandtaste-artichoke.webp",
     imageAlt: "Артишок крупным планом — овощ как главный герой подачи",
     ui: "#a3b86c",
@@ -664,6 +683,16 @@ export function AtServices() {
                     aria-label={`Обсудить: ${s.title} — ${s.minOrder}`}
                     onFocus={() => setActiveId(s.id)}
                     onMouseEnter={() => setActiveId(s.id)}
+                    onClick={() => {
+                      const typeId = SERVICE_TO_MENU_TYPE[s.id];
+                      if (typeId && typeof window !== "undefined") {
+                        window.dispatchEvent(
+                          new CustomEvent("catering:calc-lead", {
+                            detail: { typeId },
+                          }),
+                        );
+                      }
+                    }}
                   >
                     <span className="at-svc__row-index" aria-hidden="true">
                       {"//"}

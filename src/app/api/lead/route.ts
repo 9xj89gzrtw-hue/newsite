@@ -5,8 +5,12 @@ import { memoryLeadStore } from "@/lib/lead-store";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Russian phone regex: +7 XXX XXX-XX-XX or 8 XXX XXX-XX-XX */
-const PHONE_REGEX = /^(\+7|8)[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+/**
+ * Russian phone regex: +7/7/8 prefix + 10 digits, or bare 10 digits
+ * (Cycle 40: bare 10-digit input previously 400'd — the client normalizes
+ * to +7XXXXXXXXXX, the API accepts every common shape as defense in depth).
+ */
+const PHONE_REGEX = /^(\+7|7|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
 
 /**
  * POST /api/lead — create a lead with 152-ФЗ consent proof.

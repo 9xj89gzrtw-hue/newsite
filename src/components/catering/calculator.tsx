@@ -278,8 +278,8 @@ export function Calculator() {
                         {m.label}
                       </span>
                       
-                      {/* Price hint */}
-                      <span className="font-mono text-[11px] text-ink/70">
+                      {/* Price hint — Cycle 40: 14px, matches menu badges */}
+                      <span className="font-mono text-sm font-semibold text-ink/70">
                         от {formatRUB(m.perGuest)}/чел
                       </span>
                     </motion.button>
@@ -407,7 +407,7 @@ export function Calculator() {
                   </button>
 
                   {/* Per-person indicator */}
-                  <div className="flex items-center gap-2 text-xs text-ink/70">
+                  <div className="flex items-center gap-2 text-sm text-ink/70">
                     <TrendingUp className="size-3.5 text-gold/60" />
                     <span>~{formatRUB(Math.round(result.total / guestsClamped))}/чел</span>
                   </div>
@@ -636,6 +636,9 @@ export function Calculator() {
                           guests: guestsClamped,
                           date,
                           total: result.total,
+                          addons: ADDONS.filter((a) =>
+                            addons.includes(a.id),
+                          ).map((a) => a.label),
                         },
                       }),
                     );

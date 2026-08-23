@@ -263,8 +263,21 @@ export function EventsVideoCarousel() {
     }
   };
 
-  const openModal = useCallback((i: number) => setActiveIndex(i), []);
-  const closeModal = useCallback(() => setActiveIndex(null), []);
+  // Cycle 40 a11y: remember which tile opened the modal so focus returns
+  // there on close (previously focus fell to <body> — keyboard users lost
+  // their place on the page).
+  const openerRef = useRef<HTMLButtonElement | null>(null);
+  const openModal = useCallback((i: number) => {
+    openerRef.current =
+      document.activeElement instanceof HTMLButtonElement
+        ? document.activeElement
+        : null;
+    setActiveIndex(i);
+  }, []);
+  const closeModal = useCallback(() => {
+    setActiveIndex(null);
+    requestAnimationFrame(() => openerRef.current?.focus());
+  }, []);
 
   const activeTile = activeIndex === null ? null : TILES[activeIndex];
 

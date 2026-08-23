@@ -137,7 +137,19 @@ export function GgVideoShowcase() {
         )}
         {expanded && (
           <video
-            ref={videoRef}
+            ref={(el) => {
+              videoRef.current = el;
+              // Explicit play() on mount: autoplay-with-sound inside a real
+              // click handler is allowed, but some browsers still need the
+              // imperative nudge (Cycle 40 — critic saw a paused video).
+              if (el) {
+                el.controls = true;
+                el.muted = false;
+                void el.play().catch(() => {
+                  /* autoplay rejected — user can press play in the controls */
+                });
+              }
+            }}
             autoPlay
             controls
             playsInline

@@ -9,7 +9,6 @@ import { AmbientAudio } from "@/components/catering/ambient-audio";
 import { Preloader } from "@/components/catering/preloader";
 import { EaCookieBanner } from "@/components/catering/ea-cookie-banner";
 import { GrainOverlay } from "@/components/catering/grain";
-import { PageBorders } from "@/components/catering/page-borders";
 import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ChapterNav } from "@/components/catering/chapter-nav";
 import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
@@ -274,7 +273,7 @@ const faqJsonLd = {
       name: "За сколько дней нужно бронировать?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Свадьбы и банкеты — за 14–30 дней. Корпоративные обеды — за 3 рабочих дня. Аварийные заказы (24 часа) — возможны с наценкой 25%.",
+        text: "Свадьбы и банкеты — за 14–30 дней. Корпоративные обеды — за 3 рабочих дня. Срочные заказы (24 часа) — возможны с наценкой 25%.",
       },
     },
     {
@@ -340,7 +339,6 @@ export default function RootLayout({
         <CustomCursor />
         <AmbientAudio />
         <GrainOverlay />
-        <PageBorders />
         <VerticalBrandLabel />
         <ChapterNav />
         <EaCookieBanner />

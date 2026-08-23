@@ -135,6 +135,10 @@ export function TottHero() {
             2.25rem keeps the hierarchy on narrow screens. */}
         <motion.h1
           variants={rise}
+          /* Cycle 40 SEO fix: the visible wordmark alone carries no keywords;
+             aria-label gives search engines «премиальный кейтеринг
+             Санкт-Петербурга» without changing the visual design. */
+          aria-label="Interfood — премиальный кейтеринг Санкт-Петербурга"
           className="tott-display text-white"
           style={{
             fontSize: "clamp(4rem, 14vw, 9.5rem)",

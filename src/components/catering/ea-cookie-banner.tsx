@@ -142,16 +142,10 @@ export function EaCookieBanner() {
     setVisible(!hasActiveChoice());
   }, []);
 
-  // Autofocus the first text link when the banner appears (after the
-  // enter-animation finishes; instant for reduced-motion users).
-  useEffect(() => {
-    if (!visible) return;
-    const t = setTimeout(
-      () => firstFocusRef.current?.focus(),
-      prefersReducedMotion ? 0 : 350,
-    );
-    return () => clearTimeout(t);
-  }, [visible, prefersReducedMotion]);
+  // Cycle 40 fix: NO programmatic focus on the first link — it painted a
+  // persistent focus ring for every visitor (focus() ≠ :focus-visible).
+  // Keyboard users reach the banner naturally via Tab (it's early in DOM
+  // order); the focus trap below keeps them inside once they arrive.
 
   // Focus trap inside the banner — Tab cycles within text links + buttons.
   useEffect(() => {
@@ -212,7 +206,7 @@ export function EaCookieBanner() {
           data-component="ea-cookie-banner"
           /* Cycle 39 fix: docked to the BOTTOM — previously top-0 z-60 exactly
              covered the sticky header (nav/phone/CTA invisible until consent). */
-          className="fixed inset-x-0 bottom-0 z-[60] w-full"
+          className="fixed inset-x-0 bottom-0 z-[80] w-full"
           style={{
             background: "rgba(0, 0, 0, 0.96)",
             borderTop: "1px solid var(--ea-red)",

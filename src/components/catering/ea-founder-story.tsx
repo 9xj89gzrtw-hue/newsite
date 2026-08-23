@@ -219,13 +219,14 @@ export function EaFounderStory() {
                 }}
               >
                 <Image
-                  src="/media/event-chef-action.jpg"
-                  alt="Дмитрий Нилов, шеф-повар Interfood Catering"
+                  src="/media/event-10.jpg"
+                  alt="Шеф-повар Interfood Catering с подносом фирменных закусок"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.02]"
-                  // Loop cycle 1: VLM flagged head cropped → anchor to upper-body framing.
-                  style={{ objectPosition: "center 25%" }}
+                  // Cycle 40: real portrait staff photo (1920×2560) — the previous
+                  // landscape asset was upscaled ×3.8 and read as blurry.
+                  style={{ objectPosition: "center 20%" }}
                 />
                 {/* Tonal wash to keep the photo reading as part of the blush section */}
                 <div
@@ -329,13 +330,14 @@ export function EaFounderStory() {
                         reduce={reduce}
                       />
                     </span>
-                    {/* Small uppercase label */}
+                    {/* Small uppercase label — Cycle 40: floor raised to 12px
+                        (was clamp 10.4–12.5px, unreadable on mobile). */}
                     <span
                       className="mt-2"
                       style={{
                         fontFamily: "var(--ea-font-eyebrow)",
                         fontWeight: 700,
-                        fontSize: "clamp(0.65rem, 0.8vw, 0.78rem)",
+                        fontSize: "clamp(0.75rem, 0.85vw, 0.85rem)",
                         letterSpacing: "0.16em",
                         textTransform: "uppercase",
                         color: "var(--ea-mauve)",

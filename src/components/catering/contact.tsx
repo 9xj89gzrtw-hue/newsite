@@ -38,6 +38,27 @@ const DRAFT_KEY = "catering-lead-draft";
 // so this runs against the compact form: "+79991234567" / "89991234567" / "79991234567".
 const PHONE_REGEX = /^(\+7|7|8)?\d{10}$/;
 
+/**
+ * Cycle 40 fix (CRITICAL): the client regex accepts bare 10-digit input
+ * ("9991234567") but /api/lead rejects it with 400 — the most common way
+ * people type phone numbers KILLED the lead submission. Normalize every
+ * accepted shape to the canonical +7XXXXXXXXXX before POST.
+ */
+function normalizePhone(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 10) return "+7" + digits;
+  if (digits.length === 11 && digits.startsWith("8")) return "+7" + digits.slice(1);
+  if (digits.length === 11 && digits.startsWith("7")) return "+" + digits;
+  return raw.trim();
+}
+
+/** Snapshot from the calculator (catering:calc-lead) — appended to the
+ *  lead message so the manager sees the estimate the client saw. */
+type CalcSnapshot = {
+  total?: number;
+  addons?: string[];
+};
+
 type LeadData = {
   eventType: string;
   guests: number;
@@ -622,6 +643,9 @@ function DotPattern({ className = "" }: { className?: string }) {
 export function Contact() {
   const [step, setStep] = useState(0);
   const [data, setData] = useState<LeadData>(EMPTY);
+  // Cycle 40: estimate snapshot from the calculator — appended to the
+  // outgoing lead so «Отправить заявку с расчётом» keeps its promise.
+  const [calcSnapshot, setCalcSnapshot] = useState<CalcSnapshot | null>(null);
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const formRef = useRef<HTMLFormElement>(null);
@@ -666,8 +690,11 @@ export function Contact() {
         typeId?: string;
         guests?: number;
         date?: string;
+        total?: number;
+        addons?: string[];
       }>).detail;
       if (!detail) return;
+      setCalcSnapshot({ total: detail.total, addons: detail.addons });
       setData((d) => ({
         ...d,
         eventType:
@@ -744,13 +771,18 @@ export function Contact() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: data.name,
-          phone: data.phone,
+          phone: normalizePhone(data.phone),
           email: data.email || undefined,
           eventType: data.eventType || undefined,
           guests: data.guests,
           message: [
             data.date && `Желаемая дата: ${data.date}`,
             data.preferredTime && `Желаемое время звонка: ${data.preferredTime}`,
+            calcSnapshot?.total &&
+              `Расчёт с сайта: ~${calcSnapshot.total.toLocaleString("ru-RU")} ₽` +
+                (calcSnapshot.addons?.length
+                  ? ` (доп. услуги: ${calcSnapshot.addons.join(", ")})`
+                  : ""),
           ].filter(Boolean).join("\n") || undefined,
           consentAccepted: true,
         }),
@@ -1090,7 +1122,7 @@ export function Contact() {
                               type="range"
                               min={10}
                               max={500}
-                              step={10}
+                              step={5}
                               value={Math.min(data.guests, 500)}
                               onChange={(e) => set("guests", Number(e.target.value))}
                               className="mt-4 w-full accent-gold"
@@ -1185,6 +1217,7 @@ export function Contact() {
                             Проверьте заявку
                           </legend>
                           <ul className="divide-y divide-border-line rounded-xl border border-border-line bg-cream/40">
+                            <SummaryRow icon={Users} label="Имя" value={data.name} />
                             <SummaryRow icon={PartyPopper} label="Тип" value={menuLabel} />
                             <SummaryRow icon={Users} label="Гости" value={String(data.guests)} />
                             <SummaryRow

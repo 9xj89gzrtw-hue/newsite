@@ -39,7 +39,7 @@ export const LEGAL_INFO = {
   legalForm: "ИП",
   legalName: "Нилов Дмитрий Игоревич",
   // Реальные реквизиты (ЕГРИП, rusprofile.ru/egrul.nalog.ru):
-  ogrn: "314784710400401",
+  ogrn: "314784710400402",
   inn: "781433059704",
   // Дата регистрации: 14.04.2014
   registeredAt: "14 апреля 2014 г.",

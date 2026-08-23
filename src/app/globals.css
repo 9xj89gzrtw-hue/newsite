@@ -155,7 +155,7 @@
 
   /* ===== SOPRANOS CATERING LIGHT THEME PALETTE ===== */
   /* Off-white/Cream surfaces — Sopranos clean airy editorial */
-  --cream: #F9FAFB;
+  --cream: #F7F5F5;           /* Cycle 40: unified with EA cream (was cool #F9FAFB) */
   --cream-2: #F7F5F5;           /* Cycle 39: unified with EA cream (was #F3F4F6 cool gray — banded against FAQ/Instagram) */
   --parchment: #EDE8E1;
   --beige: #E8DDD4;
@@ -170,7 +170,7 @@
   /* Text — warm blacks for elegance */
   --ink: #1F2937;
   --ink-soft: #4B5563;
-  --paper: #F9FAFB;
+  --paper: #F7F5F5;
   --paper-soft: #B8B2A9;
 
   /* Luxury accents — Sopranos gold #D4A373 + warm tones */
@@ -3556,7 +3556,8 @@ header[data-scrolled="true"] [data-mega-panel] {
 /* EA section wrapper */
 .ea-section {
   position: relative;
-  padding-block: clamp(5rem, 9vw, 8rem);
+  /* Cycle 40: 144px desktop cap — matches menu/calculator md:py-36 rhythm */
+  padding-block: clamp(5rem, 10vw, 9rem);
 }
 
 .ea-section--blush { background: var(--ea-blush); }
@@ -3890,7 +3891,7 @@ header[data-scrolled="true"] [data-mega-panel] {
   gap: 0.6rem;
   font-family: var(--font-lato), var(--font-sans), sans-serif;
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: 0.8rem; /* Cycle 40: 12.8px floor (was 11.5px) */
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--tott-burgundy);

@@ -64,7 +64,7 @@ export function ChapterNav() {
       aria-label="Быстрая навигация по разделам"
       className="pointer-events-none fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 lg:block"
     >
-      <ul className="pointer-events-auto flex flex-col items-end gap-3">
+      <ul className="pointer-events-auto relative flex flex-col items-end gap-3">
         {SECTIONS.map((s) => {
           const isActive = active === s.id;
           return (
@@ -88,10 +88,12 @@ export function ChapterNav() {
           );
         })}
       </ul>
-      {/* Vertical progress line */}
+      {/* Vertical progress line — anchored INSIDE the dots column
+          (Cycle 40: previously floated 22px to the left, detached from
+          the dots it tracks). */}
       <motion.div
         aria-hidden="true"
-        className="absolute -left-3 top-0 h-full w-px bg-border-line"
+        className="absolute right-[5px] top-3 bottom-3 w-px bg-border-line"
       >
         <motion.div
           className="w-full origin-top bg-gradient-to-b from-gold to-terracotta rounded-full"
