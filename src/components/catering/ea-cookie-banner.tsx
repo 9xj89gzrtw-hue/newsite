@@ -191,13 +191,13 @@ export function EaCookieBanner() {
 
   const initial = prefersReducedMotion
     ? { opacity: 0 }
-    : { opacity: 0, y: -100 };
+    : { opacity: 0, y: 100 };
   const animate = prefersReducedMotion
     ? { opacity: 1 }
     : { opacity: 1, y: 0 };
   const exit = prefersReducedMotion
     ? { opacity: 0 }
-    : { opacity: 0, y: -100 };
+    : { opacity: 0, y: 100 };
   const transition = prefersReducedMotion
     ? { duration: 0.3 }
     : { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const };
@@ -210,10 +210,12 @@ export function EaCookieBanner() {
           role="region"
           aria-label="Уведомление об использовании cookies"
           data-component="ea-cookie-banner"
-          className="fixed inset-x-0 top-0 z-[60] w-full"
+          /* Cycle 39 fix: docked to the BOTTOM — previously top-0 z-60 exactly
+             covered the sticky header (nav/phone/CTA invisible until consent). */
+          className="fixed inset-x-0 bottom-0 z-[60] w-full"
           style={{
             background: "rgba(0, 0, 0, 0.96)",
-            borderBottom: "1px solid var(--ea-red)",
+            borderTop: "1px solid var(--ea-red)",
             color: "var(--ea-cream)",
           }}
           initial={initial}

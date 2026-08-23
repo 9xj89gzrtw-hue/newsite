@@ -136,7 +136,7 @@
   color: #fff;
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
-  font-size: 0.7rem;
+  font-size: 0.82rem; /* Cycle 39: 13px — primary card CTA was unreadable at 11px */
   letter-spacing: 0.18em;
   text-transform: uppercase;
   cursor: pointer;
@@ -330,5 +330,60 @@
   }
   .ea-evt-video__modal {
     animation: none;
+  }
+}
+
+
+/* ── Cycle 39: desktop prev/next navigation arrows ───────────────────
+   The 4th card was partially cut with no affordance on desktop. Two
+   ghost-circle arrows under the progress track scroll one card each. */
+.ea-evt-video__nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ea-evt-video__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--ea-ink) 20%, transparent);
+  background: transparent;
+  color: var(--ea-ink);
+  cursor: pointer;
+  transition: border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.ea-evt-video__nav-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ea-evt-video__nav-btn:hover,
+.ea-evt-video__nav-btn:focus-visible {
+  border-color: var(--ea-red);
+  color: var(--ea-red);
+  outline: none;
+  transform: scale(1.06);
+}
+
+.ea-evt-video__nav-btn:active {
+  transform: scale(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ea-evt-video__nav-btn,
+  .ea-evt-video__nav-btn:hover {
+    transition: none;
+    transform: none;
   }
 }

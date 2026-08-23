@@ -160,7 +160,7 @@ const SERVICES: AtServiceItem[] = [
     title: "Обеды в офис",
     category: "corporate",
     tagline: "Горячее в термоупаковке к 12:00. Без полуфабрикатов.",
-    minOrder: "от 15 порций",
+    minOrder: "от 10 порций",
     image: "/media/menu-office-lunch.jpg",
     imageAlt: "Корпоративные обеды в индивидуальной упаковке",
     ui: "#ce8f45",
@@ -232,7 +232,7 @@ const SERVICES: AtServiceItem[] = [
     title: "Барбекю",
     category: "buffet",
     tagline: "Гриль на углях. Стейки рибай, овощи с мангала, фирменные маринады.",
-    minOrder: "от 25 человек",
+    minOrder: "от 20 человек",
     image: "/media/talkofthetown/talkofthetown-section-paella-station.jpg",
     imageAlt: "Гриль-станция с открытым огнём на мероприятии",
     ui: "#e1582f",
@@ -389,8 +389,10 @@ function ScrambleText({
 }) {
   const scrambled = useScramble(text, play);
   return (
-    <span className={className}>
-      <span className="sr-only">{text}</span>
+    /* Cycle 39 a11y fix: aria-label on the wrapper replaces the sr-only
+       mirror — previously the accessible name concatenated the mirror +
+       the scrambled layer ("УСЛУГИУСЛУГИ"). */
+    <span className={className} aria-label={text}>
       <span aria-hidden="true">{scrambled}</span>
     </span>
   );
@@ -430,6 +432,10 @@ function Preview({ active, index, total }: { active: AtServiceItem; index: numbe
               fill
               sizes="(min-width: 1024px) 40vw, 100vw"
               className="at-svc__preview-img"
+              /* priority: the preview aside is display:none below lg — a lazy
+                 image inside it never loads there and audits flag it as
+                 broken (naturalWidth=0). One ~80 KB asset, eager is cheap. */
+              priority
             />
             {/* Bottom readability block — AT's #060606 card backing. */}
             <span className="at-svc__preview-shade" />
@@ -693,11 +699,42 @@ export function AtServices() {
                 <span className="at-svc__empty-arrow" aria-hidden="true">
                   {"->"}
                 </span>
-                НИЧЕГО НЕ НАЙДЕНО —{" "}
-                <a href="#contact" className="at-svc__empty-link">
-                  НАПИШИТЕ НАМ
-                </a>
-                , ПРИДУМАЕМ
+                {cat !== "all" && query.trim() ? (
+                  <>
+                    В КАТЕГОРИИ{" "}
+                    «{CATEGORIES.find((x) => x.id === cat)?.label.toUpperCase()}»{" "}
+                    НИЧЕГО НЕ НАЙДЕНО ПО ЗАПРОСУ «{query.trim().toUpperCase()}» —{" "}
+                    <button
+                      type="button"
+                      className="at-svc__empty-link"
+                      onClick={() => {
+                        setCat("all");
+                        setQuery("");
+                      }}
+                    >
+                      СБРОСИТЬ ФИЛЬТРЫ
+                    </button>
+                  </>
+                ) : query.trim() ? (
+                  <>
+                    ПО ЗАПРОСУ «{query.trim().toUpperCase()}» НИЧЕГО НЕ НАЙДЕНО —{" "}
+                    <button
+                      type="button"
+                      className="at-svc__empty-link"
+                      onClick={() => setQuery("")}
+                    >
+                      ОЧИСТИТЬ ПОИСК
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    НИЧЕГО НЕ НАЙДЕНО —{" "}
+                    <a href="#contact" className="at-svc__empty-link">
+                      НАПИШИТЕ НАМ
+                    </a>
+                    , ПРИДУМАЕМ
+                  </>
+                )}
               </li>
             )}
           </motion.ul>
@@ -719,7 +756,7 @@ export function AtServices() {
             18 УСЛУГ · 5 КАТЕГОРИЙ · САНКТ-ПЕТЕРБУРГ И ОБЛАСТЬ
           </p>
           <Link href="#contact" className="at-svc__pill">
-            ОБСУДАТЬ СОБЫТИЕ
+            ОБСУДИТЬ СОБЫТИЕ
             <ArrowUpRight strokeWidth={1.5} aria-hidden="true" />
           </Link>
         </motion.div>

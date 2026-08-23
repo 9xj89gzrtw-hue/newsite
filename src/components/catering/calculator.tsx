@@ -615,7 +615,7 @@ export function Calculator() {
                 >
                   <Check className="size-4 text-sage shrink-0" />
                   <span>
-                    Включено: сервис, посуда, флористика, доставка в пределах 50 км
+                    Включено: сервис, посуда, флористика, доставка в пределах КАД
                   </span>
                 </motion.div>
               </div>

@@ -18,7 +18,7 @@
   background: #000;
   color: #fff;
   font-family: var(--at-mono), ui-monospace, "IBM Plex Mono", monospace;
-  padding-block: clamp(6rem, 12vw, 10rem);
+  padding-block: clamp(6rem, 10vw, 9rem); /* Cycle 39: 144px max — matches menu/calculator md:py-36 rhythm */
 }
 
 /* Vignette — AT's #070d0d corners / #1d6278 core glow, kept whisper-quiet. */
@@ -154,7 +154,7 @@
 .at-svc__opt-count {
   font-size: 0.75rem;
   font-weight: 300;
-  color: #6a6a6a;
+  color: #9a9a9a;
 }
 
 .at-svc__opt:hover,
@@ -211,7 +211,7 @@
   font-size: 0.75rem;
   font-weight: 300;
   letter-spacing: 0.14em;
-  color: #6a6a6a;
+  color: #9a9a9a;
 }
 
 /* ── BODY: list + preview ─────────────────────────────────────────────── */
@@ -319,7 +319,7 @@
   font-size: 0.75rem;
   font-weight: 300;
   letter-spacing: 0.06em;
-  color: #6a6a6a;
+  color: #9a9a9a;
   transition: color 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
 }
 
@@ -433,6 +433,18 @@
   transition: transform 0.4s cubic-bezier(0.17, 0.4, 0.02, 0.99);
 }
 
+/* Cycle 39: the empty-state link also renders as a <button> (reset filters) —
+   needs native-control resets + cursor. */
+button.at-svc__empty-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
 .at-svc__empty-link:hover {
   display: inline-block;
   transform: translateX(6px);
@@ -540,7 +552,7 @@
   font-size: 0.75rem;
   font-weight: 300;
   letter-spacing: 0.08em;
-  color: #6f6f6f;
+  color: #9a9a9a;
 }
 
 /* ── FOOT ─────────────────────────────────────────────────────────────── */
@@ -629,7 +641,7 @@
   /* Category + minimum live under the tagline on touch devices. */
   .at-svc__row-tagline::after {
     content: " · " attr(data-cat-min);
-    color: #6a6a6a;
+    color: #9a9a9a;
   }
 
   .at-svc__row-arrow {

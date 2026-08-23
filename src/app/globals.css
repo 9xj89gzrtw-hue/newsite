@@ -156,7 +156,7 @@
   /* ===== SOPRANOS CATERING LIGHT THEME PALETTE ===== */
   /* Off-white/Cream surfaces — Sopranos clean airy editorial */
   --cream: #F9FAFB;
-  --cream-2: #F3F4F6;
+  --cream-2: #F7F5F5;           /* Cycle 39: unified with EA cream (was #F3F4F6 cool gray — banded against FAQ/Instagram) */
   --parchment: #EDE8E1;
   --beige: #E8DDD4;
   
@@ -231,7 +231,7 @@
      restraint is what makes it pop. Neutra2Display-Light handles ALL headings
      (uppercase, tight -2% tracking, hero H1 at clamp up to 244px). */
   --cep-black: #000000;         /* hero bg, footer bg, half of sections */
-  --cep-cream: #EFEFE7;         /* body bg, cream sections (warm off-white hsl 52.5 20% 92%) */
+  --cep-cream: #F7F5F5;         /* body bg, cream sections — Cycle 39: unified with --ea-cream so FAQ/Instagram/Contact read as one surface */
   --cep-cream-warm: #EFEDE7;    /* subtle alt for layering */
   --cep-red: #FF360A;           /* the ONLY accent — stats band bg, outline CTA borders, bullets */
   --cep-red-deep: #E22E08;      /* hover/pressed state for red elements */

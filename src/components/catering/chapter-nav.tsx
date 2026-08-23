@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 /**
  * ChapterNav — LIGHT THEME
@@ -13,20 +14,26 @@ import { motion, useScroll, useSpring } from "framer-motion";
 // (block was deleted). Renamed Services → ea-service-tabs, Events →
 // page.tsx. Removed Events dot in Cycle 35 (events block deleted). Services
 // id renamed #ea-service-tabs → #services for the new EaServices grid.
+// Cycle 39: labels localized to Russian + nav hidden on non-home routes
+// (previously 7 dead buttons on /offer, /privacy, /terms).
 const SECTIONS = [
-  { id: "home", label: "Hero" },
-  { id: "services", label: "Services" },
-  { id: "menu", label: "Menu" },
-  { id: "calculator", label: "Calculator" },
-  { id: "about", label: "About" },
-  { id: "faq", label: "FAQ" },
-  { id: "contact", label: "Contact" },
+  { id: "hero", label: "Начало" },
+  { id: "services", label: "Услуги" },
+  { id: "menu", label: "Меню" },
+  { id: "calculator", label: "Калькулятор" },
+  { id: "about", label: "О нас" },
+  { id: "faq", label: "Вопросы" },
+  { id: "contact", label: "Контакты" },
 ];
 
 export function ChapterNav() {
-  const [active, setActive] = useState("home");
+  const [active, setActive] = useState("hero");
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
+  // Cycle 39: hide on static legal pages — the section anchors don't exist
+  // there, leaving 7 dead buttons (critic 3 finding).
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -49,6 +56,8 @@ export function ChapterNav() {
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  if (!isHome) return null;
 
   return (
     <nav

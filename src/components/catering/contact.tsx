@@ -627,16 +627,33 @@ export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  // Restore draft on mount.
+  // Restore draft on mount + URL-param prefill (Cycle 39: ?type=X&guests=Y
+  // from the calculator share-links / direct visits now seed the form too —
+  // previously only the CustomEvent path prefilled).
   useEffect(() => {
+    let restored: Partial<LeadData> = {};
     try {
       const raw = window.localStorage.getItem(DRAFT_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<LeadData>;
-        setData({ ...EMPTY, ...parsed });
+      if (raw) restored = JSON.parse(raw) as Partial<LeadData>;
+    } catch {
+      // ignore — non-critical.
+    }
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const type = params.get("type");
+      const guests = params.get("guests");
+      if (type && MENU_TYPES.some((m) => m.id === type)) {
+        restored.eventType = type;
+      }
+      if (guests) {
+        const g = Number.parseInt(guests, 10);
+        if (Number.isFinite(g) && g >= 1) restored.guests = g;
       }
     } catch {
       // ignore — non-critical.
+    }
+    if (Object.keys(restored).length > 0) {
+      setData({ ...EMPTY, ...restored });
     }
   }, []);
 
@@ -744,7 +761,8 @@ export function Contact() {
       setFormStatus("success");
       toast.success("Заявка отправлена! Перезвоним в течение 15 минут.");
       
-      // Reset after showing success state
+      // Reset after showing success state (Cycle 39: 2.5s was too fast —
+      // the visitor never registered the confirmation before it vanished).
       setTimeout(() => {
         setData(EMPTY);
         setStep(0);
@@ -754,7 +772,7 @@ export function Contact() {
         } catch {
           // ignore.
         }
-      }, 2500);
+      }, 6000);
     } catch (err) {
       setFormStatus("error");
       
@@ -860,11 +878,11 @@ export function Contact() {
                       external
                     />
                     <ContactCard
-                      icon={Instagram}
-                      href={CONTACTS.instagramHref}
-                      label={CONTACTS.instagram}
-                      ariaLabel={`Instagram: ${CONTACTS.instagram}`}
-                      sublabel="Instagram"
+                      icon={MessageCircle}
+                      href={CONTACTS.whatsappHref}
+                      label={CONTACTS.whatsapp}
+                      ariaLabel={`WhatsApp: ${CONTACTS.whatsapp}`}
+                      sublabel="WhatsApp"
                       external
                     />
                   </div>
@@ -875,7 +893,8 @@ export function Contact() {
                   <ContactCard
                     icon={Mail}
                     href={`mailto:${CONTACTS.email}`}
-                    label="Эл. почта"
+                    label={CONTACTS.email}
+                    ariaLabel={`Написать на email: ${CONTACTS.email}`}
                     sublabel="Эл. почта"
                   />
                   <ContactCard
@@ -931,7 +950,8 @@ export function Contact() {
                       transition={{ delay: 0.6 }}
                       className="mt-2 text-sm text-ink/70"
                     >
-                      Перезвоним в течение 15 минут
+                      Мы получили вашу заявку и перезвоним в течение 15 минут
+                      в рабочее время (Пн–Пт 9:00–19:00, Сб 10:00–16:00).
                     </motion.p>
                   </motion.div>
                 ) : null}

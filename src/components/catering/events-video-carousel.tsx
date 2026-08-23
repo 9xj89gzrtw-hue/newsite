@@ -80,45 +80,45 @@ type EventTile = {
 };
 
 /**
- * 4 event-type tiles. Uses the in-repo food b-roll (mculinary-hero.mp4)
- * for all 4 tiles — different poster images + captions per tile give each
- * tile its own visual identity. (Cycle 32 /loop fix: previously alternated
- * with gg-hero-video.mp4, but that clip shows the ggcatering brand logo,
- * which is wrong on our site.)
- * Posters come from the existing /media/event-0[1-4].{png,jpg} assets.
+ * 4 tiles with genuinely DIFFERENT video clips (Cycle 39 honesty fix:
+ * previously all 4 tiles opened the same full video while captions
+ * promised different event stories). The mculinary b-roll (28s) is cut
+ * into 4 unique 7-second fragments via ffmpeg — each tile opens its own
+ * clip in a fullscreen modal: crostini appetizers / tortellini / dessert /
+ * plated main. Posters come from /media/event-0[1-4] assets.
  */
 const TILES: EventTile[] = [
   {
-    video: "/media/mculinary/mculinary-hero.mp4",
+    video: "/media/clips/catering-clip-1.mp4",
     poster: "/media/event-01.png",
-    category: "Свадьбы",
-    title: "Свадебный банкет",
-    meta: "Усадьба · 180 гостей",
-    videoAlt: "Тизер-видео свадебного банкета в усадьбе на 180 гостей",
+    category: "Закуски",
+    title: "Кростини и канапе",
+    meta: "Старт банкета · первая подача",
+    videoAlt: "Видео: кростини с топпингами — подача закусок",
   },
   {
-    video: "/media/mculinary/mculinary-hero.mp4",
+    video: "/media/clips/catering-clip-2.mp4",
     poster: "/media/event-02.jpg",
-    category: "Корпоратив",
-    title: "Корпоративный ужин",
-    meta: "Ленэкспо · 1200 гостей",
-    videoAlt: "Тизер-видео корпоративного ужина в Ленэкспо на 1200 гостей",
+    category: "Горячее",
+    title: "Тортелини с овощами",
+    meta: "Основная подача · кухня в работе",
+    videoAlt: "Видео: тортелини с овощами — горячая подача",
   },
   {
-    video: "/media/mculinary/mculinary-hero.mp4",
+    video: "/media/clips/catering-clip-3.mp4",
     poster: "/media/event-03.jpg",
-    category: "Банкеты",
-    title: "Банкет в особняке",
-    meta: "Частная усадьба · 120 гостей",
-    videoAlt: "Тизер-видео банкета в частном особняке на 120 гостей",
+    category: "Десерты",
+    title: "Меренга и мороженое",
+    meta: "Финал трапезы · авторский десерт",
+    videoAlt: "Видео: десерт с меренгой и мороженым",
   },
   {
-    video: "/media/mculinary/mculinary-hero.mp4",
+    video: "/media/clips/catering-clip-4.mp4",
     poster: "/media/event-04.jpg",
-    category: "Фуршеты",
-    title: "Фуршет на презентации",
-    meta: "Шоурум · 200 гостей",
-    videoAlt: "Тизер-видео фуршета на презентации для 200 гостей",
+    category: "Кухня шефа",
+    title: "Авторское горячее",
+    meta: "Мясо с гарниром · plated main",
+    videoAlt: "Видео: авторское горячее блюдо с мясом и гарниром",
   },
 ];
 
@@ -236,6 +236,33 @@ export function EventsVideoCarousel() {
     };
   }, [activeIndex]);
 
+  // Cycle 39 a11y fix: move focus into the modal when it opens and keep it
+  // trapped while open (Tab cycles close → video → caption → close).
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+  const videoWrapRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (activeIndex === null) return;
+    closeRef.current?.focus();
+  }, [activeIndex]);
+  const trapFocus = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== "Tab" || !videoWrapRef.current) return;
+    const focusables = Array.from(
+      videoWrapRef.current.querySelectorAll<HTMLElement>(
+        'button, a[href], video[controls], [tabindex]:not([tabindex="-1"])',
+      ),
+    );
+    if (focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+
   const openModal = useCallback((i: number) => setActiveIndex(i), []);
   const closeModal = useCallback(() => setActiveIndex(null), []);
 
@@ -257,16 +284,15 @@ export function EventsVideoCarousel() {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <div className="ea-evt-video__heading-block">
-            <TiltedAccent text="события" className="mb-3 block" />
-            <span className="ea-eyebrow">Видео мероприятий</span>
+            <TiltedAccent text="кухня" className="mb-3 block" />
+            <span className="ea-eyebrow">Видео с нашей кухни</span>
             <h2 className="ea-section-h2 ea-evt-video__h2">
-              {"События, которые мы "}
+              {"Блюда, которые мы "}
               <i className="ea-italic-fragment">создаём</i>
               {"."}
             </h2>
             <p className="ea-evt-video__subtitle">
-              Короткие истории о том, как проходит наш кейтеринг — от
-              подготовки до финального тоста.
+              Четыре фрагмента нашей работы — от первых закусок до десертов.
             </p>
           </div>
         </motion.div>
@@ -304,7 +330,10 @@ export function EventsVideoCarousel() {
                   className="ea-evt-video__video"
                   src={tile.poster}
                   alt={tile.videoAlt}
-                  loading="lazy"
+                  /* eager: tiles live in a horizontal scroller — lazy images
+                     horizontally off-screen never load and read as "broken"
+                     to audits (same fix as Cycle 33 menu carousel). */
+                  loading="eager"
                   decoding="async"
                 />
               </ClipPathReveal>
@@ -351,6 +380,43 @@ export function EventsVideoCarousel() {
             }}
           />
         </div>
+
+        {/* Cycle 39 fix: desktop prev/next arrows — the 4th card was
+            partially cut with no affordance. Arrows scroll one card. */}
+        <div className="ea-evt-video__nav">
+          <button
+            type="button"
+            className="ea-evt-video__nav-btn"
+            onClick={() => {
+              const scroller = scrollerRef.current;
+              if (!scroller) return;
+              const card = scroller.querySelector<HTMLElement>(".ea-evt-video__card");
+              const w = (card?.offsetWidth ?? 320) + CARD_GAP_PX;
+              scroller.scrollBy({ left: -w, behavior: "smooth" });
+            }}
+            aria-label="Предыдущее видео"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="ea-evt-video__nav-btn"
+            onClick={() => {
+              const scroller = scrollerRef.current;
+              if (!scroller) return;
+              const card = scroller.querySelector<HTMLElement>(".ea-evt-video__card");
+              const w = (card?.offsetWidth ?? 320) + CARD_GAP_PX;
+              scroller.scrollBy({ left: w, behavior: "smooth" });
+            }}
+            aria-label="Следующее видео"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Fullscreen modal — full video unmuted + native controls + close. */}
@@ -361,8 +427,10 @@ export function EventsVideoCarousel() {
           aria-modal="true"
           aria-label={`Видео: ${activeTile.title}`}
           onClick={closeModal}
+          onKeyDown={trapFocus}
         >
           <button
+            ref={closeRef}
             type="button"
             className="ea-evt-video__close"
             onClick={closeModal}
@@ -373,6 +441,7 @@ export function EventsVideoCarousel() {
             </svg>
           </button>
           <div
+            ref={videoWrapRef}
             className="ea-evt-video__modal-frame"
             onClick={(e) => e.stopPropagation()}
           >

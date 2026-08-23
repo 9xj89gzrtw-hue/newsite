@@ -255,6 +255,63 @@ const jsonLd = {
   ],
 };
 
+/** Cycle 39: FAQPage structured data — mirrors FAQ_ITEMS from
+ *  ea-faq-accordion.tsx so search engines can render rich FAQ snippets. */
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Какой минимальный заказ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Банкеты — от 30 гостей, фуршеты — от 20, кофе-брейки — от 15, барбекю — от 20, обеды в офис — от 10. Для меньших форматов есть доставка закусок в индивидуальной упаковке.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "За сколько дней нужно бронировать?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Свадьбы и банкеты — за 14–30 дней. Корпоративные обеды — за 3 рабочих дня. Аварийные заказы (24 часа) — возможны с наценкой 25%.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Что входит в стоимость?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Еда, доставка, сервировка, посуда, текстиль, повар и официанты на месте, а также лёгкое цветочное сопровождение на столах. Не входит: аренда площадки, алкоголь, музыка и расширенное флористическое оформление — поможем организовать по запросу.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Можете учесть аллергии и диеты?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Да. Вегетарианское, веганское, безглютеновое, халяль, кошер — без доплат. Специфические аллергии просим сообщить за 7 дней.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Как происходит оплата?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Предоплата 30% при подтверждении заказа, окончательный расчёт — не позднее 3 дней до мероприятия (условия публичной оферты). Работаем с юр. лицами по безналичному расчёту.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Есть ли дегустация перед заказом?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Да. Запишитесь на приватную дегустацию в нашей студии на Петроградке. Шесть блюд из вашего будущего меню за 45 минут — 3500 ₽/чел. Сумма возвращается при заказе от 50 гостей.",
+      },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -274,6 +331,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
         <Preloader />
         <CustomCursor />

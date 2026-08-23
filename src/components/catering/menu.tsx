@@ -439,7 +439,7 @@ export function Menu() {
             aria-label="Типы меню"
             className="mt-12 flex flex-wrap justify-center gap-3 md:gap-4"
           >
-            {MENU_TYPES.map((m) => {
+            {MENU_TYPES.map((m, i) => {
               const isActive = active === m.id;
               return (
                 <button
@@ -447,9 +447,25 @@ export function Menu() {
                   id={`tab-${m.id}`}
                   role="tab"
                   aria-selected={isActive}
+                  tabIndex={isActive ? 0 : -1}
                   aria-controls="menu-panel"
                   aria-label={`${m.label}, от ${formatRUB(m.perGuest)} за человека`}
                   onClick={() => select(m.id)}
+                  onKeyDown={(e) => {
+                    // Cycle 39: ARIA tabs pattern — roving tabindex + arrows.
+                    let next = -1;
+                    if (e.key === "ArrowRight") next = (i + 1) % MENU_TYPES.length;
+                    if (e.key === "ArrowLeft") next = (i - 1 + MENU_TYPES.length) % MENU_TYPES.length;
+                    if (e.key === "Home") next = 0;
+                    if (e.key === "End") next = MENU_TYPES.length - 1;
+                    if (next >= 0) {
+                      e.preventDefault();
+                      select(MENU_TYPES[next].id);
+                      requestAnimationFrame(() => {
+                        document.getElementById(`tab-${MENU_TYPES[next].id}`)?.focus();
+                      });
+                    }
+                  }}
                   className={`group relative flex min-h-[72px] sm:min-h-[80px] w-[140px] sm:w-[160px] flex-col items-center overflow-hidden rounded-2xl border-2 transition-all duration-500 ${
                     isActive
                       ? "border-transparent shadow-xl shadow-gold/20 scale-[1.02]"
@@ -499,9 +515,9 @@ export function Menu() {
                     }`} />
                     
                     {/* Price badge on thumbnail */}
-                    <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-2 py-0.5 shadow-sm">
-                      <Sparkles className={`size-2.5 ${isActive ? "text-gold" : "text-ink/70"} transition-colors`} />
-                      <span className={`font-mono text-xs font-bold leading-none ${isActive ? "text-ink" : "text-ink/70"}`}>
+                    <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-2 py-1 shadow-sm">
+                      <Sparkles className={`size-3 ${isActive ? "text-gold" : "text-ink/70"} transition-colors`} />
+                      <span className={`font-mono text-sm font-bold leading-none ${isActive ? "text-ink" : "text-ink/70"}`}>
                         от {formatRUB(m.perGuest)}
                       </span>
                     </div>
@@ -607,7 +623,7 @@ export function Menu() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.4 }}
             >
-              <span className="relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-2 font-mono text-xs text-white shadow-md shadow-gold/25 overflow-hidden">
+              <span className="relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-2 font-mono text-sm font-semibold text-white shadow-md shadow-gold/25 overflow-hidden">
                 {!prefersReducedMotion && (
                   <motion.span
                     className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
@@ -796,7 +812,7 @@ function ShimmerOverlay() {
 function PriceBadge({ price, unit }: { price: number; unit: string }) {
   return (
     <motion.span 
-      className="relative inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold to-terracotta px-3.5 py-1.5 font-mono text-xs font-bold text-white shadow-lg shadow-gold/30 overflow-hidden"
+      className="relative inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold to-terracotta px-3.5 py-1.5 font-mono text-sm font-bold text-white shadow-lg shadow-gold/30 overflow-hidden"
       whileHover={{ scale: 1.05 }}
       transition={{ type: "spring", stiffness: 400, damping: 15 }}
     >

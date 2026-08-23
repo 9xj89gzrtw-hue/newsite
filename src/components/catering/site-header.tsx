@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
 import { CONTACTS } from "@/lib/media";
-import { CepOverlayMenu } from "./cep-overlay-menu";
 
 /**
  * SiteHeader — Talk of the Town (talkofthetownatlanta.com) header graft
@@ -48,7 +47,6 @@ const NAV: NavItem[] = [
 export function SiteHeader() {
   const [stuck, setStuck] = useState(false);
   const [open, setOpen] = useState(false);
-  const [cepMenuOpen, setCepMenuOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -263,8 +261,6 @@ export function SiteHeader() {
                 onClick={() => setOpen(false)}
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 text-ink"
                 aria-label="Закрыть меню"
-                aria-expanded={open ? "true" : "false"}
-                aria-controls="mobile-menu"
               >
                 <X className="size-7" />
               </button>
@@ -310,8 +306,6 @@ export function SiteHeader() {
         <Phone className="size-6" />
       </a>
 
-      {/* CepOverlayMenu kept available (triggered programmatically if needed). */}
-      <CepOverlayMenu isOpen={cepMenuOpen} onClose={() => setCepMenuOpen(false)} />
     </>
   );
 }

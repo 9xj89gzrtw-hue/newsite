@@ -62,14 +62,14 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const STATS = [
   { value: 17, suffix: "", label: "лет на рынке" },
   { value: 2400, suffix: "+", label: "событий" },
-  { value: 75000, suffix: "+", label: "гостей" },
+  { value: 120000, suffix: "+", label: "гостей" },
   { value: 35, suffix: "+", label: "команда" },
 ] as const;
 
 const STORY_PARAGRAPHS = [
-  "Дмитрий Нилов основал Interfood Catering в 2009 году в Санкт-Петербурге — с одной печки, тремя поварами и убеждением, что хороший банкет начинается не с меню, а с разговора. За семнадцать лет маленькая кухня на Петроградской стороне превратилась в команду из тридцати пяти человек, обслужившую более двух тысяч четырёхсот событий — от камерных свадеб на двадцать гостей до приёмов на полторы тысячи персон в исторических особняках.",
+  "Дмитрий Нилов основал Interfood Catering в 2009 году в Санкт-Петербурге — с одной печки, тремя поварами и убеждением, что хороший банкет начинается не с меню, а с разговора. За семнадцать лет маленькая кухня на Петроградской стороне превратилась в команду из тридцати пяти человек (плюс привлечённый персонал на крупные проекты), обслужившую более двух тысяч четырёхсот событий — от камерных свадеб на двадцать гостей до приёмов на полторы тысячи персон в исторических особняках.",
   "Сезонные продукты, готовка с нуля, авторская кухня. Лук для французского супа томится шесть часов. Свинина вялится в собственной печи двое суток. Свежий хлеб пахнет рано утром, когда все гости ещё спят и в залах стоит тишина. Мы не работаем с полуфабрикатами — каждое блюдо это руки, время и температура. И ещё немного удачи, но удача приходит только к тем, кто готов.",
-  "За плечами — 75 000 обслуженных гостей и партнёрства, которым мы гордимся: рестораны группы «Гинза Проект», отель «Хилтон Мойка 22», корпоративные заказы от Сбербанка, Газпрома и Яндекса. Мы возим фарфор, стекло, текстиль, официантов и при желании — открытую кухню. Ресторан там, где он вам нужен.",
+  "За плечами — 120 000 обслуженных гостей и партнёрства, которым мы гордимся: рестораны группы «Гинза Проект», отель «Хилтон Мойка 22», корпоративные заказы от Сбербанка, Газпрома и Яндекса. Мы возим фарфор, стекло, текстиль, официантов и при желании — открытую кухню. Ресторан там, где он вам нужен.",
 ] as const;
 
 /**
@@ -130,12 +130,14 @@ function CountUp({
 }
 
 /**
- * Smooth-scroll to the #manifesto anchor (used by the "Читать манифест" CTA).
+ * Smooth-scroll to the #menu anchor (used by the "Смотреть меню" CTA).
+ * Cycle 39 fix: previously targeted #manifesto which no longer exists on
+ * the page — the click silently did nothing (dead button after the story).
  * Falls back to native scrollIntoView when Lenis isn't loaded.
  */
-function scrollToManifesto() {
+function scrollToMenu() {
   if (typeof window === "undefined") return;
-  const target = document.getElementById("manifesto");
+  const target = document.getElementById("menu");
   if (!target) return;
   // Lenis attaches to window.lenis when active; otherwise fall back to native.
   const lenis = (window as unknown as { lenis?: { scrollTo: (t: Element, o?: { offset?: number; duration?: number }) => void } }).lenis;
@@ -200,12 +202,16 @@ export function EaFounderStory() {
           <ClipPathReveal
             direction="bottom"
             duration={1.1}
-            className="order-1"
+            className="order-1 md:h-full"
           >
-            <div className="group relative">
-              {/* 4:5 portrait frame — square corners (4px), inner shadow */}
+            {/* Cycle 39 fix: frame stretches to full column height on desktop
+                (md:h-full chain) — previously aspect-[4/5] left ~600px of dead
+                space below the photo when the text column was taller. Mobile
+                keeps the aspect-ratio frame. */}
+            <div className="group relative md:h-full">
+              {/* 4:5 portrait frame (mobile) / full-height (desktop) */}
               <div
-                className="relative aspect-[4/5] w-full overflow-hidden"
+                className="relative aspect-[4/5] w-full overflow-hidden md:aspect-auto md:h-full md:min-h-[560px]"
                 style={{
                   borderRadius: "4px",
                   boxShadow:
@@ -347,11 +353,11 @@ export function EaFounderStory() {
             <motion.div className="mt-10" {...reveal(0.6)}>
               <button
                 type="button"
-                onClick={scrollToManifesto}
+                onClick={scrollToMenu}
                 className="ea-text-link"
-                aria-label="Читать манифест — перейти к разделу"
+                aria-label="Смотреть меню — перейти к разделу"
               >
-                Читать манифест
+                Смотреть меню
                 <svg
                   className="ea-text-link__arrow"
                   viewBox="0 0 24 24"

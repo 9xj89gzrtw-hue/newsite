@@ -168,7 +168,7 @@ function NewsletterSignup() {
           />
           <span>
             Я соглашаюсь на обработку персональных данных в соответствии с{" "}
-            <a href="/privacy" className="text-gold hover:underline">
+            <a href="/privacy" className="text-gold hover:underline py-1.5 -my-1.5 inline-block">
               политикой конфиденциальности
             </a>
             .
@@ -516,9 +516,34 @@ export function SiteFooter() {
       {/* ============ Section 5 — Копирайт ============ */}
       <div className="border-t border-cream/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-xs text-cream/50 md:flex-row md:px-8">
-          <p className="text-center md:text-left">
-            © {year ?? 2025} {SITE_CONFIG.brandName}, Санкт-Петербург · Все права защищены
-          </p>
+          <div className="flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-4">
+            <p className="text-center md:text-left">
+              © {year ?? 2025} {SITE_CONFIG.brandName}, Санкт-Петербург · Все права защищены
+            </p>
+            {/* Cycle 39 fix: legal document links — /offer was an orphan page,
+                /terms required by the cookie banner. */}
+            <span className="hidden md:inline text-cream/30" aria-hidden="true">·</span>
+            <nav aria-label="Юридические документы" className="flex items-center gap-4">
+              <a
+                href="/offer"
+                className="py-2 text-cream/60 underline-offset-2 transition-colors hover:text-gold hover:underline"
+              >
+                Публичная оферта
+              </a>
+              <a
+                href="/terms"
+                className="py-2 text-cream/60 underline-offset-2 transition-colors hover:text-gold hover:underline"
+              >
+                Пользовательское соглашение
+              </a>
+              <a
+                href="/privacy"
+                className="py-2 text-cream/60 underline-offset-2 transition-colors hover:text-gold hover:underline"
+              >
+                Политика конфиденциальности
+              </a>
+            </nav>
+          </div>
           <a
             href={CONTACTS.phoneHref}
             className="font-display tracking-wide text-cream/60 transition-colors hover:text-gold min-h-[44px] flex items-center"
