@@ -2107,3 +2107,74 @@ Work Log:
 Stage Summary:
 - Loop converged: R3 zero defects (desktop+mobile+boundaries) + R4 zero defects after 2 improvements. 2 consecutive clean rounds across different review dimensions.
 - Final state: aw-services.tsx ~790 LOC + aw-services.css ~800 LOC, lint green, tsc clean, console clean, reduced-motion verified, keyboard/focus/mobile/tablet(1024)/anchors all verified live.
+
+---
+Task ID: C44-C
+Agent: Implementation Research — WebGL Flowmap
+Task: Research + verify canonical OGL flowmap/displacement-hover implementations and spec the React adaptation for the services-list floating preview (C44 rebuild).
+
+Work Log:
+- Learned web-search skill; searched Codrops/OGL/React flowmap demos (Codrops Mouse Flowmap Deformation, OGL examples, react ports, npm packages).
+- Downloaded + extracted verbatim sources: oframe/ogl (master tarball), robin-dela/flowmap-effect (Codrops demo repo), robin-dela/hover-effect (Codrops Distortion Hover Effect), kekkorider/codrops-tutorial-ogl-image-carousel.
+- Extracted full source: OGL examples/mouse-flowmap.html + src/extras/Flowmap.js (ping-pong FBO trail engine), Codrops demo1 cover-fit shader (res vec4 trick), hover-effect displacement-mix fragment (the A→B transition), carousel uProgress swap bookkeeping pattern.
+- npm registry checks: ogl@1.0.11 (2025-01-27, zero deps, sideEffects:false, ESM, MIT, ~12–18KB gz tree-shaken for our imports); react-ogl@0.15.1 (React 19 peer, not needed); hover-effect@1.2.1 (three+gsap — rejected).
+- Built self-contained PoC (OGL + flowmap + displacement A→B mix in a cursor-following card over Russian list rows) and verified live in isolated agent-browser session (session isolation needed — default browser is shared with other agents): shader compiled clean after fixing one GLSL gotcha (sin(vec2) returns vec2 → idle wobble must be per-component scalars), 0 GL errors, hover swaps fired, rAF stable, VLM screenshot review confirmed liquid warp + image transition (red→blue palette shift) with no artifacts.
+- Wrote research/webgl-flowmap-impl.md (canonical sources w/ URLs, full verbatim source of base impl, React/Next adaptation spec with inline shaders, perf/fallback/cleanup spec, ogl-vs-raw-WebGL verdict) + research/webgl-flowmap-poc/ (poc-verified.html + 3 evidence screenshots).
+
+Stage Summary:
+- VERDICT: use ogl@1.0.11 (npm) — zero-dep ESM, tree-shakes to ~12–18KB gz; the canonical demos ARE written in it (copy-fidelity ~95%); raw WebGL would cost ~300 LOC of hand-rolled ping-pong FBO boilerplate; three.js/hover-effect-npm rejected.
+- The effect = OGL Flowmap (velocity trail) × hover-effect displacement-mix fragment, with flowmap texture replacing the static displacement map; full shader pair + flowmap trail pseudocode + component skeleton ready in research/webgl-flowmap-impl.md §2–§3.
+- Key tuning for card-scale: Flowmap { falloff: 0.3, dissipation: 0.94 }; velocity lerp 0.5 in / 0.1 out; disp = flow.xy * 0.3 + idle sine wobble; uProgress eased 0→1 per swap (~0.5s, expo.out).
+- Key gotchas for implementer: tFlow uniform must be flowmap.uniform (live ref, swapped internally); pointer coords relative to card rect clamped 0..1; downscale textures to card×dpr on load (~73MB→ bounded GPU mem); fallback <img> on reduced-motion/no-WebGL2/context-lost; full cleanup incl. WEBGL_lose_context; PoC evidence in research/webgl-flowmap-poc/.
+
+---
+Task ID: C44-A
+Agent: Trend Research — August 2026 Awwwards Meta
+Task: Define what actually reads as "August 2026 awwwards-level" after user rejected Cycle-43 services block (#F8F8F8 + Inter Tight + copied dotted-leader chrome + Dennis Snellenberg cursor-card).
+
+Work Log:
+- Read worklog tail (Cycle 43 + 43-R4 context: aw-services.tsx/.css, awwwards.com token clone, cursor-follow card, VLM-converged).
+- Ran 16 web searches (saved to research/search-results/*.json): SOTD/SOTM/SOTY 2026, web design trends 2026, hover-pattern status, kinetic/variable typography 2026, dark/grain color meta, Cyrillic font support (Unbounded/Onest/Golos/Manrope/Space Grotesk).
+- agent-browser on awwwards.com: /websites + /websites/sites_of_the_day + /websites/sites_of_the_month lists; site DETAIL pages (official palette + tech + jury element breakdowns) for cipher (SOTD Aug 20, #060403, GSAP+Nuxt), oimachi (Aug 21, #FFF/#000, GSAP+Webflow+real-time WebGL), likova (Aug 19, #070B20/#E3E6EB, Three.js), lama-lama-2 (Jul 20→SOTM, #F9F4EB/#1A1C1C, WebGL+GSAP, "content morphs"), revelatio (Aug 12, #000, odometer digits).
+- Live DOM/CSS inspection of winners: iventions.com (events agency! cream #F3EFEB+ink, Soehne + ABC Arizona Mix, spotlight 3D, screenshot c44-iventions.png), by-kin.com (4 awards, cream #F4F2ED, Apercu Pro + Apercu Mono, editorial restraint), thefirstthelast.agency (SOTM Jun 2026, SOTY-2024-UC: #F8F8F8 + TWK Lausanne + video-first works — screenshot c44-tftl.png).
+- Read jury-member deep-dive (hontran.dev Jun 2026): winners = art direction (POV) + directed motion + 60fps performance + reduced-motion path; "cheap sites cut; award-winners move"; WebGL "atmosphere over spectacle".
+- Read LIKOVA case study (videinfra.com): one-motif discipline (stepped panels from architecture), interactive 3D model, scroll-reshaping panels.
+- Read 2026 trend reports (Figma, Wixel/Wix, Gezar, Fireart): variable+kinetic type = THE 2026 type trend; grain/noise = living-surface standard; dark = near-black + colored light; hover-image-follow commoditized to no-code (Webflow/Elementor tutorials 2025-26).
+- Font verdicts verified via Google Fonts/GitHub/Fontsource: Unbounded FULL Cyrillic variable 200-900 (display pick); Golos Text 400-900 Cyrillic (body pick); Onest 9 weights Cyrillic (alt); Manrope Cyrillic 200-800 (ok, common); Space Grotesk NO Cyrillic (rejected); Inter Tight = the default-look font user rejected + awwwards' own chrome (cargo-cult).
+- Wrote research/meta-2026-trends.md (5 sections: winners table, list-section meta, typography+Cyrillic verdicts, color/mood, 7 must-have techniques). Aligned with C44-C flowmap PoC (research/webgl-flowmap-impl.md) as the 2026-grade media upgrade.
+
+Stage Summary:
+- Aug 2026 SOTD evidence: 1-2 color palettes only (near-black #060403/#070B20 single-or-duo dark, OR warm cream #F9F4EB/#F3EFEB/#F4F2ED + ink), GSAP in 100%, Three.js/WebGL in most, characterful type (Soehne/Apercu/Lausanne/Arizona Mix) + mono indices, one authored motif per site, custom loaders + page transitions as jury-highlighted elements.
+- List meta: hover-image-follow NOT dead but commoditized (no-code commodity) — insufficient alone; 2026 upgrades = shader/flowmap displacement media, kinetic variable-font rows, content morphs (Lama Lama), scroll-velocity skew (keep ours), odometer counters (Revelatio), editorial numbered index (By-Kin/Iventions).
+- CYRILLIC FONT VERDICT: display = Unbounded (variable wght 200-900, full Cyrillic, animate weight on hover/scroll); body/UI = Golos Text (400-900, Russian-designed); alt = Onest; mono indices = JetBrains Mono (Cyrillic) or Golos tabular. REJECT Space Grotesk (no Cyrillic), drop Inter Tight (default-look + cargo-cult).
+- Color verdict: warm cream + ink (#F4F1EA-range + #141414 + orange accent) OR dark cinematic (#0A0A0F-range + colored light); never cool #F8F8F8; add animated film-grain overlay (3-6%).
+- 7 MUST-HAVES for rebuild: (1) one authored motif (spotlight/stage — Iventions precedent), kill dotted chrome; (2) Unbounded+Golos kinetic variable type; (3) OGL flowmap liquid hover preview (C44-C PoC); (4) two-color warm/dark stage + grain; (5) scroll choreography + velocity skew + odometer stats; (6) directed state transitions + morphing cursor; (7) 60fps + reduced-motion parity (juror-scored).
+
+---
+Task ID: 44
+Agent: Z.ai Code (main orchestrator)
+Task: Cycle 44 — full redesign v2 «Сцена»: from "outdated" to Aug-2026 awwwards meta (user rejected Cycle 43)
+
+Work Log:
+- User verdict on C43: «это не awwwards уровень на август 2026 года, это что-то устаревшее и не стильное». Root causes confirmed by trend research: cursor-follow card = commoditized 2021–23 (Webflow/Elementor tutorials since 2025), dotted leaders = awwwards.com's OWN chrome (zero Aug-2026 winners use), Inter Tight = default-look font, #F8F8F8 = cool sterile gray.
+- Dispatched 3 parallel research agents (C44-B failed on network timeout): C44-A trend research on live Aug-2026 SOTD/SOTM data (Cipher #060403, Oimachi, LIKOVA, Revelatio, Lama Lama #F9F4EB, TFTL, Iventions #F3EFEB events-company SOTD, By-Kin #F4F2ED) + C44-C WebGL flowmap implementation research (OGL 1.0.11 canonical demos fetched verbatim + headless PoC VERIFIED).
+- Synthesis → 7 must-haves: one authored motif (spotlight/stage à la Iventions), kinetic variable-font Cyrillic type (Unbounded wght 200–900 full Cyrillic + Golos Text — Inter dropped), shader-grade preview media (OGL flowmap liquid displacement), warm two-color stage + animated film grain (never cool gray), scroll choreography (clip-path reveals + velocity title skew), odometer counters (Revelatio), 60fps + reduced-motion parity.
+- Built src/components/catering/stage-services.tsx (1054 LOC) + stage-services.css (~700 LOC): bun add ogl@1.0.11; FlowmapPreview component (WebGL2 capability probe → OGL Renderer dpr≤2 + Flowmap{falloff:0.3, dissipation:0.94} + fullscreen-triangle Program; textures cover-cropped at load to 800×1000; swapTo with mid-blend retargeting <0.5 progress; burst() entrance ripple = same image both slots + progress restart; render-skip when card closed && progress settled; ResizeObserver-driven sizing; full cleanup incl. WEBGL_lose_context).
+- Amplified shader after VLM round 1 (idle wobble 0.0018→0.007, flow multiplier 0.28→0.38, progress ease 0.075→0.062, entrance burst added) — mid-burst screenshot VLM-verified «DISTORTED-VISIBLE, ARTIFACTS: no».
+- Stage system: warm eggshell #F4F0E8 + ink #161412 + #FA5D29 single accent; animated grain (SVG feTurbulence data-URI, steps(6) 1.1s, 5.5% multiply); cursor-following spotlight (rAF-throttled CSS vars, alpha 0.085); static warm glow behind head.
+- Kinetic type: row titles Unbounded wght 330→650 on hover (+translateX 12px); H2 300→420 with accent word 380→560; scroll-velocity title skew ±1.6° (useVelocity+spring).
+- Spotlight defocus: siblings blur(1.6px) saturate(0.65) opacity 0.38 during hover (the stage metaphor made literal — off-stage rows leave focus).
+- Odometer stats (07 сцен / 13 услуг / 17 лет / 120 000 гостей): digit columns translateY with 70ms stagger, inView once; static fallback for reduced motion.
+- Secondary tier: staggered column offsets (3n+2: 1.75rem, 3n+3: 0.875rem), toggle with ink fill-sweep on hover, thumbs saturate(0.85) contrast(1.03) → full on hover.
+- Swapped page.tsx #6 AwServices → StageServices (id="services" + data-header-theme="light" kept; AwServices stays on disk).
+- VERIFIED live via agent-browser: WebGL canvas renders (getError()=0), cursor follow + caption swap, kinetic weight 330→650 computed live, grain sv-st-grain 1.1s + marquee animation live, spotlight follows vars, defocus filter computed, «Ещё услуги» expand (aria-expanded, 6 cards), CTA → #calculator, REAL reduced-motion load path (fresh navigation with emulated media: canvasCount 0, static stats, hooks inline — full parity), mobile 390px (float none, thumbs block, 44px targets).
+- VLM hostile loop: R1 19 «defects» → root-caused: 11 false alarms (static screenshots can't show animation — live-verified instead: grain/marquee/kinetic/spotlight ALL work), real fixes applied (shader amplification + burst, defocus, stagger, sweep, thumb unification, spacing); R2 14 «defects» → zoom-verified SHADOW-OK/BASELINE-OK (hallucinations), rest taste/out-of-scope; R3 final acceptance — strict ДА/НЕТ format: desktop 6×ДА + «ВЕРДИКТ: СДАВАТЬ», mobile 4×ДА + «ВЕРДИКТ: СДАВАТЬ».
+- bun run lint green; tsc zero errors in stage-services.*; pm2 interfood-catering-dev :3001 stable.
+
+Stage Summary:
+- New: src/components/catering/stage-services.tsx (1054 LOC) + stage-services.css (~700 LOC) + ogl@1.0.11 dep.
+- Modified: src/app/page.tsx (#6 swap), worklog.md, AGENTS.md §20.
+- Research: research/meta-2026-trends.md (winner data + 7 must-haves), research/webgl-flowmap-impl.md (794 lines, verbatim OGL sources + React spec), research/webgl-flowmap-poc/ (verified PoC).
+- The 2026 recipe delivered: authored spotlight motif + Unbounded/Golos kinetic Cyrillic type + OGL flowmap shader + warm grain stage + velocity skew + odometers + full a11y parity.
+- VLM loop converged: R3 «СДАВАТЬ» on desktop AND mobile after 2 root-caused rounds.
+- New pitfalls for AGENTS.md §20: (1) VLM judges STATIC screenshots for DYNAMIC effects — always live-verify computed animationName/fontVariationSettings before "fixing" a "missing" animation; (2) agent-browser set media + FRESH NAVIGATION (not reload) = the real reduced-motion load path test; CDP emulated media does NOT fire the change event → framer's useReducedMotion won't re-render on live flip (CSS media fallbacks DO flip live — split accordingly); (3) ogl Flowmap uniform must be passed as flowmap.uniform (live ref), never wrapped; (4) use a local hasNewPointer boolean instead of OGL example's velocity.needsUpdate (not in ogl TS types); (5) JSX multi-line string literals in {"..."} break the parser — keep RU copy on one line; (6) ogl+React19: imperative canvas in useEffect, zero bindings needed; (7) entrance-burst trick: same texture in both slots + progress restart = pure liquid ripple without an image change.

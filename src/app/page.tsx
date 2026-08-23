@@ -4,7 +4,7 @@ import { TottHero } from "@/components/catering/tott-hero";
 import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
 import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
-import { AwServices } from "@/components/catering/aw-services";
+import { StageServices } from "@/components/catering/stage-services";
 import { Menu } from "@/components/catering/menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
@@ -135,22 +135,22 @@ export default function Home() {
 
       {/* ── ACT II: WHAT WE OFFER ── */}
 
-      {/* 6. AwServices — Cycle 43 NEW. Services block fully redesigned in
-             the design language of awwards.com (tokens scraped from their
-             live CSS): Inter Tight + #F8F8F8 bg + #222 ink + #FA5D29 accent
-             + dotted leader lines (their #1 signature) + yellow #FFF083
-             badge chips. Content restructured per research (Task 3-A): 7
-             primary services with price anchoring «от X ₽/гость» (Фуршеты,
-             Банкеты, Свадьбы NEW, Корпоратив, Кофе-брейки, Барбекю,
-             Выездной бар NEW) + 6 secondary «Ещё услуги» (expandable grid)
-             + inverted marquee teaser + magnetic CTA «Получить смету за 30
-             минут». The wow: Dennis-Snellenberg cursor-following 4:5 media
-             card (spring lag 150/22/0.6 + velocity skew ±6° + asymmetric
-             enter/exit beziers + zero-flash crossfade + sibling dim 0.32);
-             focus docks the card for keyboard users; mobile degrades to
-             inline-thumb rows (Dennis's own ≤1000px pattern). Replaces the
-             Cycle-37 AtServices terminal list (kept on disk for reference). */}
-      <AwServices />
+      {/* 6. StageServices — Cycle 44 NEW «Сцена». Full redesign per
+             Aug-2026 awwwards meta research (C44-A: live SOTD/SOTM data —
+             Cipher, Oimachi, LIKOVA, Lama Lama, Iventions, By-Kin):
+             authored spotlight/stage motif (events-company precedent),
+             warm eggshell #F4F0E8 + ink #161412 + single accent, animated
+             film grain, kinetic variable-font Cyrillic type (Unbounded
+             200–900 wght axis animated on hover + Golos Text body — no
+             Inter), OGL flowmap liquid-displacement shader on the
+             cursor-follow preview (velocity trail + A→B displacement
+             swap, PoC-verified), scroll-velocity title skew, odometer
+             digit-roll stats (Revelatio pattern), cursor spotlight layer,
+             clip-path row reveals, magnetic CTA. A11y discipline kept
+             from C43: keyboard-docked preview, reduced-motion parity,
+             mobile inline-thumb rows. Replaces Cycle-43 AwServices (kept
+             on disk for reference). */}
+      <StageServices />
 
       {/* 7. Menu — 7 menu types with interactive list + real dishes + PDF. */}
       <Menu />

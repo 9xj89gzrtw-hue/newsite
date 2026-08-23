@@ -1,0 +1,1012 @@
+/* ==========================================================================
+   StageServices — Cycle 44 «Сцена». Design system per C44-A research:
+   warm eggshell stage + warm ink + ONE accent, film grain, kinetic
+   variable-font type (Unbounded 200–900 + Golos Text), spotlight motif.
+   Scoped `.sv-st` + `.sv-st__*` only. No globals.css edits.
+   ========================================================================== */
+
+.sv-st {
+  /* warm two-color stage (Lama Lama / Iventions / By-Kin lineage) */
+  --sv-stage: #f4f0e8;
+  --sv-ink: #161412;
+  --sv-accent: #fa5d29;
+  --sv-line: rgb(22 20 18 / 0.14);
+  --sv-line-strong: rgb(22 20 18 / 0.28);
+  --sv-meta: rgb(22 20 18 / 0.56);
+  --sv-radius: 10px;
+
+  position: relative;
+  isolation: isolate;
+  overflow: clip; /* clip grain + glows; float card is FIXED so unaffected */
+  background: var(--sv-stage);
+  color: var(--sv-ink);
+  font-family: var(--sv-golos), "Golos Text", system-ui, -apple-system, sans-serif;
+  padding-block: clamp(4.5rem, 10vh, 8.5rem);
+}
+
+/* --------------------------------- film grain (2026 "living surface") --- */
+
+.sv-st::after {
+  content: "";
+  position: absolute;
+  inset: -140px;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.055;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  animation: sv-st-grain 1.1s steps(6) infinite;
+}
+
+@keyframes sv-st-grain {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-30px, 24px, 0); }
+  40% { transform: translate3d(24px, -36px, 0); }
+  60% { transform: translate3d(-40px, -18px, 0); }
+  80% { transform: translate3d(32px, 30px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* ------------------------------- spotlight that follows the cursor ------ */
+
+.sv-st__spot {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    560px circle at var(--sv-mx, 50%) var(--sv-my, 24%),
+    rgb(250 93 41 / 0.085),
+    transparent 62%
+  );
+  transition: opacity 0.4s ease-out;
+}
+
+/* static warm glow behind the head — the fixed stage light */
+.sv-st__glow {
+  position: absolute;
+  inset-inline: 0;
+  top: -10%;
+  z-index: 0;
+  height: 62%;
+  pointer-events: none;
+  background:
+    radial-gradient(52% 60% at 68% 22%, rgb(250 93 41 / 0.075), transparent 70%),
+    radial-gradient(46% 52% at 18% 8%, rgb(255 176 94 / 0.10), transparent 72%);
+}
+
+.sv-st__container {
+  position: relative;
+  z-index: 2;
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 4rem);
+}
+
+/* ------------------------------------------------------------- head ----- */
+
+.sv-st__head {
+  margin-bottom: clamp(2.5rem, 6vh, 4.5rem);
+}
+
+.sv-st__eyebrow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  margin-bottom: clamp(1.5rem, 3vh, 2.25rem);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.sv-st__eyebrow-label {
+  color: var(--sv-ink);
+}
+
+.sv-st__eyebrow-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6rem;
+  height: 1.3rem;
+  padding-inline: 0.4rem;
+  border-radius: 999px;
+  background: var(--sv-ink);
+  color: var(--sv-stage);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  transform: translateY(0.12em);
+}
+
+.sv-st__eyebrow-note {
+  color: var(--sv-meta);
+  letter-spacing: 0.14em;
+  font-weight: 400;
+}
+
+.sv-st__title {
+  font-family: var(--sv-unb), "Unbounded", system-ui, sans-serif;
+  font-size: clamp(1.9rem, 4.6vw, 4.4rem);
+  font-variation-settings: "wght" 300;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  max-width: 22ch;
+  transition: font-variation-settings 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.sv-st__title:hover {
+  font-variation-settings: "wght" 420;
+}
+
+.sv-st__title-accent {
+  color: var(--sv-accent);
+  font-variation-settings: "wght" 380;
+  transition: font-variation-settings 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sv-st__title:hover .sv-st__title-accent {
+  font-variation-settings: "wght" 560;
+}
+
+.sv-st__sub {
+  margin-top: 1.4rem;
+  max-width: 34rem;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: rgb(22 20 18 / 0.7);
+}
+
+.sv-st__nowrap {
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------------- primary rows -- */
+
+.sv-st__list {
+  border-top: 1px solid var(--sv-line);
+}
+
+.sv-st__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding-block: clamp(1.15rem, 2.4vh, 1.7rem);
+  border-bottom: 1px solid var(--sv-line);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    opacity 0.45s ease-out,
+    filter 0.45s ease-out;
+}
+
+/* sibling spotlight — off-stage rows defocus (blur + desaturate + fade).
+ * The spotlight metaphor made literal: what isn't hovered is out of focus. */
+@media (hover: hover), (pointer: none) {
+  .sv-st__list[data-hover="true"]
+    .sv-st__row:not(:hover):not(:focus-visible) {
+    opacity: 0.38;
+    filter: blur(1.6px) saturate(0.65);
+  }
+}
+
+.sv-st__row {
+  transition:
+    opacity 0.45s ease-out,
+    filter 0.45s ease-out;
+}
+
+.sv-st__row:focus-visible {
+  outline: 2px solid var(--sv-accent);
+  outline-offset: -2px;
+  border-radius: var(--sv-radius);
+}
+
+.sv-st__row-index {
+  flex: none;
+  width: 2.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--sv-meta);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: color 0.35s ease-out;
+}
+
+.sv-st__row:hover .sv-st__row-index,
+.sv-st__row:focus-visible .sv-st__row-index {
+  color: var(--sv-accent);
+}
+
+.sv-st__row-thumb {
+  display: none;
+  position: relative; /* next/image fill requires a positioned parent */
+}
+
+.sv-st__row-body {
+  display: block;
+  min-width: 0;
+}
+
+/* THE kinetic signature: variable weight breathes on hover */
+.sv-st__row-title {
+  display: block;
+  font-family: var(--sv-unb), "Unbounded", system-ui, sans-serif;
+  font-size: clamp(1.08rem, 1.9vw, 1.72rem);
+  font-variation-settings: "wght" 330;
+  line-height: 1.22;
+  letter-spacing: 0;
+  overflow-wrap: break-word;
+  transition:
+    font-variation-settings 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.35s ease-out;
+}
+
+.sv-st__row:hover .sv-st__row-title,
+.sv-st__row:focus-visible .sv-st__row-title {
+  font-variation-settings: "wght" 650;
+  transform: translateX(12px);
+}
+
+.sv-st__row-hook {
+  display: none; /* desktop: lives in the float caption */
+}
+
+.sv-st__row-tags {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.22rem;
+  text-align: right;
+}
+
+.sv-st__row-price {
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.35s ease-out;
+}
+
+.sv-st__row:hover .sv-st__row-price,
+.sv-st__row:focus-visible .sv-st__row-price {
+  color: var(--sv-accent);
+}
+
+.sv-st__row-guests {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sv-meta);
+  white-space: nowrap;
+}
+
+/* arrow chip — slides in and fills with ink on hover */
+.sv-st__row-arrow {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--sv-line-strong);
+  color: var(--sv-ink);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity 0.35s ease-out,
+    transform 0.35s ease-out,
+    background-color 0.35s ease-out,
+    color 0.35s ease-out,
+    border-color 0.35s ease-out;
+}
+
+.sv-st__row-arrow svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.sv-st__row:hover .sv-st__row-arrow,
+.sv-st__row:focus-visible .sv-st__row-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  background: var(--sv-ink);
+  border-color: var(--sv-ink);
+  color: var(--sv-stage);
+}
+
+/* --------------------------------------------- secondary («Ещё услуги») - */
+
+.sv-st__more-wrap {
+  margin-top: clamp(2rem, 4vh, 3rem);
+}
+
+.sv-st__more-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--sv-line-strong);
+  background: transparent;
+  color: var(--sv-ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    border-color 0.3s ease-out,
+    color 0.3s ease-out;
+}
+
+/* fill sweep on hover (directed state transition, not a color cut) */
+.sv-st__more-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--sv-ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 0;
+}
+
+.sv-st__more-toggle > span,
+.sv-st__more-icon {
+  position: relative;
+  z-index: 1;
+}
+
+.sv-st__more-toggle:hover {
+  border-color: var(--sv-ink);
+  color: var(--sv-stage);
+}
+
+.sv-st__more-toggle:hover::before {
+  transform: scaleX(1);
+}
+
+.sv-st__more-toggle:focus-visible {
+  outline: 2px solid var(--sv-accent);
+  outline-offset: 2px;
+}
+
+.sv-st__more-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding-inline: 0.35rem;
+  border-radius: 999px;
+  background: var(--sv-accent);
+  color: #fff;
+  font-style: normal;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.sv-st__more-icon {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sv-st__more-icon[data-open="true"] {
+  transform: rotate(45deg);
+}
+
+.sv-st__more {
+  overflow: hidden; /* height animation — no sticky inside, safe */
+}
+
+.sv-st__more-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  padding-top: 1.75rem;
+  padding-bottom: 1.75rem; /* room for staggered offsets */
+}
+
+/* staggered editorial offsets (desktop) — asymmetric rhythm */
+@media (min-width: 1024px) {
+  .sv-st__more-card:nth-child(3n + 2) {
+    margin-top: 1.75rem;
+  }
+  .sv-st__more-card:nth-child(3n + 3) {
+    margin-top: 0.875rem;
+  }
+}
+
+.sv-st__more-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 0.9rem;
+  border-radius: var(--sv-radius);
+  border: 1px solid var(--sv-line);
+  background: rgb(255 255 255 / 0.42);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.35s ease-out,
+    border-color 0.35s ease-out,
+    box-shadow 0.35s ease-out;
+}
+
+.sv-st__more-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--sv-line-strong);
+  box-shadow: 0 18px 44px -22px rgb(22 20 18 / 0.35);
+}
+
+.sv-st__more-card:focus-visible {
+  outline: 2px solid var(--sv-accent);
+  outline-offset: 2px;
+}
+
+.sv-st__more-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  border-radius: calc(var(--sv-radius) - 2px);
+  overflow: hidden;
+}
+
+.sv-st__more-thumb img {
+  object-fit: cover;
+  filter: saturate(0.85) contrast(1.03); /* stage unification */
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.6s ease-out;
+}
+
+.sv-st__more-card:hover .sv-st__more-thumb img {
+  transform: scale(1.045);
+  filter: saturate(1) contrast(1);
+}
+
+.sv-st__more-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-inline: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.sv-st__more-title {
+  font-family: var(--sv-unb), "Unbounded", system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-variation-settings: "wght" 420;
+  line-height: 1.3;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.sv-st__more-arrow {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--sv-accent);
+  transition: transform 0.35s ease-out;
+}
+
+.sv-st__more-card:hover .sv-st__more-arrow {
+  transform: translate(2px, -2px);
+}
+
+.sv-st__more-hook {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgb(22 20 18 / 0.64);
+}
+
+/* ------------------------------------------------------- marquee strip -- */
+
+.sv-st__marquee {
+  margin-top: clamp(2.5rem, 5vh, 3.5rem);
+  background: var(--sv-ink);
+  color: var(--sv-stage);
+  overflow: hidden;
+  padding-block: 0.85rem;
+  border-radius: var(--sv-radius);
+}
+
+.sv-st__marquee-track {
+  display: flex;
+  width: max-content;
+  animation: sv-st-marquee 38s linear infinite;
+}
+
+.sv-st__marquee-seg {
+  display: flex;
+  flex: none;
+}
+
+.sv-st__marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.25rem;
+  padding-right: 2.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgb(244 240 232 / 0.9);
+}
+
+.sv-st__marquee-star {
+  font-style: normal;
+  font-size: 0.65rem;
+  color: var(--sv-accent);
+}
+
+@keyframes sv-st-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ------------------------------------------------------------- foot ----- */
+
+.sv-st__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: clamp(3rem, 7vh, 5rem);
+  padding-top: clamp(2rem, 4vh, 3rem);
+  border-top: 1px solid var(--sv-line);
+}
+
+.sv-st__stats {
+  display: flex;
+  gap: clamp(1.5rem, 3.5vw, 3.25rem);
+  flex-wrap: wrap;
+}
+
+.sv-st__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.sv-st__stat-value,
+.sv-st-odo {
+  font-family: var(--sv-unb), "Unbounded", system-ui, sans-serif;
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  font-variation-settings: "wght" 380;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* odometer digit columns */
+.sv-st-odo {
+  display: inline-flex;
+}
+
+.sv-st-odo__gap {
+  width: 0.28em;
+}
+
+.sv-st-odo__digit {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.sv-st-odo__col {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1;
+  transform: translateY(0);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sv-st__stat-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sv-meta);
+}
+
+.sv-st__foot-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* magnetic pill CTA */
+.sv-st__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.75rem;
+  border-radius: 999px;
+  background: var(--sv-accent);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.18),
+    0 10px 24px -12px rgb(250 93 41 / 0.55);
+  transition:
+    background-color 0.3s ease-out,
+    box-shadow 0.3s ease-out;
+  will-change: transform;
+}
+
+.sv-st__cta svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sv-st__cta:hover {
+  background: color-mix(in oklab, var(--sv-accent) 88%, #000000);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.22),
+    0 16px 36px -14px rgb(250 93 41 / 0.65);
+}
+
+.sv-st__cta:hover svg {
+  transform: translate(2px, -2px);
+}
+
+.sv-st__cta:focus-visible {
+  outline: 2px solid var(--sv-ink);
+  outline-offset: 3px;
+}
+
+.sv-st__foot-alt {
+  font-size: 0.9rem;
+  color: rgb(22 20 18 / 0.72);
+  text-decoration: underline;
+  text-decoration-color: rgb(22 20 18 / 0.24);
+  text-underline-offset: 4px;
+  transition: color 0.3s ease-out, text-decoration-color 0.3s ease-out;
+}
+
+.sv-st__foot-alt:hover {
+  color: var(--sv-ink);
+  text-decoration-color: var(--sv-accent);
+}
+
+.sv-st__foot-alt:focus-visible {
+  outline: 2px solid var(--sv-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------ cursor-follow shader card ---- */
+
+.sv-st__float {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 35;
+  pointer-events: none;
+}
+
+.sv-st__float-lag {
+  will-change: transform;
+  transform: rotate(0.001deg); /* GPU-compositing hint */
+}
+
+.sv-st__float-card {
+  position: relative;
+  width: clamp(240px, 26vw, 400px);
+  aspect-ratio: 4 / 5;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--sv-ink);
+  box-shadow:
+    0 6px 16px -8px rgb(22 20 18 / 0.22),
+    0 28px 64px -20px rgb(22 20 18 / 0.42),
+    0 0 0 0.5px rgb(255 255 255 / 0.12) inset;
+  will-change: transform, opacity;
+}
+
+/* the media area: WebGL canvas host or stacked fallback images */
+.sv-st__media {
+  position: absolute;
+  inset: 0;
+}
+
+.sv-st__media-gl {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.sv-st__media-img {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
+}
+
+.sv-st__media-img[data-on="true"] {
+  opacity: 1;
+}
+
+.sv-st__media-img img {
+  object-fit: cover;
+}
+
+.sv-st__float-cap {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: 3.5rem 1.15rem 1.2rem;
+  background: linear-gradient(
+    0deg,
+    rgb(10 8 6 / 0.82),
+    rgb(10 8 6 / 0.34) 64%,
+    transparent
+  );
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.sv-st__float-cap-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.sv-st__float-cap-index {
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.72);
+}
+
+.sv-st__float-cap-title {
+  font-family: var(--sv-unb), "Unbounded", system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-variation-settings: "wght" 450;
+  line-height: 1.25;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.35);
+}
+
+/* --------------------------------------------------- mobile (≤1023px) --- */
+
+@media (max-width: 1023px) {
+  .sv-st__float,
+  .sv-st__spot {
+    display: none; /* no hover media / cursor spotlight on touch */
+  }
+
+  .sv-st__list {
+    border-top: none;
+  }
+
+  .sv-st__row {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr 2.75rem;
+    grid-template-areas:
+      "thumb index arrow"
+      "thumb body  arrow"
+      "thumb tags  arrow";
+    align-items: start;
+    column-gap: 1rem;
+    row-gap: 0.15rem;
+    padding-block: 1.25rem;
+  }
+
+  .sv-st__row-index {
+    grid-area: index;
+    width: auto;
+    font-size: 0.75rem;
+  }
+
+  .sv-st__row-thumb {
+    grid-area: thumb;
+    display: block;
+    width: 4.5rem;
+    aspect-ratio: 4 / 5;
+    border-radius: 8px;
+    overflow: hidden;
+    align-self: start;
+  }
+
+  .sv-st__row-thumb img {
+    object-fit: cover;
+  }
+
+  .sv-st__row-body {
+    grid-area: body;
+  }
+
+  .sv-st__row-title {
+    font-size: clamp(0.95rem, 3.4vw, 1.12rem);
+    font-variation-settings: "wght" 380;
+    line-height: 1.3;
+    transform: none !important; /* no nudge on touch */
+  }
+
+  .sv-st__row-hook {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.83rem;
+    line-height: 1.45;
+    color: rgb(22 20 18 / 0.66);
+  }
+
+  .sv-st__row-tags {
+    grid-area: tags;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.6rem;
+    text-align: left;
+    margin-top: 0.4rem;
+  }
+
+  .sv-st__row-price {
+    font-size: 0.88rem;
+    color: var(--sv-accent);
+  }
+
+  .sv-st__row-guests {
+    font-size: 0.68rem;
+  }
+
+  .sv-st__row-arrow {
+    grid-area: arrow;
+    align-self: center;
+    justify-self: end;
+    opacity: 1;
+    transform: none;
+    background: var(--sv-ink);
+    border-color: var(--sv-ink);
+    color: var(--sv-stage);
+  }
+
+  .sv-st__more-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+  .sv-st__foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .sv-st__row {
+    grid-template-columns: 4rem 1fr 2.75rem;
+  }
+
+  .sv-st__row-thumb {
+    width: 4rem;
+  }
+
+  .sv-st__more-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sv-st__eyebrow-note {
+    display: none;
+  }
+
+  .sv-st__title {
+    font-size: clamp(1.55rem, 8.4vw, 2.1rem);
+  }
+
+  .sv-st__stats {
+    gap: 1.25rem 2rem;
+  }
+}
+
+/* ------------------------------------------- reduced motion (global) ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .sv-st::after {
+    animation: none;
+  }
+
+  .sv-st__marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sv-st__marquee-item {
+    white-space: normal;
+  }
+
+  .sv-st__spot {
+    display: none;
+  }
+
+  /* rows show hooks inline — information parity with the shader card */
+  @media (min-width: 1024px) {
+    .sv-st__row {
+      align-items: flex-start;
+      padding-block: 1.35rem;
+    }
+
+    .sv-st__row-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .sv-st__row-hook {
+      display: block;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: rgb(22 20 18 / 0.66);
+    }
+
+    .sv-st__row-title,
+    .sv-st__row-arrow,
+    .sv-st__row-price,
+    .sv-st__row-index {
+      transition: none;
+    }
+
+    .sv-st__row:hover .sv-st__row-title {
+      transform: none;
+    }
+
+    .sv-st__row-arrow {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .sv-st__title,
+  .sv-st__title-accent,
+  .sv-st__row-title {
+    transition: none;
+  }
+
+  .sv-st__title:hover,
+  .sv-st__title:hover .sv-st__title-accent,
+  .sv-st__row:hover .sv-st__row-title {
+    font-variation-settings: inherit;
+  }
+
+  .sv-st__row:hover .sv-st__row-title {
+    font-variation-settings: "wght" 330;
+  }
+
+  .sv-st__more-icon,
+  .sv-st__more-thumb img {
+    transition: none;
+  }
+
+  .sv-st-odo__col {
+    transition: none;
+  }
+}
