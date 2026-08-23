@@ -2006,3 +2006,89 @@ Stage Summary:
 - Dev server: pm2 interfood-catering-dev on :3001 (3000 = parent sandbox). Restart after heavy hot-edits if ChunkLoadError appears.
 - Key pitfalls for future agents: (1) overflow:hidden on a section kills position:sticky descendants — never add it to a section containing sticky elements; (2) agent-browser `set viewport` resets after `open` — always set AFTER navigating; (3) synthetic dispatchEvent(mouseenter) does NOT trigger React onMouseEnter — use real mouse move or .focus(); (4) VLM screenshot claims must be root-caused (2 of 4 "defects" were false alarms); (5) IBM Plex Mono has full cyrillic — the default --font-poppins (Montserrat) carried row titles for brand consistency; (6) image assignments MUST be VLM-audited against service semantics — filenames lie (menu-vegetarian.jpg is a buffet).
 - Loop converged: 2 consecutive «ДЕФЕКТОВ НЕТ» verdicts (desktop 9/10, mobile 9/10). Remaining wishlist (out of scope): WebGL particle scene, cursor-follow glow parallax on preview, kinetic glitch on scroll velocity.
+
+---
+Task ID: 3-A
+Agent: Research Subagent A — Services Block Content Best Practices
+Task: Исследование контента блока «УСЛУГИ» (актуальные/устаревшие услуги и паттерны) для полного редизайна.
+
+Work Log:
+- Прочитал контекст: newsite/worklog.md (хвост), docs/SERVICES-CONTENT.md (18 услуг, 5 категорий), AGENTS.md §1–§5.
+- Прогнал 18 веб-поисков через z-ai CLI (web_search): catering sites 2025/2026, services UX patterns, pricing patterns, Miller 7±2, filtering UX, carousels research, catering trends 2025, hover-reveal/sticky-preview, RU-рынок кейтеринга СПб.
+- Прочитал живые страницы (page_reader): wolfgangpuckcatering.com, ridgewells.com, fundamental-events.com, threetomatoes.com/event-services, eatcatering.ru, colorlib.com/roundup. Сырые JSON: research/3A/.
+- Сверил с docs/: WOLFGANG-PUCK-DESIGN-ANALYSIS.md (таб-модуль 5 услуг + мега-меню 7), RIDGEWELLS-ANALYSIS.md (4 карточки 2×2), REFERENCE-SITES-ANALYSIS.md (23 сайта).
+- Проверил текущую реализацию at-services.tsx: 18 строк, фильтр-радиогруппа + поиск, sticky-превью, метаданные только minOrder.
+- Написал отчёт: research/services-block-content-research.md (секция НЕ в git — /research/ в .gitignore).
+
+Stage Summary:
+- Лидеры рынка показывают 4–8 верхнеуровневых категорий услуг (Ridgewells 4; Wolfgang Puck 5 табов + 7 в меню; Three Tomatoes 7; fundamental events 8) — 18 строк «в лицо» не держит никто.
+- Две оси категоризации у лучших: «тип события» (свадьбы/корпоратив/частные) × «стиль подачи» (фуршет/банкет/станции/доставка); аудитории и стили часто разнесены в разную навигацию.
+- ГЛАВНЫЙ КОНТЕНТНЫЙ ПРОБЕЛ текущего блока: нет «Свадьб» (услуга №1 всех эталонов) и нет «Выездного бара» (отдельная категория у fundamental/Traditions; тренд моктейлей 2025).
+- Устарели как отдельные строки: шоколадный фонтан и пирамида шампанского (пропы 2000-х; тренд-2025 — интерактивные станции шефа), вегетарианское/халяль (атрибуты меню → бейджи/фильтр калькулятора), презентации (дубль конференций), НГ-корпоратив (сезонная кампания).
+- Актуальные паттерны 2025: editorial-типографический список с hover-reveal превью и sticky-панелью (текущий AtServices уже в парадигме — редизайн = реструктуризация данных, не смена визуального языка); таб-браузер; нумерация 01–07; контекстный CTA на строку.
+- Устаревшие паттерны: иконочные карточки-тройки, автокарусели (NN/g + CXL: ~1% кликов дальше 1-го слайда), плотный список без медиа, плоский список 15–20 без иерархии.
+- ЦЕНА «от X ₽/гость» — показывать: все проверенные СПб-конкуренты её показывают (Empire: фуршет от 1600 ₽/чел; Яндекс.Услуги: кофе-брейк от 250 ₽/чел), price anchoring подтверждён Figma/SBI; публичный калькулятор сайта делает прозрачность цены логичной.
+- Рекомендация: 7 основных услуг (Фуршеты / Банкеты / Свадьбы NEW / Корпоративные / Кофе-брейки+обеды / Барбекю / Выездной бар NEW) + раскрываемый второй эшелон (шоу-станции шефа NEW, гастро-боксы, детский, логистика под ключ); фильтр оставить только при раскрытом списке.
+- Метаданные на строку: индекс, hook ≤90 знаков, «от X ₽/гость» + «от N гостей» (+длительность для бара/банкета), превью-медиа, 1 контекстный CTA («Рассчитать фуршет» → #calculator); финальный CTA секции — «Получить смету за 30 минут».
+- Данные цен вынести в единый src/data/services.ts, чтобы блок услуг и калькулятор не разъехались.
+
+---
+Task ID: 3-C
+Agent: Research Subagent C — Award-Winning List Patterns
+Task: Reverse-engineer 5-8 award-winning services/works list implementations (awwwards-level, 2024-2025) and pick the next wow direction for the services block (replacing Cycle-37 AtServices terminal list + sticky preview).
+
+Work Log:
+- Read worklog tail: confirmed Cycle 37 shipped AtServices (terminal radiogroup filter + decode/scramble + FIXED sticky 4:5 preview). New winner must make the preview MOVE.
+- Loaded web-search skill; ran 10 searches (hover image reveal lists, awwwards SOTD/SOTY 2024-2025, Dennis Snellenberg, exoape, basement.studio, accordion services, text-mask lists, follow-cursor inspiration).
+- Live reverse-engineering via agent-browser (DOM dumps + computed styles + stylesheet rule extraction):
+  * dennissnellenberg.com/work — extracted the FULL cursor-follow CSS: .mouse-pos-list-image fixed, translate(-50%,-52%), width clamp(10em,27.5vw,25em), enter 0.4s cubic-bezier(0.34,1,0.64,1) vs exit 0.4s cubic-bezier(0.36,0,0.66,0) (different easings!), lag layer 0.5s cubic-bezier(0.65,0,0.35,1) + rotate(0.001deg) GPU hack, thumbs 810x810 crossfade by width swap, sibling dim via GSAP; row = flex 32px 0, title 2.3vw/450, meta 16px; mobile: ≤1000px rows stack + 2em circle arrow + location hidden, ≤540px float display:none, ≤450px type scales down.
+  * zajno.com — numbered work rows (01 + role + awards chips + name + category + JS-filled hover-image slot _ri), row padding ~20px.
+  * exoape.com — homepage tiles img→muted looping video swap on hover; /work = stacked full-screen position:absolute deck (Vue+GSAP).
+  * basement.studio/services — anti-list: 4 categories as 2-col alternating editorial grid (H2 + hr + big paragraph), awards list as grid-cols-12 Tailwind rows with group hover.
+  * wjystudios.com/services — Radix accordion "My Expertise" (Research/Strategy/Design/Prototyping/Testing), trigger padding 20px, content via --radix-accordion-content-height.
+  * unseen.co/projects — filterable index with per-discipline counts (All 20 / Branding 5 / Digital 20 / Motion 5 / Experiment 6) in overlay bar.
+  * immersive-g.com — editorial scattered parallax media per project + mobile text-link list (name + category pairs).
+  * waaark.com/works — WebGL canvas works (documented as anti-reference: not replicable without WebGL).
+- Dead/unreachable (checked 2026-08): toxin.so, poyeyo.com, llvltv.com, qochem.co, davidlangarica.com (redirected to Drupal CV), madeinblock.com (SSL), curioagency.com (parked), superpower.so (conn closed), cosie.studio, moreby.us (Cloudflare).
+- Prevalence check: "Follow Cursor images" is its own Awwwards Inspiration category (Jeremie Bouchard et al.) + 466-item "Hovers, Cursors and Cute Interactions" collection — pattern still juror-rewarded.
+- Wrote /home/z/my-project/newsite/research/award-winning-list-patterns.md: 8 site breakdowns, comparison matrix (wow/effort/mobile/fit), full winner interaction spec.
+- Screenshots saved: research/ds-work-desktop.png, research/zajno-work.png.
+
+Stage Summary:
+- WINNER: Cursor-Following Media Reveal list («Services Cursor List», Dennis Snellenberg pattern) + 2024-25 upgrades: velocity skew (±6° via useVelocity/useSpring) + unseen.co-style count-per-category filter pills. Scored 10 wow / 1-1.5d effort / 10 catering fit in the matrix; accordion (7 fit), horizontal strip (5, and AT-style already shipped), text-masks (4, RU long words) rejected.
+- Full spec in research/award-winning-list-patterns.md §3: 18 rows (index 01-18 + Playfair clamp(1.5rem,2.6vw,2.6rem) title + capacity + category chip + arrow), float card 4:5 portrait clamp(240px,26vw,400px) with useSpring(stiffness 150, damping 22, mass 0.6) follow, enter 0.4s [0.34,1,0.64,1] / exit 0.4s [0.36,0,0.66,0], image crossfade 0.35s, row title x+12px + siblings dim 0.32, focus-docked preview for keyboard, mobile ≤1023px = inline 96x120 thumbs + arrow circles + taglines + scroll-snap filter pills, prefers-reduced-motion = static docked panel.
+- Key implementation guardrails carried over from Cycle-37 pitfalls: no overflow:hidden on section, real mouse events for verification, VLM-audit all 18 media assignments (filenames lie), keep id="services" + data-header-theme="light".
+
+---
+Task ID: 43
+Agent: Z.ai Code (main orchestrator)
+Task: Полный редизайн блока «Услуги» — дизайн-язык awwwards.com (Cycle 43)
+
+Work Log:
+- Read AGENTS.md + worklog (cycles 35–42); current block = AtServices (activetheory terminal style, 18 services).
+- Dispatched 3 parallel research subagents: 3-A (content best practices → 7 primary + 6 secondary, price anchoring, kill-list of outdated rows), 3-B (awwwards.com live CSS scrape → exact token system: Inter Tight/#F8F8F8/#222/#FA5D29/#FFF083, dotted leaders, .3s house motion), 3-C (award list patterns reverse-engineering → winner: Dennis Snellenberg cursor-follow with extracted exact easings/springs).
+- Built src/components/catering/aw-services.tsx (783 LOC) + aw-services.css (791 LOC), self-contained, scoped aw-svc__* classes:
+  * 7 primary rows (Фуршеты, Банкеты, Свадьбы NEW, Корпоратив, Кофе-брейки, Барбекю, Выездной бар NEW) with «от X ₽/гость» + «от N гостей» price anchoring + per-row CTA link;
+  * 6 secondary «Ещё услуги» (expandable 3-col grid, aria-expanded toggle) + inverted #222 marquee teaser (seamless 2-seg loop);
+  * cursor-following 4:5 float card: spring lag {150,22,0.6}, velocity skew ±6° {200,30}, enter 0.4s [0.34,1,0.64,1] / exit [0.36,0,0.66,0], stacked preloaded imgs zero-flash crossfade 0.35s + inner scale 1.08→1, caption title+hook swap;
+  * awwwards signatures: dotted leaders igniting #FA5D29 left→right on hover, yellow count badge, Inter Tight 300-400 tight tracking, sibling dim 0.32, title x+12px, arrow chip invert;
+  * index scramble (Cyrillic-safe glyphs !%?*·№@#&) on row hover + eyebrow count on inView;
+  * magnetic CTA «Получить смету за 30 минут» (±14px spring);
+  * a11y: focus-visible docks float at row right edge (keyboard parity), rows real <a>, scramble/float/marquee aria-hidden, list-level mouseleave/focusout close (no row-to-row pulse), 44px touch targets, prefers-reduced-motion: no float/no springs/no marquee + hooks shown inline (info parity);
+  * mobile ≤1023px: grid-areas rows with 4:5 inline thumbs + hook + always-visible ink arrow circles (Dennis's own degradation), marquee stays, secondary grid 1-col.
+- Swapped AtServices → AwServices in page.tsx position #6 (kept id="services", data-header-theme="light"; section flips black→#F8F8F8 — page rhythm: dark photo band → LIGHT services → dark menu band).
+- Installed pm2 globally (7.0.3), started ecosystem.config.js (port 3001, name interfood-catering-dev; 3000 = parent sandbox).
+- VERIFIED via agent-browser (real mouse events): float follows cursor (center within 120px), crossfade row→row («Банкеты»→«Свадьбы»), velocity skew visible in matrix (off-diagonal -0.0165 mid-exit), sibling dim 0.32 computed, focus dock cardRight=1440 vs rowRight=1472 ✓, «Ещё услуги» expands 6 cards, console CLEAN after fixing next/image fill parent warning (.aw-svc__row-thumb needed position:relative), reduced-motion live-verified (float display:none + hook block + marquee animation:none via `set media reduced-motion`).
+- /loop hostile VLM critique:
+  R1 desktop 6/5/4/5 + mobile 15 defects → root-caused each; FIXED: gray contrast pass (--aw-meta #a7a7a7→#6f6f6f, --aw-line→#c9c9c9), float card multi-layer shadow + inset ring, marquee 94% + smaller, caption scrim 0.78 + hook 0.92, H2 accent word dotted underline (menu-leader metaphor), CTA inset ring + arrow slide, badge smaller+bordered, mobile index 0.75rem/60%, row padding 1.25rem, sub line-height 1.6. REJECTED as false alarms (documented): float overlaying content IS the Dennis pattern; orange accent passes AA large-text; logo/cookie/FAB out of scope; arrows already 44px; H2 wraps balanced 2 lines.
+  R2 desktop 8/8/7, 3 defects → FIXED: badge hairline border, scrim stronger, dotted rule darker.
+  R3 desktop «ДЕФЕКТОВ: 0» 9/10×3, mobile «ДЕФЕКТОВ: 0» 9/10×2, section boundaries CLEAN. Converged: 2 consecutive zero-defect verdicts.
+- bun run lint: green. tsc --noEmit: zero errors in aw-services.* (pre-existing unrelated prisma/nuqs/gsap module errors unchanged).
+
+Stage Summary:
+- New: src/components/catering/aw-services.tsx (783 LOC) + aw-services.css (791 LOC).
+- Modified: src/app/page.tsx (AtServices→AwServices #6), worklog.md (3-A/B/C + 43 entries).
+- Research artifacts: research/services-block-content-research.md, research/awwwards-design-language.md, research/award-winning-list-patterns.md (+ cycle-43 verification screenshots c43-*.png).
+- Dev server: pm2 interfood-catering-dev :3001 — STABLE (autorestart, 1G limit).
+- New pitfalls for AGENTS.md: (1) next/image fill inside display:none parents still warns — always set position:relative on thumb wrappers even when hidden; (2) agent-browser `set media reduced-motion` (not `reduced`) applies LIVE to the current page but resets on reload — verify computed styles without reloading; (3) headless automation reports (pointer: none) — gate JS hover features on `!matchMedia('(pointer: coarse)')` + width, and CSS on `(hover: hover), (pointer: none)` so automation/keyboard contexts get parity; (4) sticky header overlays list rows near viewport top — scrollIntoView({block:'center'}) before hover tests; (5) list-level mouseleave/focusout (with relatedTarget check) instead of per-row leave — prevents float pulse between adjacent rows; (6) framer-motion inline opacity fights CSS sibling-dim — wrap rows in motion.div reveal wrappers so the <a> keeps CSS-owned opacity.
+- Loop converged: R3 zero defects desktop + mobile + boundaries CLEAN. Wishlist (out of scope): Lenis velocity → marquee speed coupling, WebGL-free liquid hover distortion via SVG feDisplacementMap, per-category color ramps (unleashed when a filter is ever added).

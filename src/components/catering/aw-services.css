@@ -1,0 +1,864 @@
+/* ==========================================================================
+   AwServices — Cycle 43. Services block in the design language of
+   awwwards.com (tokens scraped from their live CSS, Task 3-B research).
+
+   Scoped to `.aw-svc` (section root) + `.aw-svc__*` BEM classes only.
+   Zero edits to globals.css / sibling components.
+
+   Token map (awwwards.com :root → our scoped vars):
+     --font-1: Inter Tight        → --aw-font (next/font variable)
+     --color-primary: #222        → --aw-ink
+     --bg-primary: #F8F8F8        → --aw-bg
+     --color-orange: #FA5D29      → --aw-accent
+     grays #a7a7a7 / #dedede /
+     #ededed                     → --aw-meta / --aw-line / --aw-soft
+     badge yellow #FFF083        → --aw-badge
+     --rounded-normal: 8px       → --aw-radius
+     dotted leaders: linear-
+     gradient 8px×1px dashes     → --aw-dots / --aw-dots-hot
+   ========================================================================== */
+
+.aw-svc {
+  --aw-bg: #f8f8f8;
+  --aw-ink: #222222;
+  --aw-accent: #fa5d29;
+  --aw-soft: #ededed;
+  --aw-badge: #fff083;
+  --aw-radius: 8px;
+  /* NOTE: --aw-font comes from next/font (InterTight.variable="--aw-font")
+     set as a class on the <section> — do NOT redefine it here.
+     43-R1/R2 contrast passes (VLM critique): meta/line grays darkened vs
+     the original awwwards #a7a7a7/#dedede for WCAG AA on small text. */
+  --aw-meta: #6f6f6f;
+  --aw-line: #c9c9c9;
+
+  position: relative;
+  isolation: isolate;
+  background: var(--aw-bg);
+  color: var(--aw-ink);
+  font-family: var(--aw-font), "Inter Tight", system-ui, -apple-system, sans-serif;
+  padding-block: clamp(4.5rem, 10vh, 8rem);
+}
+
+.aw-svc__container {
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 4rem);
+}
+
+/* ------------------------------------------------------------- head ----- */
+
+.aw-svc__head {
+  margin-bottom: clamp(2.25rem, 5vh, 4rem);
+}
+
+.aw-svc__eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: clamp(1.5rem, 3vh, 2.25rem);
+}
+
+.aw-svc__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--aw-ink);
+}
+
+/* awwwards badge — yellow attention chip (their Learn/badge fill) */
+.aw-svc__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6rem;
+  height: 1.25rem;
+  padding-inline: 0.4rem;
+  border-radius: 999px;
+  background: var(--aw-badge);
+  border: 0.5px solid color-mix(in oklab, var(--aw-ink) 22%, transparent);
+  color: var(--aw-ink);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* dotted rule — the #1 awwwards signature (8px×1px gradient dashes) */
+.aw-svc__eyebrow-rule {
+  flex: 1;
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    var(--aw-line) 0 50%,
+    transparent 50%
+  );
+  background-size: 8px 1px;
+  background-repeat: repeat-x;
+}
+
+.aw-svc__title {
+  font-size: clamp(2.6rem, 6.5vw, 5.75rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  text-wrap: balance;
+  max-width: 16ch;
+}
+
+.aw-svc__title-accent {
+  color: var(--aw-accent);
+  /* menu-leader metaphor: the accent word carries the section's dotted
+     signature in accent color (large-display type — AA large-text pass) */
+  text-decoration: underline dotted;
+  text-decoration-color: color-mix(in oklab, var(--aw-accent) 55%, transparent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.16em;
+}
+
+.aw-svc__sub {
+  margin-top: 1.25rem;
+  max-width: 34rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--aw-ink) 68%, transparent);
+}
+
+/* -------------------------------------------------------- primary rows -- */
+
+.aw-svc__list {
+  border-top: 0.5px solid var(--aw-line);
+}
+
+.aw-svc__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding-block: clamp(1.15rem, 2.4vh, 1.7rem);
+  border-bottom: 0.5px solid var(--aw-line);
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.35s ease-out;
+}
+
+/* sibling dim — non-hovered rows recede while the float is open.
+ * (hover: hover) = real mouse desktops; (pointer: none) = automation + pure
+ * keyboard contexts (focus dims siblings too — desirable). Touch excluded. */
+@media (hover: hover), (pointer: none) {
+  .aw-svc__list[data-hover="true"]
+    .aw-svc__row:not(:hover):not(:focus-visible) {
+    opacity: 0.32;
+  }
+}
+
+.aw-svc__row:focus-visible {
+  outline: 2px solid var(--aw-accent);
+  outline-offset: -2px;
+  border-radius: var(--aw-radius);
+}
+
+.aw-svc__row-index {
+  flex: none;
+  width: 2.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: color-mix(in oklab, var(--aw-ink) 52%, transparent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* inline thumb — mobile/reduced-motion only on desktop rows */
+.aw-svc__row-thumb {
+  display: none;
+  position: relative; /* next/image fill requires a positioned parent */
+}
+
+.aw-svc__row-body {
+  display: block;
+  min-width: 0;
+}
+
+.aw-svc__row-title {
+  display: block;
+  font-size: clamp(1.45rem, 2.7vw, 2.6rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  overflow-wrap: break-word;
+  transition: transform 0.35s ease-out, color 0.35s ease-out;
+}
+
+.aw-svc__row:hover .aw-svc__row-title,
+.aw-svc__row:focus-visible .aw-svc__row-title {
+  transform: translateX(12px);
+  color: var(--aw-ink);
+}
+
+.aw-svc__row-hook {
+  display: none; /* desktop: lives in the float caption */
+}
+
+/* dotted leader — flex-fill, ignites #FA5D29 left→right on hover */
+.aw-svc__row-leader {
+  flex: 1;
+  position: relative;
+  align-self: center;
+  height: 1px;
+  min-width: 2rem;
+  background-image: linear-gradient(
+    to right,
+    var(--aw-line) 0 50%,
+    transparent 50%
+  );
+  background-size: 8px 1px;
+  background-repeat: repeat-x;
+}
+
+.aw-svc__row-leader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    to right,
+    var(--aw-accent) 0 50%,
+    transparent 50%
+  );
+  background-size: 8px 1px;
+  background-repeat: repeat-x;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.3s ease-out;
+}
+
+.aw-svc__row:hover .aw-svc__row-leader::after,
+.aw-svc__row:focus-visible .aw-svc__row-leader::after {
+  transform: scaleX(1);
+}
+
+.aw-svc__row-tags {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  text-align: right;
+}
+
+.aw-svc__row-price {
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.aw-svc__row-guests {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--aw-meta);
+  white-space: nowrap;
+}
+
+/* arrow chip — slides in on hover */
+.aw-svc__row-arrow {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--aw-line);
+  color: var(--aw-ink);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity 0.35s ease-out,
+    transform 0.35s ease-out,
+    background-color 0.35s ease-out,
+    color 0.35s ease-out,
+    border-color 0.35s ease-out;
+}
+
+.aw-svc__row-arrow svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.aw-svc__row:hover .aw-svc__row-arrow,
+.aw-svc__row:focus-visible .aw-svc__row-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  background: var(--aw-ink);
+  border-color: var(--aw-ink);
+  color: var(--aw-bg);
+}
+
+/* ------------------------------------------------------- marquee strip -- */
+
+.aw-svc__marquee {
+  margin-top: clamp(2.5rem, 5vh, 3.5rem);
+  background: var(--aw-ink);
+  color: var(--aw-bg);
+  overflow: hidden;
+  padding-block: 0.85rem;
+}
+
+.aw-svc__marquee-track {
+  display: flex;
+  width: max-content;
+  animation: aw-svc-marquee 36s linear infinite;
+}
+
+.aw-svc__marquee-seg {
+  display: flex;
+  flex: none;
+}
+
+.aw-svc__marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.25rem;
+  padding-right: 2.25rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: color-mix(in oklab, var(--aw-bg) 94%, transparent);
+}
+
+.aw-svc__marquee-star {
+  font-style: normal;
+  font-size: 0.65rem;
+  color: var(--aw-accent);
+  opacity: 0.9;
+}
+
+@keyframes aw-svc-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ------------------------------------------------- secondary («Ещё») ---- */
+
+.aw-svc__more-wrap {
+  margin-top: clamp(2rem, 4vh, 3rem);
+}
+
+.aw-svc__more-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 999px;
+  border: 0.5px solid var(--aw-line);
+  background: transparent;
+  color: var(--aw-ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease-out,
+    border-color 0.3s ease-out;
+}
+
+.aw-svc__more-toggle > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.aw-svc__more-toggle:hover {
+  background: var(--aw-soft);
+  border-color: var(--aw-meta);
+}
+
+.aw-svc__more-toggle:focus-visible {
+  outline: 2px solid var(--aw-accent);
+  outline-offset: 2px;
+}
+
+.aw-svc__more-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding-inline: 0.35rem;
+  border-radius: 999px;
+  background: var(--aw-badge);
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.aw-svc__more-icon {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.aw-svc__more-icon[data-open="true"] {
+  transform: rotate(45deg);
+}
+
+.aw-svc__more {
+  overflow: hidden; /* height animation — no sticky inside, safe */
+}
+
+.aw-svc__more-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  padding-top: 1.75rem;
+}
+
+.aw-svc__more-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 0.9rem;
+  border-radius: var(--aw-radius);
+  border: 0.5px solid var(--aw-line);
+  background: color-mix(in oklab, var(--aw-bg) 55%, #ffffff);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.35s ease-out,
+    border-color 0.35s ease-out,
+    box-shadow 0.35s ease-out;
+}
+
+.aw-svc__more-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--aw-meta);
+  box-shadow: 0 16px 40px -20px rgb(34 34 34 / 0.25);
+}
+
+.aw-svc__more-card:focus-visible {
+  outline: 2px solid var(--aw-accent);
+  outline-offset: 2px;
+}
+
+.aw-svc__more-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  border-radius: calc(var(--aw-radius) - 2px);
+  overflow: hidden;
+}
+
+.aw-svc__more-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-inline: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.aw-svc__more-title {
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.aw-svc__more-arrow {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--aw-accent);
+  transform: translateZ(0);
+  transition: transform 0.35s ease-out;
+}
+
+.aw-svc__more-card:hover .aw-svc__more-arrow {
+  transform: translate(2px, -2px);
+}
+
+.aw-svc__more-hook {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: color-mix(in oklab, var(--aw-ink) 62%, transparent);
+}
+
+/* ------------------------------------------------------------- foot ----- */
+
+.aw-svc__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: clamp(2.5rem, 5vh, 4rem);
+  padding-top: clamp(1.75rem, 3vh, 2.5rem);
+  border-top: 0.5px solid var(--aw-line);
+}
+
+.aw-svc__foot-note {
+  max-width: 26rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--aw-ink) 60%, transparent);
+}
+
+.aw-svc__foot-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* magnetic pill CTA — awwwards orange */
+.aw-svc__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.75rem;
+  border-radius: 999px;
+  background: var(--aw-accent);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.18),
+    0 10px 24px -12px color-mix(in oklab, var(--aw-accent) 55%, transparent);
+  transition:
+    background-color 0.3s ease-out,
+    box-shadow 0.3s ease-out;
+  will-change: transform;
+}
+
+.aw-svc__cta svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.aw-svc__cta:hover {
+  background: color-mix(in oklab, var(--aw-accent) 88%, #000000);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.22),
+    0 16px 36px -14px color-mix(in oklab, var(--aw-accent) 65%, transparent);
+}
+
+.aw-svc__cta:hover svg {
+  transform: translate(2px, -2px);
+}
+
+.aw-svc__cta:focus-visible {
+  outline: 2px solid var(--aw-ink);
+  outline-offset: 3px;
+}
+
+.aw-svc__foot-alt {
+  font-size: 0.9rem;
+  color: color-mix(in oklab, var(--aw-ink) 70%, transparent);
+  text-decoration: underline;
+  text-decoration-color: var(--aw-line);
+  text-underline-offset: 4px;
+  transition: color 0.3s ease-out, text-decoration-color 0.3s ease-out;
+}
+
+.aw-svc__foot-alt:hover {
+  color: var(--aw-ink);
+  text-decoration-color: var(--aw-accent);
+}
+
+.aw-svc__foot-alt:focus-visible {
+  outline: 2px solid var(--aw-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------- cursor-follow float card ---- */
+
+.aw-svc__float {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 35; /* below sticky header */
+  pointer-events: none;
+}
+
+.aw-svc__float-lag {
+  will-change: transform;
+  transform: rotate(0.001deg); /* GPU-compositing hint (Dennis's own hack) */
+}
+
+.aw-svc__float-card {
+  position: relative;
+  width: clamp(240px, 26vw, 400px);
+  aspect-ratio: 4 / 5;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--aw-ink);
+  /* multi-layer diffused shadow (43-R1): depth without heaviness */
+  box-shadow:
+    0 6px 16px -8px rgb(0 0 0 / 0.22),
+    0 28px 64px -20px rgb(0 0 0 / 0.38),
+    0 0 0 0.5px rgb(255 255 255 / 0.12) inset;
+  will-change: transform, opacity;
+}
+
+.aw-svc__float-media {
+  position: absolute;
+  inset: 0;
+}
+
+/* stacked preloaded thumbs — crossfade via data-on (zero-flash) */
+.aw-svc__float-img {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease-out;
+}
+
+.aw-svc__float-img[data-on="true"] {
+  opacity: 1;
+}
+
+.aw-svc__float-img img {
+  object-fit: cover;
+  transform: scale(1.08);
+  transition: transform 0.45s ease-out;
+}
+
+.aw-svc__float-img[data-on="true"] img {
+  transform: scale(1);
+}
+
+.aw-svc__float-cap {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 3.5rem 1.1rem 1.15rem;
+  background: linear-gradient(0deg, rgb(0 0 0 / 0.78), rgb(0 0 0 / 0.32) 66%, transparent);
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.aw-svc__float-cap-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.aw-svc__float-cap-title {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.aw-svc__float-cap-hook {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: rgb(255 255 255 / 0.92);
+}
+
+.aw-svc__float-cap-title {
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.35);
+}
+
+/* --------------------------------------------------- mobile (≤1023px) --- */
+
+@media (max-width: 1023px) {
+  .aw-svc__float {
+    display: none; /* Dennis's own degradation — no hover media on touch */
+  }
+
+  .aw-svc__list {
+    border-top: none;
+  }
+
+  .aw-svc__row {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr 2.75rem;
+    grid-template-areas:
+      "thumb index arrow"
+      "thumb body  arrow"
+      "thumb tags  arrow";
+    align-items: start;
+    column-gap: 1rem;
+    row-gap: 0.15rem;
+    padding-block: 1.25rem;
+  }
+
+  .aw-svc__row-index {
+    grid-area: index;
+    width: auto;
+    font-size: 0.75rem;
+    color: color-mix(in oklab, var(--aw-ink) 60%, transparent);
+  }
+
+  .aw-svc__row-thumb {
+    grid-area: thumb;
+    display: block;
+    position: relative;
+    width: 4.5rem;
+    aspect-ratio: 4 / 5;
+    border-radius: 6px;
+    overflow: hidden;
+    align-self: start;
+  }
+
+  .aw-svc__row-thumb img {
+    object-fit: cover;
+  }
+
+  .aw-svc__row-body {
+    grid-area: body;
+  }
+
+  .aw-svc__row-title {
+    font-size: clamp(1.2rem, 4.6vw, 1.55rem);
+    transform: none !important; /* no nudge on touch */
+  }
+
+  .aw-svc__row-hook {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.83rem;
+    line-height: 1.45;
+    color: color-mix(in oklab, var(--aw-ink) 66%, transparent);
+  }
+
+  .aw-svc__row-leader {
+    display: none;
+  }
+
+  .aw-svc__row-tags {
+    grid-area: tags;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.6rem;
+    text-align: left;
+    margin-top: 0.4rem;
+  }
+
+  .aw-svc__row-price {
+    font-size: 0.88rem;
+    color: var(--aw-accent);
+  }
+
+  .aw-svc__row-guests {
+    font-size: 0.68rem;
+  }
+
+  /* arrow chip: always visible, solid ink circle (Dennis ≤1000px pattern) */
+  .aw-svc__row-arrow {
+    grid-area: arrow;
+    align-self: center;
+    justify-self: end;
+    opacity: 1;
+    transform: none;
+    background: var(--aw-ink);
+    border-color: var(--aw-ink);
+    color: var(--aw-bg);
+    width: 2.75rem;
+    height: 2.75rem; /* ≥44px touch target */
+  }
+
+  .aw-svc__more-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+  .aw-svc__foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .aw-svc__row {
+    grid-template-columns: 4rem 1fr 2.75rem;
+  }
+
+  .aw-svc__row-thumb {
+    width: 4rem;
+  }
+
+  .aw-svc__more-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aw-svc__eyebrow-rule {
+    display: none;
+  }
+
+  .aw-svc__title {
+    font-size: clamp(2.2rem, 11vw, 3rem);
+  }
+}
+
+/* ------------------------------------------- reduced motion (global) ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .aw-svc__float {
+    display: none;
+  }
+
+  .aw-svc__marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .aw-svc__marquee-item {
+    white-space: normal;
+  }
+
+  /* desktop rows reveal hooks inline — information parity with the float */
+  @media (min-width: 1024px) {
+    .aw-svc__row {
+      align-items: flex-start;
+      padding-block: 1.35rem;
+    }
+
+    .aw-svc__row-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .aw-svc__row-hook {
+      display: block;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: color-mix(in oklab, var(--aw-ink) 62%, transparent);
+    }
+
+    .aw-svc__row-title,
+    .aw-svc__row-arrow {
+      transition: none;
+    }
+
+    .aw-svc__row:hover .aw-svc__row-title {
+      transform: none;
+    }
+
+    .aw-svc__row-arrow {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .aw-svc__more-icon {
+    transition: none;
+  }
+}

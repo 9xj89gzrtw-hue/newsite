@@ -3450,3 +3450,48 @@ touch-targets, контрасты, 3 картинки после VLM-аудит�
 - Открытые полировочные зоны: типографика меню (VLM 6.5), калькулятор (7/10),
   бледная подпись «— ШЕФ-ПОВАР», аудио-кнопка hero (не проверяема в headless).
 - Метод продолжения: см. worklog Task 42 Stage Summary.
+
+## 19. Cycle 43 — блок услуг в дизайн-языке awwwards.com (23.08.2026, Z.ai Agent)
+
+Полный редизайн: AtServices (terminal, чёрный) → AwServices (светлый
+«сервисный индекс»). Спека и исследования: `research/awwwards-design-language.md`
+(токены awwwards, спарсенные из их живого CSS), `research/award-winning-list-patterns.md`
+(Dennis Snellenberg cursor-follow с точными easing'ами),
+`research/services-block-content-research.md` (7+6 услуг вместо 18, price anchoring).
+
+### Грабли цикла 43 (новые)
+
+1. **next/image `fill` внутри `display:none`-родителя всё равно WARN'ит** —
+   требование «positioned parent» проверяется до display. Всегда ставьте
+   `position: relative` на обёртки-превью, даже если они скрыты на этом
+   брейкпоинте (`.aw-svc__row-thumb`).
+2. **agent-browser reduced-motion:** команда называется
+   `set media reduced-motion` (НЕ `reduced`); применяется LIVE к текущей
+   странице (media-запросы пере-вычисляются без reload), но сбрасывается при
+   reload — проверяйте computed styles сразу после set, без перезагрузки.
+3. **Headless-автоматизация отчитывает `(pointer: none)`** — гейт JS-ховеров
+   на `!matchMedia('(pointer: coarse)') && min-width`, а CSS-затемнение
+   соседей на `@media (hover: hover), (pointer: none)`: automation и
+   чисто-клавиатурные контексты получают паритет, тачи — нет.
+4. **Sticky-хедер перекрывает верхние строки списка** при scrollIntoView —
+   перед hover-тестами всегда `scrollIntoView({block:'center'})`, иначе
+   mouse-события попадают в хедер, а не в строку (ложный «hover не работает»).
+5. **Закрытие float по уходу со СПИСКА, а не со строки** (list-level
+   `onMouseLeave` + `onBlur` с `relatedTarget`-проверкой): пер-строчное
+   закрытие даёт пульсацию карточки при переходе строка→строка.
+6. **framer-motion inline opacity воюет с CSS sibling-dim** — reveal-анимацию
+   рядов вешайте на обёртку motion.div, а CSS-управляемую opacity (dim 0.32)
+   оставьте на самом `<a>`.
+7. **Inter Tight** (шрифт awwwards) имеет полный cyrillic-набор в
+   next/font/google — не ищите замену.
+8. VLM-критика «карточка перекрывает контент = z-index fail» — это и есть
+   паттерн Dennis Snellenberg (медиа НАД списком); root-cause перед фиксом.
+   Оранжевый #FA5D29 на #F8F8F8 = 3.05:1 — проходит AA для large-text
+   (заголовки), не использовать его для мелкого текста.
+
+### Правила, которые подтвердились
+
+- `set viewport` сбрасывается после `open`/`reload` — выставлять ПОСЛЕ.
+- Реальные mouse move обязательны (синтетика не триггерит React onMouseEnter).
+- Изображения услуг VLM-аудировать по семантике (все 7 + 6 прошли).
+- pm2 для dev-сервера (port 3001; 3000 = parent sandbox) — держит устойчивость.

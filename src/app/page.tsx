@@ -4,7 +4,7 @@ import { TottHero } from "@/components/catering/tott-hero";
 import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
 import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
-import { AtServices } from "@/components/catering/at-services";
+import { AwServices } from "@/components/catering/aw-services";
 import { Menu } from "@/components/catering/menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
@@ -135,17 +135,22 @@ export default function Home() {
 
       {/* ── ACT II: WHAT WE OFFER ── */}
 
-      {/* 6. AtServices — Cycle 37 NEW. Services block restyled after
-             activetheory.net/work (researched via headless browser + bundle
-             analysis): near-black stage with teal vignette, IBM Plex Mono
-             terminal filter ("ЧТО ВЫ ИЩЕТЕ?" + -> категории + поиск-пилюля,
-             cyan #00ffff accents, blinking caret), 18 services as a big
-             typographic list (Montserrat uppercase + per-item uiColor glow
-             hover complex: #c6c6c6→#fff, translateX(10px), text-shadow,
-             accent underline sweep), decode/scramble reveals, sticky 4:5
-             preview panel with crossfade + per-item glow. Replaces the
-             Cycle-35 EaServices grid (kept on disk for reference). */}
-      <AtServices />
+      {/* 6. AwServices — Cycle 43 NEW. Services block fully redesigned in
+             the design language of awwards.com (tokens scraped from their
+             live CSS): Inter Tight + #F8F8F8 bg + #222 ink + #FA5D29 accent
+             + dotted leader lines (their #1 signature) + yellow #FFF083
+             badge chips. Content restructured per research (Task 3-A): 7
+             primary services with price anchoring «от X ₽/гость» (Фуршеты,
+             Банкеты, Свадьбы NEW, Корпоратив, Кофе-брейки, Барбекю,
+             Выездной бар NEW) + 6 secondary «Ещё услуги» (expandable grid)
+             + inverted marquee teaser + magnetic CTA «Получить смету за 30
+             минут». The wow: Dennis-Snellenberg cursor-following 4:5 media
+             card (spring lag 150/22/0.6 + velocity skew ±6° + asymmetric
+             enter/exit beziers + zero-flash crossfade + sibling dim 0.32);
+             focus docks the card for keyboard users; mobile degrades to
+             inline-thumb rows (Dennis's own ≤1000px pattern). Replaces the
+             Cycle-37 AtServices terminal list (kept on disk for reference). */}
+      <AwServices />
 
       {/* 7. Menu — 7 menu types with interactive list + real dishes + PDF. */}
       <Menu />
