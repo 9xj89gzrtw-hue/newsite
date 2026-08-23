@@ -124,6 +124,11 @@
   color: color-mix(in oklab, var(--aw-ink) 68%, transparent);
 }
 
+/* compound words with a hyphen must not break at the hyphen (43-R4) */
+.aw-svc__nowrap {
+  white-space: nowrap;
+}
+
 /* -------------------------------------------------------- primary rows -- */
 
 .aw-svc__list {
@@ -251,6 +256,13 @@
   font-weight: 500;
   letter-spacing: -0.01em;
   white-space: nowrap;
+  transition: color 0.35s ease-out;
+}
+
+/* 43-R4: hover directs the eye along «название → цена → действие» */
+.aw-svc__row:hover .aw-svc__row-price,
+.aw-svc__row:focus-visible .aw-svc__row-price {
+  color: var(--aw-accent);
 }
 
 .aw-svc__row-guests {
@@ -499,8 +511,8 @@
   justify-content: space-between;
   gap: 1.5rem;
   flex-wrap: wrap;
-  margin-top: clamp(2.5rem, 5vh, 4rem);
-  padding-top: clamp(1.75rem, 3vh, 2.5rem);
+  margin-top: clamp(3rem, 7vh, 5rem);
+  padding-top: clamp(2rem, 4vh, 3rem);
   border-top: 0.5px solid var(--aw-line);
 }
 

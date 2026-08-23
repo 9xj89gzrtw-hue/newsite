@@ -2092,3 +2092,18 @@ Stage Summary:
 - Dev server: pm2 interfood-catering-dev :3001 — STABLE (autorestart, 1G limit).
 - New pitfalls for AGENTS.md: (1) next/image fill inside display:none parents still warns — always set position:relative on thumb wrappers even when hidden; (2) agent-browser `set media reduced-motion` (not `reduced`) applies LIVE to the current page but resets on reload — verify computed styles without reloading; (3) headless automation reports (pointer: none) — gate JS hover features on `!matchMedia('(pointer: coarse)')` + width, and CSS on `(hover: hover), (pointer: none)` so automation/keyboard contexts get parity; (4) sticky header overlays list rows near viewport top — scrollIntoView({block:'center'}) before hover tests; (5) list-level mouseleave/focusout (with relatedTarget check) instead of per-row leave — prevents float pulse between adjacent rows; (6) framer-motion inline opacity fights CSS sibling-dim — wrap rows in motion.div reveal wrappers so the <a> keeps CSS-owned opacity.
 - Loop converged: R3 zero defects desktop + mobile + boundaries CLEAN. Wishlist (out of scope): Lenis velocity → marquee speed coupling, WebGL-free liquid hover distortion via SVG feDisplacementMap, per-category color ramps (unleashed when a filter is ever added).
+
+---
+Task ID: 43-R4
+Agent: Z.ai Code (main orchestrator)
+Task: Cycle 43 critique loop round 4 — final polish + convergence confirmation
+
+Work Log:
+- Ran full-section 4-screenshot holistic VLM review (top→bottom sweep).
+- Root-caused its 3 findings: (1) «row 01 price not bold» = FALSE ALARM (computed styles identical fw500/15.2px/#222 across all rows — verified live); (2) marquee right-edge crop = DESIGN INTENT (infinite full-bleed strip); (3) «кофе-/брейка» hyphen line-break = REAL → fixed with .aw-svc__nowrap span.
+- Applied 2 improvements: price turns #FA5D29 on row hover/focus (eye-path «название → цена → действие», verified live rgb(250,93,41)); CTA block breathing room (foot margin-top clamp 3rem/7vh/5rem + padding-top 2rem/4vh/3rem).
+- VLM final verdict on both: «ДЕФЕКТОВ: 0».
+
+Stage Summary:
+- Loop converged: R3 zero defects (desktop+mobile+boundaries) + R4 zero defects after 2 improvements. 2 consecutive clean rounds across different review dimensions.
+- Final state: aw-services.tsx ~790 LOC + aw-services.css ~800 LOC, lint green, tsc clean, console clean, reduced-motion verified, keyboard/focus/mobile/tablet(1024)/anchors all verified live.
