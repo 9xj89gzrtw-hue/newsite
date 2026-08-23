@@ -793,18 +793,13 @@ export function Contact() {
       setFormStatus("success");
       toast.success("Заявка отправлена! Перезвоним в течение 15 минут.");
       
-      // Reset after showing success state (Cycle 39: 2.5s was too fast —
-      // the visitor never registered the confirmation before it vanished).
-      setTimeout(() => {
-        setData(EMPTY);
-        setStep(0);
-        setFormStatus("idle");
-        try {
-          window.localStorage.removeItem(DRAFT_KEY);
-        } catch {
-          // ignore.
-        }
-      }, 6000);
+      // Cycle 42: the success state persists until the user explicitly
+      // dismisses it («Отправить ещё одну заявку»).
+      try {
+        window.localStorage.removeItem(DRAFT_KEY);
+      } catch {
+        // ignore.
+      }
     } catch (err) {
       setFormStatus("error");
       
@@ -985,6 +980,20 @@ export function Contact() {
                       Мы получили вашу заявку и перезвоним в течение 15 минут
                       в рабочее время (Пн–Пт 9:00–19:00, Сб 10:00–16:00).
                     </motion.p>
+                    <motion.button
+                      type="button"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 }}
+                      onClick={() => {
+                        setData(EMPTY);
+                        setStep(0);
+                        setFormStatus("idle");
+                      }}
+                      className="mt-6 min-h-[44px] rounded-full border border-border-line px-6 py-3 text-sm font-medium text-ink/70 transition-colors hover:border-gold hover:text-gold"
+                    >
+                      Отправить ещё одну заявку
+                    </motion.button>
                   </motion.div>
                 ) : null}
               </AnimatePresence>

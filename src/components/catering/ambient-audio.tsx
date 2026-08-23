@@ -183,7 +183,14 @@ export function AmbientAudio() {
   return (
     <button
       type="button"
-      onClick={() => setEnabled((e) => !e)}
+      onClick={() => {
+        setEnabled((e) => !e);
+        /* Cycle 42: browsers can keep a programmatically created
+           AudioContext suspended — resume() inside the click gesture
+           guarantees the sound actually starts. */
+        const ctx = audioCtxRef.current;
+        if (ctx && ctx.state === "suspended") void ctx.resume();
+      }}
       aria-pressed={enabled}
       aria-label={enabled ? "Выключить фоновый звук" : "Включить фоновый звук"}
       title={enabled ? "Звук включён — нажмите, чтобы выключить" : "Включить фоновый звук атмосферы кухни"}

@@ -220,12 +220,21 @@ export function EventsVideoCarousel() {
     return () => scroller.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* Latest closeModal for the ESC listener — assigned in an effect that
+     lives after closeModal's declaration (see below). */
+  const closeModalRef = useRef<() => void>(() => {});
+
   // Escape key closes the open modal. Locks body scroll while modal is open
   // so the background doesn't scroll behind the overlay.
   useEffect(() => {
     if (activeIndex === null) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setActiveIndex(null);
+      /* Cycle 42 fix: route ESC through closeModal so focus returns to
+         the opener tile (setActiveIndex(null) bypassed the return). */
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeModalRef.current();
+      }
     };
     document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
@@ -278,6 +287,9 @@ export function EventsVideoCarousel() {
     setActiveIndex(null);
     requestAnimationFrame(() => openerRef.current?.focus());
   }, []);
+  useEffect(() => {
+    closeModalRef.current = closeModal;
+  }, [closeModal]);
 
   const activeTile = activeIndex === null ? null : TILES[activeIndex];
 

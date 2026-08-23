@@ -81,11 +81,11 @@ export function Calculator() {
   // nuqs: typeId + guests are shareable via URL (?type=banquet&guests=60).
   const [typeId, setTypeId] = useQueryState(
     "type",
-    parseAsString.withDefault("banquet"),
+    parseAsString.withDefault("buffet"),
   );
   const [guests, setGuests] = useQueryState(
     "guests",
-    parseAsInteger.withDefault(60),
+    parseAsInteger.withDefault(50),
   );
   // Cycle 38 fix: paid addons are NO LONGER pre-selected — the first price
   // a visitor sees is the honest base for the selected format (previously

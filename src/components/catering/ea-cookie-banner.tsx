@@ -223,14 +223,14 @@ export function EaCookieBanner() {
         >
           <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-2 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-3 md:px-12">
             <p
-              className="m-0 max-w-[68ch] leading-relaxed"
+              className="m-0 max-w-[68ch] text-[13px] leading-snug sm:text-[13px]"
               style={{
                 fontFamily: "var(--ea-font-body)",
                 fontSize: "0.8125rem",
                 color: "color-mix(in srgb, var(--ea-cream) 85%, transparent)",
               }}
             >
-              Мы используем cookies для аналитики и улучшения сервиса.{" "}
+              Мы используем cookies для аналитики и улучшения сервиса. Подробнее:{" "}
               <a
                 href={LINK_PRIVACY_HREF}
                 target="_blank"
@@ -247,10 +247,9 @@ export function EaCookieBanner() {
                 className={LINK_CLASS}
               >
                 Условия
-              </a>{" "}
-              Подробнее:
+              </a>.
             </p>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:gap-2 md:gap-3">
+            <div className="flex w-full shrink-0 flex-row flex-wrap items-center justify-end gap-2 sm:w-auto sm:gap-2 md:gap-3">
               <button
                 type="button"
                 onClick={() => decide("rejected")}
