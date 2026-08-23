@@ -52,7 +52,7 @@ export function ChapterNav() {
 
   return (
     <nav
-      aria-label="Quick navigation by section"
+      aria-label="Быстрая навигация по разделам"
       className="pointer-events-none fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 lg:block"
     >
       <ul className="pointer-events-auto flex flex-col items-end gap-3">
@@ -63,7 +63,7 @@ export function ChapterNav() {
               <button
                 onClick={() => scrollTo(s.id)}
                 className="group flex items-center gap-2.5 min-h-[44px] min-w-[44px] px-2 py-2"
-                aria-label={`Jump to section: ${s.label}`}
+                aria-label={`Перейти к разделу: ${s.label}`}
                 aria-current={isActive ? "true" : undefined}
               >
                 <span className="sr-only">{s.label}</span>

@@ -119,7 +119,7 @@ export function CepInstagramGrid() {
               href={IG_PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Публикация ${i + 1} в Instagram${isReel ? " (Reel)" : ""}`}
+              aria-label={`Instagram Interfood Catering — фото ${i + 1} из ленты (открывает профиль)`}
               className="group relative block aspect-square overflow-hidden bg-black/5"
               variants={itemVariants}
             >
@@ -155,7 +155,7 @@ export function CepInstagramGrid() {
                 <div className="relative aspect-square w-full">
                   <Image
                     src={src}
-                    alt={`Публикация ${i + 1} в Instagram`}
+                    alt={`Фото ${i + 1} из ленты Instagram Interfood Catering — ${isReel ? "видео-ролик Reel с блюдом" : "блюдо или сервировка мероприятия"}`}
                     fill
                     sizes="(max-width: 768px) 33vw, 22vw"
                     className="object-cover transition-[filter,transform] duration-500 ease-out group-hover:scale-105 group-hover:saturate-150 group-hover:brightness-105"

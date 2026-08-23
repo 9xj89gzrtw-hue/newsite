@@ -504,7 +504,7 @@ function OfficeHours() {
         </div>
         {/* Live "open/closed" badge */}
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium ${
+          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium ${
             status.open
               ? "border-sage/40 bg-sage/15 text-sage"
               : "border-bordeaux/30 bg-bordeaux/5 text-bordeaux"
@@ -535,7 +535,7 @@ function OfficeHours() {
         ✨ {OFFICE_HOURS.note}
       </p>
       {!status.open && status.nextLabel && (
-        <p className="mt-1 text-[11px] text-ink/70">
+        <p className="mt-1 text-[12px] text-ink/70">
           {status.nextLabel}
         </p>
       )}
@@ -638,6 +638,34 @@ export function Contact() {
     } catch {
       // ignore — non-critical.
     }
+  }, []);
+
+  // Cycle 38 fix: pre-fill from the calculator ("Отправить заявку с расчётом"
+  // dispatches catering:calc-lead with {typeId, guests, date}) — the user's
+  // calculation is carried into the form instead of being silently dropped.
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{
+        typeId?: string;
+        guests?: number;
+        date?: string;
+      }>).detail;
+      if (!detail) return;
+      setData((d) => ({
+        ...d,
+        eventType:
+          detail.typeId && MENU_TYPES.some((m) => m.id === detail.typeId)
+            ? detail.typeId
+            : d.eventType,
+        guests:
+          typeof detail.guests === "number" && detail.guests >= 1
+            ? detail.guests
+            : d.guests,
+        date: detail.date || d.date,
+      }));
+    };
+    window.addEventListener("catering:calc-lead", handler);
+    return () => window.removeEventListener("catering:calc-lead", handler);
   }, []);
 
   // Persist draft on change.
@@ -981,7 +1009,7 @@ export function Contact() {
                                   <span className="text-sm font-medium text-ink">
                                     {m.label}
                                   </span>
-                                  <span className="font-mono text-[11px] text-ink/70">
+                                  <span className="font-mono text-[12px] text-ink/70">
                                     от {m.perGuest.toLocaleString("ru-RU")} ₽{m.priceUnit ?? "/чел"}
                                   </span>
                                 </button>
@@ -1176,7 +1204,7 @@ export function Contact() {
                                 href="/privacy"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-gold underline underline-offset-2 hover:text-terracotta transition-colors"
+                                className="text-gold underline underline-offset-2 hover:text-terracotta transition-colors py-1.5 -my-1.5 inline-block"
                               >
                                 Политикой конфиденциальности
                               </a>
@@ -1260,10 +1288,25 @@ export function Contact() {
                   )}
                 </div>
 
+                {/* Cycle 38 fix: explain WHY «Далее» is disabled instead of a
+                    dead button — step-specific actionable hints. */}
+                {!stepValid() && formStatus === "idle" && (
+                  <p
+                    className="mt-3 flex items-center justify-center gap-1.5 font-mono text-xs text-terracotta/90"
+                    role="status"
+                  >
+                    <Sparkles className="size-3.5" />
+                    {step === 0 && "Выберите тип мероприятия, чтобы продолжить"}
+                    {step === 2 && !data.name.trim() && "Введите имя, чтобы продолжить"}
+                    {step === 2 && data.name.trim() && !PHONE_REGEX.test(data.phone.replace(/[^+0-9]/g, "")) && "Введите корректный телефон"}
+                    {step === 3 && "Подтвердите согласие на обработку данных"}
+                  </p>
+                )}
+
                 {/* Security notice */}
                 <p className="mt-3 flex items-center justify-center gap-1.5 font-mono text-xs text-ink/70">
                   <ShieldCheck className="size-3.5 text-sage" />
-                  Данные защищены · соответствует GDPR
+                  Данные защищены · обрабатываются по 152-ФЗ
                 </p>
               </motion.div>
             </form>
@@ -1291,7 +1334,7 @@ export function Contact() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Яндекс.Карты (откроется в новой вкладке)"
-              className="flex items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors group"
+              className="flex min-h-[44px] items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors group"
             >
               <MapPin className="size-4 transition-transform group-hover:scale-110" />
               {YANDEX_MAPS.address} — открыть на Яндекс.Картах →

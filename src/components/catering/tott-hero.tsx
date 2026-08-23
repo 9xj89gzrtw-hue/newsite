@@ -212,7 +212,7 @@ export function TottHero() {
         animate={showStatic ? undefined : { opacity: 1, transition: { delay: 1.3, duration: 0.8 } }}
         aria-hidden="true"
       >
-        <span className="tott-body text-[11px] font-bold uppercase tracking-[0.35em] text-white/60">
+        <span className="tott-body text-[12px] font-bold uppercase tracking-[0.35em] text-white/60">
           Листайте
         </span>
         {showStatic ? (

@@ -44,7 +44,8 @@ export const LEGAL_INFO = {
   // Дата регистрации: 14.04.2014
   registeredAt: "14 апреля 2014 г.",
   // Address for legal correspondence (ЗОПП ст. 8 + 152-ФЗ — full postal address)
-  legalAddress: "197198, г. Санкт-Петербург, ул. Большая Морская, д. 18, офис 33",
+  // Индекс 191181 подтверждён Яндекс.Картами для дома 18 по ул. Большая Морская.
+  legalAddress: "191181, г. Санкт-Петербург, ул. Большая Морская, д. 18, офис 33",
   legalEmail: "interfood-catering@yandex.ru",
   dataOfficer: "Нилов Дмитрий Игоревич",
 };

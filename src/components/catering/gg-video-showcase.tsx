@@ -82,30 +82,17 @@ export function GgVideoShowcase() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [expanded, setExpanded] = useState(false);
 
-  /** Toggle the play-pill: unmute + reveal native controls on first click,
-   *  re-mute + hide on the next click. We don't change `src` — per Task 4-C
-   *  spec we have only one video file, so we just toggle presentation mode
-   *  on the same element (simpler than GGCatering's teaser→iframe swap). */
+  /** Toggle the play-pill. Cycle 38 perf fix: the video no longer
+   *  autoplays in the background — the same 5 MB mculinary-hero.mp4 was
+   *  downloaded twice in parallel (hero + this block), starving the
+   *  browser connection pool. Now a static poster renders by default and
+   *  the <video> element only mounts on first click (user gesture →
+   *  autoplay with sound is guaranteed to succeed). */
   const togglePlay = () => {
-    const v = videoRef.current;
-    if (!v) return;
     const next = !expanded;
     setExpanded(next);
-    v.muted = !next;
-    if (next) {
-      // Reveal controls + nudge autoplay forward in case it stalled.
-      v.controls = true;
-      try {
-        void v.play().catch(() => {
-          /* autoplay can still reject on some browsers without a user
-             gesture — but we're inside a click handler so this should
-             succeed; swallow the rejection silently either way. */
-        });
-      } catch {
-        /* noop */
-      }
-    } else {
-      v.controls = false;
+    if (!next && videoRef.current) {
+      videoRef.current.pause();
     }
   };
 
@@ -136,22 +123,32 @@ export function GgVideoShowcase() {
           aspect-video only at md+ where the viewport is wide enough for
           16:9 to hold the content. */}
       <div className="relative min-h-[560px] w-full md:aspect-video md:min-h-0">
-        {/* Background teaser video — muted autoplay loop, decorative.
-            `preload="metadata"` for a fast first-paint; poster fills the
-            gap until the mp4 streams in. */}
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster="/media/hero-premium/hero-premium-6.jpg"
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
-        >
-          <source src="/media/mculinary/mculinary-hero.mp4" type="video/mp4" />
-        </video>
+        {/* Static poster by default — the <video> mounts only after the
+            user clicks the Play pill (Cycle 38 perf fix: no second
+            parallel download of mculinary-hero.mp4). */}
+        {!expanded && (
+          <img
+            src="/media/hero-premium/hero-premium-6.jpg"
+            alt="Банкетный зал Interfood: сервированный стол с блюдами высокой кухни"
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
+        {expanded && (
+          <video
+            ref={videoRef}
+            autoPlay
+            controls
+            playsInline
+            preload="metadata"
+            poster="/media/hero-premium/hero-premium-6.jpg"
+            aria-label="Видео: как мы работаем"
+            className="absolute inset-0 h-full w-full object-cover"
+          >
+            <source src="/media/mculinary/mculinary-hero.mp4" type="video/mp4" />
+          </video>
+        )}
 
         {/* Dark gradient overlay — bottom-heavier for the editorial
             text sitting at lower-left, with a softer top scrim so the

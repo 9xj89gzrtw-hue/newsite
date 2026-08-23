@@ -150,11 +150,11 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   title: {
-    default: "Interfood Catering — Кейтеринг в Санкт-Петербурге от 2450₽/чел",
+    default: "Interfood Catering — Кейтеринг в Санкт-Петербурге от 650₽/чел",
     template: "%s | Interfood Catering",
   },
   description:
-    "«Еда как искусство» — выездной кейтеринг полного цикла в СПб. Фуршет, банкет, кофе-брейк, барбекю от 2450₽/чел. Рассчитайте стоимость онлайн за 30 секунд.",
+    "«Еда как искусство» — выездной кейтеринг полного цикла в СПб. Фуршет от 2450₽, банкет от 4470₽, кофе-брейк от 900₽, обеды в офис от 650₽ за человека. Рассчитайте стоимость онлайн за 30 секунд.",
   keywords: [
     "кейтеринг",
     "кейтеринг СПб",
@@ -211,7 +211,7 @@ const jsonLd = {
   "@id": siteUrl + "#organization",
   name: "Interfood Catering",
   alternateName: "NILOV CATERING",
-  description: "«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Фуршет, банкет, кофе-брейк, барбекю от 2450₽/чел.",
+  description: "«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Фуршет от 2450₽, банкет от 4470₽, кофе-брейк от 900₽, обеды в офис от 650₽ за человека.",
   url: siteUrl,
   image: siteUrl + "/og-image.jpg",
   logo: siteUrl + "/logo.svg",
@@ -231,10 +231,10 @@ const jsonLd = {
     addressCountry: "RU",
     addressRegion: "Санкт-Петербург",
     addressLocality: "Санкт-Петербург",
-    postalCode: "197198",
+    postalCode: "191181",
     streetAddress: "ул. Большая Морская, д. 18, офис 33",
   },
-  geo: { "@type": "GeoCoordinates", latitude: 59.939495, longitude: 30.315785 },
+  geo: { "@type": "GeoCoordinates", latitude: 59.934862, longitude: 30.316218 },
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
@@ -248,8 +248,11 @@ const jsonLd = {
     },
   ],
   founder: { "@type": "Person", name: "Нилов Дмитрий Игоревич" },
-  foundingDate: "2014-04-14",
-  areaServed: { "@type": "City", name: "Санкт-Петербург" },
+  foundingDate: "2009",
+  areaServed: [
+    { "@type": "City", name: "Санкт-Петербург" },
+    { "@type": "AdministrativeArea", name: "Ленинградская область" },
+  ],
 };
 
 export default function RootLayout({

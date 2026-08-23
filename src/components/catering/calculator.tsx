@@ -87,7 +87,10 @@ export function Calculator() {
     "guests",
     parseAsInteger.withDefault(60),
   );
-  const [addons, setAddons] = useState<string[]>(["equipment", "decor"]);
+  // Cycle 38 fix: paid addons are NO LONGER pre-selected — the first price
+  // a visitor sees is the honest base for the selected format (previously
+  // +40 000 ₽ of addons was silently baked in, inflating the first quote 15%).
+  const [addons, setAddons] = useState<string[]>([]);
   const [date, setDate] = useState("");
   const [copied, setCopied] = useState(false);
   
@@ -108,6 +111,13 @@ export function Calculator() {
   const result = calcTotal(typeId, guests, addons, date);
   const current = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
   const guestsClamped = Math.max(guests, current.minGuests);
+
+  // Cycle 38 fix: clamp guests to the format minimum whenever the type
+  // changes (or a too-low guests= value arrives via URL) — slider, estimate
+  // and share link now always agree on the same number.
+  useEffect(() => {
+    if (guests < current.minGuests) setGuests(current.minGuests);
+  }, [current.minGuests, guests, setGuests]);
 
   // Animated total
   const mv = useMotionValue(result.total);
@@ -135,7 +145,7 @@ export function Calculator() {
   // Share current calculator config as URL
   const shareLink = async () => {
     if (typeof window === "undefined") return;
-    const url = `${window.location.origin}/?type=${typeId}&guests=${guests}#calculator`;
+    const url = `${window.location.origin}/?type=${typeId}&guests=${guestsClamped}#calculator`;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -151,12 +161,12 @@ export function Calculator() {
   // which caused a hydration mismatch on the <a href> that broke hydration for
   // the WHOLE page (preventing all client effects, incl. Embla carousels, from
   // running). Server + first client render now both get "" → match → hydrate.
-  const shareText = `Catering quote: ${formatRUB(result.total)} — ${current.label}, ${guests} guests. Details:`;
+  const shareText = `Расчёт кейтеринга: ${formatRUB(result.total)} — ${current.label}, ${guestsClamped} гостей. Подробности:`;
   const [shareUrls, setShareUrls] = useState({ telegram: "", whatsapp: "" });
   useEffect(() => {
     if (typeof window === "undefined") return;
     const enc = encodeURIComponent(
-      `${window.location.origin}/?type=${typeId}&guests=${guests}#calculator`,
+      `${window.location.origin}/?type=${typeId}&guests=${guestsClamped}#calculator`,
     );
     setShareUrls({
       telegram: `https://t.me/share/url?url=${enc}&text=${encodeURIComponent(shareText)}`,
@@ -164,7 +174,7 @@ export function Calculator() {
         `${shareText} ${decodeURIComponent(enc)}`,
       )}`,
     });
-  }, [typeId, guests, shareText]);
+  }, [typeId, guestsClamped, shareText]);
   const telegramShareUrl = shareUrls.telegram;
   const whatsappShareUrl = shareUrls.whatsapp;
 
@@ -213,7 +223,7 @@ export function Calculator() {
             {/* ═══ Type selector — Visual Cards ═══ */}
             <div>
               <label className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
-                <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">1</span>
+                <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[11px] font-bold">1</span>
                 Тип мероприятия
               </label>
               <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -269,7 +279,7 @@ export function Calculator() {
                       </span>
                       
                       {/* Price hint */}
-                      <span className="font-mono text-[10px] text-ink/70">
+                      <span className="font-mono text-[11px] text-ink/70">
                         от {formatRUB(m.perGuest)}/чел
                       </span>
                     </motion.button>
@@ -295,7 +305,7 @@ export function Calculator() {
             <div className="mt-8">
               <label className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center justify-between">
                 <span className="flex items-center gap-2">
-                  <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">2</span>
+                  <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[11px] font-bold">2</span>
                   Количество гостей
                 </span>
                 <span className="flex items-baseline gap-1">
@@ -320,19 +330,21 @@ export function Calculator() {
                 <div className="relative h-12 flex items-center">
                   {/* Background track */}
                   <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-cream" />
-                  
-                  {/* Filled track (gold gradient) */}
+
+                  {/* Filled track (gold gradient) — min tracks the format
+                      minimum so the fill never starts off-scale */}
                   <motion.div
                     className="absolute left-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-gold to-terracotta origin-left"
                     style={{
-                      width: `${((guests - 5) / (500 - 5)) * 100}%`,
+                      width: `${((guests - current.minGuests) / (500 - current.minGuests)) * 100}%`,
                     }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
-                  
-                  {/* Tick marks — evenly spaced visually, labels show actual values */}
+
+                  {/* Tick marks — evenly spaced visually, labels show actual values.
+                      Ticks below the format minimum are filtered out. */}
                   <div className="absolute inset-x-0 top-1/2 flex justify-between -translate-y-1/2 pointer-events-none">
-                    {[5, ...SLIDER_TICKS].map((tick, i, arr) => {
+                    {[current.minGuests, ...SLIDER_TICKS.filter(t => t > current.minGuests)].map((tick, i, arr) => {
                       const position = (i / (arr.length - 1)) * 100;
                       const isActive = guests >= tick;
                       return (
@@ -341,7 +353,7 @@ export function Calculator() {
                           className="flex flex-col items-center"
                           style={{ position: 'absolute', left: `${position}%`, transform: 'translateX(-50%)' }}
                         >
-                          <span className={`font-mono text-[10px] mb-1.5 ${isActive ? 'text-ink/70' : 'text-ink/70'}`}>
+                          <span className={`font-mono text-[12px] mb-1.5 ${isActive ? 'text-ink/70' : 'text-ink/70'}`}>
                             {tick >= 1000 ? `${tick/1000}k` : tick}
                           </span>
                           <div className={`w-0.5 rounded-full transition-colors ${isActive ? 'h-3 bg-gold/60' : 'h-2 bg-ink/15'}`} />
@@ -354,7 +366,7 @@ export function Calculator() {
                   <motion.div
                     className="absolute top-0 flex items-center justify-center pointer-events-none"
                     style={{
-                      left: `${((guests - 5) / (500 - 5)) * 100}%`,
+                      left: `${((guests - current.minGuests) / (500 - current.minGuests)) * 100}%`,
                       transform: 'translateX(-50%)',
                     }}
                     animate={{ y: [-2, 0, -2] }}
@@ -366,38 +378,40 @@ export function Calculator() {
                     <div className="w-2 h-2 bg-gold rotate-45 -mb-1 mt-1" />
                   </motion.div>
 
-                  {/* Actual input (invisible but functional) */}
+                  {/* Actual input (invisible but functional) — min bound to
+                      the format minimum (Cycle 38 fix: the slider, the
+                      estimate and the share link now always agree) */}
                   <input
                     type="range"
-                    min={5}
+                    min={current.minGuests}
                     max={500}
                     step={5}
                     value={guests}
                     onChange={(e) => setGuests(Number(e.target.value))}
                     aria-valuenow={guests}
-                    aria-valuemin={5}
+                    aria-valuemin={current.minGuests}
                     aria-valuemax={500}
                     aria-label="Количество гостей"
                     className="relative z-10 h-12 w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-7 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-gold [&::-webkit-slider-thumb]:to-terracotta [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:shadow-gold/40 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:active:cursor-grabbing [&::-moz-range-thumb]:size-7 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-gradient-to-r [&::-moz-range-thumb]:from-gold [&::-moz-range-thumb]:to-terracotta [&::-moz-range-thumb]:shadow-lg [&::-moz-range-thumb]:shadow-gold/40"
                   />
                 </div>
 
-                {/* Quick adjust buttons */}
+                {/* Quick adjust buttons — respect the format minimum */}
                 <div className="flex items-center justify-between mt-2">
                   <button
-                    onClick={() => setGuests((g) => Math.max(5, g - 5))}
+                    onClick={() => setGuests((g) => Math.max(current.minGuests, g - 5))}
                     className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-2.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95 min-h-[44px]"
                     aria-label="Меньше гостей"
                   >
                     <Minus className="size-3" /> −5
                   </button>
-                  
+
                   {/* Per-person indicator */}
                   <div className="flex items-center gap-2 text-xs text-ink/70">
                     <TrendingUp className="size-3.5 text-gold/60" />
                     <span>~{formatRUB(Math.round(result.total / guestsClamped))}/чел</span>
                   </div>
-                  
+
                   <button
                     onClick={() => setGuests((g) => Math.min(500, g + 5))}
                     className="flex items-center gap-1.5 rounded-full border border-border-line bg-cream/50 px-3 py-2.5 text-xs font-medium text-ink/70 hover:border-gold hover:bg-gold/10 hover:text-gold transition-all active:scale-95 min-h-[44px]"
@@ -412,7 +426,7 @@ export function Calculator() {
             {/* ═══ Addons — Enhanced Cards ═══ */}
             <div className="mt-8">
               <label className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
-                <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">3</span>
+                <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[11px] font-bold">3</span>
                 Дополнительно
                 {addons.length > 0 && (
                   <span className="ml-auto font-normal text-gold">
@@ -497,7 +511,7 @@ export function Calculator() {
             {/* ═══ Date picker ═══ */}
             <div role="group" aria-label="Дата мероприятия (необязательно)" className="mt-8">
               <div className="font-mono text-xs uppercase tracking-wider text-ink/70 font-medium flex items-center gap-2">
-                <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[10px] font-bold">4</span>
+                <span className="inline-flex items-center justify-center size-5 rounded-full bg-gold/10 text-gold text-[11px] font-bold">4</span>
                 Дата мероприятия
                 <span className="font-normal text-ink/70">(необязательно)</span>
               </div>
@@ -606,11 +620,26 @@ export function Calculator() {
                 </motion.div>
               </div>
 
-              {/* CTA Button — wrapped in <Magnetic> for cursor-tracking translation */}
+              {/* CTA Button — wrapped in <Magnetic> for cursor-tracking translation.
+                  Cycle 38 fix: dispatches the calculator state so the contact
+                  form pre-fills type/guests/date — the user's calculation is
+                  no longer lost when crossing into the form. */}
               <Magnetic className="mt-7">
                 <motion.a
                   href="#contact"
                   data-cursor="inquiry"
+                  onClick={() => {
+                    window.dispatchEvent(
+                      new CustomEvent("catering:calc-lead", {
+                        detail: {
+                          typeId,
+                          guests: guestsClamped,
+                          date,
+                          total: result.total,
+                        },
+                      }),
+                    );
+                  }}
                   className="group flex w-full items-center justify-center gap-2 rounded-full cta-gradient-punchy bg-gradient-to-r from-gold to-terracotta px-6 py-4 text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-gold/25 transition-all hover:shadow-xl active:scale-[0.98] min-h-[44px]"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
@@ -626,7 +655,7 @@ export function Calculator() {
                   initial={{ opacity: 0, y: 8, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-3 flex items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-[11px] font-medium text-gold"
+                  className="mt-3 flex items-center justify-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-[12px] font-medium text-gold"
                   title="Сезонный спрос высок — итоговая стоимость подтверждается нашим менеджером"
                 >
                   <Gift className="size-3.5" />

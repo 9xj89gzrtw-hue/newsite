@@ -12,28 +12,18 @@ import {
   Loader2,
   Sparkles,
   ChevronRight,
-  Trophy,
-  Award,
-  Star,
   Instagram,
   Send,
   MessageCircle,
 } from "lucide-react";
 import {
   SOPRANOS_CITIES,
-  SOPRANOS_AWARDS,
   CONTACTS,
 } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
 import { Magnetic } from "@/components/motion/magnetic";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 import { toast } from "sonner";
-
-const FOOTER_AWARD_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Award,
-  Trophy,
-  Star,
-};
 
 /**
  * Stable current year — computed once on mount to avoid SSR/CSR
@@ -168,7 +158,7 @@ function NewsletterSignup() {
             </AnimatePresence>
           </button>
         </Magnetic>
-        <label className="mt-3 flex min-h-[44px] items-start gap-2 text-[11px] text-cream/70 sm:mt-2">
+        <label className="mt-3 flex min-h-[44px] items-start gap-2 text-[12px] text-cream/70 sm:mt-2">
           <input
             type="checkbox"
             checked={consent}
@@ -189,16 +179,17 @@ function NewsletterSignup() {
   );
 }
 
-/** Навигация футера — ссылки на ключевые разделы (Cycle 35: убраны
-    «События» — блок удалён; «Свадьбы»/«Корпоративы»/«Гриль» теперь ведут
-    на #services — новую сетку 18 услуг). */
+/** Навигация футера — каждая ссылка ведёт к уникальному разделу
+    (Cycle 38 fix: ранее «Свадьбы»/«Корпоративы»/«Гриль» вели на один и
+    тот же #services, а «Поднос» был невнятным ярлыком). */
 const FOOTER_NAV = [
   { label: "Главная", href: "#main-content" },
-  { label: "Свадьбы", href: "#services" },
-  { label: "Корпоративы", href: "#services" },
-  { label: "Гриль и BBQ", href: "#services" },
-  { label: "Поднос", href: "#menu" },
-  { label: "Закуски", href: "#menu" },
+  { label: "Услуги", href: "#services" },
+  { label: "Меню и цены", href: "#menu" },
+  { label: "Видео событий", href: "#events-video-carousel" },
+  { label: "Калькулятор", href: "#calculator" },
+  { label: "О компании", href: "#about" },
+  { label: "Вопросы и ответы", href: "#faq" },
   { label: "Контакты", href: "#contact" },
 ] as const;
 
@@ -423,7 +414,7 @@ export function SiteFooter() {
             </ul>
           </motion.nav>
 
-          {/* ---- Column 3: Наши награды ---- */}
+          {/* ---- Column 3: Клиенты и партнёры ---- */}
           <motion.section
             {...motionProps}
             custom={2}
@@ -435,31 +426,31 @@ export function SiteFooter() {
               id="footer-awards-heading"
               className="eyebrow-wide text-sm text-gold"
             >
-              Наши награды
+              Нам доверяют
             </h2>
-            <div className="flex flex-wrap items-center gap-4">
-              {SOPRANOS_AWARDS.map((award) => {
-                const Icon = FOOTER_AWARD_ICONS[award.icon] ?? Trophy;
-                return (
-                  <a
-                    key={award.title}
-                    href="#about"
-                    className="group flex flex-col items-center gap-2 transition-transform duration-300 hover:scale-105"
-                    aria-label={award.alt}
-                  >
-                    <div className="flex size-16 items-center justify-center rounded-full border border-gold/30 bg-gold/10">
-                      <Icon className="size-8 text-gold" />
-                    </div>
-                    <span className="max-w-[100px] text-center font-mono text-[10px] uppercase tracking-wider text-cream/60">
-                      {award.title}
-                    </span>
-                  </a>
-                );
-              })}
-            </div>
+            <ul className="flex flex-col gap-2.5">
+              {[
+                "Сбербанк — корпоративные банкеты",
+                "Газпром — приёмы и фуршеты",
+                "Яндекс — офисные обеды и ивенты",
+                "«Гинза Проект» — ресторанные проекты",
+                "Отель «Хилтон Мойка 22» — банкеты",
+                "ООО «Спортинг» — события 100–350 гостей",
+              ].map((client) => (
+                <li
+                  key={client}
+                  className="flex items-start gap-2 text-sm text-cream/80"
+                >
+                  <ChevronRight
+                    className="mt-0.5 size-3.5 shrink-0 text-gold/60"
+                    aria-hidden="true"
+                  />
+                  <span>{client}</span>
+                </li>
+              ))}
+            </ul>
             <p className="text-xs text-cream/60">
-              Признание на премиях Санкт-Петербурга и России за качество кухни
-              и сервиса.
+              2 400+ мероприятий для компаний и частных клиентов с 2009 года.
             </p>
           </motion.section>
         </div>

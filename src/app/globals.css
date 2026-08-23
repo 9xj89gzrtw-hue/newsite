@@ -361,6 +361,12 @@ html {
     text-rendering: optimizeLegibility;
     overflow-x: clip;
   }
+  /* Cycle 38 fix: anchored sections scroll to just below the sticky header
+     (~60px tall) — previously headings like «Сезонные меню» landed underneath
+     it when following #menu anchors from hero CTAs. */
+  section[id] {
+    scroll-margin-top: 84px;
+  }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "ss01", "cv01";
@@ -3441,7 +3447,8 @@ header[data-scrolled="true"] [data-mega-panel] {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 0.5em 0;
+  padding: 0.5em 0.4em;
+  min-height: 44px; /* Cycle 38 fix: touch-target ≥44px on mobile */
   position: relative;
   text-decoration: none;
   transition: color 200ms ease;

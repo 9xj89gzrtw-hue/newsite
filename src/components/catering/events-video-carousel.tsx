@@ -289,29 +289,23 @@ export function EventsVideoCarousel() {
               aria-roledescription="slide"
               aria-label={`Видео ${i + 1} из ${TILES.length}: ${tile.title}`}
             >
-              {/* Background looping muted autoplay teaser video.
-                  Wrapped in ClipPathReveal (directional inset mask + inner
-                  zoom — Sondaven photo-reveal signature). The mask sits on an
-                  absolute-inset-0 wrapper so the existing absolute-positioned
-                  <video> (which fills the card via .ea-evt-video__video CSS)
-                  keeps its containing block. `group-hover` wash on the video
-                  adds a cinematic saturate/brightness lift on card hover. */}
+              {/* Poster image only — video loads exclusively in the modal
+                  (click-to-play). Cycle 38 perf fix: 4 autoplaying <video>
+                  elements with the same 5 MB src starved the browser's
+                  connection pool, breaking images and freezing the main
+                  thread. Posters keep the visual identity per tile. */}
               <ClipPathReveal
                 direction="alternate"
                 index={i}
                 duration={0.8}
                 className="absolute inset-0"
               >
-                <video
-                  className="ea-evt-video__video transition-[filter,transform] duration-500 group-hover:saturate-150 group-hover:brightness-105"
-                  src={tile.video}
-                  poster={tile.poster}
-                  autoPlay
-                  muted
-                  playsInline
-                  loop
-                  preload="metadata"
-                  aria-label={tile.videoAlt}
+                <img
+                  className="ea-evt-video__video"
+                  src={tile.poster}
+                  alt={tile.videoAlt}
+                  loading="lazy"
+                  decoding="async"
                 />
               </ClipPathReveal>
 
@@ -388,8 +382,8 @@ export function EventsVideoCarousel() {
               poster={activeTile.poster}
               autoPlay
               controls
-              loop
               playsInline
+              preload="metadata"
               aria-label={activeTile.videoAlt}
             />
             <div className="ea-evt-video__modal-caption">

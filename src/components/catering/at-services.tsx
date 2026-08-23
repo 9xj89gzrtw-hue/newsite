@@ -716,7 +716,7 @@ export function AtServices() {
           transition={{ duration: 0.6, ease: EASE_AT }}
         >
           <p className="at-svc__stat">
-            18 УСЛУГ · 5 КАТЕГОРИЙ · СПБ / МСК / ВСЯ РОССИЯ
+            18 УСЛУГ · 5 КАТЕГОРИЙ · САНКТ-ПЕТЕРБУРГ И ОБЛАСТЬ
           </p>
           <Link href="#contact" className="at-svc__pill">
             ОБСУДАТЬ СОБЫТИЕ

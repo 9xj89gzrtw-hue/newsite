@@ -50,7 +50,7 @@ const LINK_TERMS_HREF = "/terms";
 
 // Tailwind classnames hoisted so AnimatePresence child JSX stays readable.
 const LINK_CLASS =
-  "no-underline text-[var(--ea-red)] transition-colors hover:text-[var(--ea-red-deep)] hover:underline focus-visible:underline";
+  "no-underline text-[var(--ea-red)] transition-colors hover:text-[var(--ea-red-deep)] hover:underline focus-visible:underline py-2.5 -my-2.5";
 const BTN_OUTLINE_CLASS =
   "border border-[var(--ea-cream)] bg-transparent text-[var(--ea-cream)] hover:bg-white/10 focus-visible:bg-white/10";
 const BTN_SOLID_CLASS =
@@ -208,7 +208,7 @@ export function EaCookieBanner() {
         <motion.div
           ref={bannerRef}
           role="region"
-          aria-label="Cookie consent"
+          aria-label="Уведомление об использовании cookies"
           data-component="ea-cookie-banner"
           className="fixed inset-x-0 top-0 z-[60] w-full"
           style={{

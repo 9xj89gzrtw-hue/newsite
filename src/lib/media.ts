@@ -225,14 +225,15 @@ export const INSTAGRAM = {
 
 /**
  * Yandex Maps embed — office location.
- * Replace with the client's actual address on Yandex Maps.
+ * Координаты дома 18 по ул. Большая Морская подтверждены Яндекс.Картами
+ * (59.934862, 30.316218, индекс 191181) — совпадают с LEGAL_INFO.legalAddress.
  */
 export const YANDEX_MAPS = {
   // Embed URL for iframe (Yandex Maps → Share → HTML code)
   embedSrc:
-    "https://yandex.ru/map-widget/v1/?ll=30.315785%2C59.939495&z=11&pt=30.315785,59.939495,pm2rdm",
-  // Direct link for "open in maps" button
-  href: "https://yandex.ru/maps/-/CTgzMJKL",
+    "https://yandex.ru/map-widget/v1/?ll=30.316218%2C59.934862&z=16&pt=30.316218,59.934862,pm2rdm",
+  // Direct link for "open in maps" button — поиск по точному адресу
+  href: "https://yandex.ru/maps/?text=%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%2C%20%D1%83%D0%BB%D0%B8%D1%86%D0%B0%20%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%9C%D0%BE%D1%80%D1%81%D0%BA%D0%B0%D1%8F%2C%2018",
   // Address (display) — using full legal address from LEGAL_INFO
   address: "ул. Большая Морская, д. 18, офис 33, Санкт-Петербург",
 };

@@ -70,13 +70,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
     {
       name: "Ассорти морских канапе",
       chefNote: "Краб, лосось и сливочный сыр — маленькие укусы холодного моря.",
-      price: "от 2400 ₽ / чел",
+      price: "от 2450 ₽ / чел",
       image: "/media/concorde-handhelds.jpg",
     },
     {
       name: "Скаллоп с цветной капустой",
       chefNote: "Три скаллопа, фиолетовая цветная капуста и микрогрин — текстура в каждом кусочке.",
-      price: "от 2400 ₽ / чел",
+      price: "от 2450 ₽ / чел",
       image: "/media/ridgewells-scallops.jpg",
     },
   ],
@@ -167,16 +167,16 @@ const SIGNATURE_DISHES: Record<string, Array<{
 };
 
 /**
- * Map menu type IDs to their thumbnail images
+ * Map menu type IDs to their thumbnail images + descriptive alt
  */
-const MENU_TYPE_IMAGES: Record<string, string> = {
-  buffet: "/media/concorde-handhelds.jpg",
-  banquet: "/media/concorde-boardroom.webp",
-  "snack-box": "/media/menu-snack-box.jpg",
-  "coffee-break": "/media/concorde-avo-toast.jpg",
-  vegetarian: "/media/ridgewells-veg-mosaic.jpg",
-  bbq: "/media/event-06.jpg",
-  "office-lunch": "/media/concept-banquet-table.jpg",
+const MENU_TYPE_IMAGES: Record<string, { src: string; alt: string }> = {
+  buffet: { src: "/media/concorde-handhelds.jpg", alt: "Фуршетные канапе и закуски в руках официанта" },
+  banquet: { src: "/media/concorde-boardroom.webp", alt: "Банкетная сервировка стола с закусками" },
+  "snack-box": { src: "/media/menu-snack-box.jpg", alt: "Снек-боксы с закусками в индивидуальной упаковке" },
+  "coffee-break": { src: "/media/concorde-avo-toast.jpg", alt: "Кофе-брейк: тосты с авокадо и кофе" },
+  vegetarian: { src: "/media/ridgewells-veg-mosaic.jpg", alt: "Вегетарианские блюда — овощная мозаика" },
+  bbq: { src: "/media/event-06.jpg", alt: "Барбекю на открытом воздухе — гриль и овощи" },
+  "office-lunch": { src: "/media/concept-banquet-table.jpg", alt: "Обеды в офис — сервировка обеденного стола" },
 };
 
 /**
@@ -248,7 +248,7 @@ function FeaturedSpotlight({
       <div className="relative z-10 flex h-full flex-col justify-end p-6 md:p-12 lg:p-16">
         <div className="max-w-2xl">
           <motion.span
-            className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.3em] text-gold backdrop-blur-md"
+            className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.3em] text-gold backdrop-blur-md"
             initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -291,7 +291,7 @@ function FeaturedSpotlight({
               }}
             >
               «{dish.chefNote}»
-              <span className="mt-2 block font-sans text-[11px] not-italic uppercase tracking-[0.25em] text-gold/80">
+              <span className="mt-2 block font-sans text-[12px] not-italic uppercase tracking-[0.25em] text-gold/80">
                 — шеф-пова́р
               </span>
             </motion.p>
@@ -336,7 +336,7 @@ function FeaturedSpotlight({
                   <button
                     type="button"
                     onClick={() => setIdx(nextDishIdx)}
-                    className="ml-2 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-cream/25 bg-cream/5 px-4 py-2 text-[11px] uppercase tracking-wider text-cream/80 transition-colors hover:bg-cream/15 hover:text-cream"
+                    className="ml-2 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-cream/25 bg-cream/5 px-4 py-2 text-[12px] uppercase tracking-wider text-cream/80 transition-colors hover:bg-cream/15 hover:text-cream"
                     aria-label="Следующее блюдо"
                   >
                     Дальше
@@ -362,7 +362,7 @@ export function Menu() {
   const [expandedPackage, setExpandedPackage] = useState<string | null>(null);
   const [dietary, setDietary] = useState<string[]>([]);
   const current = MENU_TYPES.find((m) => m.id === active) ?? MENU_TYPES[0];
-  const priceUnit = current.priceUnit ?? "/guest";
+  const priceUnit = current.priceUnit ?? "/чел";
   const prefersReducedMotion = useReducedMotion();
 
   const toggleDietary = (id: string) => {
@@ -485,8 +485,8 @@ export function Menu() {
                   {/* Thumbnail image */}
                   <div className="relative h-16 w-full overflow-hidden sm:h-20">
                     <Image
-                      src={MENU_TYPE_IMAGES[m.id] || "/media/concorde-handhelds.jpg"}
-                      alt=""
+                      src={MENU_TYPE_IMAGES[m.id]?.src || "/media/concorde-handhelds.jpg"}
+                      alt={MENU_TYPE_IMAGES[m.id]?.alt || `${m.label} — фото блюда`}
                       fill
                       sizes="160px"
                       loading="eager"
@@ -501,7 +501,7 @@ export function Menu() {
                     {/* Price badge on thumbnail */}
                     <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-center gap-1 rounded-full bg-white/95 backdrop-blur-sm px-2 py-0.5 shadow-sm">
                       <Sparkles className={`size-2.5 ${isActive ? "text-gold" : "text-ink/70"} transition-colors`} />
-                      <span className={`font-mono text-[10px] font-bold leading-none ${isActive ? "text-ink" : "text-ink/70"}`}>
+                      <span className={`font-mono text-xs font-bold leading-none ${isActive ? "text-ink" : "text-ink/70"}`}>
                         от {formatRUB(m.perGuest)}
                       </span>
                     </div>
@@ -547,7 +547,7 @@ export function Menu() {
             aria-label="Фильтр по пищевым предпочтениям"
             className="mt-10 flex flex-wrap items-center justify-center gap-2 md:gap-3"
           >
-            <span className="mr-2 font-mono text-[11px] uppercase tracking-[0.25em] text-ink/70">
+            <span className="mr-2 font-mono text-[12px] uppercase tracking-[0.25em] text-ink/70">
               Фильтр:
             </span>
             {DIETARY_CHIPS.map(({ id, label, icon: Icon }) => {
@@ -963,7 +963,7 @@ function PackageCarousel({
                     <div className="flex items-end justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <motion.span 
-                          className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-gold"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1 font-mono text-xs uppercase tracking-wider text-gold"
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.1 + idx * 0.05 }}
@@ -1028,7 +1028,7 @@ function PackageCarousel({
                           data-dietary={tags.join(" ") || undefined}
                           className="group/dish flex items-baseline gap-2.5 text-sm"
                         >
-                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-gold/10 font-mono text-[10px] font-bold text-gold transition-colors group-hover/dish:bg-gold/20">
+                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-gold/10 font-mono text-[11px] font-bold text-gold transition-colors group-hover/dish:bg-gold/20">
                             {String(i + 1).padStart(2, "0")}
                           </span>
                           <span className="flex-1 text-ink/80 leading-relaxed transition-colors group-hover/dish:text-ink">
@@ -1054,7 +1054,7 @@ function PackageCarousel({
                             </span>
                           )}
                           {d.weight && (
-                            <span className="shrink-0 rounded-full bg-ink/5 px-2 py-0.5 font-mono text-[10px] text-ink/70 tabular-nums">
+                            <span className="shrink-0 rounded-full bg-ink/5 px-2 py-0.5 font-mono text-xs text-ink/70 tabular-nums">
                               {d.weight}
                             </span>
                           )}
@@ -1073,8 +1073,10 @@ function PackageCarousel({
                   )}
                 </ul>
 
-                {/* Expand/collapse button */}
-                {hiddenCount > 0 && (
+                {/* Expand/collapse button — stays mounted while expanded so
+                    the list can be collapsed back (Cycle 38 fix: previously
+                    disappeared when hiddenCount hit 0, making it irreversible) */}
+                {(hiddenCount > 0 || isExpanded) && (
                   <motion.button
                     aria-expanded={isExpanded ? "true" : "false"}
                     aria-controls={`dish-list-${idx}`}
