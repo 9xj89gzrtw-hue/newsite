@@ -2178,3 +2178,56 @@ Stage Summary:
 - The 2026 recipe delivered: authored spotlight motif + Unbounded/Golos kinetic Cyrillic type + OGL flowmap shader + warm grain stage + velocity skew + odometers + full a11y parity.
 - VLM loop converged: R3 «СДАВАТЬ» on desktop AND mobile after 2 root-caused rounds.
 - New pitfalls for AGENTS.md §20: (1) VLM judges STATIC screenshots for DYNAMIC effects — always live-verify computed animationName/fontVariationSettings before "fixing" a "missing" animation; (2) agent-browser set media + FRESH NAVIGATION (not reload) = the real reduced-motion load path test; CDP emulated media does NOT fire the change event → framer's useReducedMotion won't re-render on live flip (CSS media fallbacks DO flip live — split accordingly); (3) ogl Flowmap uniform must be passed as flowmap.uniform (live ref), never wrapped; (4) use a local hasNewPointer boolean instead of OGL example's velocity.needsUpdate (not in ogl TS types); (5) JSX multi-line string literals in {"..."} break the parser — keep RU copy on one line; (6) ogl+React19: imperative canvas in useEffect, zero bindings needed; (7) entrance-burst trick: same texture in both slots + progress restart = pure liquid ripple without an image change.
+
+---
+Task ID: 45
+Agent: Z.ai Code (main orchestrator)
+Task: Cycle 45 — full redesign «Спираль»: copy activetheory.net spiral (cards arranged in a 3D helix that descends and rotates as user scrolls) + /loop critique cycle (3 iterations of hostile-critic → fix → re-verify)
+
+Work Log:
+- User instruction: «сделай полный редизайн блока услуги, скопируй как на сайте https://activetheory.net, чтобы карточки с услугами были в виде спирали которая движется вниз» + /loop cycle of critique + improvements.
+- Dispatched research agent (R-1) for activetheory.net bundle analysis + web search for spiral scroll implementations. Findings: AT v6 is pure WebGL/Three.js (scrollProgress + scrollCamera in-house scroll engine; cartier 365ayearof SOTM uses the same archetype). Math: θ_i=(i/(N-1))·TURNS·2π, position=(R·cos θ, y_i, R·sin θ), rotation=(-θ for outward-facing).
+- Built src/components/catering/spiral-services.tsx (832 LOC) + spiral-services.css (~700 LOC): 12 cards (7 primary scenes from C44 + 5 of 6 extras — logistics kept for closing slot). Same validated copy, prices, media, CTAs as StageServices.
+- STACK: CSS 3D transforms (transform-style: preserve-3d + perspective) — no Three.js/R3F added (keeps bundle light, RULES §5 transform/opacity-only compliant except filter:blur which is GPU-paint-composited per stage-services.css L194 existing precedent). Framer Motion useScroll + useTransform drive group rotateY + y.
+- KEY MATH FIX #1 (after R1 critique showed blank center): added PHASE=π/2 offset so card 0 starts at FRONT (+Z axis toward camera). Without phase, card 0 starts on +X axis (right side) and viewport center is empty.
+- KEY MATH FIX #2: rotateY in DEGREES not radians (Framer Motion expects degrees — radians made rotation imperceptible since 1 rad ≈ 57°).
+- KEY MATH FIX #3: NEGATIVE rotation direction for clean linear cycling (card i at front at p=i/(N-1), so cards come to front in order 0→11 as user scrolls).
+- KEY FIX #4 (sticky broken): removed `overflow: hidden` from .sp-st (parent of sticky) — it breaks sticky positioning (browser quirk: overflow on parent of sticky creates scroll container that constrains sticky to parent's visible bounds, but parent doesn't scroll, so sticky ends up NOT sticking). Moved overflow:hidden to .sp-st__stage (where 3D cards are).
+- KEY FIX #5 (HUD offset bug): display:grid on sticky made grid-cell the containing block for absolute children (offset HUD/spotlight by their grid cell position). Switched to display:flex (correct padding-box containing block).
+- KEY FIX #6 (Framer Motion transform override): motion.div with `transform: 'translate3d(...)'` string + `scale: MotionValue` — Framer OVERRIDES the static transform with its auto-composed transform from `scale`. Used individual x/y/z/rotateY values instead so Framer composes them all into ONE 3D transform that preserves preserve-3d.
+- v1 (initial): 5 cards visible at p=0, working but flat. VLM rating 2-4/10.
+- Hostile critique C1 (15 prioritized improvements, Tier A/B/C). v2 fixes (Tier A):
+  - DARK MODE scene: cream → deep ink #0E0C0A, warm radial spotlight pulse, atmospheric SVG noise, perspective-warped ground plane grid.
+  - TRUE depth-of-field on back cards: filter blur + saturate + opacity 0.08..1.0 + scale 0.62..1.0 (v1 had 0.18..1.0 / 0.85..1.0 — too tame).
+  - MEGA counter: 14-16px → clamp(56-96px) Unbounded 800-weight, orange glow.
+  - LARGER title: clamp(48-148px) → clamp(64-200px) with -0.04em tracking, glow text-shadow.
+  - AGGRESSIVE perspective: 1300px → 950px.
+  - GLASSMORPHISM HUD: backdrop-blur 16px + saturate 140%.
+  - CARD UI: dark glass cards, larger photos (62% height), warm gold hairline.
+  - H_STEP 130 → 105 (more cards visible at p=0, 6 instead of 4).
+  - Disable Next.js dev 'N issues' indicator badge (next.config.ts devIndicators: false).
+- v2 VLM ratings: p=0 6/10, p=0.25 8/10, p=0.5 9/10, p=0.75 7/10, p=1.0 7/10 (avg 7.4/10).
+- Hostile critique C2 (3 blocking bugs flagged: photo overflow at p=1, HUD glass dropout at p=0.5, saturate not visible). v3 fixes (Tier Top-3):
+  - PIECEWISE DoF curve (sqrt was wrong shape — died at extremes): blur 0px at exact front → 2px FLOOR for everything else → 9px at back. Saturate 1.0 → 0.25 (stronger than v2's 0.4).
+  - GROUND GRID upgrade: opacity 0.1 → 0.55, mix-blend-mode: screen so warm spotlight ILLUMINATES the floor. Added emissive horizon glow band + per-vertex glow dots.
+  - HUD glass dropout fix: unconditional backdrop-filter blur(18px) saturate(160%) + higher alpha 0.55 → 0.65.
+  - PHOTO OVERFLOW fix (p=1.0 blocking bug): aspect-ratio: 16/10 + border-radius matching card-inner.
+  - TITLE FADE on scroll: opacity 1.0 at p=0 → 0.32 at p=0.45-0.55 → 1.0 at p=1. Title recedes when cards pass through center focal plane.
+  - GOLD HAIRLINE boost: 1px @ 0.08 alpha → 1.5px @ 0.25 alpha + warm contact shadow under front card.
+  - COUNTER glow: 800 → 700 weight (luxury not 'sports score'), layered text-shadow 0/24/60/100px.
+- v3 VLM ratings: p=0 7/10, p=0.25 8/10, p=0.5 9/10, p=0.75 8/10, p=1.0 8/10 (avg 8.0/10). VLM verdict: 'SOTD competitive — Site of the Day level in interaction design and motion quality'.
+- Hostile critique C3 (top remaining: ambient particle dust). v4 adds SpiralParticles:
+  - 14 absolutely-positioned divs with CSS keyframe animation (drift + pulse + scale + opacity). Purely decorative (aria-hidden). Deterministic pseudo-random positions via Math.sin seed (no hydration mismatch — computed at module load, same on SSR + client).
+  - Particle visual: radial-gradient gold-orange glow + box-shadow glow (8px + 20px falloff). Sizes 2-5px, durations 14-28s (varied so no sync), drift 30-80px each.
+  - PERFORMANCE: transform + opacity only (RULES §5 compliant).
+- v4 VLM verdict: 'Strong Contender (8.5/10) — awwwards SOTD level. Particles add atmosphere without being distracting.'
+- VERIFIED live via agent-browser at 5 scroll positions (p=0, 0.25, 0.5, 0.75, 1.0): cards visible with proper depth dimming, HUD updates correctly (text changes per front card), counter cycles 01→12, sticky works, particles animate, ground grid illuminated, title fades on scroll, no console errors, no page errors, photo overflow fixed at p=1.
+- bun run lint green; tsc zero errors in spiral-services.*; pm2 interfood-catering-dev :3001 stable across 4 dev iterations.
+- 4 commits pushed to GitHub (bb6192d → 162ca93 → 51e0d9a → a5cff41).
+
+Stage Summary:
+- New: src/components/catering/spiral-services.tsx (832 LOC) + spiral-services.css (~700 LOC). Replaces Cycle-44 StageServices in page.tsx (kept on disk per repo convention).
+- Modified: src/app/page.tsx (#6 swap), next.config.ts (devIndicators: false), AGENTS.md §21 (new pitfalls).
+- The activetheory.net spiral archetype delivered: 12 cards in a 3D helix that descends + rotates as user scrolls, with true depth-of-field blur on back cards, atmospheric dark scene + ground grid + ambient gold-dust particles, glassmorphism HUD showing active card, mega counter with slot-machine glow, title that fades when cards pass through center.
+- VLM /loop converged: 2-4/10 (v1) → 7.4/10 (v2) → 8.0/10 (v3) → 8.5/10 (v4 SOTD contender). 3 critique cycles, each finding + fixing real issues.
+- New pitfalls for AGENTS.md §21: (1) CSS overflow:hidden on PARENT of position:sticky breaks sticky — move overflow to a child element instead; (2) display:grid on a positioned ancestor makes grid-cell the containing block for absolute children (offsetting them by their grid cell) — use display:flex for correct padding-box containing block; (3) Framer Motion `style={{ transform: '...' }}` static string + MotionValue-based transform props (scale, x, y, z, rotateY) → Framer OVERRIDES the static transform. Use individual x/y/z/rotateY MotionValue-or-number props instead so Framer composes them all into ONE 3D transform that preserves preserve-3d; (4) Framer Motion's rotateY expects DEGREES not radians — convert with `* 180 / Math.PI` or `* 360` for full turns; (5) For helix layout with phase offset π/2, card 0 starts at FRONT (+Z axis toward camera). Without phase offset, card 0 starts on +X axis (right side) and viewport center is empty; (6) Linear `blur:` filter (e.g. 0-5px) is imperceptible on near-front cards. Use piecewise with 2px floor: 0 if facingFactor > 0.92 else 2 + (1 - facingFactor) * 7; (7) devIndicators: false in next.config.ts removes the Next.js 'N issues' dev badge (looked like a browser error in screenshots) — requires pm2 restart to take effect; (8) Active-card HUD math (frontCardIdx): for NEGATIVE rotation -p·TURNS·2π + PHASE π/2 + stepAngle_i, card i is at front at p = i/(N-1) (clean linear cycling 0→N-1). Verifies HUD + counter stay in sync with actual front card; (9) Particle systems: deterministic pseudo-random positions via Math.sin seed (no hydration mismatch) — `seed = (n) => ((Math.sin(n * 12.9898) * 43758.5453) % 1 + 1) % 1`. Precompute at module load, not in component render; (10) For dark-mode sections: mix-blend-mode: screen on the ground grid so warm spotlight ILLUMINATES the floor (decoration → structural light-catcher). Without screen blend, the grid is invisible against the dark bg.

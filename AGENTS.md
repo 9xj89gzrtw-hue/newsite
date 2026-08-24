@@ -3534,3 +3534,108 @@ touch-targets, контрасты, 3 картинки после VLM-аудит�
 7. Unbounded (variable 200–900, полная кириллица) + Golos Text — валидная
    RU-пара уровня Soehne/Apercu у победителей; next/font/google отдаёт
    variable-версию, если НЕ указывать weight.
+
+---
+
+## 21. Cycle 45 — блок услуг «Спираль»: activetheory.net spiral graft + /loop critique (24.08.2026, Z.ai Agent)
+
+Полный редизайн блока услуг по запросу юзера: «скопируй как на
+https://activetheory.net — карточки с услугами в виде спирали которая
+движется вниз». Архетип — Cartier 365ayearof SOTM (карточки на 3D-геликсе,
+скролл → вращение + нисхождение). 3 итерации /loop критики (hostile critic
+C1→C2→C3), каждая — скриншоты на 5 позициях (p=0, 0.25, 0.5, 0.75, 1.0)
+через agent-browser → VLM-анализ → патчи → ре-верификация.
+
+Финальный компонент: `src/components/catering/spiral-services.tsx` (832 LOC)
++ `spiral-services.css` (~700 LOC). 12 услуг (7 primary scenes из C44
+StageServices + 5 из 6 extras — логистика осталась закрывающей). Та же
+валидированная копирайт-копия, цены, медиа, CTA.
+
+### Стек реализации
+
+- **CSS 3D transforms** (`transform-style: preserve-3d` + `perspective: 950px`)
+  — НЕ добавляли Three.js/R3F (бандл лёгкий, RULES §5 transform/opacity
+  compliant). Framer Motion `useScroll` + `useTransform` драйвят group
+  rotateY (один оборот на scroll-range) + y (камера спускается сквозь спираль).
+- **12 карточек** статически разложены на геликсе: `x = R·cos(θ)`,
+  `z = R·sin(θ)`, `y = (i - (N-1)/2) · H_STEP`, `rotY = -stepAngle`. PHASE=π/2
+  offset — card 0 стартует на FRONT (+Z к камере).
+- **Per-card opacity + scale + filter:blur** driven by `useTransform` на
+  `scrollYProgress` — задние карточки dim + blur + desaturate (true depth-of-field).
+- **Active-card HUD** (top-right, glassmorphism) — показывает индекс/название/тег
+  текущей front-карточки, обновляется со скроллом (AT-style technical readout).
+- **Mega counter** (bottom-left) — `clamp(56-96px) Unbounded 700-weight, orange glow`.
+- **Title fade on scroll** — opacity 1.0 at p=0 → 0.32 at p=0.45-0.55 → 1.0 at p=1
+  (title recedes when cards pass through center focal plane).
+- **Ambient gold-dust particles** (14 шт, deterministic Math.sin seed) —
+  CSS keyframe drift+pulse, atmosphere layer без отвлечения.
+- **Ground plane grid** (CSS-only SVG perspective-warped) — `mix-blend-mode: screen`
+  so warm spotlight illuminates the floor.
+
+### /loop VLM convergence
+
+| iter | p=0 | p=0.25 | p=0.5 | p=0.75 | p=1.0 | avg |
+|------|-----|--------|-------|--------|-------|-----|
+| v1 (initial) | — | — | — | — | — | 2-4/10 |
+| v2 (dark mode + DoF + mega counter) | 6 | 8 | 9 | 7 | 7 | 7.4/10 |
+| v3 (piecewise DoF + ground boost + title fade) | 7 | 8 | 9 | 8 | 8 | 8.0/10 |
+| v4 (ambient particles) | 7 | 8 | 9 | 8 | 7.5 | 8.0/10 (VLM verdict: 8.5/10 SOTD contender) |
+
+VLM final: «Strong Contender (8.5/10) — awwwards SOTD level in interaction
+design and motion quality».
+
+### 10 новых граблей для будущих циклов
+
+1. **CSS `overflow: hidden` на РОДИТЕЛЕ `position: sticky` ломает sticky**
+   (браузер-квирк: overflow на parent-of-sticky создаёт scroll-container,
+   который ограничивает sticky-range видимыми bounds родителя, но родитель
+   сам не скроллит → sticky НЕ стикит). Решение: перенеси `overflow: hidden`
+   на child-элемент (где 3D-карточки) — это не ломает sticky родителя.
+
+2. **`display: grid` на positioned-предке делает grid-CELL containing block'ом
+   для absolute-детей** (offset'ит HUD/spotlight на позицию их grid-ячейки,
+   вместо padding-box). Решение: `display: flex` (правильный padding-box
+   containing block для absolute-детей).
+
+3. **Framer Motion `style={{ transform: '...' }}` static string + MotionValue-based
+   transform props (scale, x, y, z, rotateY)** → Framer OVERRIDES static
+   transform. Решение: используй индивидуальные `x`/`y`/`z`/`rotateY`
+   MotionValue-or-number props — Framer compose'ит их в ONE 3D transform,
+   который сохраняет `transform-style: preserve-3d`.
+
+4. **Framer Motion's `rotateY` ожидает DEGREES, не радианы** — convert
+   `* 180 / Math.PI` или `* 360` для полных оборотов. Был баг: радианы
+   делали вращение ~57° вместо 360° — еле заметно.
+
+5. **Для helix layout с phase offset π/2** card 0 стартует на FRONT (+Z к
+   камере). Без phase offset card 0 на +X (правая сторона) → центр вьюпорта
+   пустой. Математика: `θ_i = PHASE + (i/(N-1)) * TURNS * 2π`, `position =
+   (R·cos θ, y_i, R·sin θ)`, `rotY = -stepAngle_i` (= `π/2 - θ_i`, face outward).
+
+6. **Linear `filter: blur(Xpx)` imperceptible на near-front карточках**
+   (blur 0-5px на карте с facingFactor 0.92 даёт 0.4px — VLM не видит).
+   Решение: piecewise с 2px FLOOR: `0 if facingFactor > 0.92 else 2 +
+   (1 - facingFactor) * 7`. Saturate 1.0 → 0.25 (сильнее чем 0.4 — иначе
+   desaturation невидим).
+
+7. **`devIndicators: false` в `next.config.ts`** убирает Next.js 'N issues'
+   dev-badge (выглядел как browser-error на скриншотах). Требует pm2 restart.
+
+8. **Active-card HUD math (`frontCardIdx`)**: для NEGATIVE rotation `-p·TURNS·2π`
+   + PHASE π/2 + stepAngle_i, card i на front при `p = i/(N-1)` (чистый linear
+   cycling 0→N-1). HUD + counter стей-в-синке с actual front card.
+
+9. **Particle systems**: deterministic pseudo-random positions через
+   `Math.sin` seed (no hydration mismatch): `seed = (n) => ((Math.sin(n *
+   12.9898) * 43758.5453) % 1 + 1) % 1`. Precompute at module load, НЕ в
+   component render (SSR + client match).
+
+10. **Для dark-mode секций**: `mix-blend-mode: screen` на ground grid → warm
+    spotlight ILLUMINATES the floor (decoration → structural light-catcher).
+    Без screen-blend — grid невидим на тёмном bg.
+
+### Итог
+
+Cycle 45 «Спираль» доставлен: 4 коммита (bb6192d → 162ca93 → 51e0d9a →
+a5cff41), 3 итерации /loop, VLM 8.5/10 SOTD contender. Заменил Cycle-44
+StageServices в page.tsx (StageServices остался на диске для reference).
