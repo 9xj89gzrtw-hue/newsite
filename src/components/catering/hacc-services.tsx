@@ -38,6 +38,15 @@
  * 11. full-bleed rack (edge-to-edge like gamma), print styles (all panels
  *     expanded), forced-colors borders, WCAG-AA text contrast.
  *
+ * Cycle 50 premium pass — the "alive" layer that separates a good copy
+ * from a SOTD contender:
+ * 12. ambient tint wash — the section bg glows with the open panel's tint
+ *     (12 stacked opacity-only layers — the manifesto overlay pattern);
+ * 13. live counter HUD (01/12) ticking next to the H2 during autoplay;
+ * 14. choreographed entrance — spines cascade in with a 40ms stagger;
+ * 15. spring mouse-parallax on the open photo (fine pointers, ±10px);
+ * 16. magnetic CTA + arrow micro-affordance + script-title settle.
+ *
  * Self-contained: scoped CSS in ./hacc-services.css + EA shared utilities.
  * The orchestrator places <HaccServices /> in page.tsx (position #6).
  */
@@ -50,12 +59,20 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
 } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-import { MousePointer2, Plus } from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+} from "framer-motion";
+import { ArrowUpRight, MousePointer2, Plus } from "lucide-react";
 
 import { SmartImage } from "@/components/media/smart-image";
+import { Magnetic } from "@/components/motion/magnetic";
 import "./hacc-services.css";
 
 /* ------------------------------------------------------------------ config */
@@ -303,6 +320,12 @@ export function HaccServices() {
 
   const prefersReduced = useReducedMotion();
 
+  /* ── Cycle 50: spring mouse-parallax on the open panel's photo ──────── */
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const parallaxX = useSpring(px, { stiffness: 140, damping: 22, mass: 0.6 });
+  const parallaxY = useSpring(py, { stiffness: 140, damping: 22, mass: 0.6 });
+
   /* mirror frequently-read values into refs for stable closures ---------- */
   const openIndexRef = useRef<number | null>(openIndex);
   useEffect(() => {
@@ -478,6 +501,31 @@ export function HaccServices() {
   }, []);
   useEffect(() => () => window.clearTimeout(hoverTimer.current), []);
 
+  /* parallax: zero out whenever the springs can't be used (mobile/reduced) */
+  useEffect(() => {
+    if (!desktopFine || prefersReduced) {
+      px.set(0);
+      py.set(0);
+    }
+  }, [desktopFine, prefersReduced, px, py]);
+
+  const onRackMouseMove = useCallback(
+    (e: ReactMouseEvent<HTMLDivElement>) => {
+      if (!desktopFine || prefersReduced) return;
+      const idx = openIndexRef.current;
+      if (idx === null) return;
+      const item = itemRefs.current[idx];
+      if (!item) return;
+      const r = item.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const nx = (e.clientX - r.left) / r.width - 0.5;
+      const ny = (e.clientY - r.top) / r.height - 0.5;
+      px.set(Math.max(-0.6, Math.min(0.6, nx)) * 20);
+      py.set(Math.max(-0.6, Math.min(0.6, ny)) * 12);
+    },
+    [desktopFine, prefersReduced, px, py],
+  );
+
   /* ── keyboard: arrows wrap, Home/End jump (gamma model, extended) ────── */
   const onRackKeyDown = useCallback(
     (e: ReactKeyboardEvent<HTMLDivElement>) => {
@@ -516,6 +564,25 @@ export function HaccServices() {
 
   const autoplayOn = playing && !prefersReduced && isDesktop && openIndex !== null;
 
+  /* ── Cycle 50: choreographed entrance — the rack fades in and the
+     spines cascade up with a 40ms stagger (transform/opacity only) ──── */
+  const rackVariants = prefersReduced
+    ? undefined
+    : {
+        hidden: { opacity: 0 },
+        show: { opacity: 1 },
+      };
+  const itemVariants = prefersReduced
+    ? undefined
+    : {
+        hidden: { opacity: 0, y: 36 },
+        show: (i: number) => ({
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.65, ease: EASE, delay: 0.06 + i * 0.04 },
+        }),
+      };
+
   /* ─────────────────────────────────────────────────────────────── render */
 
   return (
@@ -524,6 +591,23 @@ export function HaccServices() {
       aria-labelledby="hacc-heading"
       className="hacc ea-section ea-section--cream"
     >
+      {/* Cycle 50: ambient tint wash — the section background slowly glows
+          with the open panel's tint. 12 stacked layers with opacity-only
+          transitions (the manifesto stacked-overlay pattern — colors never
+          animate, only opacity does). Synced to the rack's 620ms ease. */}
+      <div className="hacc__ambient" aria-hidden="true">
+        {SERVICES.map((s, i) => (
+          <span
+            key={s.id}
+            className="hacc__ambient-layer"
+            style={{
+              backgroundColor: s.tint,
+              opacity: openIndex === i ? 0.34 : 0,
+            }}
+          />
+        ))}
+      </div>
+
       {/* section head stays inside the site grid; the rack below goes
           full-bleed edge-to-edge — exactly like gamma's haccordion */}
       <div className="ea-container ea-container--wide">
@@ -546,10 +630,41 @@ export function HaccServices() {
               раскройте формат — увидите кухню, команду и цену за гостя.
             </p>
           </div>
-          <span className="hacc__hint" aria-hidden="true">
-            <MousePointer2 aria-hidden="true" />
-            Щёлкните по корешку — формат раскроется
-          </span>
+          {/* Cycle 50: live counter HUD — the big index mirrors the big H2
+              on the left and ticks with the autoplay (desktop ≥1024px) */}
+          <div className="hacc__meta">
+            <div className="hacc__counter" aria-hidden="true">
+              <span className="hacc__counter-current">
+                {prefersReduced ? (
+                  openIndex !== null ? (
+                    SERVICES[openIndex].index
+                  ) : (
+                    "··"
+                  )
+                ) : (
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    <motion.span
+                      key={openIndex ?? "none"}
+                      initial={{ y: 16, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -16, opacity: 0 }}
+                      transition={{ duration: 0.32, ease: EASE }}
+                      className="hacc__counter-num"
+                    >
+                      {openIndex !== null ? SERVICES[openIndex].index : "··"}
+                    </motion.span>
+                  </AnimatePresence>
+                )}
+              </span>
+              <span className="hacc__counter-total">
+                /&nbsp;{String(N).padStart(2, "0")}
+              </span>
+            </div>
+            <span className="hacc__hint" aria-hidden="true">
+              <MousePointer2 aria-hidden="true" />
+              Щёлкните по корешку — формат раскроется
+            </span>
+          </div>
         </motion.div>
       </div>
 
@@ -561,14 +676,17 @@ export function HaccServices() {
         aria-label="12 форматов кейтеринга — раскройте формат"
         data-autoplay={autoplayOn ? "on" : "off"}
         data-paused={paused ? "true" : "false"}
-        initial={prefersReduced ? false : { opacity: 0, x: 64 }}
-        whileInView={prefersReduced ? undefined : { opacity: 1, x: 0 }}
+        initial={prefersReduced ? false : "hidden"}
+        whileInView={prefersReduced ? undefined : "show"}
         viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.8, ease: EASE, delay: 0.08 }}
+        variants={rackVariants}
+        onMouseMove={onRackMouseMove}
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => {
           setHovering(false);
           clearHoverIntent();
+          px.set(0);
+          py.set(0);
         }}
         onFocus={() => {
           setFocusWithin(true);
@@ -582,13 +700,15 @@ export function HaccServices() {
         {SERVICES.map((s, i) => {
           const isOpen = openIndex === i;
           return (
-            <div
+            <motion.div
               key={s.id}
               ref={(el) => {
                 itemRefs.current[i] = el;
               }}
               className={"hacc__item" + (isOpen ? " is-open" : "")}
               style={{ backgroundColor: s.tint }}
+              variants={itemVariants}
+              custom={i}
             >
               {/* — — — spine: the vertical "корешок" click target — — */}
               <h3 className="hacc__spine-heading">
@@ -665,31 +785,45 @@ export function HaccServices() {
                       eagerly so the photo is there the moment the wipe
                       reveals it — never a black frame. */}
                   <figure className="hacc__media">
-                    <SmartImage
-                      src={s.media}
-                      alt={s.mediaAlt}
-                      fill
-                      blurDataURL={BLUR_DATA_URL}
-                      sizes="(max-width: 1023px) 100vw, 62vw"
-                      loading={isOpen ? "eager" : "lazy"}
-                      className="hacc__img"
-                    />
+                    {/* Cycle 50: parallax bleed wrapper — slightly larger
+                        than the figure so the spring translate never
+                        reveals the tint at the edges. Ken Burns scale stays
+                        on the img itself; the translate lives here. */}
+                    <motion.div
+                      className="hacc__media-inner"
+                      style={{ x: parallaxX, y: parallaxY }}
+                    >
+                      <SmartImage
+                        src={s.media}
+                        alt={s.mediaAlt}
+                        fill
+                        blurDataURL={BLUR_DATA_URL}
+                        sizes="(max-width: 1023px) 100vw, 62vw"
+                        loading={isOpen ? "eager" : "lazy"}
+                        className="hacc__img"
+                      />
+                    </motion.div>
                   </figure>
 
                   {/* foot row: hook + CTA */}
                   <div className="hacc__row-foot">
                     <p className="hacc__hook">{s.hook}</p>
-                    <Link
-                      href={s.ctaHref}
-                      className="ea-outline-btn hacc__cta"
-                      aria-label={`${s.ctaLabel} — ${s.title}`}
-                    >
-                      {s.ctaLabel}
-                    </Link>
+                    {/* Cycle 50: magnetic CTA (existing repo wrapper —
+                        spring pull toward cursor, reduced-motion safe) */}
+                    <Magnetic className="hacc__cta-wrap" strength={0.25}>
+                      <Link
+                        href={s.ctaHref}
+                        className="ea-outline-btn hacc__cta"
+                        aria-label={`${s.ctaLabel} — ${s.title}`}
+                      >
+                        {s.ctaLabel}
+                        <ArrowUpRight aria-hidden="true" />
+                      </Link>
+                    </Magnetic>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </motion.div>
