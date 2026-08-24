@@ -80,24 +80,38 @@
 }
 
 /* ── ground plane grid — perspective-warped floor lines for cinematic
-   depth (per critique C1 §Tier-C #15). Implemented as a CSS-only SVG
-   background, faded toward the horizon. */
+   depth (per critique C1 §Tier-C #15 + C2 §Top-3 #3 upgrade).
+   v3: opacity 0.1 → 0.4, mix-blend-mode: screen so the warm spotlight
+   ILLUMINATES the floor (was decoration-only, now a structural
+   light-catcher). Adds an emissive horizon glow band at the vanishing
+   point + per-vertex glow dots so the floor reads as a stage, not
+   floating void. */
 .sp-st__ground {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 28vh;
+  height: 32vh;
   z-index: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(to top, rgba(250, 93, 41, 0.08), transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400' preserveAspectRatio='none'%3E%3Cg stroke='%23fa5d29' stroke-width='0.5' fill='none' opacity='0.4'%3E%3Cpath d='M0 400 L720 200 L1440 400'/%3E%3Cpath d='M0 360 L720 220 L1440 360'/%3E%3Cpath d='M0 320 L720 240 L1440 320'/%3E%3Cpath d='M0 280 L720 260 L1440 280'/%3E%3C/g%3E%3Cg stroke='%23f6efe3' stroke-width='0.3' fill='none' opacity='0.15'%3E%3Cline x1='0' y1='400' x2='1440' y2='400'/%3E%3Cline x1='120' y1='400' x2='720' y2='200'/%3E%3Cline x1='360' y1='400' x2='720' y2='200'/%3E%3Cline x1='600' y1='400' x2='720' y2='200'/%3E%3Cline x1='840' y1='400' x2='720' y2='200'/%3E%3Cline x1='1080' y1='400' x2='720' y2='200'/%3E%3Cline x1='1320' y1='400' x2='720' y2='200'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: cover;
-  background-position: bottom center;
+    /* horizon glow band at vanishing point */
+    radial-gradient(
+      ellipse 24% 70px at 50% 30%,
+      rgba(255, 140, 40, 0.45) 0%,
+      rgba(255, 100, 30, 0.18) 40%,
+      transparent 70%
+    ),
+    /* warm floor wash */
+    linear-gradient(to top, rgba(250, 93, 41, 0.18) 0%, transparent 60%),
+    /* perspective grid lines */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 400' preserveAspectRatio='none'%3E%3Cg stroke='%23fa5d29' stroke-width='0.8' fill='none' opacity='0.55'%3E%3Cpath d='M0 400 L720 200 L1440 400'/%3E%3Cpath d='M0 360 L720 220 L1440 360'/%3E%3Cpath d='M0 320 L720 240 L1440 320'/%3E%3Cpath d='M0 280 L720 260 L1440 280'/%3E%3C/g%3E%3Cg stroke='%23f6efe3' stroke-width='0.5' fill='none' opacity='0.25'%3E%3Cline x1='0' y1='400' x2='1440' y2='400'/%3E%3Cline x1='120' y1='400' x2='720' y2='200'/%3E%3Cline x1='360' y1='400' x2='720' y2='200'/%3E%3Cline x1='600' y1='400' x2='720' y2='200'/%3E%3Cline x1='840' y1='400' x2='720' y2='200'/%3E%3Cline x1='1080' y1='400' x2='720' y2='200'/%3E%3Cline x1='1320' y1='400' x2='720' y2='200'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover, cover, cover;
+  background-position: bottom center, bottom center, bottom center;
   background-repeat: no-repeat;
   mask-image: linear-gradient(to top, black 0%, transparent 90%);
   -webkit-mask-image: linear-gradient(to top, black 0%, transparent 90%);
+  mix-blend-mode: screen; /* spotlight illuminates the floor */
 }
 
 /* ── subtle film grain — static SVG noise, low opacity, multiply blend */
@@ -252,7 +266,13 @@
   box-shadow:
     0 30px 60px -20px rgba(0, 0, 0, 0.65),
     0 10px 22px -8px rgba(0, 0, 0, 0.4),
-    inset 0 0 0 1px rgba(250, 220, 180, 0.08);
+    /* warm contact shadow under front card (critique C2 §3 p=0 fix) */
+    0 50px 100px -20px rgba(255, 100, 30, 0.18),
+    0 0 60px rgba(255, 140, 40, 0.08),
+    /* gold hairline — boosted from 0.08 → 0.25 so it's actually visible
+       on the dark background (critique C2 §4 flagged v2's hairline as
+       invisible at 1px/0.3 alpha against #0E0C0A) */
+    inset 0 0 0 1.5px rgba(255, 200, 100, 0.25);
   display: flex;
   flex-direction: column;
   transform-style: preserve-3d;
@@ -261,10 +281,14 @@
 .sp-st__card-media {
   position: relative;
   width: 100%;
-  /* unified 4:5-ish mask — photo dominant (critique C1 §C #10) */
+  /* Unified 4:5 mask — photo dominant. Critique C2 §4: use aspect-ratio
+     (not %) so the photo height is locked and can't collapse at scroll
+     extremes, which was causing photo overflow at p=1.0. */
   height: 62%;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   background: #0a0806;
+  border-radius: 14px 14px 0 0; /* match card-inner's radius, no gaps */
 }
 
 .sp-st__img {
@@ -399,7 +423,11 @@
   transform: translate(2px, -2px);
 }
 
-/* ── active-card HUD (top-right) — glassmorphism panel (critique C1 §C #11) */
+/* ── active-card HUD (top-right) — glassmorphism panel (critique C1 §C #11 + C2 §Top-3 #1)
+   v3 fixes the p=0.5 "HUD glass dropout": unconditional backdrop-filter
+   with -webkit- fallback, slightly higher alpha (0.55 → 0.65) so the
+   glass stays visible even when over uniformly dark background (no
+   contrast for the blur to operate on without the alpha boost). */
 .sp-st__hud {
   position: absolute;
   top: clamp(20px, 3.5vh, 36px);
@@ -409,14 +437,16 @@
   align-items: center;
   gap: 14px;
   padding: 12px 16px 12px 14px;
-  background: rgba(20, 17, 13, 0.55);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border: 1px solid rgba(250, 220, 180, 0.14);
+  background: rgba(20, 17, 13, 0.65);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(250, 220, 180, 0.22);
   border-radius: 14px;
   pointer-events: none;
   font-family: var(--sp-golos), "Golos Text", sans-serif;
-  box-shadow: 0 8px 28px -8px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 8px 28px -8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 220, 180, 0.08);
 }
 
 .sp-st__hud-index {
@@ -483,11 +513,14 @@
   pointer-events: auto;
 }
 
-/* MEGA counter (critique C1 §A #3) — 56..96px display, slot-machine feel */
+/* MEGA counter (critique C1 §A #3 + C2 §3 "make the counter glow").
+   v3: drop Unbounded weight 800 → 700 (critique said 800 reads as
+   "sports score" — 700 is more luxury), add stronger text-shadow
+   glow so orange reads as a LIGHT SOURCE not flat hex. */
 .sp-st__counter {
   font-family: var(--sp-unb), "Unbounded", sans-serif;
   font-size: clamp(56px, 7vw, 96px);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 0.9;
   display: flex;
@@ -498,7 +531,10 @@
 
 .sp-st__counter-cur {
   color: #fa5d29;
-  text-shadow: 0 0 40px rgba(250, 93, 41, 0.4);
+  text-shadow:
+    0 0 24px rgba(255, 90, 0, 0.55),
+    0 0 60px rgba(255, 90, 0, 0.30),
+    0 0 100px rgba(255, 90, 0, 0.15);
   font-variant-numeric: tabular-nums;
   min-width: 1.4em;
   display: inline-block;

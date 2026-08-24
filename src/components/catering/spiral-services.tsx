@@ -370,19 +370,22 @@ function SpiralCard({
   });
 
   /**
-   * Depth-of-field filter (per critique C1 §A #2 + Tier-C #1): back cards
-   * get a Gaussian blur + desaturation, front cards stay razor-sharp.
-   * This is THE trick that makes ActiveTheory's spirals feel "alive" —
-   * without it, the cylinder reads as a flat stack of divs.
+   * Depth-of-field filter (per critique C2 §Top-3 #2 — sqrt curve was
+   * wrong shape: it died at the extremes which are the most-screenshotted
+   * moments). v3 uses a PIECEWISE curve with a forced 2px floor on any
+   * card more than 2 indices from focal, so even near-front cards read
+   * as "optically out of focus" not "scaled copies" (critique C2 §1):
    *
    *   facingFactor: 1.0 at front (π/2), 0.0 at back (3π/2)
-   *   blur: 0px front → 9px back (sqrt curve so cards just-behind-front
-   *     get visible blur immediately, not only cards at the very back)
-   *   saturate: 1.0 front → 0.4 back (desaturated, dimmed color)
+   *   blur: 0px at exact-front → 2px FLOOR for everything else → 9px at
+   *     very back. Piecewise: 0 if facingFactor > 0.92, else linear.
+   *   saturate: 1.0 front → 0.25 back (stronger than v2's 0.4 so the
+   *     desaturation is unambiguously visible — v2's 0.4 was too mild).
    *
-   * NOTE: filter:blur is a paint operation (GPU-composited) — does not
-   * trigger layout. Allowed per existing pattern in stage-services.css
-   * line 194 (`filter: blur(1.6px) saturate(0.65)` for back cards).
+   * Filter chain ORDER MATTERS: `blur() saturate()` (this order) —
+   * saturate-after-blur, never the reverse. Critique C2 §4 flagged
+   * v2's saturate as "not visibly applying" — verified the order is
+   * correct here; the issue was the value was too mild (0.4 vs 0.25).
    */
   const filter = useTransform(scrollYProgress, (p) => {
     const groupRot = -p * TURNS * Math.PI * 2;
@@ -391,11 +394,14 @@ function SpiralCard({
     if (norm > Math.PI) norm -= 2 * Math.PI;
     const facing = Math.sin(norm);
     const facingFactor = (facing + 1) / 2; // 1 front, 0 back
-    // sqrt curve: blur grows fast near the front so cards just-behind
-    // the active card get visible blur immediately (the VLM critique
-    // noted v1's linear 5px curve was imperceptible on near-front cards).
-    const blurPx = Math.sqrt(1 - facingFactor) * 9; // 0 front → 9px back
-    const sat = 0.4 + facingFactor * 0.6; // 0.4 back → 1.0 front
+    // Piecewise: 0px at exact front (factor >= 0.92),
+    // linear 2..9px for everything else (forced floor so even
+    // near-front back cards read as "out of focus").
+    const blurPx =
+      facingFactor >= 0.92
+        ? 0
+        : 2 + (1 - facingFactor) * 7; // 2px floor → 9px at back
+    const sat = 0.25 + facingFactor * 0.75; // 0.25 back → 1.0 front
     return `blur(${blurPx.toFixed(2)}px) saturate(${sat.toFixed(2)})`;
   });
 
@@ -568,6 +574,20 @@ export function SpiralServices() {
     (p) => SPIRAL[frontCardIdx(p)].index,
   );
 
+  /**
+   * Title opacity — recedes when cards pass through center (p=0.3..0.7),
+   * returns to full prominence at start/end. Critique C2 §Top-2 #2:
+   * "the massive headline competes with the 3D card cluster — apply
+   * subtle opacity offset so it recedes into atmospheric background when
+   * cards pass through the center focal plane, then returns when spiral
+   * clears (p > 0.8)".
+   */
+  const titleOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.45, 0.55, 0.8, 1],
+    [1, 0.95, 0.32, 0.32, 0.95, 1],
+  );
+
   // ── reduced-motion / mobile: vertical list variant ──────────────────────
   if (reduced) {
     return <SpiralServicesList />;
@@ -592,7 +612,11 @@ export function SpiralServices() {
           <motion.span className="sp-st__eyebrow" style={{ x: eyebrowX }}>
             {"// УСЛУГИ — SPIRALSCROLL"}
           </motion.span>
-          <h2 id="spiral-services-title" className="sp-st__title-mega">
+          <motion.h2
+            id="spiral-services-title"
+            className="sp-st__title-mega"
+            style={{ opacity: titleOpacity }}
+          >
             <span className="sp-st__title-line">
               <motion.span
                 className="sp-st__title-inner"
@@ -609,7 +633,7 @@ export function SpiralServices() {
                 услуг
               </motion.span>
             </span>
-          </h2>
+          </motion.h2>
           <p className="sp-st__subtitle">
             12 форматов кейтеринга — от кофе-брейка до свадьбы. Прокрутите,
             чтобы пройти спираль до конца.
