@@ -3720,3 +3720,54 @@ gamma (4 панели): ~87%. Наш финал: корешки 32px/gap 3px (38
 → финальный патч (autoplay-гейтинг, панель 67%, sizes 62vw) → VLM 8.5/10.
 Dev-сервер: pm2 `interfood-catering-dev`, порт 3001 (3000 — родительский
 sandbox, НЕ ТРОГАТЬ). lint + typecheck зелёные.
+
+---
+
+## 23. Cycle 50 — premium pass «живой слой» (24.08.2026, Z.ai Agent)
+
+> Ответ на вызов пользователя «это лучшее, на что ты способна?». Cycle 49 был
+> точной копией gamma с фиксом её багов (8.5/10). Разница между 8.5 и SOTD —
+> не в пикселях, а в том, что секция РЕАГИРУЕТ. Коммит `2564bfa`.
+
+Добавлено в `hacc-services.tsx/css`:
+
+1. **Ambient tint wash** — фон секции подсвечивается тинтом открытой панели:
+   12 stacked-слоёв, opacity-only 620ms (паттерн manifesto overlay — цвета
+   НИКОГДА не анимируются, только opacity). `z-index: 0`, контент выше.
+2. **Live counter HUD** — большой serif-счётчик `01/12` справа от H2
+   (зеркалит большой заголовок слева), тикает с автоплеем через
+   `AnimatePresence mode="popLayout"` (y-slide 16px, tabular-nums).
+   Только ≥1024px; в print скрыт.
+3. **Choreographed entrance** — rack фейдится, корешки каскадом
+   (variants + custom={i}, delay 0.06 + i·0.04, transform/opacity only).
+4. **Spring mouse-parallax фото** (±10px x / ±6px y, stiffness 140):
+   НОВАЯ обёртка `.hacc__media-inner { position:absolute; inset:-12px }` —
+   bleed больше хода пружины, тинт по краям НЕ виден. Ken Burns scale
+   остаётся на img, translate — на обёртке (иначе framer перезапишет CSS
+   transform). Fine-pointer only + сброс в 0 при выходе/ресайзе.
+5. **Magnetic CTA** — реповый `<Magnetic>` (strength 0.25) + стрелка
+   ArrowUpRight с нуджем при hover.
+6. **Title settle** — рукописный заголовок «падает» на базовую линию при
+   открытии (translateY(7px)→0 + scale, 820ms, delayed).
+
+### Грабли цикла
+- **agent-browser эмулирует coarse pointer** (`pointer: fine` = false!) —
+  hover-intent/parallax/magnetic в нём НЕ проверяемы вживую. Верификация
+  fine-pointer фич: Playwright desktop-контекст (`newContext({viewport})`
+  → `pointer: fine` = true). Скрипт-шаблон: `research/c50-verify.mjs`
+  (matrix-замеры transform до/после mouse.move).
+- **Magnetic в мёртвой точке**: тест курсором в ЦЕНТРЕ кнопки даёт
+  transform: none (сила = 0 по определению). Тестировать off-center.
+- **popLayout требует position: relative** на контейнере цифры, иначе
+  exiting-элемент прыгает.
+
+### Верификация (Playwright, реальные события)
+parallax: none → matrix(−4.9) слева → matrix(+4.8) справа → сброс ~0;
+edge: −9.75px (bleed 12px ✓). Hover-intent: spine 7 открылся после dwell,
+autoplay остался on. Magnetic off-center: −26px. Counter: 08→09 за цикл.
+Ambient: слой 8 @ 0.34. JS errors: NONE. lint/typecheck зелёные.
+
+VLM 7.5-8/10 (снимает баллы за УЖЕ реализованные фичи — магнитная кнопка,
+анимированный счётчик, grain — они не видны в статичном кадре; подтверждает
++2 композиция головы, +2 ambient tint). Критика сошлась: новых actionable
+дефектов нет.
