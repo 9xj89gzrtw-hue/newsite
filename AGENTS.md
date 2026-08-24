@@ -3639,3 +3639,84 @@ design and motion quality».
 Cycle 45 «Спираль» доставлен: 4 коммита (bb6192d → 162ca93 → 51e0d9a →
 a5cff41), 3 итерации /loop, VLM 8.5/10 SOTD contender. Заменил Cycle-44
 StageServices в page.tsx (StageServices остался на диске для reference).
+
+---
+
+## 22. Cycle 49 — блок услуг «Каталог»: gammacatering.com horizontal accordion (24.08.2026, Z.ai Agent)
+
+> Запрос пользователя: «надо сделать полный редизайн секции услуги, копируй с
+> https://www.gammacatering.com эффект горизонтальный аккордеон, надо
+> доработать и сделать еще лучше чем у них». Заменил Cycle 45-48 SpiralServices.
+
+**Финальный компонент:** `src/components/catering/hacc-services.tsx` (~700 LOC)
++ `hacc-services.css` (~640 LOC). 12 услуг (контент SpiralServices verbatim),
+7 фото заменены на 2048px-версии с gamma (`public/media/gamma/c49-*`).
+
+### Реверс-инжиниринг gamma (research/gamma-haccordion-research.md)
+- Механика: `flex-basis = ширина корешка`, `flex-grow 0→1` раскрывает; корешок
+  absolute слева, расширяется при открытии (32→72px); панель in-flow с
+  `margin-left = ширина корешка` и JS-фиксированной px-шириной → контент НЕ
+  рефлоит во время анимации (clip-wipe); `.is-resizing` guard 140ms; easing
+  `cubic-bezier(.37,0,.63,1)` 620ms; full-bleed rack (100vw).
+- Signature: вертикальные корешки (writing-mode vertical-rl + rotate 180°),
+  рукописные заголовки rotate(-6°) (gamma: Adobe Handwriting → у нас Marck
+  Script, кириллица), пастельные тинты.
+
+### 10 апгрейдов над gamma (все подтверждены критиками)
+1. 12 панелей с ценами/хуками/CTA (gamma: 4, без цен);
+2. `inert` + delayed visibility на закрытых панелях — Tab не утекает (у gamma
+   это ЖИВОЙ баг);
+3. полный `prefers-reduced-motion` (gamma игнорирует);
+4. autoplay + прогресс-линия: паузы hover/focus/hidden/out-of-view, стоп после
+   первого ручного взаимодействия, ТОЛЬКО ≥1024px (мобильный layout-shift);
+5. hover-intent открытие 380ms (fine pointer) + click;
+6. staggered entrance (transform/opacity only) + Ken Burns exhale фото;
+7. мобильный стек grid-rows 0fr→1fr с РЕАЛЬНЫМ toggle-close (× у gamma —
+   no-op ложь); scrollIntoView после завершения анимации (600ms);
+8. ARIA-аккордеон (h3>button aria-expanded, role=region) + стрелки/Home/End;
+9. print-стили (все панели раскрыты) + forced-colors бордеры;
+10. ResizeObserver-измерение (gamma: только window.resize) — ловит появление
+    body.has-sidebar (72px), которое window.resize НЕ ловит.
+
+### Грабли цикла (зафиксировать!)
+1. **next/font vars на `<body>` ломают `:root`-токены**: `:root { --ea-font-x:
+   var(--font-serif) }` резолвит var() на html, где next/font-переменных нет →
+   guaranteed-invalid → ВЕСЬ сайт тихо падал в ui-sans-serif. Фикс: перенести
+   `.variable`-классы на `<html>` (layout.tsx, cycle-49). Проверка:
+   `getComputedStyle(h2).fontFamily !== ui-sans-serif`.
+2. **sharp AVIF-энкодер песочницы ВИСИЕТ навсегда** на некоторых больших
+   файлах (репродукция: `curl -H "Accept: image/avif,image/webp,..."` на
+   `/_next/image?url=...`). Без AVIF в Accept — мгновенно. Фикс:
+   `next.config.ts: formats: ["image/webp", "image/avif"]` (webp первым).
+3. **«Полные» версии фото gamma = те же 484×726** (у gamma только часть
+   кадров имеет 2048w в srcset) — ВСЕГДА проверять разрешение после
+   скачивания (`node` JPEG-SOF парсер или `file`).
+4. **HMR-эксперименты загрязняют srcset-селекцию** (zoom, смена формата
+   файлов при открытой странице → браузер выбирает w=3840 и кэширует выбор).
+   Верифицировать только на чистой сессии agent-browser (close → open).
+5. **next/image lazy в закрытых панелях ненадёжен** (visibility:hidden + clip
+   32px → 0-intersection → eager-запрос никогда не стреляет). Фикс:
+   `loading={isOpen ? "eager" : "lazy"}`.
+6. **h3-обёртка кнопки с min-width:auto ломает мобильный ellipsis**: цепочка
+   усечения (flex → min-width:0 → ellipsis) работает только при определённой
+   ширине контейнера; grid-элемент h3 рос от min-content («Вегетарианское и
+   халяль» выпихивало × за экран). Фикс: `.hacc__spine-heading { width:100%;
+   min-width:0 }`.
+7. **scrollIntoView во время grid-rows анимации целяется в устаревшую
+   позицию** (панель выше ещё сворачивается → перелёт ~200px). Фикс: таймер
+   600ms (после 520ms анимации).
+8. **VLM-скриншоты врут** (§18 подтверждён): «обрезанный 12-й корешок»,
+   «нет активного состояния», «чёрный прямоугольник» — всё опровергнуто
+   getBoundingClientRect-измерениями. Верить только измерениям.
+
+### Пропорция панели (главная метрика композиции)
+12 корешков съедают ширину: `panelW = rackW − 11·(spine+gap) − spineOpen`.
+gamma (4 панели): ~87%. Наш финал: корешки 32px/gap 3px (38px ≥1600) →
+панель 67% при 1440 (911/1368), 71% при 1920. Цель критиков ≥65% — достигнута
+(цикл 1: 34% при корешках 64px — главный провал первой итерации).
+
+### Итог
+3 цикла /loop-критики: 5.5/10 (cycle 1, НЕ ПРИНЯТО) → 8/10 (cycle 3, ПРИНЯТО)
+→ финальный патч (autoplay-гейтинг, панель 67%, sizes 62vw) → VLM 8.5/10.
+Dev-сервер: pm2 `interfood-catering-dev`, порт 3001 (3000 — родительский
+sandbox, НЕ ТРОГАТЬ). lint + typecheck зелёные.

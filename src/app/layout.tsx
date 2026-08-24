@@ -314,16 +314,23 @@ const faqJsonLd = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Cycle 49 (font-fix): next/font variable classes live on <html> (= :root)
+  // so that :root-level custom properties in globals.css (e.g.
+  // --ea-font-display: var(--font-serif)) can resolve them. Declared on
+  // <body> they were invisible to :root → every var(--ea-font-*) fell back
+  // to ui-sans-serif site-wide. They cascade to <body> unchanged.
   return (
-    <html lang="ru" suppressHydrationWarning>
+    <html
+      lang="ru"
+      suppressHydrationWarning
+      className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} ${prata.variable} ${nothingYouCouldDo.variable} ${lato.variable} ${marck.variable}`}
+    >
       <head>
         {/* Preconnect hints for external domains */}
         <link rel="preconnect" href="https://www.instagram.com" />
         <link rel="preconnect" href="https://yandex.ru" />
       </head>
-      <body
-        className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} ${prata.variable} ${nothingYouCouldDo.variable} ${lato.variable} ${marck.variable} antialiased bg-background text-foreground`}
-      >
+      <body className="antialiased bg-background text-foreground">
         <a href="#main-content" className="skip-link">
           Перейти к содержанию
         </a>

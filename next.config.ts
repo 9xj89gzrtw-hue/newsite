@@ -8,7 +8,10 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   allowedDevOrigins: ["*.space-z.ai", "*.chatglm.cn", "*.z.ai"],
   images: {
-    formats: ["image/avif", "image/webp"],
+    // Cycle 49: webp first — the local sharp AVIF encoder hangs on some
+    // large sources (sandbox CPU quirk; Vercel's CDN optimizer is unaffected).
+    // WebP is universally supported in 2026, so this is loss-free in prod.
+    formats: ["image/webp", "image/avif"],
     remotePatterns: [
       { protocol: "https", hostname: "sfile.chatglm.cn" },
       { protocol: "https", hostname: "images.unsplash.com" },

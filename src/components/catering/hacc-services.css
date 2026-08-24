@@ -1,0 +1,704 @@
+/* ============================================================================
+   HaccServices — «Каталог услуг»: horizontal accordion (Cycle 49)
+   ----------------------------------------------------------------------------
+   Reverse-engineered from gammacatering.com "Erlebnisse" haccordion
+   (research/gamma-haccordion-research.md) + upgraded:
+
+   gamma mechanics (kept 1:1):
+   - flex-basis = closed spine width, flex-grow 0→1 opens the item
+   - spine (vertical title) absolute left, width widens when open
+   - open panel in-flow, margin-left = open-spine width, JS-fixed px width
+     → zero content reflow during the flex animation (the clip-wipe reveal)
+   - .is-resizing guard kills transitions for 140ms on resize
+   - easeInOutSine cubic-bezier(.37,0,.63,1)
+   - FULL-BLEED rack (edge-to-edge) — gamma's haccordion is 100vw wide
+
+   upgrades over gamma:
+   - 12 panels (gamma: 4), numbers 01–12, price anchoring, per-service tints
+   - visibility-delay + inert on closed panels → no Tab focus leak (gamma bug)
+   - prefers-reduced-motion fully respected (gamma ignores it)
+   - autoplay with progress line, paused on hover/hidden/out-of-view
+   - staggered content entrance + Ken Burns photo exhale (transform/opacity)
+   - Marck Script handwritten titles rotate(-6°) — Cyrillic-capable analog
+     of gamma's Adobe Handwriting
+   - mobile: grid-template-rows 0fr→1fr stack (gamma mobile pattern) with a
+     REAL toggle-close (gamma's × is a no-op)
+   - print: all panels expand into a document-friendly stack
+   - forced-colors: borders keep the rack legible in Windows High Contrast
+   ========================================================================== */
+
+.hacc {
+  /* ---- tokens (px by breakpoint so JS can parseFloat them — gamma trick).
+     Gamma-grade narrow spines: at 12 panels the closed rack must stay slim
+     enough for the open panel to dominate (≥65% of the rack). ------------ */
+  --hacc-spine: 32px;        /* closed spine width  */
+  --hacc-spine-open: 72px;   /* open spine width    */
+  --hacc-gap: 3px;           /* rack gutter         */
+  --hacc-ease: cubic-bezier(0.37, 0, 0.63, 1);   /* gamma easeInOutSine */
+  --hacc-dur: 620ms;
+  --hacc-ink: var(--ea-ink, #1a1a1a);
+  --hacc-red: var(--ea-red, #e71d3a);
+  --hacc-red-deep: var(--ea-red-deep, #b91431);  /* AA-safe on tints */
+  --hacc-soft: rgba(26, 26, 26, 0.68);           /* AA on all tints  */
+}
+
+@media (min-width: 1600px) {
+  .hacc {
+    --hacc-spine: 38px;
+    --hacc-spine-open: 84px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────── section head ── */
+
+.hacc__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem 2.5rem;
+  margin-bottom: clamp(2rem, 4vw, 3.25rem);
+}
+
+.hacc__head-text {
+  max-width: 46rem;
+}
+
+.hacc__lede {
+  margin-top: 1.1rem;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  line-height: 1.65;
+  color: var(--hacc-soft);
+  max-width: 56ch;
+}
+
+/* interaction hint (desktop, fine pointer only) */
+.hacc__hint {
+  display: none;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--ea-font-eyebrow), sans-serif;
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 26, 0.62);
+  white-space: nowrap;
+  padding-bottom: 0.4rem;
+}
+
+.hacc__hint svg {
+  width: 15px;
+  height: 15px;
+  color: var(--hacc-red-deep);
+  flex: none;
+}
+
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .hacc__hint {
+    display: inline-flex;
+  }
+}
+
+/* ─────────────────────────────────────────────── the rack (desktop flex) ── */
+
+/* heading reset — the APG accordion heading wrapper must not add layout.
+   width/min-width keep the long-title mobile bar from pushing the × icon
+   off-screen: without a definite width the h3 grows to its min-content
+   (the un-truncated title) and breaks the flex ellipsis chain. */
+.hacc__spine-heading {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-width: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+/* plus icon: mobile bars only */
+.hacc__spine-plus {
+  display: none;
+}
+
+/* Full-bleed: the rack sits OUTSIDE .ea-container — edge-to-edge strip,
+   exactly like gamma's haccordion (100vw). Only the 1px PageBorders frame
+   (pointer-events:none) may overlap it. */
+.hacc__rack {
+  position: relative;
+  display: flex;
+  gap: var(--hacc-gap);
+  height: clamp(560px, 76vh, 760px);
+}
+
+.hacc__item {
+  position: relative;
+  flex: 0 0 var(--hacc-spine);       /* closed width = spine width          */
+  overflow: hidden;
+  border-radius: 5px;
+  scroll-margin-top: 96px;           /* mobile scrollIntoView + sticky hdr  */
+  transition: flex-grow var(--hacc-dur) var(--hacc-ease);
+}
+
+.hacc__item.is-open {
+  flex-grow: 1;
+}
+
+/* gamma's resize guard — no transition while measuring */
+.hacc__rack.is-resizing .hacc__item,
+.hacc__rack.is-resizing .hacc__spine,
+.hacc__rack.is-resizing .hacc__open {
+  transition: none !important;
+}
+
+/* ───────────────────────────────────────────────── spine (the корешок) ── */
+
+.hacc__spine {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  z-index: 2;
+  width: var(--hacc-spine);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.9rem 0 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--hacc-ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: width var(--hacc-dur) var(--hacc-ease);
+  /* inward outline — item overflow:hidden would clip an outer ring */
+  outline-offset: -3px;
+}
+
+.hacc__item.is-open .hacc__spine {
+  width: var(--hacc-spine-open);
+}
+
+.hacc__spine:focus-visible {
+  outline: 2px solid var(--hacc-red);
+}
+
+.hacc__num {
+  font-family: var(--ea-font-eyebrow), sans-serif;
+  font-weight: 700;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(26, 26, 26, 0.75);      /* AA: 4.6:1 on the lightest tint */
+  transition: color 300ms ease;
+}
+
+.hacc__item.is-open .hacc__num,
+.hacc__spine:hover .hacc__num {
+  color: var(--hacc-red-deep);
+}
+
+/* vertical title — reads bottom-to-top (gamma signature). The wrapper (no
+   rotation) carries the hover shift so the movement is physical-up. */
+.hacc__spine-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.75rem 0;
+  min-width: 0;                       /* allow ellipsis of long titles */
+  transition: transform 320ms var(--hacc-ease);
+}
+
+.hacc__spine-title-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--ea-font-eyebrow), sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  max-height: 46vh;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;                       /* flex-item min-width:auto fix */
+  transition: color 300ms ease;
+}
+
+/* the open spine is unmistakably active — number AND title turn red */
+.hacc__item.is-open .hacc__spine-title-text {
+  color: var(--hacc-red-deep);
+}
+
+/* left accent line grows on hover (fine pointers only) */
+.hacc__spine::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--hacc-red);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 320ms var(--hacc-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hacc__item:not(.is-open) .hacc__spine:hover::before {
+    transform: scaleY(1);
+  }
+  .hacc__item:not(.is-open) .hacc__spine:hover .hacc__spine-title {
+    transform: translateY(-6px);
+  }
+}
+
+/* darkening veil on hover (paint-only, gamma uses inset shadow) */
+.hacc__item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.05);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hacc__item:not(.is-open):hover::after {
+    opacity: 1;
+  }
+}
+
+/* autoplay progress line — bottom of the OPEN spine only */
+.hacc__spine-progress {
+  width: calc(100% - 0.75rem);
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(26, 26, 26, 0.14);
+  overflow: hidden;
+  position: relative;
+  flex: none;
+}
+
+.hacc__spine-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--hacc-red);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.hacc__rack[data-autoplay="on"] .hacc__item.is-open .hacc__spine-progress::after {
+  animation: hacc-progress var(--hacc-autoplay-ms, 6500ms) linear forwards;
+}
+
+.hacc__rack[data-autoplay="on"][data-paused="true"]
+  .hacc__item.is-open
+  .hacc__spine-progress::after {
+  animation-play-state: paused;
+}
+
+@keyframes hacc-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ─────────────────────────────────────── open panel (gamma's fixed width) ── */
+
+.hacc__open {
+  position: relative;
+  height: 100%;
+  margin-left: var(--hacc-spine-open);
+  /* JS measures the exact px so nothing reflows mid-animation; pre-JS the
+     calc fallback is already correct */
+  width: var(--hacc-panel-w, calc(100% - var(--hacc-spine-open)));
+  /* keep in DOM for the clip animation, but unreachable when closed —
+     visibility hides AFTER the collapse finishes (delayed) */
+  visibility: hidden;
+  transition: visibility 0s linear 700ms;
+}
+
+.hacc__item.is-open .hacc__open {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.hacc__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: clamp(1.25rem, 2.2vw, 2rem) clamp(1.25rem, 2.2vw, 2rem)
+    clamp(1.25rem, 2vw, 1.75rem) clamp(0.75rem, 1.4vw, 1.25rem);
+}
+
+/* staggered entrance — transform/opacity only (RULES §5) */
+.hacc__body > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hacc__item.is-open .hacc__body > *:nth-child(1) { transition-delay: 140ms; }
+.hacc__item.is-open .hacc__body > *:nth-child(2) { transition-delay: 220ms; }
+.hacc__item.is-open .hacc__body > *:nth-child(3) { transition-delay: 300ms; }
+
+.hacc__item.is-open .hacc__body > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── head row: tag ─ script title ─ price (gamma's 1fr/auto/1fr grid) ── */
+
+.hacc__row-head {
+  /* minmax(0,·) columns let long rotated titles wrap instead of pushing
+     the flanking tag/price out of a narrow panel; generous bottom padding
+     gives the −6° tilt room to swing WITHOUT diving into the photo below
+     (cycle-2 critique C2 — long titles collided before) */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
+  align-items: end;
+  column-gap: 1rem;
+  padding-block: 0.75rem 2rem;
+}
+
+.hacc__tag {
+  justify-self: start;
+  font-family: var(--ea-font-eyebrow), sans-serif;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hacc-red-deep);        /* AA: 5.9:1 on tints */
+}
+
+.hacc__title {
+  font-family: var(--font-marck), cursive;
+  font-weight: 400;
+  font-size: clamp(2.1rem, 2.7vw, 3.4rem);
+  line-height: 1.08;
+  text-align: center;
+  color: var(--hacc-ink);
+  transform: rotate(-6deg);           /* gamma's handwritten tilt */
+  transform-origin: 50% 100%;         /* swing splits around the baseline */
+  max-width: 68%;                     /* caps the tilt swing + kisses price */
+  overflow-wrap: anywhere;
+}
+
+.hacc__price {
+  justify-self: end;
+  text-align: right;
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.05rem, 1.25vw, 1.35rem);
+  line-height: 1.15;
+  color: var(--hacc-ink);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hacc__price small {
+  display: block;
+  font-family: var(--ea-font-eyebrow), sans-serif;
+  font-weight: 600;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hacc-soft);
+  margin-bottom: 0.25rem;
+}
+
+/* ── media — Ken Burns exhale on open ── */
+
+.hacc__media {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-block: 0.35rem 1rem;
+}
+
+.hacc__img {
+  transform: scale(1.09);
+  transition: transform 7s cubic-bezier(0.22, 1, 0.36, 1);
+  object-fit: cover;
+}
+
+.hacc__item.is-open .hacc__img {
+  transform: scale(1);
+}
+
+/* ── foot row: hook + CTA ── */
+
+.hacc__row-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex: none;
+}
+
+.hacc__cta {
+  flex: none;
+  min-height: 44px;          /* touch target (RULES §7) */
+  padding-inline: 1.6rem;
+  white-space: nowrap;
+}
+
+.hacc__hook {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: clamp(0.9rem, 1vw, 0.98rem);
+  line-height: 1.55;
+  color: var(--hacc-soft);
+  max-width: 46ch;
+}
+
+/* ───────────────────────────── mobile (<1024px) vertical stack + print ──
+   The SAME block serves @media print: the rack becomes a document-friendly
+   vertical stack (all panels forced open via the print override below).   */
+
+@media (max-width: 1023px) {
+  .hacc__rack {
+    flex-direction: column;
+    gap: 0.6rem;
+    height: auto;
+    padding-inline: clamp(1rem, 4vw, 2rem); /* rack is full-bleed — give
+        mobile bars side breathing room */
+  }
+
+  /* item = grid with the collapsible 0fr row (gamma mobile pattern) */
+  .hacc__item {
+    display: grid;
+    grid-template-rows: auto 0fr;
+    flex: none;
+    transition: grid-template-rows 520ms var(--hacc-ease);
+  }
+
+  .hacc__item.is-open {
+    grid-template-rows: auto 1fr;
+  }
+
+  /* spine becomes a horizontal bar */
+  .hacc__spine {
+    position: static;
+    width: 100%;
+    height: 84px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 1.1rem;
+  }
+
+  .hacc__item.is-open .hacc__spine {
+    width: 100%;
+  }
+
+  .hacc__spine-title {
+    flex: 1 1 auto;
+    margin: 0;
+    justify-content: flex-start;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .hacc__spine-title-text {
+    writing-mode: horizontal-tb;
+    transform: rotate(-4deg);
+    font-family: var(--font-marck), cursive;
+    font-weight: 400;
+    font-size: 1.7rem;
+    letter-spacing: 0;
+    text-transform: none;
+    max-height: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transform-origin: left center;
+  }
+
+  /* plus icon rotates into × when open — and (unlike gamma's ×) it
+     genuinely toggles the panel closed (see hacc-services.tsx open()) */
+  .hacc__spine-plus {
+    flex: none;
+    display: inline-flex;
+    color: var(--hacc-ink);
+    opacity: 0.65;
+    transition: transform 420ms var(--hacc-ease);
+  }
+
+  .hacc__spine-plus svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .hacc__item.is-open .hacc__spine-plus {
+    transform: rotate(45deg);
+    color: var(--hacc-red-deep);
+    opacity: 1;
+  }
+
+  /* progress bar is a desktop-only affordance */
+  .hacc__spine-progress {
+    display: none;
+  }
+
+  /* panel: no fixed width, reveal via the 0fr row */
+  .hacc__open {
+    width: 100%;
+    height: auto;
+    margin-left: 0;
+    visibility: visible;
+    transition: none;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .hacc__body {
+    height: auto;
+    padding: 0.4rem 1.1rem 1.4rem;
+  }
+
+  /* media first (gamma mobile order), then head, then foot */
+  .hacc__media {
+    order: 1;
+    aspect-ratio: 16 / 10;
+    flex: none;
+    margin: 0.4rem 0 1.1rem;
+  }
+
+  .hacc__row-head {
+    order: 2;
+    grid-template-columns: 1fr;
+    align-items: start;
+    row-gap: 0.5rem;
+    padding-block: 0.4rem;
+  }
+
+  .hacc__title {
+    text-align: left;
+    justify-self: start;
+    font-size: clamp(2.4rem, 9vw, 3rem);
+    transform: rotate(-4deg);
+    max-width: 100%;
+  }
+
+  .hacc__price {
+    justify-self: start;
+    text-align: left;
+  }
+
+  .hacc__row-foot {
+    order: 3;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.1rem;
+  }
+
+  .hacc__hook {
+    max-width: none;
+  }
+}
+
+/* ───────────────────────────────────────────────────────── print styles ── */
+
+@media print {
+  /* the mobile stack block above only matches max-width — replicate the
+     essential bits for print: vertical stack, all panels open */
+  .hacc__rack {
+    display: block;
+    height: auto;
+  }
+
+  .hacc__item {
+    display: block;
+    overflow: visible;
+    break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+
+  .hacc__spine,
+  .hacc__spine-progress,
+  .hacc__hint {
+    display: none;
+  }
+
+  .hacc__open {
+    display: block;
+    width: auto;
+    height: auto;
+    margin-left: 0;
+    visibility: visible;
+  }
+
+  .hacc__body {
+    display: block;
+    height: auto;
+  }
+
+  .hacc__body > * {
+    opacity: 1;
+    transform: none;
+  }
+
+  .hacc__media {
+    aspect-ratio: 16 / 9;
+    margin: 0.5rem 0 1rem;
+  }
+
+  .hacc__row-foot {
+    display: block;
+  }
+}
+
+/* ─────────────────────────────── forced colors (Windows High Contrast) ── */
+
+@media (forced-colors: active) {
+  .hacc__item {
+    border: 1px solid CanvasText;    /* tints vanish — keep the rack legible */
+  }
+
+  .hacc__spine-progress {
+    background: CanvasText;
+  }
+
+  .hacc__spine-progress::after {
+    background: Highlight;
+  }
+}
+
+/* ─────────────────────────────────────────────── reduced motion (always) ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .hacc__item,
+  .hacc__spine,
+  .hacc__open,
+  .hacc__body > *,
+  .hacc__img,
+  .hacc__spine-title,
+  .hacc__spine-plus,
+  .hacc__spine::before {
+    transition: none !important;
+  }
+
+  .hacc__spine-progress {
+    display: none !important;
+  }
+
+  .hacc__img {
+    transform: none;
+  }
+
+  .hacc__body > * {
+    opacity: 1;
+    transform: none;
+  }
+}

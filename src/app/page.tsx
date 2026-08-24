@@ -4,7 +4,7 @@ import { TottHero } from "@/components/catering/tott-hero";
 import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
 import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
-import { SpiralServices } from "@/components/catering/spiral-services";
+import { HaccServices } from "@/components/catering/hacc-services";
 import { Menu } from "@/components/catering/menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
@@ -135,39 +135,29 @@ export default function Home() {
 
       {/* ── ACT II: WHAT WE OFFER ── */}
 
-      {/* 6. SpiralServices — Cycle 45 NEW «Спираль». Full redesign per
-             user request: copy the activetheory.net spiral — service
-             cards arranged in a 3D helix that descends and rotates as
-             the user scrolls. Research C45-R1 confirmed AT's homepage is
-             a WebGL/Three.js scene with `scrollProgress` + `scrollCamera`
-             driving a 3D helix where cards descend past the camera (the
-             Cartier 365ayearof SOTM uses the same archetype, already in
-             INSPIRATION.md).
+      {/* 6. HaccServices — Cycle 49 NEW «Каталог услуг». Full redesign per
+             user request: copy the gammacatering.com horizontal accordion
+             ("Erlebnisse" haccordion) and make it better. One open panel +
+             11 vertical spines in a flex rack — the exact gamma mechanics
+             (flex-grow 0→1 transition, spine widens when open, JS-fixed
+             panel width so content never reflows mid-animation, is-resizing
+             guard) — reverse-engineered in
+             research/gamma-haccordion-research.md.
 
-             IMPLEMENTATION: CSS 3D transforms (transform-style:
-             preserve-3d + perspective) — no Three.js/R3F added (keeps
-             bundle light, RULES §5 transform/opacity-only compliant).
-             Framer Motion useScroll + useTransform drive the helix
-             group's rotateY (1.5 turns across scroll range) and y
-             (camera descends through the spiral — the "spiral moves
-             down" feel). 12 cards statically positioned on the helix
-             via translate3d(R·cos θ, y_i, R·sin θ) rotateY(-θ); per-card
-             opacity dims cards on the back of the cylinder (we see only
-             the front-facing cards — the spiral's signature visual).
+             UPGRADES over gamma: 12 panels vs their 4 (prices, hooks,
+             per-service warm tints), inert + delayed visibility on closed
+             panels (fixes gamma's live Tab-focus-leak bug), full
+             prefers-reduced-motion support, autoplay with progress line
+             (pauses on hover/focus/hidden/out-of-view, stops after manual
+             interaction), hover-intent opening (380ms, fine pointers),
+             staggered content entrance + Ken Burns photo exhale
+             (transform/opacity only), Marck Script handwritten titles
+             tilted −6° (Cyrillic analog of gamma's Adobe Handwriting),
+             mobile vertical stack with grid-rows 0fr→1fr + plus→× icons.
 
-             CONTENT: 12 services — 7 primary scenes from Cycle-44
-             StageServices + 5 of 6 extras. Same validated copy, prices,
-             media, CTAs.
-
-             A11Y: <section aria-labelledby>; every card is a real <a
-             href="#calculator|#contact"> (keyboard, middle-click, SEO);
-             prefers-reduced-motion renders a clean vertical list
-             variant with same content + CTAs; mobile (≤820px) replaces
-             the 3D stage with a CSS vertical list (12 absolute 3D cards
-             is janky on narrow mobile GPUs). Active-card HUD updates
-             with scroll (AT-style technical readout). Replaces Cycle-44
-             StageServices (kept on disk per repo convention). */}
-      <SpiralServices />
+             Replaces Cycle 45-48 SpiralServices (kept on disk per repo
+             convention). */}
+      <HaccServices />
 
       {/* 7. Menu — 7 menu types with interactive list + real dishes + PDF. */}
       <Menu />
