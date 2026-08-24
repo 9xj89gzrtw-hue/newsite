@@ -39,6 +39,7 @@
   --hacc-ink: var(--ea-ink, #1a1a1a);
   --hacc-red: var(--ea-red, #e71d3a);
   --hacc-red-deep: var(--ea-red-deep, #b91431);  /* AA-safe on tints */
+  --hacc-red-bright: #ff5560;                    /* AA-safe on dark veil */
   --hacc-soft: rgba(26, 26, 26, 0.68);           /* AA on all tints  */
 }
 
@@ -101,6 +102,65 @@
   }
 }
 
+/* ─────────────────────────── Cycle 51: filmstrip photo layer ──────────
+   The item's photo sits edge-to-edge BEHIND everything (z0). Closed, it is
+   clipped to the spine width — a dark veiled frame; the rack reads as a
+   12-frame filmstrip instead of flat "paint chips". Opening "develops"
+   the frame into the light tinted panel (dark→light reveal metaphor). */
+
+.hacc__photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hacc__photo-img {
+  object-fit: cover;
+  /* subtle unifying grade so 12 heterogeneous sources read as one film */
+  filter: saturate(0.94) contrast(1.05) brightness(0.98);
+}
+
+/* warm charcoal veil — darker at top/bottom where the num/title/progress
+   sit, lighter mid-frame; AA backdrop for the white spine typography */
+.hacc__photo-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(23, 17, 12, 0.68) 0%,
+    rgba(23, 17, 12, 0.56) 38%,
+    rgba(23, 17, 12, 0.56) 62%,
+    rgba(23, 17, 12, 0.68) 100%
+  );
+  transition: opacity 340ms ease;
+}
+
+/* the open spine lightens its veil — the frame "wakes up" and is
+   unmistakably the active one (VLM cycle-51: width alone wasn't enough) */
+.hacc__item.is-open .hacc__photo-veil {
+  opacity: 0.58;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hacc__item:not(.is-open):hover .hacc__photo-veil {
+    opacity: 0.8;
+  }
+  .hacc__item:not(.is-open) .hacc__spine:hover::before {
+    transform: scaleY(1);
+  }
+  .hacc__item:not(.is-open) .hacc__spine:hover .hacc__spine-title {
+    transform: translateY(-6px);
+  }
+}
+
+/* the OPEN spine carries a permanent bright-red marker line (hover-only
+   for closed spines above) — the active frame is obvious at a glance */
+.hacc__item.is-open .hacc__spine::before {
+  transform: scaleY(1);
+}
+
 /* ─────────────────────────────────────────────── the rack (desktop flex) ── */
 
 /* heading reset — the APG accordion heading wrapper must not add layout.
@@ -148,7 +208,8 @@
 /* gamma's resize guard — no transition while measuring */
 .hacc__rack.is-resizing .hacc__item,
 .hacc__rack.is-resizing .hacc__spine,
-.hacc__rack.is-resizing .hacc__open {
+.hacc__rack.is-resizing .hacc__open,
+.hacc__rack.is-resizing .hacc__photo-veil {
   transition: none !important;
 }
 
@@ -179,7 +240,7 @@
 }
 
 .hacc__spine:focus-visible {
-  outline: 2px solid var(--hacc-red);
+  outline: 2px solid #ffffff;         /* visible on the dark veil */
 }
 
 .hacc__num {
@@ -188,13 +249,13 @@
   font-size: 0.74rem;
   letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
-  color: rgba(26, 26, 26, 0.75);      /* AA: 4.6:1 on the lightest tint */
+  color: rgba(255, 255, 255, 0.85);   /* AA on the dark veil */
   transition: color 300ms ease;
 }
 
 .hacc__item.is-open .hacc__num,
 .hacc__spine:hover .hacc__num {
-  color: var(--hacc-red-deep);
+  color: var(--hacc-red-bright);
 }
 
 /* vertical title — reads bottom-to-top (gamma signature). The wrapper (no
@@ -222,12 +283,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;                       /* flex-item min-width:auto fix */
+  color: #ffffff;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
   transition: color 300ms ease;
 }
 
-/* the open spine is unmistakably active — number AND title turn red */
+/* the open spine is unmistakably active — bright red over the dark frame */
 .hacc__item.is-open .hacc__spine-title-text {
-  color: var(--hacc-red-deep);
+  color: #ffffff;
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.7);
 }
 
 /* left accent line grows on hover (fine pointers only) */
@@ -238,44 +302,24 @@
   top: 0;
   bottom: 0;
   width: 3px;
-  background: var(--hacc-red);
+  background: var(--hacc-red-bright);
   transform: scaleY(0);
   transform-origin: top;
   transition: transform 320ms var(--hacc-ease);
+  z-index: 1;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .hacc__item:not(.is-open) .hacc__spine:hover::before {
-    transform: scaleY(1);
-  }
-  .hacc__item:not(.is-open) .hacc__spine:hover .hacc__spine-title {
-    transform: translateY(-6px);
-  }
-}
+/* (hover rules live in the Cycle 51 photo-veil block above) */
 
-/* darkening veil on hover (paint-only, gamma uses inset shadow) */
-.hacc__item::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(26, 26, 26, 0.05);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 320ms ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .hacc__item:not(.is-open):hover::after {
-    opacity: 1;
-  }
-}
+/* (Cycle 51: hover lightening lives on .hacc__photo-veil above — the old
+   5% darkening overlay was removed to avoid double-treating the photo.) */
 
 /* autoplay progress line — bottom of the OPEN spine only */
 .hacc__spine-progress {
   width: calc(100% - 0.75rem);
   height: 4px;
   border-radius: 2px;
-  background: rgba(26, 26, 26, 0.14);
+  background: rgba(255, 255, 255, 0.24);
   overflow: hidden;
   position: relative;
   flex: none;
@@ -285,7 +329,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--hacc-red);
+  background: var(--hacc-red-bright);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -309,6 +353,7 @@
 
 .hacc__open {
   position: relative;
+  z-index: 1;                         /* above the filmstrip photo layer */
   height: 100%;
   margin-left: var(--hacc-spine-open);
   /* JS measures the exact px so nothing reflows mid-animation; pre-JS the
@@ -331,6 +376,9 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* Cycle 51: opaque tint card over the filmstrip photo — the panel area
+     stays the calm editorial surface, only the spine strip keeps the photo */
+  background-color: var(--hacc-item-tint);
   padding: clamp(1.25rem, 2.2vw, 2rem) clamp(1.25rem, 2.2vw, 2rem)
     clamp(1.25rem, 2vw, 1.75rem) clamp(0.75rem, 1.4vw, 1.25rem);
 }
@@ -430,13 +478,20 @@
 }
 
 .hacc__img {
-  transform: scale(1.09);
-  transition: transform 7s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Cycle 51: perpetual slow drift replaces the one-shot exhale — the open
+     photo never settles, the panel keeps breathing (transform-only). */
+  transform: scale(1.055) translate(-0.6%, 0.4%);
+  filter: saturate(0.94) contrast(1.03);
   object-fit: cover;
 }
 
 .hacc__item.is-open .hacc__img {
-  transform: scale(1);
+  animation: hacc-drift 34s ease-in-out infinite alternate;
+}
+
+@keyframes hacc-drift {
+  from { transform: scale(1.055) translate(-0.6%, 0.4%); }
+  to   { transform: scale(1.09) translate(0.7%, -0.5%); }
 }
 
 /* Cycle 50: the script title settles onto its baseline when open */
@@ -494,9 +549,12 @@
     grid-template-rows: auto 1fr;
   }
 
-  /* spine becomes a horizontal bar */
+  /* spine becomes a horizontal bar — relative so the bar's typography
+     paints ABOVE the filmstrip photo layer (in-flow static content would
+     sink below the positioned z0 photo) */
   .hacc__spine {
-    position: static;
+    position: relative;
+    z-index: 2;
     width: 100%;
     height: 84px;
     flex-direction: row;
@@ -538,8 +596,8 @@
   .hacc__spine-plus {
     flex: none;
     display: inline-flex;
-    color: var(--hacc-ink);
-    opacity: 0.65;
+    color: #ffffff;
+    opacity: 0.85;
     transition: transform 420ms var(--hacc-ease);
   }
 
@@ -550,7 +608,7 @@
 
   .hacc__item.is-open .hacc__spine-plus {
     transform: rotate(45deg);
-    color: var(--hacc-red-deep);
+    color: var(--hacc-red-bright);
     opacity: 1;
   }
 
@@ -641,7 +699,8 @@
   .hacc__spine-progress,
   .hacc__hint,
   .hacc__ambient,
-  .hacc__meta {
+  .hacc__meta,
+  .hacc__photo {
     display: none;
   }
 
@@ -678,6 +737,18 @@
 @media (forced-colors: active) {
   .hacc__item {
     border: 1px solid CanvasText;    /* tints vanish — keep the rack legible */
+  }
+
+  /* the photo veil reads as a solid block in WHP — drop the filmstrip,
+     the forced CanvasText spine typography needs a plain backdrop */
+  .hacc__photo {
+    display: none;
+  }
+
+  .hacc__spine-title-text,
+  .hacc__num {
+    color: CanvasText;
+    text-shadow: none;
   }
 
   .hacc__spine-progress {
@@ -799,6 +870,7 @@
   .hacc__img,
   .hacc__title,
   .hacc__ambient-layer,
+  .hacc__photo-veil,
   .hacc__spine-title,
   .hacc__spine-plus,
   .hacc__cta svg,
@@ -812,6 +884,7 @@
 
   .hacc__img {
     transform: none;
+    animation: none !important;      /* no perpetual drift */
   }
 
   .hacc__title {

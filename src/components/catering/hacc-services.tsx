@@ -47,6 +47,16 @@
  * 15. spring mouse-parallax on the open photo (fine pointers, ±10px);
  * 16. magnetic CTA + arrow micro-affordance + script-title settle.
  *
+ * Cycle 51 filmstrip pass — closed spines stop being "paint chips":
+ * 17. every item carries its photo edge-to-edge behind everything (a
+ *     decorative duplicate with alt=""), clipped to the spine width when
+ *     closed → the rack reads as a 12-frame filmstrip; opening "develops"
+ *     the frame into the light tinted panel (dark→light reveal metaphor);
+ * 18. the panel body is an opaque tint card over the photo layer, so the
+ *     open spine strip keeps the photo — book spine matches its cover;
+ * 19. infinite Ken Burns drift on the open photo (34s alternate) + a subtle
+ *     unifying color grade (saturate/contrast) across all photos.
+ *
  * Self-contained: scoped CSS in ./hacc-services.css + EA shared utilities.
  * The orchestrator places <HaccServices /> in page.tsx (position #6).
  */
@@ -706,10 +716,33 @@ export function HaccServices() {
                 itemRefs.current[i] = el;
               }}
               className={"hacc__item" + (isOpen ? " is-open" : "")}
-              style={{ backgroundColor: s.tint }}
+              style={
+                {
+                  backgroundColor: s.tint,
+                  "--hacc-item-tint": s.tint,
+                } as CSSProperties
+              }
               variants={itemVariants}
               custom={i}
             >
+              {/* — — — Cycle 51: filmstrip photo layer — the item's photo sits
+                      edge-to-edge BEHIND everything. Closed, it is clipped to
+                      the spine width (a dark veiled frame); open, the opaque
+                      tinted body covers the panel area, so the strip keeps the
+                      photo — the spine literally matches its cover. Decorative
+                      duplicate: alt="" + aria-hidden. — — */}
+              <div className="hacc__photo" aria-hidden="true">
+                <SmartImage
+                  src={s.media}
+                  alt=""
+                  fill
+                  blurDataURL={BLUR_DATA_URL}
+                  sizes="(max-width: 1023px) 100vw, 96px"
+                  loading={isOpen ? "eager" : "lazy"}
+                  className="hacc__photo-img"
+                />
+                <span className="hacc__photo-veil" />
+              </div>
               {/* — — — spine: the vertical "корешок" click target — — */}
               <h3 className="hacc__spine-heading">
                 <button
