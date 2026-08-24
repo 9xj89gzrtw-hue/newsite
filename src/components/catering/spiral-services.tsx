@@ -523,6 +523,57 @@ function ActiveCardHud({
 
 /* ============================================================= main ==== */
 
+/**
+ * SpiralParticles — ambient gold-dust particles drifting in the dark
+ * background (critique C3 §Top-1: 'add ambient particle dust that
+ * gets brighter/larger when a card passes closest to camera').
+ *
+ * Implementation: 12 absolutely-positioned divs with CSS keyframe
+ * animations (drift + pulse). Purely decorative (aria-hidden).
+ * Positions are deterministic (precomputed array) so SSR + client
+ * render match. Animation durations vary 12-26s so they don't sync.
+ *
+ * Performance: 12 elements with `transform` + `opacity` only —
+ * RULES §5 compliant. will-change on the parent only.
+ */
+const PARTICLES = Array.from({ length: 14 }, (_, i) => {
+  // Deterministic pseudo-random distribution (no hydration mismatch).
+  const seed = (n: number) => ((Math.sin(n * 12.9898) * 43758.5453) % 1 + 1) % 1;
+  return {
+    id: i,
+    left: `${(seed(i + 1) * 100).toFixed(2)}%`,
+    top: `${(seed(i + 11) * 100).toFixed(2)}%`,
+    size: 2 + Math.floor(seed(i + 21) * 4), // 2-5px
+    duration: 14 + Math.floor(seed(i + 31) * 14), // 14-28s
+    delay: `-${(seed(i + 41) * 8).toFixed(2)}s`, // -0..-8s (negative for instant start)
+    drift: 30 + Math.floor(seed(i + 51) * 50), // 30-80px drift
+  };
+});
+
+function SpiralParticles() {
+  return (
+    <div className="sp-st__particles" aria-hidden="true">
+      {PARTICLES.map((p) => (
+        <span
+          key={p.id}
+          className="sp-st__particle"
+          style={
+            {
+              left: p.left,
+              top: p.top,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              animationDuration: `${p.duration}s`,
+              animationDelay: p.delay,
+              "--drift": `${p.drift}px`,
+            } as React.CSSProperties
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
 export function SpiralServices() {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
@@ -602,6 +653,8 @@ export function SpiralServices() {
       <div className="sp-st__sticky">
         {/* ambient spotlight behind the helix (pulsing warm glow) */}
         <div className="sp-st__spotlight" aria-hidden="true" />
+        {/* ambient gold-dust particles drifting in the dark (atmosphere) */}
+        <SpiralParticles />
         {/* perspective-warped ground plane grid for cinematic depth */}
         <div className="sp-st__ground" aria-hidden="true" />
         {/* subtle film grain */}
