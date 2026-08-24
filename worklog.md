@@ -2264,3 +2264,30 @@ Stage Summary:
 - Rewritten: src/components/catering/spiral-services.tsx + spiral-services.css (v5, net −621 LOC vs v4).
 - The activetheory.net spiral now ACTUALLY works: one card front-and-center sharp at every scroll step, others dimmed/blurred winding around the vertical axis, spiral descends as you scroll (per user's brief), HUD/counter perfectly synced.
 - KEY LESSON for future cycles: the previous 45-cycle "convergence" (VLM 8.5/10) was measured on its own screenshots and missed real-screen breakage. Clean-room rewrite with the classic carousel transform chain + single rAF owner beats debugging 1.8k LOC of conflicting transforms. VLM screenshots must be taken at MULTIPLE scroll positions INCLUDING mid-motion (video), and angle-argmax is ambiguous for multi-turn helixes — use position-based indexing.
+
+---
+Task ID: cycle-47
+Agent: main (Z.ai Code)
+Task: User critique of v5: "the reference spiral GOES DOWN and you can SEE it's a spiral — here you can't; there were way more effects; mobile doesn't work at all." Rework v6.
+
+Work Log:
+- DIAGNOSED the three complaints against v5:
+  1) Spiral invisible: back cards faded to 4% opacity (ghost floor), vfade window 0.58vh too narrow, camera looked perpendicular at the axis → read as a 1-card slider, not a helix. Back-of-cylinder cards also rendered MIRRORED text (no backface handling).
+  2) Few effects vs activetheory.net.
+  3) Mobile ≤820px fell back to a list — user explicitly wants the spiral on mobile.
+- v6 REWORK (same files, +714/−178):
+  - VISIBLE CORKSCREW: back-ghost floor 21% + neighbour curve f^1.5, wide vfade band (full ≤0.5vh → 0 at ~1.35vh), world scale3d(0.84) camera pull-back so 4-6 cards visible at once. TURNS desktop 1.6 (48° steps — neighbours at cos48=0.67 → ~60% brightness), mobile 1.3.
+  - REAL CARD BACKS: .sp-card__back slab (rotateY(180°) + backface-visibility:hidden on both faces) — far-side cards now show elegant dark panels with a stroked ghost index + "INTERFOOD" wordmark instead of mirrored text. transform-style:preserve-3d on the anchor. JS writes opacity/filter to BOTH faces per frame.
+  - CAMERA: world rotateX(+12°) base tilt — looking down INTO the spiral, helix descends below the front card; section height 580vh→500vh (denser pitch 36vh, more cards in the visibility band).
+  - MORE EFFECTS: dotted luminous helix trail (67 dots, outer 1.16·R amber + inner 0.68·R dim + red node beacons at card positions), axis light column (wide red glow + bright cream core, breathing), giant ghost counter 01→12 stroked behind cards (pulses via WAAPI on change), 24 deterministic gold-dust particles (SSR-safe seed), 12-tick progress rail (active glows red), counter bump animation, intro spin-in (+46° rotation + rise from below, 1.5s easeOutCubic, skipped on mid-section reload), mega-title clip reveal, per-card slow float (6.5s, staggered).
+  - MOBILE 3D ON: LIST_MODE reduced to prefers-reduced-motion only. Mobile geometry: radius ≤0.6·vw (max 340), worldScale 0.92, blur cap 5px, particles off, compact HUD/ticks/ghost/mega, safe-area padding, CTA ellipsis fix. Verified 390×844: stage block, list none, spiral renders.
+- VERIFICATION (/loop):
+  - Desktop 5 positions after first pass: VLM "PARTIAL/FAIL — spiral not readable" → root causes above → fixed with back slabs + camera pull-back + wider band.
+  - Desktop 5 positions after rework: spiral "CLEARLY READABLE" at p=.5/.75 (9/10), no mirrored text, no clipping; detailed spatial check confirms front card center, neighbour upper-right 30-40% brightness, trail, ghost number, counter.
+  - Mobile 4 positions: 8.5–9/10 all shots, spiral renders and reads, HUD usable, only CTA truncation → fixed (9.5px + ellipsis).
+  - Motion video (16s smooth scroll) VLM: "spiral clearly visible as continuous corkscrew, helix visibly winds downward, no glitches/z-fighting/mirrored text, 9/10 Awwwards-level, significantly superior to a plain carousel".
+  - Rapid-scroll stress (8 jumps @150ms): no NaN, counter+ghost synced, no page errors. lint green, tsc green.
+
+Stage Summary:
+- The spiral is now VISIBLE (4-6 cards at once, real back panels, dotted trail, axis light), DESCENDS on scroll with a tilted camera, and WORKS ON MOBILE. Effects: ghost counter, particles, ticks rail, intro spin, card float, counter bump, title reveal.
+- KEY LESSONS: (1) a spiral reads only if ≥3 cards are simultaneously visible — depth-cue floors must stay ≥20%; (2) multi-turn CSS helixes MUST use backface-visibility + a designed back slab or the far side shows mirrored content; (3) uniform scale3d(s) LEFTMOST in the world transform pulls the camera back without breaking the p=i/(N-1) front-card sync (S multiplies the child-space translate too); (4) testing stills at 5 scroll positions is not enough — VLM must also judge a mid-motion video.

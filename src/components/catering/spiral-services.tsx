@@ -1,49 +1,44 @@
 "use client";
 
 /**
- * SpiralServices — «Спираль» v5 (full rewrite).
+ * SpiralServices — «Спираль» v6 (rework per user critique).
  * ---------------------------------------------------------------------------
  *
- * WHY THE REWRITE: v2–v4 (Cycle 45) rendered broken — cards scattered,
- * text skewed unreadable, transform conflicts between Framer Motion and
- * CSS. Root causes: (1) Framer `useTransform` writing `transform` on the
- * same elements that also carried static CSS 3D transforms, (2) helix
- * math mixing cos/sin placement with a separate rotateY phase, (3) 988
- * lines of CSS fighting itself. This version is a clean-room rewrite.
+ * USER FEEDBACK (cycle 46 → 47): "on the reference site the spiral GOES DOWN
+ * and you can SEE it's a spiral; here you can't see it, and there were way
+ * more effects; mobile doesn't work at all."
  *
- * ARCHITECTURE (bulletproof by construction):
- *   - ONE rAF loop owns ALL animation. It reads scroll once per frame
- *     (`getBoundingClientRect` on the section — no offsetTop walking),
- *     lerps progress for buttery trailing motion, and writes:
- *       • `transform` on the single `.sp__world` group,
- *       • `opacity` + `filter` on each card's INNER wrapper (depth cues).
- *     No Framer Motion. No CSS transitions on 3D elements. No conflicts.
- *   - Cards are positioned ONCE per layout on the classic 3D-carousel
- *     chain: `translate(-50%,-50%) rotateY(θi) translateZ(R) translateY(yi)`
- *     which places card i on a vertical helix of radius R, facing outward,
- *     at height −i·pitch (the helix ascends; the world descends on scroll,
- *     so the spiral visually MOVES DOWN past the camera — per user brief).
- *   - Group transform per frame: `translate3d(0, ty, 0) rotateY(rot)` where
- *     ty = p·(N−1)·pitch and rot = −p·(N−1)·Δθ. Card i is dead-center
- *     facing the camera exactly when p = i/(N−1) — perfect sync of
- *     descent + rotation. This is the activetheory.net archetype.
- *   - Depth cues per frame from world angle α = θi + rot:
- *       frontness f = cos α  →  opacity, blur, brightness, saturate.
- *     Cards on the back of the cylinder dim to ~4% (ghost spiral receding
- *     into the dark — AT's signature), the front card is tack sharp.
- *   - Real z-buffering: `transform-style: preserve-3d` on the world; the
- *     group carries NO overflow/filter/opacity (flattening hazards), those
- *     live on inner wrappers only.
- *   - Mouse parallax (±1.5°) on pointer:fine devices — subtle life.
- *   - HUD: mono-style counter `01 / 12` + active service name + progress
- *     bar, updated only on index change (no layout thrash).
- *   - Mobile ≤820px / prefers-reduced-motion: CSS swaps the 3D stage for
- *     a clean editorial list (IO-revealed). No JS branching → no hydration
- *     mismatch.
+ * v6 fixes all three:
  *
- * CONTENT: 12 services — validated copy, prices, media, CTAs (unchanged).
- * A11Y: <section aria-labelledby>; cards are real <a> links; HUD duplicated
- * info is aria-hidden; images carry alt text.
+ * 1) THE SPIRAL MUST BE VISIBLE.
+ *    - Back cards no longer fade to 4% — floor is ~12–16% with blur: the
+ *      corkscrew SHAPE is readable at every scroll position.
+ *    - Camera TILTS DOWN (world rotateX ≈ +12°): we look INTO the spiral
+ *      from slightly above, seeing the helix descend below the front card —
+ *      the "spiral moves down" reads instantly.
+ *    - A luminous DOTTED TRAIL traces the helix path (two tracks: outer at
+ *      1.16·R, inner at 0.68·R) winding between the cards.
+ *    - An axis light column marks the vertical axis the spiral spins around.
+ *
+ * 2) MORE EFFECTS.
+ *    - Giant ghost counter (01→12) stroked behind the cards, pulsing on
+ *      every change; mega serif «Услуги» reveals top-center on entry.
+ *    - Intro spin-in: on first view the helix rotates +46° and rises from
+ *      below while fading in (skipped if reloaded mid-section).
+ *    - Ambient gold-dust particles (24, deterministic seed — SSR-safe).
+ *    - Vertical ticks rail (12 ticks) on the right; active tick glows red.
+ *    - Cards breathe (slow per-card float); front card has red rim light;
+ *      counter bumps on change; mouse parallax on desktop.
+ *
+ * 3) MOBILE GETS THE REAL 3D SPIRAL.
+ *    - No more list fallback on small screens (list only for
+ *      prefers-reduced-motion). Responsive geometry: fewer turns (1.2),
+ *      tighter radius (≤0.6·vw·), capped blur (5px) for mobile GPUs.
+ *
+ * Engine unchanged in spirit: ONE rAF loop owns everything; cards sit on
+ * the classic carousel chain rotateY(θi)·translateZ(R)·translateY(−i·pitch);
+ * the group descends + rotates so card i is front-center exactly at
+ * p = i/(N−1). Active index = round(p·(N−1)) (position-based, no ties).
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -214,13 +209,39 @@ const SERVICES: SpiralItem[] = [
 /* ------------------------------------------------------------ helix math --- */
 
 const N = SERVICES.length; // 12 cards
-const TURNS = 2; // helix windings across the whole scroll range
-const STEP_DEG = (TURNS * 360) / N; // 60° between consecutive cards
-const TOTAL_ROT = STEP_DEG * (N - 1); // total world rotation, degrees
 const FINE_POINTER = "(pointer: fine)";
-const LIST_MODE = "(max-width: 820px), (prefers-reduced-motion: reduce)";
+const LIST_MODE = "(prefers-reduced-motion: reduce)";
+const MOBILE_W = 820;
+const DOT_SUBS = 6; // trail dots per card step
+const DOT_COUNT = (N - 1) * DOT_SUBS + 1; // 67
+const TURNS_DESKTOP = 1.6; // neighbours 48° apart — bright enough to read
+const TURNS_MOBILE = 1.3; // tighter spiral so neighbours stay on-screen
+const INTRO_MS = 1500;
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+const fract = (v: number) => v - Math.floor(v);
+// deterministic pseudo-random (same on SSR + client — no hydration mismatch)
+const seed = (n: number) => fract(Math.sin(n * 12.9898) * 43758.5453);
+
+/* ambient gold-dust particles — module-level constant, SSR-safe */
+const PARTICLES = Array.from({ length: 24 }, (_, i) => {
+  const r1 = seed(i * 3 + 1);
+  const r2 = seed(i * 3 + 2);
+  const r3 = seed(i * 3 + 3);
+  const r4 = seed(i * 7 + 11);
+  const r5 = seed(i * 13 + 5);
+  return {
+    x: 4 + r1 * 92, // left %
+    y: 8 + r2 * 84, // top %
+    s: 2 + Math.round(r3 * 2.5), // px
+    dx: Math.round((r4 - 0.5) * 130), // drift x
+    dy: Math.round((r5 - 0.5) * 100), // drift y
+    dur: 16 + r1 * 20, // s
+    delay: r2 * 22, // s
+    op: 0.22 + r3 * 0.4,
+  };
+});
 
 /* -------------------------------------------------------------- component --- */
 
@@ -228,25 +249,28 @@ export function SpiralServices() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const worldRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const megaRef = useRef<HTMLSpanElement | null>(null);
+  const ghostRef = useRef<HTMLDivElement | null>(null);
   const counterRef = useRef<HTMLSpanElement | null>(null);
   const nameRef = useRef<HTMLSpanElement | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
   const hintRef = useRef<HTMLSpanElement | null>(null);
-  const [isDesktop, setIsDesktop] = useState(true);
+  const tickRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const [isMotion, setIsMotion] = useState(true);
 
-  // Track list/desktop mode so the rAF loop boots only when needed.
+  // 3D stage for everyone except reduced-motion users (mobile included).
   useEffect(() => {
     const mq = window.matchMedia(LIST_MODE);
-    const update = () => setIsDesktop(!mq.matches);
+    const update = () => setIsMotion(!mq.matches);
     update();
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // Reveal-on-scroll for the list variant (mobile / reduced motion).
+  // Reveal-on-scroll for the reduced-motion list variant.
   useEffect(() => {
-    if (isDesktop) return;
+    if (isMotion) return;
     const list = sectionRef.current?.querySelector(".sp-list");
     if (!list) return;
     const items = Array.from(list.querySelectorAll(".sp-lcard"));
@@ -267,23 +291,28 @@ export function SpiralServices() {
     );
     items.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [isDesktop]);
+  }, [isMotion]);
 
   /* ------------------------------------------------- the one rAF engine --- */
   useEffect(() => {
-    if (!isDesktop) return;
+    if (!isMotion) return;
     const section = sectionRef.current;
     const world = worldRef.current;
     if (!section || !world) return;
 
     const cards = cardRefs.current.filter(Boolean) as HTMLAnchorElement[];
-    const inners = cards
-      .map((c) => c.firstElementChild as HTMLElement | null)
+    const fronts = cards
+      .map((c) => c.querySelector<HTMLElement>(".sp-card__inner"))
       .filter(Boolean) as HTMLElement[];
-    if (cards.length !== N) return;
+    const backs = cards
+      .map((c) => c.querySelector<HTMLElement>(".sp-card__back"))
+      .filter(Boolean) as HTMLElement[];
+    const dots = dotRefs.current.filter(Boolean) as HTMLSpanElement[];
+    const ticks = tickRefs.current.filter(Boolean) as HTMLSpanElement[];
+    if (cards.length !== N || fronts.length !== N || backs.length !== N)
+      return;
 
     let raf = 0;
-    let running = false;
     let inView = true;
     let firstFrame = true;
     let last = performance.now();
@@ -292,31 +321,69 @@ export function SpiralServices() {
     let vh = window.innerHeight;
     let pitch = 0; // vertical distance between consecutive cards, px
     let radius = 0; // helix radius, px
+    let stepDeg = 0; // degrees between consecutive cards
+    let totalRot = 0; // total world rotation across the scroll range
+    let worldScale = 1; // camera pull-back: shrinks the helix so MORE
+    // cards fit on screen at once (spiral stays readable)
     let mx = 0;
     let my = 0;
     let smx = 0;
     let smy = 0;
     let lastIdx = -1;
+    let introT0 = -1; // -1 pending, >=0 running, -2 done/skipped
 
     /* layout(): derive helix geometry from the real rendered section so
        CSS height and JS motion can never drift apart. */
     const layout = () => {
       vh = window.innerHeight;
+      const mob = window.innerWidth <= MOBILE_W;
       const H = section.offsetHeight;
       pitch = Math.max(120, (H - vh) / (N - 1));
-      radius = Math.max(300, Math.min(500, window.innerWidth * 0.31));
+      radius = mob
+        ? Math.max(210, Math.min(340, window.innerWidth * 0.6))
+        : Math.max(280, Math.min(430, window.innerWidth * 0.27));
+      worldScale = mob ? 0.92 : 0.84;
+      const turns = mob ? TURNS_MOBILE : TURNS_DESKTOP;
+      stepDeg = (turns * 360) / N;
+      totalRot = stepDeg * (N - 1);
+
       cards.forEach((card, i) => {
         card.style.transform =
           `translate(-50%, -50%) ` +
-          `rotateY(${(i * STEP_DEG).toFixed(3)}deg) ` +
+          `rotateY(${(i * stepDeg).toFixed(3)}deg) ` +
           `translateZ(${radius.toFixed(1)}px) ` +
           `translateY(${(-i * pitch).toFixed(1)}px)`;
+      });
+      // dotted trail tracing the helix: outer ring outside the cards,
+      // inner ring inside — together they read as a tunnel/corkscrew.
+      dots.forEach((dot, j) => {
+        const k = j / DOT_SUBS;
+        const ang = k * stepDeg;
+        const outer = j % 2 === 0;
+        const r = outer ? radius * 1.16 : radius * 0.68;
+        dot.classList.toggle("sp__dot--outer", outer);
+        dot.classList.toggle("sp__dot--inner", !outer);
+        dot.style.transform =
+          `translate(-50%, -50%) ` +
+          `rotateY(${ang.toFixed(3)}deg) ` +
+          `translateZ(${r.toFixed(1)}px) ` +
+          `translateY(${(-k * pitch).toFixed(1)}px)`;
       });
     };
 
     const onMouse = (e: MouseEvent) => {
       mx = e.clientX / window.innerWidth - 0.5;
       my = e.clientY / window.innerHeight - 0.5;
+    };
+
+    const pulse = (el: HTMLElement) => {
+      el.animate(
+        [
+          { opacity: 0.25, transform: "translate(-50%, -50%) scale(1.05)" },
+          { opacity: 1, transform: "translate(-50%, -50%) scale(1)" },
+        ],
+        { duration: 700, easing: "cubic-bezier(.2,.7,.2,1)" }
+      );
     };
 
     const frame = (now: number) => {
@@ -339,45 +406,73 @@ export function SpiralServices() {
       smx += (mx - smx) * (1 - Math.exp(-dt * 5));
       smy += (my - smy) * (1 - Math.exp(-dt * 5));
 
-      const rot = -p * TOTAL_ROT;
-      const ty = p * (N - 1) * pitch;
+      // intro spin-in (first time the section becomes visible near its top)
+      let introE = 1;
+      if (introT0 >= 0) {
+        introE = easeOutCubic(clamp01((now - introT0) / INTRO_MS));
+        if (introE >= 1) introT0 = -2;
+      }
+
+      const mob = window.innerWidth <= MOBILE_W;
+      const rot = -p * totalRot + (1 - introE) * 46;
+      const ty = p * (N - 1) * pitch + (1 - introE) * vh * 0.55;
+      // camera looks INTO the spiral from slightly above (base tilt +12°);
+      // worldScale pulls the camera back so several cards are visible at once
       world.style.transform =
+        `scale3d(${worldScale.toFixed(3)}, ${worldScale.toFixed(3)}, ${worldScale.toFixed(3)}) ` +
         `translate3d(0, ${ty.toFixed(2)}px, 0) ` +
-        `rotateX(${(-smy * 1.6).toFixed(3)}deg) ` +
-        `rotateY(${(rot + smx * 2.2).toFixed(3)}deg)`;
+        `rotateX(${(12 + smy * 2.4).toFixed(3)}deg) ` +
+        `rotateY(${(rot + smx * 2.6).toFixed(3)}deg)`;
 
       const descent = (N - 1) * pitch;
       for (let i = 0; i < N; i++) {
-        const alpha = ((i * STEP_DEG + rot) * Math.PI) / 180;
+        const alpha = ((i * stepDeg + rot) * Math.PI) / 180;
         const f = Math.cos(alpha); // 1 front … −1 back
-        const wy = -i * pitch + ty; // card height relative to camera axis
-        const vfade = 1 - Math.min(1, Math.abs(wy) / (vh * 0.58));
-        // steep falloff: neighbors at 60° drop to ~⅓ brightness/opacity,
-        // back-of-cylinder ghosts at ~4% — the AT depth signature
-        const fade = f > 0 ? 0.05 + 0.95 * Math.pow(f, 2.4) : 0.04;
-        const op = Math.max(0, fade * vfade);
-        const blur = Math.max(0, Math.pow(1 - f, 1.4) * 11);
-        const br = 0.3 + 0.7 * Math.pow(Math.max(0, f), 1.5);
-        const sat = 0.42 + 0.58 * Math.pow(Math.max(0, f), 1.3);
-        const el = inners[i];
-        el.style.opacity = op.toFixed(3);
-        el.style.filter =
+        const wyEff =
+          (-i * pitch + ty) * worldScale; // on-screen height vs camera axis
+        // wide visibility band: full within 0.5vh, fades to zero at ~1.35vh
+        const vfade = 1 - clamp01((Math.abs(wyEff) - vh * 0.5) / (vh * 0.85));
+        // VISIBLE corkscrew: back floor 21%, neighbours ~55–65%, front 100%
+        const fade = 0.21 + 0.79 * Math.pow(Math.max(0, f), 1.5);
+        const op = Math.max(0, fade * vfade * introE);
+        let blur = Math.pow(1 - Math.max(0, f), 1.25) * 7.5;
+        if (mob) blur = Math.min(blur, 5);
+        const br = 0.5 + 0.5 * Math.pow(Math.max(0, f), 1.3);
+        const sat = 0.55 + 0.45 * Math.max(0, f);
+        const filt =
           `blur(${blur.toFixed(2)}px) brightness(${br.toFixed(3)}) ` +
           `saturate(${sat.toFixed(3)})`;
+        fronts[i].style.opacity = op.toFixed(3);
+        fronts[i].style.filter = filt;
+        backs[i].style.opacity = op.toFixed(3);
+        backs[i].style.filter = filt;
       }
 
-      // Active card = the one nearest the camera axis center. Card i sits
-      // dead-center exactly at p = i/(N−1), so rounding smoothed progress
-      // is unambiguous — unlike angle argmax, which ties after 1+ turns.
+      // Active card = nearest the camera axis center. Card i sits
+      // dead-center exactly at p = i/(N−1) — unambiguous by construction.
       const bestI = Math.max(0, Math.min(N - 1, Math.round(p * (N - 1))));
 
       if (bestI !== lastIdx) {
         lastIdx = bestI;
         cards.forEach((c, i) => c.classList.toggle("is-front", i === bestI));
-        if (counterRef.current)
+        ticks.forEach((t, i) => t.classList.toggle("is-on", i === bestI));
+        if (counterRef.current) {
           counterRef.current.textContent = SERVICES[bestI].index;
+          counterRef.current.animate(
+            [
+              { transform: "scale(1)" },
+              { transform: "scale(1.06)", offset: 0.4 },
+              { transform: "scale(1)" },
+            ],
+            { duration: 420, easing: "ease-out" }
+          );
+        }
         if (nameRef.current)
           nameRef.current.textContent = SERVICES[bestI].title;
+        if (ghostRef.current) {
+          ghostRef.current.textContent = SERVICES[bestI].index;
+          pulse(ghostRef.current);
+        }
       }
       if (barRef.current)
         barRef.current.style.transform = `scaleX(${p.toFixed(4)})`;
@@ -385,13 +480,8 @@ export function SpiralServices() {
         hintRef.current.style.opacity = clamp01(1 - pT * 24).toFixed(2);
       if (megaRef.current)
         megaRef.current.style.transform = `translate3d(0, ${(
-          p * descent * 0.1
+          p * descent * 0.06
         ).toFixed(1)}px, 0)`;
-
-      // stop burning cycles when parked at either end
-      if (!running && Math.abs(pT - p) < 0.0005 && (pT === 0 || pT === 1)) {
-        // still keep the loop for mouse parallax — cheap enough.
-      }
     };
 
     layout();
@@ -399,9 +489,18 @@ export function SpiralServices() {
 
     const io = new IntersectionObserver(
       (entries) => {
-        inView = entries[0]?.isIntersecting ?? true;
+        const vis = entries[0]?.isIntersecting ?? true;
+        inView = vis;
+        if (vis && introT0 === -1) {
+          // start the intro only when arriving from above the section;
+          // a mid-section reload (pT > 0.03) skips straight to the end state
+          const r = section.getBoundingClientRect();
+          const t = r.height - window.innerHeight;
+          const p0 = t > 0 ? clamp01(-r.top / t) : 0;
+          introT0 = p0 < 0.03 ? performance.now() : -2;
+        }
       },
-      { rootMargin: "40% 0px" }
+      { rootMargin: "25% 0px" }
     );
     io.observe(section);
 
@@ -427,12 +526,17 @@ export function SpiralServices() {
         c.style.transform = "";
         c.classList.remove("is-front");
       });
-      inners.forEach((el) => {
+      dots.forEach((d) => (d.style.transform = ""));
+      fronts.forEach((el) => {
+        el.style.opacity = "";
+        el.style.filter = "";
+      });
+      backs.forEach((el) => {
         el.style.opacity = "";
         el.style.filter = "";
       });
     };
-  }, [isDesktop]);
+  }, [isMotion]);
 
   /* ------------------------------------------------------------- markup --- */
 
@@ -445,12 +549,44 @@ export function SpiralServices() {
       className="sp"
       aria-labelledby="sp-title"
     >
-      {/* ── 3D stage (desktop, motion allowed) ── */}
+      {/* ── 3D stage (desktop AND mobile; reduced-motion falls back) ── */}
       <div className="sp__stage">
-        {/* background scene: spotlight, grain, mega title */}
+        {/* background scene */}
         <div className="sp__spot" aria-hidden="true" />
         <div className="sp__grain" aria-hidden="true" />
-        <div className="sp__vignette" aria-hidden="true" />
+
+        {/* ambient gold-dust particles */}
+        <div className="sp__dust" aria-hidden="true">
+          {PARTICLES.map((pt, i) => (
+            <span
+              key={i}
+              className="sp__p"
+              style={
+                {
+                  left: `${pt.x}%`,
+                  top: `${pt.y}%`,
+                  width: `${pt.s}px`,
+                  height: `${pt.s}px`,
+                  "--dx": `${pt.dx}px`,
+                  "--dy": `${pt.dy}px`,
+                  "--po": pt.op,
+                  animationDuration: `${pt.dur}s`,
+                  animationDelay: `${-pt.delay}s`,
+                } as React.CSSProperties
+              }
+            />
+          ))}
+        </div>
+
+        {/* axis light column — marks the vertical axis the spiral spins on */}
+        <div className="sp__axis" aria-hidden="true" />
+
+        {/* giant ghost counter behind the cards */}
+        <div ref={ghostRef} className="sp__ghost" aria-hidden="true">
+          01
+        </div>
+
+        {/* eyebrow + mega title */}
         <p className="sp__eyebrow" aria-hidden="true">
           <span className="sp__eyebrow-num">02</span>
           <span className="sp__eyebrow-line" />
@@ -462,8 +598,20 @@ export function SpiralServices() {
           </span>
         </h2>
 
-        {/* the helix */}
+        {/* the helix: cards + dotted trail */}
         <div ref={worldRef} className="sp__world">
+          {Array.from({ length: DOT_COUNT }).map((_, j) => (
+            <span
+              key={`dot-${j}`}
+              ref={(el) => {
+                dotRefs.current[j] = el;
+              }}
+              className={
+                j % DOT_SUBS === 0 ? "sp__dot sp__dot--node" : "sp__dot"
+              }
+              aria-hidden="true"
+            />
+          ))}
           {SERVICES.map((s, i) => (
             <a
               key={s.id}
@@ -475,47 +623,73 @@ export function SpiralServices() {
               aria-label={cardLabel(s)}
             >
               <div className="sp-card__inner">
-                <div className="sp-card__media">
-                  <img
-                    className="sp-card__img"
-                    src={s.media}
-                    alt={s.mediaAlt}
-                    loading={i < 3 ? "eager" : "lazy"}
-                    decoding="async"
-                  />
-                  <span className="sp-card__tag">{s.tag}</span>
-                </div>
-                <div className="sp-card__body">
-                  <div className="sp-card__row">
-                    <span className="sp-card__index">{s.index}</span>
-                    <span className="sp-card__rule" aria-hidden="true" />
+                <div className="sp-card__float">
+                  <div className="sp-card__media">
+                    <img
+                      className="sp-card__img"
+                      src={s.media}
+                      alt={s.mediaAlt}
+                      loading={i < 3 ? "eager" : "lazy"}
+                      decoding="async"
+                    />
+                    <span className="sp-card__tag">{s.tag}</span>
                   </div>
-                  <h3 className="sp-card__title">{s.title}</h3>
-                  <p className="sp-card__hook">{s.hook}</p>
-                  <div className="sp-card__foot">
-                    <span className="sp-card__price">{s.price}</span>
-                    <span className="sp-card__cta">
-                      {s.ctaLabel}
-                      <svg
-                        viewBox="0 0 16 16"
-                        width="12"
-                        height="12"
-                        fill="none"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M2 8h11M9 4l4 4-4 4"
-                          stroke="currentColor"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
+                  <div className="sp-card__body">
+                    <div className="sp-card__row">
+                      <span className="sp-card__index">{s.index}</span>
+                      <span className="sp-card__rule" aria-hidden="true" />
+                    </div>
+                    <h3 className="sp-card__title">{s.title}</h3>
+                    <p className="sp-card__hook">{s.hook}</p>
+                    <div className="sp-card__foot">
+                      <span className="sp-card__price">{s.price}</span>
+                      <span className="sp-card__cta">
+                        {s.ctaLabel}
+                        <svg
+                          viewBox="0 0 16 16"
+                          width="12"
+                          height="12"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M2 8h11M9 4l4 4-4 4"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
+              {/* back slab: what you see when the card is on the far side
+                  of the cylinder — a dark panel with the ghost index, so
+                  the back half of the helix reads as elegant panels
+                  instead of mirrored text */}
+              <div className="sp-card__back" aria-hidden="true">
+                <span className="sp-card__back-num">{s.index}</span>
+                <span className="sp-card__back-brand">Interfood</span>
+              </div>
             </a>
+          ))}
+        </div>
+
+        {/* vignette above cards — edges melt into darkness */}
+        <div className="sp__vignette" aria-hidden="true" />
+
+        {/* ticks rail — 12 progress markers */}
+        <div className="sp__ticks" aria-hidden="true">
+          {SERVICES.map((s, i) => (
+            <span
+              key={s.id}
+              ref={(el) => {
+                tickRefs.current[i] = el;
+              }}
+              className={i === 0 ? "sp__tick is-on" : "sp__tick"}
+            />
           ))}
         </div>
 
@@ -545,7 +719,7 @@ export function SpiralServices() {
         </div>
       </div>
 
-      {/* ── list variant (mobile / reduced motion) ── */}
+      {/* ── list variant (reduced motion only) ── */}
       <div className="sp-list">
         <div className="sp-list__head">
           <p className="sp__eyebrow sp-list__eyebrow">
