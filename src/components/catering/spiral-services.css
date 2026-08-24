@@ -1,0 +1,869 @@
+/* =============================================================
+ * SpiralServices — Cycle 45 «Спираль»
+ * Scoped styles (`sp-st__*` classes only — no edits to globals.css).
+ *
+ * Layout: 320vh-tall section → 100vh sticky inner with perspective stage
+ * in the middle and header/footer pinned top/bottom. The motion.div
+ * helix inside the perspective container holds 12 absolutely-positioned
+ * cards (each with its own translate3d+rotateY from spiral-services.tsx).
+ * Mobile (≤820px) renders the vertical list variant instead.
+ * ============================================================= */
+
+/* root section.
+   NOTE: do NOT put `overflow: hidden` here — it breaks the sticky
+   positioning of .sp-st__sticky (a known browser quirk: overflow on the
+   parent of a sticky element creates a scroll container that constrains
+   the sticky's range to the parent's visible bounds, but since the parent
+   itself doesn't scroll, the sticky ends up NOT sticking at all). The
+   overflow clipping is moved to .sp-st__sticky itself, which clips the
+   3D cards to the viewport without breaking the sticky behavior. */
+.sp-st {
+  position: relative;
+  min-height: 320vh;
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 50% 50%,
+      #fbf6ec 0%,
+      #f4f0e8 55%,
+      #ede5d5 100%
+    );
+  color: #161412;
+  font-family: var(--sp-golos), "Golos Text", system-ui, sans-serif;
+  isolation: isolate;
+}
+
+/* sticky inner — pins the 100vh viewport-filling stage while user scrolls
+   through the 320vh section (220vh of scroll range for the rotation).
+   `overflow: hidden` HERE clips the 3D cards to the viewport bounds (so
+   they don't spill into adjacent sections) without breaking the sticky
+   (since this element IS the sticky, not its parent).
+
+   NOTE: using `display: flex` (not `display: grid`) because GRID sets the
+   containing block of absolutely-positioned children to their grid area
+   (not the parent's padding box), which would offset the HUD by its grid
+   cell's position. FLEX correctly positions absolute children relative
+   to the flex container's padding box. */
+.sp-st__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  padding: clamp(20px, 3.5vh, 40px) clamp(20px, 4vw, 56px);
+  gap: 16px;
+  /* overflow moved to .sp-st__stage (the 3D card clipping happens there
+     instead of here — having overflow on this sticky element was creating
+     a positioning context quirk that offset absolute children by
+     -2*padding-top, breaking the HUD/spotlight/grain positioning). */
+}
+
+/* ── ambient spotlight — warm radial glow behind the helix ────────────── */
+.sp-st__spotlight {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle 38vmin at 50% 52%,
+      rgba(250, 93, 41, 0.07) 0%,
+      rgba(250, 93, 41, 0.03) 30%,
+      transparent 70%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── subtle film grain — animated via background-position is banned
+   (RULES §5); we animate opacity of a layered noise PNG instead. Here
+   it's a static inline SVG noise with low opacity — pure decoration. */
+.sp-st__grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── header ──────────────────────────────────────────────────────────── */
+.sp-st__header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  pointer-events: none;
+}
+
+.sp-st__eyebrow {
+  display: inline-block;
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 8px;
+}
+
+.sp-st__title-mega {
+  font-family: var(--sp-unb), "Unbounded", sans-serif;
+  font-size: clamp(48px, 9.5vw, 148px);
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+  text-transform: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+}
+
+.sp-st__title-line {
+  display: block;
+  overflow: hidden;
+  line-height: 0.86;
+}
+
+.sp-st__title-inner {
+  display: inline-block;
+  will-change: clip-path, transform;
+  /* fallback if framer-motion's clipPath MotionValue doesn't apply
+     (e.g. SSR before hydration): show the text */
+  clip-path: inset(0 0% 0 0);
+}
+
+.sp-st__title-line:last-child .sp-st__title-inner {
+  color: #fa5d29; /* accent on second line for visual rhythm */
+}
+
+.sp-st__subtitle {
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: clamp(13px, 1.05vw, 15px);
+  font-weight: 400;
+  line-height: 1.45;
+  max-width: 540px;
+  margin: 14px auto 0;
+  opacity: 0.65;
+}
+
+/* ── 3D stage ────────────────────────────────────────────────────────── */
+.sp-st__stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0; /* allow shrinking inside flex column */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* clip 3D cards that extend beyond the stage's bounds so they don't
+     overlap with header/footer (vertical) or adjacent content (lateral).
+     The perspective container inside also has its own implicit clipping
+     via `overflow: hidden` to ensure clean card edges. */
+  overflow: hidden;
+}
+
+.sp-st__perspective {
+  perspective: 1300px;
+  perspective-origin: 50% 45%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.sp-st__helix {
+  position: relative;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ── card ────────────────────────────────────────────────────────────── */
+.sp-st__card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 360px;
+  margin-left: -140px; /* center horizontally (card center on the helix point) */
+  margin-top: -180px;  /* center vertically  */
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  pointer-events: auto;
+  backface-visibility: visible; /* we want to see cards' backs dimmed, not culled */
+}
+
+.sp-st__card-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+  outline: none;
+  border-radius: 14px;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sp-st__card-link:hover,
+.sp-st__card-link:focus-visible {
+  transform: translateZ(20px); /* lift card toward camera on hover/focus */
+}
+
+.sp-st__card-link:focus-visible {
+  box-shadow: 0 0 0 3px #fa5d29, 0 0 0 5px rgba(250, 93, 41, 0.25);
+}
+
+.sp-st__card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #fffdf8;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 30px 60px -20px rgba(22, 20, 18, 0.4),
+    0 10px 22px -8px rgba(22, 20, 18, 0.22),
+    inset 0 0 0 1px rgba(22, 20, 18, 0.06);
+  display: flex;
+  flex-direction: column;
+  transform-style: preserve-3d;
+}
+
+.sp-st__card-media {
+  position: relative;
+  width: 100%;
+  height: 60%;
+  overflow: hidden;
+  background: #2a2520;
+}
+
+.sp-st__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* top-of-card chrome: index chip + tag chip */
+.sp-st__card-chrome {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sp-st__index {
+  font-family: var(--sp-unb), "Unbounded", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: rgba(255, 253, 248, 0.94);
+  color: #161412;
+  padding: 4px 8px;
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.sp-st__tag {
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: #fa5d29;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* photo bottom veil — soft gradient for chrome readability */
+.sp-st__card-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.25) 0%,
+    transparent 35%,
+    transparent 65%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+  pointer-events: none;
+}
+
+.sp-st__card-body {
+  padding: 14px 16px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+
+.sp-st__card-title {
+  font-family: var(--sp-unb), "Unbounded", sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.sp-st__card-hook {
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: #4a4540;
+  margin: 0;
+  flex: 1;
+  /* clamp to ~3 lines so all cards have consistent body height */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sp-st__card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.sp-st__price {
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sp-st__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #fa5d29;
+  white-space: nowrap;
+}
+
+.sp-st__cta-icon {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sp-st__card-link:hover .sp-st__cta-icon,
+.sp-st__card-link:focus-visible .sp-st__cta-icon {
+  transform: translate(2px, -2px);
+}
+
+/* ── active-card HUD (top-right) ─────────────────────────────────────── */
+.sp-st__hud {
+  position: absolute;
+  top: clamp(20px, 3.5vh, 36px);
+  right: clamp(20px, 4vw, 56px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px 10px 12px;
+  border: 1px solid rgba(22, 20, 18, 0.18);
+  background: rgba(255, 253, 248, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 100px;
+  pointer-events: none;
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+}
+
+.sp-st__hud-index {
+  font-family: var(--sp-unb), "Unbounded", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fa5d29;
+  line-height: 1;
+  min-width: 32px;
+}
+
+.sp-st__hud-divider {
+  width: 1px;
+  height: 26px;
+  background: rgba(22, 20, 18, 0.2);
+}
+
+.sp-st__hud-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-st__hud-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #161412;
+  line-height: 1.1;
+}
+
+.sp-st__hud-tag {
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(22, 20, 18, 0.5);
+}
+
+/* ── footer ──────────────────────────────────────────────────────────── */
+.sp-st__footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+.sp-st__footer > * {
+  pointer-events: auto;
+}
+
+.sp-st__counter {
+  font-family: var(--sp-unb), "Unbounded", sans-serif;
+  font-size: clamp(14px, 1.1vw, 16px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  color: #161412;
+}
+
+.sp-st__counter-cur {
+  color: #fa5d29;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sp-st__counter-sep {
+  opacity: 0.4;
+  margin: 0 2px;
+}
+
+.sp-st__counter-tot {
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.sp-st__cta-mega {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: clamp(12px, 0.95vw, 14px);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #161412;
+  text-decoration: none;
+  padding: 12px 22px;
+  border: 1.5px solid #161412;
+  border-radius: 100px;
+  transition:
+    background 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sp-st__cta-mega svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sp-st__cta-mega:hover,
+.sp-st__cta-mega:focus-visible {
+  background: #161412;
+  color: #f4f0e8;
+}
+
+.sp-st__cta-mega:hover svg,
+.sp-st__cta-mega:focus-visible svg {
+  transform: translate(2px, -2px);
+}
+
+/* ============================================================= fallback list variant
+ * Rendered for `prefers-reduced-motion` users and — via the @media
+ * (max-width: 820px) rule below — for mobile. Same content, same CTAs,
+ * no 3D transforms. The component returns SpiralServicesList directly
+ * when reduced-motion is active; on mobile the CSS hides the 3D stage
+ * and shows the list (since SpiralServicesList is also rendered inside
+ * the same component via the `sp-st--list` modifier class).
+ * ============================================================= */
+
+.sp-st--list {
+  min-height: auto;
+  padding: clamp(60px, 10vh, 100px) 0;
+}
+
+.sp-st__list-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 5vw, 40px);
+}
+
+.sp-st__header--list {
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.sp-st__header--list .sp-st__title-mega {
+  align-items: flex-start;
+}
+
+.sp-st__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sp-st__list-row {
+  border-top: 1px solid rgba(22, 20, 18, 0.12);
+  transition: background 0.3s ease;
+}
+
+.sp-st__list-row:last-child {
+  border-bottom: 1px solid rgba(22, 20, 18, 0.12);
+}
+
+.sp-st__list-row:hover {
+  background: rgba(250, 93, 41, 0.04);
+}
+
+.sp-st__list-link {
+  display: grid;
+  grid-template-columns: 50px 160px 1fr auto;
+  gap: 24px;
+  align-items: center;
+  padding: 20px 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.sp-st__list-index {
+  font-family: var(--sp-unb), "Unbounded", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fa5d29;
+  letter-spacing: 0.02em;
+}
+
+.sp-st__list-media {
+  width: 160px;
+  height: 110px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #2a2520;
+}
+
+.sp-st__list-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sp-st__list-row:hover .sp-st__list-img {
+  transform: scale(1.04);
+}
+
+.sp-st__list-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sp-st__list-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sp-st__list-title {
+  font-family: var(--sp-unb), "Unbounded", sans-serif;
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.sp-st__list-tag {
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: rgba(250, 93, 41, 0.14);
+  color: #fa5d29;
+  padding: 3px 7px;
+  border-radius: 4px;
+}
+
+.sp-st__list-hook {
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #4a4540;
+  margin: 0;
+  /* clamp 2 lines on the list variant (tighter rows) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sp-st__list-foot {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.sp-st__list-price {
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sp-st__list-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--sp-golos), "Golos Text", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fa5d29;
+  white-space: nowrap;
+}
+
+.sp-st__list-cta svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sp-st__list-row:hover .sp-st__list-cta svg {
+  transform: translate(2px, -2px);
+}
+
+.sp-st__footer--list {
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+/* ============================================================= responsive */
+
+/* Tablet — tighten the 3D cards a bit so they fit */
+@media (max-width: 1100px) {
+  /* cards stay 280px wide — the perspective container will clip naturally
+     at the viewport edges, which is part of the spiral's charm (cards
+     peeking in/out at the sides). */
+}
+
+/* Mobile — replace the 3D stage with the vertical list (better UX on
+   a narrow viewport, and CSS 3D transforms on 12 absolute cards is
+   janky on low-end mobile GPUs). The list is rendered server-side too
+   (no JS required) for reduced-motion users — same component. */
+@media (max-width: 820px) {
+  /* hide the 3D stage entirely; the list is rendered by JS via the
+     `prefers-reduced-motion` path. But if JS is enabled and motion is
+     NOT reduced, the 3D stage would still be shown — so we ALSO need to
+     hide it here. The list fallback (SpiralServicesList) is rendered
+     server-side only for reduced-motion; for normal mobile users we
+     need a CSS-level swap. Approach: hide stage + show list via CSS
+     by using the .sp-st--list modifier. But normal mobile users get the
+     3D stage markup, not the list markup. So instead, we transform the
+     3D stage into a vertical scroll list at mobile widths. */
+  .sp-st {
+    min-height: auto;
+    padding: clamp(40px, 8vh, 60px) 0;
+  }
+
+  .sp-st__sticky {
+    position: relative;
+    height: auto;
+    display: block;
+    padding: 0;
+  }
+
+  .sp-st__spotlight,
+  .sp-st__grain,
+  .sp-st__hud {
+    display: none;
+  }
+
+  .sp-st__header {
+    padding: 0 clamp(20px, 5vw, 40px);
+    margin-bottom: 24px;
+  }
+
+  .sp-st__title-mega {
+    font-size: clamp(48px, 14vw, 80px);
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  /* transform the 3D helix into a vertical scroll list */
+  .sp-st__stage,
+  .sp-st__perspective {
+    display: block;
+    height: auto;
+    perspective: none;
+  }
+
+  .sp-st__helix {
+    transform: none !important;
+    transform-style: flat;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 clamp(20px, 5vw, 40px);
+    width: 100%;
+    height: auto;
+  }
+
+  .sp-st__card {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    transform: none !important;
+    opacity: 1 !important;
+    will-change: auto;
+    backface-visibility: visible;
+  }
+
+  .sp-st__card-link {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 14px;
+    padding: 12px;
+    transform: none !important;
+  }
+
+  .sp-st__card-link:hover,
+  .sp-st__card-link:focus-visible {
+    transform: none;
+  }
+
+  .sp-st__card-inner {
+    height: 100%;
+    min-height: 120px;
+    flex-direction: row;
+    border-radius: 10px;
+  }
+
+  .sp-st__card-media {
+    width: 120px;
+    height: 120px;
+    flex-shrink: 0;
+  }
+
+  .sp-st__card-body {
+    padding: 10px 12px;
+    flex: 1;
+    gap: 4px;
+  }
+
+  .sp-st__card-title {
+    font-size: 15px;
+  }
+
+  .sp-st__card-hook {
+    font-size: 11px;
+    -webkit-line-clamp: 2;
+  }
+
+  .sp-st__card-foot {
+    margin-top: 4px;
+  }
+
+  .sp-st__price {
+    font-size: 11px;
+  }
+
+  .sp-st__cta {
+    font-size: 10px;
+  }
+
+  .sp-st__footer {
+    padding: 0 clamp(20px, 5vw, 40px);
+    margin-top: 32px;
+  }
+
+  /* hide the list-variant-3D-stage overlap rules; the list variant is
+     rendered separately when reduced-motion is active */
+  .sp-st--list .sp-st__list-link {
+    grid-template-columns: 40px 100px 1fr;
+    gap: 14px;
+  }
+
+  .sp-st--list .sp-st__list-media {
+    width: 100px;
+    height: 70px;
+  }
+
+  .sp-st--list .sp-st__list-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* prefers-reduced-motion — kill all transitions/animations, even in the
+   3D stage (which is normally only shown when motion is NOT reduced,
+   but defense-in-depth in case the SSR path renders it) */
+@media (prefers-reduced-motion: reduce) {
+  .sp-st *,
+  .sp-st *::before,
+  .sp-st *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* high-contrast mode safety — make sure focus rings and text contrast
+   are not destroyed by the 3D transforms */
+@media (forced-colors: active) {
+  .sp-st__card-inner {
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+  .sp-st__cta-mega {
+    border: 2px solid CanvasText;
+  }
+}

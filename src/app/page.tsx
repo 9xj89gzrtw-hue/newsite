@@ -4,7 +4,7 @@ import { TottHero } from "@/components/catering/tott-hero";
 import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
 import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
-import { StageServices } from "@/components/catering/stage-services";
+import { SpiralServices } from "@/components/catering/spiral-services";
 import { Menu } from "@/components/catering/menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
@@ -135,22 +135,39 @@ export default function Home() {
 
       {/* ── ACT II: WHAT WE OFFER ── */}
 
-      {/* 6. StageServices — Cycle 44 NEW «Сцена». Full redesign per
-             Aug-2026 awwwards meta research (C44-A: live SOTD/SOTM data —
-             Cipher, Oimachi, LIKOVA, Lama Lama, Iventions, By-Kin):
-             authored spotlight/stage motif (events-company precedent),
-             warm eggshell #F4F0E8 + ink #161412 + single accent, animated
-             film grain, kinetic variable-font Cyrillic type (Unbounded
-             200–900 wght axis animated on hover + Golos Text body — no
-             Inter), OGL flowmap liquid-displacement shader on the
-             cursor-follow preview (velocity trail + A→B displacement
-             swap, PoC-verified), scroll-velocity title skew, odometer
-             digit-roll stats (Revelatio pattern), cursor spotlight layer,
-             clip-path row reveals, magnetic CTA. A11y discipline kept
-             from C43: keyboard-docked preview, reduced-motion parity,
-             mobile inline-thumb rows. Replaces Cycle-43 AwServices (kept
-             on disk for reference). */}
-      <StageServices />
+      {/* 6. SpiralServices — Cycle 45 NEW «Спираль». Full redesign per
+             user request: copy the activetheory.net spiral — service
+             cards arranged in a 3D helix that descends and rotates as
+             the user scrolls. Research C45-R1 confirmed AT's homepage is
+             a WebGL/Three.js scene with `scrollProgress` + `scrollCamera`
+             driving a 3D helix where cards descend past the camera (the
+             Cartier 365ayearof SOTM uses the same archetype, already in
+             INSPIRATION.md).
+
+             IMPLEMENTATION: CSS 3D transforms (transform-style:
+             preserve-3d + perspective) — no Three.js/R3F added (keeps
+             bundle light, RULES §5 transform/opacity-only compliant).
+             Framer Motion useScroll + useTransform drive the helix
+             group's rotateY (1.5 turns across scroll range) and y
+             (camera descends through the spiral — the "spiral moves
+             down" feel). 12 cards statically positioned on the helix
+             via translate3d(R·cos θ, y_i, R·sin θ) rotateY(-θ); per-card
+             opacity dims cards on the back of the cylinder (we see only
+             the front-facing cards — the spiral's signature visual).
+
+             CONTENT: 12 services — 7 primary scenes from Cycle-44
+             StageServices + 5 of 6 extras. Same validated copy, prices,
+             media, CTAs.
+
+             A11Y: <section aria-labelledby>; every card is a real <a
+             href="#calculator|#contact"> (keyboard, middle-click, SEO);
+             prefers-reduced-motion renders a clean vertical list
+             variant with same content + CTAs; mobile (≤820px) replaces
+             the 3D stage with a CSS vertical list (12 absolute 3D cards
+             is janky on narrow mobile GPUs). Active-card HUD updates
+             with scroll (AT-style technical readout). Replaces Cycle-44
+             StageServices (kept on disk per repo convention). */}
+      <SpiralServices />
 
       {/* 7. Menu — 7 menu types with interactive list + real dishes + PDF. */}
       <Menu />
