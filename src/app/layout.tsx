@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed, Montserrat, Prata, Nothing_You_Could_Do, Lato, Marck_Script } from "next/font/google";
+import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed, Montserrat, Prata, Nothing_You_Could_Do, Lato, Marck_Script, Neucha } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -133,6 +133,15 @@ const lato = Lato({
 const marck = Marck_Script({
   variable: "--font-marck",
   subsets: ["latin", "latin-ext", "cyrillic"],
+  weight: ["400"],
+  display: "swap",
+});
+
+// Cycle 53: Neucha — the elegant Cyrillic handwriting (neat pen vs Marck's
+// school loops) for the services catalog's script titles.
+const neucha = Neucha({
+  variable: "--font-neucha",
+  subsets: ["latin", "cyrillic"],
   weight: ["400"],
   display: "swap",
 });
@@ -323,7 +332,7 @@ export default function RootLayout({
     <html
       lang="ru"
       suppressHydrationWarning
-      className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} ${prata.variable} ${nothingYouCouldDo.variable} ${lato.variable} ${marck.variable}`}
+      className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} ${prata.variable} ${nothingYouCouldDo.variable} ${lato.variable} ${marck.variable} ${neucha.variable}`}
     >
       <head>
         {/* Preconnect hints for external domains */}

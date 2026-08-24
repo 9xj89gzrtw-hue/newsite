@@ -8,7 +8,7 @@
  * so the catalog splits into TWO racks of six, the second below the first:
  *
  *   Rack A «Форматы события»        01–06  (фуршеты → барбекю)
- *   Rack B «Сервисы и дополнения»   07–12  (бар → логистика)
+ *   Rack B «К любому формату»        07–12  (бар → логистика)
  *
  * Six spines per rack give the open panel ~71% of the rack width —
  * gamma-grade cinema (the 12-spine rack could only reach 67% while keeping
@@ -116,10 +116,10 @@ const SERVICES: HaccService[] = [
     id: "furshety",
     index: "01",
     title: "Фуршеты",
-    hook: "Канапе, welcome-коктейли и подача, которая не останавливается ни на минуту.",
+    hook: "Канапе — тёплыми, коктейли — ледяными: подача не прерывается весь вечер.",
     price: "от 1\u00A0600\u00A0₽",
     priceLabel: "за гостя",
-    tag: "Базовая подача",
+    tag: "Классическая подача",
     tint: "#F5EEE2",
     media: "/media/gamma/c49-furshet-hires.jpg",
     mediaAlt: "Фуршетные закуски и канапе на подаче",
@@ -130,10 +130,10 @@ const SERVICES: HaccService[] = [
     id: "bankety",
     index: "02",
     title: "Банкеты",
-    hook: "Полная посадка: от аперитива до десерта — официанты, сомелье и тайминг до минуты.",
+    hook: "От аперитива до десерта вечер идёт по нотам — горячее подают горячим.",
     price: "от 3\u00A0500\u00A0₽",
     priceLabel: "за гостя",
-    tag: "Премиум",
+    tag: "Полная посадка",
     tint: "#F6E0DB",
     media: "/media/gamma/c49-banket-hires.jpg",
     mediaAlt: "Банкетный ужин в зале с полным накрытием столов",
@@ -144,13 +144,13 @@ const SERVICES: HaccService[] = [
     id: "svadby",
     index: "03",
     title: "Свадьбы",
-    hook: "Выездная регистрация, банкет и торт — одна команда отвечает за весь день.",
+    hook: "От утреннего кофе до ночного торта — весь день ведёт одна команда.",
     price: "от 5\u00A0500\u00A0₽",
     priceLabel: "за гостя",
     tag: "Под ключ",
     tint: "#E6EBDF",
-    media: "/media/gamma/c49-svadby-hires.webp",
-    mediaAlt: "Свадебный банкет с сервировкой и декором",
+    media: "/media/c53/svadby.webp",
+    mediaAlt: "Свадебный банкет при свечах с сервировкой столов",
     ctaLabel: "Обсудить свадьбу",
     ctaHref: "#contact",
   },
@@ -158,27 +158,27 @@ const SERVICES: HaccService[] = [
     id: "korporativ",
     index: "04",
     title: "Корпоратив",
-    hook: "Конференции, форумы и гала-ужины: кофе-брейки, фуршеты и полный техтайминг.",
+    hook: "Кофе — к первому перерыву, гала-ужин — к финалу: тайминг сходится до минуты.",
     price: "от 2\u00A0500\u00A0₽",
     priceLabel: "за гостя",
     tag: "B2B",
     tint: "#F6E9C9",
     media: "/media/gamma/c49-korporativ-hires.webp",
     mediaAlt: "Корпоративный гала-ужин с сервировкой",
-    ctaLabel: "Запросить смету",
+    ctaLabel: "Получить смету",
     ctaHref: "#contact",
   },
   {
     id: "kofe-breyki",
     index: "05",
     title: "Кофе-брейки",
-    hook: "Горячее в термоупаковке к 12:00 — каждый день или к вашей дате.",
+    hook: "Выпечка ещё тёплая, кофе пахнет на весь этаж — к нужному часу.",
     price: "от 450\u00A0₽",
     priceLabel: "за гостя",
     tag: "Офис",
     tint: "#F4DECD",
-    media: "/media/menu-coffee-break.jpg",
-    mediaAlt: "Кофе-брейк с выпечкой и горячими напитками",
+    media: "/media/c53/kofe.webp",
+    mediaAlt: "Кофе-брейк: стойка с выпечкой, фруктами и кофе",
     ctaLabel: "Заказать кофе-брейк",
     ctaHref: "#calculator",
   },
@@ -191,8 +191,8 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "На природе",
     tint: "#F3E3E8",
-    media: "/media/talkofthetown/talkofthetown-section-paella-station.jpg",
-    mediaAlt: "Гриль-станция с живым огнём на мероприятии",
+    media: "/media/c53/ribay.webp",
+    mediaAlt: "Шеф готовит стейки на гриле с живым огнём",
     ctaLabel: "Рассчитать барбекю",
     ctaHref: "#calculator",
   },
@@ -200,13 +200,13 @@ const SERVICES: HaccService[] = [
     id: "bar",
     index: "07",
     title: "Выездной бар",
-    hook: "Коктейли, моктейли и винная подача: бармены, лёд, бокалы и настроение.",
+    hook: "Шейкер звенит, бокалы ледяные — бар живёт до последнего тоста.",
     price: "от 900\u00A0₽",
     priceLabel: "за гостя",
     tag: "Миксология",
     tint: "#F5EEE2",
-    media: "/media/gamma/c49-bar-hires.webp",
-    mediaAlt: "Аперитив и винная подача на выездном баре",
+    media: "/media/c53/bar.webp",
+    mediaAlt: "Бармен наливает коктейль за выездной барной стойкой",
     ctaLabel: "Обсудить бар",
     ctaHref: "#contact",
   },
@@ -214,27 +214,27 @@ const SERVICES: HaccService[] = [
     id: "shou-stancii",
     index: "08",
     title: "Шоу-станции",
-    hook: "Поке, паста, карвинг и тако: гости смотрят, как рождается блюдо.",
+    hook: "Кухня выходит к столу: паста в облаке пара, карвинг под ножом шефа.",
     price: "от 1\u00A0800\u00A0₽",
     priceLabel: "за гостя",
-    tag: "Live cooking",
+    tag: "Живая кухня",
     tint: "#F6E0DB",
-    media: "/media/gamma/c49-shou-hires.webp",
-    mediaAlt: "Шеф-повара у шоу-станции с презентацией блюд",
-    ctaLabel: "Запросить шоу-станции",
+    media: "/media/c53/live.webp",
+    mediaAlt: "Шеф-повар за живой кухней в облаке пара",
+    ctaLabel: "Обсудить станции",
     ctaHref: "#contact",
   },
   {
     id: "gastro-boksy",
     index: "09",
     title: "Гастро-боксы",
-    hook: "6–8 видов канапе, упакованных порционно, — к нужному часу.",
+    hook: "Банкет, который помещается в коробке, — каждому гостю лично.",
     price: "от 650\u00A0₽",
     priceLabel: "за гостя",
     tag: "Доставка",
     tint: "#E6EBDF",
-    media: "/media/menu-snack-box.jpg",
-    mediaAlt: "Гастро-боксы с порционными закусками",
+    media: "/media/c53/boksy.webp",
+    mediaAlt: "Кейтеринг-боксы с закусками и десертами",
     ctaLabel: "Заказать боксы",
     ctaHref: "#calculator",
   },
@@ -247,8 +247,8 @@ const SERVICES: HaccService[] = [
     priceLabel: "за торт",
     tag: "Десерт",
     tint: "#F6E9C9",
-    media: "/media/concorde-dessert.jpg",
-    mediaAlt: "Многоярусный свадебный торт с ягодами",
+    media: "/media/c53/tort.webp",
+    mediaAlt: "Двухъярусный торт с клубникой, малиной и ежевикой",
     ctaLabel: "Обсудить торт",
     ctaHref: "#contact",
   },
@@ -256,14 +256,14 @@ const SERVICES: HaccService[] = [
     id: "veg-halal",
     index: "11",
     title: "Вегетарианское и халяль",
-    hook: "Сертифицированные поставки и овощи как главные герои.",
+    hook: "Сертификат — на халяль, сезонные овощи — в главную роль.",
     price: "от 1\u00A0900\u00A0₽",
     priceLabel: "за гостя",
-    tag: "Спецдиета",
+    tag: "Особые меню",
     tint: "#F4DECD",
     media: "/media/ridgewells-veg-mosaic.jpg",
     mediaAlt: "Овощная мозаика вегетарианского меню",
-    ctaLabel: "Запросить меню",
+    ctaLabel: "Получить меню",
     ctaHref: "#contact",
   },
   {
@@ -272,8 +272,8 @@ const SERVICES: HaccService[] = [
     title: "Логистика под ключ",
     hook: "Посуда, мебель, текстиль, декор: привезли — сервировали — забрали.",
     price: "под проект",
-    priceLabel: "оценка за 1 день",
-    tag: "Под ключ",
+    priceLabel: "смета за один день",
+    tag: "Всё, кроме еды",
     tint: "#F3E3E8",
     media: "/media/gamma/c49-logistika-hires.webp",
     mediaAlt: "Сервировка и логистика крупного мероприятия",
@@ -285,7 +285,7 @@ const SERVICES: HaccService[] = [
 /** The semantic split: event formats vs services & extras. */
 const GROUPS: { label: string; range: string }[] = [
   { label: "Форматы события", range: "01–06" },
-  { label: "Сервисы и дополнения", range: "07–12" },
+  { label: "К любому формату", range: "07–12" },
 ];
 
 const GROUP_SIZE = 6;
@@ -719,8 +719,8 @@ function HaccRack({
                   <span className="hacc__tag">{s.tag}</span>
                   <p className="hacc__title">{s.title}</p>
                   <span className="hacc__price">
-                    <small>{s.priceLabel}</small>
                     {s.price}
+                    <small>{s.priceLabel}</small>
                   </span>
                 </div>
 
@@ -882,15 +882,14 @@ export function HaccServices() {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <div className="hacc__head-text">
-            <span className="ea-eyebrow">Услуги · 12 форматов</span>
+            <span className="ea-eyebrow">Форматы и сервисы · 01–12</span>
             <h2 id="hacc-heading" className="ea-section-h2">
-              {"Меню события начинается с "}
-              <i className="ea-italic-fragment">формата</i>
-              {"."}
+              {"Сначала формат. "}
+              <i className="ea-italic-fragment">Потом меню.</i>
             </h2>
             <p className="hacc__lede">
               От кофе-брейка на двадцать персон до свадьбы на пятьсот гостей:
-              раскройте формат — увидите кухню, команду и цену за гостя.
+              раскройте формат — увидите меню, команду и цену за гостя.
             </p>
           </div>
           {/* live counter HUD — the big index mirrors the big H2 on the left
@@ -925,7 +924,7 @@ export function HaccServices() {
             </div>
             <span className="hacc__hint" aria-hidden="true">
               <MousePointer2 aria-hidden="true" />
-              Щёлкните по корешку — формат раскроется
+              Троньте корешок — формат развернётся
             </span>
           </div>
         </motion.div>

@@ -396,9 +396,9 @@
 }
 
 .hacc__title {
-  font-family: var(--font-marck), cursive;
+  font-family: var(--font-neucha), var(--font-marck), cursive;
   font-weight: 400;
-  font-size: clamp(2.2rem, 2.9vw, 3.6rem);
+  font-size: clamp(2.3rem, 3vw, 3.8rem);
   line-height: 1.08;
   text-align: center;
   color: var(--hacc-ink);
@@ -424,6 +424,7 @@
   text-overflow: ellipsis;
 }
 
+/* cycle-53 m2: natural RU order — the number first, the unit label under it */
 .hacc__price small {
   display: block;
   font-family: var(--ea-font-eyebrow), sans-serif;
@@ -432,7 +433,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--hacc-soft);
-  margin-bottom: 0.25rem;
+  margin: 0.2rem 0 0;
 }
 
 /* ── media — perpetual Ken Burns drift + unifying grade ── */
@@ -490,11 +491,20 @@
   flex: none;
 }
 
+/* AA fix (cycle-53 C3): the bright red on pastel tints is 3.5–3.9:1 —
+   deepen to --ea-red-deep (5.9:1) for text AND border; the hover fill
+   follows so the wash stays one hue. */
 .hacc__cta {
   flex: none;
   min-height: 44px;          /* touch target (RULES §7) */
   padding-inline: 1.6rem;
   white-space: nowrap;
+  color: var(--hacc-red-deep);
+  border-color: var(--hacc-red-deep);
+}
+
+.hacc__cta::before {
+  background: var(--hacc-red-deep);
 }
 
 .hacc__cta svg {
@@ -510,7 +520,9 @@
 
 .hacc__hook {
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: clamp(0.9rem, 1vw, 0.98rem);
+  /* cycle-53 m1: the panel's main selling line was smaller than the price —
+     give it editorial weight */
+  font-size: clamp(0.95rem, 1.15vw, 1.08rem);
   line-height: 1.55;
   color: var(--hacc-soft);
   max-width: 46ch;
@@ -575,9 +587,9 @@
   .hacc__spine-title-text {
     writing-mode: horizontal-tb;
     transform: rotate(-4deg);
-    font-family: var(--font-marck), cursive;
+    font-family: var(--font-neucha), var(--font-marck), cursive;
     font-weight: 400;
-    font-size: 1.7rem;
+    font-size: 1.8rem;
     letter-spacing: 0;
     text-transform: none;
     max-height: none;
