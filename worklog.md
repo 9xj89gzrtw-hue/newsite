@@ -2231,3 +2231,36 @@ Stage Summary:
 - The activetheory.net spiral archetype delivered: 12 cards in a 3D helix that descends + rotates as user scrolls, with true depth-of-field blur on back cards, atmospheric dark scene + ground grid + ambient gold-dust particles, glassmorphism HUD showing active card, mega counter with slot-machine glow, title that fades when cards pass through center.
 - VLM /loop converged: 2-4/10 (v1) → 7.4/10 (v2) → 8.0/10 (v3) → 8.5/10 (v4 SOTD contender). 3 critique cycles, each finding + fixing real issues.
 - New pitfalls for AGENTS.md §21: (1) CSS overflow:hidden on PARENT of position:sticky breaks sticky — move overflow to a child element instead; (2) display:grid on a positioned ancestor makes grid-cell the containing block for absolute children (offsetting them by their grid cell) — use display:flex for correct padding-box containing block; (3) Framer Motion `style={{ transform: '...' }}` static string + MotionValue-based transform props (scale, x, y, z, rotateY) → Framer OVERRIDES the static transform. Use individual x/y/z/rotateY MotionValue-or-number props instead so Framer composes them all into ONE 3D transform that preserves preserve-3d; (4) Framer Motion's rotateY expects DEGREES not radians — convert with `* 180 / Math.PI` or `* 360` for full turns; (5) For helix layout with phase offset π/2, card 0 starts at FRONT (+Z axis toward camera). Without phase offset, card 0 starts on +X axis (right side) and viewport center is empty; (6) Linear `blur:` filter (e.g. 0-5px) is imperceptible on near-front cards. Use piecewise with 2px floor: 0 if facingFactor > 0.92 else 2 + (1 - facingFactor) * 7; (7) devIndicators: false in next.config.ts removes the Next.js 'N issues' dev badge (looked like a browser error in screenshots) — requires pm2 restart to take effect; (8) Active-card HUD math (frontCardIdx): for NEGATIVE rotation -p·TURNS·2π + PHASE π/2 + stepAngle_i, card i is at front at p = i/(N-1) (clean linear cycling 0→N-1). Verifies HUD + counter stay in sync with actual front card; (9) Particle systems: deterministic pseudo-random positions via Math.sin seed (no hydration mismatch) — `seed = (n) => ((Math.sin(n * 12.9898) * 43758.5453) % 1 + 1) % 1`. Precompute at module load, not in component render; (10) For dark-mode sections: mix-blend-mode: screen on the ground grid so warm spotlight ILLUMINATES the floor (decoration → structural light-catcher). Without screen blend, the grid is invisible against the dark bg.
+
+---
+Task ID: cycle-46
+Agent: main (Z.ai Code)
+Task: User report: "у тебя вообще не получилось, все супер-криво отображается" — the Cycle-45 spiral rendered broken on the user's real screen. Full investigation + clean-room rewrite of the services spiral.
+
+Work Log:
+- Local env had been reset (newsite clone gone). Re-cloned repo, bun install, prisma generate, pm2 start ecosystem.config.js (port 3001, parent sandbox owns 3000).
+- Reproduced the breakage via agent-browser screenshots at p=0/.5/1 + VLM hostile critique: "random scatter plot, not a spiral" — chaotic Z positions, inconsistent rotation axes, skewed unreadable text, no depth cues, background text bleeding through cards.
+- Root causes identified in v2–v4 code: (1) Framer Motion MotionValue transforms fighting static CSS 3D transforms (known pitfall §21-3, still present); (2) helix math split between cos/sin placement and a separate rotateY phase — cards never faced the camera cleanly; (3) 817 LOC tsx + 988 LOC CSS over-engineered, self-contradictory (undefined --sp-golos var, etc.).
+- CLEAN-ROOM REWRITE (spiral v5): deleted both files, wrote from scratch (~470 tsx + ~560 css, net −621 LOC):
+  - ONE rAF loop owns all animation (no Framer Motion at all): reads scroll via section.getBoundingClientRect(), lerps progress p (exp-decay, ~0.6s settle), writes transform on the single .sp__world group + opacity/filter on each card's INNER wrapper. Zero transform conflicts by construction.
+  - Classic 3D-carousel chain per card (set once per layout): translate(-50%,-50%) rotateY(θi) translateZ(R) translateY(−i·pitch) — θi = i·60° (TURNS=2), R = clamp(300, 31vw, 500). Group per frame: translate3d(0, p·descent, 0) rotateY(−p·TOTAL_ROT). Card i is dead-center facing camera exactly at p = i/(N−1) — descent and rotation perfectly synced.
+  - Pitch derived FROM rendered section height ((H − vh)/(N−1)) so CSS height (580vh) and JS motion can never drift.
+  - Depth cues per frame from frontness f = cos(θi + rot): opacity 0.05+0.95·f^2.4 (steep), blur (1−f)^1.4·11px, brightness/saturate falloff, vertical fade |wy| > 0.58vh. Back-of-cylinder ghosts at 4% — AT signature.
+  - Layers: spot/gradient bg (z0) → mega serif "Услуги" (z0, parallax 10% of descent) → helix world (z2, preserve-3d, NO grouping properties) → cinematic edge vignette ABOVE cards (z5) → HUD (z5, DOM later) → eyebrow (z6).
+  - HUD: Barlow counter 01/12 + active service name + red progress bar. BUG FIXED (found in /loop): angle-argmax active-card detection TIES after 1+ turns (cos(−371°) == cos(−11°)) — replaced with round(p·(N−1)), unambiguous by construction.
+  - Mouse parallax ±1.5–2.2° on pointer:fine. IntersectionObserver pauses work out of view. firstFrame p-jump prevents mid-page-reload animation from 0.
+  - Mobile ≤820px / prefers-reduced-motion: CSS-only swap to editorial list variant (IO-revealed), no JS branching → no hydration mismatch. Cyrillic-safe fonts only: Playfair (--font-serif), Barlow Semi Condensed (--font-barlow), Lato (--font-lato).
+- /loop verification (4 critique rounds):
+  - R1: 8–9/10 but counter desync + bottom-edge clipping → fixed round(p·(N−1)) + vfade 0.58vh.
+  - R2 (7 positions): all clean, WOW 7.5–8.5 → wanted more rotation/DoF/parallax.
+  - R3: TURNS 1.5→2 (60° steps), steep falloff curves, mega-title parallax → avg 8.7/10.
+  - R4 final: + cinematic vignette overlay (hides frustum clipping) → **9/10 on ALL 5 positions, zero defects**.
+  - MOTION verified via recorded webm→mp4 + video-understand VLM: "smooth, no glitches, counter perfectly synced, 9/10 — Awwwards/SOTD-level execution".
+  - Mobile 390px: list variant clean, 8/10 (docked only for site-level cookie banner — out of scope).
+  - Rapid-scroll stress (7 random jumps @180ms): no NaN, counter settled correct, no console/page errors.
+- bun run lint green; bun run typecheck green. pm2 interfood-catering-dev :3001 stable throughout.
+
+Stage Summary:
+- Rewritten: src/components/catering/spiral-services.tsx + spiral-services.css (v5, net −621 LOC vs v4).
+- The activetheory.net spiral now ACTUALLY works: one card front-and-center sharp at every scroll step, others dimmed/blurred winding around the vertical axis, spiral descends as you scroll (per user's brief), HUD/counter perfectly synced.
+- KEY LESSON for future cycles: the previous 45-cycle "convergence" (VLM 8.5/10) was measured on its own screenshots and missed real-screen breakage. Clean-room rewrite with the classic carousel transform chain + single rAF owner beats debugging 1.8k LOC of conflicting transforms. VLM screenshots must be taken at MULTIPLE scroll positions INCLUDING mid-motion (video), and angle-argmax is ambiguous for multi-turn helixes — use position-based indexing.

@@ -1,97 +1,57 @@
 "use client";
 
 /**
- * SpiralServices — Cycle 45. «Спираль» (The Spiral).
+ * SpiralServices — «Спираль» v5 (full rewrite).
  * ---------------------------------------------------------------------------
  *
- * REDESIGN RATIONALE: the user explicitly asked to copy the
- * activetheory.net spiral — service cards arranged in a 3D helix that
- * descends and rotates as the user scrolls. Research C45-R1 (web search +
- * bundle analysis) confirmed AT's homepage is a WebGL/Three.js scene with
- * `scrollProgress` + `scrollCamera` driving a 3D helix where cards descend
- * past the camera. The Cartier `365ayearof` SOTM (already in our
- * INSPIRATION.md) uses the same archetype.
+ * WHY THE REWRITE: v2–v4 (Cycle 45) rendered broken — cards scattered,
+ * text skewed unreadable, transform conflicts between Framer Motion and
+ * CSS. Root causes: (1) Framer `useTransform` writing `transform` on the
+ * same elements that also carried static CSS 3D transforms, (2) helix
+ * math mixing cos/sin placement with a separate rotateY phase, (3) 988
+ * lines of CSS fighting itself. This version is a clean-room rewrite.
  *
- * IMPLEMENTATION (per research §2, "Pattern B — CSS 3D transforms"):
- *   - CSS `transform-style: preserve-3d` + `perspective` for true 3D depth
- *     (no Three.js/R3F dependency added — keeps bundle light, complies
- *     with RULES §5 "transform/opacity only").
- *   - Framer Motion `useScroll` + `useTransform` drive the helix group's
- *     `rotateY` (one-and-a-half turns across the scroll range) and `y`
- *     (camera descends through the spiral — the "spiral moves down" feel).
- *   - Each card is statically positioned on the helix via
- *     `translate3d(R·cos θ, y_i, R·sin θ) rotateY(-θ)` — the canonical
- *     helix layout from research §4. y_i is centered around the helix's
- *     midpoint so the spiral is vertically balanced.
- *   - Per-card opacity (per-card `useTransform` in <SpiralCard>) dims cards
- *     on the back of the cylinder — we see only the front-facing cards,
- *     which is the spiral's signature visual.
- *   - Active-card HUD ("01 / 12 — Фуршеты") updates with scroll, AT-style.
+ * ARCHITECTURE (bulletproof by construction):
+ *   - ONE rAF loop owns ALL animation. It reads scroll once per frame
+ *     (`getBoundingClientRect` on the section — no offsetTop walking),
+ *     lerps progress for buttery trailing motion, and writes:
+ *       • `transform` on the single `.sp__world` group,
+ *       • `opacity` + `filter` on each card's INNER wrapper (depth cues).
+ *     No Framer Motion. No CSS transitions on 3D elements. No conflicts.
+ *   - Cards are positioned ONCE per layout on the classic 3D-carousel
+ *     chain: `translate(-50%,-50%) rotateY(θi) translateZ(R) translateY(yi)`
+ *     which places card i on a vertical helix of radius R, facing outward,
+ *     at height −i·pitch (the helix ascends; the world descends on scroll,
+ *     so the spiral visually MOVES DOWN past the camera — per user brief).
+ *   - Group transform per frame: `translate3d(0, ty, 0) rotateY(rot)` where
+ *     ty = p·(N−1)·pitch and rot = −p·(N−1)·Δθ. Card i is dead-center
+ *     facing the camera exactly when p = i/(N−1) — perfect sync of
+ *     descent + rotation. This is the activetheory.net archetype.
+ *   - Depth cues per frame from world angle α = θi + rot:
+ *       frontness f = cos α  →  opacity, blur, brightness, saturate.
+ *     Cards on the back of the cylinder dim to ~4% (ghost spiral receding
+ *     into the dark — AT's signature), the front card is tack sharp.
+ *   - Real z-buffering: `transform-style: preserve-3d` on the world; the
+ *     group carries NO overflow/filter/opacity (flattening hazards), those
+ *     live on inner wrappers only.
+ *   - Mouse parallax (±1.5°) on pointer:fine devices — subtle life.
+ *   - HUD: mono-style counter `01 / 12` + active service name + progress
+ *     bar, updated only on index change (no layout thrash).
+ *   - Mobile ≤820px / prefers-reduced-motion: CSS swaps the 3D stage for
+ *     a clean editorial list (IO-revealed). No JS branching → no hydration
+ *     mismatch.
  *
- * CONTENT: 12 services — the 7 primary scenes from Cycle-44 StageServices
- * + 5 of the 6 «Ещё услуги» extras (logistics kept for the closing slot).
- * Same validated copy, prices, media, and CTA targets as StageServices.
- *
- * ACCESSIBILITY (AGENTS.md §5 #7 + §8):
- *   - <section aria-labelledby>; mega-title has the linked id.
- *   - Every card is a real <a href="#calculator|#contact"> (keyboard, middle-
- *     click, SEO) — the entire card surface is the link.
- *   - `prefers-reduced-motion`: renders a clean vertical list variant with
- *     the same content, same CTAs, same heading (NO 3D, NO transforms).
- *   - Mobile (≤820px) also renders the vertical list — CSS 3D transforms on
- *     a 360px-wide viewport with 12 absolute cards is janky; the list is the
- *     better UX. (AT itself falls back to a stacked list on mobile.)
- *   - Card photos use <SmartImage> (next/image) with explicit alt + sizes.
- *
- * MOTION (RULES §5 — transform/opacity only):
- *   - Helix group: rotateY + y driven by scrollYProgress (two MotionValues,
- *     composed by Framer Motion into a single GPU-friendly transform).
- *   - Per-card opacity: useTransform on scrollYProgress, cosine-based facing
- *     factor → 0.18..1.0 range. will-change on the helix + cards only.
- *   - Title: clip-path reveal on enter (Reveal pattern, already in
- *     motion/reveal.tsx — reused here inline for the eyebrow + subtitle).
- *
- * Self-contained: scoped CSS in ./spiral-services.css (`sp-st__*` classes).
- * Swaps StageServices in page.tsx (both kept on disk per repo convention).
+ * CONTENT: 12 services — validated copy, prices, media, CTAs (unchanged).
+ * A11Y: <section aria-labelledby>; cards are real <a> links; HUD duplicated
+ * info is aria-hidden; images carry alt text.
  */
 
-import { useRef } from "react";
-import Link from "next/link";
-import { Unbounded, Golos_Text } from "next/font/google";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-  type MotionValue,
-} from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
-
-import { SmartImage } from "@/components/media/smart-image";
-
+import { useEffect, useRef, useState } from "react";
 import "./spiral-services.css";
 
-/* ----------------------------------------------------------------- tokens -- */
+/* -------------------------------------------------------------- content --- */
 
-/** Unbounded — variable wght 200–900, full Cyrillic (display/kinetic type). */
-const unbounded = Unbounded({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "600", "800"],
-  variable: "--sp-unb",
-  display: "swap",
-});
-
-/** Golos Text — Russian-designed neo-grotesk (body/UI/meta). */
-const golos = Golos_Text({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600"],
-  variable: "--sp-golos",
-  display: "swap",
-});
-
-/* ------------------------------------------------------------------- data --- */
-
-type SpiralItem = {
+interface SpiralItem {
   id: string;
   index: string;
   title: string;
@@ -102,15 +62,9 @@ type SpiralItem = {
   mediaAlt: string;
   ctaLabel: string;
   ctaHref: string;
-};
+}
 
-/**
- * 12 services — 7 primary scenes (Cycle-44 StageServices) + 5 extras.
- * Same validated content, prices, media, CTAs. Re-shaped for the spiral:
- * every entry carries an `index` (01..12) and a short uppercase `tag` for
- * the card's accent chip.
- */
-const SPIRAL: SpiralItem[] = [
+const SERVICES: SpiralItem[] = [
   {
     id: "furshety",
     index: "01",
@@ -257,560 +211,376 @@ const SPIRAL: SpiralItem[] = [
   },
 ];
 
-/* ----------------------------------------------------------- helix math --- */
+/* ------------------------------------------------------------ helix math --- */
 
-const N = SPIRAL.length; // 12
-const TURNS = 1; // 1 full revolution of the helix across the scroll range
-                 // (clean linear cycling: card i is at front at p = i/(N-1))
-const R = 300; // helix radius, px (card center distance from central axis)
-const H_STEP = 105; // vertical step per card, px (card-center spacing).
-                   // v2 lowered from 130 → 105 to fit more cards in the
-                   // viewport vertically (6 visible at p=0 instead of 4,
-                   // per critique C1 §A that said "feels flat at start").
+const N = SERVICES.length; // 12 cards
+const TURNS = 2; // helix windings across the whole scroll range
+const STEP_DEG = (TURNS * 360) / N; // 60° between consecutive cards
+const TOTAL_ROT = STEP_DEG * (N - 1); // total world rotation, degrees
+const FINE_POINTER = "(pointer: fine)";
+const LIST_MODE = "(max-width: 820px), (prefers-reduced-motion: reduce)";
 
-/** Phase offset so card 0 starts at the FRONT of the cylinder (facing the
- *  camera, on the +Z axis). Without this, card 0 would start on the +X
- *  axis (right side) and the viewport center would be empty. */
-const PHASE = Math.PI / 2;
+const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
-/**
- * Static helix layout for card i.
- *
- * Geometry (per research §4, with phase offset fix):
- *   - stepAngle_i = (i / (N-1)) · TURNS · 2π  (angular step from card 0)
- *   - θ_i = PHASE + stepAngle_i  (actual angular position, starts at π/2)
- *   - x = R · cos(θ_i)  (horizontal position around the Y axis)
- *   - z = R · sin(θ_i)  (depth — +z is toward camera, -z is behind helix)
- *   - y = (i - (N-1)/2) · H_STEP  (centered around helix midpoint, so card 0
- *     is at the top and card N-1 is at the bottom of the helix's vertical
- *     extent)
- *   - rotY = -stepAngle_i  (= π/2 - θ_i — face outward, so the card's
- *     normal points away from the central axis. Verified: for card 0 with
- *     θ_0 = π/2, rotY = 0 → card faces +Z (default) = outward = toward
- *     camera. ✓)
- *
- * The `angle` returned is θ_i (with phase offset), so the per-card opacity
- * calc in <SpiralCard> can use the full effective angle directly.
- */
-function spiralLayout(i: number) {
-  const stepAngle = (i / (N - 1)) * TURNS * Math.PI * 2;
-  const θ = PHASE + stepAngle;
-  const y = (i - (N - 1) / 2) * H_STEP;
-  const x = Math.cos(θ) * R;
-  const z = Math.sin(θ) * R;
-  const rotY = -stepAngle;
-  return { x, y, z, rotY, angle: θ };
-}
-
-/* -------------------------------------------------------- per-card shell --- */
-
-/**
- * SpiralCard — one card on the helix.
- *
- * Static transform places it on the helix (translate3d + rotateY). Dynamic
- * opacity (per-card useTransform on scrollYProgress) dims it when it's on
- * the back of the cylinder — we see only the front-facing cards (the
- * spiral's signature visual).
- *
- * The whole card is wrapped in an <a> so it's keyboard-focusable and the
- * click navigates to the CTA target (calculator or contact). The inner
- * motion.article animates opacity only — the link wraps it for hit-area.
- */
-function SpiralCard({
-  item,
-  i,
-  scrollYProgress,
-}: {
-  item: SpiralItem;
-  i: number;
-  scrollYProgress: MotionValue<number>;
-}) {
-  const { x, y, z, rotY, angle } = spiralLayout(i);
-
-  /**
-   * Facing factor: 1.0 when the card is at the FRONT of the cylinder
-   * (effective angle ≈ π/2 — closest to camera on +Z), 0.0 when at the
-   * BACK (effective angle ≈ 3π/2 — furthest from camera on -Z).
-   *
-   * effective_angle = card_local_angle_θ + group_rotation
-   * group_rotation = -scroll · TURNS · 2π  (NEGATIVE — clean linear
-   *   cycling: card i is at front at p = i/(N-1), so cards come to front
-   *   in order 0, 1, 2, ..., 11 as user scrolls)
-   *
-   * facing = sin(effective_angle) — peaks at π/2 (front), troughs at 3π/2
-   * (back). Maps to opacity 0.18..1.0 so back cards fade out gracefully.
-   */
-  const opacity = useTransform(scrollYProgress, (p) => {
-    const groupRot = -p * TURNS * Math.PI * 2;
-    const eff = angle + groupRot;
-    // Normalize to [-π, π]
-    let norm = ((eff % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-    if (norm > Math.PI) norm -= 2 * Math.PI;
-    const facing = Math.sin(norm); // 1 at π/2 (front), -1 at -π/2 (back)
-    // Stronger falloff than v1: 0.08..1.0 (back cards almost invisible,
-    // giving the cylinder a true depth-of-field read instead of a flat
-    // stack — per design critique C1 §Tier-A #2).
-    const o = 0.08 + 0.92 * ((facing + 1) / 2);
-    return Math.max(0.05, Math.min(1, o));
-  });
-
-  /**
-   * Card scale: stronger depth scale — cards at the front are full size
-   * (1.0), cards at the back shrink to 0.62 (back of cylinder appears
-   * further from camera). v1 was 0.85..1.0 (too tame — back cards read
-   * as "layout mistake" per critique C1).
-   */
-  const scale = useTransform(scrollYProgress, (p) => {
-    const groupRot = -p * TURNS * Math.PI * 2;
-    const eff = angle + groupRot;
-    let norm = ((eff % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-    if (norm > Math.PI) norm -= 2 * Math.PI;
-    const facing = Math.sin(norm);
-    return 0.62 + 0.38 * ((facing + 1) / 2);
-  });
-
-  /**
-   * Depth-of-field filter (per critique C2 §Top-3 #2 — sqrt curve was
-   * wrong shape: it died at the extremes which are the most-screenshotted
-   * moments). v3 uses a PIECEWISE curve with a forced 2px floor on any
-   * card more than 2 indices from focal, so even near-front cards read
-   * as "optically out of focus" not "scaled copies" (critique C2 §1):
-   *
-   *   facingFactor: 1.0 at front (π/2), 0.0 at back (3π/2)
-   *   blur: 0px at exact-front → 2px FLOOR for everything else → 9px at
-   *     very back. Piecewise: 0 if facingFactor > 0.92, else linear.
-   *   saturate: 1.0 front → 0.25 back (stronger than v2's 0.4 so the
-   *     desaturation is unambiguously visible — v2's 0.4 was too mild).
-   *
-   * Filter chain ORDER MATTERS: `blur() saturate()` (this order) —
-   * saturate-after-blur, never the reverse. Critique C2 §4 flagged
-   * v2's saturate as "not visibly applying" — verified the order is
-   * correct here; the issue was the value was too mild (0.4 vs 0.25).
-   */
-  const filter = useTransform(scrollYProgress, (p) => {
-    const groupRot = -p * TURNS * Math.PI * 2;
-    const eff = angle + groupRot;
-    let norm = ((eff % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-    if (norm > Math.PI) norm -= 2 * Math.PI;
-    const facing = Math.sin(norm);
-    const facingFactor = (facing + 1) / 2; // 1 front, 0 back
-    // Piecewise: 0px at exact front (factor >= 0.92),
-    // linear 2..9px for everything else (forced floor so even
-    // near-front back cards read as "out of focus").
-    const blurPx =
-      facingFactor >= 0.92
-        ? 0
-        : 2 + (1 - facingFactor) * 7; // 2px floor → 9px at back
-    const sat = 0.25 + facingFactor * 0.75; // 0.25 back → 1.0 front
-    return `blur(${blurPx.toFixed(2)}px) saturate(${sat.toFixed(2)})`;
-  });
-
-  return (
-    <motion.div
-      className="sp-st__card"
-      style={{
-        // NOTE: do NOT use a static `transform: 'translate3d(...)'` string
-        // here — Framer Motion would override it with its own auto-composed
-        // transform for `scale` (and any other transform MotionValues),
-        // losing the 3D rotateY. Use individual x/y/z/rotateY values
-        // instead so Framer composes them all into ONE 3D transform that
-        // preserves `transform-style: preserve-3d` on the parent.
-        x,
-        y,
-        z,
-        rotateY: (rotY * 180) / Math.PI, // Framer Motion's rotateY expects degrees
-        opacity,
-        scale,
-        filter,
-      }}
-    >
-      <Link
-        href={item.ctaHref}
-        className="sp-st__card-link"
-        aria-label={`${item.title} — ${item.ctaLabel}`}
-      >
-        <article className="sp-st__card-inner">
-          <div className="sp-st__card-media">
-            <SmartImage
-              src={item.media}
-              alt={item.mediaAlt}
-              width={560}
-              height={700}
-              sizes="(max-width: 820px) 100vw, 320px"
-              className="sp-st__img"
-            />
-            <div className="sp-st__card-chrome">
-              <span className="sp-st__index">{item.index}</span>
-              <span className="sp-st__tag">{item.tag}</span>
-            </div>
-            <div className="sp-st__card-veil" aria-hidden="true" />
-          </div>
-          <div className="sp-st__card-body">
-            <h3 className="sp-st__card-title">{item.title}</h3>
-            <p className="sp-st__card-hook">{item.hook}</p>
-            <div className="sp-st__card-foot">
-              <span className="sp-st__price">{item.price}</span>
-              <span className="sp-st__cta">
-                {item.ctaLabel}
-                <ArrowUpRight className="sp-st__cta-icon" strokeWidth={1.6} />
-              </span>
-            </div>
-          </div>
-        </article>
-      </Link>
-    </motion.div>
-  );
-}
-
-/* -------------------------------------------------------- active-card HUD --- */
-
-/**
- * frontCardIdx — index of the card whose effective angle is closest to
- * the front position (π/2 — closest to camera on +Z axis). The effective
- * angle = card_local_angle + group_rotation. Used by the HUD and the
- * bottom counter so both stay in sync with the actual front card.
- */
-function frontCardIdx(p: number): number {
-  // group rotation is NEGATIVE for clean linear cycling (card i at front
-  // at p = i/(N-1))
-  const groupRot = -p * TURNS * Math.PI * 2;
-  let bestI = 0;
-  let bestDist = Infinity;
-  for (let i = 0; i < N; i++) {
-    // card's local angle (with phase offset, matches spiralLayout's θ)
-    const cardAngle = PHASE + (i / (N - 1)) * TURNS * Math.PI * 2;
-    let eff = cardAngle + groupRot;
-    // Normalize to [-π, π]
-    eff = ((eff % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-    if (eff > Math.PI) eff -= 2 * Math.PI;
-    // Distance to π/2 (front position)
-    let dist = Math.abs(eff - Math.PI / 2);
-    if (dist > Math.PI) dist = 2 * Math.PI - dist;
-    if (dist < bestDist) {
-      bestDist = dist;
-      bestI = i;
-    }
-  }
-  return bestI;
-}
-
-/**
- * ActiveCardHud — top-right corner readout showing the current front-facing
- * card's index, title, and tag. Updates with scrollYProgress (the front
- * card cycles through all N as the user scrolls). AT-style technical HUD.
- */
-function ActiveCardHud({
-  scrollYProgress,
-}: {
-  scrollYProgress: MotionValue<number>;
-}) {
-  const idx = useTransform(scrollYProgress, (p) => frontCardIdx(p));
-  const idxStr = useTransform(idx, (i) => SPIRAL[i].index);
-  const title = useTransform(idx, (i) => SPIRAL[i].title);
-  const tag = useTransform(idx, (i) => SPIRAL[i].tag);
-
-  return (
-    <motion.div className="sp-st__hud" aria-hidden="true">
-      <motion.span className="sp-st__hud-index">{idxStr}</motion.span>
-      <div className="sp-st__hud-divider" />
-      <div className="sp-st__hud-meta">
-        <motion.span className="sp-st__hud-title">{title}</motion.span>
-        <motion.span className="sp-st__hud-tag">{tag}</motion.span>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ============================================================= main ==== */
-
-/**
- * SpiralParticles — ambient gold-dust particles drifting in the dark
- * background (critique C3 §Top-1: 'add ambient particle dust that
- * gets brighter/larger when a card passes closest to camera').
- *
- * Implementation: 12 absolutely-positioned divs with CSS keyframe
- * animations (drift + pulse). Purely decorative (aria-hidden).
- * Positions are deterministic (precomputed array) so SSR + client
- * render match. Animation durations vary 12-26s so they don't sync.
- *
- * Performance: 12 elements with `transform` + `opacity` only —
- * RULES §5 compliant. will-change on the parent only.
- */
-const PARTICLES = Array.from({ length: 14 }, (_, i) => {
-  // Deterministic pseudo-random distribution (no hydration mismatch).
-  const seed = (n: number) => ((Math.sin(n * 12.9898) * 43758.5453) % 1 + 1) % 1;
-  return {
-    id: i,
-    left: `${(seed(i + 1) * 100).toFixed(2)}%`,
-    top: `${(seed(i + 11) * 100).toFixed(2)}%`,
-    size: 2 + Math.floor(seed(i + 21) * 4), // 2-5px
-    duration: 14 + Math.floor(seed(i + 31) * 14), // 14-28s
-    delay: `-${(seed(i + 41) * 8).toFixed(2)}s`, // -0..-8s (negative for instant start)
-    drift: 30 + Math.floor(seed(i + 51) * 50), // 30-80px drift
-  };
-});
-
-function SpiralParticles() {
-  return (
-    <div className="sp-st__particles" aria-hidden="true">
-      {PARTICLES.map((p) => (
-        <span
-          key={p.id}
-          className="sp-st__particle"
-          style={
-            {
-              left: p.left,
-              top: p.top,
-              width: `${p.size}px`,
-              height: `${p.size}px`,
-              animationDuration: `${p.duration}s`,
-              animationDelay: p.delay,
-              "--drift": `${p.drift}px`,
-            } as React.CSSProperties
-          }
-        />
-      ))}
-    </div>
-  );
-}
+/* -------------------------------------------------------------- component --- */
 
 export function SpiralServices() {
-  const ref = useRef<HTMLElement>(null);
-  const reduced = useReducedMotion();
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const worldRef = useRef<HTMLDivElement | null>(null);
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const megaRef = useRef<HTMLSpanElement | null>(null);
+  const counterRef = useRef<HTMLSpanElement | null>(null);
+  const nameRef = useRef<HTMLSpanElement | null>(null);
+  const barRef = useRef<HTMLDivElement | null>(null);
+  const hintRef = useRef<HTMLSpanElement | null>(null);
+  const [isDesktop, setIsDesktop] = useState(true);
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
+  // Track list/desktop mode so the rAF loop boots only when needed.
+  useEffect(() => {
+    const mq = window.matchMedia(LIST_MODE);
+    const update = () => setIsDesktop(!mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
-  /**
-   * Helix group rotation — NEGATIVE direction for clean linear cycling
-   * (card i is at front at p = i/(N-1), so cards come to front in order
-   * 0, 1, 2, ..., 11 as user scrolls — matches the descending Y order).
-   * Output in DEGREES (Framer Motion's rotateY expects degrees, not
-   * radians — verified the hard way: passing radians makes the helix
-   * appear to barely rotate, since 1 rad ≈ 57° looks "almost zero").
-   */
-  const rotateY = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [0, -TURNS * 360],
-  );
+  // Reveal-on-scroll for the list variant (mobile / reduced motion).
+  useEffect(() => {
+    if (isDesktop) return;
+    const list = sectionRef.current?.querySelector(".sp-list");
+    if (!list) return;
+    const items = Array.from(list.querySelectorAll(".sp-lcard"));
+    if (!("IntersectionObserver" in window)) {
+      items.forEach((el) => el.classList.add("is-in"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    items.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [isDesktop]);
 
-  /**
-   * Helix group Y translation — the helix moves UP as the user scrolls
-   * (camera effectively descends through the spiral). This is the
-   * "spiral moves down" feel from activetheory.net: cards come from below
-   * the viewport, pass through the front, and exit above.
-   *
-   * Range: from +((N-1)/2)·H_STEP (so card 0 ends up centered) to
-   * -((N-1)/2)·H_STEP (so card N-1 ends up centered).
-   */
-  const yHalf = ((N - 1) / 2) * H_STEP;
-  const translateY = useTransform(scrollYProgress, [0, 1], [yHalf, -yHalf]);
+  /* ------------------------------------------------- the one rAF engine --- */
+  useEffect(() => {
+    if (!isDesktop) return;
+    const section = sectionRef.current;
+    const world = worldRef.current;
+    if (!section || !world) return;
 
-  /** Subtle parallax on the eyebrow label (HUD coordinate feel). */
-  const eyebrowX = useTransform(scrollYProgress, [0, 1], [0, -40]);
+    const cards = cardRefs.current.filter(Boolean) as HTMLAnchorElement[];
+    const inners = cards
+      .map((c) => c.firstElementChild as HTMLElement | null)
+      .filter(Boolean) as HTMLElement[];
+    if (cards.length !== N) return;
 
-  /** Mega-title clip reveal — drives the line-mask sweep on enter. */
-  const titleClip = useTransform(
-    scrollYProgress,
-    [0, 0.08, 0.18],
-    ["inset(0 100% 0 0)", "inset(0 100% 0 0)", "inset(0 0% 0 0)"],
-  );
+    let raf = 0;
+    let running = false;
+    let inView = true;
+    let firstFrame = true;
+    let last = performance.now();
+    let p = 0; // smoothed progress
+    let pT = 0; // target progress
+    let vh = window.innerHeight;
+    let pitch = 0; // vertical distance between consecutive cards, px
+    let radius = 0; // helix radius, px
+    let mx = 0;
+    let my = 0;
+    let smx = 0;
+    let smy = 0;
+    let lastIdx = -1;
 
-  /** Counter string (current front card index) — driven by scrollYProgress. */
-  const counterStr = useTransform(
-    scrollYProgress,
-    (p) => SPIRAL[frontCardIdx(p)].index,
-  );
+    /* layout(): derive helix geometry from the real rendered section so
+       CSS height and JS motion can never drift apart. */
+    const layout = () => {
+      vh = window.innerHeight;
+      const H = section.offsetHeight;
+      pitch = Math.max(120, (H - vh) / (N - 1));
+      radius = Math.max(300, Math.min(500, window.innerWidth * 0.31));
+      cards.forEach((card, i) => {
+        card.style.transform =
+          `translate(-50%, -50%) ` +
+          `rotateY(${(i * STEP_DEG).toFixed(3)}deg) ` +
+          `translateZ(${radius.toFixed(1)}px) ` +
+          `translateY(${(-i * pitch).toFixed(1)}px)`;
+      });
+    };
 
-  /**
-   * Title opacity — recedes when cards pass through center (p=0.3..0.7),
-   * returns to full prominence at start/end. Critique C2 §Top-2 #2:
-   * "the massive headline competes with the 3D card cluster — apply
-   * subtle opacity offset so it recedes into atmospheric background when
-   * cards pass through the center focal plane, then returns when spiral
-   * clears (p > 0.8)".
-   */
-  const titleOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.2, 0.45, 0.55, 0.8, 1],
-    [1, 0.95, 0.32, 0.32, 0.95, 1],
-  );
+    const onMouse = (e: MouseEvent) => {
+      mx = e.clientX / window.innerWidth - 0.5;
+      my = e.clientY / window.innerHeight - 0.5;
+    };
 
-  // ── reduced-motion / mobile: vertical list variant ──────────────────────
-  if (reduced) {
-    return <SpiralServicesList />;
-  }
+    const frame = (now: number) => {
+      raf = requestAnimationFrame(frame);
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      if (!inView) return;
+
+      const rect = section.getBoundingClientRect();
+      const total = rect.height - vh;
+      if (total <= 0) return;
+      pT = clamp01(-rect.top / total);
+      if (firstFrame) {
+        // never animate from 0 when the page loads mid-section
+        p = pT;
+        firstFrame = false;
+      }
+      p += (pT - p) * (1 - Math.exp(-dt * 7.5));
+
+      smx += (mx - smx) * (1 - Math.exp(-dt * 5));
+      smy += (my - smy) * (1 - Math.exp(-dt * 5));
+
+      const rot = -p * TOTAL_ROT;
+      const ty = p * (N - 1) * pitch;
+      world.style.transform =
+        `translate3d(0, ${ty.toFixed(2)}px, 0) ` +
+        `rotateX(${(-smy * 1.6).toFixed(3)}deg) ` +
+        `rotateY(${(rot + smx * 2.2).toFixed(3)}deg)`;
+
+      const descent = (N - 1) * pitch;
+      for (let i = 0; i < N; i++) {
+        const alpha = ((i * STEP_DEG + rot) * Math.PI) / 180;
+        const f = Math.cos(alpha); // 1 front … −1 back
+        const wy = -i * pitch + ty; // card height relative to camera axis
+        const vfade = 1 - Math.min(1, Math.abs(wy) / (vh * 0.58));
+        // steep falloff: neighbors at 60° drop to ~⅓ brightness/opacity,
+        // back-of-cylinder ghosts at ~4% — the AT depth signature
+        const fade = f > 0 ? 0.05 + 0.95 * Math.pow(f, 2.4) : 0.04;
+        const op = Math.max(0, fade * vfade);
+        const blur = Math.max(0, Math.pow(1 - f, 1.4) * 11);
+        const br = 0.3 + 0.7 * Math.pow(Math.max(0, f), 1.5);
+        const sat = 0.42 + 0.58 * Math.pow(Math.max(0, f), 1.3);
+        const el = inners[i];
+        el.style.opacity = op.toFixed(3);
+        el.style.filter =
+          `blur(${blur.toFixed(2)}px) brightness(${br.toFixed(3)}) ` +
+          `saturate(${sat.toFixed(3)})`;
+      }
+
+      // Active card = the one nearest the camera axis center. Card i sits
+      // dead-center exactly at p = i/(N−1), so rounding smoothed progress
+      // is unambiguous — unlike angle argmax, which ties after 1+ turns.
+      const bestI = Math.max(0, Math.min(N - 1, Math.round(p * (N - 1))));
+
+      if (bestI !== lastIdx) {
+        lastIdx = bestI;
+        cards.forEach((c, i) => c.classList.toggle("is-front", i === bestI));
+        if (counterRef.current)
+          counterRef.current.textContent = SERVICES[bestI].index;
+        if (nameRef.current)
+          nameRef.current.textContent = SERVICES[bestI].title;
+      }
+      if (barRef.current)
+        barRef.current.style.transform = `scaleX(${p.toFixed(4)})`;
+      if (hintRef.current)
+        hintRef.current.style.opacity = clamp01(1 - pT * 24).toFixed(2);
+      if (megaRef.current)
+        megaRef.current.style.transform = `translate3d(0, ${(
+          p * descent * 0.1
+        ).toFixed(1)}px, 0)`;
+
+      // stop burning cycles when parked at either end
+      if (!running && Math.abs(pT - p) < 0.0005 && (pT === 0 || pT === 1)) {
+        // still keep the loop for mouse parallax — cheap enough.
+      }
+    };
+
+    layout();
+    section.classList.add("is-live");
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        inView = entries[0]?.isIntersecting ?? true;
+      },
+      { rootMargin: "40% 0px" }
+    );
+    io.observe(section);
+
+    let resizeRaf = 0;
+    const onResize = () => {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(layout);
+    };
+
+    const fine = window.matchMedia(FINE_POINTER).matches;
+    if (fine) window.addEventListener("mousemove", onMouse, { passive: true });
+    window.addEventListener("resize", onResize);
+    raf = requestAnimationFrame(frame);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      cancelAnimationFrame(resizeRaf);
+      io.disconnect();
+      window.removeEventListener("resize", onResize);
+      if (fine) window.removeEventListener("mousemove", onMouse);
+      section.classList.remove("is-live");
+      cards.forEach((c) => {
+        c.style.transform = "";
+        c.classList.remove("is-front");
+      });
+      inners.forEach((el) => {
+        el.style.opacity = "";
+        el.style.filter = "";
+      });
+    };
+  }, [isDesktop]);
+
+  /* ------------------------------------------------------------- markup --- */
+
+  const cardLabel = (s: SpiralItem) => `${s.title} — ${s.ctaLabel}`;
 
   return (
     <section
-      ref={ref}
-      className={`sp-st ${unbounded.variable} ${golos.variable}`}
-      aria-labelledby="spiral-services-title"
+      ref={sectionRef}
+      id="services"
+      className="sp"
+      aria-labelledby="sp-title"
     >
-      <div className="sp-st__sticky">
-        {/* ambient spotlight behind the helix (pulsing warm glow) */}
-        <div className="sp-st__spotlight" aria-hidden="true" />
-        {/* ambient gold-dust particles drifting in the dark (atmosphere) */}
-        <SpiralParticles />
-        {/* perspective-warped ground plane grid for cinematic depth */}
-        <div className="sp-st__ground" aria-hidden="true" />
-        {/* subtle film grain */}
-        <div className="sp-st__grain" aria-hidden="true" />
+      {/* ── 3D stage (desktop, motion allowed) ── */}
+      <div className="sp__stage">
+        {/* background scene: spotlight, grain, mega title */}
+        <div className="sp__spot" aria-hidden="true" />
+        <div className="sp__grain" aria-hidden="true" />
+        <div className="sp__vignette" aria-hidden="true" />
+        <p className="sp__eyebrow" aria-hidden="true">
+          <span className="sp__eyebrow-num">02</span>
+          <span className="sp__eyebrow-line" />
+          <span>Форматы мероприятий</span>
+        </p>
+        <h2 id="sp-title" className="sp__mega">
+          <span ref={megaRef} className="sp__mega-word">
+            Услуги
+          </span>
+        </h2>
 
-        {/* header */}
-        <header className="sp-st__header">
-          <motion.span className="sp-st__eyebrow" style={{ x: eyebrowX }}>
-            {"// УСЛУГИ — SPIRALSCROLL"}
-          </motion.span>
-          <motion.h2
-            id="spiral-services-title"
-            className="sp-st__title-mega"
-            style={{ opacity: titleOpacity }}
-          >
-            <span className="sp-st__title-line">
-              <motion.span
-                className="sp-st__title-inner"
-                style={{ clipPath: titleClip }}
-              >
-                Спираль
-              </motion.span>
-            </span>
-            <span className="sp-st__title-line">
-              <motion.span
-                className="sp-st__title-inner"
-                style={{ clipPath: titleClip }}
-              >
-                услуг
-              </motion.span>
-            </span>
-          </motion.h2>
-          <p className="sp-st__subtitle">
-            12 форматов кейтеринга — от кофе-брейка до свадьбы. Прокрутите,
-            чтобы пройти спираль до конца.
-          </p>
-        </header>
-
-        {/* Active card HUD */}
-        <ActiveCardHud scrollYProgress={scrollYProgress} />
-
-        {/* 3D stage */}
-        <div className="sp-st__stage">
-          <div className="sp-st__perspective">
-            <motion.div
-              className="sp-st__helix"
-              style={{ rotateY, y: translateY }}
+        {/* the helix */}
+        <div ref={worldRef} className="sp__world">
+          {SERVICES.map((s, i) => (
+            <a
+              key={s.id}
+              ref={(el) => {
+                cardRefs.current[i] = el;
+              }}
+              className="sp-card"
+              href={s.ctaHref}
+              aria-label={cardLabel(s)}
             >
-              {SPIRAL.map((item, i) => (
-                <SpiralCard
-                  key={item.id}
-                  item={item}
-                  i={i}
-                  scrollYProgress={scrollYProgress}
-                />
-              ))}
-            </motion.div>
-          </div>
-        </div>
-
-        {/* footer */}
-        <footer className="sp-st__footer">
-          <div className="sp-st__counter">
-            <span className="sp-st__counter-cur">
-              <motion.span>{counterStr}</motion.span>
-            </span>
-            <span className="sp-st__counter-sep">/</span>
-            <span className="sp-st__counter-tot">
-              {String(N).padStart(2, "0")}
-            </span>
-          </div>
-          <Link href="#contact" className="sp-st__cta-mega">
-            <span>Обсудить событие</span>
-            <ArrowUpRight strokeWidth={1.6} />
-          </Link>
-        </footer>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------- list fallback --- */
-
-/**
- * SpiralServicesList — vertical list variant. Used for:
- *   - `prefers-reduced-motion` (no transforms, no 3D)
- *   - mobile (≤820px) via CSS — same component, different layout
- *
- * Same content, same heading, same CTAs. The list IS the a11y fallback.
- * Each row is a real <a href> (keyboard, middle-click, SEO).
- */
-function SpiralServicesList() {
-  return (
-    <section
-      className={`sp-st sp-st--list ${unbounded.variable} ${golos.variable}`}
-      aria-labelledby="spiral-services-title"
-    >
-      <div className="sp-st__list-container">
-        <header className="sp-st__header sp-st__header--list">
-          <span className="sp-st__eyebrow">{"// УСЛУГИ"}</span>
-          <h2 id="spiral-services-title" className="sp-st__title-mega">
-            <span className="sp-st__title-line">Спираль</span>
-            <span className="sp-st__title-line">услуг</span>
-          </h2>
-          <p className="sp-st__subtitle">
-            12 форматов кейтеринга — от кофе-брейка до свадьбы.
-          </p>
-        </header>
-
-        <ul className="sp-st__list" role="list">
-          {SPIRAL.map((item) => (
-            <li key={item.id} className="sp-st__list-row">
-              <Link
-                href={item.ctaHref}
-                className="sp-st__list-link"
-                aria-label={`${item.title} — ${item.ctaLabel}`}
-              >
-                <span className="sp-st__list-index">{item.index}</span>
-                <div className="sp-st__list-media">
-                  <SmartImage
-                    src={item.media}
-                    alt={item.mediaAlt}
-                    width={400}
-                    height={300}
-                    sizes="160px"
-                    className="sp-st__list-img"
+              <div className="sp-card__inner">
+                <div className="sp-card__media">
+                  <img
+                    className="sp-card__img"
+                    src={s.media}
+                    alt={s.mediaAlt}
+                    loading={i < 3 ? "eager" : "lazy"}
+                    decoding="async"
                   />
+                  <span className="sp-card__tag">{s.tag}</span>
                 </div>
-                <div className="sp-st__list-body">
-                  <div className="sp-st__list-head">
-                    <h3 className="sp-st__list-title">{item.title}</h3>
-                    <span className="sp-st__list-tag">{item.tag}</span>
+                <div className="sp-card__body">
+                  <div className="sp-card__row">
+                    <span className="sp-card__index">{s.index}</span>
+                    <span className="sp-card__rule" aria-hidden="true" />
                   </div>
-                  <p className="sp-st__list-hook">{item.hook}</p>
-                  <div className="sp-st__list-foot">
-                    <span className="sp-st__list-price">{item.price}</span>
-                    <span className="sp-st__list-cta">
-                      {item.ctaLabel}
-                      <ArrowUpRight strokeWidth={1.6} />
+                  <h3 className="sp-card__title">{s.title}</h3>
+                  <p className="sp-card__hook">{s.hook}</p>
+                  <div className="sp-card__foot">
+                    <span className="sp-card__price">{s.price}</span>
+                    <span className="sp-card__cta">
+                      {s.ctaLabel}
+                      <svg
+                        viewBox="0 0 16 16"
+                        width="12"
+                        height="12"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M2 8h11M9 4l4 4-4 4"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
                     </span>
                   </div>
                 </div>
-              </Link>
-            </li>
+              </div>
+            </a>
           ))}
-        </ul>
+        </div>
 
-        <footer className="sp-st__footer sp-st__footer--list">
-          <span className="sp-st__counter-tot">
-            {String(N).padStart(2, "0")} услуг · 6 категорий
-          </span>
-          <Link href="#contact" className="sp-st__cta-mega">
-            <span>Обсудить событие</span>
-            <ArrowUpRight strokeWidth={1.6} />
-          </Link>
-        </footer>
+        {/* HUD — technical readout */}
+        <div className="sp__hud" aria-hidden="true">
+          <div className="sp__hud-left">
+            <div className="sp__counter">
+              <span ref={counterRef} className="sp__counter-cur">
+                01
+              </span>
+              <span className="sp__counter-sep">/</span>
+              <span className="sp__counter-total">12</span>
+            </div>
+            <span ref={nameRef} className="sp__hud-name">
+              {SERVICES[0].title}
+            </span>
+          </div>
+          <div className="sp__hud-right">
+            <span ref={hintRef} className="sp__hint">
+              Листайте вниз
+              <span className="sp__hint-dot" />
+            </span>
+            <div className="sp__track">
+              <div ref={barRef} className="sp__bar" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── list variant (mobile / reduced motion) ── */}
+      <div className="sp-list">
+        <div className="sp-list__head">
+          <p className="sp__eyebrow sp-list__eyebrow">
+            <span className="sp__eyebrow-num">02</span>
+            <span className="sp__eyebrow-line" />
+            <span>Форматы мероприятий</span>
+          </p>
+          <h2 className="sp-list__title">Услуги</h2>
+          <p className="sp-list__sub">
+            Двенадцать форматов — от кофе-брейка до свадьбы под ключ.
+          </p>
+        </div>
+        <div className="sp-list__grid">
+          {SERVICES.map((s) => (
+            <a key={s.id} className="sp-lcard" href={s.ctaHref}>
+              <div className="sp-lcard__media">
+                <img
+                  src={s.media}
+                  alt={s.mediaAlt}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div className="sp-lcard__body">
+                <span className="sp-lcard__index">{s.index}</span>
+                <h3 className="sp-lcard__title">{s.title}</h3>
+                <p className="sp-lcard__hook">{s.hook}</p>
+                <div className="sp-lcard__foot">
+                  <span className="sp-lcard__price">{s.price}</span>
+                  <span className="sp-lcard__cta">{s.ctaLabel} →</span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   );
