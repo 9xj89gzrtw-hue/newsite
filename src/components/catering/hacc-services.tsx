@@ -1,64 +1,44 @@
 "use client";
 
 /**
- * HaccServices — «Каталог услуг» (Cycle 49)
+ * HaccServices — «Каталог услуг» (Cycle 52: two six-spine racks)
  * ---------------------------------------------------------------------------
- * Full redesign of the services section as a horizontal accordion copied
- * from gammacatering.com ("Erlebnisse" haccordion) and improved beyond it.
+ * User verdict after three passes: the SOLID tint spines read better than
+ * the filmstrip experiment (reverted), and 12 spines crowd the composition —
+ * so the catalog splits into TWO racks of six, the second below the first:
  *
- * gamma mechanics (reverse-engineered, research/gamma-haccordion-research.md):
- *  - rack = flex row; each item flex-basis = closed spine width, flex-grow
- *    0→1 opens it (transition .62s easeInOutSine);
- *  - the spine (vertical title) is absolutely positioned at the item's left
- *    edge and widens a little when open;
- *  - the open panel stays in-flow with margin-left = open-spine width and a
- *    JS-measured FIXED px width → the panel never reflows during the flex
- *    animation, it is simply un-clipped left→right (the wipe reveal);
- *  - `.is-resizing` guard disables transitions for 140ms around resize.
+ *   Rack A «Форматы события»        01–06  (фуршеты → барбекю)
+ *   Rack B «Сервисы и дополнения»   07–12  (бар → логистика)
  *
- * upgrades over gamma (see AGENTS.md §22 for the full list):
- *  1. 12 panels vs gamma's 4 — a real catalog with prices, hooks and CTAs;
- *  2. inert + delayed visibility on closed panels → no Tab focus leak
- *     (gamma has this bug live);
- *  3. prefers-reduced-motion: instant transitions, no autoplay, no Ken Burns;
- *  4. autoplay with a progress line — pauses on hover/tab-hidden/out-of-view,
- *     stops permanently after the first manual interaction OR focus;
- *  5. hover-intent opening (380ms, fine pointers, ≥1024px) + click anywhere;
- *  6. staggered content entrance (tag → title/media → foot), transform+opacity
- *     only (RULES §5);
- *  7. Ken Burns "exhale" on the open photo (scale 1.09 → 1 over 7s);
- *  8. Marck Script handwritten titles tilted −6° — Cyrillic-capable analog of
- *     gamma's Adobe Handwriting signature;
- *  9. mobile (<1024px): gamma's vertical stack — grid-template-rows 0fr→1fr
- *     collapse, script titles on the bars, plus→× icon with REAL toggle-close
- *     (gamma's × is a lie: tapping the open bar is a no-op), scrollIntoView
- *     on open after the animation settles;
- * 10. accordion ARIA (h3 > button aria-expanded/aria-controls, panel
- *     role=region), arrow/Home/End keyboard nav, visible focus;
- * 11. full-bleed rack (edge-to-edge like gamma), print styles (all panels
- *     expanded), forced-colors borders, WCAG-AA text contrast.
+ * Six spines per rack give the open panel ~71% of the rack width —
+ * gamma-grade cinema (the 12-spine rack could only reach 67% while keeping
+ * the spines readable). Each rack is a full gamma haccordion on its own.
  *
- * Cycle 50 premium pass — the "alive" layer that separates a good copy
- * from a SOTD contender:
- * 12. ambient tint wash — the section bg glows with the open panel's tint
- *     (12 stacked opacity-only layers — the manifesto overlay pattern);
- * 13. live counter HUD (01/12) ticking next to the H2 during autoplay;
- * 14. choreographed entrance — spines cascade in with a 40ms stagger;
- * 15. spring mouse-parallax on the open photo (fine pointers, ±10px);
- * 16. magnetic CTA + arrow micro-affordance + script-title settle.
+ * gamma mechanics (research/gamma-haccordion-research.md), per rack:
+ *  - flex-basis = closed spine width, flex-grow 0→1 opens (620ms easeInOutSine)
+ *  - spine (vertical title) absolute at the item's left, widens when open
+ *  - open panel: JS-measured FIXED px width → zero reflow mid-animation
+ *  - .is-resizing guard around resize measurement
+ *  - full-bleed rack (edge-to-edge like gamma)
+ *  - exclusivity: one panel always open (mobile: real toggle-close —
+ *    gamma's × is a no-op lie)
+ *  - inert + delayed visibility on closed panels → no Tab focus leak
  *
- * Cycle 51 filmstrip pass — closed spines stop being "paint chips":
- * 17. every item carries its photo edge-to-edge behind everything (a
- *     decorative duplicate with alt=""), clipped to the spine width when
- *     closed → the rack reads as a 12-frame filmstrip; opening "develops"
- *     the frame into the light tinted panel (dark→light reveal metaphor);
- * 18. the panel body is an opaque tint card over the photo layer, so the
- *     open spine strip keeps the photo — book spine matches its cover;
- * 19. infinite Ken Burns drift on the open photo (34s alternate) + a subtle
- *     unifying color grade (saturate/contrast) across all photos.
+ * Two-rack focus model (the only genuinely new machinery):
+ *  - each rack owns its openIndex; opening in B never disturbs A
+ *  - ONE rack plays at a time — the FOCUSED rack. Focus follows hover /
+ *    click / keyboard, and scroll (IO hysteresis: a rack takes focus when
+ *    visibly dominant; manual focus wins for 2.5s so scrolling past a rack
+ *    the user is reading can't steal it back)
+ *  - section-level ambient tint wash + live counter HUD mirror the focused
+ *    rack's open panel (global index 01–12)
  *
- * Self-contained: scoped CSS in ./hacc-services.css + EA shared utilities.
- * The orchestrator places <HaccServices /> in page.tsx (position #6).
+ * Carried over from cycles 49–51: hover-intent opening (380ms, fine
+ * pointers), staggered entrances per rack, spring mouse-parallax on the
+ * open photo, magnetic CTA + arrow, script-title settle, perpetual Ken
+ * Burns drift + unifying color grade, autoplay progress line (desktop,
+ * focused rack only, stops after the first manual engagement — WCAG 2.2.2),
+ * full prefers-reduced-motion, print styles, forced-colors.
  */
 
 import {
@@ -88,12 +68,16 @@ import "./hacc-services.css";
 /* ------------------------------------------------------------------ config */
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** One autoplay cycle — kept in sync with the CSS progress line via an
- *  inline `animationDuration` (single source of truth, no magic dupe). */
+/** One autoplay cycle — synced with the CSS progress line via a cascading
+ *  custom property (single source of truth, no magic dupe). */
 const AUTOPLAY_MS = 6500;
 /** Baymard: hover-intent delay avoids flicker when sweeping across spines. */
 const HOVER_INTENT_MS = 380;
 const DESKTOP_MQ = "(min-width: 1024px)";
+/** Manual focus suppresses scroll-based focus switching for this long. */
+const FOCUS_STICKY_MS = 2500;
+/** IO hysteresis: a rack must beat the other by this ratio to take focus. */
+const FOCUS_RATIO_EDGE = 0.15;
 
 /**
  * Tiny 8×8 SVG placeholder (base64) — soft parchment wash before the photo
@@ -113,8 +97,7 @@ interface HaccService {
   price: string;
   priceLabel: string;
   tag: string;
-  /** warm per-service tint — 6 distinct families cycling over 12 panels
-   *  (cycle-2 critique: 12 near-identical tints read as "paint chips") */
+  /** warm per-service tint — 6 distinct families cycling over 12 panels */
   tint: string;
   media: string;
   mediaAlt: string;
@@ -124,9 +107,9 @@ interface HaccService {
 
 /**
  * 12 services — validated copy carried over from Cycle 45 SpiralServices;
- * media upgraded to 2048px sources (cycle-2 critique C4: the old 484×726
- * thumbnails were mushy on retina). Tints: 6 distinct warm editorial
- * families (cream / blush / sage / honey / ember / rose), no blue.
+ * 2048px media (cycle-49). The split is semantic, not arbitrary: rack A is
+ * event FORMATS (what kind of event), rack B is SERVICES & extras (what we
+ * additionally deliver at any event).
  */
 const SERVICES: HaccService[] = [
   {
@@ -299,42 +282,69 @@ const SERVICES: HaccService[] = [
   },
 ];
 
-const N = SERVICES.length;
+/** The semantic split: event formats vs services & extras. */
+const GROUPS: { label: string; range: string }[] = [
+  { label: "Форматы события", range: "01–06" },
+  { label: "Сервисы и дополнения", range: "07–12" },
+];
 
-/* -------------------------------------------------------------- component */
+const GROUP_SIZE = 6;
 
-export function HaccServices() {
+/* ----------------------------------------------------------- rack (6 items) */
+
+interface HaccRackProps {
+  /** The six services this rack owns. */
+  items: HaccService[];
+  /** Global index of items[0] (0 for rack A, 6 for rack B). */
+  offset: number;
+  /** Group label — used for the rack's aria-label. */
+  groupLabel: string;
+  /** Only the focused rack autoplays / shows its progress line. */
+  focused: boolean;
+  /** Global autoplay liveness — dies on the first manual engagement. */
+  playing: boolean;
+  docHidden: boolean;
+  reduced: boolean | null;
+  /** Report the rack's open panel (global index, or null = all closed). */
+  onOpen: (globalIndex: number | null) => void;
+  /** Hover — shifts focus to this rack (autoplay keeps living). */
+  onHoverRack: () => void;
+  /** Click / keyboard focus — shifts focus AND stops autoplay (WCAG 2.2.2). */
+  onEngageRack: () => void;
+}
+
+function HaccRack({
+  items,
+  offset,
+  groupLabel,
+  focused,
+  playing,
+  docHidden,
+  reduced,
+  onOpen,
+  onHoverRack,
+  onEngageRack,
+}: HaccRackProps) {
   const baseId = useId();
 
   const rackRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const spineRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  /**
-   * One panel open at a time (gamma exclusivity) — but `null` (all closed)
-   * is allowed on mobile via toggle-close, where the × icon promises it.
-   * SSR renders #1 open — matches the client's initial state.
-   */
+  const N = items.length;
+
+  /** One panel open at a time (gamma exclusivity); null = all closed
+   *  (mobile toggle-close only). SSR renders #1 open — matches client. */
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  /** autoplay lives until the first manual interaction or focus (WCAG 2.2.2) */
-  const [playing, setPlaying] = useState(true);
   const [hovering, setHovering] = useState(false);
   const [focusWithin, setFocusWithin] = useState(false);
-  const [docHidden, setDocHidden] = useState(false);
   const [inView, setInView] = useState(false);
-  /** ≥1024px — autoplay is desktop-only: on mobile the expanding panel
-   *  shifts layout ~500px under a reading user every cycle (cycle-3 MAJOR) */
-  const [isDesktop, setIsDesktop] = useState(false);
-  /** ≥1024px + fine pointer → hover-intent opening is allowed */
+  /** ≥1024px + fine pointer → hover-intent opening + parallax allowed */
   const [desktopFine, setDesktopFine] = useState(false);
+  /** ≥1024px → autoplay allowed (mobile layout-shift guard) */
+  const [isDesktop, setIsDesktop] = useState(false);
 
-  const prefersReduced = useReducedMotion();
-
-  /* ── Cycle 50: spring mouse-parallax on the open panel's photo ──────── */
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const parallaxX = useSpring(px, { stiffness: 140, damping: 22, mass: 0.6 });
-  const parallaxY = useSpring(py, { stiffness: 140, damping: 22, mass: 0.6 });
+  const paused = hovering || focusWithin || docHidden || !inView || !focused;
 
   /* mirror frequently-read values into refs for stable closures ---------- */
   const openIndexRef = useRef<number | null>(openIndex);
@@ -342,7 +352,6 @@ export function HaccServices() {
     openIndexRef.current = openIndex;
   }, [openIndex]);
 
-  const paused = hovering || focusWithin || docHidden || !inView;
   const pausedRef = useRef(paused);
   useEffect(() => {
     pausedRef.current = paused;
@@ -405,14 +414,34 @@ export function HaccServices() {
       window.clearTimeout(timer);
       window.cancelAnimationFrame(raf);
     };
+  }, [N]);
+
+  /* report the open panel to the section (ambient + counter mirror it) --- */
+  useEffect(() => {
+    onOpen(openIndex === null ? null : offset + openIndex);
+  }, [openIndex, offset, onOpen]);
+
+  /* ── visibility for autoplay pausing ─────────────────────────────────── */
+  useEffect(() => {
+    const rack = rackRef.current;
+    if (!rack) return;
+    const io = new IntersectionObserver(
+      (entries) => setInView(entries[0]?.isIntersecting ?? false),
+      { threshold: 0.25 },
+    );
+    io.observe(rack);
+    return () => io.disconnect();
   }, []);
 
-  /* ── autoplay: advance every AUTOPLAY_MS while visible & not paused ──── */
+  /* ── autoplay: the FOCUSED rack advances every AUTOPLAY_MS while in
+     view and not paused. Unfocused racks freeze — one thing moves at a
+     time (premium restraint). ──────────────────────────────────────────── */
   const nextAtRef = useRef(0);
   const remainingRef = useRef(AUTOPLAY_MS);
 
   useEffect(() => {
-    if (prefersReduced || !playing || !isDesktop || openIndex === null) return;
+    if (reduced || !playing || !focused || !isDesktop || openIndex === null)
+      return;
     nextAtRef.current = Date.now() + AUTOPLAY_MS;
     remainingRef.current = AUTOPLAY_MS;
 
@@ -432,24 +461,7 @@ export function HaccServices() {
     };
     const iv = window.setInterval(tick, 250);
     return () => window.clearInterval(iv);
-  }, [prefersReduced, playing, isDesktop, openIndex]);
-
-  /* ── visibility: IntersectionObserver + document visibilitychange ────── */
-  useEffect(() => {
-    const rack = rackRef.current;
-    if (!rack) return;
-    const io = new IntersectionObserver(
-      (entries) => setInView(entries[0]?.isIntersecting ?? false),
-      { threshold: 0.3 },
-    );
-    io.observe(rack);
-    const onVis = () => setDocHidden(document.hidden);
-    document.addEventListener("visibilitychange", onVis);
-    return () => {
-      io.disconnect();
-      document.removeEventListener("visibilitychange", onVis);
-    };
-  }, []);
+  }, [reduced, playing, focused, isDesktop, openIndex, N]);
 
   /* ── open(): the single interaction entry point ──────────────────────── */
   const scrollTimer = useRef(0);
@@ -458,11 +470,10 @@ export function HaccServices() {
   const open = useCallback(
     (i: number, manual: boolean) => {
       if (i < 0 || i >= N) return;
-      if (manual) setPlaying(false);
+      if (manual) onEngageRack();
       if (openIndexRef.current === i) {
         // Mobile: the × icon promises a toggle — close the panel (gamma's
-        // own × is a no-op lie). Desktop has no × affordance, so it stays
-        // exclusive-always-open like gamma.
+        // own × is a no-op lie). Desktop stays exclusive-always-open.
         if (
           typeof window !== "undefined" &&
           !window.matchMedia(DESKTOP_MQ).matches
@@ -473,14 +484,12 @@ export function HaccServices() {
       }
       setOpenIndex(i);
       // mobile: bring the freshly-opened item into view (gamma behaviour,
-      // refined — scroll-margin-top on the item respects the sticky header).
-      // Wait for the 520ms grid-rows animation to FINISH first: scrolling
-      // mid-animation targets a stale position (the closing panel above is
-      // still collapsing) and overshoots by the remaining delta.
+      // refined). Wait for the 520ms grid-rows animation to FINISH first:
+      // scrolling mid-animation targets a stale position and overshoots.
       if (
         typeof window !== "undefined" &&
         !window.matchMedia(DESKTOP_MQ).matches &&
-        !prefersReduced
+        !reduced
       ) {
         window.clearTimeout(scrollTimer.current);
         scrollTimer.current = window.setTimeout(() => {
@@ -491,37 +500,42 @@ export function HaccServices() {
         }, 600);
       }
     },
-    [prefersReduced],
+    [reduced, onEngageRack, N],
   );
 
   /* ── hover-intent (fine pointer, desktop): open after 380ms dwell ────── */
   const hoverTimer = useRef(0);
   const onSpineEnter = useCallback(
     (i: number) => {
-      if (!desktopFine || prefersReduced) return;
+      if (!desktopFine || reduced) return;
       window.clearTimeout(hoverTimer.current);
       hoverTimer.current = window.setTimeout(() => {
         if (i !== openIndexRef.current) open(i, false);
       }, HOVER_INTENT_MS);
     },
-    [desktopFine, prefersReduced, open],
+    [desktopFine, reduced, open],
   );
   const clearHoverIntent = useCallback(() => {
     window.clearTimeout(hoverTimer.current);
   }, []);
   useEffect(() => () => window.clearTimeout(hoverTimer.current), []);
 
-  /* parallax: zero out whenever the springs can't be used (mobile/reduced) */
+  /* ── spring mouse-parallax on this rack's open photo ─────────────────── */
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const parallaxX = useSpring(px, { stiffness: 140, damping: 22, mass: 0.6 });
+  const parallaxY = useSpring(py, { stiffness: 140, damping: 22, mass: 0.6 });
+
   useEffect(() => {
-    if (!desktopFine || prefersReduced) {
+    if (!desktopFine || reduced) {
       px.set(0);
       py.set(0);
     }
-  }, [desktopFine, prefersReduced, px, py]);
+  }, [desktopFine, reduced, px, py]);
 
   const onRackMouseMove = useCallback(
     (e: ReactMouseEvent<HTMLDivElement>) => {
-      if (!desktopFine || prefersReduced) return;
+      if (!desktopFine || reduced) return;
       const idx = openIndexRef.current;
       if (idx === null) return;
       const item = itemRefs.current[idx];
@@ -533,10 +547,10 @@ export function HaccServices() {
       px.set(Math.max(-0.6, Math.min(0.6, nx)) * 20);
       py.set(Math.max(-0.6, Math.min(0.6, ny)) * 12);
     },
-    [desktopFine, prefersReduced, px, py],
+    [desktopFine, reduced, px, py],
   );
 
-  /* ── keyboard: arrows wrap, Home/End jump (gamma model, extended) ────── */
+  /* ── keyboard: arrows wrap within THIS rack, Home/End jump ──────────── */
   const onRackKeyDown = useCallback(
     (e: ReactKeyboardEvent<HTMLDivElement>) => {
       const idx = Number(
@@ -566,32 +580,273 @@ export function HaccServices() {
       e.preventDefault();
       spineRefs.current[target]?.focus();
     },
-    [],
+    [N],
   );
 
-  const panelId = (i: number) => `${baseId}-panel-${SERVICES[i].id}`;
-  const spineId = (i: number) => `${baseId}-spine-${SERVICES[i].id}`;
+  const panelId = (i: number) => `${baseId}-panel-${items[i].id}`;
+  const spineId = (i: number) => `${baseId}-spine-${items[i].id}`;
 
-  const autoplayOn = playing && !prefersReduced && isDesktop && openIndex !== null;
+  const autoplayOn = focused && playing && !reduced && isDesktop && openIndex !== null;
 
-  /* ── Cycle 50: choreographed entrance — the rack fades in and the
-     spines cascade up with a 40ms stagger (transform/opacity only) ──── */
-  const rackVariants = prefersReduced
+  /* choreographed entrance — this rack's spines cascade (40ms stagger) -- */
+  const rackVariants = reduced
     ? undefined
     : {
         hidden: { opacity: 0 },
         show: { opacity: 1 },
       };
-  const itemVariants = prefersReduced
+  const itemVariants = reduced
     ? undefined
     : {
         hidden: { opacity: 0, y: 36 },
         show: (i: number) => ({
           opacity: 1,
           y: 0,
-          transition: { duration: 0.65, ease: EASE, delay: 0.06 + i * 0.04 },
+          transition: { duration: 0.65, ease: EASE, delay: 0.06 + i * 0.045 },
         }),
       };
+
+  /* ─────────────────────────────────────────────────────────────── render */
+
+  return (
+    <motion.div
+      ref={rackRef}
+      className="hacc__rack"
+      role="group"
+      aria-label={`${groupLabel} — ${N} форматов`}
+      data-autoplay={autoplayOn ? "on" : "off"}
+      data-paused={paused ? "true" : "false"}
+      initial={reduced ? false : "hidden"}
+      whileInView={reduced ? undefined : "show"}
+      viewport={{ once: true, margin: "-60px" }}
+      variants={rackVariants}
+      onMouseMove={onRackMouseMove}
+      onMouseEnter={() => {
+        setHovering(true);
+        onHoverRack();
+      }}
+      onMouseLeave={() => {
+        setHovering(false);
+        clearHoverIntent();
+        px.set(0);
+        py.set(0);
+      }}
+      onFocus={() => {
+        setFocusWithin(true);
+        // WCAG 2.2.2: keyboard engagement stops the rotation for good.
+        onEngageRack();
+      }}
+      onBlur={() => setFocusWithin(false)}
+      onKeyDown={onRackKeyDown}
+    >
+      {items.map((s, k) => {
+        const isOpen = openIndex === k;
+        return (
+          <motion.div
+            key={s.id}
+            ref={(el) => {
+              itemRefs.current[k] = el;
+            }}
+            className={"hacc__item" + (isOpen ? " is-open" : "")}
+            style={
+              {
+                backgroundColor: s.tint,
+                "--hacc-item-tint": s.tint,
+              } as CSSProperties
+            }
+            variants={itemVariants}
+            custom={k}
+          >
+            {/* — — — spine: the vertical "корешок" click target — — */}
+            <h3 className="hacc__spine-heading">
+              <button
+                type="button"
+                ref={(el) => {
+                  spineRefs.current[k] = el;
+                }}
+                id={spineId(k)}
+                data-spine-index={k}
+                className="hacc__spine"
+                aria-expanded={isOpen}
+                aria-controls={panelId(k)}
+                aria-label={
+                  isOpen
+                    ? `${s.title} — открыто`
+                    : `Раскрыть формат — ${s.title}`
+                }
+                onClick={() => open(k, true)}
+                onMouseEnter={() => onSpineEnter(k)}
+                onMouseLeave={clearHoverIntent}
+              >
+                <span className="hacc__num" aria-hidden="true">
+                  {s.index}
+                </span>
+                <span className="hacc__spine-title">
+                  <span className="hacc__spine-title-text">{s.title}</span>
+                </span>
+                {/* plus icon — mobile bars only (CSS hides on desktop) */}
+                <span className="hacc__spine-plus" aria-hidden="true">
+                  <Plus />
+                </span>
+                {/* autoplay progress — focused rack's open spine only; the
+                    inline duration var keeps CSS and JS clocks in sync */}
+                {autoplayOn && isOpen ? (
+                  <span
+                    className="hacc__spine-progress"
+                    key={`progress-${openIndex}`}
+                    style={
+                      {
+                        "--hacc-autoplay-ms": `${AUTOPLAY_MS}ms`,
+                      } as CSSProperties
+                    }
+                    aria-hidden="true"
+                  />
+                ) : null}
+              </button>
+            </h3>
+
+            {/* — — — open panel: fixed-width, clipped while closed — — */}
+            <div
+              id={panelId(k)}
+              className="hacc__open"
+              role="region"
+              aria-labelledby={spineId(k)}
+              inert={!isOpen}
+            >
+              <div className="hacc__body">
+                {/* head row: tag · handwritten title · price */}
+                <div className="hacc__row-head">
+                  <span className="hacc__tag">{s.tag}</span>
+                  <p className="hacc__title">{s.title}</p>
+                  <span className="hacc__price">
+                    <small>{s.priceLabel}</small>
+                    {s.price}
+                  </span>
+                </div>
+
+                {/* media with perpetual Ken Burns drift. `loading` follows
+                    the open state: closed panels stay lazy (nothing to see
+                    inside a clipped spine), the open panel loads eagerly so
+                    the photo is there the moment the wipe reveals it. */}
+                <figure className="hacc__media">
+                  {/* parallax bleed wrapper — larger than the figure so the
+                      spring translate never reveals the tint at the edges */}
+                  <motion.div
+                    className="hacc__media-inner"
+                    style={{ x: parallaxX, y: parallaxY }}
+                  >
+                    <SmartImage
+                      src={s.media}
+                      alt={s.mediaAlt}
+                      fill
+                      blurDataURL={BLUR_DATA_URL}
+                      sizes="(max-width: 1023px) 100vw, 64vw"
+                      loading={isOpen ? "eager" : "lazy"}
+                      className="hacc__img"
+                    />
+                  </motion.div>
+                </figure>
+
+                {/* foot row: hook + magnetic CTA */}
+                <div className="hacc__row-foot">
+                  <p className="hacc__hook">{s.hook}</p>
+                  <Magnetic className="hacc__cta-wrap" strength={0.25}>
+                    <Link
+                      href={s.ctaHref}
+                      className="ea-outline-btn hacc__cta"
+                      aria-label={`${s.ctaLabel} — ${s.title}`}
+                    >
+                      {s.ctaLabel}
+                      <ArrowUpRight aria-hidden="true" />
+                    </Link>
+                  </Magnetic>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        );
+      })}
+    </motion.div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────── the section */
+
+export function HaccServices() {
+  const prefersReduced = useReducedMotion();
+
+  /** Which rack is "live" (autoplay + ambient + counter mirror it). */
+  const [focusedRack, setFocusedRack] = useState(0);
+  /** Each rack's open panel as a GLOBAL service index (null = all closed). */
+  const [openByRack, setOpenByRack] = useState<(number | null)[]>([
+    0,
+    GROUP_SIZE,
+  ]);
+  /** Autoplay liveness — dies on the first manual engagement (WCAG 2.2.2). */
+  const [playing, setPlaying] = useState(true);
+  const [docHidden, setDocHidden] = useState(false);
+
+  const groupRefs = [
+    useRef<HTMLDivElement | null>(null),
+    useRef<HTMLDivElement | null>(null),
+  ];
+  const ratioRef = useRef([0, 0]);
+  const manualUntilRef = useRef(0);
+
+  /* document visibility — pause everything when the tab is hidden -------- */
+  useEffect(() => {
+    const onVis = () => setDocHidden(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  /* scroll-based focus: the visibly dominant rack takes focus (with
+     hysteresis), unless the user manually focused one recently ---------- */
+  useEffect(() => {
+    const ios = groupRefs.map((ref, gi) => {
+      const io = new IntersectionObserver(
+        (entries) => {
+          ratioRef.current[gi] = entries[0]?.intersectionRatio ?? 0;
+          if (Date.now() < manualUntilRef.current) return;
+          const [ra, rb] = ratioRef.current;
+          const dominant = rb > ra + FOCUS_RATIO_EDGE ? 1 : ra > rb + FOCUS_RATIO_EDGE ? 0 : null;
+          if (dominant !== null) setFocusedRack(dominant);
+        },
+        { threshold: [0, 0.15, 0.3, 0.5, 0.7, 0.9] },
+      );
+      if (ref.current) io.observe(ref.current);
+      return io;
+    });
+    return () => ios.forEach((io) => io.disconnect());
+  }, []);
+
+  /* stable handlers per rack --------------------------------------------- */
+  const handleHover = useCallback((gi: number) => {
+    manualUntilRef.current = Date.now() + FOCUS_STICKY_MS;
+    setFocusedRack(gi);
+  }, []);
+
+  const handleEngage = useCallback((gi: number) => {
+    manualUntilRef.current = Date.now() + FOCUS_STICKY_MS;
+    setFocusedRack(gi);
+    setPlaying(false);
+  }, []);
+
+  const handleOpen = useCallback((gi: number, globalIndex: number | null) => {
+    setOpenByRack((prev) =>
+      prev[gi] === globalIndex
+        ? prev
+        : prev.map((v, i) => (i === gi ? globalIndex : v)),
+    );
+  }, []);
+
+  const makeOnOpen = (gi: number) => (globalIndex: number | null) =>
+    handleOpen(gi, globalIndex);
+  const makeOnHover = (gi: number) => () => handleHover(gi);
+  const makeOnEngage = (gi: number) => () => handleEngage(gi);
+
+  /** The focused rack's open panel — drives the ambient wash + counter. */
+  const activeIndex = openByRack[focusedRack] ?? null;
 
   /* ─────────────────────────────────────────────────────────────── render */
 
@@ -601,10 +856,8 @@ export function HaccServices() {
       aria-labelledby="hacc-heading"
       className="hacc ea-section ea-section--cream"
     >
-      {/* Cycle 50: ambient tint wash — the section background slowly glows
-          with the open panel's tint. 12 stacked layers with opacity-only
-          transitions (the manifesto stacked-overlay pattern — colors never
-          animate, only opacity does). Synced to the rack's 620ms ease. */}
+      {/* ambient tint wash — the section bg glows with the FOCUSED rack's
+          open panel tint. 12 stacked layers, opacity-only transitions. */}
       <div className="hacc__ambient" aria-hidden="true">
         {SERVICES.map((s, i) => (
           <span
@@ -612,13 +865,13 @@ export function HaccServices() {
             className="hacc__ambient-layer"
             style={{
               backgroundColor: s.tint,
-              opacity: openIndex === i ? 0.34 : 0,
+              opacity: activeIndex === i ? 0.34 : 0,
             }}
           />
         ))}
       </div>
 
-      {/* section head stays inside the site grid; the rack below goes
+      {/* section head stays inside the site grid; the racks below go
           full-bleed edge-to-edge — exactly like gamma's haccordion */}
       <div className="ea-container ea-container--wide">
         <motion.div
@@ -640,34 +893,34 @@ export function HaccServices() {
               раскройте формат — увидите кухню, команду и цену за гостя.
             </p>
           </div>
-          {/* Cycle 50: live counter HUD — the big index mirrors the big H2
-              on the left and ticks with the autoplay (desktop ≥1024px) */}
+          {/* live counter HUD — the big index mirrors the big H2 on the left
+              and ticks with the focused rack's autoplay (desktop ≥1024px) */}
           <div className="hacc__meta">
             <div className="hacc__counter" aria-hidden="true">
               <span className="hacc__counter-current">
                 {prefersReduced ? (
-                  openIndex !== null ? (
-                    SERVICES[openIndex].index
+                  activeIndex !== null ? (
+                    SERVICES[activeIndex].index
                   ) : (
                     "··"
                   )
                 ) : (
                   <AnimatePresence mode="popLayout" initial={false}>
                     <motion.span
-                      key={openIndex ?? "none"}
+                      key={activeIndex === null ? "none" : activeIndex}
                       initial={{ y: 16, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -16, opacity: 0 }}
                       transition={{ duration: 0.32, ease: EASE }}
                       className="hacc__counter-num"
                     >
-                      {openIndex !== null ? SERVICES[openIndex].index : "··"}
+                      {activeIndex !== null ? SERVICES[activeIndex].index : "··"}
                     </motion.span>
                   </AnimatePresence>
                 )}
               </span>
               <span className="hacc__counter-total">
-                /&nbsp;{String(N).padStart(2, "0")}
+                /&nbsp;{String(SERVICES.length).padStart(2, "0")}
               </span>
             </div>
             <span className="hacc__hint" aria-hidden="true">
@@ -678,188 +931,35 @@ export function HaccServices() {
         </motion.div>
       </div>
 
-      {/* — — — — — — the rack: 12 vertical spines + one open panel — — — */}
-      <motion.div
-        ref={rackRef}
-        className="hacc__rack"
-        role="group"
-        aria-label="12 форматов кейтеринга — раскройте формат"
-        data-autoplay={autoplayOn ? "on" : "off"}
-        data-paused={paused ? "true" : "false"}
-        initial={prefersReduced ? false : "hidden"}
-        whileInView={prefersReduced ? undefined : "show"}
-        viewport={{ once: true, margin: "-60px" }}
-        variants={rackVariants}
-        onMouseMove={onRackMouseMove}
-        onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => {
-          setHovering(false);
-          clearHoverIntent();
-          px.set(0);
-          py.set(0);
-        }}
-        onFocus={() => {
-          setFocusWithin(true);
-          // WCAG 2.2.2: once the user engages with the keyboard, the
-          // rotation stops for good — no silent autoplay under their hands.
-          setPlaying(false);
-        }}
-        onBlur={() => setFocusWithin(false)}
-        onKeyDown={onRackKeyDown}
-      >
-        {SERVICES.map((s, i) => {
-          const isOpen = openIndex === i;
-          return (
-            <motion.div
-              key={s.id}
-              ref={(el) => {
-                itemRefs.current[i] = el;
-              }}
-              className={"hacc__item" + (isOpen ? " is-open" : "")}
-              style={
-                {
-                  backgroundColor: s.tint,
-                  "--hacc-item-tint": s.tint,
-                } as CSSProperties
-              }
-              variants={itemVariants}
-              custom={i}
-            >
-              {/* — — — Cycle 51: filmstrip photo layer — the item's photo sits
-                      edge-to-edge BEHIND everything. Closed, it is clipped to
-                      the spine width (a dark veiled frame); open, the opaque
-                      tinted body covers the panel area, so the strip keeps the
-                      photo — the spine literally matches its cover. Decorative
-                      duplicate: alt="" + aria-hidden. — — */}
-              <div className="hacc__photo" aria-hidden="true">
-                <SmartImage
-                  src={s.media}
-                  alt=""
-                  fill
-                  blurDataURL={BLUR_DATA_URL}
-                  sizes="(max-width: 1023px) 100vw, 96px"
-                  loading={isOpen ? "eager" : "lazy"}
-                  className="hacc__photo-img"
-                />
-                <span className="hacc__photo-veil" />
-              </div>
-              {/* — — — spine: the vertical "корешок" click target — — */}
-              <h3 className="hacc__spine-heading">
-                <button
-                  type="button"
-                  ref={(el) => {
-                    spineRefs.current[i] = el;
-                  }}
-                  id={spineId(i)}
-                  data-spine-index={i}
-                  className="hacc__spine"
-                  aria-expanded={isOpen}
-                  aria-controls={panelId(i)}
-                  aria-label={
-                    isOpen
-                      ? `${s.title} — открыто`
-                      : `Раскрыть формат — ${s.title}`
-                  }
-                  onClick={() => open(i, true)}
-                  onMouseEnter={() => onSpineEnter(i)}
-                  onMouseLeave={clearHoverIntent}
-                >
-                  <span className="hacc__num" aria-hidden="true">
-                    {s.index}
-                  </span>
-                  <span className="hacc__spine-title">
-                    <span className="hacc__spine-title-text">{s.title}</span>
-                  </span>
-                  {/* plus icon — mobile bars only (CSS hides on desktop) */}
-                  <span className="hacc__spine-plus" aria-hidden="true">
-                    <Plus />
-                  </span>
-                  {/* autoplay progress — open spine only, CSS-driven; the
-                      inline duration keeps CSS and JS clocks in sync */}
-                  {autoplayOn && isOpen ? (
-                    <span
-                      className="hacc__spine-progress"
-                      key={`progress-${openIndex}`}
-                      /* single source of truth for both clocks — the CSS var
-                         cascades into the ::after fill animation */
-                      style={
-                        {
-                          "--hacc-autoplay-ms": `${AUTOPLAY_MS}ms`,
-                        } as CSSProperties
-                      }
-                      aria-hidden="true"
-                    />
-                  ) : null}
-                </button>
-              </h3>
-
-              {/* — — — open panel: fixed-width, clipped while closed — — */}
-              <div
-                id={panelId(i)}
-                className="hacc__open"
-                role="region"
-                aria-labelledby={spineId(i)}
-                inert={!isOpen}
-              >
-                <div className="hacc__body">
-                  {/* head row: tag · handwritten title · price */}
-                  <div className="hacc__row-head">
-                    <span className="hacc__tag">{s.tag}</span>
-                    <p className="hacc__title">{s.title}</p>
-                    <span className="hacc__price">
-                      <small>{s.priceLabel}</small>
-                      {s.price}
-                    </span>
-                  </div>
-
-                  {/* media with Ken Burns exhale. `loading` follows the
-                      open state: closed panels stay lazy (nothing to see
-                      inside a 36px clipped spine), the open panel loads
-                      eagerly so the photo is there the moment the wipe
-                      reveals it — never a black frame. */}
-                  <figure className="hacc__media">
-                    {/* Cycle 50: parallax bleed wrapper — slightly larger
-                        than the figure so the spring translate never
-                        reveals the tint at the edges. Ken Burns scale stays
-                        on the img itself; the translate lives here. */}
-                    <motion.div
-                      className="hacc__media-inner"
-                      style={{ x: parallaxX, y: parallaxY }}
-                    >
-                      <SmartImage
-                        src={s.media}
-                        alt={s.mediaAlt}
-                        fill
-                        blurDataURL={BLUR_DATA_URL}
-                        sizes="(max-width: 1023px) 100vw, 62vw"
-                        loading={isOpen ? "eager" : "lazy"}
-                        className="hacc__img"
-                      />
-                    </motion.div>
-                  </figure>
-
-                  {/* foot row: hook + CTA */}
-                  <div className="hacc__row-foot">
-                    <p className="hacc__hook">{s.hook}</p>
-                    {/* Cycle 50: magnetic CTA (existing repo wrapper —
-                        spring pull toward cursor, reduced-motion safe) */}
-                    <Magnetic className="hacc__cta-wrap" strength={0.25}>
-                      <Link
-                        href={s.ctaHref}
-                        className="ea-outline-btn hacc__cta"
-                        aria-label={`${s.ctaLabel} — ${s.title}`}
-                      >
-                        {s.ctaLabel}
-                        <ArrowUpRight aria-hidden="true" />
-                      </Link>
-                    </Magnetic>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+      {/* — — — two racks of six: formats, then services & extras — — — */}
+      {GROUPS.map((g, gi) => (
+        <div
+          className="hacc__group"
+          key={g.label}
+          ref={groupRefs[gi]}
+          onMouseEnter={() => handleHover(gi)}
+          onFocusCapture={() => handleEngage(gi)}
+        >
+          <div className="ea-container ea-container--wide">
+            <p className="hacc__rack-label">
+              <strong>{g.range}</strong>
+              {g.label}
+            </p>
+          </div>
+          <HaccRack
+            items={SERVICES.slice(gi * GROUP_SIZE, gi * GROUP_SIZE + GROUP_SIZE)}
+            offset={gi * GROUP_SIZE}
+            groupLabel={g.label}
+            focused={focusedRack === gi}
+            playing={playing}
+            docHidden={docHidden}
+            reduced={prefersReduced}
+            onOpen={makeOnOpen(gi)}
+            onHoverRack={makeOnHover(gi)}
+            onEngageRack={makeOnEngage(gi)}
+          />
+        </div>
+      ))}
     </section>
   );
 }

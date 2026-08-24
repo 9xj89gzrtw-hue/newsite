@@ -1,52 +1,59 @@
 /* ============================================================================
-   HaccServices — «Каталог услуг»: horizontal accordion (Cycle 49)
+   HaccServices — «Каталог услуг»: TWO horizontal accordion racks (Cycle 52)
    ----------------------------------------------------------------------------
-   Reverse-engineered from gammacatering.com "Erlebnisse" haccordion
-   (research/gamma-haccordion-research.md) + upgraded:
+   gammacatering.com "Erlebnisse" haccordion, split into two racks of six
+   (user verdict: solid tint spines read better than the filmstrip
+   experiment, and 12 spines crowd the composition — two racks restore the
+   gamma-grade open-panel proportion, ~71% of the rack width).
 
-   gamma mechanics (kept 1:1):
+   gamma mechanics per rack (reverse-engineered,
+   research/gamma-haccordion-research.md):
    - flex-basis = closed spine width, flex-grow 0→1 opens the item
-   - spine (vertical title) absolute left, width widens when open
+   - spine (vertical title) absolute at the item's left, widens when open
    - open panel in-flow, margin-left = open-spine width, JS-fixed px width
      → zero content reflow during the flex animation (the clip-wipe reveal)
    - .is-resizing guard kills transitions for 140ms on resize
-   - easeInOutSine cubic-bezier(.37,0,.63,1)
-   - FULL-BLEED rack (edge-to-edge) — gamma's haccordion is 100vw wide
+   - easeInOutSine cubic-bezier(.37,0,.63,1), 620ms
+   - full-bleed racks (edge-to-edge like gamma)
 
-   upgrades over gamma:
-   - 12 panels (gamma: 4), numbers 01–12, price anchoring, per-service tints
-   - visibility-delay + inert on closed panels → no Tab focus leak (gamma bug)
-   - prefers-reduced-motion fully respected (gamma ignores it)
-   - autoplay with progress line, paused on hover/hidden/out-of-view
-   - staggered content entrance + Ken Burns photo exhale (transform/opacity)
-   - Marck Script handwritten titles rotate(-6°) — Cyrillic-capable analog
-     of gamma's Adobe Handwriting
-   - mobile: grid-template-rows 0fr→1fr stack (gamma mobile pattern) with a
-     REAL toggle-close (gamma's × is a no-op)
-   - print: all panels expand into a document-friendly stack
-   - forced-colors: borders keep the rack legible in Windows High Contrast
+   The alive layer (cycles 50–51, kept): ambient tint wash, live counter
+   HUD, choreographed entrance per rack, spring mouse-parallax, magnetic
+   CTA, script-title settle, perpetual Ken Burns drift + unifying grade.
    ========================================================================== */
 
 .hacc {
   /* ---- tokens (px by breakpoint so JS can parseFloat them — gamma trick).
-     Gamma-grade narrow spines: at 12 panels the closed rack must stay slim
-     enough for the open panel to dominate (≥65% of the rack). ------------ */
-  --hacc-spine: 32px;        /* closed spine width  */
-  --hacc-spine-open: 72px;   /* open spine width    */
-  --hacc-gap: 3px;           /* rack gutter         */
+     TWO racks of six: spines can be generous again (readable, premium),
+     and the open panel still takes ~71% of the rack. -------------------- */
+  --hacc-spine: 56px;        /* closed spine width  */
+  --hacc-spine-open: 96px;   /* open spine width    */
+  --hacc-gap: 4px;           /* rack gutter         */
   --hacc-ease: cubic-bezier(0.37, 0, 0.63, 1);   /* gamma easeInOutSine */
   --hacc-dur: 620ms;
   --hacc-ink: var(--ea-ink, #1a1a1a);
   --hacc-red: var(--ea-red, #e71d3a);
   --hacc-red-deep: var(--ea-red-deep, #b91431);  /* AA-safe on tints */
-  --hacc-red-bright: #ff5560;                    /* AA-safe on dark veil */
   --hacc-soft: rgba(26, 26, 26, 0.68);           /* AA on all tints  */
 }
 
 @media (min-width: 1600px) {
   .hacc {
-    --hacc-spine: 38px;
-    --hacc-spine-open: 84px;
+    --hacc-spine: 60px;
+    --hacc-spine-open: 100px;
+  }
+}
+
+@media (max-width: 1439px) {
+  .hacc {
+    --hacc-spine: 50px;
+    --hacc-spine-open: 88px;
+  }
+}
+
+@media (max-width: 1199px) {
+  .hacc {
+    --hacc-spine: 44px;
+    --hacc-spine-open: 80px;
   }
 }
 
@@ -74,99 +81,43 @@
   max-width: 56ch;
 }
 
-/* interaction hint (desktop, fine pointer only) */
-.hacc__hint {
-  display: none;
+/* ────────────────────────────────────── group label + rack stack (Cycle 52) */
+
+.hacc__group + .hacc__group {
+  margin-top: clamp(2.75rem, 5vw, 4.25rem);
+}
+
+/* eyebrow label above each rack: "01–06 Форматы события" + hairline rule */
+.hacc__rack-label {
+  display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.85rem;
+  margin: 0 0 1.1rem;
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 600;
   font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(26, 26, 26, 0.62);
-  white-space: nowrap;
-  padding-bottom: 0.4rem;
+  color: var(--hacc-soft);
 }
 
-.hacc__hint svg {
-  width: 15px;
-  height: 15px;
+.hacc__rack-label strong {
   color: var(--hacc-red-deep);
-  flex: none;
+  font-weight: 700;
 }
 
-@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
-  .hacc__hint {
-    display: inline-flex;
-  }
-}
-
-/* ─────────────────────────── Cycle 51: filmstrip photo layer ──────────
-   The item's photo sits edge-to-edge BEHIND everything (z0). Closed, it is
-   clipped to the spine width — a dark veiled frame; the rack reads as a
-   12-frame filmstrip instead of flat "paint chips". Opening "develops"
-   the frame into the light tinted panel (dark→light reveal metaphor). */
-
-.hacc__photo {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.hacc__photo-img {
-  object-fit: cover;
-  /* subtle unifying grade so 12 heterogeneous sources read as one film */
-  filter: saturate(0.94) contrast(1.05) brightness(0.98);
-}
-
-/* warm charcoal veil — darker at top/bottom where the num/title/progress
-   sit, lighter mid-frame; AA backdrop for the white spine typography */
-.hacc__photo-veil {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(23, 17, 12, 0.68) 0%,
-    rgba(23, 17, 12, 0.56) 38%,
-    rgba(23, 17, 12, 0.56) 62%,
-    rgba(23, 17, 12, 0.68) 100%
-  );
-  transition: opacity 340ms ease;
-}
-
-/* the open spine lightens its veil — the frame "wakes up" and is
-   unmistakably the active one (VLM cycle-51: width alone wasn't enough) */
-.hacc__item.is-open .hacc__photo-veil {
-  opacity: 0.58;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .hacc__item:not(.is-open):hover .hacc__photo-veil {
-    opacity: 0.8;
-  }
-  .hacc__item:not(.is-open) .hacc__spine:hover::before {
-    transform: scaleY(1);
-  }
-  .hacc__item:not(.is-open) .hacc__spine:hover .hacc__spine-title {
-    transform: translateY(-6px);
-  }
-}
-
-/* the OPEN spine carries a permanent bright-red marker line (hover-only
-   for closed spines above) — the active frame is obvious at a glance */
-.hacc__item.is-open .hacc__spine::before {
-  transform: scaleY(1);
+.hacc__rack-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(26, 26, 26, 0.15);
 }
 
 /* ─────────────────────────────────────────────── the rack (desktop flex) ── */
 
 /* heading reset — the APG accordion heading wrapper must not add layout.
    width/min-width keep the long-title mobile bar from pushing the × icon
-   off-screen: without a definite width the h3 grows to its min-content
-   (the un-truncated title) and breaks the flex ellipsis chain. */
+   off-screen (h3 min-width:auto breaks the flex ellipsis chain). */
 .hacc__spine-heading {
   margin: 0;
   padding: 0;
@@ -182,14 +133,14 @@
   display: none;
 }
 
-/* Full-bleed: the rack sits OUTSIDE .ea-container — edge-to-edge strip,
-   exactly like gamma's haccordion (100vw). Only the 1px PageBorders frame
-   (pointer-events:none) may overlap it. */
+/* Full-bleed: racks sit OUTSIDE .ea-container — edge-to-edge strips,
+   exactly like gamma's haccordion. Two of them, one per group. */
 .hacc__rack {
   position: relative;
+  z-index: 1;
   display: flex;
   gap: var(--hacc-gap);
-  height: clamp(560px, 76vh, 760px);
+  height: clamp(480px, 62vh, 640px);
 }
 
 .hacc__item {
@@ -208,9 +159,25 @@
 /* gamma's resize guard — no transition while measuring */
 .hacc__rack.is-resizing .hacc__item,
 .hacc__rack.is-resizing .hacc__spine,
-.hacc__rack.is-resizing .hacc__open,
-.hacc__rack.is-resizing .hacc__photo-veil {
+.hacc__rack.is-resizing .hacc__open {
   transition: none !important;
+}
+
+/* subtle darkening veil on hover (paint-only, gamma uses inset shadow) */
+.hacc__item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.05);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hacc__item:not(.is-open):hover::after {
+    opacity: 1;
+  }
 }
 
 /* ───────────────────────────────────────────────── spine (the корешок) ── */
@@ -224,7 +191,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.9rem 0 0.75rem;
+  padding: 1rem 0 0.85rem;
   border: 0;
   background: transparent;
   color: var(--hacc-ink);
@@ -240,22 +207,22 @@
 }
 
 .hacc__spine:focus-visible {
-  outline: 2px solid #ffffff;         /* visible on the dark veil */
+  outline: 2px solid var(--hacc-red);
 }
 
 .hacc__num {
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 700;
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.85);   /* AA on the dark veil */
+  color: rgba(26, 26, 26, 0.75);      /* AA: 4.6:1 on the lightest tint */
   transition: color 300ms ease;
 }
 
 .hacc__item.is-open .hacc__num,
 .hacc__spine:hover .hacc__num {
-  color: var(--hacc-red-bright);
+  color: var(--hacc-red-deep);
 }
 
 /* vertical title — reads bottom-to-top (gamma signature). The wrapper (no
@@ -265,7 +232,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0.75rem 0;
+  margin: 0.8rem 0;
   min-width: 0;                       /* allow ellipsis of long titles */
   transition: transform 320ms var(--hacc-ease);
 }
@@ -275,26 +242,24 @@
   transform: rotate(180deg);
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.13em;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
   max-height: 46vh;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;                       /* flex-item min-width:auto fix */
-  color: #ffffff;
-  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55);
   transition: color 300ms ease;
 }
 
-/* the open spine is unmistakably active — bright red over the dark frame */
+/* the open spine is unmistakably active — number AND title turn red,
+   and the marker line is permanent (width alone is too quiet) */
 .hacc__item.is-open .hacc__spine-title-text {
-  color: #ffffff;
-  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.7);
+  color: var(--hacc-red-deep);
 }
 
-/* left accent line grows on hover (fine pointers only) */
+/* left accent line — grows on hover for closed spines, permanent when open */
 .hacc__spine::before {
   content: "";
   position: absolute;
@@ -302,24 +267,32 @@
   top: 0;
   bottom: 0;
   width: 3px;
-  background: var(--hacc-red-bright);
+  background: var(--hacc-red);
   transform: scaleY(0);
   transform-origin: top;
   transition: transform 320ms var(--hacc-ease);
   z-index: 1;
 }
 
-/* (hover rules live in the Cycle 51 photo-veil block above) */
+.hacc__item.is-open .hacc__spine::before {
+  transform: scaleY(1);
+}
 
-/* (Cycle 51: hover lightening lives on .hacc__photo-veil above — the old
-   5% darkening overlay was removed to avoid double-treating the photo.) */
+@media (hover: hover) and (pointer: fine) {
+  .hacc__item:not(.is-open) .hacc__spine:hover::before {
+    transform: scaleY(1);
+  }
+  .hacc__item:not(.is-open) .hacc__spine:hover .hacc__spine-title {
+    transform: translateY(-6px);
+  }
+}
 
-/* autoplay progress line — bottom of the OPEN spine only */
+/* autoplay progress line — the FOCUSED rack's open spine only */
 .hacc__spine-progress {
-  width: calc(100% - 0.75rem);
+  width: calc(100% - 1.1rem);
   height: 4px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(26, 26, 26, 0.14);
   overflow: hidden;
   position: relative;
   flex: none;
@@ -329,7 +302,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--hacc-red-bright);
+  background: var(--hacc-red);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -353,7 +326,7 @@
 
 .hacc__open {
   position: relative;
-  z-index: 1;                         /* above the filmstrip photo layer */
+  z-index: 1;
   height: 100%;
   margin-left: var(--hacc-spine-open);
   /* JS measures the exact px so nothing reflows mid-animation; pre-JS the
@@ -376,8 +349,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* Cycle 51: opaque tint card over the filmstrip photo — the panel area
-     stays the calm editorial surface, only the spine strip keeps the photo */
   background-color: var(--hacc-item-tint);
   padding: clamp(1.25rem, 2.2vw, 2rem) clamp(1.25rem, 2.2vw, 2rem)
     clamp(1.25rem, 2vw, 1.75rem) clamp(0.75rem, 1.4vw, 1.25rem);
@@ -406,8 +377,7 @@
 .hacc__row-head {
   /* minmax(0,·) columns let long rotated titles wrap instead of pushing
      the flanking tag/price out of a narrow panel; generous bottom padding
-     gives the −6° tilt room to swing WITHOUT diving into the photo below
-     (cycle-2 critique C2 — long titles collided before) */
+     gives the −6° tilt room to swing without diving into the photo */
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
   align-items: end;
@@ -428,12 +398,11 @@
 .hacc__title {
   font-family: var(--font-marck), cursive;
   font-weight: 400;
-  font-size: clamp(2.1rem, 2.7vw, 3.4rem);
+  font-size: clamp(2.2rem, 2.9vw, 3.6rem);
   line-height: 1.08;
   text-align: center;
   color: var(--hacc-ink);
-  /* Cycle 50: settle — the script title drops into place when its panel
-     opens (transform-only, delayed to ride the stagger entrance) */
+  /* settle — the script title drops into place when its panel opens */
   transform: rotate(-6deg) translateY(7px) scale(0.985);
   transform-origin: 50% 100%;         /* swing splits around the baseline */
   transition: transform 820ms cubic-bezier(0.22, 1, 0.36, 1) 180ms;
@@ -466,7 +435,7 @@
   margin-bottom: 0.25rem;
 }
 
-/* ── media — Ken Burns exhale on open ── */
+/* ── media — perpetual Ken Burns drift + unifying grade ── */
 
 .hacc__media {
   position: relative;
@@ -477,9 +446,17 @@
   margin-block: 0.35rem 1rem;
 }
 
+/* parallax bleed wrapper — larger than the figure so the spring translate
+   never reveals the tint at the photo edges. Ken Burns scale stays on the
+   img; the translate lives on this wrapper. */
+.hacc__media-inner {
+  position: absolute;
+  inset: -12px;
+}
+
 .hacc__img {
-  /* Cycle 51: perpetual slow drift replaces the one-shot exhale — the open
-     photo never settles, the panel keeps breathing (transform-only). */
+  /* perpetual slow drift — the open photo never settles; the panel keeps
+     breathing (transform-only). Plus a subtle unifying color grade. */
   transform: scale(1.055) translate(-0.6%, 0.4%);
   filter: saturate(0.94) contrast(1.03);
   object-fit: cover;
@@ -494,18 +471,22 @@
   to   { transform: scale(1.09) translate(0.7%, -0.5%); }
 }
 
-/* Cycle 50: the script title settles onto its baseline when open */
+/* the script title settles onto its baseline when open */
 .hacc__item.is-open .hacc__title {
   transform: rotate(-6deg) translateY(0) scale(1);
 }
 
-/* ── foot row: hook + CTA ── */
+/* ── foot row: hook + magnetic CTA ── */
 
 .hacc__row-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
+  flex: none;
+}
+
+.hacc__cta-wrap {
   flex: none;
 }
 
@@ -516,6 +497,17 @@
   white-space: nowrap;
 }
 
+.hacc__cta svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hacc__cta:hover svg,
+.hacc__cta:focus-visible svg {
+  transform: translate(2px, -2px);
+}
+
 .hacc__hook {
   font-family: var(--font-sans), system-ui, sans-serif;
   font-size: clamp(0.9rem, 1vw, 0.98rem);
@@ -524,17 +516,24 @@
   max-width: 46ch;
 }
 
-/* ───────────────────────────── mobile (<1024px) vertical stack + print ──
-   The SAME block serves @media print: the rack becomes a document-friendly
-   vertical stack (all panels forced open via the print override below).   */
+/* ───────────────────────────── mobile (<1024px) vertical stack, per rack ── */
 
 @media (max-width: 1023px) {
+  .hacc__group + .hacc__group {
+    margin-top: clamp(2.5rem, 8vw, 3.5rem);
+  }
+
+  /* label aligns with the rack's side padding below */
+  .hacc__rack-label {
+    margin-inline: clamp(1rem, 4vw, 2rem);
+    font-size: 0.66rem;
+  }
+
   .hacc__rack {
     flex-direction: column;
     gap: 0.6rem;
     height: auto;
-    padding-inline: clamp(1rem, 4vw, 2rem); /* rack is full-bleed — give
-        mobile bars side breathing room */
+    padding-inline: clamp(1rem, 4vw, 2rem);
   }
 
   /* item = grid with the collapsible 0fr row (gamma mobile pattern) */
@@ -549,12 +548,9 @@
     grid-template-rows: auto 1fr;
   }
 
-  /* spine becomes a horizontal bar — relative so the bar's typography
-     paints ABOVE the filmstrip photo layer (in-flow static content would
-     sink below the positioned z0 photo) */
+  /* spine becomes a horizontal bar */
   .hacc__spine {
-    position: relative;
-    z-index: 2;
+    position: static;
     width: 100%;
     height: 84px;
     flex-direction: row;
@@ -591,13 +587,12 @@
     transform-origin: left center;
   }
 
-  /* plus icon rotates into × when open — and (unlike gamma's ×) it
-     genuinely toggles the panel closed (see hacc-services.tsx open()) */
+  /* plus icon rotates into × when open — and genuinely toggles closed */
   .hacc__spine-plus {
     flex: none;
     display: inline-flex;
-    color: #ffffff;
-    opacity: 0.85;
+    color: var(--hacc-ink);
+    opacity: 0.65;
     transition: transform 420ms var(--hacc-ease);
   }
 
@@ -608,7 +603,7 @@
 
   .hacc__item.is-open .hacc__spine-plus {
     transform: rotate(45deg);
-    color: var(--hacc-red-bright);
+    color: var(--hacc-red-deep);
     opacity: 1;
   }
 
@@ -681,8 +676,6 @@
 /* ───────────────────────────────────────────────────────── print styles ── */
 
 @media print {
-  /* the mobile stack block above only matches max-width — replicate the
-     essential bits for print: vertical stack, all panels open */
   .hacc__rack {
     display: block;
     height: auto;
@@ -699,8 +692,7 @@
   .hacc__spine-progress,
   .hacc__hint,
   .hacc__ambient,
-  .hacc__meta,
-  .hacc__photo {
+  .hacc__meta {
     display: none;
   }
 
@@ -736,19 +728,7 @@
 
 @media (forced-colors: active) {
   .hacc__item {
-    border: 1px solid CanvasText;    /* tints vanish — keep the rack legible */
-  }
-
-  /* the photo veil reads as a solid block in WHP — drop the filmstrip,
-     the forced CanvasText spine typography needs a plain backdrop */
-  .hacc__photo {
-    display: none;
-  }
-
-  .hacc__spine-title-text,
-  .hacc__num {
-    color: CanvasText;
-    text-shadow: none;
+    border: 1px solid CanvasText;    /* tints vanish — keep the racks legible */
   }
 
   .hacc__spine-progress {
@@ -760,12 +740,11 @@
   }
 }
 
-/* ══════════════════════════════════════════ Cycle 50 — premium pass ═══ */
+/* ════════════════════════════════════ Cycle 50 — premium pass (kept) ═══ */
 
 /* Ambient tint wash — 12 stacked layers, opacity-only transitions (the
    manifesto stacked-overlay pattern; colors never animate themselves).
-   The section background slowly glows with the open panel's tint, in
-   sync with the 620ms rack ease. */
+   The section background slowly glows with the FOCUSED rack's open tint. */
 .hacc__ambient {
   position: absolute;
   inset: 0;
@@ -780,13 +759,10 @@
   transition: opacity var(--hacc-dur) var(--hacc-ease);
 }
 
-/* head + rack stack above the ambient wash */
-.hacc > .ea-container {
+/* head + groups stack above the ambient wash */
+.hacc > .ea-container,
+.hacc > .hacc__group {
   position: relative;
-  z-index: 1;
-}
-
-.hacc__rack {
   z-index: 1;
 }
 
@@ -836,28 +812,31 @@
   }
 }
 
-/* Parallax bleed wrapper — slightly larger than the figure so the spring
-   translate never reveals the tint at the photo edges. Ken Burns scale
-   stays on the img; the translate lives on this wrapper. */
-.hacc__media-inner {
-  position: absolute;
-  inset: -12px;
+/* interaction hint (desktop, fine pointer only) */
+.hacc__hint {
+  display: none;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--ea-font-eyebrow), sans-serif;
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(26, 26, 26, 0.62);
+  white-space: nowrap;
 }
 
-/* Magnetic CTA wrapper + arrow micro-affordance */
-.hacc__cta-wrap {
+.hacc__hint svg {
+  width: 15px;
+  height: 15px;
+  color: var(--hacc-red-deep);
   flex: none;
 }
 
-.hacc__cta svg {
-  width: 14px;
-  height: 14px;
-  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.hacc__cta:hover svg,
-.hacc__cta:focus-visible svg {
-  transform: translate(2px, -2px);
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .hacc__hint {
+    display: inline-flex;
+  }
 }
 
 /* ─────────────────────────────────────────────── reduced motion (always) ── */
@@ -870,11 +849,11 @@
   .hacc__img,
   .hacc__title,
   .hacc__ambient-layer,
-  .hacc__photo-veil,
   .hacc__spine-title,
   .hacc__spine-plus,
   .hacc__cta svg,
-  .hacc__spine::before {
+  .hacc__spine::before,
+  .hacc__item::after {
     transition: none !important;
   }
 
