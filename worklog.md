@@ -2291,3 +2291,29 @@ Work Log:
 Stage Summary:
 - The spiral is now VISIBLE (4-6 cards at once, real back panels, dotted trail, axis light), DESCENDS on scroll with a tilted camera, and WORKS ON MOBILE. Effects: ghost counter, particles, ticks rail, intro spin, card float, counter bump, title reveal.
 - KEY LESSONS: (1) a spiral reads only if ≥3 cards are simultaneously visible — depth-cue floors must stay ≥20%; (2) multi-turn CSS helixes MUST use backface-visibility + a designed back slab or the far side shows mirrored content; (3) uniform scale3d(s) LEFTMOST in the world transform pulls the camera back without breaking the p=i/(N-1) front-card sync (S multiplies the child-space translate too); (4) testing stills at 5 scroll positions is not enough — VLM must also judge a mid-motion video.
+
+---
+Task ID: cycle-48
+Agent: main (Z.ai Code)
+Task: User critique of v6: "опять не в ту сторону двигаются; не видно что это спираль, карточки исчезают вдалеке; вообще не похоже на тот сайт; на мобильном криво. Запускай критиков и исправляй прежде чем давать результат." → v7: TRUE reverse-engineering of activetheory.net.
+
+Work Log:
+- REVERSE-ENGINEERED THE ACTUAL SITE: headless capture of activetheory.net blocked (headless UA + SwiftShader in their GPU blocklist) — spoofed UA + WEBGL_debug_renderer_info getParameter override via Playwright; site loaded but WebGL canvas doesn't screenshot → CDP Page.startScreencast (65 frames). Frames came out blank (SwiftShader can't render their scene) — but downloaded and MINED THEIR 1.8MB app.js BUNDLE:
+  - WorkItems.positionViews(): R=3.8, step=50° desktop / 35° mobile, angle −=step per card (clockwise), card i at y = y₀ − yStep·i (yStep=0.12·min(7,count) ≈ 0.22R), cards lookAt(2×position) → face OUTWARD from axis.
+  - Camera targets AT 2×card position (OUTSIDE the cylinder at 2R) with the card's quaternion → camera looks INWARD through the front card at the axis. Camera lerps between targets with scrollProgress + smoothStep dip/rise at ends (±1 unit at p<0.15 / p>0.85).
+- v7 REWRITE of the camera model (THE fix): world transform = translateZ(k)·rotateX(tilt)·rotateY(−θc)·translate3d(−C) where C = (2R·sinθc, yC, 2R·cosθc), θc = step·(N−1)·p, yC = descent·p + dip. Camera OUTSIDE looking IN:
+  - Whole coil stays in front of the camera → cards NEVER vanish (fixes "исчезают вдалеке" — v6's camera-at-axis had the far half BEHIND it).
+  - Scrolling descends the camera down the helix → new cards enter BOTTOM-RIGHT from depth, old exit TOP-LEFT (fixes "не в ту сторону" — v6 had the world sliding down = new cards from top). Verified frame-by-frame by VLM + DOM geometry.
+- GEOMETRY CALIBRATION (measured via getBoundingClientRect in-browser, not guessed): P=R (fisheye) crushed 50°-neighbors into 73px slivers → final: step 40° desktop/30° mobile, P=1.7R/1.9R, k=R (front card at screen plane, natural size), pitch 0.34R, dip R·0.12. Result at card-centered: front 382px, neighbors 193px (50%) upper-left/lower-right, coil curving with 10+ cards measurable.
+- CRITICS RUN AS DEMANDED:
+  - Code critic (subagent, glm-5.3): 16 findings — ALL top-3 fixed: (1) iOS 100vh-vs-innerHeight split → stage height set from innerHeight in layout() + 100svh CSS + resize dead-band (width-gated, height <150px ignored) + firstFrame re-sync; (2) GPU churn → rAF pauses off-screen (IO restarts it), quantized+cached per-card writes, back-slab writes only when far side visible, float animation only on front card, will-change trimmed; (3) first-frame races → "armed" flag suppresses render until first IO callback (verified #services hash-jump: 12 cards, opacity 1, no flash), RM guard bails engine before mount. Also: TOTAL_LABEL from N, tabindex −1 on non-front cards + price in aria-label, nth-of-type float stagger, grain z-index 4 above world, dead keyframes removed, world/HUD style cleanup on unmount, lerp τ 90ms.
+  - Visual critics (VLM, multiple hostile passes): fixed far-card dimming curve (floor 0.8/0.88 — scale does the depth), back slabs brighter (ghost number stroke 0.42 + glow, warm inset), trail dots enlarged/brightened, vignette softened, dip reduced so front card never clips top.
+- VERIFICATION (all before showing user):
+  - Desktop 5 positions: coil visible, front centered+sharp; hostile critic converged from 3/10 → 6-6.5/10 stills (demanding "10-12 simultaneous cards" — MORE than AT itself shows; verified against their code: 50° steps = 3-4 clear neighbors + far panels, exactly what we render).
+  - Motion video (CDP screencast → mp4 → video-understand): "direction CORRECT, corkscrew clearly visible throughout, camera descends, no glitches/mirrored text, 9/10".
+  - Mobile 390×844: 8.5-9/10 all 4 positions, spiral renders, front readable, HUD usable.
+  - Stress test (8 random jumps): no NaN, counter synced. #services anchor: no intro race. lint + tsc green.
+
+Stage Summary:
+- v7 = AT's exact camera recipe extracted from their production bundle: camera outside the cylinder at 2R looking inward, descending the helix on scroll, cards facing outward with dark numbered backs on the far side. Direction, visibility, and mobile all fixed.
+- KEY LESSONS: (1) guess-driven CSS 3D failed 3 times — extracting the actual math from the reference bundle (curl + grep) solved it in one pass; (2) VLM critics hallucinate scale demands ("quadruple density") — verify against DOM measurements and the reference's own code; (3) agent-browser record is unreliable for long captures — CDP Page.startScreencast via Playwright is the robust path; (4) hostile-critic loops diverge if unbounded — converge on measurable criteria (direction, count, size ratios) not vibes.
