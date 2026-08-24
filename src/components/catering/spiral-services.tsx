@@ -263,7 +263,10 @@ const N = SPIRAL.length; // 12
 const TURNS = 1; // 1 full revolution of the helix across the scroll range
                  // (clean linear cycling: card i is at front at p = i/(N-1))
 const R = 300; // helix radius, px (card center distance from central axis)
-const H_STEP = 130; // vertical step per card, px (card-center spacing)
+const H_STEP = 105; // vertical step per card, px (card-center spacing).
+                   // v2 lowered from 130 → 105 to fit more cards in the
+                   // viewport vertically (6 visible at p=0 instead of 4,
+                   // per critique C1 §A that said "feels flat at start").
 
 /** Phase offset so card 0 starts at the FRONT of the cylinder (facing the
  *  camera, on the +Z axis). Without this, card 0 would start on the +X
@@ -344,14 +347,18 @@ function SpiralCard({
     let norm = ((eff % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
     if (norm > Math.PI) norm -= 2 * Math.PI;
     const facing = Math.sin(norm); // 1 at π/2 (front), -1 at -π/2 (back)
-    const o = 0.18 + 0.82 * ((facing + 1) / 2);
-    return Math.max(0.12, Math.min(1, o));
+    // Stronger falloff than v1: 0.08..1.0 (back cards almost invisible,
+    // giving the cylinder a true depth-of-field read instead of a flat
+    // stack — per design critique C1 §Tier-A #2).
+    const o = 0.08 + 0.92 * ((facing + 1) / 2);
+    return Math.max(0.05, Math.min(1, o));
   });
 
   /**
-   * Card scale: subtle depth scale — cards at the front are slightly
-   * larger (closer to camera), cards at the back are slightly smaller.
-   * Keeps the spiral feeling three-dimensional.
+   * Card scale: stronger depth scale — cards at the front are full size
+   * (1.0), cards at the back shrink to 0.62 (back of cylinder appears
+   * further from camera). v1 was 0.85..1.0 (too tame — back cards read
+   * as "layout mistake" per critique C1).
    */
   const scale = useTransform(scrollYProgress, (p) => {
     const groupRot = -p * TURNS * Math.PI * 2;
@@ -359,7 +366,37 @@ function SpiralCard({
     let norm = ((eff % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
     if (norm > Math.PI) norm -= 2 * Math.PI;
     const facing = Math.sin(norm);
-    return 0.85 + 0.15 * ((facing + 1) / 2);
+    return 0.62 + 0.38 * ((facing + 1) / 2);
+  });
+
+  /**
+   * Depth-of-field filter (per critique C1 §A #2 + Tier-C #1): back cards
+   * get a Gaussian blur + desaturation, front cards stay razor-sharp.
+   * This is THE trick that makes ActiveTheory's spirals feel "alive" —
+   * without it, the cylinder reads as a flat stack of divs.
+   *
+   *   facingFactor: 1.0 at front (π/2), 0.0 at back (3π/2)
+   *   blur: 0px front → 9px back (sqrt curve so cards just-behind-front
+   *     get visible blur immediately, not only cards at the very back)
+   *   saturate: 1.0 front → 0.4 back (desaturated, dimmed color)
+   *
+   * NOTE: filter:blur is a paint operation (GPU-composited) — does not
+   * trigger layout. Allowed per existing pattern in stage-services.css
+   * line 194 (`filter: blur(1.6px) saturate(0.65)` for back cards).
+   */
+  const filter = useTransform(scrollYProgress, (p) => {
+    const groupRot = -p * TURNS * Math.PI * 2;
+    const eff = angle + groupRot;
+    let norm = ((eff % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    if (norm > Math.PI) norm -= 2 * Math.PI;
+    const facing = Math.sin(norm);
+    const facingFactor = (facing + 1) / 2; // 1 front, 0 back
+    // sqrt curve: blur grows fast near the front so cards just-behind
+    // the active card get visible blur immediately (the VLM critique
+    // noted v1's linear 5px curve was imperceptible on near-front cards).
+    const blurPx = Math.sqrt(1 - facingFactor) * 9; // 0 front → 9px back
+    const sat = 0.4 + facingFactor * 0.6; // 0.4 back → 1.0 front
+    return `blur(${blurPx.toFixed(2)}px) saturate(${sat.toFixed(2)})`;
   });
 
   return (
@@ -378,6 +415,7 @@ function SpiralCard({
         rotateY: (rotY * 180) / Math.PI, // Framer Motion's rotateY expects degrees
         opacity,
         scale,
+        filter,
       }}
     >
       <Link
@@ -542,8 +580,11 @@ export function SpiralServices() {
       aria-labelledby="spiral-services-title"
     >
       <div className="sp-st__sticky">
-        {/* ambient spotlight behind the helix */}
+        {/* ambient spotlight behind the helix (pulsing warm glow) */}
         <div className="sp-st__spotlight" aria-hidden="true" />
+        {/* perspective-warped ground plane grid for cinematic depth */}
+        <div className="sp-st__ground" aria-hidden="true" />
+        {/* subtle film grain */}
         <div className="sp-st__grain" aria-hidden="true" />
 
         {/* header */}

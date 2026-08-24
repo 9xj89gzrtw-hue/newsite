@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  // Hide the Next.js dev mode "N issues" indicator badge (Cycle 45 — was
+  // showing in spiral screenshots and looked like a browser error).
+  devIndicators: false,
   allowedDevOrigins: ["*.space-z.ai", "*.chatglm.cn", "*.z.ai"],
   images: {
     formats: ["image/avif", "image/webp"],
