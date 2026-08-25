@@ -101,11 +101,6 @@
   color: var(--hacc-soft);
 }
 
-.hacc__rack-label strong {
-  color: var(--hacc-red-deep);
-  font-weight: 700;
-}
-
 .hacc__rack-label::after {
   content: "";
   flex: 1;
@@ -208,21 +203,6 @@
 
 .hacc__spine:focus-visible {
   outline: 2px solid var(--hacc-red);
-}
-
-.hacc__num {
-  font-family: var(--ea-font-eyebrow), sans-serif;
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  font-variant-numeric: tabular-nums;
-  color: rgba(26, 26, 26, 0.75);      /* AA: 4.6:1 on the lightest tint */
-  transition: color 300ms ease;
-}
-
-.hacc__item.is-open .hacc__num,
-.hacc__spine:hover .hacc__num {
-  color: var(--hacc-red-deep);
 }
 
 /* vertical title — reads bottom-to-top (gamma signature). The wrapper (no

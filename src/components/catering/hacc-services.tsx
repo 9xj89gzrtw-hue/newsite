@@ -190,7 +190,7 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "На природе",
     tint: "#F3E3E8",
-    media: "/media/c53/steik.webp",
+    media: "/media/c55/barbekyu.webp",
     mediaAlt: "Стейк на кости жарится на живых углях",
     ctaLabel: "Рассчитать барбекю",
     ctaHref: "#calculator",
@@ -204,7 +204,7 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "Миксология",
     tint: "#F5EEE2",
-    media: "/media/c53/bar.webp",
+    media: "/media/c55/bar.webp",
     mediaAlt: "Бармен наливает коктейль за выездной барной стойкой",
     ctaLabel: "Обсудить бар",
     ctaHref: "#contact",
@@ -218,7 +218,7 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "Живая кухня",
     tint: "#F6E0DB",
-    media: "/media/c53/live.webp",
+    media: "/media/c55/shou.webp",
     mediaAlt: "Шеф-повар за живой кухней в облаке пара",
     ctaLabel: "Обсудить станции",
     ctaHref: "#contact",
@@ -232,7 +232,7 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "Доставка",
     tint: "#E6EBDF",
-    media: "/media/c53/boksy.webp",
+    media: "/media/c55/boksy.webp",
     mediaAlt: "Кейтеринг-боксы с закусками и десертами",
     ctaLabel: "Заказать боксы",
     ctaHref: "#calculator",
@@ -246,7 +246,7 @@ const SERVICES: HaccService[] = [
     priceLabel: "за торт",
     tag: "Десерт",
     tint: "#F6E9C9",
-    media: "/media/c53/tort.webp",
+    media: "/media/c55/tort.webp",
     mediaAlt: "Двухъярусный торт с клубникой, малиной и ежевикой",
     ctaLabel: "Обсудить торт",
     ctaHref: "#contact",
@@ -274,7 +274,7 @@ const SERVICES: HaccService[] = [
     priceLabel: "смета за один день",
     tag: "Всё, кроме еды",
     tint: "#F3E3E8",
-    media: "/media/gamma/c49-logistika-hires.webp",
+    media: "/media/c55/logistika.webp",
     mediaAlt: "Сервировка и логистика крупного мероприятия",
     ctaLabel: "Обсудить логистику",
     ctaHref: "#contact",
@@ -282,9 +282,9 @@ const SERVICES: HaccService[] = [
 ];
 
 /** The semantic split: event formats vs services & extras. */
-const GROUPS: { label: string; range: string }[] = [
-  { label: "Форматы события", range: "01–06" },
-  { label: "К любому формату", range: "07–12" },
+const GROUPS: { label: string }[] = [
+  { label: "Форматы события" },
+  { label: "К любому формату" },
 ];
 
 const GROUP_SIZE = 6;
@@ -612,7 +612,7 @@ function HaccRack({
       ref={rackRef}
       className="hacc__rack"
       role="group"
-      aria-label={`${groupLabel} — ${N} форматов`}
+      aria-label={`${groupLabel} — форматы кейтеринга`}
       data-autoplay={autoplayOn ? "on" : "off"}
       data-paused={paused ? "true" : "false"}
       initial={reduced ? false : "hidden"}
@@ -677,9 +677,9 @@ function HaccRack({
                 onMouseEnter={() => onSpineEnter(k)}
                 onMouseLeave={clearHoverIntent}
               >
-                <span className="hacc__num" aria-hidden="true">
-                  {s.index}
-                </span>
+                {/* cycle-55: spine numbers REMOVED — the user asked twice
+                    what they're for; the honest answer was "nothing". The
+                    rack labels name the groups; the titles sell the service. */}
                 <span className="hacc__spine-title">
                   <span className="hacc__spine-title-text">{s.title}</span>
                 </span>
@@ -881,7 +881,7 @@ export function HaccServices() {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <div className="hacc__head-text">
-            <span className="ea-eyebrow">Форматы и сервисы · 01–12</span>
+            <span className="ea-eyebrow">Форматы и сервисы</span>
             <h2 id="hacc-heading" className="ea-section-h2">
               {"Сначала формат. "}
               <i className="ea-italic-fragment">Потом меню.</i>
@@ -913,10 +913,7 @@ export function HaccServices() {
           onFocusCapture={() => handleEngage(gi)}
         >
           <div className="ea-container ea-container--wide">
-            <p className="hacc__rack-label">
-              <strong>{g.range}</strong>
-              {g.label}
-            </p>
+            <p className="hacc__rack-label">{g.label}</p>
           </div>
           <HaccRack
             items={SERVICES.slice(gi * GROUP_SIZE, gi * GROUP_SIZE + GROUP_SIZE)}
