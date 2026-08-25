@@ -53,7 +53,6 @@ import {
 } from "react";
 import Link from "next/link";
 import {
-  AnimatePresence,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -177,8 +176,8 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "Офис",
     tint: "#F4DECD",
-    media: "/media/c53/kofe.webp",
-    mediaAlt: "Кофе-брейк: стойка с выпечкой, фруктами и кофе",
+    media: "/media/c53/kofe-stol.webp",
+    mediaAlt: "Кофе-брейк: круассаны, пирог и кофе с латте-артом",
     ctaLabel: "Заказать кофе-брейк",
     ctaHref: "#calculator",
   },
@@ -191,8 +190,8 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "На природе",
     tint: "#F3E3E8",
-    media: "/media/c53/ribay.webp",
-    mediaAlt: "Шеф готовит стейки на гриле с живым огнём",
+    media: "/media/c53/steik.webp",
+    mediaAlt: "Стейк на кости жарится на живых углях",
     ctaLabel: "Рассчитать барбекю",
     ctaHref: "#calculator",
   },
@@ -892,36 +891,10 @@ export function HaccServices() {
               раскройте формат — увидите меню, команду и цену за гостя.
             </p>
           </div>
-          {/* live counter HUD — the big index mirrors the big H2 on the left
-              and ticks with the focused rack's autoplay (desktop ≥1024px) */}
+          {/* cycle-54: the big 01/12 counter is GONE — it ticked far from
+              where the eye reads (700px above rack B) and duplicated the
+              spine indices; pure decoration with no job. The hint stays. */}
           <div className="hacc__meta">
-            <div className="hacc__counter" aria-hidden="true">
-              <span className="hacc__counter-current">
-                {prefersReduced ? (
-                  activeIndex !== null ? (
-                    SERVICES[activeIndex].index
-                  ) : (
-                    "··"
-                  )
-                ) : (
-                  <AnimatePresence mode="popLayout" initial={false}>
-                    <motion.span
-                      key={activeIndex === null ? "none" : activeIndex}
-                      initial={{ y: 16, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -16, opacity: 0 }}
-                      transition={{ duration: 0.32, ease: EASE }}
-                      className="hacc__counter-num"
-                    >
-                      {activeIndex !== null ? SERVICES[activeIndex].index : "··"}
-                    </motion.span>
-                  </AnimatePresence>
-                )}
-              </span>
-              <span className="hacc__counter-total">
-                /&nbsp;{String(SERVICES.length).padStart(2, "0")}
-              </span>
-            </div>
             <span className="hacc__hint" aria-hidden="true">
               <MousePointer2 aria-hidden="true" />
               Троньте корешок — формат развернётся
