@@ -14,7 +14,9 @@
    ========================================================================== */
 
 .hmenu {
-  /* ---- токены (px, чтобы JS мог parseFloat — gamma trick) ---------------- */
+  /* ---- токены (px, чтобы JS мог parseFloat — gamma trick) ----------------
+     спайны чуть уже услуг (54/92 против 56/96): семь корешков на рэк
+     против шести — иначе открытая панель теряет проценты ширины ------ */
   --hmenu-spine: 54px;       /* ширина закрытого корешка (7 штук на рэк)    */
   --hmenu-spine-open: 92px;  /* ширина корешка открытой панели              */
   --hmenu-gap: 4px;          /* зазор между панелями                        */
@@ -96,6 +98,15 @@
   cursor: progress;
 }
 
+/* статус ошибки PDF (aria-live) — резервируем место, чтобы не дёргалось */
+.hmenu__pdf-status {
+  min-height: 1.1em;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.78rem;
+  color: var(--hmenu-red-deep);
+  text-align: right;
+}
+
 .hmenu__hint {
   display: inline-flex;
   align-items: center;
@@ -158,7 +169,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 900ms var(--hmenu-ease);
+  transition: opacity var(--hmenu-dur) var(--hmenu-ease);
 }
 
 /* ────────────────────────────────────────────── the rack (desktop flex) ── */
@@ -494,11 +505,15 @@
   min-width: 0;
 }
 
-/* табы пакетов — uppercase + красное подчёркивание активного */
+/* табы пакетов — uppercase + красное подчёркивание активного.
+   flex-wrap ОБЯЗАТЕЛЕН: у snack-box четыре пакета с длинными именами,
+   без переноса цена наезжает на табы при 1024–1280 (критик R1, B1) */
 .hmenu__tabs {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: clamp(0.8rem, 1.6vw, 1.6rem);
+  row-gap: 0.3rem;
   border-bottom: 1px solid rgba(26, 26, 26, 0.25);
   flex: none;
 }
@@ -588,7 +603,8 @@
   display: flex;
 }
 
-/* мягкое затухание внизу — честный сигнал «список продолжается» */
+/* мягкое затухание внизу — честный сигнал «список продолжается».
+   Класс is-scrollable ставит JS-замер (scrollHeight > clientHeight) */
 .hmenu__listwrap::after {
   content: "";
   position: absolute;
@@ -604,6 +620,12 @@
 
 .hmenu__listwrap.is-scrollable::after {
   opacity: 1;
+}
+
+/* fade не должен съедать последнюю строку — компенсируем паддингом
+   (2.2rem > высоты градиента 34px — критик R2, п.3) */
+.hmenu__listwrap.is-scrollable .hmenu__list {
+  padding-bottom: 2.2rem;
 }
 
 .hmenu__list {
@@ -697,6 +719,12 @@
   color: var(--hmenu-soft);
 }
 
+/* нечётный последний пункт не висит одиноко во второй колонке
+   (bbq и snack-box имеют 5 пунктов — критик R1, n3) */
+.hmenu__incl-item:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .hmenu__check {
   flex: none;
   width: 14px;
@@ -751,6 +779,58 @@
   line-height: 1.55;
   color: var(--hmenu-soft);
   max-width: 52ch;
+}
+
+/* хинт про корешок — только там, где hover-механика существует:
+   на таче и узких экранах он врёт (критик R1, m2; как в услугах) */
+@media (max-width: 1023px), (hover: none) {
+  .hmenu__hint {
+    display: none;
+  }
+}
+
+/* ──────────────────── узкий десктоп (1024–1279): вертикальный бюджет ── */
+/* На этой ширине панель ~586px: трёхколоночная шапка (tag+титул+цена) и
+   «включено» съедают высоту, списку блюд остаётся ~70px. Убираем tag
+   (категория названа корешком и скрипт-титулом), ужимаем титул/паддинги. */
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .hmenu__row-head {
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+    padding-block: 0.35rem 0.85rem;
+  }
+
+  .hmenu__tag {
+    display: none;
+  }
+
+  .hmenu__title {
+    justify-self: start;
+    text-align: left;
+    font-size: clamp(1.85rem, 2.4vw, 2.2rem);
+  }
+
+  .hmenu__price {
+    justify-self: end;
+  }
+
+  .hmenu__body {
+    padding: clamp(0.9rem, 1.6vw, 1.25rem) clamp(1rem, 1.8vw, 1.5rem)
+      clamp(0.9rem, 1.5vw, 1.25rem) clamp(0.65rem, 1.2vw, 1rem);
+  }
+
+  .hmenu__mid {
+    grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+    gap: 0.85rem;
+  }
+
+  .hmenu__hook {
+    font-size: 0.88rem;
+  }
+
+  .hmenu__row-foot {
+    padding-top: 0.65rem;
+  }
 }
 
 /* ───────────────────────────── мобильный (<1024px): вертикальный стек ── */
@@ -952,9 +1032,21 @@
 /* ───────────────────────────────────────────────────────── print styles ── */
 
 @media print {
+  /* экраные MQ (1024–1279 скрывает tag, узкий row-head) не должны
+     действовать в печати из широкого окна — восстанавливаем явно
+     (критик R2, п.2; блок идёт ПОСЛЕ всех экраных MQ — побеждает) */
+  .hmenu__row-head {
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
+  }
+
+  .hmenu__tag {
+    display: block;
+  }
+
   .hmenu__ambient,
   .hmenu__hint,
   .hmenu__pdf,
+  .hmenu__pdf-status,
   .hmenu__spine-plus {
     display: none !important;
   }
@@ -1008,6 +1100,11 @@
     grid-template-columns: 1fr;
   }
 
+  /* фото схлопывается в 0 без явного аспекта (критик R1, M3) */
+  .hmenu__media {
+    aspect-ratio: 16 / 10;
+  }
+
   .hmenu__listwrap {
     overflow: visible;
   }
@@ -1016,7 +1113,10 @@
     overflow: visible;
   }
 
-  .hmenu__title {
+  /* специфичность 0,3,0 — перебивает .hmenu__item.is-open .hmenu__title
+     (−6° settle) в печати (критик R2, п.1) */
+  .hmenu__item .hmenu__title,
+  .hmenu__item.is-open .hmenu__title {
     transform: none;
     text-align: left;
   }

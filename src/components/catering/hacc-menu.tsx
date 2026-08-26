@@ -122,6 +122,9 @@ const FALLBACK_META = {
   priceLabel: "за гостя",
 };
 
+/** Если у пакета нет фото — показываем проверенный фуршетный кадр. */
+const FALLBACK_PHOTO = "/media/furshet-1.jpg";
+
 const MENUS: MenuCat[] = MENU_TYPES.map((m) => {
   const meta = META[m.id] ?? FALLBACK_META;
   return { ...m, ...meta, priceLabel: meta.priceLabel ?? "за гостя" };
@@ -323,8 +326,8 @@ function MenuRack({
       if (!r.width || !r.height) return;
       const nx = (e.clientX - r.left) / r.width - 0.5;
       const ny = (e.clientY - r.top) / r.height - 0.5;
-      px.set(Math.max(-0.6, Math.min(0.6, nx)) * 18);
-      py.set(Math.max(-0.6, Math.min(0.6, ny)) * 11);
+      px.set(Math.max(-0.6, Math.min(0.6, nx)) * 20);
+      py.set(Math.max(-0.6, Math.min(0.6, ny)) * 12);
     },
     [desktopFine, reduced, px, py],
   );
@@ -367,6 +370,32 @@ function MenuRack({
   const selectPkg = useCallback((catId: string, i: number) => {
     setPkgs((prev) => (prev[catId] === i ? prev : { ...prev, [catId]: i }));
   }, []);
+
+  /* M1: fade-индикатор «список продолжается» — живой замер скролла открытой
+     панели (перепроверяется при смене пакета/категории и на resize) --------- */
+  const listRefs = useRef<(HTMLUListElement | null)[]>([]);
+  const [scrollable, setScrollable] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (openIndex === null) return;
+    const cat = cats[openIndex];
+    const el = listRefs.current[openIndex];
+    if (!cat || !el) return;
+    const check = () => {
+      const can = el.scrollHeight > el.clientHeight + 1;
+      setScrollable((prev) =>
+        prev[cat.id] === can ? prev : { ...prev, [cat.id]: can },
+      );
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    window.addEventListener("resize", check);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", check);
+    };
+  }, [openIndex, pkgs, cats]);
 
   const onTabKeyDown = useCallback(
     (e: ReactKeyboardEvent<HTMLButtonElement>, catId: string, pkgCount: number, current: number) => {
@@ -425,8 +454,12 @@ function MenuRack({
     >
       {cats.map((cat, k) => {
         const isOpen = openIndex === k;
-        const pkgIdx = Math.min(pkgs[cat.id] ?? 0, cat.packages.length - 1);
-        const pkg = cat.packages[pkgIdx];
+        const pkgIdx = Math.max(
+          0,
+          Math.min(pkgs[cat.id] ?? 0, cat.packages.length - 1),
+        );
+        // лёгкий guard от развязки данных (n6): пустой/битый массив пакетов
+        const pkg = cat.packages[pkgIdx] ?? cat.packages[0];
         return (
           <motion.div
             key={cat.id}
@@ -481,6 +514,7 @@ function MenuRack({
               aria-labelledby={spineId(k)}
               inert={!isOpen}
             >
+              {pkg ? (
               <div className="hmenu__body">
                 {/* head: tag · script-заголовок · цена «от» */}
                 <div className="hmenu__row-head">
@@ -503,14 +537,14 @@ function MenuRack({
                       style={{ x: parallaxX, y: parallaxY }}
                     >
                       <motion.div
-                        key={pkg.photo}
+                        key={pkg.photo ?? FALLBACK_PHOTO}
                         className="hmenu__media-fade"
                         initial={reduced ? false : { opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, ease: EASE }}
                       >
                         <SmartImage
-                          src={pkg.photo}
+                          src={pkg.photo ?? FALLBACK_PHOTO}
                           alt={`«${pkg.name}» — ${cat.label}: ${pkg.description}`}
                           fill
                           blurDataURL={BLUR_DATA_URL}
@@ -556,15 +590,28 @@ function MenuRack({
                       </span>
                     </div>
 
-                    {/* блюда выбранного пакета */}
+                    {/* блюда выбранного пакета. tabIndex=0 — панель со
+                        скроллом доступна с клавиатуры (APG tabs) */}
                     <div
                       className="hmenu__tabpanel"
                       id={`${baseId}-dishlist-${cat.id}`}
                       role="tabpanel"
                       aria-labelledby={`${baseId}-pkg-${cat.id}-${pkgIdx}`}
+                      tabIndex={0}
+                      aria-label={`Состав — ${pkg.name}`}
                     >
-                      <div className="hmenu__listwrap">
-                        <ul className="hmenu__list">
+                      <div
+                        className={
+                          "hmenu__listwrap" +
+                          (scrollable[cat.id] ? " is-scrollable" : "")
+                        }
+                      >
+                        <ul
+                          className="hmenu__list"
+                          ref={(el) => {
+                            listRefs.current[k] = el;
+                          }}
+                        >
                           {pkg.dishes.map((dish, di) => (
                             <li key={`${dish.name}-${di}`} className="hmenu__dish">
                               <span className="hmenu__dish-name">{dish.name}</span>
@@ -607,6 +654,7 @@ function MenuRack({
                   </Magnetic>
                 </div>
               </div>
+              ) : null}
             </div>
           </motion.div>
         );
@@ -621,6 +669,8 @@ export function HaccMenu() {
   const prefersReduced = useReducedMotion();
   /** Скачивание PDF-каталога — единственная ссылка, в шапке секции. */
   const [pdfBusy, setPdfBusy] = useState(false);
+  /** m3: честный статус ошибки — молча падать нельзя (проверка критика). */
+  const [pdfError, setPdfError] = useState(false);
   /** Открытая категория — ведёт ambient wash (как focus-модель в услугах). */
   const [activeIdx, setActiveIdx] = useState<number | null>(0);
   const handleOpenChange = useCallback((i: number | null) => setActiveIdx(i), []);
@@ -628,11 +678,11 @@ export function HaccMenu() {
   const downloadPdf = useCallback(async () => {
     if (pdfBusy) return;
     setPdfBusy(true);
+    setPdfError(false);
     try {
       await generateMenuPdf("all");
     } catch {
-      // Тихая честность: если PDF не собрался — просто возвращаем кнопку.
-      // (Файл сам по себе и есть подтверждение успеха.)
+      setPdfError(true);
     } finally {
       setPdfBusy(false);
     }
@@ -678,10 +728,19 @@ export function HaccMenu() {
             </h2>
             <p className="hmenu__lede">
               Семь каталогов — от канапе до мангала. Раскройте корешок:
-              внутри три уровня меню, состав блюд и цена за гостя.
+              состав пакетов, список блюд и цена за гостя.
             </p>
           </div>
           <div className="hmenu__meta">
+            <span
+              className="hmenu__pdf-status"
+              aria-live="polite"
+              role="status"
+            >
+              {pdfError
+                ? "Не удалось собрать PDF — попробуйте ещё раз."
+                : ""}
+            </span>
             <button
               type="button"
               className="ea-text-link hmenu__pdf"
