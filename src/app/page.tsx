@@ -5,7 +5,7 @@ import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
 import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
 import { HaccServices } from "@/components/catering/hacc-services";
-import { Menu } from "@/components/catering/menu";
+import { HaccMenu } from "@/components/catering/hacc-menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
 import { CepProcess } from "@/components/catering/cep-process";
@@ -159,8 +159,9 @@ export default function Home() {
              convention). */}
       <HaccServices />
 
-      {/* 7. Menu — 7 menu types with interactive list + real dishes + PDF. */}
-      <Menu />
+      {/* 7. Menu — Cycle 58: каталог меню в гамма-стиле блока услуг
+          (hacc-механика: корешки, тинты, Marck Script, табы пакетов). */}
+      <HaccMenu />
 
       {/* 8. TottParallaxBand — PARALLAX BAND. Talk of the Town CSS-parallax bg
              (background-attachment:fixed) + char-split headline reveal + "bon
