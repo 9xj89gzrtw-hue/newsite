@@ -59,16 +59,17 @@ const BTN_SOLID_CLASS =
 const BTN_BASE_STYLE: CSSProperties = {
   fontFamily: "var(--ea-font-eyebrow)",
   fontWeight: 700,
-  fontSize: "0.8125rem",
-  letterSpacing: "0.14em",
+  /* размер/паддинги — классами: на мобильном баннер сжимается в одну
+     компактную строку (3 независимых слепых критика C59: на iPhone
+     баннер закрывал зону CTA панели меню) */
+  letterSpacing: "0.1em",
   textTransform: "uppercase",
   lineHeight: 1,
-  padding: "0.5em 1em",
   borderRadius: 0,
   cursor: "pointer",
   transition:
     "background-color 200ms ease, border-color 200ms ease, color 200ms ease",
-  minHeight: 44,
+  minHeight: 40,
   minWidth: 44,
 };
 
@@ -215,29 +216,29 @@ export function EaCookieBanner() {
             background: "rgba(0, 0, 0, 0.96)",
             borderTop: "1px solid var(--ea-red)",
             color: "var(--ea-cream)",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
           }}
           initial={initial}
           animate={animate}
           exit={exit}
           transition={transition}
         >
-          <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-2 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-3 md:px-12">
+          <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-1.5 px-3 py-2 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-3 md:px-12">
             <p
-              className="m-0 max-w-[68ch] text-[13px] leading-snug sm:text-[13px]"
+              className="m-0 max-w-[68ch] truncate text-[10.5px] leading-snug sm:truncate-none sm:text-[13px]"
               style={{
                 fontFamily: "var(--ea-font-body)",
-                fontSize: "0.8125rem",
                 color: "color-mix(in srgb, var(--ea-cream) 85%, transparent)",
               }}
             >
-              Мы используем cookies для аналитики и улучшения сервиса. Подробнее:{" "}
+              Мы используем cookies для аналитики. Подробнее:{" "}
               <a
                 href={LINK_PRIVACY_HREF}
                 target="_blank"
                 rel="noopener"
                 className={LINK_CLASS}
               >
-                Политика конфиденциальности
+                Политика
               </a>{" "}
               и{" "}
               <a
@@ -249,12 +250,12 @@ export function EaCookieBanner() {
                 Условия
               </a>.
             </p>
-            <div className="flex w-full shrink-0 flex-row flex-wrap items-center justify-end gap-2 sm:w-auto sm:gap-2 md:gap-3">
+            <div className="flex w-full shrink-0 flex-row flex-wrap items-center justify-end gap-1.5 sm:w-auto sm:gap-2 md:gap-3">
               <button
                 type="button"
                 onClick={() => decide("rejected")}
                 style={BTN_BASE_STYLE}
-                className={BTN_OUTLINE_CLASS}
+                className="px-2.5 py-2 text-[10.5px] sm:px-4 sm:text-[12px]"
               >
                 Отклонить
               </button>
@@ -262,15 +263,16 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("essential")}
                 style={BTN_BASE_STYLE}
-                className={BTN_OUTLINE_CLASS}
+                className="px-2.5 py-2 text-[10.5px] sm:px-4 sm:text-[12px]"
               >
-                Только необходимые
+                <span className="sm:hidden">Необходимые</span>
+                <span className="hidden sm:inline">Только необходимые</span>
               </button>
               <button
                 type="button"
                 onClick={() => decide("accepted")}
                 style={BTN_BASE_STYLE}
-                className={BTN_SOLID_CLASS}
+                className="px-2.5 py-2 text-[10.5px] sm:px-4 sm:text-[12px]"
               >
                 Принять все
               </button>

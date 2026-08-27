@@ -20,8 +20,9 @@
   --hmenu-spine: 54px;       /* ширина закрытого корешка (7 штук на рэк)    */
   --hmenu-spine-open: 92px;  /* ширина корешка открытой панели              */
   --hmenu-gap: 4px;          /* зазор между панелями                        */
-  --hmenu-ease: cubic-bezier(0.37, 0, 0.63, 1);  /* gamma easeInOutSine     */
-  --hmenu-dur: 620ms;
+  /* expo-out (жюри C59 REQ4): авторская кривая вместо easeInOutSine */
+  --hmenu-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --hmenu-dur: 780ms;
   --hmenu-ink: var(--ea-ink, #1a1a1a);
   --hmenu-red: var(--ea-red, #e71d3a);
   --hmenu-red-deep: var(--ea-red-deep, #b91431);  /* AA-safe на тинтах       */
@@ -179,8 +180,15 @@
   z-index: 1;
   display: flex;
   gap: var(--hmenu-gap);
-  /* меню — поверхность чтения: рэк чуть выше рэков услуг (480–640) */
+  /* меню — поверхность чтения: рэк чуть выше рэков услуг (480–640);
+     на низких окнах ноутбука (≤840px) не выходим за 78vh (жюри C59) */
   height: clamp(560px, 72vh, 760px);
+}
+
+@media (min-width: 1024px) and (max-height: 840px) {
+  .hmenu__rack {
+    height: clamp(520px, 80vh, 640px);
+  }
 }
 
 .hmenu__item {
@@ -267,6 +275,8 @@
   margin: 0.8rem 0;
   min-width: 0;
   transition: transform 320ms var(--hmenu-ease);
+  position: relative;
+  z-index: 2;   /* над фото-подглядыванием (peek z0) */
 }
 
 /* вертикальный заголовок — снизу вверх (gamma signature) */
@@ -316,6 +326,46 @@
   .hmenu__item:not(.is-open) .hmenu__spine:hover .hmenu__spine-title {
     transform: translateY(-6px);
   }
+  /* над фото заголовок читается белым */
+  .hmenu__item:not(.is-open) .hmenu__spine:hover .hmenu__spine-title-text {
+    color: rgba(255, 253, 248, 0.96);
+    text-shadow: 0 1px 14px rgba(20, 16, 12, 0.45);
+  }
+}
+
+/* ── фото-подглядывание (сигнатурный момент C59): полоса кадра выезжает
+   из-под корешка при hover. Ноль layout-сдвигов: absolute, transform only */
+.hmenu__spine-peek {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform: translateY(101%);
+  opacity: 0.92;
+  transition: transform 560ms var(--hmenu-ease);
+}
+
+.hmenu__spine-peek-img {
+  object-fit: cover;
+  filter: saturate(0.96) contrast(1.02);
+}
+
+/* затемнение под белый вертикальный заголовок */
+.hmenu__spine-peek::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(20, 16, 12, 0.5),
+    rgba(20, 16, 12, 0.12) 45%,
+    rgba(20, 16, 12, 0.28)
+  );
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hmenu__item:not(.is-open):hover .hmenu__spine-peek {
+    transform: translateY(0);
+  }
 }
 
 /* плюс — только мобильные бары (на десктопе скрыт) */
@@ -332,9 +382,9 @@
   margin-left: var(--hmenu-spine-open);
   width: var(--hmenu-panel-w, calc(100% - var(--hmenu-spine-open)));
   /* в DOM для clip-анимации, но недостижима когда закрыта; visibility
-     прячется ЗАДЕРЖАННО — после завершения коллапса */
+     прячется ЗАДЕРЖАННО — после завершения коллапса (dur 780 + запас) */
   visibility: hidden;
-  transition: visibility 0s linear 700ms;
+  transition: visibility 0s linear 880ms;
 }
 
 .hmenu__item.is-open .hmenu__open {
@@ -431,11 +481,18 @@
   display: block;
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 600;
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--hmenu-soft);
-  margin: 0.2rem 0 0;
+  margin: 0.24rem 0 0;
+}
+
+/* цифра цены — морфит за выбранной ступенью (жюри C59: ценовой отклик) */
+.hmenu__price-num {
+  display: inline-block;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 /* ── середина: фото пакета (слева) + табы и блюда (справа) ─────────────── */
@@ -493,8 +550,9 @@
   background: linear-gradient(to top, rgba(20, 16, 12, 0.62), rgba(20, 16, 12, 0));
   color: rgba(255, 253, 248, 0.94);
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   line-height: 1.45;
+  pointer-events: none;
 }
 
 /* правая колонка: табы → список → «включено» */
@@ -505,15 +563,15 @@
   min-width: 0;
 }
 
-/* табы пакетов — uppercase + красное подчёркивание активного.
-   flex-wrap ОБЯЗАТЕЛЕН: у snack-box четыре пакета с длинными именами,
-   без переноса цена наезжает на табы при 1024–1280 (критик R1, B1) */
+/* табы пакетов — имя + цена ступени (цена видна ДО клика — сравнение
+   без переключения; Марина/Артём C59/W2). flex-wrap ОБЯЗАТЕЛЕН:
+   у snack-box четыре пакета с длинными именами (критик R1, B1) */
 .hmenu__tabs {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: clamp(0.8rem, 1.6vw, 1.6rem);
-  row-gap: 0.3rem;
+  align-items: stretch;
+  gap: clamp(0.9rem, 1.6vw, 1.7rem);
+  row-gap: 0.25rem;
   border-bottom: 1px solid rgba(26, 26, 26, 0.25);
   flex: none;
 }
@@ -523,12 +581,18 @@
   background: none;
   border: 0;
   margin: 0;
-  padding: 0.45rem 0.05rem 0.65rem;
+  padding: 0.7rem 0.05rem;
+  min-height: 44px;            /* тач-цель (симуляция Виктор C59: 35px → ≥44) */
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.1rem;
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 700;
-  font-size: 0.74rem;
-  letter-spacing: 0.15em;
+  font-size: 0.8rem;           /* 11.8px → 12.8px */
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--hmenu-soft);
   cursor: pointer;
@@ -566,25 +630,26 @@
   outline-offset: 2px;
 }
 
-/* цена активного пакета — справа от табов, серифом (как цена в услугах) */
-.hmenu__tab-price {
-  margin-left: auto;
-  font-family: var(--font-serif), Georgia, serif;
-  font-weight: 600;
-  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
-  color: var(--hmenu-ink);
+/* цена ступени под именем — серифная цифра, темнее остального софта:
+   вес/цена — ключевая информация кейтеринга (жюри C59/W2) */
+.hmenu__tab-name {
   white-space: nowrap;
 }
 
-.hmenu__tab-price em {
-  font-style: normal;
-  font-family: var(--ea-font-eyebrow), sans-serif;
+.hmenu__tab-sum {
+  font-family: var(--font-serif), Georgia, serif;
   font-weight: 600;
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--hmenu-soft);
-  margin-left: 0.35rem;
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: rgba(26, 26, 26, 0.8);
+  white-space: nowrap;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.hmenu__tab[aria-selected="true"] .hmenu__tab-sum {
+  color: var(--hmenu-red-deep);
 }
 
 /* список блюд — гамма-строки-лидеры (паттерн .service-section__list) */
@@ -658,7 +723,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   column-gap: 1rem;
-  padding: 0.58rem 0;
+  padding: 0.62rem 0;
   border-bottom: 1px solid var(--hmenu-line);
 }
 
@@ -668,18 +733,18 @@
 
 .hmenu__dish-name {
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: clamp(0.86rem, 0.95vw, 0.94rem);
-  line-height: 1.45;
+  font-size: clamp(0.92rem, 1vw, 1.02rem);  /* 13.8 → 14.7–16.3px (жюри C59) */
+  line-height: 1.5;
   color: var(--hmenu-ink);
 }
 
 .hmenu__dish-weight {
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 600;
-  font-size: 0.66rem;
+  font-size: 0.72rem;          /* 10.6 → 11.5px */
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--hmenu-soft);
+  color: rgba(26, 26, 26, 0.8);   /* контраст весов поднят (жюри C59/W2) */
   white-space: nowrap;
   font-feature-settings: "tnum";
 }
@@ -688,14 +753,16 @@
 .hmenu__incl {
   flex: none;
   margin-top: 0.85rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--hmenu-line);   /* отделяем чек-лист от списка */
 }
 
 .hmenu__incl-label {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.55rem;
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 700;
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
+  font-size: 0.7rem;           /* 9.9 → 11.2px (жюри/Виктор C59) */
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--hmenu-soft);
 }
@@ -714,8 +781,8 @@
   align-items: flex-start;
   gap: 0.5rem;
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.78rem;
-  line-height: 1.4;
+  font-size: 0.83rem;          /* 12.5 → 13.3px */
+  line-height: 1.45;
   color: var(--hmenu-soft);
 }
 
@@ -747,6 +814,9 @@
 
 .hmenu__cta-wrap {
   flex: none;
+  /* зона магнита больше кнопки без layout-сдвига (жюри C59: radius ~80px) */
+  padding: 14px;
+  margin: -14px;
 }
 
 .hmenu__cta {
@@ -773,11 +843,27 @@
   transform: translate(2px, -2px);
 }
 
+.hmenu__foot-text {
+  min-width: 0;
+}
+
 .hmenu__hook {
   font-family: var(--font-sans), system-ui, sans-serif;
   font-size: clamp(0.9rem, 1.05vw, 1rem);
   line-height: 1.55;
   color: var(--hmenu-soft);
+  max-width: 52ch;
+}
+
+/* сниматель возражения одной строкой (minGuests / регулярка обедов / вег-мост).
+   Крупнее обычного софта — не «мелкий шрифт-лазейка» (симуляция Ксения C59/W4) */
+.hmenu__hook-note {
+  margin: 0.4rem 0 0;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-weight: 500;
+  color: var(--hmenu-red-deep);
   max-width: 52ch;
 }
 
@@ -828,8 +914,31 @@
     font-size: 0.88rem;
   }
 
+  .hmenu__hook-note {
+    font-size: 0.9rem;
+  }
+
+  /* компенсация вертикального бюджета за укрупнение типографики C59 */
+  .hmenu__dish {
+    padding: 0.5rem 0;
+  }
+
+  .hmenu__dish-name {
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .hmenu__incl {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+  }
+
+  .hmenu__incl-item {
+    font-size: 0.8rem;
+  }
+
   .hmenu__row-foot {
-    padding-top: 0.65rem;
+    padding-top: 0.55rem;
   }
 }
 
@@ -977,21 +1086,25 @@
     order: 3;
   }
 
-  /* табы переносятся: цена уходит на отдельную строку */
+  /* табы переносятся: две строки на таб сохраняются (имя+цена) */
   .hmenu__tabs {
     flex-wrap: wrap;
     row-gap: 0.1rem;
   }
 
-  .hmenu__tab-price {
-    margin-left: 0;
-    flex-basis: 100%;
-    padding-bottom: 0.45rem;
-  }
-
   /* список блюд на мобильном показывается ЦЕЛИКОМ — это меню, его читают */
   .hmenu__listwrap {
     flex: none;
+  }
+
+  /* звонковый FAB (fixed, правый нижний угол) не должен ложиться на
+     граммовки и названия (симуляция Мила C59/W6) */
+  .hmenu__dish {
+    padding-right: 76px;
+  }
+
+  .hmenu__incl-item {
+    padding-right: 76px;
   }
 
   .hmenu__listwrap::after {
@@ -1047,7 +1160,8 @@
   .hmenu__hint,
   .hmenu__pdf,
   .hmenu__pdf-status,
-  .hmenu__spine-plus {
+  .hmenu__spine-plus,
+  .hmenu__spine-peek {
     display: none !important;
   }
 
@@ -1146,6 +1260,7 @@
   .hmenu__spine,
   .hmenu__spine-title,
   .hmenu__spine-title-text,
+  .hmenu__spine-peek,
   .hmenu__tab,
   .hmenu__tab::after,
   .hmenu__open,
