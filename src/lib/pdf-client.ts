@@ -1,41 +1,59 @@
 "use client";
 
 import jsPDF from "jspdf";
-import { MENU_TYPES, formatRUB, type MenuType, type MenuPackage } from "@/lib/pricing";
+import {
+  MENU_TYPES,
+  formatRUB,
+  type MenuType,
+  type MenuPackage,
+} from "@/lib/pricing";
 import { CONTACTS } from "@/lib/config";
 
 /**
- * Client-side PDF generation — editorial, two-column, minimal.
- * Inspired by Ridgewells/Salza: whitespace, serif hierarchy, no photos.
- * jsPDF + embedded Roboto TTF (Cyrillic support).
+ * PDF-каталог — печатная версия блока «Меню» (Cycle 61).
+ * ---------------------------------------------------------------------------
+ * Дизайн-язык = дизайн-язык сайта (hacc-menu):
+ *  - сливочная бумага #F7F5F5, чернила #1A1A1A, красный deep #B91431 (AA на тинтах);
+ *  - шапка каждой категории — пастельный тинт панели (как у панели на сайте),
+ *    рукописный заголовок Marck Script, цены Roboto Bold;
+ *  - блюда — гамма-строки: название + волосяная линейка снизу, вес справа
+ *    по правому краю (одноколоночный поток — дисбаланс колонок невозможен);
+ *  - «Включено» — галочки от руки (та же кривая, что HandCheck на сайте);
+ *  - тёмная мховая обложка со списком каталогов и точечными лидерами.
+ *
+ * Поток (flow engine): контент течёт сверху вниз; перед каждым блоком
+ * проверяем бюджет страницы; не влезает — новая страница с «продолжением»-
+ * колонтитулом. Ничего не режется молча (дефект C60-PDF: блюда терялись).
+ *
+ * Шрифты: Roboto (текст) + Marck Script (рукописные заголовки) +
+ * Prata (имена пакетов) — все с кириллицей, лежат в /public/fonts.
  */
 
 const PAGE = {
   w: 210,
   h: 297,
-  marginL: 25,
-  marginR: 25,
-  marginT: 30,
-  marginB: 25,
-  colGap: 8,
+  mL: 22,
+  mR: 22,
   get contentW() {
-    return this.w - this.marginL - this.marginR;
+    return this.w - this.mL - this.mR;
   },
-  get colW() {
-    return (this.contentW - this.colGap) / 2;
-  },
+  /** Нижняя граница контента (ниже — только футер). */
+  bottom: 271,
 };
 
+/** rgba(26,26,26,x) поверх бумаги #F7F5F5 → сплошные эквиваленты. */
 const C = {
-  bordeaux: [209, 26, 70] as [number, number, number],
-  ink: [38, 38, 38] as [number, number, number],
-  inkSoft: [120, 120, 120] as [number, number, number],
-  inkMid: [80, 80, 80] as [number, number, number],
-  cream: [252, 251, 248] as [number, number, number],
+  ink: [26, 26, 26] as [number, number, number],
+  soft: [92, 92, 92] as [number, number, number], // ≈ ink/68%
+  faint: [150, 150, 150] as [number, number, number],
+  line: [199, 199, 199] as [number, number, number], // ≈ ink/22% — волосяные
+  lineDark: [168, 168, 168] as [number, number, number],
+  red: [185, 20, 49] as [number, number, number], // --ea-red-deep
+  cream: [247, 245, 245] as [number, number, number], // --ea-cream
   moss: [29, 40, 32] as [number, number, number],
+  mossLine: [86, 96, 88] as [number, number, number],
   peach: [252, 178, 107] as [number, number, number],
-  divider: [200, 200, 200] as [number, number, number],
-  dividerLight: [230, 230, 230] as [number, number, number],
+  coverMuted: [172, 167, 156] as [number, number, number],
 };
 
 let fontsLoaded = false;
@@ -49,21 +67,105 @@ async function loadFonts(doc: jsPDF): Promise<void> {
       binary += String.fromCharCode(bytes[i]);
     return btoa(binary);
   };
-  const [regular, bold, italic] = await Promise.all([
+  const [robotoR, robotoB, robotoI, marck, prata] = await Promise.all([
     fetch("/fonts/Roboto-Regular.ttf").then((r) => r.arrayBuffer()),
     fetch("/fonts/Roboto-Bold.ttf").then((r) => r.arrayBuffer()),
     fetch("/fonts/Roboto-Italic.ttf").then((r) => r.arrayBuffer()),
+    fetch("/fonts/MarckScript-Regular.ttf").then((r) => r.arrayBuffer()),
+    fetch("/fonts/Prata-Regular.ttf").then((r) => r.arrayBuffer()),
   ]).catch((err) => {
     fontsLoaded = false; // allow retry on next click
     throw err;
   });
-  doc.addFileToVFS("Roboto-Regular.ttf", toBase64(regular));
+  doc.addFileToVFS("Roboto-Regular.ttf", toBase64(robotoR));
   doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-  doc.addFileToVFS("Roboto-Bold.ttf", toBase64(bold));
+  doc.addFileToVFS("Roboto-Bold.ttf", toBase64(robotoB));
   doc.addFont("Roboto-Bold.ttf", "Roboto", "bold");
-  doc.addFileToVFS("Roboto-Italic.ttf", toBase64(italic));
+  doc.addFileToVFS("Roboto-Italic.ttf", toBase64(robotoI));
   doc.addFont("Roboto-Italic.ttf", "Roboto", "italic");
+  doc.addFileToVFS("MarckScript-Regular.ttf", toBase64(marck));
+  doc.addFont("MarckScript-Regular.ttf", "Marck", "normal");
+  doc.addFileToVFS("Prata-Regular.ttf", toBase64(prata));
+  doc.addFont("Prata-Regular.ttf", "Prata", "normal");
   fontsLoaded = true;
+}
+
+/* ────────────────────────────────────────────────────────── shared utils */
+
+function hairline(
+  doc: jsPDF,
+  x1: number,
+  y: number,
+  x2: number,
+  color: [number, number, number] = C.line,
+  w = 0.18,
+) {
+  doc.setDrawColor(...color);
+  doc.setLineWidth(w);
+  doc.line(x1, y, x2, y);
+}
+
+function dottedLeader(
+  doc: jsPDF,
+  x1: number,
+  y: number,
+  x2: number,
+  color: [number, number, number] = C.lineDark,
+) {
+  if (x2 - x1 < 4) return;
+  doc.setDrawColor(...color);
+  doc.setLineWidth(0.22);
+  doc.setLineDashPattern([0.35, 0.85], 0);
+  doc.line(x1, y, x2, y);
+  doc.setLineDashPattern([], 0);
+}
+
+/** «от 20 гостей»: 21/101 → «гостя», остальное → «гостей». */
+function guestsWord(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  return mod10 === 1 && mod100 !== 11 ? "гостя" : "гостей";
+}
+
+/** Единица цены — как на сайте (META.priceLabel): «за гостя», у обедов «за порцию». */
+function unitFor(m: MenuType): string {
+  return m.id === "office-lunch" ? "за порцию" : "за гостя";
+}
+
+/* ─────────────────────────────────────────────────────────────── entry */
+
+export async function buildMenuCatalogDoc(typeId = "all"): Promise<jsPDF> {
+  const types =
+    typeId === "all" ? MENU_TYPES : MENU_TYPES.filter((m) => m.id === typeId);
+  if (types.length === 0) throw new Error("no menus for typeId=" + typeId);
+
+  const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
+  await loadFonts(doc);
+  doc.setFont("Roboto");
+  doc.setLineJoin("round");
+  doc.setLineCap("round");
+
+  doc.setProperties({
+    title: "Каталог меню — Interfood Catering",
+    subject: "Кейтеринг полного цикла · Санкт-Петербург",
+    author: "Interfood Catering",
+    creator: "interfood-catering.ru",
+  });
+
+  if (types.length > 1) {
+    drawCover(doc);
+    for (const menu of types) {
+      doc.addPage();
+      drawMenu(doc, menu);
+    }
+    doc.addPage();
+    drawBackCover(doc);
+  } else {
+    drawMenu(doc, types[0]);
+  }
+
+  drawPageFooters(doc, types.length > 1);
+  return doc;
 }
 
 export async function generateMenuPdf(typeId: string): Promise<void> {
@@ -71,22 +173,7 @@ export async function generateMenuPdf(typeId: string): Promise<void> {
     typeId === "all" ? MENU_TYPES : MENU_TYPES.filter((m) => m.id === typeId);
   if (types.length === 0) return;
 
-  const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
-  await loadFonts(doc);
-  doc.setFont("Roboto");
-
-  let firstPage = true;
-
-  if (types.length > 1) {
-    drawCover(doc);
-    firstPage = false;
-  }
-
-  for (const menu of types) {
-    if (!firstPage) doc.addPage();
-    firstPage = false;
-    drawMenuPage(doc, menu);
-  }
+  const doc = await buildMenuCatalogDoc(typeId);
 
   const filename =
     types.length > 1
@@ -95,314 +182,405 @@ export async function generateMenuPdf(typeId: string): Promise<void> {
   doc.save(filename);
 }
 
-// ─── Cover ────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────── cover */
+
 function drawCover(doc: jsPDF) {
-  // Full dark bg
   doc.setFillColor(...C.moss);
   doc.rect(0, 0, PAGE.w, PAGE.h, "F");
 
-  // Thin bordeaux line top-left
-  doc.setDrawColor(...C.bordeaux);
-  doc.setLineWidth(0.6);
-  doc.line(PAGE.marginL, 55, PAGE.marginL + 35, 55);
+  // красная линейка + надзаголовок
+  doc.setDrawColor(...C.red);
+  doc.setLineWidth(0.8);
+  doc.line(PAGE.mL, 52, PAGE.mL + 34, 52);
 
-  // Eyebrow
-  doc.setTextColor(...C.peach);
-  doc.setFontSize(8);
-  doc.setFont("Roboto", "normal");
-  doc.text(`КАТАЛОГ · ${new Date().getFullYear()}`, PAGE.marginL, 62);
-
-  // Title — large, airy
-  doc.setTextColor(...C.cream);
-  doc.setFontSize(52);
-  doc.setFont("Roboto", "bold");
-  doc.text("Interfood", PAGE.marginL, 95);
-  doc.setFillColor(...C.bordeaux);
-  doc.circle(PAGE.marginL + 88, 91, 2.5, "F");
-
-  // Subtitle — italic, breathing
-  doc.setTextColor(160, 155, 145);
-  doc.setFontSize(13);
-  doc.setFont("Roboto", "italic");
-  doc.text("Кейтеринг полного цикла · Санкт-Петербург", PAGE.marginL, 110);
-
-  // Menu types — vertical list with prices, lots of whitespace
-  doc.setFontSize(10);
-  doc.setFont("Roboto", "normal");
-  doc.setTextColor(180, 180, 180);
-  const startY = 145;
-  MENU_TYPES.forEach((m, i) => {
-    const y = startY + i * 10;
-    // Dot
-    doc.setFillColor(...C.bordeaux);
-    doc.circle(PAGE.marginL + 1, y - 1.5, 0.8, "F");
-    // Label
-    doc.setTextColor(...C.cream);
-    doc.setFontSize(11);
-    doc.setFont("Roboto", "normal");
-    doc.text(m.label, PAGE.marginL + 6, y);
-    // Price — right aligned, muted
-    doc.setTextColor(140, 140, 140);
-    doc.setFontSize(9);
-    doc.text(`от ${formatRUB(m.perGuest)} ${m.priceUnit ?? "/чел"}`, PAGE.marginL + 90, y);
-    // Dotted leader line
-    doc.setDrawColor(...C.dividerLight);
-    doc.setLineWidth(0.2);
-    const labelW = doc.getTextWidth(m.label);
-    const priceW = doc.getTextWidth(`от ${formatRUB(m.perGuest)} ${m.priceUnit ?? "/чел"}`);
-    const lineStart = PAGE.marginL + 6 + labelW + 3;
-    const lineEnd = PAGE.marginL + 90 - priceW - 3;
-    if (lineEnd > lineStart) {
-      doc.setLineDashPattern([0.5, 1], 0);
-      doc.line(lineStart, y - 1.5, lineEnd, y - 1.5);
-      doc.setLineDashPattern([], 0);
-    }
-  });
-
-  // Bottom accent
-  doc.setDrawColor(...C.peach);
-  doc.setLineWidth(0.3);
-  doc.line(PAGE.marginL, 255, PAGE.marginL + 60, 255);
-
-  // Contacts — minimal, bottom
   doc.setTextColor(...C.peach);
   doc.setFontSize(9);
   doc.setFont("Roboto", "bold");
-  doc.text(CONTACTS.phone, PAGE.marginL, 263);
+  doc.text(`КАТАЛОГ МЕНЮ · ${new Date().getFullYear()}`, PAGE.mL, 61);
 
-  doc.setTextColor(160, 160, 160);
-  doc.setFontSize(8);
-  doc.setFont("Roboto", "normal");
-  doc.text(`${CONTACTS.email}  ·  ${CONTACTS.city}`, PAGE.marginL, 269);
-  doc.text("interfood-catering.ru", PAGE.marginL, 274);
-}
+  // рукописный бренд (шрифт сайта) + красная точка по фактической ширине
+  doc.setTextColor(...C.cream);
+  doc.setFont("Marck", "normal");
+  doc.setFontSize(54);
+  doc.text("Interfood", PAGE.mL, 96);
+  const brandW = doc.getTextWidth("Interfood");
+  doc.setFillColor(...C.red);
+  doc.circle(PAGE.mL + brandW + 4.5, 92.5, 1.7, "F");
 
-// ─── Menu page ───────────────────────────────────────────────────────
-function drawMenuPage(doc: jsPDF, menu: MenuType) {
-  let y = PAGE.marginT;
-  const priceUnit = menu.priceUnit ?? "/чел";
-  const pageNum = MENU_TYPES.indexOf(menu) + 1;
-
-  // ── Top bar ──
-  doc.setTextColor(...C.inkSoft);
-  doc.setFontSize(7);
-  doc.setFont("Roboto", "normal");
-  doc.text(`INTERFOOD CATERING`, PAGE.marginL, y);
-  doc.text(`СТР. ${String(pageNum).padStart(2, "0")} / ${MENU_TYPES.length}`, PAGE.w - PAGE.marginR, y, { align: "right" });
-
-  // Thin line
-  doc.setDrawColor(...C.dividerLight);
-  doc.setLineWidth(0.2);
-  doc.line(PAGE.marginL, y + 2, PAGE.w - PAGE.marginR, y + 2);
-  y += 12;
-
-  // ── Title block ──
-  doc.setTextColor(...C.bordeaux);
-  doc.setFontSize(7);
-  doc.setFont("Roboto", "normal");
-  doc.text("МЕНЮ", PAGE.marginL, y);
-  y += 8;
-
-  doc.setTextColor(...C.ink);
-  doc.setFontSize(36);
-  doc.setFont("Roboto", "bold");
-  doc.text(menu.label, PAGE.marginL, y);
-  y += 4;
-
-  // Price — right of title, muted
-  doc.setTextColor(...C.bordeaux);
-  doc.setFontSize(10);
-  doc.setFont("Roboto", "bold");
-  doc.text(
-    `от ${formatRUB(menu.perGuest)} ${priceUnit}`,
-    PAGE.w - PAGE.marginR,
-    y - 2,
-    { align: "right" },
-  );
-  y += 10;
-
-  // Italic description — lots of air
-  doc.setTextColor(...C.inkSoft);
-  doc.setFontSize(10);
+  doc.setTextColor(...C.coverMuted);
   doc.setFont("Roboto", "italic");
-  const descLines = doc.splitTextToSize(menu.description, PAGE.contentW - 40);
-  doc.text(descLines, PAGE.marginL, y);
-  y += descLines.length * 4.5 + 8;
+  doc.setFontSize(11.5);
+  doc.text("Кейтеринг полного цикла · Санкт-Петербург", PAGE.mL, 110);
 
-  // Divider
-  doc.setDrawColor(...C.divider);
-  doc.setLineWidth(0.3);
-  doc.line(PAGE.marginL, y, PAGE.w - PAGE.marginR, y);
-  y += 8;
+  // список каталогов: название ······ цена (цена — по ПРАВОМУ краю)
+  const listTop = 142;
+  const step = 11.5;
+  MENU_TYPES.forEach((m, i) => {
+    const y = listTop + i * step;
 
-  // ── Packages — two-column flow ──
-  const colH = PAGE.h - PAGE.marginB - y - 10; // available height
-  const col1X = PAGE.marginL;
-  const col2X = PAGE.marginL + PAGE.colW + PAGE.colGap;
+    doc.setFillColor(...C.red);
+    doc.circle(PAGE.mL + 0.8, y - 1.2, 0.75, "F");
 
-  let colY1 = y;
-  let colY2 = y;
-  let useCol2 = false;
+    doc.setTextColor(...C.cream);
+    doc.setFont("Roboto", "normal");
+    doc.setFontSize(11.5);
+    doc.text(m.label, PAGE.mL + 6, y);
 
-  for (let i = 0; i < menu.packages.length; i++) {
-    const pkg = menu.packages[i];
-    const targetY = useCol2 ? colY2 : colY1;
-    const x = useCol2 ? col2X : col1X;
+    const price = `от ${formatRUB(m.perGuest)} ${unitFor(m)}`;
+    doc.setTextColor(...C.coverMuted);
+    doc.setFontSize(9);
+    doc.text(price, PAGE.w - PAGE.mR, y, { align: "right" });
 
-    const result = drawPackageColumn(doc, pkg, x, targetY, PAGE.colW, priceUnit, i + 1);
+    const labelW = doc.getTextWidth(m.label);
+    const priceW = doc.getTextWidth(price);
+    dottedLeader(
+      doc,
+      PAGE.mL + 6 + labelW + 3.5,
+      y - 1.2,
+      PAGE.w - PAGE.mR - priceW - 3.5,
+      C.mossLine,
+    );
+  });
 
-    if (useCol2) {
-      colY2 = result.endY + 6;
-    } else {
-      colY1 = result.endY + 6;
-    }
+  // честная приписка о сезонности (как на сайте)
+  doc.setTextColor(...C.coverMuted);
+  doc.setFont("Roboto", "italic");
+  doc.setFontSize(8);
+  doc.text(
+    "Цены — за одного гостя. В высокий сезон (май–сентябрь, декабрь) действует коэффициент ×1,15.",
+    PAGE.mL,
+    listTop + MENU_TYPES.length * step + 6,
+  );
 
-    // Switch to col 2 after first package if it fit, or if next won't fit in col 1
-    if (!useCol2 && i === 0 && colY1 < PAGE.h - PAGE.marginB - 40) {
-      useCol2 = true;
-    }
-    // If col 2 is full, start new page and go back to col 1
-    if (useCol2 && colY2 > PAGE.h - PAGE.marginB - 30) {
-      drawFooter(doc);
-      doc.addPage();
-      y = PAGE.marginT;
-      colY1 = y;
-      colY2 = y;
-      useCol2 = false;
-    }
-  }
-
-  // ── Included block — bottom of page ──
-  const finalY = Math.max(colY1, colY2);
-  if (finalY < PAGE.h - PAGE.marginB - 35) {
-    drawIncluded(doc, menu, finalY + 5);
-  } else {
-    drawFooter(doc);
-    doc.addPage();
-    drawIncluded(doc, menu, PAGE.marginT);
-  }
-
-  drawFooter(doc);
+  // контакты
+  doc.setDrawColor(...C.peach);
+  doc.setLineWidth(0.4);
+  doc.line(PAGE.mL, 254, PAGE.mL + 58, 254);
+  doc.setTextColor(...C.peach);
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(10);
+  doc.text(CONTACTS.phone, PAGE.mL, 262);
+  doc.setTextColor(...C.coverMuted);
+  doc.setFont("Roboto", "normal");
+  doc.setFontSize(8.5);
+  doc.text(
+    `${CONTACTS.email}  ·  ${CONTACTS.city}  ·  interfood-catering.ru`,
+    PAGE.mL,
+    269,
+  );
 }
 
-function drawPackageColumn(
-  doc: jsPDF,
-  pkg: MenuPackage,
-  x: number,
-  y: number,
-  w: number,
-  priceUnit: string,
-  pkgNum: number,
-): { endY: number } {
-  // Package name — large serif
-  doc.setTextColor(...C.ink);
-  doc.setFontSize(14);
-  doc.setFont("Roboto", "bold");
-  doc.text(pkg.name, x, y);
-  y += 3;
+/* ───────────────────────────────────────────────────── category header */
 
-  // Price — right aligned, bordeaux
-  doc.setTextColor(...C.bordeaux);
-  doc.setFontSize(10);
+const BAND_H = 47;
+
+/** Пастельный тинт панели — те же цвета, что у панели категории на сайте. */
+const TINTS: Record<string, [number, number, number]> = {
+  buffet: [245, 238, 226],
+  banquet: [246, 224, 219],
+  "snack-box": [230, 235, 223],
+  "coffee-break": [244, 222, 205],
+  vegetarian: [246, 233, 201],
+  bbq: [243, 227, 232],
+  "office-lunch": [245, 238, 226],
+};
+
+function drawCategoryHeader(doc: jsPDF, menu: MenuType, index: number) {
+  const tint = TINTS[menu.id] ?? [245, 238, 226];
+
+  // тинт-полоса во всю ширину листа — как панель категории на сайте
+  doc.setFillColor(...tint);
+  doc.rect(0, 0, PAGE.w, BAND_H, "F");
+
+  doc.setTextColor(...C.red);
   doc.setFont("Roboto", "bold");
-  doc.text(`${formatRUB(pkg.pricePerGuest)} ${priceUnit}`, x + w, y - 1, {
+  doc.setFontSize(7.5);
+  doc.text(
+    `КАТАЛОГ ${String(index + 1).padStart(2, "0")} / ${String(MENU_TYPES.length).padStart(2, "0")}`,
+    PAGE.mL,
+    16.5,
+  );
+
+  // рукописный заголовок (шрифт сайта)
+  doc.setTextColor(...C.ink);
+  doc.setFont("Marck", "normal");
+  doc.setFontSize(30);
+  doc.text(menu.label, PAGE.mL, 35.5);
+
+  // цена — по правому краю, на базовой линии заголовка (единица — как на сайте)
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(...C.red);
+  doc.text(`от ${formatRUB(menu.perGuest)} ${unitFor(menu)}`, PAGE.w - PAGE.mR, 30, {
     align: "right",
   });
-  y += 5;
-
-  // Description — italic, muted
-  doc.setTextColor(...C.inkSoft);
-  doc.setFontSize(8);
-  doc.setFont("Roboto", "italic");
-  const descLines = doc.splitTextToSize(pkg.description, w);
-  doc.text(descLines, x, y);
-  y += descLines.length * 3.5 + 4;
-
-  // Thin divider under package header
-  doc.setDrawColor(...C.dividerLight);
-  doc.setLineWidth(0.2);
-  doc.line(x, y, x + w, y);
-  y += 5;
-
-  // Dishes — clean list, no boxes, just name + dotted leader + weight
-  doc.setFontSize(8.5);
   doc.setFont("Roboto", "normal");
-  pkg.dishes.forEach((dish, i) => {
-    if (y > PAGE.h - PAGE.marginB - 15) return; // page safety
-
-    // Number — tiny, muted
-    doc.setTextColor(180, 180, 180);
-    doc.setFontSize(6.5);
-    doc.text(String(i + 1).padStart(2, "0"), x, y);
-
-    // Dish name
-    doc.setTextColor(...C.inkMid);
-    doc.setFontSize(8.5);
-    doc.setFont("Roboto", "normal");
-    const nameLines = doc.splitTextToSize(dish.name, w - 6);
-    doc.text(nameLines, x + 5, y);
-
-    // Weight — right aligned
-    if (dish.weight) {
-      doc.setTextColor(160, 160, 160);
-      doc.setFontSize(7);
-      doc.text(dish.weight, x + w, y, { align: "right" });
-    }
-
-    y += Math.max(nameLines.length * 3.8, 4.5);
-  });
-
-  return { endY: y };
-}
-
-function drawIncluded(doc: jsPDF, menu: MenuType, y: number) {
-  // Divider
-  doc.setDrawColor(...C.divider);
-  doc.setLineWidth(0.3);
-  doc.line(PAGE.marginL, y, PAGE.w - PAGE.marginR, y);
-  y += 6;
-
-  // Header
-  doc.setTextColor(...C.bordeaux);
-  doc.setFontSize(7);
-  doc.setFont("Roboto", "bold");
-  doc.text("ВКЛЮЧЕНО ВО ВСЕ ПАКЕТЫ", PAGE.marginL, y);
-  y += 5;
-
-  // Items — two columns, clean
-  const half = Math.ceil(menu.included.length / 2);
-  const col1Items = menu.included.slice(0, half);
-  const col2Items = menu.included.slice(half);
-
-  doc.setFontSize(8.5);
-  doc.setFont("Roboto", "normal");
-  doc.setTextColor(...C.inkMid);
-
-  col1Items.forEach((item, i) => {
-    doc.text(`·  ${item}`, PAGE.marginL, y + i * 5);
-  });
-  col2Items.forEach((item, i) => {
-    doc.text(`·  ${item}`, PAGE.marginL + PAGE.colW + PAGE.colGap, y + i * 5);
-  });
-
-  y += Math.max(col1Items.length, col2Items.length) * 5 + 5;
-}
-
-function drawFooter(doc: jsPDF) {
-  const y = PAGE.h - 12;
-
-  doc.setDrawColor(...C.dividerLight);
-  doc.setLineWidth(0.2);
-  doc.line(PAGE.marginL, y, PAGE.w - PAGE.marginR, y);
-
-  doc.setTextColor(...C.inkSoft);
-  doc.setFontSize(7);
-  doc.setFont("Roboto", "normal");
-  doc.text("Interfood Catering · Санкт-Петербург", PAGE.marginL, y + 4);
+  doc.setFontSize(7.5);
+  doc.setTextColor(...C.soft);
   doc.text(
-    `${CONTACTS.phone}  ·  ${CONTACTS.email}`,
-    PAGE.w - PAGE.marginR,
-    y + 4,
+    `от ${menu.minGuests} ${guestsWord(menu.minGuests)} · состав согласуем под событие`,
+    PAGE.w - PAGE.mR,
+    36,
     { align: "right" },
   );
+
+  // описание категории под полосой
+  let y = BAND_H + 10;
+  doc.setTextColor(...C.soft);
+  doc.setFont("Roboto", "italic");
+  doc.setFontSize(9.5);
+  const descLines = doc.splitTextToSize(menu.description, PAGE.contentW - 30);
+  doc.text(descLines, PAGE.mL, y);
+  y += descLines.length * 4.4 + 4;
+  hairline(doc, PAGE.mL, y, PAGE.w - PAGE.mR, C.line, 0.3);
+  return y + 7;
+}
+
+/** Колонтитул страницы-продолжения. */
+function drawContinuationHeader(doc: jsPDF, menu: MenuType) {
+  doc.setTextColor(...C.faint);
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(7);
+  doc.text(menu.label.toUpperCase(), PAGE.mL, 15);
+  doc.text("ПРОДОЛЖЕНИЕ", PAGE.w - PAGE.mR, 15, { align: "right" });
+  hairline(doc, PAGE.mL, 18, PAGE.w - PAGE.mR, C.line, 0.25);
+}
+
+/* ────────────────────────────────────────────────────── package section */
+
+const ROW_H = 4.7;
+
+function packageHeaderH(doc: jsPDF, pkg: MenuPackage): number {
+  const descLines = doc.splitTextToSize(pkg.description, PAGE.contentW - 46);
+  // имя(8.5) + описание(3.4/строку) + отбивка(2.5) + линейка→контент(5)
+  return 8.5 + descLines.length * 3.4 + 2.5 + 5;
+}
+
+function drawMenu(doc: jsPDF, menu: MenuType) {
+  const index = MENU_TYPES.indexOf(menu);
+  let y = drawCategoryHeader(doc, menu, index);
+
+  const ensure = (h: number) => {
+    if (y + h <= PAGE.bottom) return;
+    doc.addPage();
+    drawContinuationHeader(doc, menu);
+    y = 26;
+  };
+
+  /** Высота всех блюд пакета — РОВНО та же формула, что при отрисовке:
+      базовая линия +3, линейка +1.9, шаг к следующей строке +2.8. */
+  const dishesH = (pkg: MenuPackage) =>
+    pkg.dishes.reduce((s, d) => {
+      const lines: string[] = doc.splitTextToSize(d.name, PAGE.contentW - 20);
+      return s + (lines.length - 1) * 3.9 + 7.7;
+    }, 0);
+
+  menu.packages.forEach((pkg, pkgIdx) => {
+    const headerH = packageHeaderH(doc, pkg);
+
+    // «Включено» идёт сразу за ПОСЛЕДНИМ пакетом: если последний пакет +
+    // «включено» не помещаются вместе на остатке страницы, но помещаются
+    // на свежей — переносим их ВМЕСТЕ (страница не рвётся на 3 строки +
+    // включено, дефект «почти пустой страницы»)
+    if (pkgIdx === menu.packages.length - 1) {
+      const inclH = 8 + menu.included.length * 5 + 6;
+      const needed = headerH + dishesH(pkg) + 4.5 + inclH;
+      const freshBudget = PAGE.bottom - 26;
+      if (
+        y + needed > PAGE.bottom &&
+        needed <= freshBudget &&
+        y > 30 /* уже рисовали контент на этой странице */
+      ) {
+        doc.addPage();
+        drawContinuationHeader(doc, menu);
+        y = 26;
+      }
+    }
+
+    // заголовок пакета не отрывается от первых двух блюд
+    ensure(headerH + 2 * ROW_H + 2);
+
+    // имя пакета (Prata) + цена справа
+    doc.setTextColor(...C.ink);
+    doc.setFont("Prata", "normal");
+    doc.setFontSize(13.5);
+    doc.text(pkg.name, PAGE.mL, y + 5);
+
+    doc.setFont("Roboto", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(...C.red);
+    doc.text(formatRUB(pkg.pricePerGuest), PAGE.w - PAGE.mR, y + 5, {
+      align: "right",
+    });
+    y += 8.5;
+
+    // описание пакета
+    doc.setTextColor(...C.soft);
+    doc.setFont("Roboto", "italic");
+    doc.setFontSize(8);
+    const descLines: string[] = doc.splitTextToSize(
+      pkg.description,
+      PAGE.contentW - 46,
+    );
+    doc.text(descLines, PAGE.mL, y);
+    y += descLines.length * 3.4 + 2.5;
+    hairline(doc, PAGE.mL, y, PAGE.w - PAGE.mR, C.lineDark, 0.25);
+    y += 5;
+
+    // блюда — гамма-строки
+    doc.setFont("Roboto", "normal");
+    for (const dish of pkg.dishes) {
+      const lines: string[] = doc.splitTextToSize(
+        dish.name,
+        PAGE.contentW - 20,
+      );
+      const rowH = (lines.length - 1) * 3.9 + ROW_H;
+      ensure(rowH);
+
+      doc.setTextColor(...C.ink);
+      doc.setFontSize(9);
+      doc.text(lines, PAGE.mL, y + 3);
+
+      if (dish.weight) {
+        doc.setTextColor(...C.faint);
+        doc.setFontSize(7.5);
+        doc.text(dish.weight, PAGE.w - PAGE.mR, y + 3, { align: "right" });
+      }
+
+      const ruleY = y + 3 + (lines.length - 1) * 3.9 + 1.9;
+      hairline(doc, PAGE.mL, ruleY, PAGE.w - PAGE.mR, C.line, 0.15);
+      y = ruleY + 2.8;
+    }
+    y += 4.5;
+  });
+
+  // «включено» — той же кривой, что галочки на сайте
+  const inclH = 8 + menu.included.length * 5 + 6;
+  ensure(inclH);
+  hairline(doc, PAGE.mL, y, PAGE.w - PAGE.mR, C.lineDark, 0.3);
+  y += 6.5;
+  doc.setTextColor(...C.red);
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(7.5);
+  doc.text("ВКЛЮЧЕНО ВО ВСЕ ПАКЕТЫ", PAGE.mL, y);
+  y += 6;
+
+  doc.setFont("Roboto", "normal");
+  doc.setFontSize(9);
+  for (const inc of menu.included) {
+    doc.setTextColor(...C.ink);
+    doc.text(inc, PAGE.mL + 8, y);
+    drawHandCheck(doc, PAGE.mL, y);
+    y += 5;
+  }
+}
+
+/** Галочка «от руки» — та же кривая, что HandCheck SVG на сайте (16×16). */
+function drawHandCheck(doc: jsPDF, x: number, baselineY: number) {
+  const s = 0.34; // 16u → ~5.4mm
+  const ox = x;
+  const oy = baselineY - 5.2; // верх рамки
+  const p = (ux: number, uy: number): [number, number] => [
+    ox + ux * s,
+    oy + uy * s,
+  ];
+  doc.setDrawColor(...C.ink);
+  doc.setLineWidth(0.55);
+  const a = p(2.5, 8.6);
+  const b = p(4.6, 10.9);
+  const c = p(6.1, 13.0);
+  const d = p(9.7, 7.5);
+  const e = p(13.9, 2.4);
+  doc.line(...a, ...b);
+  doc.line(...b, ...c);
+  doc.line(...c, ...d);
+  doc.line(...d, ...e);
+}
+
+/* ─────────────────────────────────────────────────────────── back cover */
+
+function drawBackCover(doc: jsPDF) {
+  doc.setFillColor(...C.moss);
+  doc.rect(0, 0, PAGE.w, PAGE.h, "F");
+
+  doc.setDrawColor(...C.red);
+  doc.setLineWidth(0.8);
+  doc.line(PAGE.mL, 96, PAGE.mL + 34, 96);
+
+  // рукописное приглашение — тот же голос, что на обложке
+  doc.setTextColor(...C.cream);
+  doc.setFont("Marck", "normal");
+  doc.setFontSize(30);
+  doc.text("Соберём меню под ваше событие", PAGE.mL, 120);
+
+  doc.setTextColor(...C.coverMuted);
+  doc.setFont("Roboto", "italic");
+  doc.setFontSize(10.5);
+  const lines: string[] = doc.splitTextToSize(
+    "Заменим блюдо, соберём смешанный уровень, посчитаем банкет на вашу дату — сезонный коэффициент назовём заранее.",
+    PAGE.contentW - 40,
+  );
+  doc.text(lines, PAGE.mL, 132);
+
+  // контакты крупно
+  doc.setDrawColor(...C.peach);
+  doc.setLineWidth(0.4);
+  doc.line(PAGE.mL, 168, PAGE.mL + 58, 168);
+  doc.setTextColor(...C.peach);
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(16);
+  doc.text(CONTACTS.phone, PAGE.mL, 180);
+  doc.setTextColor(...C.cream);
+  doc.setFontSize(10.5);
+  doc.text(CONTACTS.email, PAGE.mL, 190);
+
+  doc.setTextColor(...C.coverMuted);
+  doc.setFont("Roboto", "normal");
+  doc.setFontSize(9);
+  doc.text(
+    `${CONTACTS.city}  ·  interfood-catering.ru`,
+    PAGE.mL,
+    198,
+  );
+
+  // подпись бренда внизу — рукописная, как на обложке
+  doc.setTextColor(...C.cream);
+  doc.setFont("Marck", "normal");
+  doc.setFontSize(22);
+  doc.text("Interfood", PAGE.mL, 258);
+  const brandW = doc.getTextWidth("Interfood");
+  doc.setFillColor(...C.red);
+  doc.circle(PAGE.mL + brandW + 2.6, 255.5, 1.2, "F");
+  doc.setTextColor(...C.coverMuted);
+  doc.setFont("Roboto", "normal");
+  doc.setFontSize(8);
+  doc.text(
+    `Каталог меню · ${new Date().getFullYear()}`,
+    PAGE.w - PAGE.mR,
+    258,
+    { align: "right" },
+  );
+}
+
+/* ────────────────────────────────────────────────────── footers */
+
+function drawPageFooters(doc: jsPDF, hasCover: boolean) {
+  const total = doc.getNumberOfPages();
+  for (let i = 1; i <= total; i++) {
+    doc.setPage(i);
+    // у обложки и задней обложки свои подписи
+    if (hasCover && (i === 1 || i === total)) continue;
+
+    hairline(doc, PAGE.mL, 279, PAGE.w - PAGE.mR, C.line, 0.2);
+    doc.setTextColor(...C.faint);
+    doc.setFont("Roboto", "normal");
+    doc.setFontSize(7);
+    doc.text("Interfood Catering · Санкт-Петербург", PAGE.mL, 284);
+    doc.text(
+      `${CONTACTS.phone}  ·  ${String(i).padStart(2, "0")} / ${String(total).padStart(2, "0")}`,
+      PAGE.w - PAGE.mR,
+      284,
+      { align: "right" },
+    );
+  }
 }

@@ -64,6 +64,7 @@ import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-moti
 import {
   ArrowUpRight,
   ChevronDown,
+  ChevronUp,
   Download,
   MousePointer2,
   Plus,
@@ -247,6 +248,12 @@ function MenuRack({
   /** Выбранный пакет на категорию — память не сбрасывается при переключении. */
   const [pkgs, setPkgs] = useState<Record<string, number>>({});
 
+  /** C61 (жалоба клиента): список, раскрытый кнопкой «Ещё N блюд» на
+   *  ПОЛНУЮ высоту: рэк отдаёт фиксированную высоту, панель растёт
+   *  естественной, чтение идёт скроллом СТРАНИЦЫ — привычным способом;
+   *  в конце списка — пилюля «Свернуть список». */
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   /** ≥1024px + fine pointer → hover-intent + параллакс разрешены. */
   const [desktopFine, setDesktopFine] = useState(false);
 
@@ -263,7 +270,20 @@ function MenuRack({
   /* media queries ---------------------------------------------------------- */
   useEffect(() => {
     const fine = window.matchMedia("(min-width: 1024px) and (pointer: fine)");
-    const update = () => setDesktopFine(fine.matches);
+    const update = () => {
+      setDesktopFine(fine.matches);
+      /* уход с десктопа при раскрытом списке: мгновенный сброс, иначе
+         inline-высота рэка (px) ломает мобильную grid-раскладку */
+      if (!fine.matches) {
+        const rack = rackRef.current;
+        if (rack) {
+          rack.classList.remove("is-animating");
+          rack.classList.remove("is-expanded");
+          rack.style.height = "";
+        }
+        setExpandedId(null);
+      }
+    };
     update();
     fine.addEventListener("change", update);
     return () => fine.removeEventListener("change", update);
@@ -324,6 +344,15 @@ function MenuRack({
     (i: number, manual: boolean) => {
       if (i < 0 || i >= N) return;
       suppressHoverUntil.current = Date.now() + 700;
+      /* смена категории при раскрытом списке: мгновенный схлоп без
+         анимации — иначе высотная и ширинная анимации рэка конфликтуют */
+      const rack = rackRef.current;
+      if (rack && expandedId !== null) {
+        rack.classList.remove("is-animating");
+        rack.classList.remove("is-expanded");
+        rack.style.height = "";
+        setExpandedId(null);
+      }
       if (openIndexRef.current === i) {
         // Мобильный: крестик обещает toggle — закрываем (в услугах так же).
         if (
@@ -350,7 +379,7 @@ function MenuRack({
         }, 600);
       }
     },
-    [N, reduced],
+    [N, reduced, expandedId],
   );
 
   /* hover-intent (desktop, fine pointer) ----------------------------------- */
@@ -501,6 +530,17 @@ function MenuRack({
       }
     };
     check();
+    /* C61/волна-1 (QA): после смены пакета список ремоунтится (key=pkg.name):
+       ul приобретает финальный размер сразу, а ОБЁРТКА (listwrap) дозжимается
+       позже — ResizeObserver на ul больше НЕ срабатывает, и check() мог
+       зафиксировать устаревший scrollHeight>clientHeight → пилюля «Ещё N»
+       врёт (видна при полностью видимом списке). Лечится наблюдением за
+       обёрткой + контрольными перепроверками после кадра — состояние
+       гарантированно сходится */
+    const wrapEl = el.closest(".hmenu__listwrap");
+    const roWrap = new ResizeObserver(check);
+    if (wrapEl) roWrap.observe(wrapEl);
+    const rechecks = [340, 800].map((t) => window.setTimeout(check, t));
     const onScroll = () => {
       if (!raf) raf = window.requestAnimationFrame(check);
     };
@@ -512,29 +552,165 @@ function MenuRack({
     const ro = new ResizeObserver(check);
     ro.observe(el);
     window.addEventListener("resize", check);
+    /* C61: куки-баннер закрыли — events нет (скролла не было), а lift уже
+       выставлен: без MutationObserver кнопка остаётся поднятой над обёрткой
+       и уходит под overflow:clip (невидима и некликабельна навсегда) */
+    const mo = new MutationObserver(() => {
+      if (!raf) raf = window.requestAnimationFrame(check);
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
     return () => {
       el.removeEventListener("scroll", onScroll);
       window.removeEventListener("scroll", onScroll);
       ro.disconnect();
+      roWrap.disconnect();
+      mo.disconnect();
+      rechecks.forEach((t) => window.clearTimeout(t));
       window.removeEventListener("resize", check);
       if (raf) window.cancelAnimationFrame(raf);
     };
-  }, [openIndex, pkgs, cats]);
+  }, [openIndex, pkgs, cats, expandedId]);
 
-  /* клик по «Ещё N блюд»: плавно раскрываем список ДО САМОГО КОНЦА.
-     C60/волна-2 (аудитор-блокер): фиксированный шаг не делился на высоту
-     окна 1024 — счётчик гас, пока последняя строка была срезана; а 14-позиционный
-     банкет требовал 7 кликов по «открытке». Один клик = всё блюдо видно,
-     счётчик гаснет ровно у дна, где паддинг показывает последнюю строку целиком */
-  const scrollListBy = useCallback(
-    (el: HTMLUListElement | null, reducedMotion: boolean | null) => {
-      if (!el) return;
-      el.scrollTo({
-        top: el.scrollHeight,
-        behavior: reducedMotion ? "auto" : "smooth",
-      });
+  /* клик по «Ещё N блюд»: C61 (жалоба клиента) — список раскрывается на
+     ПОЛНУЮ высоту: рэк отдаёт clamp-высоту, панель растёт естественной,
+     и дочитывать меню можно СКРОЛЛОМ СТРАНИЦЫ (привычным способом),
+     а не невидимым скроллом внутри окна. Ровно это чинит «непонятно
+     как скроллить после этого вверх, чтобы прочитать целиком»:
+     вверх скроллит сама страница. В конце списка — пилюля «Свернуть». */
+  /* C61/волна-1 (QA): последовательный номер анимации рэка — отменяет
+     отложенные done()-колбэки предыдущей анимации (иначе таймер страховки
+     прерванного схлопа убивал новое раскрытие на 950-м миллисекунде) */
+  const animSeq = useRef(0);
+
+  /** Программный скролл страницы: через Lenis, если он жив (гасит колесную
+      инерцию), иначе нативно. reduced-motion → мгновенно. Смещение на
+      sticky-шапку (~96px) УЖЕ учтено в y вызывающим кодом. */
+  const scrollPageTo = useCallback(
+    (y: number) => {
+      const target = Math.max(0, y);
+      const lenis = (
+        window as unknown as {
+          __lenis?: { scrollTo: (t: number, o?: object) => void };
+        }
+      ).__lenis;
+      if (lenis?.scrollTo) {
+        lenis.scrollTo(target, { duration: 1.1 });
+      } else {
+        window.scrollTo({
+          top: target,
+          behavior: reduced ? "auto" : "smooth",
+        });
+      }
     },
-    [],
+    [reduced],
+  );
+
+  const expandList = useCallback(
+    (catId: string, k: number) => {
+      const rack = rackRef.current;
+      const list = listRefs.current[k];
+      if (!rack || !list) return;
+      /* прерванная анимация (быстрый цикл collapse→reveal, QA-случай 3):
+         мгновенно завершаем её в компактное состояние и мерим с чистого */
+      if (rack.classList.contains("is-animating")) {
+        animSeq.current += 1;
+        rack.classList.remove("is-animating");
+        rack.classList.remove("is-expanded");
+        rack.style.height = "";
+      }
+      /* ВАЖНО: все замеры — ДО смены классов, иначе clientHeight/scrollHeight
+         уже пересчитаны под auto-высоту и deficit == 0. Паддинг-компенсацию
+         (3.2rem под кнопку-счётчик) вычитаем: вместе с is-scrollable она
+         снимется, и без вычета рэк получит лишние ~51px воздуха в конце */
+      const fromH = rack.clientHeight;
+      const preListClient = list.clientHeight;
+      const padBottom =
+        parseFloat(getComputedStyle(list).paddingBottom) || 0;
+      const deficit = Math.max(
+        0,
+        list.scrollHeight - padBottom - list.clientHeight,
+      );
+      const seq = ++animSeq.current;
+      setExpandedId(catId);
+      rack.classList.add("is-expanded"); // высота auto (цель анимации)
+
+      const finish = () => {
+        if (seq !== animSeq.current) return; // отменено новой анимацией
+        rack.classList.remove("is-animating");
+        rack.style.height = ""; // дальше высоту ведёт .is-expanded (auto)
+      };
+
+      if (reduced || deficit <= 4) {
+        finish();
+        return;
+      }
+
+      /* жюри-волна-1: после раскрытия читатель должен оказаться на ПЕРВОЙ
+         из скрытых строк — скроллим страницу к линии прежнего сгиба */
+      scrollPageTo(
+        list.getBoundingClientRect().top + window.scrollY + preListClient - 96,
+      );
+
+      rack.classList.add("is-animating");
+      rack.style.height = `${fromH}px`; // старт = компактная высота
+      void rack.offsetHeight; // фиксируем стартовое значение
+      rack.style.height = `${fromH + deficit}px`;
+      const done = () => finish();
+      rack.addEventListener("transitionend", done, { once: true });
+      // страховка: transitionend может не прийти (вкладка в фоне и т.п.)
+      window.setTimeout(done, 950);
+    },
+    [reduced, scrollPageTo],
+  );
+
+  const collapseList = useCallback(
+    (k: number) => {
+      const rack = rackRef.current;
+      if (!rack) return;
+      const item = itemRefs.current[k];
+      /* QA-волна-1: если пилюля в фокусе, после размонтирования фокус упадёт
+         в <body> (Tab начнёт со страницы). Заранее переводим фокус на
+         корешок открытой панели — стабильная точка возврата */
+      const pillFocused =
+        document.activeElement?.closest(".hmenu__collapse") != null;
+      if (pillFocused) {
+        spineRefs.current[k]?.focus({ preventScroll: true });
+      }
+      setExpandedId(null);
+      const seq = ++animSeq.current;
+
+      const finish = () => {
+        if (seq !== animSeq.current) return;
+        rack.classList.remove("is-animating");
+        rack.classList.remove("is-expanded");
+        rack.style.height = "";
+      };
+
+      if (reduced) {
+        finish();
+        // возвращаем верх панели в кадр — точка чтения сбрасывается наверх
+        item?.scrollIntoView({ behavior: "auto", block: "start" });
+        return;
+      }
+
+      /* порядок критичен: curH — при снятой inline-высоте и ЖИВОМ
+         is-expanded; targetH — после снятия is-expanded (clamp из
+         стилей), но ещё БЕЗ inline px (иначе замер вернёт inline) */
+      const curH = rack.getBoundingClientRect().height;
+      rack.classList.add("is-animating");
+      rack.classList.remove("is-expanded");
+      const targetH = rack.clientHeight; // clamp из стилей
+      rack.style.height = `${curH}px`; // визуально без change (rendered = curH)
+      void rack.offsetHeight;
+      rack.style.height = `${targetH}px`;
+      // верх панели — в кадр (sticky header ≈ 96px); позиция панели в
+      // документе при схлопе не меняется — контент выше неё статичен
+      scrollPageTo(item.getBoundingClientRect().top + window.scrollY - 96);
+      const done = () => finish();
+      rack.addEventListener("transitionend", done, { once: true });
+      window.setTimeout(done, 950);
+    },
+    [reduced, scrollPageTo],
   );
 
   const onTabKeyDown = useCallback(
@@ -577,7 +753,9 @@ function MenuRack({
   return (
     <motion.div
       ref={rackRef}
-      className="hmenu__rack"
+      className={
+        "hmenu__rack" + (expandedId !== null ? " is-expanded" : "")
+      }
       role="group"
       aria-label="Каталоги меню — семь направлений кейтеринга"
       initial={reduced ? false : "hidden"}
@@ -835,16 +1013,17 @@ function MenuRack({
                           ))}
                         </motion.ul>
 
-                        {/* C60: явный аффорданс скролла — считает скрытые блюда
-                            live; у нижней границы обнуляется и исчезает.
-                            Важен на macOS (overlay-скроллбар невидим) */}
+                        {/* C60/C61: явный аффорданс скролла — живой счётчик скрытых
+                            блюд; клик теперь РАСКРЫВАЕТ список на всю высоту
+                            (чтение — скроллом страницы, жалоба клиента C61);
+                            в раскрытом состоянии кнопка исчезает (счётчик 0) */}
                         {scrollable[cat.id] && (hiddenCount[cat.id] ?? 0) > 0 ? (
                           <button
                             type="button"
                             className="hmenu__scrollcue"
                             data-testid={`hmenu-scrollcue-${cat.id}`}
-                            onClick={() => scrollListBy(listRefs.current[k], reduced)}
-                            aria-label={`Показать ещё ${hiddenCount[cat.id]} ${dishesWord(hiddenCount[cat.id])} из пакета «${pkg.name}»`}
+                            onClick={() => expandList(cat.id, k)}
+                            aria-label={`Раскрыть весь список — ещё ${hiddenCount[cat.id]} ${dishesWord(hiddenCount[cat.id])} из пакета «${pkg.name}»`}
                           >
                             <span aria-hidden="true">
                               Ещё {hiddenCount[cat.id]} {dishesWord(hiddenCount[cat.id])}
@@ -853,6 +1032,21 @@ function MenuRack({
                           </button>
                         ) : null}
                       </div>
+
+                      {/* C61: пилюля «Свернуть список» — конец раскрытого списка.
+                          Возвращает компактную высоту рэка и верх панели в кадр */}
+                      {expandedId === cat.id ? (
+                        <button
+                          type="button"
+                          className="hmenu__collapse"
+                          data-testid={`hmenu-collapse-${cat.id}`}
+                          onClick={() => collapseList(k)}
+                          aria-label="Свернуть список — вернуться к компактному виду"
+                        >
+                          <ChevronUp aria-hidden="true" />
+                          <span>Свернуть список</span>
+                        </button>
+                      ) : null}
                     </div>
 
                     {/* «включено» — галочки от руки, gamma-style */}

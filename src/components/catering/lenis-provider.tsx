@@ -21,6 +21,10 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       smoothWheel: true,
       touchMultiplier: 1.5,
     });
+    /* C61: глобальный хук для программных скроллов блоков — Lenis.scrollTo
+       корректно гасит колесную инерцию (голый window.scrollTo(smooth)
+       Lenis перебивает своим таргетом, грабля §2) */
+    (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
     let raf = 0;
     const loop = (time: number) => {
       lenis.raf(time);
@@ -46,6 +50,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     return () => {
       off();
       cancelAnimationFrame(raf);
+      delete (window as unknown as { __lenis?: Lenis }).__lenis;
       lenis.destroy();
     };
   }, []);

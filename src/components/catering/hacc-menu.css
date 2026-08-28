@@ -194,7 +194,15 @@
 .hmenu__item {
   position: relative;
   flex: 0 0 var(--hmenu-spine);
-  overflow: hidden;
+  /* clip, не hidden: clip НЕ создаёт scrollport → position:sticky внутри
+     панели работает против скролла СТРАНИЦЫ (C61: прилипающая шапка
+     раскрытой панели); визуальный клиппинг тот же, что у hidden.
+  */
+  overflow: clip;
+  /* ВАЖНО при clip: автоматический min-width:flex-элемента = min-content
+     (панель фиксированной ширины!) — без явного нуля рэк разъезжается
+     на 7 колонок по 1020px (поймано живым замером C61/волна-2) */
+  min-width: 0;
   border-radius: 5px;
   scroll-margin-top: 96px;   /* мобильный scrollIntoView + sticky header */
   transition: flex-grow var(--hmenu-dur) var(--hmenu-ease);
@@ -403,8 +411,34 @@
   flex-direction: column;
   height: 100%;
   background-color: var(--hmenu-item-tint);
-  padding: clamp(1.1rem, 2vw, 1.75rem) clamp(1.25rem, 2.2vw, 2rem)
-    clamp(1.1rem, 1.8vw, 1.6rem) clamp(0.75rem, 1.4vw, 1.25rem);
+  /* паддинги — в переменных: их использует прилипающая шапка раскрытой
+     панели (full-bleed растяжение на поля тела) */
+  --hmenu-body-pt: clamp(1.1rem, 2vw, 1.75rem);
+  --hmenu-body-pr: clamp(1.25rem, 2.2vw, 2rem);
+  --hmenu-body-pb: clamp(1.1rem, 1.8vw, 1.6rem);
+  --hmenu-body-pl: clamp(0.75rem, 1.4vw, 1.25rem);
+  padding: var(--hmenu-body-pt) var(--hmenu-body-pr) var(--hmenu-body-pb)
+    var(--hmenu-body-pl);
+}
+
+/* C61 (жюри-волна-1): в раскрытой панели шапка каталога (категория + цена)
+   прилипает к верхней кромке под шапкой сайта — контекст не теряется,
+   пока читаешь длинный список скроллом страницы. Только в раскрытом
+   состоянии: компактная панель короче вьюпорта, и липнуть там нечему */
+.hmenu__rack.is-expanded .hmenu__item.is-open .hmenu__row-head {
+  position: sticky;
+  top: 84px; /* высота sticky-шапки сайта (fusion-wrapper ~84px) */
+  z-index: 3;
+  margin-inline: calc(-1 * var(--hmenu-body-pr)) calc(-1 * var(--hmenu-body-pl));
+  padding-inline: var(--hmenu-body-pr) var(--hmenu-body-pl);
+  background-color: var(--hmenu-item-tint);
+  box-shadow: 0 1px 0 rgba(26, 26, 26, 0.07);
+}
+
+@media (min-width: 1024px) and (max-height: 840px) {
+  .hmenu__rack.is-expanded .hmenu__item.is-open .hmenu__row-head {
+    top: 72px;
+  }
 }
 
 /* ступенчатое появление содержимого панели — transform/opacity only */
@@ -732,6 +766,77 @@
   }
 }
 
+/* ─── C61: раскрытый список — рэк отдаёт clamp-высоту ──────────────────
+   Клик по «Ещё N блюд» растит панель до естественной высоты: меню читается
+   скроллом СТРАНИЦЫ (жалоба клиента: после раскрытия непонятно, как
+   скроллить вверх, чтобы прочитать целиком). is-animating включает
+   height-transition только на время анимации (ставит/снимает JS) */
+.hmenu__rack.is-expanded {
+  height: auto;
+  min-height: clamp(560px, 72vh, 760px);
+}
+
+@media (min-width: 1024px) and (max-height: 840px) {
+  .hmenu__rack.is-expanded {
+    min-height: clamp(520px, 80vh, 640px);
+  }
+}
+
+.hmenu__rack.is-animating {
+  transition: height 620ms var(--hmenu-ease);
+  will-change: height;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hmenu__rack.is-animating {
+    transition: none;
+  }
+}
+
+/* пилюля «Свернуть список» — конец раскрытого списка (тот же язык, что
+   у кнопки-счётчика: пилюля на тинте панели, шеврон вверх) */
+.hmenu__collapse {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  margin-top: 0.55rem;
+  padding: 0.44rem 0.9rem;
+  border: 1px solid rgba(26, 26, 26, 0.28);
+  border-radius: 999px;
+  background: var(--hmenu-item-tint, #f5eee2);
+  color: var(--hmenu-ink);
+  font-family: var(--ea-font-eyebrow), sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(26, 26, 26, 0.1);
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+  appearance: none;
+}
+
+.hmenu__collapse:hover {
+  background: #fffdf7;
+  border-color: rgba(26, 26, 26, 0.5);
+  box-shadow: 0 4px 16px rgba(26, 26, 26, 0.14);
+}
+
+.hmenu__collapse:focus-visible {
+  outline: 2px solid var(--hmenu-red-deep, #b0402f);
+  outline-offset: 2px;
+}
+
+.hmenu__collapse svg {
+  width: 14px;
+  height: 14px;
+}
+
 .hmenu__list::-webkit-scrollbar {
   width: 6px;
 }
@@ -990,8 +1095,12 @@
   }
 
   .hmenu__body {
-    padding: clamp(0.9rem, 1.6vw, 1.25rem) clamp(1rem, 1.8vw, 1.5rem)
-      clamp(0.9rem, 1.5vw, 1.25rem) clamp(0.65rem, 1.2vw, 1rem);
+    --hmenu-body-pt: clamp(0.9rem, 1.6vw, 1.25rem);
+    --hmenu-body-pr: clamp(1rem, 1.8vw, 1.5rem);
+    --hmenu-body-pb: clamp(0.9rem, 1.5vw, 1.25rem);
+    --hmenu-body-pl: clamp(0.65rem, 1.2vw, 1rem);
+    padding: var(--hmenu-body-pt) var(--hmenu-body-pr) var(--hmenu-body-pb)
+      var(--hmenu-body-pl);
   }
 
   .hmenu__mid {
@@ -1076,6 +1185,12 @@
   .hmenu__rack-label {
     margin-inline: clamp(1rem, 4vw, 2rem);
     font-size: 0.66rem;
+  }
+
+  /* C61: раскрытие списка — десктоп-механика; на мобильном список и так
+     показывается целиком (защита от гонки MQ-сброса состояния) */
+  .hmenu__collapse {
+    display: none;
   }
 
   .hmenu__rack {
@@ -1289,6 +1404,7 @@
   .hmenu__pdf,
   .hmenu__pdf-status,
   .hmenu__scrollcue,
+  .hmenu__collapse,
   .hmenu__spine-plus,
   .hmenu__spine-peek {
     display: none !important;
