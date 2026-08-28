@@ -34,6 +34,12 @@ export function ChapterNav() {
   // there, leaving 7 dead buttons (critic 3 finding).
   const pathname = usePathname();
   const isHome = pathname === "/";
+  // Cycle 60 (blind critics): the rail sits exactly over the right-edge spines
+  // of the two full-bleed accordion racks (#services, #menu) and intercepts
+  // their clicks — two independent critics hit this within a minute. While a
+  // rack section owns the viewport, the rail fades out and stops catching
+  // pointers (its links duplicate the header anchors anyway).
+  const [overRack, setOverRack] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -53,6 +59,27 @@ export function ChapterNav() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const racks = ["services", "menu"]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+    if (!racks.length) return;
+    /* C60: IO отдаёт только ИЗМЕНИВШИЕся entries — брать entries.some()
+       неверно (уход одного таргета гасил индикатор, пока второй ещё
+       в кадре). Держим состояние по каждому таргету отдельно */
+    const state: Record<string, boolean> = {};
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) state[(e.target as HTMLElement).id] = e.isIntersecting;
+        setOverRack(Object.values(state).some(Boolean));
+      },
+      { rootMargin: "-6% 0px -6% 0px", threshold: 0 },
+    );
+    racks.forEach((r) => io.observe(r));
+    return () => io.disconnect();
+  }, []);
+
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -62,7 +89,10 @@ export function ChapterNav() {
   return (
     <nav
       aria-label="Быстрая навигация по разделам"
-      className="pointer-events-none fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 lg:block"
+      className={`pointer-events-none fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 transition-opacity duration-300 lg:block ${
+        overRack ? "invisible opacity-0" : "visible opacity-100"
+      }`}
+      aria-hidden={overRack || undefined}
     >
       <ul className="pointer-events-auto relative flex flex-col items-end gap-3">
         {SECTIONS.map((s) => {

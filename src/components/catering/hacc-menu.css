@@ -345,6 +345,10 @@
 }
 
 .hmenu__spine-peek-img {
+  /* сырой <img> (C60): тянутся на всю полосу корешка, кроп — cover */
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   filter: saturate(0.96) contrast(1.02);
 }
@@ -481,10 +485,11 @@
   display: block;
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 600;
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  font-size: 0.78rem;   /* C60 (Ольга): «за гостя» читалась мельче цены — риск
+                           прочесть 2 450 ₽ как цену стола; ключевые слова — крупнее */
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--hmenu-soft);
+  color: rgba(26, 26, 26, 0.78);
   margin: 0.24rem 0 0;
 }
 
@@ -553,6 +558,12 @@
   font-size: 0.78rem;
   line-height: 1.45;
   pointer-events: none;
+  /* C60 (волна-2): длинные подписи срезались посреди слова — максимум
+     2 строки с многоточием, без жёсткого обреза */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* правая колонка: табы → список → «включено» */
@@ -669,15 +680,22 @@
 }
 
 /* мягкое затухание внизу — честный сигнал «список продолжается».
-   Класс is-scrollable ставит JS-замер (scrollHeight > clientHeight) */
+   Класс is-scrollable ставит JS-замер (scrollHeight > clientHeight).
+   C60: тон (сплошной tint с 0%) начинается ниже (45%), чтобы обрезанная
+   строка оставалась читаемой — срез ряда сам работает аффордансом */
 .hmenu__listwrap::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 34px;
-  background: linear-gradient(to bottom, rgba(26, 26, 26, 0), var(--hmenu-item-tint));
+  height: 36px;
+  background: linear-gradient(
+    to bottom,
+    rgba(26, 26, 26, 0),
+    rgba(26, 26, 26, 0) 45%,
+    var(--hmenu-item-tint)
+  );
   pointer-events: none;
   opacity: 0;
   transition: opacity 240ms ease;
@@ -687,10 +705,10 @@
   opacity: 1;
 }
 
-/* fade не должен съедать последнюю строку — компенсируем паддингом
-   (2.2rem > высоты градиента 34px — критик R2, п.3) */
+/* fade не должен съедать последнюю строку — компенсируем паддингом.
+   C60: 3.2rem — чтобы нижние строки не уходили под кнопку-счётчик (≈44px) */
 .hmenu__listwrap.is-scrollable .hmenu__list {
-  padding-bottom: 2.2rem;
+  padding-bottom: 3.2rem;
 }
 
 .hmenu__list {
@@ -701,12 +719,21 @@
   min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(26, 26, 26, 0.28) transparent;
+  scrollbar-color: rgba(26, 26, 26, 0.34) transparent;
   padding-right: 0.55rem;
+  /* C60/жюри: жест у кромки списка не должен уводить страницу */
+  overscroll-behavior: contain;
+}
+
+/* нативная колесо/ PgDn тоже плавные (reduced-motion отключит) */
+@media (prefers-reduced-motion: no-preference) {
+  .hmenu__list {
+    scroll-behavior: smooth;
+  }
 }
 
 .hmenu__list::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 .hmenu__list::-webkit-scrollbar-track {
@@ -714,8 +741,70 @@
 }
 
 .hmenu__list::-webkit-scrollbar-thumb {
-  background: rgba(26, 26, 26, 0.24);
+  background: rgba(26, 26, 26, 0.3);
   border-radius: 3px;
+}
+
+/* C60 — явный аффорданс «Ещё N блюд»: пилюля-счётчик у нижней кромки
+   списка. Живой счётчик (JS) обнуляется у дна — кнопка исчезает.
+   Слой над fade (z-index 2), кликабельна, видима на macOS */
+.hmenu__scrollcue {
+  position: absolute;
+  left: 50%;
+  /* C60: --hmenu-cue-lift поднимает кнопку над куки-баннером, когда
+     нижняя кромка списка попадает в его полосу (ставит JS-замер) */
+  bottom: calc(10px + var(--hmenu-cue-lift, 0px));
+  transform: translateX(-50%);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.44rem 0.9rem;
+  border: 1px solid rgba(26, 26, 26, 0.28);
+  border-radius: 999px;
+  background: var(--hmenu-item-tint);
+  color: var(--hmenu-ink);
+  font-family: var(--ea-font-eyebrow), sans-serif;
+  font-weight: 600;
+  font-size: 0.78rem;   /* C60/жюри: 11.5px — на грани читаемости для главного
+                           аффорданса; 12.5px ничего не стоят */
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(26, 26, 26, 0.1);
+  transition:
+    background 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+  appearance: none;
+}
+
+.hmenu__scrollcue:hover {
+  background: #fffdf7;
+  border-color: rgba(26, 26, 26, 0.5);
+  box-shadow: 0 4px 16px rgba(26, 26, 26, 0.14);
+}
+
+.hmenu__scrollcue:focus-visible {
+  outline: 2px solid var(--hmenu-red-deep, #b0402f);
+  outline-offset: 2px;
+}
+
+.hmenu__scrollcue svg {
+  width: 14px;
+  height: 14px;
+  animation: hmenu-cue-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes hmenu-cue-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
 }
 
 .hmenu__dish {
@@ -883,7 +972,7 @@
 @media (min-width: 1024px) and (max-width: 1279px) {
   .hmenu__row-head {
     grid-template-columns: minmax(0, auto) minmax(0, 1fr);
-    padding-block: 0.35rem 0.85rem;
+    padding-block: 0.3rem 0.6rem;
   }
 
   .hmenu__tag {
@@ -928,17 +1017,56 @@
     line-height: 1.45;
   }
 
+  /* C60 (два критика): на 4-табовых каталогах (закуски) и 5 пунктах
+     «включено» сетка 2×2 съедала до 150px — списку оставалось 51–95px
+     («замочная скважина»). Переводим «включено» в компактные строки,
+     ужимаем табы — список получает ≥150px на 1024×800 */
+  .hmenu__tabs {
+    row-gap: 0;
+  }
+
+  .hmenu__tab {
+    padding: 0.45rem 0.05rem;
+  }
+
+  .hmenu__tab-name {
+    font-size: 0.78rem;
+  }
+
+  .hmenu__tab-sum {
+    font-size: 0.76rem;
+  }
+
   .hmenu__incl {
-    margin-top: 0.6rem;
-    padding-top: 0.6rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+  }
+
+  /* C60/финал: на ~246px колонке описание пакета в подписи резалось
+     на 2-й строке (−37px хвоста, аудитор). Оставляем только имя —
+     ноль молчаливых потерь; описание читается в соседнем списке */
+  .hmenu__media-cap-desc {
+    display: none;
+  }
+
+  .hmenu__incl-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1.1rem;
   }
 
   .hmenu__incl-item {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    gap: 0.4rem;
+  }
+
+  .hmenu__incl-item .hmenu__check {
+    width: 13px;
+    height: 13px;
   }
 
   .hmenu__row-foot {
-    padding-top: 0.55rem;
+    padding-top: 0.5rem;
   }
 }
 
@@ -1160,6 +1288,7 @@
   .hmenu__hint,
   .hmenu__pdf,
   .hmenu__pdf-status,
+  .hmenu__scrollcue,
   .hmenu__spine-plus,
   .hmenu__spine-peek {
     display: none !important;
@@ -1275,6 +1404,15 @@
 
   .hmenu__item.is-open .hmenu__img {
     animation: none !important;
+  }
+
+  /* C60: счётчик скрытых блюд не подпрыгивает */
+  .hmenu__scrollcue svg {
+    animation: none !important;
+  }
+
+  .hmenu__list {
+    scroll-behavior: auto !important;
   }
 
   .hmenu__title {

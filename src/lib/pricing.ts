@@ -33,7 +33,7 @@ export const MENU_TYPES: MenuType[] = [
   {
     id: "buffet",
     label: "Фуршет",
-    short: "Канапе, брускетты, горячие закуски",
+    short: "Канапе и брускетты",
     perGuest: 2450,
     minGuests: 20,
     description: "Фуршетные столы, канапе, брускетты и горячие закуски — для приёмов, презентаций и арт-открытий.",
@@ -120,7 +120,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Базовый",
         pricePerGuest: 4470,
         description: "14 позиций — классический банкет: рыбные и мясные закуски, салаты, горячее",
-        photo: "/media/banket-1.jpg",
+        photo: "/media/c60/c60-banket-1.webp",
         dishes: [
           { name: "Речная форель слабой соли, белая масляная рыба холодного копчения, в окружении королевских креветок, лимона и свежей зелени", weight: "150 г" },
           { name: "Домашняя буженина в чесночном пюре, тимьяне и горчице; куриный рулет «су-вид»; бруски из свиной вырезки в беконе", weight: "200 г" },
@@ -142,7 +142,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Стандарт",
         pricePerGuest: 4970,
         description: "16 позиций — ростбиф, блинные роллы, стейк лосося, медальоны из свинины",
-        photo: "/media/banket-2.jpg",
+        photo: "/media/c60/c60-banket-2.webp",
         dishes: [
           { name: "Лосось слабой соли с творожным сыром, каперсами и лаймом, в дуэте с копчёным палтусом, с миксом тигровых креветок и вяленых томатов", weight: "150 г" },
           { name: "Ростбиф из говяжьей вырезки medium rare, домашняя буженина в дижонской горчице, говяжий язык, пармская ветчина с грушей конфи и пармезаном", weight: "250 г" },
@@ -166,7 +166,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 6970,
         description: "17 позиций — гусиная печень, утка магре, дорада, филе-миньон, мидии",
-        photo: "/media/banket-3.jpg",
+        photo: "/media/c60/c60-banket-3.webp",
         dishes: [
           { name: "Микс маринованных овощей — мини-патиссоны с томатами черри, хрустящий чеснок с корнишонами, перец халапеньо с кукурузой бейби", weight: "100 г" },
           { name: "Блинный ролл с красной икрой и лососем", weight: "60 г" },
@@ -209,7 +209,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Канапе (6 шт)",
         pricePerGuest: 780,
         description: "6 видов канапе на выбор",
-        photo: "/media/snack-1.jpg",
+        photo: "/media/c60/c60-canape.webp",
         dishes: [
           { name: "Канапе с куриным рулетом «су-вид», маринованным огурцом и зеленью на пшеничном крутоне", weight: "35 г" },
           { name: "Ломтик итальянского салями с сыром маскарпоне и миндалём на пшеничном крутоне", weight: "35 г" },
@@ -223,7 +223,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Брускетты (3 шт)",
         pricePerGuest: 660,
         description: "3 вида брускетт на авторском хлебе",
-        photo: "/media/snack-2.jpg",
+        photo: "/media/c60/c60-bruschetta.webp",
         dishes: [
           { name: "Брускетта с копчёным палтусом, лаймом и каперсами на бородинском хлебе", weight: "75 г" },
           { name: "Брускетта со слабосолёным лососем, творожным сыром, лаймом и каперсами", weight: "75 г" },
@@ -234,7 +234,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Салаты (3 шт)",
         pricePerGuest: 690,
         description: "3 порционных салата в индивидуальной упаковке",
-        photo: "/media/snack-3.jpg",
+        photo: "/media/c60/c60-salad.webp",
         dishes: [
           { name: "Салат с куриным филе, картофелем, маринованными огурцами и перепелиным яйцом", weight: "100 г" },
           { name: "Салат с тигровыми креветками, рукколой, пармезаном, грейпфрутом и кедровыми орешками", weight: "100 г" },
@@ -245,7 +245,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Горячее (3 шашлычка)",
         pricePerGuest: 1950,
         description: "3 вида шашлычков на углях",
-        photo: "/media/concorde-handhelds.jpg",
+        photo: "/media/c60/c60-skewers.webp",
         dishes: [
           { name: "Шашлычок из свиной вырезки в маринаде из горчицы и розмарина", weight: "120 г" },
           { name: "Шашлычок из лосося (Фарерские острова) с соусом бешамель", weight: "120 г" },
@@ -272,7 +272,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Базовый",
         pricePerGuest: 900,
         description: "7 позиций — кофе, чай, выпечка, фрукты",
-        photo: "/media/concorde-avo-toast.jpg",
+        photo: "/media/c60/c60-coffee-basic.webp",
         dishes: [
           { name: "Кофе зерновой (100% арабика, Бразилия)", weight: "200 мл" },
           { name: "Чай листовой (чёрный/зелёный)", weight: "200 мл" },
@@ -287,7 +287,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Стандарт",
         pricePerGuest: 1450,
         description: "10 позиций — добавлены салаты и горячие закуски",
-        photo: "/media/concorde-dessert.jpg",
+        photo: "/media/c60/c60-coffee-std.webp",
         dishes: [
           { name: "Кофе зерновой (100% арабика, Бразилия)", weight: "200 мл" },
           { name: "Чай листовой (чёрный/зелёный)", weight: "200 мл" },
@@ -305,7 +305,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 2200,
         description: "12 позиций — капучино, авторская выпечка, сырная тарелка",
-        photo: "/media/cutandtaste-artichoke.webp",
+        photo: "/media/c60/c60-coffee-premium.webp",
         dishes: [
           { name: "Капучино / Латте (профессиональная кофемашина, 100% арабика)", weight: "200 мл" },
           { name: "Чай листовой премиум (Эрл Грей, Жасмин, Молочный улун)", weight: "200 мл" },
@@ -326,7 +326,7 @@ export const MENU_TYPES: MenuType[] = [
   {
     id: "vegetarian",
     label: "Вегетарианское",
-    short: "Полностью растительное меню",
+    short: "Сезонное меню без мяса",
     perGuest: 2450,
     minGuests: 15,
     description: "Сезонное вегетарианское меню с молочными продуктами.",
@@ -357,7 +357,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 3250,
         description: "11 позиций — добавлены средиземноморские шашлычки и гратен",
-        photo: "/media/menu-vegetarian.jpg",
+        photo: "/media/c60/c60-veg.webp",
         dishes: [
           { name: "Канапе с авокадо, томатами черри, кунжутом и микрозеленью", weight: "35 г" },
           { name: "Канапе с печёным перцем, тофу, базиликом и кедровыми орешками", weight: "35 г" },
@@ -393,7 +393,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Базовый",
         pricePerGuest: 2200,
         description: "7 позиций — шашлык из свинины и курицы, овощи-гриль",
-        photo: "/media/event-06.jpg",
+        photo: "/media/c60/c60-bbq.webp",
         dishes: [
           { name: "Шашлык из свиной вырезки в маринаде из горчицы и розмарина", weight: "200 г" },
           { name: "Шашлык из куриного бедра в йогурте и специях", weight: "180 г" },
@@ -408,7 +408,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Премиум",
         pricePerGuest: 3500,
         description: "10 позиций — добавлены лосось на кедровой доске, морепродукты, бургеры",
-        photo: "/media/event-07.jpg",
+        photo: "/media/c60/c60-bbq-premium.webp",
         dishes: [
           { name: "Шашлык из свиной вырезки в маринаде из горчицы и розмарина", weight: "200 г" },
           { name: "Шашлык из куриного бедра в йогурте и специях", weight: "180 г" },
@@ -442,7 +442,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Базовый",
         pricePerGuest: 650,
         description: "5 позиций — салат, суп, горячее, напиток",
-        photo: "/media/concept-banquet-table.jpg",
+        photo: "/media/c60/c60-lunch.webp",
         dishes: [
           { name: "Салат на выбор: Оливье с курицей / Винегрет / Цезарь с куриным бедром", weight: "150 г" },
           { name: "Суп на выбор: Борщ классический / Тыквенный-пюре / Грибной с лисичками", weight: "250 мл" },
@@ -455,7 +455,7 @@ export const MENU_TYPES: MenuType[] = [
         name: "Расширенный",
         pricePerGuest: 950,
         description: "7 позиций — добавлены закуска и выпечка",
-        photo: "/media/menu-office-lunch.jpg",
+        photo: "/media/c60/c60-lunch-2.webp",
         dishes: [
           { name: "Закуска: брускетта с куриным паштетом и брусничным соусом / канапе с сыром", weight: "60 г" },
           { name: "Салат на выбор из 5 видов (Оливье, Винегрет, Цезарь, Греческий, Мимоза)", weight: "150 г" },

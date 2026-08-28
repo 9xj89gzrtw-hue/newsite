@@ -61,7 +61,13 @@ import {
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
-import { ArrowUpRight, Download, MousePointer2, Plus } from "lucide-react";
+import {
+  ArrowUpRight,
+  ChevronDown,
+  Download,
+  MousePointer2,
+  Plus,
+} from "lucide-react";
 
 import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
@@ -184,6 +190,15 @@ function guestsLabel(n: number): string {
   return `от ${n} ${word}`;
 }
 
+/** 1 блюдо / 2–4 блюда / 5+ блюд — для подписи «Ещё N …» у списка. */
+function dishesWord(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return "блюдо";
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "блюда";
+  return "блюд";
+}
+
 /* ----------------------------------------------------- hand-drawn check ✎ */
 
 /** SVG-«галочка от руки» — приём из gamma service-section grid. */
@@ -299,9 +314,16 @@ function MenuRack({
   const scrollTimer = useRef(0);
   useEffect(() => () => window.clearTimeout(scrollTimer.current), []);
 
+  /* C60: после КАЖДОГО открытия рэк переверстывается — под неподвижный
+     курсор попадает ДРУГОЙ корешок и hover-intent «угоняет» панель
+     (на 1024 поймано живьём: 5 кликов подряд дергались обратно).
+     700ms тишины после открытия гасят перехват на переверстке */
+  const suppressHoverUntil = useRef(0);
+
   const open = useCallback(
     (i: number, manual: boolean) => {
       if (i < 0 || i >= N) return;
+      suppressHoverUntil.current = Date.now() + 700;
       if (openIndexRef.current === i) {
         // Мобильный: крестик обещает toggle — закрываем (в услугах так же).
         if (
@@ -336,6 +358,7 @@ function MenuRack({
   const onSpineEnter = useCallback(
     (i: number) => {
       if (!desktopFine || reduced) return;
+      if (Date.now() < suppressHoverUntil.current) return;
       window.clearTimeout(hoverTimer.current);
       hoverTimer.current = window.setTimeout(() => {
         if (i !== openIndexRef.current) open(i, false);
@@ -418,30 +441,101 @@ function MenuRack({
   }, []);
 
   /* M1: fade-индикатор «список продолжается» — живой замер скролла открытой
-     панели (перепроверяется при смене пакета/категории и на resize) --------- */
+     панели (перепроверяется при смене пакета/категории и на resize).
+     C60 (жалоба клиента): fade+тонкий скроллбар НЕ читаются на десктопе —
+     добавлен явный счётчик скрытых блюд (кнопка «Ещё N блюд»),
+     пересчитывается live при скролле/resize/смене пакета ------------------- */
   const listRefs = useRef<(HTMLUListElement | null)[]>([]);
   const [scrollable, setScrollable] = useState<Record<string, boolean>>({});
+  const [hiddenCount, setHiddenCount] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (openIndex === null) return;
     const cat = cats[openIndex];
     const el = listRefs.current[openIndex];
     if (!cat || !el) return;
+    let raf = 0;
     const check = () => {
+      raf = 0;
       const can = el.scrollHeight > el.clientHeight + 1;
       setScrollable((prev) =>
         prev[cat.id] === can ? prev : { ...prev, [cat.id]: can },
       );
+      /* сколько блюд ещё НЕ ПРОЧИТАНО целиком: строка считается скрытой,
+         пока её низ ниже нижней кромки списка. Такое правило сходится
+         ровно в ноль В МОМЕНТ доскролла до дна (паддинг гарантирует,
+         что у дна последняя строка видна целиком) — кнопка не может
+         погаснуть, пока что-то срезано (волна-2, аудитор-блокер) */
+      const bottom = el.getBoundingClientRect().bottom;
+      let n = 0;
+      el.querySelectorAll(".hmenu__dish").forEach((li) => {
+        if (li.getBoundingClientRect().bottom > bottom + 2) n += 1;
+      });
+      setHiddenCount((prev) =>
+        prev[cat.id] === n ? prev : { ...prev, [cat.id]: n },
+      );
+      /* C60 (аудитор-блокер): на первом визите куки-баннер (fixed, низ,
+         ~77px) ложится НА кнопку-счётчик и перехватывает её клики.
+         Если позиция покоя кнопки пересекает полосу баннера И кнопка ещё
+         видима — прижимаем её ПОВЕРХ верхней кромки баннера (sticky- effect),
+         с клампом внутрь обёртки списка. Волна-3: условие «низ списка на
+         экране» оставляло мёртвую зону, когда низ списка уже уехал за сгиб */
+      const wrap = el.closest(".hmenu__listwrap");
+      if (wrap instanceof HTMLElement) {
+        const banner = document.querySelector('[data-component="ea-cookie-banner"]');
+        if (banner) {
+          const br = banner.getBoundingClientRect();
+          const wrapBottom = wrap.getBoundingClientRect().bottom;
+          const cueRestBottom = wrapBottom - 10; // bottom:10px в покое
+          const vb = window.innerHeight;
+          if (cueRestBottom > br.top + 4 && cueRestBottom - 48 < vb) {
+            const lift = Math.ceil(cueRestBottom - br.top + 8);
+            const maxLift = Math.max(0, Math.floor(wrap.clientHeight - 52));
+            wrap.style.setProperty("--hmenu-cue-lift", `${Math.min(lift, maxLift)}px`);
+          } else {
+            wrap.style.removeProperty("--hmenu-cue-lift");
+          }
+        } else {
+          wrap.style.removeProperty("--hmenu-cue-lift");
+        }
+      }
     };
     check();
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(check);
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    /* C60/волна-3 (аудитор): скролл СТРАНИЦЫ тоже меняет положение кнопки
+       относительно куки-баннера — без этого слушателя lift был бы
+       устаревшим и кнопка могла бы лечь ПОД баннер (видима, некликабельна) */
+    window.addEventListener("scroll", onScroll, { passive: true });
     const ro = new ResizeObserver(check);
     ro.observe(el);
     window.addEventListener("resize", check);
     return () => {
+      el.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll);
       ro.disconnect();
       window.removeEventListener("resize", check);
+      if (raf) window.cancelAnimationFrame(raf);
     };
   }, [openIndex, pkgs, cats]);
+
+  /* клик по «Ещё N блюд»: плавно раскрываем список ДО САМОГО КОНЦА.
+     C60/волна-2 (аудитор-блокер): фиксированный шаг не делился на высоту
+     окна 1024 — счётчик гас, пока последняя строка была срезана; а 14-позиционный
+     банкет требовал 7 кликов по «открытке». Один клик = всё блюдо видно,
+     счётчик гаснет ровно у дна, где паддинг показывает последнюю строку целиком */
+  const scrollListBy = useCallback(
+    (el: HTMLUListElement | null, reducedMotion: boolean | null) => {
+      if (!el) return;
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: reducedMotion ? "auto" : "smooth",
+      });
+    },
+    [],
+  );
 
   const onTabKeyDown = useCallback(
     (e: ReactKeyboardEvent<HTMLButtonElement>, catId: string, pkgCount: number, current: number) => {
@@ -560,11 +654,16 @@ function MenuRack({
                     (сигнатурный момент жюри C59; ноль сдвигов layout) */}
                 {!isOpen && cat.packages[pkgIdx]?.photo ? (
                   <span className="hmenu__spine-peek" aria-hidden="true">
-                    <SmartImage
+                    {/* сырой <img>: next/image с sizes=64px отдавал вариант
+                        64px шириной, который растягивался в полосу 54×648
+                        (10–15× апскейл — «каша» на самой кликаемой рейке).
+                        Декоративный слой за hover — оригинал даёт резкость,
+                        файлы панели и так загружены */}
+                    <img
                       src={cat.packages[pkgIdx].photo as string}
                       alt=""
-                      fill
-                      sizes="64px"
+                      loading="lazy"
+                      draggable={false}
                       className="hmenu__spine-peek-img"
                     />
                   </span>
@@ -632,7 +731,14 @@ function MenuRack({
                       </motion.div>
                     </motion.div>
                     <figcaption className="hmenu__media-cap">
-                      {pkg.name} · {pkg.description}
+                      <span className="hmenu__media-cap-name">{pkg.name}</span>
+                      {/* описание пакета: на 1024–1279 прячем (col ~246px —
+                          текст резался на 2-й строке без хвоста, аудитор C60);
+                          полный состав и так рядом — в списке блюд */}
+                      <span className="hmenu__media-cap-desc">
+                        {" · "}
+                        {pkg.description}
+                      </span>
                     </figcaption>
                   </figure>
 
@@ -681,7 +787,12 @@ function MenuRack({
                       <div
                         className={
                           "hmenu__listwrap" +
-                          (scrollable[cat.id] ? " is-scrollable" : "")
+                          /* C60: fade честен — гаснет, когда скрытых блюд не
+                             осталось (доскроллили до дна), даже если
+                             scrollHeight ещё больше clientHeight (паддинг) */
+                          (scrollable[cat.id] && (hiddenCount[cat.id] ?? 0) > 0
+                            ? " is-scrollable"
+                            : "")
                         }
                       >
                         {/* кроссфейд списка при смене пакета (моушн-критик
@@ -723,6 +834,24 @@ function MenuRack({
                             </motion.li>
                           ))}
                         </motion.ul>
+
+                        {/* C60: явный аффорданс скролла — считает скрытые блюда
+                            live; у нижней границы обнуляется и исчезает.
+                            Важен на macOS (overlay-скроллбар невидим) */}
+                        {scrollable[cat.id] && (hiddenCount[cat.id] ?? 0) > 0 ? (
+                          <button
+                            type="button"
+                            className="hmenu__scrollcue"
+                            data-testid={`hmenu-scrollcue-${cat.id}`}
+                            onClick={() => scrollListBy(listRefs.current[k], reduced)}
+                            aria-label={`Показать ещё ${hiddenCount[cat.id]} ${dishesWord(hiddenCount[cat.id])} из пакета «${pkg.name}»`}
+                          >
+                            <span aria-hidden="true">
+                              Ещё {hiddenCount[cat.id]} {dishesWord(hiddenCount[cat.id])}
+                            </span>
+                            <ChevronDown aria-hidden="true" />
+                          </button>
+                        ) : null}
                       </div>
                     </div>
 
@@ -891,8 +1020,8 @@ export function HaccMenu() {
       <div className="ea-container ea-container--wide">
         <p className="hmenu__note">
           Цены — за одного гостя. Условия называем заранее, до заявки: при
-          выборе даты в расчёте сразу виден сезонный коэффициент (май–
-          сентябрь и декабрь — ×1,15), срочные заказы — по правилам из
+          выборе даты в расчёте сразу виден сезонный коэффициент (май–сентябрь
+          и декабрь — ×1,15), срочные заказы — по правилам из
           вопросов ниже. Ориентир: банкет на 40 гостей — от{" "}
           {formatRUB(40 * banquetPerGuest)}. Алкоголь, аренда площадки,
           музыка и расширенное оформление — отдельными строками по запросу.
