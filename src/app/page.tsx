@@ -54,8 +54,9 @@ import { BackToTop } from "@/components/catering/back-to-top";
 //   11. EventsVideoCarousel  — NEW. Carousel of 4 event-type video tiles with
 //                               looping muted autoplay teasers + fullscreen click-to-play
 //                               modal. Magazine scroll-snap pattern, 5s auto-advance.
-//   12. CepProcess           — "THE CREATIVE EDGE" 3-step process (01 DREAM /
-//                               02 BUILD / 03 SAVOR).
+//   12. CepProcess           — Cycle 63. «КАК МЫ РАБОТАЕМ» compact 4-step strip:
+//                               scroll-drawn red progress rail, sequential step
+//                               activation, ink-fill outline numerals.
 //   13. DeliveryBlock        — NEW. 2-col split: delivery photo + 5 USPs + 2 CTAs.
 //                               "Кейтеринг, который *доставляют*." bridges logistics
 //                               into the conversion flow.
@@ -179,8 +180,9 @@ export default function Home() {
              work" algorithm) — a cinematic trust beat showing the food in motion. */}
       <EventsVideoCarousel />
 
-      {/* 10. CepProcess — "THE CREATIVE EDGE" 3-step process: 01 DREAM / 02 BUILD /
-              03 SAVOR. The "algorithm of actions" block — how we work, the creative edge. */}
+      {/* 10. CepProcess — Cycle 63. «КАК МЫ РАБОТАЕМ» — compact 4-step strip
+              (ЗАЯВКА / СОЗВОН / НАКРЫВАЕМ / УБИРАЕМ): scroll-drawn red progress
+              rail, sequential node/step activation, ink-fill outline numerals. */}
       <CepProcess />
 
       {/* ── ACT IV: CONVERSION ── */}
