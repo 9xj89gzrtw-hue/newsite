@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -87,6 +87,12 @@ export function ClipPathReveal({
 }: ClipPathRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  // C62 hydration-safety: branch the tree on reduce ONLY after mount —
+  // useReducedMotion() is false at SSR and true on a reduce-user's first
+  // client render; a direct branch caused a hydration mismatch (React
+  // regenerated the whole page tree). First client render must match SSR.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const inView = useInView(ref, { once, margin: "-80px" });
 
   const resolvedDir: Exclude<ClipDirection, "alternate"> =
@@ -94,7 +100,7 @@ export function ClipPathReveal({
       ? ALTERNATE_CYCLE[(index ?? 0) % ALTERNATE_CYCLE.length]
       : direction;
 
-  if (reduce) {
+  if (mounted && reduce) {
     return <div className={className}>{children}</div>;
   }
 

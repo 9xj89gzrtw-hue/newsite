@@ -1,97 +1,149 @@
 "use client";
 
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useInView,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { TottReveal } from "./tott-reveal";
-import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 
 /**
  * TottParallaxBand — Talk of the Town (talkofthetownatlanta.com) parallax
- * quote band (Cycle 30). Their homepage uses 16× CSS-parallax sections
- * (`background-attachment: fixed`) — full-bleed photo backgrounds that stay
- * fixed while content scrolls over them. This component reproduces that
- * signature motion as an editorial pause between Act II and Act III of the
- * Interfood homepage.
+ * quote band (Cycle 30, rebuilt Cycle 62). Their homepage uses 16× CSS-parallax
+ * sections (`background-attachment: fixed`) — full-bleed photo backgrounds that
+ * stay glued to the viewport while the dark band window slides over them.
+ *
+ * ══ CYCLE 62 — WHY THE EFFECT DIED AND HOW IT COMES BACK ══
+ *
+ * Cycle 34 wrapped the photo stack in `ClipPathReveal`, whose inner motion.div
+ * carries a permanent inline `will-change: transform` (plus scale/y entrance
+ * transforms). Per css-transforms-1 §3 + css-will-change-1, ANY ancestor with
+ * `will-change: transform` / transform / filter becomes a containing block for
+ * fixed-position painting — `background-attachment: fixed` silently degrades
+ * to `scroll` and the "photo doesn't move" effect dies. The old comment claimed
+ * "the parallax keeps playing inside the clipped container" — wrong: measured
+ * 98.26% pixel drift across a 220px scroll (research/c62/parallax-verify.mjs).
+ *
+ * The rebuild keeps the CSS-native fixed attachment (the exact TOTT/Avada
+ * motion) by giving the photo layer a CLEAN ancestor chain — no transformed
+ * element between `.tott-parallax` and `<html>`:
+ *
+ *   section (plain) → div.absolute (plain) → .tott-parallax (fixed bg)
+ *
+ * The Cycle-34 entrance reveal is reproduced WITHOUT touching the photo's
+ * ancestors: a sibling cover panel (bg-black, z above photo+frame, below
+ * content) animates its OWN clip-path `inset(0% 0% 0% 0%)` →
+ * `inset(100% 0% 0% 0%)` — a top→bottom wipe that exposes the band exactly
+ * like the old reveal. clip-path on a SIBLING cannot create a containing
+ * block for the photo layer, so the parallax survives the animation and
+ * composes with it (photo already viewport-glued as the cover wipes away).
+ *
+ * Touch / reduced-motion: the CSS falls back to `background-attachment:
+ * scroll` (globals.css media queries). On coarse pointers the layer gains a
+ * subtle JS drift (useScroll ±7% on a 118%-tall layer) — real parallax life
+ * on mobile instead of a static image. On fine pointers NO transform ever
+ * touches the layer (would kill the fixed attachment again).
  *
  * Composition:
- *   - Full-bleed background image (the talkofthetown "Olive Trees" parallax
- *     bg — downloaded from their wp-content uploads). Mounted via next/image
- *     + a `.tott-parallax` overlay div using `background-attachment: fixed`
- *     so the parallax is the CSS-native kind (their Avada approach), not JS.
- *   - Layered burgundy/ink gradient overlay (so the cream text reads).
- *   - Centered stack:
- *       • script accent "приятного аппетита" (Nothing You Could Do — their hero
- *         overlay script font; English because the face is Latin-only, here
- *         rendered via Marck Script in Marck-capable Cyrillic)
- *       • char-split headline "Еда — это ритуал." rendered with SplitTextReveal
- *         mode="chars" stagger={0.03} (the sondaven.com split-line per-char
- *         reveal — replaces the prior TottReveal variant="split" with the
- *         shared Wave-2 motion primitive; same RU Playfair serif, same delay).
- *       • supporting line + olive-divider eyebrow.
- *
- * Cycle 34 WOW graft (sondaven.com):
- *  - `data-theme-flip="cream"` ensures the html root `--background` returns to
- *    cream as soon as this band enters (resets the lingering espresso from
- *    the CepEditorialDivider above so the hand-off is smooth). The band
- *    itself stays on its own `bg-black` (intentional — the parallax photo
- *    needs a dark backdrop to read).
- *  - The parallax bg photo (next/image + .tott-parallax fixed-attachment
- *    layer together) reveals top→bottom via `ClipPathReveal direction="top"`
- *    on enter — opposite direction to the editorial divider above for
- *    variety. The existing CSS `background-attachment: fixed` parallax keeps
- *    playing inside the clipped container (composes on different elements).
- *
- * Reduced-motion: SplitTextReveal + ClipPathReveal render statically; the
- * `.tott-parallax` CSS falls back to `background-attachment: scroll` on
- * touch/reduced-motion (globals.css media query).
+ *   - `.tott-parallax` bg: /media/c62/interfood-olive-trees-1920.webp
+ *     (Cycle 62: single optimized asset — the old build downloaded the raw
+ *     657KB JPG for the CSS layer AND a next/image webp copy hidden beneath;
+ *     new webp q75 512KB replaces both, new folder+filename = cache-bust per
+ *     AGENTS.md §28).
+ *   - Layered burgundy/ink gradient overlays (so the cream text reads).
+ *   - Centered stack: script accent "приятного аппетита" (Marck Script),
+ *     char-split headline "Еда — это ритуал." (SplitTextReveal, sondaven
+ *     per-char reveal), supporting line + olive-divider eyebrow.
+ *   - 5px cream border frame (their SR7 decorative border shape).
+ *   - `data-theme-flip="cream"` resets the espresso theme on entry.
  *
  * @see docs/talkofthetown-MINED-EXTRACTION.md (parallax sections)
+ * @see research/c62/parallax-verify.mjs (proof harness — must report
+ *      attachment:fixed, 0 breaker ancestors, best shift = 0px with
+ *      row-correlation err ≪ ±1px err)
  */
+
+const BAND_BG = "/media/c62/interfood-olive-trees-1920.webp";
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 export function TottParallaxBand() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+
+  /** Reveal cover: wipes away when the band enters (sibling — photo's
+   * ancestor chain stays clean). Skipped entirely under reduced motion. */
+  const coverInView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const [coverDone, setCoverDone] = useState(false);
+
+  /** Coarse-pointer drift — mobile gets a real (JS) parallax because the CSS
+   * fixed attachment is disabled there anyway (globals.css fallback). Fine
+   * pointers never receive a transform (fixed attachment must survive). */
+  const [isCoarse, setIsCoarse] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
+    const update = () => setIsCoarse(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const driftRaw = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
+  const drift = useSpring(driftRaw, { stiffness: 90, damping: 26, mass: 0.4 });
+
+  const driftActive = isCoarse && !reduce;
+
   return (
     <section
+      ref={sectionRef}
       data-header-theme="dark"
       data-theme-flip="cream"
       aria-label="Еда как ритуал"
       className="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-black py-24"
     >
       {/*
-        Parallax background — CSS background-attachment: fixed (their 16×
-        Avada parallax pattern). The next/image sits behind as the LCP
-        fallback; the .tott-parallax div drives the fixed-attachment motion.
-
-        Both layers are wrapped in a single ClipPathReveal so the whole
-        photo stack reveals top→bottom on enter. The wrapper div inside
-        ClipPathReveal carries an explicit h-[70vh] so next/image `fill`
-        (position:absolute) has a definite containing block — the inner
-        motion.div's height is auto, so this in-flow wrapper establishes it.
-        The existing `background-attachment: fixed` parallax keeps running
-        inside the clipped container (composes on different elements: outer
-        motion.div clips, inner motion.div scales 1.15→1.0, the .tott-parallax
-        div keeps its own viewport-fixed background-position).
+        Parallax background — CSS background-attachment: fixed (TOTT's Avada
+        pattern). C62 REBUILD: the photo layer sits inside a PLAIN absolute
+        wrapper — its ancestor chain (section → main → body → html) contains
+        no transform / filter / will-change, so the fixed attachment actually
+        attaches to the viewport. On touch the layer is oversized (118%) and
+        drifts ±7% with scroll (JS parallax); on desktop it is exactly
+        inset-0 with zero transforms.
       */}
-      <ClipPathReveal direction="top" duration={1.2} className="absolute inset-0">
-        <div className="relative h-[70vh] w-full">
-          <Image
-            src="/media/talkofthetown/talkofthetown-bg-olive-trees.jpg"
-            alt="Оливковые деревья — сезонные локальные продукты"
-            fill
-            sizes="100vw"
-            className="absolute inset-0 z-0 object-cover"
-          />
-          <div
-            className="tott-parallax absolute inset-0 z-[1]"
-            style={{
-              backgroundImage:
-                "url('/media/talkofthetown/talkofthetown-bg-olive-trees.jpg')",
-            }}
-            aria-hidden="true"
-          />
-        </div>
-      </ClipPathReveal>
-      {/* Burgundy-ink gradient overlay — deepens edges so cream text reads. */}
+      <div className="absolute inset-0 z-0">
+        <motion.div
+          className={
+            driftActive
+              ? "tott-parallax absolute -top-[9%] left-0 right-0 h-[118%]"
+              : "tott-parallax absolute inset-0"
+          }
+          style={
+            driftActive
+              ? { backgroundImage: `url('${BAND_BG}')`, y: drift }
+              : { backgroundImage: `url('${BAND_BG}')` }
+          }
+          aria-hidden="true"
+        >
+          {/* No next/image here — the CSS layer IS the visual (single
+              optimized webp download, C62). The parallax motion comes from
+              background-attachment: fixed on .tott-parallax (desktop) or
+              the drift transform (touch only). */}
+        </motion.div>
+      </div>
+
+      {/* Burgundy-ink gradient overlays — deepen edges so cream text reads.
+          C62 (seal-critic note): on narrow screens the busier photo made the
+          body copy harder to read — mobile gets a heavier veil (max-md). */}
       <div
-        className="absolute inset-0 z-[2] bg-gradient-to-b from-black/70 via-black/45 to-black/75"
+        className="absolute inset-0 z-[2] bg-gradient-to-b from-black/70 via-black/45 to-black/75 max-md:from-black/80 max-md:via-black/60 max-md:to-black/85"
         aria-hidden="true"
       />
       <div
@@ -102,8 +154,39 @@ export function TottParallaxBand() {
       {/* 5px cream border frame — their SR7 decorative border shape. */}
       <span className="tott-border-frame tott-border-frame--cream z-[3]" aria-hidden="true" />
 
-      {/* Centered content. */}
-      <div className="relative z-10 mx-auto max-w-3xl px-6 text-center text-white">
+      {/*
+        Reveal cover (C62): sibling wipe panel — animates its own clip-path
+        top→bottom; never wraps the photo layer, so the fixed attachment is
+        unaffected.
+
+        HYDRATION-SAFE (C62, per blind-QA finding): the panel is ALWAYS in
+        the DOM — useReducedMotion() is false during SSR and true on a
+        reduce-client first render, so conditional cover rendering produced
+        a hydration mismatch (React regenerated the whole tree + a black
+        flash). Now: reduce hides the panel via the CSS media query
+        (.tott-band-cover → display:none, pre-paint, zero flash) while the
+        ANIMATION stays JS-gated. Post-animation unmount (coverDone) is a
+        legal post-hydration update.
+      */}
+      {!coverDone && (
+        <motion.div
+          aria-hidden="true"
+          className="tott-band-cover pointer-events-none absolute inset-0 z-[4] bg-black"
+          initial={{ clipPath: "inset(0% 0% 0% 0%)" }}
+          animate={
+            coverInView && !reduce
+              ? { clipPath: "inset(100% 0% 0% 0%)" }
+              : undefined
+          }
+          transition={{ duration: 1.2, ease: EASE }}
+          onAnimationComplete={() => setCoverDone(true)}
+        />
+      )}
+
+      {/* Centered content. Soft inherited text-shadow (C62 seal note) lifts
+          the olive script + body copy off the busy foliage without touching
+          the TOTT palette. */}
+      <div className="relative z-10 mx-auto max-w-3xl px-6 text-center text-white [text-shadow:0_1px_18px_rgba(0,0,0,0.5),0_0_2px_rgba(0,0,0,0.35)]">
         <TottReveal
           variant="fade-left"
           as="p"
@@ -114,10 +197,8 @@ export function TottParallaxBand() {
         </TottReveal>
 
         {/* Char-split headline — sondaven.com split-line per-char reveal.
-            RU text in Playfair (Cyrillic-safe serif fallback). The shared
-            SplitTextReveal primitive replaces the prior TottReveal
-            variant="split" — same per-char animation, same delay (0.15s)
-            so the headline lifts in after the script accent settles. */}
+            RU text in Playfair (Cyrillic-safe serif fallback). Same delay
+            (0.15s) so the headline lifts in after the script accent settles. */}
         <SplitTextReveal
           as="h2"
           mode="chars"

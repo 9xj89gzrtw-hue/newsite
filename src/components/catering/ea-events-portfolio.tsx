@@ -124,6 +124,11 @@ const EVENTS: EventCard[] = [
 
 export function EaEventsPortfolio() {
   const reduce = useReducedMotion();
+  // C62 hydration-safety: entrance props serialize into SSR HTML — the reduce
+  // branch resolves only after mount (direct branch = mismatch).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const reduceSettled = mounted && reduce;
   const scrollerRef = useRef<HTMLUListElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [progress, setProgress] = useState(0);
@@ -215,8 +220,8 @@ export function EaEventsPortfolio() {
       <div className="ea-container ea-container--wide">
         <motion.div
           className="ea-evt-portfolio__top"
-          initial={reduce ? false : { opacity: 0, y: 24 }}
-          whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+          initial={reduceSettled ? false : { opacity: 0, y: 24 }}
+          whileInView={reduceSettled ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, ease: EASE }}
         >

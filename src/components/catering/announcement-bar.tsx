@@ -42,6 +42,8 @@ const CTA_HREF = "#calculator";
 export function AnnouncementBar() {
   const [visible, setVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  // C62: entrance props (initial/exit) ALSO serialize into SSR HTML —
+  // they use reduceSettled below (mounted gate), not the raw flag.
   // Track mount to gate rendering of the reduced-motion variant —
   // avoids SSR/CSR hydration mismatch (useReducedMotion returns null on SSR,
   // then a boolean on client; rendering the reduced-branch during initial
@@ -50,6 +52,7 @@ export function AnnouncementBar() {
   useEffect(() => {
     setMounted(true);
   }, []);
+  const reduceSettled = mounted && prefersReducedMotion;
 
   useEffect(() => {
     try {
@@ -129,9 +132,9 @@ export function AnnouncementBar() {
             backgroundColor: "var(--espresso)",
             color: "var(--cream)",
           }}
-          initial={prefersReducedMotion ? false : { opacity: 0, y: -20 }}
+          initial={reduceSettled ? false : { opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20 }}
+          exit={reduceSettled ? { opacity: 0 } : { opacity: 0, y: -20 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="flex items-center justify-center gap-2 px-10 py-2.5 text-center">

@@ -3883,6 +3883,17 @@ header[data-scrolled="true"] [data-mega-panel] {
 @media (hover: none) and (pointer: coarse) {
   .tott-parallax { background-attachment: scroll; }
 }
+/* C62: reduced-motion users get the static photo too (a11y parity with
+   the touch fallback; previously only touch devices fell back). */
+@media (prefers-reduced-motion: reduce) {
+  .tott-parallax { background-attachment: scroll; }
+}
+/* C62: reveal cover — hydration-safe reduce handling. The panel is always
+   in the DOM (SSR/client parity); reduced-motion hides it BEFORE first
+   paint (no JS timing, no black flash, no hydration mismatch). */
+@media (prefers-reduced-motion: reduce) {
+  .tott-band-cover { display: none; }
+}
 
 /* --- Olive divider bullet (their section eyebrow accent) ----------------- */
 .tott-eyebrow {

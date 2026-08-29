@@ -239,7 +239,13 @@ function CitiesTrack({ trackId = '' }: { trackId?: string }) {
 export function SiteFooter() {
   const year = useCurrentYear();
   const reduce = useReducedMotion();
-  const motionProps = reduce
+  // C62 hydration-safety: reduce branches (motionProps + cities marquee tree)
+  // resolve only after mount — useReducedMotion() is false at SSR and true on
+  // a reduce-user's first client render; a direct branch = hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const reduceSettled = mounted && reduce;
+  const motionProps = reduceSettled
     ? { initial: false, animate: { opacity: 1, y: 0 } }
     : { initial: "hidden", whileInView: "visible", viewport: { once: true, margin: "-80px" } };
 
@@ -468,7 +474,7 @@ export function SiteFooter() {
             </p>
           </div>
 
-          {reduce ? (
+          {reduceSettled ? (
             // Reduced motion: static wrap of cities, no animation
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
               {SOPRANOS_CITIES.map((city, i) => (

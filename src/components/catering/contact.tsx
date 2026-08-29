@@ -312,6 +312,10 @@ function ContactCard({
 }) {
   const [hovered, setHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  // C62 hydration-safety: the pulse-ring tree branch resolves only after mount
+  // (SSR renders it; a reduce-user's first client render must too).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const content = (
     <motion.div
@@ -364,7 +368,7 @@ function ContactCard({
         />
         
         {/* Pulse ring on hover */}
-        {!prefersReducedMotion && highlight && (
+        {mounted && !prefersReducedMotion && highlight && (
           <motion.span
             className="absolute inset-0 rounded-full border-2 border-gold/40"
             initial={{ scale: 1, opacity: 0.8 }}
@@ -438,8 +442,12 @@ function ContactCard({
 /** Success confetti particles */
 function ConfettiParticles() {
   const prefersReducedMotion = useReducedMotion();
-  
-  if (prefersReducedMotion) {
+  // C62 hydration-safety: the tree branch resolves only after mount — SSR
+  // renders the motion branch; a reduce-user's first client render must too.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (mounted && prefersReducedMotion) {
     return (
       <div className="flex items-center justify-center py-8">
         <CheckCircle2 className="size-16 text-sage" />
@@ -650,6 +658,10 @@ export function Contact() {
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const formRef = useRef<HTMLFormElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  // C62 hydration-safety: the step-panel initial prop serializes into SSR —
+  // the reduce variant resolves only after mount (direct branch = mismatch).
+  const [stepsMounted, setStepsMounted] = useState(false);
+  useEffect(() => setStepsMounted(true), []);
 
   // Restore draft on mount + URL-param prefill (Cycle 39: ?type=X&guests=Y
   // from the calculator share-links / direct visits now seed the form too —
@@ -1041,7 +1053,7 @@ export function Contact() {
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={step}
-                      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, x: 24 }}
+                      initial={stepsMounted ? { opacity: 0 } : { opacity: 0, x: 24 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, x: -24 }}
                       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}

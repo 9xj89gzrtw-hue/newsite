@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import * as React from "react";
 
@@ -28,8 +29,12 @@ export function Reveal({
   once = true,
 }: RevealProps) {
   const reduce = useReducedMotion();
+  // C62 hydration-safety: branch the tree only after mount (SSR/client parity
+  // on the first render; reduce swaps in post-hydration — legal).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  if (reduce) {
+  if (mounted && reduce) {
     return <div className={className}>{children}</div>;
   }
 

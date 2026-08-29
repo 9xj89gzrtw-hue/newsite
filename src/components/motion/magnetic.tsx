@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 
 /**
@@ -23,12 +23,16 @@ export function Magnetic({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  // C62 hydration-safety: branch the tree only after mount — reduce flips
+  // post-hydration (legal), a direct branch mismatches SSR vs client.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 200, damping: 15, mass: 0.3 });
   const sy = useSpring(y, { stiffness: 200, damping: 15, mass: 0.3 });
 
-  if (reduce) {
+  if (mounted && reduce) {
     return <div className={className}>{children}</div>;
   }
 

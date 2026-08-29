@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -68,6 +68,10 @@ export function MagneticCircleButton({
 }: MagneticCircleButtonProps) {
   const ref = useRef<HTMLAnchorElement>(null);
   const reduce = useReducedMotion();
+  // C62 hydration-safety: branch the tree only after mount (SSR/client parity
+  // on the first render; reduce swaps in post-hydration — legal).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // Outer translation (whole button).
   const x = useMotionValue(0);
@@ -92,7 +96,7 @@ export function MagneticCircleButton({
     ? { target: "_blank" as const, rel: "noopener noreferrer" }
     : {};
 
-  if (reduce) {
+  if (mounted && reduce) {
     return (
       <a
         href={href}

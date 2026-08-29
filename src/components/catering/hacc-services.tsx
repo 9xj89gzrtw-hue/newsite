@@ -335,6 +335,12 @@ function HaccRack({
   onEngageRack,
 }: HaccRackProps) {
   const baseId = useId();
+  // C62 hydration-safety: entrance variants serialize into SSR HTML — the
+  // reduce branch resolves only after mount (direct branch = mismatch:
+  // useReducedMotion() is false at SSR, true on reduce-clients' first render).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const reduceSettled = mounted && reduced;
 
   const rackRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -598,13 +604,13 @@ function HaccRack({
   const autoplayOn = focused && playing && !reduced && isDesktop && openIndex !== null;
 
   /* choreographed entrance — this rack's spines cascade (40ms stagger) -- */
-  const rackVariants = reduced
+  const rackVariants = reduceSettled
     ? undefined
     : {
         hidden: { opacity: 0 },
         show: { opacity: 1 },
       };
-  const itemVariants = reduced
+  const itemVariants = reduceSettled
     ? undefined
     : {
         hidden: { opacity: 0, y: 36 },
@@ -625,8 +631,8 @@ function HaccRack({
       aria-label={`${groupLabel} — форматы кейтеринга`}
       data-autoplay={autoplayOn ? "on" : "off"}
       data-paused={paused ? "true" : "false"}
-      initial={reduced ? false : "hidden"}
-      whileInView={reduced ? undefined : "show"}
+      initial={reduceSettled ? false : "hidden"}
+      whileInView={reduceSettled ? undefined : "show"}
       viewport={{ once: true, margin: "-60px" }}
       variants={rackVariants}
       onMouseMove={onRackMouseMove}
@@ -783,6 +789,11 @@ function HaccRack({
 
 export function HaccServices() {
   const prefersReduced = useReducedMotion();
+  // C62 hydration-safety: the head's entrance props serialize into SSR HTML —
+  // the reduce branch resolves only after mount (direct branch = mismatch).
+  const [headMounted, setHeadMounted] = useState(false);
+  useEffect(() => setHeadMounted(true), []);
+  const reduceSettled = headMounted && prefersReduced;
 
   /** Which rack is "live" (autoplay + ambient + counter mirror it). */
   const [focusedRack, setFocusedRack] = useState(0);
@@ -885,8 +896,8 @@ export function HaccServices() {
       <div className="ea-container ea-container--wide">
         <motion.div
           className="hacc__head"
-          initial={prefersReduced ? false : { opacity: 0, y: 26 }}
-          whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
+          initial={reduceSettled ? false : { opacity: 0, y: 26 }}
+          whileInView={reduceSettled ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7, ease: EASE }}
         >

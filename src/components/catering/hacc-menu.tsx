@@ -236,6 +236,12 @@ function MenuRack({
   onOpenChange: (i: number | null) => void;
 }) {
   const baseId = useId();
+  // C62 hydration-safety: entrance variants serialize into SSR HTML — the
+  // reduce branch resolves only after mount (direct branch = mismatch:
+  // useReducedMotion() is false at SSR, true on reduce-clients' first render).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const reduceSettled = mounted && reduced;
 
   const rackRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -734,10 +740,10 @@ function MenuRack({
   const spineId = (i: number) => `${baseId}-spine-${cats[i].id}`;
 
   /* entrance-каскад корешков (как в услугах) -------------------------------- */
-  const rackVariants = reduced
+  const rackVariants = reduceSettled
     ? undefined
     : { hidden: { opacity: 0 }, show: { opacity: 1 } };
-  const itemVariants = reduced
+  const itemVariants = reduceSettled
     ? undefined
     : {
         hidden: { opacity: 0, y: 44 },
@@ -758,8 +764,8 @@ function MenuRack({
       }
       role="group"
       aria-label="Каталоги меню — семь направлений кейтеринга"
-      initial={reduced ? false : "hidden"}
-      whileInView={reduced ? undefined : "show"}
+      initial={reduceSettled ? false : "hidden"}
+      whileInView={reduceSettled ? undefined : "show"}
       viewport={{ once: true, margin: "-60px" }}
       variants={rackVariants}
       onMouseMove={onRackMouseMove}
@@ -868,7 +874,7 @@ function MenuRack({
                       key={pkg?.name ?? "pkg"}
                       className="hmenu__price-num"
                       data-testid="hmenu-price-morph"
-                      initial={reduced ? false : { opacity: 0, y: 8 }}
+                      initial={reduceSettled ? false : { opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.34, ease: EASE }}
                     >
@@ -893,7 +899,7 @@ function MenuRack({
                       <motion.div
                         key={pkg.photo ?? FALLBACK_PHOTO}
                         className="hmenu__media-fade"
-                        initial={reduced ? false : { opacity: 0 }}
+                        initial={reduceSettled ? false : { opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, ease: EASE }}
                       >
@@ -979,7 +985,7 @@ function MenuRack({
                         <motion.ul
                           key={pkg.name}
                           className="hmenu__list"
-                          initial={reduced ? false : "hidden"}
+                          initial={reduceSettled ? false : "hidden"}
                           animate="show"
                           variants={{
                             hidden: {},
@@ -1106,6 +1112,11 @@ function MenuRack({
 
 export function HaccMenu() {
   const prefersReduced = useReducedMotion();
+  // C62 hydration-safety: the head's entrance props serialize into SSR HTML —
+  // the reduce branch resolves only after mount (direct branch = mismatch).
+  const [headMounted, setHeadMounted] = useState(false);
+  useEffect(() => setHeadMounted(true), []);
+  const headReduceSettled = headMounted && prefersReduced;
   /** Скачивание PDF-каталога — единственная ссылка, в шапке секции. */
   const [pdfBusy, setPdfBusy] = useState(false);
   /** m3: честный статус ошибки — молча падать нельзя (проверка критика). */
@@ -1154,8 +1165,8 @@ export function HaccMenu() {
       <div className="ea-container ea-container--wide">
         <motion.div
           className="hmenu__head"
-          initial={prefersReduced ? false : { opacity: 0, y: 26 }}
-          whileInView={prefersReduced ? undefined : { opacity: 1, y: 0 }}
+          initial={headReduceSettled ? false : { opacity: 0, y: 26 }}
+          whileInView={headReduceSettled ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7, ease: EASE }}
         >

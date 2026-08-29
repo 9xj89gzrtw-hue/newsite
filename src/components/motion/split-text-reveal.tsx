@@ -64,6 +64,9 @@ export function SplitTextReveal({
   once = true,
 }: SplitTextRevealProps) {
   const reduce = useReducedMotion();
+  // C62 hydration-safety gate — see the render comment below.
+  const [mountedRef, setMountedRef] = useState(false);
+  useEffect(() => setMountedRef(true), []);
   const containerRef = useRef<Element | null>(null);
   const splitRef = useRef<HTMLSpanElement>(null);
   const innersRef = useRef<HTMLElement[]>([]);
@@ -186,7 +189,14 @@ export function SplitTextReveal({
     ? { role: "heading" as const, "aria-level": level }
     : {};
 
-  if (reduce) {
+  // C62 hydration-safety: useReducedMotion() is false during SSR but true on
+  // a reduce-user's first client render — branching the TREE on it directly
+  // produced a hydration mismatch (React regenerated the whole page tree).
+  // The first client render must match SSR; the plain static branch is only
+  // allowed to swap in AFTER mount (post-hydration updates are legal).
+  const reduceConfirmed = mountedRef && !!reduce;
+
+  if (reduceConfirmed) {
     // Reduced motion: plain element with the full text as accessible name.
     // aria-label overrides visible text for AT, so the heading is announced
     // correctly without the animation scaffolding.
