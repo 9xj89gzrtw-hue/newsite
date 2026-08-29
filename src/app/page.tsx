@@ -9,12 +9,11 @@ import { HaccMenu } from "@/components/catering/hacc-menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
 import { CepProcess } from "@/components/catering/cep-process";
-import { Calculator } from "@/components/catering/calculator";
+import { HaccBooking } from "@/components/catering/hacc-booking";
 import { EaFounderStory } from "@/components/catering/ea-founder-story";
 import { GammaSeparator } from "@/components/catering/gamma-separator";
 import { EaFaqAccordion } from "@/components/catering/ea-faq-accordion";
 import { CepInstagramGrid } from "@/components/catering/cep-instagram-grid";
-import { Contact } from "@/components/catering/contact";
 import { SiteFooter } from "@/components/catering/site-footer";
 import { BackToTop } from "@/components/catering/back-to-top";
 
@@ -61,16 +60,18 @@ import { BackToTop } from "@/components/catering/back-to-top";
 //                               "Кейтеринг, который *доставляют*." bridges logistics
 //                               into the conversion flow.
 //
-//   ── ACT IV: CONVERSION (calculator → about → FAQ → instagram → form → footer) ──
-//   14. Calculator           — interactive price calculator (nuqs state, commit moment).
+//   ── ACT IV: CONVERSION (booking → about → FAQ → instagram → footer) ──
+//   14. HaccBooking          — Cycle 64 «СМЕТА-ЧЕК INTERFOOD»: merged calculator
+//                              + lead form + contacts in one receipt scene (nuqs state,
+//                              POST /api/lead). Anchors: #calculator (section top),
+//                              #contact (form zone).
 //   15. EaFounderStory       — founder-forward 2-col About + 4 count-up stats + CTA.
 //   16. GammaSeparator       — PARALLAX BAND. Full-bleed separator image + "interfood"
 //                               -6° handwritten watermark. Transition into FAQ.
 //   17. EaFaqAccordion       — minimalist 6-item accordion (resolves objections).
 //   18. CepInstagramGrid     — 3×3 IG grid with Reel play icons (social proof).
-//   19. Contact              — 4-step lead form → POST /api/lead → Prisma Lead → toast.
-//   20. SiteFooter           — dark navy footer with newsletter + 3-col + cities marquee.
-//   21. BackToTop            — floating ↑ button with circular scroll-progress ring.
+//   19. SiteFooter           — dark navy footer with newsletter + 3-col + cities marquee.
+//   20. BackToTop            — floating ↑ button with circular scroll-progress ring.
 //
 // PARALLAX BAND PLACEMENT (per user: "между некоторыми блоками можно оставить
 // классные фотки с параллакс эффектом, которые уже есть"):
@@ -187,11 +188,24 @@ export default function Home() {
 
       {/* ── ACT IV: CONVERSION ── */}
 
-      {/* 14. Calculator — interactive price calculator (nuqs state, addons, share).
-              The user has read all brand proof → ready to commit. Sits right before
-              About + FAQ so the lead form follows naturally. */}
+      {/* 14. HaccBooking — Cycle 64 «СМЕТА-ЧЕК INTERFOOD». Объединяет бывшие
+              Calculator (14) и Contact (19) в одну сцену-предмет: слева — сбор
+              банкета (тип события / слайдер гостей с одометром / дата), справа —
+              красная панель с живым бумажным смета-чеком (itemized-строки,
+              spring-итог, честная сезонная строка ×1.15) + магнитная CTA.
+              Хендофф: чек сжимается в карточку-шапку, под контролами раскрывается
+              2-шаговая форма (контакты → отправка) с prefill из nuqs-стейта →
+              POST /api/lead → штамп + tear-off + конфетти. Низ секции —
+              контакты-зона: live-бейдж Открыто/Закрыто (Europe/Moscow), быстрые
+              ссылки, ленивая Яндекс-карта. Якоря: id="calculator" (секция) и
+              id="contact" (зона формы) — на них смотрят шапка, футер, hacc-services,
+              hacc-menu, delivery-block, privacy/offer, gg-video-showcase.
+              Спека: research/c64/SPEC.md; дизайн: research/c64/RESEARCH-DESIGN.md.
+              Компонент обязан жить в Suspense (требование nuqs useQueryState).
+              Старые Calculator/Contact остаются на диске (конвенция репо),
+              НЕ рендерятся. */}
       <Suspense fallback={null}>
-        <Calculator />
+        <HaccBooking />
       </Suspense>
 
       {/* 15. EaFounderStory — Cycle 28 founder-forward 2-col About: photo LEFT,
@@ -216,14 +230,12 @@ export default function Home() {
               Follow-along social proof. */}
       <CepInstagramGrid />
 
-      {/* 19. Contact — 4-step lead form → POST /api/lead → Prisma Lead → toast.
-              The final CTA — a visitor who has scrolled this far is ready to convert. */}
-      <Contact />
-
-      {/* 20. SiteFooter — dark navy footer with newsletter + 3-col + cities marquee. */}
+      {/* 19. SiteFooter — dark navy footer with newsletter + 3-col + cities marquee.
+              Полные реквизиты/соцсети — здесь (HaccBooking дублирует только
+              быстрые CTA-контакты, SPEC §2.10). */}
       <SiteFooter />
 
-      {/* 21. BackToTop — floating ↑ button (appears on scroll > 500px) with
+      {/* 20. BackToTop — floating ↑ button (appears on scroll > 500px) with
               circular scroll-progress ring. */}
       <BackToTop />
     </main>

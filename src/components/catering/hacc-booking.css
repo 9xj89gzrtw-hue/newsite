@@ -1,0 +1,1419 @@
+/* ============================================================================
+   HaccBooking — Cycle 64 «СМЕТА-ЧЕК INTERFOOD»
+   Объединённый блок: калькулятор → живой смета-чек на красной панели →
+   инлайн-форма заявки → успех (штамп + tear-off + конфетти) → контакты.
+
+   Канон репо:
+   - cream секция (--ea-cream), красный родного слоя --ea-red #E71D3A
+     (+ --ea-red-deep #B91431) — как в hacc-menu/hacc-services;
+   - заголовки: --font-serif (Playfair, cyrillic ✓), акценты --font-marck;
+   - кириллический body — var(--font-poppins) (cyrillic ✓; --font-sans=Karla
+     cyrillic НЕ имеет — урок C63 §35; scoped-лечение в пределах секции);
+   - цифры итога — --font-prata (latin-цифры + fallback на Playfair для ₽);
+   - focus-visible — золотой канон сайта (globals §focus).
+
+   Perf: ноль filter/backdrop анимаций, ноль box-shadow transition на скролле,
+   компоновочные анимации — только grid-template-rows/transform/opacity.
+   ========================================================================== */
+
+.hbooking {
+  /* scoped-токены блока */
+  --hb-red: var(--ea-red, #e71d3a);
+  --hb-red-deep: var(--ea-red-deep, #b91431);
+  --hb-cream: var(--ea-cream, #f7f5f5);
+  --hb-paper: #fdfcf9;
+  --hb-ink: var(--ea-ink, #1a1a1a);
+  --hb-line: var(--border-line, #e5e7eb);
+  --hb-body-font: var(--font-poppins), var(--font-sans), system-ui, sans-serif;
+  --hb-serif: var(--font-serif), Georgia, serif;
+  --hb-caps: var(--ea-font-eyebrow), var(--font-sans), sans-serif;
+  --hb-num-font: var(--font-prata), var(--font-serif), Georgia, serif;
+  /* T4 (task 11-fix3): капс-шкала блока — РОВНО ДВА уровня:
+     eyebrow — 12.5px / 0.18em (заголовки групп: «Тип события», легенды шагов);
+     label   — 11.5px / 0.14em (лейблы полей, подписи, служебные капсы).
+     Раньше было 4 кегля × 4 трекинга (0.06–0.18em) — мусорная шкала. */
+  --hb-caps-eyebrow-fs: 0.78125rem; /* 12.5px */
+  --hb-caps-eyebrow-ls: 0.18em;
+  --hb-caps-label-fs: 0.71875rem;   /* 11.5px */
+  --hb-caps-label-ls: 0.14em;
+  color: var(--hb-ink);
+  font-family: var(--hb-body-font);
+}
+
+/* кнопки/ссылки блока не наследуют ситевидные underline-хуки */
+.hbooking a { text-decoration: none; }
+
+/* X4 (task 13-fix4, seal-жюри): мобильный пол кегля 12px — на <768px
+   label-уровень капс-шкалы поднимается с 11.5 до 12px (desktop не тронут). */
+@media (max-width: 767px) {
+  .hbooking { --hb-caps-label-fs: 0.75rem; }
+}
+
+/* ------------------------------------------------------------------ шапка */
+
+.hb-head {
+  max-width: 46rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+.hb-head .tilted-accent {
+  display: inline-block;
+  margin-bottom: 2px;
+}
+.hb-lede {
+  margin-top: 0.9rem;
+  max-width: 58ch;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--hb-ink) 76%, transparent);
+}
+
+/* ------------------------------------------------------------------- сетка */
+
+/* D2 (task 7-fix1): нативный якорный прыжок (#calculator из футера,
+   #contact из шапки/privacy/offer) обязан оставлять место под sticky-шапку
+   (84px) — иначе якорь уезжает за верх вьюпорта. */
+.hbooking,
+.hb-zone { scroll-margin-top: 96px; }
+
+.hb-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2rem;
+  /* БЕЗ align-items:start: правой колонке нужен stretch во всю высоту ряда,
+     иначе sticky-чеку некуда «ездить» (классическая ловушка) */
+  align-items: stretch;
+}
+@media (min-width: 1280px) {
+  .hb-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(2rem, 3.5vw, 3.25rem);
+  }
+}
+
+/* ===================================================== ЛЕВО: собери банкет */
+
+.hb-block { padding-block: 1.35rem; }
+.hb-block + .hb-block { border-top: 1px solid color-mix(in srgb, var(--hb-line) 80%, transparent); }
+
+.hb-label-caps {
+  display: inline-block;
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  /* T4: eyebrow-уровень капс-шкалы */
+  font-size: var(--hb-caps-eyebrow-fs);
+  letter-spacing: var(--hb-caps-eyebrow-ls);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--hb-ink) 62%, transparent);
+}
+.hb-label-caps__opt {
+  font-family: var(--hb-body-font);
+  font-weight: 400;
+  font-size: 0.72rem;
+  /* T4 (task 11-fix3): трекинг лейбла рвал суффикс — строчной вставке
+     положен нулевой letter-spacing (был 0.02em). */
+  letter-spacing: normal;
+  text-transform: none;
+  color: color-mix(in srgb, var(--hb-ink) 45%, transparent);
+}
+
+/* 1 · тип события — типографические кнопки */
+
+.hb-types {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .hb-types { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.hb-type {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 76px;
+  text-align: left;
+  padding: 0.85rem 1rem 1rem;
+  background: #fff;
+  border: 1px solid var(--hb-line);
+  border-radius: 14px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.hb-type:hover {
+  border-color: color-mix(in srgb, var(--hb-red) 55%, var(--hb-line));
+  box-shadow: 0 10px 26px -18px color-mix(in srgb, var(--hb-red) 65%, transparent);
+}
+.hb-type--on {
+  border-color: var(--hb-red);
+  background: color-mix(in srgb, var(--hb-red) 4%, #fff);
+  box-shadow: 0 14px 30px -20px color-mix(in srgb, var(--hb-red) 70%, transparent);
+}
+.hb-type__main { display: block; }
+.hb-type__label {
+  display: block;
+  font-family: var(--hb-serif);
+  font-size: 1.14rem;
+  line-height: 1.25;
+  color: var(--hb-ink);
+}
+.hb-type--on .hb-type__label { color: var(--hb-red-deep); }
+.hb-type__short {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
+}
+.hb-type__price {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--hb-ink) 48%, transparent);
+}
+/* T5 (task 11-fix3): ОДИН красный на активную кнопку — red-deep, как у
+   соседних блоков (hacc-menu: текст/цены на тинтах = red-deep, AA-safe).
+   Было два: заголовок #B91431 + цена #E71D3A в 30px друг от друга. */
+.hb-type--on .hb-type__price { color: var(--hb-red-deep); }
+/* M4 (task 11-fix3): мобильный кегль ключевой цифры выбора 12.5 → 13.5px. */
+@media (max-width: 767.98px) {
+  .hb-type__price { font-size: 0.84375rem; }
+}
+.hb-type__underline {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.55rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hb-red);
+}
+
+/* 2 · гости — odometer + слайдер */
+
+.hb-minwarn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--hb-red-deep);
+}
+.hb-guests {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  margin-top: 0.6rem;
+}
+.hb-guests__word {
+  font-size: 1rem;
+  color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
+}
+
+/* катушка одометра: колонка высотой 1em, лента глифов едет по y (em) */
+
+.hb-odo {
+  display: inline-flex;
+  font-family: var(--hb-num-font);
+  font-size: clamp(3rem, 6vw, 4.4rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--hb-ink);
+}
+.hb-odo__col {
+  display: block;
+  width: 1ch;
+  height: 1em;
+  overflow: hidden;
+}
+.hb-odo__strip { display: block; will-change: transform; }
+.hb-odo__glyph {
+  display: block;
+  width: 1ch;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+}
+
+/* слайдер: рейка с заливкой и тиками, инпут поверх (прозрачный трек) */
+
+.hb-slider { position: relative; margin-top: 1.1rem; }
+.hb-slider__rail {
+  position: relative;
+  height: 44px;
+  pointer-events: none;
+}
+.hb-slider__fill {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--hb-red) 72%, transparent), var(--hb-red));
+}
+/* X3 (task 13-fix4): тики — НАСТОЯЩИЕ пресет-кнопки (раньше span с
+   cursor/pointer-events:none — клик не работал). z-index над инпутом,
+   hover/focus — подсветка пресета; визуально ≥24–26px, хит-зона расширена
+   ::after (±8px по бокам, +7px вниз). НЕ 44px по вертикали сознательно:
+   тики сидят на рейке — полноразмерная зона перехватывала бы драг слайдера. */
+.hb-slider__tick {
+  position: absolute;
+  top: 18px;
+  transform: translateX(-50%);
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  min-height: 26px;
+  padding: 0 0.35rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-family: var(--hb-caps);
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--hb-ink) 38%, transparent);
+  pointer-events: auto;
+  z-index: 2;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+.hb-slider__tick::after {
+  content: "";
+  position: absolute;
+  /* Wave-4 (mobile-critic MAJOR): хит-арея тика до ~46px по вертикали —
+     расширена ВНИЗ в пустую зону подписи (рейка и драг не перекрыты),
+     по бокам ±10px. Визуальный тик не растёт. */
+  inset: -4px -10px -16px;
+}
+.hb-slider__tick:hover {
+  color: var(--hb-red-deep);
+  background: color-mix(in srgb, var(--hb-red) 7%, transparent);
+}
+.hb-slider__tick--on { color: var(--hb-red-deep); }
+.hb-slider__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.hb-slider__input::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 999px;
+  background: transparent;
+}
+.hb-slider__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  margin-top: -10.5px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--hb-red);
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hb-red) 60%, transparent);
+}
+.hb-slider__input::-moz-range-track {
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--hb-ink) 12%, transparent);
+}
+.hb-slider__input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--hb-red);
+  box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hb-red) 60%, transparent);
+}
+.hb-slider__adjust {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.2rem;
+}
+.hb-slider__btns { display: flex; gap: 0.5rem; }
+/* M2 (task 11-fix3): живая мини-сумма под слайдером — та же useMemo-цифра,
+   что и в чеке (мгновенно, без спринга). Замыкает петлю «слайдер → цена»
+   на ОБОИХ вьюпортах (большой итог чека на мобиле — за экраном).
+   Специально без aria-live: итог чека уже анонсируется (троттлинг 700 мс). */
+.hb-slider__total {
+  margin: 0;
+  font-family: var(--hb-body-font);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--hb-ink) 70%, transparent);
+  white-space: nowrap;
+}
+/* M4 (task 11-fix3): тач-таргеты ±5 — 40px → ≥44px (Apple HIG). */
+.hb-step-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--hb-line);
+  background: #fff;
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--hb-ink);
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.hb-step-btn:hover { border-color: var(--hb-red); color: var(--hb-red-deep); }
+.hb-step-btn:active { transform: scale(0.96); }
+
+/* C3 (task 9-fix2): постоянная плашка у минимума гостей — спокойный тон
+   (не ошибка), живёт ПОКА гость стоит на минимуме формата. */
+.hb-minnote {
+  display: inline-flex;
+  align-items: baseline;
+  margin-top: 0.6rem;
+  padding: 0.32rem 0.75rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--hb-ink) 5%, transparent);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--hb-ink) 65%, transparent);
+}
+
+/* 3 · дата */
+
+.hb-date { position: relative; margin-top: 0.7rem; max-width: 17rem; }
+.hb-date__icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--hb-red);
+  pointer-events: none;
+}
+.hb-date__input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 0.9rem 0 2.5rem;
+  border: 1px solid var(--hb-line);
+  border-radius: 12px;
+  background: #fff;
+  font-family: var(--hb-body-font);
+  font-size: 0.9rem;
+  color: var(--hb-ink);
+  color-scheme: light;
+}
+.hb-date__input:hover { border-color: color-mix(in srgb, var(--hb-red) 50%, var(--hb-line)); }
+
+/* ============================================== ЗОНА ФОРМЫ (id="contact") */
+
+.hb-zone {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hb-zone[data-open="true"] { grid-template-rows: 1fr; }
+.hb-zone__inner { overflow: hidden; min-height: 0; }
+.hb-zone__body { padding-top: 1.5rem; }
+
+/* форма: нить-прогресс слева */
+
+.hb-form { position: relative; padding-left: 1.15rem; }
+.hb-form__thread {
+  position: absolute;
+  left: 0;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  width: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--hb-ink) 10%, transparent);
+}
+.hb-form__thread-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: top;
+  background: var(--hb-red);
+  border-radius: 2px;
+}
+/* D4 (task 9-fix2): узлы нити-прогресса с цифрами шагов (канон нити,
+   не визард-полоса): активный шаг залит красным. */
+.hb-form__node {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--hb-ink) 24%, transparent);
+  background: var(--hb-cream);
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  font-size: 0.62rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.hb-form__node--1 { top: -7px; }
+.hb-form__node--2 { bottom: -7px; }
+.hb-form__node--on {
+  background: var(--hb-red);
+  border-color: var(--hb-red);
+  color: #fff;
+}
+.hb-form__fieldset { border: 0; padding: 0; margin: 0; min-inline-size: auto; }
+/* M5 (task 11-fix3): шаг 2 визуально различим — тонкая рамка + подложка; шаг 1
+   после перехода приглушён (лейблы 0.55, поля редактируемые, возврат по легенде). */
+.hb-form__fieldset--panel {
+  margin-top: 1.1rem;
+  padding: 1.05rem 1.05rem 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--hb-ink) 11%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, #fff 72%, transparent);
+}
+.hb-form__fieldset--dim { margin-bottom: 0.25rem; }
+.hb-form__fieldset--dim .hb-label { opacity: 0.55; }
+.hb-form__legend {
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  /* T4: eyebrow-уровень капс-шкалы */
+  font-size: var(--hb-caps-eyebrow-fs);
+  letter-spacing: var(--hb-caps-eyebrow-ls);
+  text-transform: uppercase;
+  color: var(--hb-red-deep);
+  padding: 0;
+  margin-bottom: 1rem;
+}
+/* M5в: легенда приглушённого шага 1 — кнопка возврата к шагу 1. */
+.hb-form__legend-btn {
+  display: inline-block;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-bottom: 1px dashed color-mix(in srgb, var(--hb-red-deep) 45%, transparent);
+  padding: 0 0 2px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.hb-form__legend-btn:hover { border-bottom-color: var(--hb-red-deep); }
+
+.hb-field { margin-bottom: 0.85rem; }
+.hb-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  /* T4: label-уровень капс-шкалы */
+  font-size: var(--hb-caps-label-fs);
+  letter-spacing: var(--hb-caps-label-ls);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--hb-ink) 65%, transparent);
+  /* M5в: приглушение шага 1 — плавное (только opacity) */
+  transition: opacity 0.3s ease;
+}
+.hb-label__opt {
+  font-family: var(--hb-body-font);
+  font-weight: 400;
+  font-size: 0.72rem;
+  /* T4 (task 11-fix3): было 0.01em (= 0.1152px — мусор); строчной вставке —
+     нулевой трекинг (наследование 0.14em капс-лейбла ей не подходит). */
+  letter-spacing: normal;
+  text-transform: none;
+  color: color-mix(in srgb, var(--hb-ink) 45%, transparent);
+}
+/* iOS не зумит поля ≥16px (урок Cycle 37/40) — перекрываем text-[15px] на мобиле */
+@media (max-width: 767px) {
+  .hb-form input.hb-input { font-size: 16px; }
+}
+.hb-err {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--hb-red-deep);
+}
+
+/* D3 (task 9-fix2): фокус полей — ink/золото (канон сайта), НЕ красный:
+   красная рамка считывалась как ошибка. Красный — только для invalid (D1). */
+.hb-form .hb-input:focus,
+.hb-date__input:focus {
+  border-color: color-mix(in srgb, var(--hb-ink) 38%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold, #d4a373) 22%, transparent);
+}
+
+/* D1 (task 9-fix2): валидация перестаёт быть «немой» — поле с ошибкой
+   видно и рамкой, и фоном; красный сохраняется и в фокусе. */
+.hb-form .hb-input[aria-invalid="true"],
+.hb-date__input[aria-invalid="true"] {
+  border-color: var(--hb-red-deep);
+  background: #fff5f5;
+}
+.hb-form .hb-input[aria-invalid="true"]:focus,
+.hb-date__input[aria-invalid="true"]:focus {
+  border-color: var(--hb-red-deep);
+  background: #fff5f5;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--hb-red-deep) 16%, transparent);
+}
+
+/* кнопки блока */
+
+.hb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  font-size: 0.86rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+}
+.hb-btn:active { transform: scale(0.985); }
+.hb-btn--red {
+  background: var(--hb-red);
+  color: #fff;
+}
+.hb-btn--red:hover { background: var(--hb-red-deep); }
+.hb-btn--ghost {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--hb-ink) 22%, transparent);
+  color: var(--hb-ink);
+}
+.hb-btn--ghost:hover { border-color: var(--hb-red); color: var(--hb-red-deep); }
+.hb-btn--paper {
+  background: var(--hb-cream);
+  color: var(--hb-red-deep);
+}
+.hb-btn--paper:hover { background: #fff; }
+
+/* мини-сводка (шаг 2) */
+
+.hb-summary {
+  margin: 0 0 1rem;
+  border: 1px dashed color-mix(in srgb, var(--hb-ink) 18%, transparent);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  background: #fff;
+}
+.hb-summary__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.28rem;
+  font-size: 0.85rem;
+}
+.hb-summary__row dt { color: color-mix(in srgb, var(--hb-ink) 55%, transparent); }
+.hb-summary__row dd { margin: 0; font-weight: 600; text-align: right; }
+.hb-summary__row--total {
+  margin-top: 0.35rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid color-mix(in srgb, var(--hb-ink) 12%, transparent);
+  font-size: 0.95rem;
+}
+.hb-summary__row--total dd { color: var(--hb-red-deep); }
+
+/* согласие 152-ФЗ */
+
+.hb-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--hb-ink) 72%, transparent);
+  cursor: pointer;
+}
+.hb-consent__box {
+  margin-top: 2px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--hb-red);
+  cursor: pointer;
+}
+/* M5a (task 11-fix3): фокус после «Далее» должен быть ВИДЕН */
+.hb-consent__box:focus-visible {
+  outline: 2px solid var(--gold, #d4a373);
+  outline-offset: 2px;
+}
+.hb-consent__link {
+  color: var(--hb-red-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.hb-consent__link:hover { color: var(--hb-red); }
+.hb-hint {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  color: color-mix(in srgb, var(--hb-ink) 52%, transparent);
+}
+.hb-safe {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--hb-ink) 48%, transparent);
+}
+
+/* ================================================== ПРАВО: панель и чек */
+
+.hb-panel {
+  border-radius: 22px;
+  padding: clamp(1.1rem, 2vw, 1.5rem);
+  background:
+    radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, #fff 14%, transparent) 0%, transparent 55%),
+    linear-gradient(165deg, var(--hb-red) 0%, var(--hb-red-deep) 100%);
+  box-shadow: 0 40px 80px -40px color-mix(in srgb, var(--hb-red-deep) 85%, transparent);
+  color: var(--hb-cream);
+}
+/* ниже lg панель не sticky (lg:sticky из tailwind) — держим positioned-контекст
+   для абсолютного штампа; на lg сам sticky тоже создаёт контейнер */
+@media (max-width: 1023.98px) {
+  .hb-panel { position: relative; }
+}
+.hb-panel__caps {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  /* T4: label-уровень капс-шкалы */
+  font-size: var(--hb-caps-label-fs);
+  letter-spacing: var(--hb-caps-label-ls);
+  text-transform: uppercase;
+  color: color-mix(in srgb, #fff 88%, transparent);
+}
+.hb-panel__next {
+  margin-top: 0.85rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, #fff 82%, transparent);
+}
+/* X1 (task 13-fix4): приглушённая строка-ссылка reset вместо красной CTA —
+   «text-link» канон (никакой заливки), muted-эквивалент ink-60% на красной
+   панели = white 72%. */
+.hb-again-row {
+  margin: 0.35rem 0 0.1rem;
+  text-align: center;
+}
+.hb-panel__again {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0.25rem 0.35rem;
+  border: 0;
+  background: none;
+  font-family: var(--hb-body-font);
+  font-size: 0.85rem;
+  color: color-mix(in srgb, #fff 72%, transparent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, #fff 32%, transparent);
+  cursor: pointer;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+.hb-panel__again:hover {
+  color: #fff;
+  text-decoration-color: color-mix(in srgb, #fff 70%, transparent);
+}
+
+/* бумага чека */
+
+.hb-paper {
+  position: relative;
+  margin-top: 0.9rem;
+  padding: 1.15rem 1.2rem 1.35rem;
+  background: var(--hb-paper);
+  color: var(--hb-ink);
+  border-radius: 12px 12px 0 0;
+}
+/* рваный нижний край — зубцы той же бумаги (CSS, без растра) */
+.hb-paper::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 9px;
+  background:
+    linear-gradient(-45deg, var(--hb-paper) 6.5px, transparent 0),
+    linear-gradient(45deg, var(--hb-paper) 6.5px, transparent 0);
+  background-repeat: repeat-x;
+  background-position: left top;
+  background-size: 14px 14px;
+}
+.hb-paper__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+.hb-paper__brand {
+  font-family: var(--hb-serif);
+  font-size: 1.2rem;
+  color: var(--hb-ink);
+}
+.hb-paper__type {
+  font-size: 0.74rem;
+  text-align: right;
+  color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
+}
+
+/* перфорация-разделитель */
+
+.hb-perfo {
+  display: block;
+  height: 2px;
+  margin: 0.85rem -1.2rem;
+  background-image: repeating-linear-gradient(
+    to right,
+    color-mix(in srgb, var(--hb-ink) 20%, transparent) 0 7px,
+    transparent 7px 14px
+  );
+}
+
+/* itemized-строки: схлопывание в компакт через grid-rows */
+
+.hb-lines {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hb-lines[aria-hidden="true"] { grid-template-rows: 0fr; }
+.hb-lines__clip { overflow: hidden; min-height: 0; }
+
+.hb-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.9rem;
+  padding-block: 0.34rem;
+  border-bottom: 1px dashed color-mix(in srgb, var(--hb-ink) 9%, transparent);
+  font-size: 0.85rem;
+}
+.hb-line__label { color: color-mix(in srgb, var(--hb-ink) 78%, transparent); }
+.hb-line__value {
+  flex-shrink: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.hb-line--season .hb-line__label { color: var(--hb-red-deep); }
+.hb-line--season .hb-line__value { color: var(--hb-red-deep); }
+.hb-line--included {
+  display: block;
+  border-bottom: 0;
+  padding-top: 0.45rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--hb-ink) 50%, transparent);
+}
+
+/* итог */
+
+/* T1 (task 11-fix3): слот дельты якорится К КОНТЕЙНЕРУ итога (не к числу):
+   ширина Prata-числа меняется на ±2px при пересчёте — слот этого НЕ чувствует. */
+.hb-total {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+.hb-total__label {
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  /* T4: label-уровень капс-шкалы */
+  font-size: var(--hb-caps-label-fs);
+  letter-spacing: var(--hb-caps-label-ls);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--hb-ink) 60%, transparent);
+}
+.hb-total__value { position: relative; }
+.hb-total__num {
+  font-family: var(--hb-num-font);
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+  line-height: 1.1;
+  /* T1 (task 11-fix3): tabular-nums + lining-nums заданы (безвредно), но
+     ПРИНЯТО: в Prata НЕТ tnum-таблицы — реальная вариация ширины итога ±2px
+     (замер критика: «122 500 ₽»=187px vs «312 900 ₽»=189px). Это осознанная
+     цена сигнатурной Prata-подписи — итог НЕ переводится в Montserrat.
+     Джиттер ДЕЛЬТЫ устранён отдельно: слот min-width в ch + якорь к .hb-total. */
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--hb-ink);
+}
+/* T1: фиксированный слот дельты (в ch) — разные «+44 500 ₽ / −1 150 ₽» не
+   двигают «печать»; текст выровнен по правому краю слота. */
+.hb-delta-slot {
+  position: absolute;
+  right: 0;
+  top: -1.15rem;
+  font-size: 0.82rem;
+  min-width: 9.5ch;
+  display: flex;
+  justify-content: flex-end;
+}
+.hb-delta {
+  position: absolute;
+  right: 0;
+  top: 0;
+  white-space: nowrap;
+  font-size: inherit;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--hb-red);
+  text-shadow: 0 1px 0 var(--hb-paper), 0 0 8px var(--hb-paper);
+}
+.hb-total__per {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
+}
+
+/* подвал чека */
+
+.hb-note {
+  display: block;
+  padding-top: 0.5rem;
+  font-size: 0.74rem;
+  line-height: 1.55;
+  /* D5 (task 9-fix2): 58% ≈ 4.1:1 — ниже AA для мелкого кегля; 63% ≥ 4.5:1. */
+  color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
+}
+/* C1 (task 9-fix2): сноска сезона — спокойная ink-60%, мелкая. */
+.hb-note--season { color: color-mix(in srgb, var(--hb-ink) 60%, transparent); }
+
+/* отрывной хвост (успех) */
+
+.hb-tearoff {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: var(--hb-paper);
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 18px 24px -18px color-mix(in srgb, var(--hb-ink) 45%, transparent);
+}
+
+/* штамп «Заявка принята» */
+
+.hb-stamp {
+  display: inline-block;
+  padding: 0.5rem 1.1rem;
+  border: 3px solid var(--hb-red);
+  border-radius: 12px;
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hb-red);
+  background: color-mix(in srgb, var(--hb-paper) 82%, transparent);
+}
+/* D2 (task 9-fix2): модификатор .hb-stamp--paper удалён — штамп больше
+   НЕ живёт на смете-чеке: единственная печать стоит на квитанции успеха
+   (документ о приёме заявки), у чека — только текстовая строка рядом. */
+
+/* CTA-зона панели: схлопывание при открытии формы */
+
+.hb-cta-zone {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hb-cta-zone[aria-hidden="true"] { grid-template-rows: 0fr; }
+.hb-cta-zone__clip { overflow: hidden; min-height: 0; }
+.hb-cta-zone[aria-hidden="true"] .hb-cta-zone__clip { pointer-events: none; }
+.hb-cta-note {
+  margin-top: 0.55rem;
+  text-align: center;
+  font-size: 0.74rem;
+  color: color-mix(in srgb, #fff 85%, transparent);
+}
+
+/* ============================================================ УСПЕХ */
+
+.hb-success { position: relative; }
+.hb-success__paper {
+  position: relative;
+  padding: 1.4rem 1.3rem 1.5rem;
+  background: var(--hb-paper);
+  border-radius: 12px;
+  box-shadow: 0 30px 60px -34px color-mix(in srgb, var(--hb-ink) 55%, transparent);
+}
+.hb-stamp { margin-bottom: 0.9rem; }
+.hb-success__no { font-size: 0.86rem; color: color-mix(in srgb, var(--hb-ink) 70%, transparent); }
+.hb-success__script {
+  margin-top: 0.4rem;
+  font-family: var(--font-marck), var(--font-script), cursive;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  line-height: 1.25;
+  color: var(--hb-red);
+  transform: rotate(-2.5deg);
+  transform-origin: left center;
+}
+/* Wave-4 (product-critic): часы работы в квитанции — юзер знает, когда ждать звонка */
+.hb-success__hours {
+  margin-top: 0.55rem;
+  font-family: var(--hb-caps);
+  font-size: var(--hb-caps-label-fs);
+  letter-spacing: var(--hb-caps-label-ls);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
+}
+.hb-success__meta {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--hb-ink) 58%, transparent);
+}
+.hb-success__paper .hb-btn { margin-top: 1rem; }
+
+/* конфетти */
+
+.hb-confetti {
+  position: absolute;
+  inset: -2rem 0 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 4;
+}
+.hb-confetti__chip {
+  position: absolute;
+  top: 0;
+  border-radius: 2px;
+}
+/* ================================================== MOBILE STICKY-BAR */
+
+.hb-bar {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + var(--hbooking-cookie-h, 0px) + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: none; /* >=768 — скрыт всегда; иначе .hb-bar перебивает md:hidden (порядок чанков) */
+  max-height: 72px;
+  padding: 0.6rem 0.7rem 0.6rem 1rem;
+  border-radius: 16px;
+  background: linear-gradient(165deg, var(--night, #1f2937), var(--night-2, #111827));
+  color: var(--hb-cream);
+  box-shadow: 0 24px 48px -20px rgba(17, 24, 39, 0.55);
+  /* M1 (task 11-fix3): исчез баннер → --hbooking-cookie-h → 0 — бар съезжает
+     вниз ПЛАВНО (не прыжком). */
+  transition: bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (max-width: 767.98px) {
+  .hb-bar { display: flex; align-items: center; gap: 0.75rem; }
+}
+/* D3 (task 7-fix1): показ/скрытие — плавные transform+opacity, ноль
+   layout-jump. visibility с задержкой убирает бар из a11y-дерева/tab-order
+   ПОСЛЕ анимации (при показе — немедленно); inert в JSX дублирует сразу. */
+@media (max-width: 767.98px) {
+  .hb-bar {
+    transform: translateY(calc(100% + 28px));
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.28s ease,
+      visibility 0s linear 0.35s,
+      bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hb-bar[data-visible="true"] {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.25s ease,
+      bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+.hb-bar__total {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.2;
+}
+.hb-bar__total-label {
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  /* T4: label-уровень капс-шкалы */
+  font-size: var(--hb-caps-label-fs);
+  letter-spacing: var(--hb-caps-label-ls);
+  text-transform: uppercase;
+  color: color-mix(in srgb, #fff 62%, transparent);
+}
+.hb-bar__total b {
+  font-family: var(--hb-num-font);
+  font-weight: 400;
+  font-size: 1.3rem;
+  white-space: nowrap;
+}
+.hb-bar__guests {
+  font-size: 0.7rem;
+  color: color-mix(in srgb, #fff 62%, transparent);
+  white-space: nowrap;
+}
+.hb-bar__cta {
+  margin-left: auto;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border: 0;
+  border-radius: 12px;
+  background: var(--hb-red);
+  color: #fff;
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.hb-bar__cta:hover { background: var(--hb-red-deep); }
+.hb-bar__cta:active { transform: scale(0.97); }
+
+/* BackToTop (fixed bottom-6 left-6) поднимается над баром — только пока бар
+   РЕАЛЬНО показан (<768, data-visible="true" — D3 fix1: бар больше не
+   размонтируется, селектор следит за состоянием, не за наличием в DOM).
+   Урок C59: FAB-перекрытия меряем. */
+@media (max-width: 767px) {
+  body:has(.hb-bar[data-visible="true"]) .fixed.bottom-6.left-6 {
+    bottom: calc(92px + var(--hbooking-cookie-h, 0px) + env(safe-area-inset-bottom, 0px));
+    transition: bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+/* ================================================== КОНТАКТЫ-ЗОНА */
+
+.hb-contacts__title {
+  margin-top: 0.4rem;
+  font-family: var(--hb-serif);
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+  line-height: 1.15;
+  color: var(--hb-ink);
+}
+.hb-contacts__hours {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.7rem;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--hb-ink) 58%, transparent);
+}
+.hb-contacts__hours svg { color: var(--hb-red); flex-shrink: 0; }
+
+/* C5 (task 9-fix2): строка доверия у контактов — только факты (AGENTS §0). */
+.hb-trust {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--hb-ink) 65%, transparent);
+}
+
+/* live-бейдж Открыто/Закрыто */
+
+.hb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--hb-line);
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--hb-ink);
+  white-space: nowrap;
+}
+.hb-badge__dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.hb-badge--open .hb-badge__dot { background: #2f9e44; box-shadow: 0 0 0 3px rgba(47, 158, 68, 0.16); }
+.hb-badge--closed .hb-badge__dot { background: var(--hb-red-deep); box-shadow: 0 0 0 3px rgba(185, 20, 49, 0.12); }
+.hb-badge__next { font-weight: 400; color: color-mix(in srgb, var(--hb-ink) 52%, transparent); }
+
+/* desktop: крупные строки */
+
+.hb-contacts__rows {
+  display: none;
+  margin-top: 1.1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 2rem;
+}
+@media (min-width: 768px) {
+  .hb-contacts__rows { display: grid; }
+}
+.hb-clink {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 0.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--hb-line) 85%, transparent);
+  min-height: 44px;
+  transition: border-color 0.25s ease;
+}
+.hb-clink:hover { border-bottom-color: var(--hb-red); }
+.hb-clink__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--hb-line);
+  background: #fff;
+  color: var(--hb-red);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+.hb-clink:hover .hb-clink__icon { background: var(--hb-red); color: #fff; }
+.hb-clink__body { display: flex; flex-direction: column; min-width: 0; }
+.hb-clink__sub {
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  /* T4: label-уровень капс-шкалы (было 0.64rem/0.14em) */
+  font-size: var(--hb-caps-label-fs);
+  letter-spacing: var(--hb-caps-label-ls);
+  text-transform: uppercase;
+  /* D5 (task 9-fix2): 45% ≈ 3.4:1 — ниже AA; 63% ≥ 4.5:1 на cream. */
+  color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
+}
+.hb-clink__value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--hb-ink);
+  overflow-wrap: break-word;
+  transition: color 0.25s ease;
+}
+.hb-clink:hover .hb-clink__value { color: var(--hb-red-deep); }
+.hb-clink__arrow {
+  margin-left: auto;
+  color: color-mix(in srgb, var(--hb-ink) 25%, transparent);
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+.hb-clink:hover .hb-clink__arrow { transform: translateX(4px); color: var(--hb-red); }
+.hb-clink--hl .hb-clink__value { color: var(--hb-red-deep); }
+
+/* mobile: тикер + карточки */
+
+.hb-ticker {
+  display: block;
+  overflow: hidden;
+  margin-top: 1.1rem;
+  padding-block: 0.55rem;
+  border-block: 1px dashed color-mix(in srgb, var(--hb-ink) 18%, transparent);
+}
+@media (min-width: 768px) {
+  .hb-ticker { display: none; }
+}
+.hb-ticker__inner {
+  display: flex;
+  width: max-content;
+  animation: hb-marquee 30s linear infinite;
+}
+.hb-ticker:hover .hb-ticker__inner,
+.hb-ticker:focus-within .hb-ticker__inner {
+  animation-play-state: paused;
+}
+.hb-ticker__track { display: flex; align-items: center; }
+.hb-ticker__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-inline: 0.9rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--hb-ink) 68%, transparent);
+}
+.hb-ticker__item svg { color: var(--hb-red); flex-shrink: 0; }
+@keyframes hb-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.hb-contacts__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+@media (min-width: 768px) {
+  .hb-contacts__cards { display: none; }
+}
+.hb-ccard {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 56px;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--hb-line);
+  border-radius: 14px;
+  background: #fff;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+.hb-ccard:hover {
+  border-color: color-mix(in srgb, var(--hb-red) 55%, var(--hb-line));
+  box-shadow: 0 10px 22px -16px color-mix(in srgb, var(--hb-red) 60%, transparent);
+}
+.hb-ccard svg { color: var(--hb-red); flex-shrink: 0; }
+.hb-ccard__body { display: flex; flex-direction: column; min-width: 0; }
+.hb-ccard__sub {
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  /* T4: label-уровень капс-шкалы (мобильный двойник .hb-clink__sub) */
+  font-size: var(--hb-caps-label-fs);
+  letter-spacing: var(--hb-caps-label-ls);
+  text-transform: uppercase;
+  /* D5 (task 9-fix2): мобильный двойник .hb-clink__sub — тот же контраст-фикс. */
+  color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
+}
+.hb-ccard__value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--hb-ink);
+  overflow-wrap: break-word;
+}
+
+/* карта — ленивая, гейтится IntersectionObserver-ом в компоненте */
+
+.hb-map {
+  position: relative; /* M3: якорь чипа-аффорданса */
+  margin-top: 1.2rem;
+  height: clamp(220px, 30vw, 330px);
+  border: 1px solid var(--hb-line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+/* M3 (task 11-fix3): tap-to-activate — до активации iframe мёртв для
+   указателя (свайп над картой скроллит СТРАНИЦУ, а не панорамирует карту);
+   обёртка активируется кликом/Enter/Space/фокусом (см. LazyMap). */
+.hb-map__iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  pointer-events: none;
+}
+.hb-map[data-active="true"] .hb-map__iframe { pointer-events: auto; }
+/* чип-аффорданс: cream/ink, по центру; pointer-events:none — не мешает
+   ни клику активации (проходит в обёртку), ни свайпу над чипом */
+.hb-map__hint {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: calc(100% - 2rem);
+  padding: 0.55rem 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--hb-ink) 13%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--hb-cream) 94%, transparent);
+  color: var(--hb-ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 10px 24px -12px rgba(26, 26, 26, 0.35);
+  pointer-events: none;
+}
+.hb-map__hint svg { color: var(--hb-red); flex-shrink: 0; }
+.hb-map__ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 100%;
+  border: 1px dashed color-mix(in srgb, var(--hb-ink) 16%, transparent);
+  border-radius: 16px;
+  margin: 0.5rem;
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--hb-ink) 52%, transparent);
+}
+.hb-map__ph svg { color: var(--hb-red); }
+
+/* ================================================== T2 (task 11-fix3):
+   МОБИЛЬНЫЙ МИКРОКЕГЛЬ ЧЕКА — только <768, desktop не тронут.
+   Пороги критика: строки позиций ≥14px; сноски/cta-note/type ≥12.5px;
+   «Итого за гостя» ≥13.5px. */
+@media (max-width: 767.98px) {
+  .hb-line { font-size: 0.875rem; }            /* 13.6 → 14px */
+  .hb-line--included,
+  .hb-note,
+  .hb-note--season,
+  .hb-cta-note,
+  .hb-paper__type { font-size: 0.78125rem; }   /* 11.84 → 12.5px */
+  .hb-total__per { font-size: 0.84375rem; }    /* 12.48 → 13.5px */
+}
+
+/* ================================================== X4 (task 13-fix4):
+   МОБИЛЬНЫЙ МИКРОКЕГЛЬ ≥12px — ВСЕ текстовые узлы блока (только <768,
+   desktop не трогут). До правки <12px на 390: тики слайдера 10.88,
+   шаг-цифры нити 9.92, .hb-label / .hb-label-caps__opt / .hb-label__opt /
+   .hb-panel__caps / .hb-total__label / .hb-ccard__sub / .hb-bar__total-label
+   11.5, .hb-safe 11.52, .hb-bar__guests 11.2. Полный замер до/после —
+   research/c64/verify-fix4.json (x4_before / x4_after). */
+@media (max-width: 767.98px) {
+  .hb-slider__tick { font-size: 0.75rem; }   /* 10.88 → 12px */
+  .hb-form__node { font-size: 0.75rem; }     /* 9.92 → 12px */
+  .hb-label-caps__opt,
+  .hb-label__opt { font-size: 0.75rem; }     /* 11.52 → 12px */
+  .hb-label,
+  .hb-panel__caps,
+  .hb-total__label,
+  .hb-bar__total-label,
+  .hb-ccard__sub { font-size: 0.75rem; }     /* 11.5 → 12px */
+  .hb-safe { font-size: 0.75rem; }           /* 11.52 → 12px */
+  .hb-bar__guests { font-size: 0.75rem; }    /* 11.2 → 12px */
+}
+
+/* ================================================== A11Y / MOTION */
+
+.hbooking :is(.hb-btn, .hb-type, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-consent__link, .hb-date__input, .hb-slider__input, .hb-slider__tick, .hb-panel__again):focus-visible {
+  outline: 2px solid var(--gold, #d4a373);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-ticker__inner { animation: none; }
+  .hb-zone,
+  .hb-lines,
+  .hb-cta-zone { transition: none; }
+  .hb-type,
+  .hb-clink,
+  .hb-ccard,
+  .hb-btn,
+  .hb-step-btn,
+  .hb-bar,
+  .hb-bar__cta,
+  .hb-clink__arrow,
+  .hb-label,
+  .hb-form__legend-btn,
+  .hb-form__node,
+  .hb-slider__tick,
+  .hb-panel__again { transition: none; }
+}
