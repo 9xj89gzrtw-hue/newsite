@@ -26,6 +26,8 @@
  * rate-limited at time of commit — see AGENTS.md §14 грабли #13).
  */
 
+import { CONTACTS } from "@/lib/config";
+
 export const MEDIA = {
   hero: {
     // Real catering photo from Ridgewells — "Beautiful sunset over an
@@ -225,17 +227,21 @@ export const INSTAGRAM = {
 
 /**
  * Yandex Maps embed — office location.
- * Координаты дома 18 по ул. Большая Морская подтверждены Яндекс.Картами
- * (59.934862, 30.316218, индекс 191181) — совпадают с LEGAL_INFO.legalAddress.
+ * Cycle 65 (2026-08): адрес владельца обновлён — Полевая-Сабировская, 45к1.
+ * Короткая ссылка владельца https://yandex.ru/maps/-/CTHo6Xkp резолвится в
+ * org «niloft» (99594743286), координаты 30.275093, 59.994868, z=17.
+ * LEGAL_INFO.legalAddress (документы/152-ФЗ) НЕ тронут — меняется только
+ * публичное отображение карты/адреса. Адрес/ссылка — ЕДИНЫЙ источник
+ * CONTACTS.address/addressHref (config.ts), их читают и футер, и блок заявок.
  */
 export const YANDEX_MAPS = {
   // Embed URL for iframe (Yandex Maps → Share → HTML code)
   embedSrc:
-    "https://yandex.ru/map-widget/v1/?ll=30.316218%2C59.934862&z=16&pt=30.316218,59.934862,pm2rdm",
-  // Direct link for "open in maps" button — поиск по точному адресу
-  href: "https://yandex.ru/maps/?text=%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%2C%20%D1%83%D0%BB%D0%B8%D1%86%D0%B0%20%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F%20%D0%9C%D0%BE%D1%80%D1%81%D0%BA%D0%B0%D1%8F%2C%2018",
-  // Address (display) — using full legal address from LEGAL_INFO
-  address: "ул. Большая Морская, д. 18, офис 33, Санкт-Петербург",
+    "https://yandex.ru/map-widget/v1/?ll=30.275093%2C59.994868&z=17&pt=30.275093,59.994868,pm2rdm",
+  // Direct link for "open in maps" — короткая ссылка владельца из ТЗ
+  href: CONTACTS.addressHref,
+  // Address (display) — единый источник с футером
+  address: CONTACTS.address,
 };
 
 // ============================================================================

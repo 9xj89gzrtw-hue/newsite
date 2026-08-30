@@ -162,7 +162,9 @@
   margin-top: 2px;
   font-size: 0.78rem;
   line-height: 1.4;
-  color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
+  /* Fix5 (critic F1): 55% ≈ 3.84:1 — ниже AA для мелкого кегля; 65% ≥ 4.5:1
+     (новая карточка «Ещё решаю» села на этот старый токен). */
+  color: color-mix(in srgb, var(--hb-ink) 65%, transparent);
 }
 .hb-type__price {
   display: block;
@@ -170,7 +172,8 @@
   font-size: 0.78rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: color-mix(in srgb, var(--hb-ink) 48%, transparent);
+  /* Fix5 (critic F1): 48% ≈ 3.12:1 — ниже AA; 63% ≈ 5:1 (канон .hb-note). */
+  color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
 }
 /* T5 (task 11-fix3): ОДИН красный на активную кнопку — red-deep, как у
    соседних блоков (hacc-menu: текст/цены на тинтах = red-deep, AA-safe).
@@ -211,10 +214,14 @@
   color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
 }
 
-/* катушка одометра: колонка высотой 1em, лента глифов едет по y (em) */
-
+/* катушка одометра: колонка высотой 1em, лента глифов едет по y (em).
+   Fix5 V5: width 1ch → 0.73em + gap — в Prata НЕТ tnum: замер глифов
+   (probe, 70.4px) дал самый широкий глиф 0.696em ⇒ в колонке 1ch (≈0.53em)
+   цифры обрезались и «слипались». 0.73em покрывает 0.696em с запасом,
+   gap 0.05em визуально разделяет колонки. */
 .hb-odo {
   display: inline-flex;
+  gap: 0.05em;
   font-family: var(--hb-num-font);
   font-size: clamp(3rem, 6vw, 4.4rem);
   line-height: 1;
@@ -223,21 +230,22 @@
 }
 .hb-odo__col {
   display: block;
-  width: 1ch;
+  width: 0.73em;
   height: 1em;
   overflow: hidden;
 }
 .hb-odo__strip { display: block; will-change: transform; }
 .hb-odo__glyph {
   display: block;
-  width: 1ch;
+  width: 0.73em;
   height: 1em;
   line-height: 1;
   text-align: center;
 }
 
-/* слайдер: рейка с заливкой и тиками, инпут поверх (прозрачный трек) */
-
+/* слайдер: рейка с заливкой и тиками, инпут поверх (прозрачный трек).
+   Fix5 V4: заливка — СПРАЙТ scaleX (transform-origin left, width 100%):
+   анимируется композитором, без layout — правка тормозов на мобиле. */
 .hb-slider { position: relative; margin-top: 1.1rem; }
 .hb-slider__rail {
   position: relative;
@@ -250,13 +258,33 @@
   left: 0;
   height: 5px;
   border-radius: 999px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--hb-red) 72%, transparent), var(--hb-red));
+  background: var(--hb-red);
+  will-change: transform;
 }
-/* X3 (task 13-fix4): тики — НАСТОЯЩИЕ пресет-кнопки (раньше span с
-   cursor/pointer-events:none — клик не работал). z-index над инпутом,
-   hover/focus — подсветка пресета; визуально ≥24–26px, хит-зона расширена
-   ::after (±8px по бокам, +7px вниз). НЕ 44px по вертикали сознательно:
-   тики сидят на рейке — полноразмерная зона перехватывала бы драг слайдера. */
+/* Fix5 V11: блик-свип по заливке — микро-анимация «живого» слайдера
+   (transform-only, отключается reduced-motion ниже по файлу). */
+.hb-slider__fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(100deg, transparent 15%, rgba(255, 255, 255, 0.55) 50%, transparent 85%);
+  transform: translateX(-110%);
+  animation: hb-sheen 3.6s ease-in-out 1.2s infinite;
+}
+@keyframes hb-sheen {
+  0%, 55% { transform: translateX(-110%); }
+  90%, 100% { transform: translateX(110%); }
+}
+/* X3 (task 13-fix4): тики — НАСТОЯЩИЕ пресет-кнопки. z-index над инпутом,
+   hover/focus — подсветка пресета.
+   Fix5 (cycle 65, «слайдер тормозит на мобиле»): сама кнопка —
+   pointer-events:none (драг, начавшийся на тике, больше НЕ перехватывается —
+   раньше тач-драг от дефолтного положения (30 = минимум = тик) умирал:
+   pointerdown попадал в кнопку, палец двигал «кнопку», не слайдер).
+   Кликабельная зона тика — полоса НИЖЕ зоны большого пальца (::after,
+   pointer-events:auto, y 26–46): тап по подписи = точный пресет,
+   драг сквозь подпись = инпут. Клавиатура — без изменений (фокус/Enter). */
 .hb-slider__tick {
   position: absolute;
   top: 18px;
@@ -274,7 +302,7 @@
   font-size: 0.68rem;
   letter-spacing: 0.06em;
   color: color-mix(in srgb, var(--hb-ink) 38%, transparent);
-  pointer-events: auto;
+  pointer-events: none;
   z-index: 2;
   cursor: pointer;
   transition: color 0.2s ease, background-color 0.2s ease;
@@ -282,12 +310,22 @@
 .hb-slider__tick::after {
   content: "";
   position: absolute;
-  /* Wave-4 (mobile-critic MAJOR): хит-арея тика до ~46px по вертикали —
-     расширена ВНИЗ в пустую зону подписи (рейка и драг не перекрыты),
-     по бокам ±10px. Визуальный тик не растёт. */
-  inset: -4px -10px -16px;
+  left: 50%;
+  top: 26px;
+  width: 48px;
+  height: 22px;
+  transform: translateX(-50%);
+  pointer-events: auto;
 }
-.hb-slider__tick:hover {
+/* Fix5 (critic MINOR-3): у крайнего справа тика (500) полоса не должна
+   вылезать за вьюпорт — прижимаем её к правому краю кнопки. */
+.hb-slider__tick:last-of-type::after {
+  left: auto;
+  right: 0;
+  width: 38px;
+  transform: none;
+}
+.hb-slider__tick:focus-visible {
   color: var(--hb-red-deep);
   background: color-mix(in srgb, var(--hb-red) 7%, transparent);
 }
@@ -318,7 +356,10 @@
   background: #fff;
   border: 3px solid var(--hb-red);
   box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hb-red) 60%, transparent);
+  transition: transform 0.18s ease;
 }
+/* Fix5 V11: thumb «приоткрывается» при нажатии — тактильный отклик на мобиле */
+.hb-slider__input:active::-webkit-slider-thumb { transform: scale(1.18); }
 .hb-slider__input::-moz-range-track {
   height: 5px;
   border-radius: 999px;
@@ -331,15 +372,40 @@
   background: #fff;
   border: 3px solid var(--hb-red);
   box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--hb-red) 60%, transparent);
+  transition: transform 0.18s ease;
 }
+.hb-slider__input:active::-moz-range-thumb { transform: scale(1.18); }
 .hb-slider__adjust {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap; /* V-fit: на узких экранах ряд ввода переносится, не обрезается */
+  row-gap: 0.45rem;
   gap: 0.75rem;
   margin-top: 0.2rem;
 }
-.hb-slider__btns { display: flex; gap: 0.5rem; }
+/* Fix5 V2: группа ручного ввода количества — [−1] [ввод] [+1] */
+.hb-slider__edit { display: inline-flex; align-items: center; gap: 0.4rem; }
+.hb-guests-input {
+  width: 3.6rem;
+  min-height: 44px;
+  padding: 0 0.3rem;
+  border: 1px solid var(--hb-line);
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+  font-family: var(--hb-num-font);
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--hb-ink);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.hb-guests-input:hover { border-color: color-mix(in srgb, var(--hb-red) 50%, var(--hb-line)); }
+.hb-guests-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--hb-ink) 38%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold, #d4a373) 22%, transparent);
+}
 /* M2 (task 11-fix3): живая мини-сумма под слайдером — та же useMemo-цифра,
    что и в чеке (мгновенно, без спринга). Замыкает петлю «слайдер → цена»
    на ОБОИХ вьюпортах (большой итог чека на мобиле — за экраном).
@@ -695,6 +761,9 @@
 .hb-panel__caps {
   display: flex;
   justify-content: space-between;
+  /* Fix5 V11: правая внутренняя отбивка — под круговую печать (иначе
+     «· INTERFOOD» и печать сталкиваются в углу панели) */
+  padding-right: 60px;
   font-family: var(--hb-caps);
   font-weight: 700;
   /* T4: label-уровень капс-шкалы */
@@ -773,11 +842,13 @@
   font-family: var(--hb-serif);
   font-size: 1.2rem;
   color: var(--hb-ink);
+  white-space: nowrap; /* «Смета-чек» не переносится («Смета- / чек» на мобиле) */
 }
 .hb-paper__type {
   font-size: 0.74rem;
   text-align: right;
   color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
+  min-width: 0;
 }
 
 /* перфорация-разделитель */
@@ -1101,9 +1172,12 @@
 /* BackToTop (fixed bottom-6 left-6) поднимается над баром — только пока бар
    РЕАЛЬНО показан (<768, data-visible="true" — D3 fix1: бар больше не
    размонтируется, селектор следит за состоянием, не за наличием в DOM).
-   Урок C59: FAB-перекрытия меряем. */
+   Урок C59: FAB-перекрытия меряем.
+   Fix5 (cycle 65): то же правило для телефонного FAB шапки
+   (.fixed.bottom-6.right-6, site-header) — без лифта он перекрывал
+   CTA бара «Оставить заявку» (замер 390px). */
 @media (max-width: 767px) {
-  body:has(.hb-bar[data-visible="true"]) .fixed.bottom-6.left-6 {
+  body:has(.hb-bar[data-visible="true"]) :is(.fixed.bottom-6.left-6, .fixed.bottom-6.right-6) {
     bottom: calc(92px + var(--hbooking-cookie-h, 0px) + env(safe-area-inset-bottom, 0px));
     transition: bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -1391,9 +1465,161 @@
   .hb-bar__guests { font-size: 0.75rem; }    /* 11.2 → 12px */
 }
 
+/* ================================================== Fix5 V8: H2 — вторая
+   строка («Чек напечатается сразу.») — С НОВОЙ СТРОКИ (просьба владельца);
+   канон .ea-italic-fragment сохранён, добавлен только display:block. */
+.hb-h2-line { display: block; }
+
+/* ================================================== Fix5 V6: карточка
+   «Ещё решаю» — пунктирная рамка, чтобы читалась как «другой путь»,
+   не как восьмой формат с ценой. */
+.hb-type--idea {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--hb-cream) 55%, #fff);
+}
+.hb-type--idea:hover {
+  border-style: solid;
+  background: #fff;
+}
+.hb-type--idea.hb-type--on { border-style: solid; }
+
+/* ================================================== Fix5 V6: «после подбора»
+   вместо числа в итоге чека — рукописный акцент, не Prata (это не цифра). */
+.hb-total__later {
+  font-family: var(--font-marck), var(--font-script), cursive;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1.1;
+  /* Fix5 (critic F2): red-deep вместо red — 6.4:1 на бумаге (у red 4.42:1
+     на границе large-text — без запаса); канон «один красный текста». */
+  color: var(--hb-red-deep);
+  display: inline-block;
+  transform: rotate(-2deg);
+}
+
+/* ================================================== Fix5 V7: подсветка зоны
+   формы после CTA — форма «находится» глазами (особенно на мобиле). */
+.hb-zone__body { border-radius: 14px; }
+@media (prefers-reduced-motion: no-preference) {
+  .hb-zone[data-open="true"] .hb-zone__body {
+    animation: hb-zone-flash 1.35s ease-out 0.2s 1;
+  }
+}
+@keyframes hb-zone-flash {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--hb-red) 0%, transparent); }
+  30% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--hb-red) 26%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--hb-red) 0%, transparent); }
+}
+
+/* ================================================== Fix5 V11: вращающаяся
+   круговая печать на красной панели — wow-акцент, живёт на всех вьюпортах.
+   Техника «char-ring»: каждый символ — абсолютный <i> с rotate(i·step)
+   вокруг центра кольца (transform-origin center 0). Чистый CSS-rotate,
+   18s/оборот; reduced-motion — статика. */
+.hb-spin {
+  --hb-spin-r: 35px;
+  position: absolute;
+  top: -24px;
+  right: -8px;
+  width: 92px;
+  height: 92px;
+  z-index: 3;
+  pointer-events: none;
+  color: #fff;
+}
+.hb-spin__ring {
+  position: absolute;
+  inset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hb-spin__ring { animation: hb-rotate 18s linear infinite; }
+}
+.hb-spin__ring i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  font-family: var(--hb-caps);
+  font-style: normal;
+  font-weight: 700;
+  font-size: 9.5px;
+  line-height: 1;
+  white-space: pre;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  /* позиция на окружности — инлайн-транформ из компонента:
+     translate(-50%,-50%) rotate(a) translateY(-var(--hb-spin-r)) */
+  transform-origin: center;
+}
+.hb-spin__core {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+@keyframes hb-rotate { to { transform: rotate(360deg); } }
+/* на мобиле печать компактнее и не вылезает за экран (владелец: «не влезает») */
+@media (max-width: 767.98px) {
+  .hb-spin { width: 80px; height: 80px; top: -18px; right: 0; --hb-spin-r: 30px; }
+  .hb-spin__ring i { font-size: 8.8px; }
+}
+
+/* ================================================== Fix5 V11: блик-свип по
+   бумажной CTA «Оставить заявку» — кнопка периодически «подмигивает»
+   бликом (transform-only, pointer-events нет, reduced-motion — нет). */
+.hb-btn--paper { position: relative; overflow: hidden; }
+@media (prefers-reduced-motion: no-preference) {
+  .hb-btn--paper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    transform: translateX(-170%) skewX(-18deg);
+    animation: hb-cta-sheen 4.8s ease-in-out 2s infinite;
+    pointer-events: none;
+  }
+}
+@keyframes hb-cta-sheen {
+  0%, 55% { transform: translateX(-170%) skewX(-18deg); }
+  95%, 100% { transform: translateX(310%) skewX(-18deg); }
+}
+
+/* ================================================== Fix5 V11: СКРОЛЛ-ДРАЙВ
+   входы — CSS animation-timeline: view(). Работает БЕЗ JS (и на мобиле:
+   Chrome/Android и Safari 26+; старые браузеры просто показывают блок —
+   @supports-гейт). Прогрессивное улучшение поверх SSR-статики (§34). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hb-head,
+    .hb-block,
+    .hb-contacts > * {
+      animation: hb-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 42%;
+    }
+    /* лёгкий перекос бумаги во время прокрутки — «живой лист» чека */
+    .hb-paper {
+      animation: hb-sway linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+@keyframes hb-rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hb-sway {
+  from { rotate: 0.8deg; }
+  to { rotate: -0.8deg; }
+}
+
 /* ================================================== A11Y / MOTION */
 
-.hbooking :is(.hb-btn, .hb-type, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-consent__link, .hb-date__input, .hb-slider__input, .hb-slider__tick, .hb-panel__again):focus-visible {
+.hbooking :is(.hb-btn, .hb-type, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-consent__link, .hb-date__input, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input):focus-visible {
   outline: 2px solid var(--gold, #d4a373);
   outline-offset: 2px;
 }
@@ -1415,5 +1641,16 @@
   .hb-form__legend-btn,
   .hb-form__node,
   .hb-slider__tick,
+  .hb-slider__input::-webkit-slider-thumb,
+  .hb-slider__input::-moz-range-thumb,
   .hb-panel__again { transition: none; }
+  /* Fix5 V11: все бесконечные/входные анимации гасятся */
+  .hb-slider__fill::after,
+  .hb-btn--paper::after { animation: none; content: none; }
+  .hb-spin__ring { animation: none; }
+  .hb-zone[data-open="true"] .hb-zone__body { animation: none; }
+  .hb-head,
+  .hb-block,
+  .hb-contacts > *,
+  .hb-paper { animation: none; }
 }

@@ -20,11 +20,14 @@
  *    только форму, чек/контролы не трогает;
  *  - draft localStorage — дебаунс 300 мс (в contact.tsx был на каждый
  *    keystroke — perf-баг из RESEARCH-TECH §2.7);
- *  - Math.random — только в useMemo (конфетти) и useEffect (№ чека);
+ *  - Math.random — только в useMemo (конфетти; Fix5: № заявки приходит
+ *    из API, локального генератора больше нет);
  *  - карта — IntersectionObserver-гейт (rootMargin 400px) + loading="lazy";
- *  - ноль бесконечных анимаций: ни одного repeat: Infinity в файле
- *    (live-точка бейджа — статичная, «пульс» убран сознательно);
- *  - scroll-listener'ов нет вообще (IO + MutationObserver только).
+ *  - бесконечные анимации: в TSX — ноль (repeat: Infinity нет); Fix5 V11
+ *    добавил ТРИ микро-CSS-анимации (печать-кольцо, 2 блика) — transform-only,
+ *    ≤2% элементов, гасятся prefers-reduced-motion (отступление от SPEC §4.5
+ *    сознательное, по прямому запросу владельца «мало анимации»);
+ *  - scroll-listener'ов нет вообще (IO + MutationObserver + rAF-коалесинг).
  *
  * Hydration (урок C62 §34): любые ветвления по useReducedMotion — через
  * mounted-гейт; SSR/первый клиентский рендер = статика, анимационные ветки
@@ -93,9 +96,51 @@
  *  измерением (probe/input-check: fill+pressSequentially работают на 1440 и
  *  390) — логика инпутов в этом таске НЕ трогалась.
  *
+ * Fix5 (cycle 65, прямые правки владельца — 15 пунктов):
+ *  - V1 СЛАЙДЕР ШАГ 1: range больше не «шаг 5» — позиция 0..1000 мапится в
+ *    гостей НЕЛИНЕЙНО (SLIDER_POS_ANCHORS): 10–50 гостей занимают 62% трека
+ *    (владелец: «чаще всего заказывают на 10–50, больше 50 — намного реже»),
+ *    50–100 → 18%, 100–200 → 10%, 200–500 → 10%. Стрелки клавиатуры = ±1.
+ *  - V2 ВВОД ЧИСЛА: в строке ±-кнопок — редактируемое поле количества
+ *    (inputMode numeric, коммит по Enter/blur, кламп в [min, 500]);
+ *    ±5 заменены на ±1 (V1).
+ *  - V3 ДЕФОЛТЫ: type=banquet, guests=30 (владелец: «изначально 30 и банкет»).
+ *  - V4 ПЕРФ СЛАЙДЕРА (тормозил на мобиле): nuqs-URL больше НЕ пишется на
+ *    каждый кадр драга — локальное зеркало guestsLocal + debounced-коммит в
+ *    URL 500мс; заливка трека — transform: scaleX (compositor) вместо width
+ *    (layout); itemized-строки чека перепечатываются от ДЕБАУНС-значения
+ *    гостей (160мс) — во время драга PrintLine не ремоунтится кадрами.
+ *  - V5 ЦИФРЫ НЕ СЛИПАЮТСЯ: колонки одометра width: 1ch → 0.66em + gap
+ *    (в Prata нет tnum — «1» уже «0», глифы обрезались/слипались в 1ch).
+ *  - V6 «ЕЩЁ РЕШАЮ»: карточка-пункт для тех, кто не выбрал формат — заявка
+ *    без цены и формата: чек печатает «обсудим по звонку», итог «после
+ *    подбора», в форме появляется необязательный комментарий; POST шлёт
+ *    eventType: undefined + пометку «нужна помощь с подбором». Услуги
+ *    НЕ перечисляем (владелец: «выбор и так большой»).
+ *  - V7 CTA ВЕДЁТ К ФОРМЕ: «Оставить заявку» (панель + sticky-бар) всегда
+ *    скроллит к #contact трёхтактно (0/300/700мс — пережимает grid-раскрытие
+ *    0.5s) и подсвечивает форму однократной анимацией (hb-zone-flash).
+ *  - V8 ШАПКА: дубль «смета-чек»/«Расчёт и заявка» устранён — остаётся
+ *    ТОЛЬКО наклонный TiltedAccent; «Чек напечатается сразу.» — с новой
+ *    строки (блок-строка в H2); lede без «справа» (на мобиле чек снизу)
+ *    + упоминание пути «ещё выбираете».
+ *  - V9 ДОВЕРИЕ БЕЗ ВРЕМЕНИ: «16 лет» → «Работаем с 2007 года» (всё, что
+ *    стареет, — не пишем).
+ *  - V10 АДРЕС/КАРТА: Полевая-Сабировская 45к1 (YANDEX_MAPS, media.ts;
+ *    короткая ссылка владельца как внешняя ссылка; iframe-title обновлён).
+ *  - V11 WOW/МОБИЛ: вращающаяся круговая печать на панели (hb-spin, CSS
+ *    rotate, 18s); блик-свип по бумажной CTA и по заливке слайдера (CSS
+ *    keyframes, transform-only); вход блоков — СКРОЛЛ-ДРАЙВ (CSS
+ *    animation-timeline: view() — работает и на мобиле, @supports-гейт);
+ *    приоткрытие thumb при нажатии; NONE из этого не требует JS.
+ *    Отступление от «ноль бесконечных анимаций» (SPEC §4.5) — сознательное,
+ *    по прямому запросу владельца («мало анимации»): 3 микроанимации,
+ *    transform-only, ≤2% элементов, отключаются reduced-motion.
+ *
  * Контракты SPEC §2 — карта реализации:
- *  1. nuqs type/guests (parseAsString/parseAsInteger, defaults buffet/50),
- *     кламп guests → minGuests — см. useQueryState + clamp-эффект;
+ *  1. nuqs type/guests (parseAsString/parseAsInteger; Fix5: defaults
+ *     banquet/30, guests — через локальное зеркало + debounced-коммит 500мс,
+ *     внешние replaceState из hacc-menu подхватываются эффектом синхронизации);
  *  2. presetCalculator-совместимость — те же хуки nuqs читают
  *     history.replaceState из hacc-menu;
  *  3. pricing.ts не тронут; calcTotal(..., [], date); formatRUB везде;
@@ -152,6 +197,7 @@ import {
   Minus,
   Phone,
   Plus,
+  ReceiptText,
   Send,
   ShieldCheck,
 } from "lucide-react";
@@ -255,12 +301,53 @@ const OFFICE_HOURS = {
 const SEASON_LABEL = "Высокий сезон: май–сентябрь и декабрь";
 const SEASON_CANON = `${SEASON_LABEL} — ×1,15`;
 
-/** Тики слайдера гостей — как в calculator.tsx (вехи, не линейная шкала). */
+/** Тики слайдера гостей — вехи; позиции считаются НЕЛИНЕЙНО (sliderPos). */
 const SLIDER_TICKS = [25, 50, 100, 200, 500];
 const GUESTS_MAX = 500;
+/** Нижняя граница для «Ещё решаю» (без формата — считаем от 10). */
+const GUESTS_ABS_MIN = 10;
+
+/**
+ * Fix5 V1: НЕЛИНЕЙНАЯ шкала слайдера — чаще всего заказывают на 10–50 гостей,
+ * поэтому первые 62% трека отдаются диапазону [min…50], дальше редкие зоны:
+ * [50…100] → 18%, [100…200] → 10%, [200…500] → 10%. Влево-вправо маппинг
+ * взаимно обратный (одно и то же дерево отрезков).
+ */
+const SLIDER_POS_ANCHORS = [0, 0.62, 0.8, 0.9, 1] as const;
+
+function sliderPos(guests: number, min: number): number {
+  const g = Math.min(GUESTS_MAX, Math.max(min, guests));
+  const stops = [min, 50, 100, 200, GUESTS_MAX];
+  for (let i = 0; i < stops.length - 1; i += 1) {
+    if (g <= stops[i + 1]) {
+      const t = (g - stops[i]) / (stops[i + 1] - stops[i]);
+      return SLIDER_POS_ANCHORS[i] + t * (SLIDER_POS_ANCHORS[i + 1] - SLIDER_POS_ANCHORS[i]);
+    }
+  }
+  return 1;
+}
+
+function guestsFromPos(p: number, min: number): number {
+  const v = Math.min(1, Math.max(0, p));
+  const stops = [min, 50, 100, 200, GUESTS_MAX];
+  for (let i = 0; i < SLIDER_POS_ANCHORS.length - 1; i += 1) {
+    if (v <= SLIDER_POS_ANCHORS[i + 1]) {
+      const t =
+        (v - SLIDER_POS_ANCHORS[i]) / (SLIDER_POS_ANCHORS[i + 1] - SLIDER_POS_ANCHORS[i]);
+      return Math.round(stops[i] + t * (stops[i + 1] - stops[i]));
+    }
+  }
+  return GUESTS_MAX;
+}
+
+/** id псевдо-типа «Ещё решаю» — НЕ в MENU_TYPES (без цен, Fix5 V6). */
+const UNDECIDED_ID = "undecided";
 
 /** Конфетти — цвета бренда (ea-red/cep-red/cream/ink/gold), без неона. */
 const CONFETTI_COLORS = ["#E71D3A", "#FF360A", "#F7F5F5", "#1F2937", "#D4A373"];
+
+/** Fix5 V11: текст круговой печати (37 символов — шаг 9.73°). */
+const HB_SPIN_TEXT = "смета-чек · interfood · с 2007 года ·";
 
 /** Катушка цифр odometer: 0–9 и дополнительный 0 на хвост 9→0. */
 const ODO_GLYPHS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
@@ -373,6 +460,20 @@ function OdometerColumn({
 }
 
 /* =============================================================== ИТОГ ЧЕКА */
+
+/**
+ * Fix5 V4: дебаунс значения (не setState на кадр). Используется для
+ * itemized-строк чека — во время драга слайдера PrintLine НЕ ремоунтится
+ * кадрами, перепечатка запускается через 160 мс после остановки значения.
+ */
+function useDebouncedValue<T>(value: T, ms: number): T {
+  const [v, setV] = useState(value);
+  useEffect(() => {
+    const t = window.setTimeout(() => setV(value), ms);
+    return () => window.clearTimeout(t);
+  }, [value, ms]);
+  return v;
+}
 
 /**
  * Итог сметы: useSpring → formatRUB как MotionValue-child — React не
@@ -669,7 +770,7 @@ function LazyMap() {
         <>
           <iframe
             src={YANDEX_MAPS.embedSrc}
-            title="Interfood Catering на карте — Санкт-Петербург, ул. Большая Морская, 18"
+            title="Interfood Catering на карте — Санкт-Петербург, ул. Полевая-Сабировская, 45к1"
             className="hb-map__iframe"
             loading="lazy"
             sandbox="allow-scripts allow-same-origin allow-presentation"
@@ -719,9 +820,10 @@ const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTM
         {OFFICE_HOURS.weekdays} · {OFFICE_HOURS.saturday} · {OFFICE_HOURS.sunday}
       </p>
 
-      {/* C5 (task 9-fix2): строка доверия — ТОЛЬКО факты из AGENTS §0
-          (16 лет, 2 400+ событий); никаких ОГРН/ИНН/отзывов — их нет в данных. */}
-      <p className="hb-trust">16 лет в Санкт-Петербурге · 2 400+ событий</p>
+      {/* C5 (task 9-fix2) + Fix5 V9: строка доверия — только ВНЕВРЕМЕННЫЕ факты
+          (владелец: «всё, что со временем устаревает, лучше не писать») —
+          «с 2007 года» вместо «16 лет». */}
+      <p className="hb-trust">Работаем в Санкт-Петербурге с 2007 года · 2 400+ событий</p>
 
       {/* Desktop: крупные строки */}
       <div className="hb-contacts__rows">
@@ -775,7 +877,9 @@ const LeadForm = memo(function LeadForm({
   typeId,
   guests,
   dateHuman,
+  dateIso,
   total,
+  undecided,
   toastPromise,
   onSuccess,
 }: {
@@ -783,16 +887,26 @@ const LeadForm = memo(function LeadForm({
   guests: number;
   /** Валидная дата в человеческом формате («19 сентября 2026 г.») или "" (C2). */
   dateHuman: string;
+  /** ISO-дата для машинного события catering:calc-lead (может быть ""). */
+  dateIso: string;
+  /** 0 для undecided (V6) — строка «Расчёт с сайта» в POST не пишется. */
   total: number;
+  /** Fix5 V6: формат ещё не выбран — без цены, с необязательным комментарием. */
+  undecided: boolean;
   /** Обещание перезвона для тоста — динамическое от офиса (C6, task 9-fix2). */
   toastPromise: string;
-  onSuccess: (leadId: string | number | undefined) => void;
+  onSuccess: (
+    id: string | number | undefined,
+    detail: { typeId: string; guests: number; dateIso: string; total: number },
+  ) => void;
 }) {
   const [step, setStep] = useState<0 | 1>(0);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
+  /** Fix5 V6: комментарий для «Ещё решаю» — свободный текст о событии. */
+  const [comment, setComment] = useState("");
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean }>({});
@@ -810,11 +924,13 @@ const LeadForm = memo(function LeadForm({
         phone: string;
         email: string;
         preferredTime: string;
+        comment: string;
       }>;
       if (typeof d.name === "string") setName(d.name);
       if (typeof d.phone === "string") setPhone(d.phone);
       if (typeof d.email === "string") setEmail(d.email);
       if (typeof d.preferredTime === "string") setPreferredTime(d.preferredTime);
+      if (typeof d.comment === "string") setComment(d.comment);
     } catch {
       // non-critical
     }
@@ -823,19 +939,19 @@ const LeadForm = memo(function LeadForm({
   /* --- draft save — ДЕБАУНС 300 мс (SPEC §2.6; в старом коде был каждый
          keystroke — perf-баг). Пустая форма не пишется. --- */
   useEffect(() => {
-    if (!name && !phone && !email && !preferredTime) return;
+    if (!name && !phone && !email && !preferredTime && !comment) return;
     const t = setTimeout(() => {
       try {
         window.localStorage.setItem(
           DRAFT_KEY,
-          JSON.stringify({ name, phone, email, preferredTime }),
+          JSON.stringify({ name, phone, email, preferredTime, comment }),
         );
       } catch {
         // non-critical
       }
     }, 300);
     return () => clearTimeout(t);
-  }, [name, phone, email, preferredTime]);
+  }, [name, phone, email, preferredTime, comment]);
 
   const phoneDigits = phone.replace(/[^+0-9]/g, "");
   const phoneValid = PHONE_REGEX.test(phoneDigits);
@@ -884,13 +1000,17 @@ const LeadForm = memo(function LeadForm({
           name,
           phone: normalizePhone(phone),
           email: email || undefined,
-          eventType: typeId || undefined,
+          // Fix5 V6: «Ещё решаю» шлётся БЕЗ формата (eventType undefined) —
+          // тип подберём по звонку.
+          eventType: undecided ? undefined : typeId || undefined,
           guests,
           message:
             [
+              undecided && "Формат ещё не выбран — нужна помощь с подбором",
               dateHuman && `Желаемая дата: ${dateHuman}`,
               preferredTime && `Желаемое время звонка: ${preferredTime}`,
-              `Расчёт с сайта: ~${formatRUB(total)}`,
+              !undecided && total > 0 && `Расчёт с сайта: ~${formatRUB(total)}`,
+              comment && `Комментарий: ${comment}`,
             ]
               .filter(Boolean)
               .join("\n") || undefined,
@@ -919,7 +1039,15 @@ const LeadForm = memo(function LeadForm({
         // non-critical
       }
       toast.success(`Заявка принята! ${toastPromise}.`);
-      onSuccess(data?.id);
+      /* КОНТРАКТ 7: снимок расчёта — из пропсов формы (родительский
+         handleSuccess полностью стабилен — React Compiler сохраняет memo). */
+      onSuccess(data?.id, {
+        // typeId-пропс уже нормализован родителем (undecided → "undecided")
+        typeId,
+        guests,
+        dateIso,
+        total,
+      });
     } catch (err) {
       if (err instanceof TypeError) {
         toast.error("Нет связи с сервером. Проверьте интернет-соединение и попробуйте ещё раз.");
@@ -931,6 +1059,8 @@ const LeadForm = memo(function LeadForm({
   };
 
   const menuType = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
+  /* Fix5 V6: формат в сводке — для undecided показываем честное «Подберём вместе». */
+  const formatLabel = undecided ? "Подберём вместе" : menuType.label;
 
   /* D3 (task 9-fix2): focus-хвосты (красные утилиты Tailwind) сняты —
      фокус поля теперь ink/золото из CSS; красный — ТОЛЬКО aria-invalid. */
@@ -1054,6 +1184,24 @@ const LeadForm = memo(function LeadForm({
                 />
               </div>
 
+              {/* Fix5 V6: комментарий виден ТОЛЬКО в режиме «Ещё решаю» —
+                  свободный текст о событии (услуги не перечисляем). */}
+              {undecided && (
+                <div className="hb-field">
+                  <label htmlFor="hb-comment" className="hb-label">
+                    О событии <span className="hb-label__opt">— необязательно</span>
+                  </label>
+                  <textarea
+                    id="hb-comment"
+                    className={`${field} resize-y min-h-[72px]`}
+                    rows={2}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Пара слов — что за событие и что уже знаете"
+                  />
+                </div>
+              )}
+
               <div className="hb-field">
                 <label htmlFor="hb-time" className="hb-label">
                   Желаемое время звонка <span className="hb-label__opt">— необязательно</span>
@@ -1097,11 +1245,11 @@ const LeadForm = memo(function LeadForm({
             <fieldset className="hb-form__fieldset hb-form__fieldset--panel">
               <legend className="hb-form__legend">Шаг 2 из 2 — Отправить</legend>
 
-              {/* Мини-сводка расчёта */}
+              {/* Мини-сводка расчёта (Fix5 V6: без «Расчёта» у undecided) */}
               <dl className="hb-summary">
                 <div className="hb-summary__row">
                   <dt>Формат</dt>
-                  <dd>{menuType.label}</dd>
+                  <dd>{formatLabel}</dd>
                 </div>
                 <div className="hb-summary__row">
                   <dt>Гостей</dt>
@@ -1122,10 +1270,12 @@ const LeadForm = memo(function LeadForm({
                   {/* T3 (task 11-fix3): единый формат отображения с контактами */}
                   <dd>{formatPhoneDisplay(normalizePhone(phone))}</dd>
                 </div>
-                <div className="hb-summary__row hb-summary__row--total">
-                  <dt>Расчёт</dt>
-                  <dd>~{formatRUB(total)}</dd>
-                </div>
+                {!undecided && (
+                  <div className="hb-summary__row hb-summary__row--total">
+                    <dt>Расчёт</dt>
+                    <dd>~{formatRUB(total)}</dd>
+                  </div>
+                )}
               </dl>
 
               {/* Согласие 152-ФЗ — обязательно, ссылка /privacy */}
@@ -1240,22 +1390,17 @@ function ConfettiBurst() {
  * смете-чеке вместо штампа — текстовая строка .hb-panel__next рядом),
  * Marck Script-строка (динамическое обещание C6), дата события
  * по-человечески (C2), однократное конфетти.
+ * Fix5 V6: мета — готовая строка metaLine (у undecided — без цены).
  */
 function SuccessPanel({
   leadId,
-  menuType,
-  guests,
-  total,
-  dateHuman,
+  metaLine,
   promiseLine,
   onReset,
   settled,
 }: {
   leadId: string | number | undefined;
-  menuType: MenuType;
-  guests: number;
-  total: number;
-  dateHuman: string;
+  metaLine: string;
   promiseLine: string;
   onReset: () => void;
   settled: boolean;
@@ -1285,10 +1430,7 @@ function SuccessPanel({
             юзер знает, КОГДА ждать звонка (C6-канон, один источник OFFICE_HOURS). */}
         <p className="hb-success__hours">Часы работы: {OFFICE_HOURS.weekdays} · {OFFICE_HOURS.saturday}</p>
 
-        <div className="hb-success__meta">
-          {menuType.label} · {guests} {guestsLabel(guests)}
-          {dateHuman ? ` · ${dateHuman}` : ""} · ~{formatRUB(total)}
-        </div>
+        <div className="hb-success__meta">{metaLine}</div>
 
         <button type="button" onClick={onReset} className="hb-btn hb-btn--ghost min-h-[44px]">
           Отправить ещё одну заявку
@@ -1315,7 +1457,8 @@ function StickyBar({
   visible,
   onCta,
 }: {
-  total: number;
+  /** null для «Ещё решаю» (Fix5 V6) — вместо цены показываем «после подбора». */
+  total: number | null;
   guests: number;
   visible: boolean;
   onCta: () => void;
@@ -1368,7 +1511,8 @@ function StickyBar({
     >
       <p className="hb-bar__total">
         <span className="hb-bar__total-label">Итого</span>
-        <b>~{formatRUB(total)}</b>
+        {/* Fix5 V6: у undecided цены нет — честный текст вместо «~0 ₽». */}
+        <b>{total != null ? `~${formatRUB(total)}` : "после подбора"}</b>
         <span className="hb-bar__guests">
           {guests} {guestsLabel(guests)}
         </span>
@@ -1386,6 +1530,9 @@ function StickyBar({
  * Сетка типов события — React.memo (task 7-fix1 D5): не зависит от
  * guests/date, перерисовывается ТОЛЬКО при смене типа (props: typeId +
  * stable onSelect). Разметка/aria/layoutId — прежние (SPEC §2.11, §3.1).
+ * Fix5 V6: последняя карточка «Ещё решаю» — псевдо-тип без цены: заявка
+ * без расчёта и формата (нужен тем, кто выбирает между услугами; сами
+ * услуги не перечисляем — выбор и так большой).
  */
 const TypeGrid = memo(function TypeGrid({
   typeId,
@@ -1429,6 +1576,28 @@ const TypeGrid = memo(function TypeGrid({
           </motion.button>
         );
       })}
+      <motion.button
+        type="button"
+        onClick={() => onSelect(UNDECIDED_ID)}
+        aria-pressed={typeId === UNDECIDED_ID}
+        whileTap={settled ? { scale: 0.985 } : undefined}
+        className={`hb-type hb-type--idea ${typeId === UNDECIDED_ID ? "hb-type--on" : ""}`}
+      >
+        <span className="hb-type__main">
+          <span className="hb-type__label">Ещё решаю</span>
+          <span className="hb-type__short">Подскажем формат — заявка без расчёта</span>
+        </span>
+        <span className="hb-type__price">без цены · формат обсудим</span>
+        {typeId === UNDECIDED_ID && (
+          <motion.span
+            layoutId="hb-type-underline"
+            className="hb-type__underline"
+            initial={false}
+            transition={{ type: "spring", stiffness: 420, damping: 34 }}
+            aria-hidden="true"
+          />
+        )}
+      </motion.button>
     </div>
   );
 });
@@ -1599,6 +1768,67 @@ const ReceiptLines = memo(function ReceiptLines({
   );
 });
 
+/**
+ * Fix5 V6: строки чека для режима «Ещё решаю» — заявка без цены и формата.
+ * Термопечать та же (PrintLine), но сигнатуры не меняются от драга слайдера
+ * (гости печатаются при остановке — как в основном чеке, через debounce
+ * в родителе не нужно: строк всего две, ремоунт дешёвый).
+ */
+const UndecidedLines = memo(function UndecidedLines({
+  guests,
+  settled,
+  active,
+}: {
+  guests: number;
+  settled: boolean;
+  active: boolean;
+}) {
+  const [entranceDone, setEntranceDone] = useState(false);
+  useEffect(() => {
+    if (!active || entranceDone) return;
+    const t = window.setTimeout(() => setEntranceDone(true), 1100);
+    return () => window.clearTimeout(t);
+  }, [active, entranceDone]);
+  const delayBase = entranceDone ? 0 : 0.2;
+
+  return (
+    <>
+      <PrintLine
+        sig="undecided-format"
+        index={0}
+        active={active}
+        settled={settled}
+        delayBase={delayBase}
+        className="hb-line"
+      >
+        <span className="hb-line__label">Формат события</span>
+        <span className="hb-line__value">обсудим по звонку</span>
+      </PrintLine>
+      <PrintLine
+        sig={`undecided-${guests}`}
+        index={1}
+        active={active}
+        settled={settled}
+        delayBase={delayBase}
+        className="hb-line"
+      >
+        <span className="hb-line__label">Гостей</span>
+        <span className="hb-line__value">{guests}</span>
+      </PrintLine>
+      <PrintLine
+        sig="undecided-included"
+        index={3}
+        active={active}
+        settled={settled}
+        delayBase={delayBase}
+        className="hb-line hb-line--included"
+      >
+        <span>Меню и сервис подберём под вашу задачу — расскажите о событии в заявке</span>
+      </PrintLine>
+    </>
+  );
+});
+
 /* ============================================================ ГЛАВНЫЙ БЛОК */
 
 type Stage = "calc" | "form" | "success";
@@ -1614,9 +1844,39 @@ export function HaccBooking() {
 
   /* --- КОНТРАКТ 1: nuqs type/guests — те же парсеры, что в calculator.tsx,
          поэтому presetCalculator (history.replaceState) из hacc-menu
-         подхватывается без изменений (Контракт 2). --- */
-  const [typeId, setTypeId] = useQueryState("type", parseAsString.withDefault("buffet"));
-  const [guests, setGuests] = useQueryState("guests", parseAsInteger.withDefault(50));
+         подхватывается без изменений (Контракт 2).
+         Fix5 V3: дефолты владельца — банкет / 30 гостей.
+         Fix5 V4 (перф): guests живёт в ЛОКАЛЬНОМ зеркале — URL (nuqs)
+         пишется дебаунсом 500 мс, а не на каждый кадр драга. --- */
+  const [typeId, setTypeId] = useQueryState("type", parseAsString.withDefault("banquet"));
+  const [guestsParam, setGuestsParam] = useQueryState("guests", parseAsInteger.withDefault(30));
+  const [guestsLocal, setGuestsLocal] = useState(guestsParam);
+  /** Последнее значение, ГАРАНТИРОВАННО отражённое в URL (или взятое из него). */
+  const guestsSyncRef = useRef(guestsParam);
+  /** Fix5 V2: драфт поля ручного ввода гостей (null = показываем значение). */
+  const [guestsDraft, setGuestsDraft] = useState<string | null>(null);
+  /* Fix5 V4 (перф): коалесинг драга слайдера в кадры — пачка pointermove
+     между кадрами даёт ОДИН setState вместо N (на тач-экранах события
+     приходят чаще кадров — именно это и читалось как «тормозит»). */
+  const guestsRafRef = useRef(0);
+  const guestsPendingRef = useRef<number | null>(null);
+  const setGuestsFrame = useCallback((next: number) => {
+    guestsPendingRef.current = next;
+    if (guestsRafRef.current) return;
+    guestsRafRef.current = requestAnimationFrame(() => {
+      guestsRafRef.current = 0;
+      if (guestsPendingRef.current != null) {
+        setGuestsLocal(guestsPendingRef.current);
+        guestsPendingRef.current = null;
+      }
+    });
+  }, []);
+  useEffect(
+    () => () => {
+      if (guestsRafRef.current) cancelAnimationFrame(guestsRafRef.current);
+    },
+    [],
+  );
   const [date, setDate] = useState("");
   const [stage, setStage] = useState<Stage>("calc");
   const [leadId, setLeadId] = useState<string | number | undefined>(undefined);
@@ -1633,9 +1893,14 @@ export function HaccBooking() {
   const contactsZoneRef = useRef<HTMLDivElement>(null);
 
   const current = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
+  /** Fix5 V6: «Ещё решаю» — псевдо-тип без цены/формата. */
+  const isUndecided = typeId === UNDECIDED_ID;
+  /** Эффективный минимум: у undecided — общий минимум 10 (не 30 банкета). */
+  const effMin = isUndecided ? GUESTS_ABS_MIN : current.minGuests;
   /* Q1 (task 9-fix2): кламп ДВУСТОРОННИЙ — URL ?guests=600 больше не даёт
-     aria-valuenow=600 > aria-valuemax=500 и чек «на 600 гостей». */
-  const guestsClamped = Math.min(GUESTS_MAX, Math.max(guests, current.minGuests));
+     aria-valuenow=600 > aria-valuemax=500 и чек «на 600 гостей».
+     Fix5 V4: кламп применяется к локальному зеркалу (URL пишется дебаунсом). */
+  const guestsClamped = Math.min(GUESTS_MAX, Math.max(guestsLocal, effMin));
 
   const minToday = useMemo(() => todayIso(), []);
 
@@ -1646,18 +1911,50 @@ export function HaccBooking() {
   const dateValid = dateInvalid ? "" : date;
   const humanDate = useMemo(() => formatHumanDate(dateValid), [dateValid]);
 
-  /* КОНТРАКТ 3: addons = [] — секцию «Дополнительно» юзер просил убрать. */
+  /* КОНТРАКТ 3: addons = [] — секцию «Дополнительно» юзер просил убрать.
+     Fix5 V6: у undecided расчёта НЕТ (result = null) — цены нигде не рендерятся. */
   const result = useMemo(
-    () => calcTotal(typeId, guests, [], dateValid),
-    [typeId, guests, dateValid],
+    () => (isUndecided ? null : calcTotal(typeId, guestsClamped, [], dateValid)),
+    [isUndecided, typeId, guestsClamped, dateValid],
   );
 
-  /* Кламп гостей к диапазону формата (Cycle 38 + Q1 task 9-fix2: и сверху).
-     setGuests пишет в nuqs → URL нормализуется автоматически. */
+  /* Fix5 V4: itemized-строки чека печатаются от ДЕБАУНС-значения гостей
+     (160 мс после остановки драга) — PrintLine не ремоунтится каждый кадр.
+     Живой итог (MotionTotal) и мини-сумма считаются от МГНОВЕННОГО значения. */
+  const receiptGuests = useDebouncedValue(guestsClamped, 160);
+  const receiptResult = useMemo(
+    () => (isUndecided ? null : calcTotal(typeId, receiptGuests, [], dateValid)),
+    [isUndecided, typeId, receiptGuests, dateValid],
+  );
+
+  /* Fix5 V4 (перф): три эффекта вместо старого кламп-эффекта с записью в URL.
+     (1) внешний URL (presetCalculator / menu-select / share-ссылка) → зеркало;
+     (2) кламп зеркала в [effMin, 500];
+     (3) debounced-коммит зеркала в URL (nuqs) — не чаще раза в 500 мс.
+     Известный компромисс (critic F6, принят): внешний пресет ВО ВРЕМЯ драга
+     перекрывается следующим кадром драга (sync-эффект, потом rAF драга) —
+     редкий, самозаживляющий случай; в обратную сторону (драг во время
+     пресета) драг честно побеждает — юзер источник истины. */
   useEffect(() => {
-    if (guests > GUESTS_MAX) setGuests(GUESTS_MAX);
-    else if (guests < current.minGuests) setGuests(current.minGuests);
-  }, [current.minGuests, guests, setGuests]);
+    if (guestsParam !== guestsSyncRef.current) {
+      guestsSyncRef.current = guestsParam;
+      setGuestsLocal(guestsParam);
+    }
+  }, [guestsParam]);
+
+  useEffect(() => {
+    if (guestsLocal > GUESTS_MAX) setGuestsLocal(GUESTS_MAX);
+    else if (guestsLocal < effMin) setGuestsLocal(effMin);
+  }, [effMin, guestsLocal]);
+
+  useEffect(() => {
+    if (guestsLocal === guestsSyncRef.current) return;
+    const t = window.setTimeout(() => {
+      guestsSyncRef.current = guestsLocal;
+      void setGuestsParam(guestsLocal);
+    }, 500);
+    return () => window.clearTimeout(t);
+  }, [guestsLocal, setGuestsParam]);
 
   /* C6 (task 9-fix2): динамическое обещание перезвона — согласовано с бейджем
      (офис ЗАКРЫТ → без «за 15 минут»). mounted-гейт: SSR/первый рендер =
@@ -1682,13 +1979,14 @@ export function HaccBooking() {
       const g = typeof detail === "object" && detail ? detail.guests : undefined;
       if (typeof id === "string" && MENU_TYPES.some((m) => m.id === id)) setTypeId(id);
       if (typeof g === "number" && Number.isFinite(g) && g >= 1) {
-        // Q1 (task 9-fix2): кламп сверху и на входе извне.
-        setGuests(Math.min(GUESTS_MAX, g));
+        // Q1 (task 9-fix2): кламп сверху; Fix5 V4 — пишем в зеркало,
+        // URL догонит debounced-коммитом (не гнать nuqs на каждый кадр).
+        setGuestsLocal(Math.min(GUESTS_MAX, g));
       }
     };
     window.addEventListener("catering:menu-select", handler);
     return () => window.removeEventListener("catering:menu-select", handler);
-  }, [setTypeId, setGuests]);
+  }, [setTypeId]);
 
   /* Sticky-bar виден только у секции (один IO, без scroll-listener'ов). */
   useEffect(() => {
@@ -1705,12 +2003,13 @@ export function HaccBooking() {
     return () => io.disconnect();
   }, []);
 
-  /* D3 (task 7-fix1): ОДИН IO на три зоны (типы / CTA чека / контакты),
-     rootMargin съедает низ вьюпорта на высоту бара с запасом (~140px).
-     §32 (урок C60): entries приходят только по ИЗМЕНИВШИМСЯ таргетам —
-     держим per-target state в Map и агрегируем по всем. threshold 0.05 —
-     гистерезис: зона должна сдвинуться на ≥5% своей высоты, чтобы
-     состояние перещёлкнулось (без мигания на границе). */
+  /* D3 (task 7-fix1): ОДИН IO на три зоны (типы / CTA чека / контакты).
+     Fix5 (critic MAJOR-2, cycle 65): раньше rootMargin «-140px снизу» давал
+     ОБРАТНУЮ семантику — бар прятался, когда зона была ГДЕ УГОДНО выше
+     нижней полосы (виден в 1 из 9 позиций), и мигал над заголовком контактов
+     при входе зоны. Теперь root — сама НИЖНЯЯ ПОЛОСА (~17% вьюпорта через
+     процентный rootMargin — переживает resize без пересчёта в px): бар виден
+     ВСЮду, кроме момента, когда интерактив реально входит в полосу под баром. */
   useEffect(() => {
     const els = [typesZoneRef.current, ctaZoneRef.current, contactsZoneRef.current].filter(
       (el): el is NonNullable<(typeof els)[number]> => !!el,
@@ -1722,7 +2021,7 @@ export function HaccBooking() {
         for (const e of entries) state.set(e.target as HTMLElement, e.isIntersecting);
         setZonesUnder([...state.values()].some(Boolean));
       },
-      { rootMargin: "0px 0px -140px 0px", threshold: 0.05 },
+      { rootMargin: "-83% 0px 0px 0px", threshold: 0 },
     );
     for (const el of els) io.observe(el);
     return () => io.disconnect();
@@ -1768,40 +2067,50 @@ export function HaccBooking() {
     };
   }, [scrollToZone]);
 
-  /** Хендофф: чек сжимается, форма раскрывается, фокус — в первое поле. */
-  const openForm = useCallback(
-    (andScroll: boolean) => {
-      setStage((s) => {
-        if (s !== "calc") return s;
-        return "form";
-      });
-      if (andScroll) scrollToZone();
-      const delay = settled ? 480 : 0;
-      window.setTimeout(() => {
-        document.getElementById("hb-name")?.focus({ preventScroll: true });
-      }, delay);
-    },
-    [scrollToZone, settled],
-  );
+  /** Хендофф: чек сжимается, форма раскрывается, фокус — в первое поле.
+      Fix5 V7: CTA ВСЕГДА ведёт к форме (владелец: «не перекидывает на форму,
+      на мобиле можно не заметить, что форма появилась сверху») — трёхтактный
+      скролл (0/300/700мс переживает grid-раскрытие 0.5s + lenis-сеттл) и
+      однократная подсветка зоны (hb-zone-flash в CSS по data-open). */
+  const openForm = useCallback(() => {
+    setStage((s) => {
+      if (s !== "calc") return s;
+      return "form";
+    });
+    scrollToZone();
+    window.setTimeout(scrollToZone, 300);
+    window.setTimeout(scrollToZone, 700);
+    const delay = settled ? 780 : 0;
+    window.setTimeout(() => {
+      document.getElementById("hb-name")?.focus({ preventScroll: true });
+    }, delay);
+  }, [scrollToZone, settled]);
 
-  /** КОНТРАКТ 7 (диспетчер): catering:calc-lead при УСПЕШНОМ сабмите. */
+  /** КОНТРАКТ 7 (диспетчер): catering:calc-lead при УСПЕШНОМ сабмите.
+      Fix5 V4 (перф) + React Compiler: колбек ПОЛНОСТЬЮ стабильный — снимок
+      расчёта строит сама форма из СВОИХ пропсов (LeadForm onSuccess-вызов;
+      пропсы формы — дебаунс-значения, на момент сабмита устоявшиеся).
+      Никаких ref-читов внутри замыкания — компилятор сохраняет memo. */
   const handleSuccess = useCallback(
-    (id: string | number | undefined) => {
+    (
+      id: string | number | undefined,
+      detail: { typeId: string; guests: number; dateIso: string; total: number },
+    ) => {
       setLeadId(id);
       setStage("success");
       window.dispatchEvent(
         new CustomEvent("catering:calc-lead", {
           detail: {
-            typeId,
-            guests: guestsClamped,
-            date: dateValid,
-            total: result.total,
+            typeId: detail.typeId,
+            guests: detail.guests,
+            date: detail.dateIso,
+            total: detail.total,
             addons: [] as string[],
           },
         }),
       );
     },
-    [typeId, guestsClamped, dateValid, result.total],
+    [],
   );
 
   const resetToCalc = useCallback(() => setStage("calc"), []);
@@ -1810,16 +2119,24 @@ export function HaccBooking() {
   const handleTypeSelect = useCallback((id: string) => setTypeId(id), [setTypeId]);
 
   /* aria-live итога — троттлинг 700 мс (SPEC §2.11), обновляется только
-     «на восстановление» после остановки изменений, не на каждый кадр. */
+     «на восстановление» после остановки изменений, не на каждый кадр.
+     Fix5 V6: у undecided — голосовая сводка без цены. */
   const [srTotal, setSrTotal] = useState("");
   useEffect(() => {
     const t = setTimeout(() => {
       setSrTotal(
-        `Итого примерно ${formatRUB(result.total)} за ${guestsClamped} ${guestsLabel(guestsClamped)}`,
+        isUndecided
+          ? `Заявка без расчёта — формат обсудим по звонку, ${guestsClamped} ${guestsLabel(guestsClamped)}`
+          : `Итого примерно ${formatRUB(result!.total)} за ${guestsClamped} ${guestsLabel(guestsClamped)}`,
       );
     }, 700);
     return () => clearTimeout(t);
-  }, [result.total, guestsClamped]);
+  }, [isUndecided, result, guestsClamped]);
+
+  /** Fix5 V6: мета квитанции успеха — одна строка (у undecided — без цены). */
+  const successMeta = isUndecided
+    ? `Формат обсудим · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""}`
+    : `${current.label} · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""} · ~${formatRUB(result!.total)}`;
 
   /* D3 (task 7-fix1): бар показан ТОЛЬКО между блоками — у секции,
      при закрытой форме и когда нижняя полоса вьюпорта свободна от зон
@@ -1836,18 +2153,18 @@ export function HaccBooking() {
       className="hbooking ea-section ea-section--cream section-light relative"
     >
       <div className="ea-container ea-container--wide">
-        {/* ── Шапка секции — канон соседних блоков (hacc-menu/cep-process):
-               TiltedAccent (Marck Script −6°) + ea-eyebrow + ea-section-h2 ── */}
+        {/* ── Шапка секции. Fix5 V8: дубль «смета-чек»/«Расчёт и заявка»
+               устранён — остаётся ТОЛЬКО наклонный TiltedAccent; вторая строка
+               H2 — с новой строки (блок-строка .hb-h2-line). ── */}
         <div className="hb-head">
           <TiltedAccent text="смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
-          <span className="ea-eyebrow">Расчёт и заявка</span>
           <h2 id="hbooking-heading" className="ea-section-h2">
             {"Соберите банкет. "}
-            <i className="ea-italic-fragment">Чек напечатается сразу.</i>
+            <i className="ea-italic-fragment hb-h2-line">Чек напечатается сразу.</i>
           </h2>
           <p className="hb-lede">
-            Выберите формат и гостей — справа печатается предварительная смета.
-            Оставьте заявку, и мы перезвоним за 15 минут в рабочее время.
+            Выберите формат и гостей — смета-чек напечатается рядом.
+            Ещё выбираете формат? Оставьте заявку — подберём и посчитаем вместе.
           </p>
         </div>
 
@@ -1860,10 +2177,19 @@ export function HaccBooking() {
                 D5: сетка — memo-компонент TypeGrid. */}
             <fieldset className="hb-block" ref={typesZoneRef} data-hb-hide="types">
               <legend className="hb-label-caps">Тип события</legend>
-              <TypeGrid typeId={current.id} onSelect={handleTypeSelect} settled={settled} />
+              {/* Fix5 V6: typeId передаём как есть — карточка «Ещё решаю»
+                  тоже подсвечивается; неизвестный id из URL по-прежнему
+                  фолбэчится на первый формат (current). */}
+              <TypeGrid
+                typeId={typeId === UNDECIDED_ID ? UNDECIDED_ID : current.id}
+                onSelect={handleTypeSelect}
+                settled={settled}
+              />
             </fieldset>
 
-            {/* 2 · Гости — odometer + слайдер */}
+            {/* 2 · Гости — odometer + слайдер. Fix5 V1/V2/V4: нелинейная шкала
+                (10–50 = 62% трека), шаг 1, ввод числа с клавиатуры, ±1,
+                заливка scaleX (compositor), URL — дебаунсом. */}
             <div className="hb-block">
               <span className="hb-label-caps">Гости</span>
               <div className="hb-guests">
@@ -1875,75 +2201,111 @@ export function HaccBooking() {
 
               <div className="hb-slider">
                 {/* Заливка трека + тики. X3 (task 13-fix4): тики — НАСТОЯЩИЕ
-                    пресет-кнопки (раньше span в aria-hidden-рейле — клик не
-                    работал): aria-label «Установить N гостей», кламп при клике,
-                    Enter/Tab нативно. aria-hidden перенесён на декоративную
-                    заливку (фокусабельные кнопки внутри aria-hidden = нарушение). */}
+                    пресет-кнопки; Fix5 V1: позиции — по НЕЛИНЕЙНОЙ карте
+                    sliderPos(). Заливка — scaleX от springs (transform-only,
+                    без layout — правка тормозов V4). */}
                 <div className="hb-slider__rail">
                   <motion.span
                     className="hb-slider__fill"
                     aria-hidden="true"
+                    style={{ width: "100%", transformOrigin: "left center" }}
                     initial={false}
-                    animate={{
-                      width: `${((guestsClamped - current.minGuests) / (GUESTS_MAX - current.minGuests)) * 100}%`,
-                    }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    animate={{ scaleX: sliderPos(guestsClamped, effMin) }}
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
                   />
-                  {[current.minGuests, ...SLIDER_TICKS.filter((t) => t > current.minGuests)].map(
-                    (tick) => (
-                      <button
-                        key={tick}
-                        type="button"
-                        className={`hb-slider__tick ${guestsClamped >= tick ? "hb-slider__tick--on" : ""}`}
-                        style={{
-                          left: `${((tick - current.minGuests) / (GUESTS_MAX - current.minGuests)) * 100}%`,
-                        }}
-                        onClick={() =>
-                          setGuests(Math.min(GUESTS_MAX, Math.max(current.minGuests, tick)))
-                        }
-                        aria-label={`Установить ${tick} ${guestsLabel(tick)}`}
-                      >
-                        {tick}
-                      </button>
-                    ),
-                  )}
+                  {[effMin, ...SLIDER_TICKS.filter((t) => t > effMin)].map((tick) => (
+                    <button
+                      key={tick}
+                      type="button"
+                      className={`hb-slider__tick ${guestsClamped >= tick ? "hb-slider__tick--on" : ""}`}
+                      style={{ left: `${sliderPos(tick, effMin) * 100}%` }}
+                      onClick={() => setGuestsLocal(Math.min(GUESTS_MAX, Math.max(effMin, tick)))}
+                      aria-label={`Установить ${tick} ${guestsLabel(tick)}`}
+                    >
+                      {tick}
+                    </button>
+                  ))}
                 </div>
+                {/* Нелинейный range: value = позиция 0..1000, гости — из карты.
+                    Стрелки клавиатуры перехвачены: ±1 гость (не микрошаг карты). */}
                 <input
                   type="range"
-                  min={current.minGuests}
-                  max={GUESTS_MAX}
-                  step={5}
-                  value={guestsClamped}
-                  onChange={(e) => setGuests(Number(e.target.value))}
+                  min={0}
+                  max={1000}
+                  step={1}
+                  value={Math.round(sliderPos(guestsClamped, effMin) * 1000)}
+                  onChange={(e) => setGuestsFrame(guestsFromPos(Number(e.target.value) / 1000, effMin))}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+                      e.preventDefault();
+                      setGuestsLocal((g) => Math.min(GUESTS_MAX, Math.max(effMin, g) + 1));
+                    } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+                      e.preventDefault();
+                      setGuestsLocal((g) => Math.max(effMin, g - 1));
+                    }
+                  }}
                   aria-valuenow={guestsClamped}
-                  aria-valuemin={current.minGuests}
+                  aria-valuemin={effMin}
                   aria-valuemax={GUESTS_MAX}
                   aria-valuetext={`${guestsClamped} ${guestsLabel(guestsClamped)}`}
                   aria-label="Количество гостей"
                   className="hb-slider__input"
                 />
                 <div className="hb-slider__adjust">
-                  {/* M2 (task 11-fix3): живая мини-сумма рядом со слайдером —
-                      меняется мгновенно той же useMemo-цифрой (result.total),
-                      без спринга; БЕЗ aria-live (итог чека уже анонсируется
-                      с троттлингом 700 мс — дубль спамил бы SR). */}
-                  <span className="hb-slider__total">≈ {formatRUB(result.total)}</span>
-                  <span className="hb-slider__btns">
+                  {/* M2 (task 11-fix3): живая мини-сумма рядом со слайдером;
+                      Fix5 V6: у undecided цены нет — короткое «после подбора»
+                      (длинный текст не должен выталкивать +1 за экран, V-fit). */}
+                  <span className="hb-slider__total">
+                    {isUndecided ? "после подбора" : `≈ ${formatRUB(result!.total)}`}
+                  </span>
+                  {/* Fix5 V2: ввод числа + шаг ±1 (владелец: «не по 5, а по одному
+                      и чтобы можно было напечатать количество»). Драфт-строка
+                      живёт, пока поле в фокусе; коммит — Enter/blur, кламп в
+                      [effMin, 500]; вне фокуса показывается текущее значение. */}
+                  <span className="hb-slider__edit">
                     <button
                       type="button"
-                      onClick={() => setGuests((g) => Math.max(current.minGuests, g - 5))}
+                      onClick={() => setGuestsLocal((g) => Math.max(effMin, Math.min(GUESTS_MAX, g) - 1))}
                       className="hb-step-btn"
-                      aria-label="Меньше на пять гостей"
+                      aria-label="Меньше на одного гостя"
                     >
-                      <Minus className="size-4" aria-hidden="true" /> −5
+                      <Minus className="size-4" aria-hidden="true" /> 1
                     </button>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      className="hb-guests-input"
+                      value={guestsDraft ?? String(guestsClamped)}
+                      onFocus={() => setGuestsDraft(String(guestsClamped))}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, "").slice(0, 3);
+                        setGuestsDraft(digits);
+                      }}
+                      onBlur={() => {
+                        if (guestsDraft != null && guestsDraft !== "") {
+                          const n = Number(guestsDraft);
+                          if (Number.isFinite(n) && n > 0) {
+                            setGuestsLocal(Math.min(GUESTS_MAX, Math.max(effMin, n)));
+                          }
+                        }
+                        setGuestsDraft(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          (e.target as HTMLInputElement).blur();
+                        }
+                      }}
+                      aria-label="Количество гостей — введите число"
+                    />
                     <button
                       type="button"
-                      onClick={() => setGuests((g) => Math.min(GUESTS_MAX, g + 5))}
+                      onClick={() => setGuestsLocal((g) => Math.min(GUESTS_MAX, Math.max(effMin, g) + 1))}
                       className="hb-step-btn"
-                      aria-label="Больше на пять гостей"
+                      aria-label="Больше на одного гостя"
                     >
-                      +5 <Plus className="size-4" aria-hidden="true" />
+                      1 <Plus className="size-4" aria-hidden="true" />
                     </button>
                   </span>
                 </div>
@@ -1951,12 +2313,22 @@ export function HaccBooking() {
 
               {/* C3 (task 9-fix2): ПОСТОЯННАЯ плашка у минимума — раньше сообщение
                   жило <120 мс (кламп-эффект гасил условие в том же кадре). Теперь
-                  живёт, ПОКА гость стоит на минимуме формата; спокойный тон. */}
-              {guestsClamped === current.minGuests && (
-                <p className="hb-minnote" role="status">
-                  Минимум для «{current.label}» — {current.minGuests} {guestsLabel(current.minGuests)}:{" "}
-                  посчитаем от него
-                </p>
+                  живёт, ПОКА гость стоит на минимуме; Fix5 V6: у undecided — свой
+                  текст (минимум формата неприменим). */}
+              {isUndecided ? (
+                guestsClamped === GUESTS_ABS_MIN && (
+                  <p className="hb-minnote" role="status">
+                    Формат ещё не выбран — считаем от 10 {guestsLabel(GUESTS_ABS_MIN)}; вилку цен
+                    покажем по звонку
+                  </p>
+                )
+              ) : (
+                guestsClamped === current.minGuests && (
+                  <p className="hb-minnote" role="status">
+                    Минимум для «{current.label}» — {current.minGuests} {guestsLabel(current.minGuests)}:{" "}
+                    посчитаем от него
+                  </p>
+                )
               )}
             </div>
 
@@ -1985,7 +2357,7 @@ export function HaccBooking() {
                   Дата уже прошла — выберите будущую
                 </p>
               )}
-              {date && result.season > 1 && (
+              {date && !isUndecided && result!.season > 1 && (
                 <p className="hb-minwarn mt-2">
                   <CalendarDays className="size-3.5" aria-hidden="true" />
                   {SEASON_CANON}
@@ -2002,20 +2374,22 @@ export function HaccBooking() {
                   {stage === "success" ? (
                     <SuccessPanel
                       leadId={leadId}
-                      menuType={current}
-                      guests={guestsClamped}
-                      total={result.total}
-                      dateHuman={humanDate}
+                      metaLine={successMeta}
                       promiseLine={scriptPromise}
                       onReset={resetToCalc}
                       settled={settled}
                     />
                   ) : (
                     <LeadForm
-                      typeId={current.id}
-                      guests={guestsClamped}
+                      typeId={typeId === UNDECIDED_ID ? UNDECIDED_ID : current.id}
+                      /* Fix5 V4 (перф): форме отдаём ДЕБАУНС-значения — иначе
+                         memo формы ломалось на каждом кадре драга слайдера
+                         (гости в сводке settlement'ся через 160 мс — не видно). */
+                      guests={receiptGuests}
                       dateHuman={humanDate}
-                      total={result.total}
+                      dateIso={dateValid}
+                      total={receiptResult?.total ?? 0}
+                      undecided={isUndecided}
                       toastPromise={toastPromise}
                       onSuccess={handleSuccess}
                     />
@@ -2041,6 +2415,29 @@ export function HaccBooking() {
               variants={HB_PANEL_VARIANTS}
               transition={{ duration: 0.7, ease: EASE }}
             >
+              {/* Fix5 V11: вращающаяся круговая печать на панели — wow-акцент,
+                  работает и на мобиле. Техника «char-ring»: 37 абсолютных <i>
+                  с rotate(i·step) вокруг центра — рендерится одинаково во всех
+                  браузерах (SVG textPath+textLength в Chrome плывёт). CSS-rotate
+                  18s, reduced-motion отключает вращение. */}
+              <span className="hb-spin" aria-hidden="true">
+                <span className="hb-spin__ring">
+                  {HB_SPIN_TEXT.split("").map((ch, i) => (
+                    <i
+                      key={i}
+                      style={{
+                        transform: `translate(-50%, -50%) rotate(${(i * 360) / HB_SPIN_TEXT.length}deg) translateY(calc(-1 * var(--hb-spin-r)))`,
+                      }}
+                    >
+                      {ch}
+                    </i>
+                  ))}
+                </span>
+                <span className="hb-spin__core">
+                  <ReceiptText className="size-5" />
+                </span>
+              </span>
+
               <p className="hb-panel__caps">
                 {/* X1 (task 13-fix4): после успеха шапка панели гасится —
                     «ЗАЯВКА ПРИНЯТА · № id». Штамп остаётся ОДИН — на квитанции
@@ -2060,66 +2457,102 @@ export function HaccBooking() {
                   квитанции успеха), поэтому и «удар штампа»-шейк снят —
                   бумагу трясло под печать, которой здесь больше нет. */}
               <motion.div className="hb-paper" variants={HB_PAPER_VARIANTS} data-stage={stage}>
-                {/* Шапка чека */}
+                {/* Шапка чека (Fix5 V6: у undecided — без формата) */}
                 <div className="hb-paper__head">
                   <span className="hb-paper__brand">Смета-чек</span>
                   <span className="hb-paper__type">
-                    {current.label} · {guestsClamped} {guestsLabel(guestsClamped)}
+                    {isUndecided
+                      ? `Формат обсудим · ${guestsClamped} ${guestsLabel(guestsClamped)}`
+                      : `${current.label} · ${guestsClamped} ${guestsLabel(guestsClamped)}`}
                   </span>
                 </div>
 
                 <span className="hb-perfo" aria-hidden="true" />
 
                 {/* Itemized-строки — схлопываются в компакт (grid-rows).
-                    D5: содержимое — memo-компонент ReceiptLines. */}
+                    D5: содержимое — memo-компонент ReceiptLines (от ДЕБАУНС-
+                    значения гостей — Fix5 V4); Fix5 V6: у undecided — свой
+                    набор строк без цен. */}
                 <div className="hb-lines" aria-hidden={stage !== "calc"}>
                   <div className="hb-lines__clip">
-                    <ReceiptLines
-                      type={current}
-                      guests={guestsClamped}
-                      perGuest={result.perGuest}
-                      subtotal={result.subtotal}
-                      season={result.season}
-                      settled={settled}
-                      active={paperInView}
-                    />
+                    {isUndecided ? (
+                      <UndecidedLines
+                        guests={guestsClamped}
+                        settled={settled}
+                        active={paperInView}
+                      />
+                    ) : (
+                      <ReceiptLines
+                        type={current}
+                        guests={receiptGuests}
+                        perGuest={receiptResult!.perGuest}
+                        subtotal={receiptResult!.subtotal}
+                        season={receiptResult!.season}
+                        settled={settled}
+                        active={paperInView}
+                      />
+                    )}
                   </div>
                 </div>
 
                 <span className="hb-perfo" aria-hidden="true" />
 
-                {/* Итог — всегда видим (и в компакте) */}
+                {/* Итог — всегда видим (и в компакте); Fix5 V6: у undecided —
+                    честное «после подбора» вместо числа. */}
                 <div className="hb-total">
-                  <span className="hb-total__label">Итого</span>
+                  <span className="hb-total__label">{isUndecided ? "Смета" : "Итого"}</span>
                   <span className="hb-total__value">
-                    <MotionTotal value={result.total} className="hb-total__num" />
-                    <TotalDelta total={result.total} animate={settled} />
+                    {isUndecided ? (
+                      <span className="hb-total__later">после подбора</span>
+                    ) : (
+                      <>
+                        <MotionTotal value={result!.total} className="hb-total__num" />
+                        {/* Fix5 V4 (перф): дельта вспыхивает от ДЕБАУНС-итога —
+                            один раз после остановки, а не на каждом шаге драга. */}
+                        <TotalDelta total={receiptResult!.total} animate={settled} />
+                      </>
+                    )}
                   </span>
                 </div>
-                <p className="hb-total__per">
-                  {/* C7 (task 9-fix2): без сезона — точная базовая цена из данных;
-                      с сезоном — «≈» + честный множитель. «₽/чел» без пробелов. */}
-                  {result.season > 1
-                    ? `≈${formatRUB(Math.round(result.perGuest * result.season))}/чел · высокий сезон ×1,15 · ${guestsClamped} ${guestsLabel(guestsClamped)}`
-                    : `${formatRUB(result.perGuest)}/чел · ${guestsClamped} ${guestsLabel(guestsClamped)}`}
-                </p>
+                {isUndecided ? (
+                  <p className="hb-total__per">
+                    Формат ещё не выбран — цена появится после короткого разговора
+                  </p>
+                ) : (
+                  <p className="hb-total__per">
+                    {/* C7 (task 9-fix2): без сезона — точная базовая цена из данных;
+                        с сезоном — «≈» + честный множитель. «₽/чел» без пробелов. */}
+                    {result!.season > 1
+                      ? `≈${formatRUB(Math.round(result!.perGuest * result!.season))}/чел · высокий сезон ×1,15 · ${guestsClamped} ${guestsLabel(guestsClamped)}`
+                      : `${formatRUB(result!.perGuest)}/чел · ${guestsClamped} ${guestsLabel(guestsClamped)}`}
+                  </p>
+                )}
 
                 {/* Подвал чека — честность минимума + сезон + дата (схлопывается) */}
                 <div className="hb-lines" aria-hidden={stage !== "calc"}>
                   <div className="hb-lines__clip">
                     <span className="hb-perfo" aria-hidden="true" />
-                    <p className="hb-note">
-                      Меньше {current.minGuests} {guestsLabel(current.minGuests)}? Посчитаем
-                      индивидуально — позвоните или оставьте заявку.
-                    </p>
-                    {/* C1 (task 9-fix2): ПОСТОЯННАЯ сноска сезона — видна ДО ввода
-                        необязательной даты (ожидания больше не занижаются на −15%).
-                        Когда сезон уже в расчёте строкой выше — не дублируем. */}
-                    {result.season <= 1 && (
-                      <p className="hb-note hb-note--season">
-                        {SEASON_CANON}
-                        {!date ? ". Выберите дату, чтобы увидеть её в расчёте." : ""}
+                    {isUndecided ? (
+                      <p className="hb-note">
+                        Ещё выбираете формат? Оставьте заявку — перезвоним, зададим пару
+                        вопросов и соберём предложение под вашу задачу.
                       </p>
+                    ) : (
+                      <>
+                        <p className="hb-note">
+                          Меньше {current.minGuests} {guestsLabel(current.minGuests)}? Посчитаем
+                          индивидуально — позвоните или оставьте заявку.
+                        </p>
+                        {/* C1 (task 9-fix2): ПОСТОЯННАЯ сноска сезона — видна ДО ввода
+                            необязательной даты (ожидания больше не занижаются на −15%).
+                            Когда сезон уже в расчёте строкой выше — не дублируем. */}
+                        {result!.season <= 1 && (
+                          <p className="hb-note hb-note--season">
+                            {SEASON_CANON}
+                            {!date ? ". Выберите дату, чтобы увидеть её в расчёте." : ""}
+                          </p>
+                        )}
+                      </>
                     )}
                     {/* C2 (task 9-fix2): дата — по-человечески; прошедшая (невалидная)
                         в чек не попадает — она объясняется подсказкой у поля. */}
@@ -2181,7 +2614,7 @@ export function HaccBooking() {
                       <Magnetic strength={0.25} className="mt-5 block">
                         <button
                           type="button"
-                          onClick={() => openForm(false)}
+                          onClick={openForm}
                           data-cursor="inquiry"
                           className="hb-btn hb-btn--paper min-h-[52px] w-full justify-center"
                         >
@@ -2230,10 +2663,10 @@ export function HaccBooking() {
           скрыт при открытой форме/успехе/вне секции/над зонами интерактива. */}
       {mounted && (
         <StickyBar
-          total={result.total}
+          total={result?.total ?? null}
           guests={guestsClamped}
           visible={barVisible}
-          onCta={() => openForm(true)}
+          onCta={openForm}
         />
       )}
     </section>

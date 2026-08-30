@@ -230,10 +230,13 @@ const jsonLd = {
     addressCountry: "RU",
     addressRegion: "Санкт-Петербург",
     addressLocality: "Санкт-Петербург",
-    postalCode: "191186",
-    streetAddress: "ул. Большая Морская, д. 18, офис 33",
+    // Cycle 65: публичный адрес офиса обновлён (Полевая-Сабировская, 45к1);
+    // индекс 191186 относился к Б. Морской — убран, чтобы не врать в разметке
+    // (не выдумываем новый до подтверждения владельцем). Координаты — из
+    // короткой ссылки владельца https://yandex.ru/maps/-/CTHo6Xkp.
+    streetAddress: "ул. Полевая-Сабировская, 45к1",
   },
-  geo: { "@type": "GeoCoordinates", latitude: 59.934862, longitude: 30.316218 },
+  geo: { "@type": "GeoCoordinates", latitude: 59.994868, longitude: 30.275093 },
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",

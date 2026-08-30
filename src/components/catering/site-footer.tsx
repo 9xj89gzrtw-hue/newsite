@@ -321,7 +321,10 @@ export function SiteFooter() {
             <address className="not-italic text-sm leading-relaxed text-cream/80">
               {LEGAL_INFO.legalName}
               <br />
-              {LEGAL_INFO.legalAddress}
+              {/* Cycle 65: витринный адрес офиса (владелец: контакты теперь
+                  Полевая-Сабировская 45к1). Полный юридический — в /privacy,
+                  /terms, /offer (LEGAL_INFO.legalAddress). */}
+              {CONTACTS.address}
             </address>
 
             <div className="flex flex-col gap-2 text-sm">

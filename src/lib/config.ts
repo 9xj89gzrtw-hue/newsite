@@ -67,6 +67,11 @@ export const CONTACTS = {
   vkHref: "https://vk.com/nilovcatering",
   city: "Санкт-Петербург",
   email: "interfood-catering@yandex.ru",
+  // Cycle 65: публичный адрес офиса (владелец: «в контактах адрес другой —
+  // Полевая-Сабировская 45к1»). ЮРИДИЧЕСКИЙ адрес для документов — LEGAL_INFO
+  // (не трогать): здесь — только витринный адрес для людей.
+  address: "ул. Полевая-Сабировская, 45к1, Санкт-Петербург",
+  addressHref: "https://yandex.ru/maps/-/CTHo6Xkp",
 };
 
 /**
