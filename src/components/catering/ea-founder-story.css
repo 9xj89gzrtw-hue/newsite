@@ -1,0 +1,491 @@
+/* ============================================================================
+   ea-founder-story — Cycle 66 redesign «Хроника одних рук»
+   Тёмная editorial-секция основателя: тёплый ink-фон #161312 (первая тёмная
+   секция в нише about — глубже и теплее философского #000, рифмуется с
+   espresso тёмных секций), cream-текст, дуэт-фото sticky-слева, гигантское
+   outlined «НИЛОВ» (Playfair, кириллица ✓) на scrub-дрейфе, 3 главы-хроники,
+   count-up строка, подпись Marck Script с «чернильным» clip-reveal.
+
+   Контраст (замер, на --efs-bg #161312, L≈0.0095):
+     --ea-cream #F7F5F5  ≈ 15.9:1 ✓ AAA
+     cream-86            ≈ 13:1   ✓ body
+     --efs-muted (62%)   ≈ 6.3:1  ✓ мелкий caps
+     --efs-red-text #FF6B77 ≈ 6.4:1 ✓ мелкий красный (--ea-red #E71D3A даёт
+       лишь 3.9:1 — оставлен только для КРУПНОГО: h2 i, подпись — AA-large)
+   Self-contained scope: `.efs__*` + три scoped-оверрайда общих .ea-* классов.
+   globals.css НЕ трогает. Вся декоративная геометрия — rem/% (§35).
+   ============================================================================ */
+
+.efs {
+  --efs-bg: #161312;
+  --efs-cream: var(--ea-cream);
+  --efs-cream-86: color-mix(in oklab, var(--ea-cream) 86%, transparent);
+  --efs-muted: color-mix(in oklab, var(--ea-cream) 62%, transparent);
+  --efs-rule: color-mix(in oklab, var(--ea-cream) 18%, transparent);
+  /* Осветлённый красный для мелкого текста на ink (≥4.5:1). */
+  --efs-red-text: #ff6b77;
+
+  position: relative;
+  /* `clip`, НЕ `hidden` — hidden создаёт scroll-container и убивает
+     position: sticky у потомков (грабля §2). */
+  overflow-x: clip;
+  background: var(--efs-bg);
+  color: var(--efs-cream);
+  padding-block: clamp(5rem, 10vw, 9rem);
+}
+
+/* — — — — — Фоновые слои: bloom → слово → контент(z10) → зерно(z30) — — — — — */
+
+/* Мягкий тёплый radial-bloom: красный у портрета, свечной — у сцены.
+   Статичный (бесконечных анимаций нет — контракт цикла 66). */
+.efs__bloom {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 42% at 14% 10%, rgba(231, 29, 58, 0.09) 0%, transparent 58%),
+    radial-gradient(ellipse 60% 48% at 88% 86%, rgba(255, 213, 178, 0.05) 0%, transparent 62%);
+  background-repeat: no-repeat;
+}
+
+/* Гигантское outlined «НИЛОВ» — signature-typography (research §2.7).
+   Playfair Display (cyrillic ✓), stroke cream 15%, fill transparent.
+   Низ секции на всю ширину; scrub-дрейф по X (±40px) через MotionValue. */
+.efs__word {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2.5rem;
+  z-index: 1;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(4.25rem, 19vw, 17rem);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--ea-cream) 15%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Фоллбек для движков без -webkit-text-stroke: тусклая заливка вместо обводки. */
+@supports not (-webkit-text-stroke: 1px #ffffff) {
+  .efs__word {
+    color: color-mix(in oklab, var(--ea-cream) 6%, transparent);
+  }
+}
+
+/* CSS-only зерно: SVG feTurbulence data-URI, поверх всего (кинематографическая
+   плёнка), opacity 0.04 — без JS, без анимации. */
+.efs__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='efs-grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23efs-grain)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+/* — — — — — Сетка: 46/54, левая колонка sticky на ≥1024 — — — — — */
+
+.efs__container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+}
+
+.efs__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3.5rem 0;
+  align-items: start; /* критично: sticky-элемент не должен растягиваться */
+}
+
+/* Ожидаемый ход sticky (contract, замер оркестратора cycle 66): travel =
+   bodyH − mediaH ≥ 600px на 1440 — пин живёт до ~0.45 высоты секции,
+   на 0.5 уже отпущен (top < 0). Растёт ТОЛЬКО воздухом между главами
+   (.efs__chapters gap) — НЕ текстом и НЕ новыми элементами. */
+.efs__grid > * {
+  min-width: 0; /* §33: страховка min-width:auto рядом с overflow-clip */
+}
+
+.efs__media {
+  position: relative; /* якорь для absolute карточки-сцены */
+  /* Резерв под внахлёст карточки-сцены — только на мобиле, где под медиа
+     сразу идёт текстовая колонка. На desktop лишний паддинг съедал бы
+     ход sticky (mediaHeight↑ ⇒ travel↓), а вылет карточки поглощает
+     нижний padding секции. */
+}
+
+@media (max-width: 1023px) {
+  .efs__media {
+    padding-bottom: 3rem;
+  }
+
+  /* На мобиле пина нет — большой desktop-гэп глав не нужен. */
+  .efs__chapters {
+    gap: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .efs__grid {
+    grid-template-columns: 46fr 54fr;
+    gap: clamp(3rem, 5.5vw, 6rem);
+  }
+
+  /* Sticky под фиксированной шапкой (~84px): top 110px (6.875rem, §35 rem). */
+  .efs__media {
+    position: sticky;
+    top: 6.875rem;
+  }
+}
+
+/* Планшет (правка волны-1): портрет во всю колонку съедал весь первый
+   экран секции (замер: mediaH 990px = 96.7vh на 768×1024). Сжимаем медиа —
+   карточка-сцена (в % от media) сжимается вместе, текст виден раньше.
+   Ниже 768 и на desktop не действует (замер 390: mediaH 515px = 61vh). */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .efs__media {
+    max-width: min(78%, 30rem);
+  }
+}
+
+/* — — — — — Дуэт-фото: портрет 3/4 + карточка-сцена внахлёст — — — — — */
+
+.efs__portrait-pos {
+  position: relative;
+  z-index: 1;
+}
+
+/* ≥1280: кап 30rem (480px) — DPR2 просит ровно 960 device-px = нативная
+   ширина источника, ноль апскейла (было 42vw@1440 = 605px → ×1.26 мыло). */
+@media (min-width: 1280px) {
+  .efs__portrait-pos {
+    max-width: 30rem;
+  }
+}
+
+.efs__portrait-frame {
+  position: relative;
+  aspect-ratio: 3 / 4; /* нативные 960×1280 — ноль кропа, ноль апскейла */
+  overflow: hidden;
+  background: #0e0b0a; /* inky-подложка на время загрузки */
+  border-radius: 2px;
+  box-shadow:
+    0 40px 90px -32px rgba(0, 0, 0, 0.75),
+    0 10px 28px -12px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(247, 245, 245, 0.07);
+}
+
+/* Тональная wash-подложка снизу — фото «утоплено» в тёмную секцию
+   (канон тёмных секций: ea-careers__image-frame::after). */
+.efs__portrait-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(22, 19, 18, 0) 62%,
+    rgba(22, 19, 18, 0.32) 100%
+  );
+}
+
+/* Ховер-зум фото — CSS на <img>, внутренний reveal-зум framer живёт на
+   отдельной обёртке (.efs__portrait-zoom) — конфликта трансформов нет. */
+.efs__portrait-img {
+  object-fit: cover;
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) {
+  .efs__portrait-frame:hover .efs__portrait-img {
+    transform: scale(1.02);
+  }
+}
+
+/* Карточка-сцена: 42% ширины, внахлёст справа-снизу, белая рамка 4px
+   как фотокарточка. Вход: clip «шторка» слева→направо + rotate −10°→−5°
+   (framer, TSX; клип СЛИТ с карточкой — clip-path режет в локальных
+   координатах до transform, отдельная обёртка срезала рамку); ховер —
+   lift + выпрямление (whileHover, TSX). */
+.efs__scene-pos {
+  position: absolute;
+  right: -4%;
+  bottom: -2.5rem;
+  z-index: 2;
+  width: 42%;
+}
+
+@media (max-width: 1023px) {
+  .efs__scene-pos {
+    right: -3%;
+    bottom: -2rem;
+    width: 46%;
+  }
+}
+
+/* <768: свес внутрь — на 390 «−3%» давал срез рамки на ~8px (край экрана),
+   читалось как баг; 2% внутрь = нахлёст на портрет без среза. */
+@media (max-width: 767px) {
+  .efs__scene-pos {
+    right: 2%;
+  }
+}
+
+/* Клип-обёртка карточки: clip-path режет И box-shadow, поэтому клип живёт
+   на обёртке с полем под тень (поле ≥ spread+offset blur вниз: 18+44−18=44px
+   → 2.75rem), а rotate/hover — на карточке. Негативные margin — без сдвига
+   визуала. Шторка входа стартует на 1.5rem вне карточки — приемлемо. */
+.efs__scene-clip {
+  padding: 1.5rem 1.5rem 2.75rem;
+  margin: -1.5rem -1.5rem -2.75rem;
+}
+
+.efs__scene-card {
+  border-radius: 3px;
+}
+
+.efs__scene-frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #0e0b0a;
+  border: 4px solid #fffdfc; /* фотокарточка */
+  border-radius: 3px;
+  box-shadow:
+    0 18px 44px -18px rgba(0, 0, 0, 0.6),
+    0 6px 16px -8px rgba(0, 0, 0, 0.4);
+}
+
+.efs__scene-img {
+  object-fit: cover;
+}
+
+/* — — — — — Правая колонка: хроника — — — — — */
+
+.efs__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: 2rem;
+}
+
+/* Scoped-оверрайд: .ea-eyebrow канонично красный #E71D3A — на ink это 3.9:1;
+   для 13–15px caps поднимаем до --efs-red-text (6.4:1 ✓ AA). */
+.efs .efs__eyebrow {
+  color: var(--efs-red-text);
+}
+
+.efs__h2 {
+  margin-top: 1.25rem;
+  font-family: var(--ea-font-display);
+  font-weight: 400;
+  font-size: clamp(2.5rem, 4.6vw, 3.9rem);
+  line-height: 1.08;
+  letter-spacing: -0.018em;
+  color: var(--efs-cream);
+  text-wrap: balance;
+}
+
+/* Italic-фрагмент — канон сайта; крупный кегль → AA-large (3.9:1 ≥ 3:1). */
+.efs__h2 i {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ea-red);
+}
+
+.efs__divider {
+  margin-top: 2rem;
+}
+
+/* Три минимальные главы: caps-лейбл + 1–3 строки, много воздуха.
+   Воздух здесь РАБОЧИЙ: это ход sticky-портрета — правая колонка длиннее
+   sticky-медиа на bodyH − mediaH (канон awwwards-scrollytelling: pinned
+   visual + главы-биты с большим воздухом; текст остаётся минимальным —
+   воздух только МЕЖДУ главами, кегль/интонация глав не тронуты).
+   Было gap 3.5rem → ход sticky 270px (пин умирал на ~28% секции);
+   6rem/14vh/9rem дал 410px (умирал на ~0.32) — ход всё ещё мал против
+   цели ~700-800px, эскалация Ф3 до 7rem/16vh/11rem. */
+.efs__chapters {
+  margin-top: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(7.5rem, 17vh, 12rem);
+}
+
+.efs__chapter-label {
+  margin: 0;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--efs-red-text);
+}
+
+.efs__chapter-text {
+  margin: 0.75rem 0 0;
+  max-width: 36rem;
+  font-family: var(--ea-font-body);
+  font-size: clamp(1.0625rem, 1.15vw, 1.1875rem);
+  line-height: 1.6;
+  color: var(--efs-cream-86);
+}
+
+/* — — — — — Строка count-up статистики: inline, hairline-делители — — — — — */
+
+.efs__stats {
+  margin-top: 4.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem 1.75rem;
+}
+
+.efs__stat {
+  position: relative;
+  padding-right: 1.75rem;
+}
+
+/* Вертикальный hairline между статами (кроме первой). */
+.efs__stat + .efs__stat::before {
+  content: "";
+  position: absolute;
+  left: -0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 2.6rem;
+  background: var(--efs-rule);
+}
+
+.efs__stat-num {
+  display: block;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 2.4vw, 2.375rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--efs-cream);
+}
+
+.efs__stat-label {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: 0.75rem; /* §36: мобильный пол caps 12px */
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--efs-muted);
+}
+
+/* Узкие экраны: статы столбиком, делители — горизонтальные hairline. */
+@media (max-width: 639px) {
+  .efs__stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.1rem;
+  }
+
+  .efs__stat {
+    padding-right: 0;
+  }
+
+  .efs__stat + .efs__stat::before {
+    left: 0;
+    top: -0.55rem;
+    transform: none;
+    width: 100%;
+    height: 1px;
+  }
+}
+
+/* — — — — — Подпись «чернильным письмом» — — — — — */
+
+.efs__sign-block {
+  margin-top: 4.25rem;
+}
+
+/* Вход подписи — clip «шторка» слева→направо 900ms (framer, TSX).
+   Правка волны-1: клип-бокс расширен паддингами с компенсирующими
+   отрицательными маржинами (лэйаут не сдвигается) — иначе descent
+   чернильных росчерков Marck Script (≈9px ниже лайн-бокса, DPR-2 скан)
+   срезался плоско нижней гранью inset(0%). Обёртка НЕ имеет кегля
+   подписи (наследует ~16px) — rem-значения от 56px (0.12/0.18/0.3em):
+   6.7/10/16.8px. Начальный inset(0% 100% 0% 0%) на расширенном боксе
+   по-прежнему прячет всё. */
+.efs__sign-clip {
+  display: block;
+  padding: 0.42rem 0.75rem 1.05rem;
+  margin: -0.42rem -0.75rem -1.05rem;
+}
+
+.efs__sign {
+  display: inline-block;
+  font-family: var(--font-marck); /* Marck Script — cyrillic ✓ */
+  font-size: clamp(2.75rem, 4.5vw, 3.5rem);
+  line-height: 1.15;
+  color: var(--ea-red); /* крупный текст — AA-large 3.9:1 ✓ */
+  transform: rotate(-2deg);
+}
+
+.efs__sign-role {
+  margin: 1rem 0 0;
+  font-family: var(--ea-font-eyebrow);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--efs-muted);
+}
+
+/* — — — — — CTA «Смотреть меню» — scoped-оверрайды .ea-text-link — — — — — */
+
+/* Общий .ea-text-link окрашен --ea-ink (#1A1A1A) — на ink-фоне не читается. */
+.efs .ea-text-link {
+  color: var(--efs-cream);
+}
+
+.efs .ea-text-link:hover,
+.efs .ea-text-link:focus-visible {
+  color: var(--efs-red-text);
+}
+
+/* Глобальный .ea-text-link гасит outline — возвращаем видимый focus-ring
+   (a11y: клавиатурная навигация по тёмной секции). */
+.efs .ea-text-link:focus-visible {
+  outline: 1px solid color-mix(in oklab, var(--efs-cream) 45%, transparent);
+  outline-offset: 4px;
+}
+
+.efs__cta {
+  margin-top: 3.25rem;
+}
+
+/* — — — — — Reduced motion: всё статично (анимации уже срезаны settled-гейтом
+   в TSX; здесь глушим только CSS-переходы/ховер-зум) — — — — — */
+
+@media (prefers-reduced-motion: reduce) {
+  .efs__portrait-img,
+  .efs__scene-img,
+  .efs__scene-frame {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .efs__portrait-frame:hover .efs__portrait-img {
+    transform: none !important;
+  }
+}

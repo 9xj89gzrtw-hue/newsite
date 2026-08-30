@@ -11,7 +11,12 @@ const nextConfig: NextConfig = {
     // Cycle 49: webp first — the local sharp AVIF encoder hangs on some
     // large sources (sandbox CPU quirk; Vercel's CDN optimizer is unaffected).
     // WebP is universally supported in 2026, so this is loss-free in prod.
-    formats: ["image/webp", "image/avif"],
+    // Cycle 66: webp ONLY. Локальный sharp/libheif пишет AVIF, который
+    // Chromium декодирует в ~45% разрешения (замер: файл 960×1280 avif →
+    // img.naturalWidth 426×568 после полного decode(); портрет DPR2 мыл
+    // в 2.25×). Webp поддерживается 100% браузеров в 2026 (аргумент C49),
+    // Vercel-оптимизатор в проде отдаёт webp без потерь качества.
+    formats: ["image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "sfile.chatglm.cn" },
       { protocol: "https", hostname: "images.unsplash.com" },

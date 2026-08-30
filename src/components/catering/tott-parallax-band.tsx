@@ -226,7 +226,7 @@ export function TottParallaxBand() {
           className="tott-eyebrow mt-10 justify-center text-white/70"
           text={undefined}
         >
-          <span style={{ color: "var(--tott-olive)" }}>Interfood · с 2009 года</span>
+          <span style={{ color: "var(--tott-olive)" }}>Interfood · с 2007 года</span>
         </TottReveal>
       </div>
     </section>

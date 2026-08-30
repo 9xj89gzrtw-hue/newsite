@@ -1,85 +1,101 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ComponentProps } from "react";
 import Image from "next/image";
 import {
+  animate,
   motion,
   useInView,
-  useReducedMotion,
-  animate,
   useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
 } from "framer-motion";
-import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
+import "./ea-founder-story.css";
 
 /**
- * EaFounderStory — Cycle 28 ea-* editorial layer.
+ * EaFounderStory — Cycle 66 redesign: «Хроника одних рук».
  *
- * Founder-forward editorial About block, grafting Elegant Affairs' founder
- * + chef quote content patterns (see docs/reference-library/elegant-affairs/
- * BRAND-CONTEXT.md §3.5 About pitch + §3.9 HQ/TwoFortyThirty founder-forward
- * section) onto Interfood's existing cinematic editorial design language.
+ * Полный редизайн секции #about по концепту из research/c66/FOUNDER-RESEARCH.md
+ * (эталоны: La Table de Joakim — основатель = лицо кухни; Dishoom — founding
+ * myth «2007, одна печка, Петроградская»; Monarque — vision-подача; GEM —
+ * subtle motion; /nk.studio — юбилейная хроника с live-цифрами).
  *
- * REPLACES the existing `about.tsx` (430-line glassmorphism maximalism, audit
- * score 6/10) — orchestrator swaps them in page.tsx Step 5.
+ * ТЁМНАЯ editorial-секция (первая в нише about): тёплый ink #161312, cream
+ * текст, зернистость CSS-only (SVG feTurbulence, opacity 0.04) + статичный
+ * тёплый bloom. data-header-theme="dark".
  *
- * Design language (per docs/EA-ANALYSIS.md §3.5 + §3.9 + §4.5):
- *   - Palette: --ea-blush #F1ECEC section bg, --ea-cream #F7F5F5 stat row bg,
- *     --ea-red #E71D3A accent (eyebrow / italic fragment / arrow / dividers),
- *     --ea-ink #1A1A1A body text.
- *   - Typography: var(--font-serif) Playfair Display H2 with `<i>` italic
- *     trailing-phrase device ("Откройте нашу *историю*."), var(--font-barlow)
- *     Barlow Semi Condensed Bold uppercase eyebrow, var(--font-poppins)
- *     Montserrat body.
- *   - Layout: full-bleed blush bg, two-column 50/50 (founder photo on one
- *     side, story + italic phrase + CTA on the other), asymmetric vertical
- *     offset (text column pushed down 80px on desktop).
- *   - Italic-as-fragment trailing-phrase device on every H2.
- *   - Restraint: NO 3D tilt, NO glassmorphism, NO Lucide icons in stat
- *     cards. Just type, hairline dividers, one photo.
+ * Структура (desktop ≥1024):
+ *   ЛЕВАЯ (46%) — sticky (top 110px) дуэт-фото: портрет 3/4 (вход clip-path
+ *   снизу + inner zoom 1.12→1.0) + карточка-сцена 42% внахлёст справа-снизу
+ *   (белая рамка 4px, вход clip «шторка» слева→направо + rotate −10°→−5°,
+ *   delay 0.4s; hover — lift + выпрямление). Дифференциальный scrub-дрейф
+ *   фото по Y (±22px, противофаза) — MotionValues, ноль setState на кадр.
+ *   За контентом на всю ширину низа — гигантское outlined «НИЛОВ» (Playfair,
+ *   cyrillic ✓, stroke cream 15%) со scrub-дрейфом по X (±40px).
+ *   ПРАВАЯ (54%) — eyebrow «ОСНОВАТЕЛЬ · ШЕФ-ПОВАР», H2 «Всё начинается с
+ *   рук.» (italic-фрагмент — канон сайта), красный hairline, 3 МИНИМАЛЬНЫЕ
+ *   главы (2007 / Философия / Сегодня — все факты из прежнего копирайта,
+ *   ничего не выдумано), inline-строка count-up (19 / 2 400+ / 120 000+,
+   портирован прежний CountUp), подпись Marck Script «чернильным» clip-reveal,
+ *   CTA «Смотреть меню» (scrollToMenu: window.__lenis → lenis → native, §33).
  *
- * Content:
- *   1st para — founder name + role + brief origin.
- *   2nd para — philosophy + approach (seasonal, scratch, author's cuisine).
- *   3rd para — track record + named milestones (Ginza Project, Hilton,
- *     Sberbank — drawn from the existing CepClientMarquee RU corporate list).
+ * Мобайл (<1024): без sticky; фото → текст; сцена-карточка внахлёст; reveal-ы
+ * короче (matchMedia-гейт, post-mount).
  *
- * Animation: Motion `whileInView` + `viewport={{ once: true }}` fade-up 28px
- * → 0 over 720ms. Count-up on stats when scrolled into view. Respects
- * `prefers-reduced-motion` (animations become static, final values shown).
+ * §34/§35 hydration-дисциплина:
+ *   - mounted-гейт: SSR и ПЕРВЫЙ клиентский рендер = полностью статичная
+ *     секция (в SSR-разметке нет opacity:0 — no-JS видит весь контент).
+ *   - settled = mounted && !reduce; ветвление анимационных пропсов ТОЛЬКО
+ *     через settled, дерево не ветвится до mount (гидра-мина useReducedMotion).
+ *   - все входные анимации навешиваются key-ремонтом при флипе settled
+ *     (§35 «initial не перевооружается пост-монтом»).
+ *   - clip-path строки — одинаковая токен-структура + animate-prop паттерн
+ *     (§34, проверено на обложке-вайпе); transform/opacity/clip-path only.
+ *   - overflow-x: clip (не hidden) на секции — sticky жив (§2).
+ *   - бесконечных анимаций нет; background-attachment: fixed нет.
  *
- * Accessibility:
- *   - Section landmark with `aria-labelledby`.
- *   - Decorative quote mark `aria-hidden`.
- *   - Hairline dividers between stats marked `aria-hidden`.
- *   - WCAG AA: ea-ink (#1A1A1A) on ea-blush (#F1ECEC) ≈ 13.5:1 ✓; ea-red
- *     (#E71D3A) on ea-blush ≈ 4.7:1 — passes AA Large for the eyebrow (14px
- *     uppercase letter-spaced 0.18em counts as large per WCAG 1.4.3).
+ * Доступность: landmark + aria-labelledby; декор (слово/bloom/зерно/делители)
+ * aria-hidden; честные alt (VLM-сверка фактического содержимого кадров);
+ * контраст: cream 15.9:1, muted 6.3:1, мелкий красный #FF6B77 6.4:1,
+ * крупный --ea-red 3.9:1 (AA-large); видимый focus-ring на CTA.
  */
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/* «35 человек», «2 400+», «120 000+» — из прежнего блока (цикл 28), не
+   выдуманы; «19 лет» = 2026 − 2007 (канон владельца: работаем с 2007 года,
+   как в hacc-booking V9) — канцелярит «на рынке» снят. «35 человек» живёт
+   в тексте главы 3, четвёртая стата прежнего блока не дублируется. */
 const STATS = [
-  { value: 17, suffix: "", label: "лет на рынке" },
+  { value: 19, suffix: "", label: "лет в Петербурге" },
   { value: 2400, suffix: "+", label: "событий" },
   { value: 120000, suffix: "+", label: "гостей" },
-  { value: 35, suffix: "+", label: "команда" },
 ] as const;
 
-const STORY_PARAGRAPHS = [
-  "Дмитрий Нилов основал Interfood Catering в 2009 году в Санкт-Петербурге — с одной печки, тремя поварами и убеждением, что хороший банкет начинается не с меню, а с разговора. За семнадцать лет маленькая кухня на Петроградской стороне превратилась в команду из тридцати пяти человек (плюс привлечённый персонал на крупные проекты), обслужившую более двух тысяч четырёхсот событий — от камерных свадеб на двадцать гостей до приёмов на полторы тысячи персон в исторических особняках.",
-  "Сезонные продукты, готовка с нуля, авторская кухня. Лук для французского супа томится шесть часов. Свинина вялится в собственной печи двое суток. Свежий хлеб пахнет рано утром, когда все гости ещё спят и в залах стоит тишина. Мы не работаем с полуфабрикатами — каждое блюдо это руки, время и температура. И ещё немного удачи, но удача приходит только к тем, кто готов.",
-  "За плечами — 120 000 обслуженных гостей и партнёрства, которым мы гордимся: рестораны группы «Гинза Проект», отель «Хилтон Мойка 22», корпоративные заказы от Сбербанка, Газпрома и Яндекса. Мы возим фарфор, стекло, текстиль, официантов и при желании — открытую кухню. Ресторан там, где он вам нужен.",
+/* Тезисные главы — сжатие прежних трёх абзацев (интонация founding myth). */
+const CHAPTERS = [
+  {
+    label: "2007",
+    text: "Одна печка, три повара и кухня на Петроградской стороне. Так начинался Interfood.",
+  },
+  {
+    label: "Философия",
+    text: "Лук для супа томится шесть часов. Хлеб встаёт рано утром, когда залы ещё спят. Полуфабрикатов нет — только руки, время и температура.",
+  },
+  {
+    label: "Сегодня",
+    // \u00A0 — неразрывные пробелы в «2 400+»/«1 500»: число не рвётся
+    // переносом строки (minor-находка волны-1).
+    text: "35 человек в команде — и 2\u00A0400+ событий: от камерных свадеб на 20 гостей до приёмов на 1\u00A0500 персон в исторических особняках.",
+  },
 ] as const;
 
 /**
- * CountUp — animates a number from 0 → `to` when scrolled into view.
- * Uses Motion's `animate()` + `useMotionValue()` + `useInView()`.
- * Respects `prefers-reduced-motion` (shows final value immediately).
- * Falls back to final value after 3s if IntersectionObserver never fires.
- *
- * Mirrors the proven pattern in `about.tsx::CountUp` but skips the icon /
- * 3D-tilt chrome (EA restraint — see audit §3.5).
+ * CountUp — порт из Cycle 28 (без изменений): финальное значение рендерится
+ * сразу (SSR/no-JS/reduce безопасно), при inView once — отсчёт 0→target
+ * через Motion `animate()`. 3s-страховка, если IntersectionObserver молчит.
  */
 function CountUp({
   to,
@@ -97,7 +113,7 @@ function CountUp({
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    // Reduced-motion: show final value, no animation.
+    // Reduced-motion: финальное значение сразу, без анимации.
     if (reduce) {
       setDisplay(to.toLocaleString("ru-RU"));
       return;
@@ -113,8 +129,8 @@ function CountUp({
     return () => controls.stop();
   }, [inView, to, count, reduce]);
 
-  // Safety net: if IntersectionObserver never fires (rare, but happens on
-  // very long pages with offset anchor jumps), show the real value after 3s.
+  // Страховка: если IntersectionObserver так и не сработал (редко, но бывает
+  // на очень длинных страницах) — показываем настоящее значение через 3s.
   useEffect(() => {
     if (reduce) return;
     const timer = setTimeout(() => setDisplay(to.toLocaleString("ru-RU")), 3000);
@@ -130,234 +146,323 @@ function CountUp({
 }
 
 /**
- * Smooth-scroll to the #menu anchor (used by the "Смотреть меню" CTA).
- * Cycle 39 fix: previously targeted #manifesto which no longer exists on
- * the page — the click silently did nothing (dead button after the story).
- * Falls back to native scrollIntoView when Lenis isn't loaded.
+ * Smooth-scroll к #menu для CTA «Смотреть меню». Cycle 66: основной путь —
+ * window.__lenis (грабля §33: Lenis перебивает программные smooth-скроллы,
+ * провайдер экспортирует инстанс как __lenis), затем легаси window.lenis,
+ * финальный фоллбек — нативный scrollIntoView. (?? здесь безопасен: слева
+ * чтения свойств, не void-вызовы — §34.)
+ *
+ * Ретаргет-паттерн (замер оркестратора cycle 66): lenis.scrollTo(element)
+ * вычисляет цель ОДИН раз на момент вызова, а лэйаут ВЫШЕ #menu дрейфует
+ * во время полёта (ленивые next/image, дев-оптимизация — замер: цель уехала
+ * на +862px, анимация сошлась к устаревшей точке). Повторные вызовы scrollTo
+ * пересчитывают rect элемента в момент вызова — дрейф поглощается повторами
+ * (паттерн hacc-booking V7). В проде с кэшированными картинками дрейф мал,
+ * но anchor-jump-навигация получает тот же риск — паттерн на оба случая.
  */
 function scrollToMenu() {
   if (typeof window === "undefined") return;
   const target = document.getElementById("menu");
   if (!target) return;
-  // Lenis attaches to window.lenis when active; otherwise fall back to native.
-  const lenis = (window as unknown as { lenis?: { scrollTo: (t: Element, o?: { offset?: number; duration?: number }) => void } }).lenis;
-  if (lenis) {
-    lenis.scrollTo(target, { offset: 0, duration: 1.4 });
+  const w = window as unknown as {
+    __lenis?: { scrollTo?: (t: Element, o?: { offset?: number; duration?: number }) => void };
+    lenis?: { scrollTo: (t: Element, o?: { offset?: number; duration?: number }) => void };
+  };
+  const lenis = w.__lenis ?? w.lenis;
+  if (lenis?.scrollTo) {
+    // Ретаргет: цель пересчитывается на каждый вызов (lenis читает rect
+    // элемента в момент вызова) — лэйаут-дрейф выше #menu (ленивые фото,
+    // дев-оптимизация) поглощается повторами. Паттерн hacc-booking V7.
+    lenis.scrollTo(target, { offset: 0, duration: 1.1 });
+    window.setTimeout(() => lenis.scrollTo?.(target, { offset: 0, duration: 0.7 }), 650);
+    window.setTimeout(() => lenis.scrollTo?.(target, { offset: 0, duration: 0.5 }), 1250);
   } else {
     target.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
 
-type MotionDivProps = ComponentProps<typeof motion.div>;
-type MotionSpanProps = ComponentProps<typeof motion.span>;
-type MotionH2Props = ComponentProps<typeof motion.h2>;
-type MotionPProps = ComponentProps<typeof motion.p>;
-
 export function EaFounderStory() {
   const reduce = useReducedMotion();
 
-  // Shared Motion transition preset — fade-up 28px → 0 over 720ms. When
-  // reduced-motion is requested, returns empty props so the element renders
-  // statically (the .ea-reveal utility's reduced-motion CSS rule keeps it
-  // visible by setting opacity:1).
-  const reveal = (delay: number): Partial<MotionDivProps & MotionSpanProps & MotionH2Props & MotionPProps> =>
-    reduce
-      ? {}
-      : {
-          initial: { opacity: 0, y: 28 },
+  // §34 mounted-гейт: первый клиентский рендер обязан совпадать с SSR.
+  // settled=true — единственная дверь ко всем входным анимациям.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const settled = mounted && !reduce;
+  const on = settled ? "on" : "off"; // суффикс key-ремонта (§35)
+
+  // Мобильные reveal-ы короче (task: «все reveal-ы остаются, но короче»).
+  // post-mount matchMedia — hydration-безопасно (как isCoarse в tott).
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const update = () => setNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const signRef = useRef<HTMLDivElement>(null);
+
+  // useInView — на ВСЕГДА присутствующих обёртках (refs не ремоунтятся,
+  // булевы стабильны при key-флипе внутренних слоёв).
+  // margin -60px (не -80px): запас против anchor-jump на #about — замер
+  // оркестратора (390×844): портрет top=89px срабатывал с запасом лишь 9px;
+  // чуть иной паддинг — и reveal не сработал бы навсегда (clip inset(100%)).
+  // Для элементов, входящих снизу, верхний инсет не участвует — скролл-поведение
+  // не меняется, растёт только запас на краю (замер diag: clip inset(0%)).
+  const portraitInView = useInView(portraitRef, { once: true, margin: "-60px" });
+  const sceneInView = useInView(sceneRef, { once: true, margin: "-60px" });
+  const signInView = useInView(signRef, { once: true, margin: "-80px" });
+
+  // Scrub-дрейф: один useScroll + useTransform-слайсы + useSpring —
+  // MotionValues, ноль setState на кадр (§35). Только transform.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const springOpts = { stiffness: 55, damping: 22, mass: 0.6 } as const;
+  const wordX = useSpring(useTransform(scrollYProgress, [0, 1], [40, -40]), springOpts);
+  const portraitY = useSpring(useTransform(scrollYProgress, [0, 1], [22, -22]), springOpts);
+  const sceneY = useSpring(useTransform(scrollYProgress, [0, 1], [-14, 18]), springOpts);
+
+  // Fade-up вход текста: 26px, stagger 80–120ms; на мобиле короче/плотнее.
+  const fadeUp = (delay: number) =>
+    settled
+      ? {
+          initial: { opacity: 0, y: 26 },
           whileInView: { opacity: 1, y: 0 },
           viewport: { once: true, margin: "-80px" },
-          transition: { duration: 0.72, delay, ease: EASE },
-        };
+          transition: {
+            duration: narrow ? 0.6 : 0.8,
+            delay: narrow ? delay * 0.7 : delay,
+            ease: EASE,
+          },
+        }
+      : {};
 
   return (
     <section
+      ref={sectionRef}
       id="about"
       aria-labelledby="ea-founder-story-headline"
-      className="ea-section ea-section--cream relative overflow-hidden"
-      data-header-theme="light"
+      data-header-theme="dark"
+      className="efs"
     >
-      {/* Subtle warm bloom at the top-right corner — single, restrained, no
-          multi-layer glow (EA restraint, per audit §3.5). */}
-      <div
-        className="pointer-events-none absolute -top-32 -right-24 h-[460px] w-[460px] rounded-full opacity-40"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(231,29,58,0.06) 0%, transparent 65%)",
-        }}
+      {/* Тёплый bloom — статичный, один слой, не отвлекает (EA restraint). */}
+      <div className="efs__bloom" aria-hidden="true" />
+
+      {/* Гигантское outlined «НИЛОВ» — signature-typography на всю ширину
+          низа. Декор: aria-hidden, pointer-events none. Дрейф — только
+          когда settled (SSR = чистая статика без transform). */}
+      <motion.div
+        className="efs__word"
         aria-hidden="true"
-      />
+        style={settled ? { x: wordX } : undefined}
+      >
+        Нилов
+      </motion.div>
 
-      <div className="ea-container ea-container--wide">
-        <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-20 lg:gap-28">
-          {/* LEFT — founder portrait photo --------------------------------
-
-              Cycle 34 (sondaven.com graft): portrait now reveals via a
-              directional `clip-path: inset()` mask (bottom→top open) with a
-              subtle inner zoom (1.15 → 1.0) — the Sondaven / Floema signature
-              photo reveal. Replaces the previous fade-up. The existing
-              `group-hover:scale-[1.02]` on the <Image> composes with the
-              clip-reveal's inner scale (reveal scale resolves first, hover
-              scale layers on top). */}
-          <ClipPathReveal
-            direction="bottom"
-            duration={1.1}
-            className="order-1"
-          >
-            {/* Cycle 41 fix: 3:4 portrait frame, vertically centered in the
-                row. The previous full-column stretch cropped ~44% of the
-                photo width; before that aspect-[4/5] left dead space. The
-                3:4 ratio matches the source photo (1920×2560) → zero crop,
-                zero upscale, and self-centering makes the whitespace
-                symmetric (reads as breathing room, not a gap). */}
-            <div className="group relative">
-              {/* 3:4 portrait frame — source-native ratio */}
-              <div
-                className="relative aspect-[3/4] w-full overflow-hidden md:mx-auto md:max-w-[560px]"
-                style={{
-                  borderRadius: "4px",
-                  boxShadow:
-                    "0 30px 80px -28px rgba(26,26,26,0.28), 0 4px 12px -4px rgba(26,26,26,0.08), inset 0 0 0 1px rgba(26,26,26,0.06)",
-                }}
+      <div className="efs__container">
+        <div className="efs__grid">
+          {/* — — ЛЕВАЯ: sticky дуэт-фото (мобайл: обычный поток, фото первым) — — */}
+          <div className="efs__media">
+            <motion.div
+              ref={portraitRef}
+              className="efs__portrait-pos"
+              style={settled ? { y: portraitY } : undefined}
+            >
+              {/* Вход портрета: clip inset(100%→0) снизу-вверх + inner zoom
+                  1.12→1.0. §34 паттерн: initial + animate по useInView
+                  (строки одной токен-структуры), key-ремонт при settled-флипе. */}
+              <motion.div
+                key={`pclip-${on}`}
+                className="efs__portrait-clip"
+                {...(settled
+                  ? {
+                      initial: { clipPath: "inset(100% 0% 0% 0%)" },
+                      animate: portraitInView
+                        ? { clipPath: "inset(0% 0% 0% 0%)" }
+                        : undefined,
+                      transition: { duration: narrow ? 0.9 : 1.1, ease: EASE },
+                    }
+                  : {})}
               >
-                <Image
-                  src="/media/event-10.jpg"
-                  alt="Шеф-повар Interfood Catering с подносом фирменных закусок"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.02]"
-                  // Cycle 40: real portrait staff photo (1920×2560) — the previous
-                  // landscape asset was upscaled ×3.8 and read as blurry.
-                  style={{ objectPosition: "center 20%" }}
-                />
-                {/* Tonal wash to keep the photo reading as part of the blush section */}
-                <div
-                  className="pointer-events-none absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, rgba(241,236,236,0.0) 60%, rgba(241,236,236,0.18) 100%)",
-                  }}
-                  aria-hidden="true"
-                />
-              </div>
-            </div>
-          </ClipPathReveal>
+                <motion.div
+                  className="efs__portrait-zoom"
+                  {...(settled
+                    ? {
+                        initial: { scale: 1.12 },
+                        animate: portraitInView ? { scale: 1 } : undefined,
+                        transition: { duration: narrow ? 1.15 : 1.4, ease: EASE },
+                      }
+                    : {})}
+                >
+                  <div className="efs__portrait-frame">
+                    <Image
+                      src="/media/c66/founder-portrait-v3.webp"
+                      alt="Дмитрий Нилов, основатель Interfood Catering, в фирменном фартуке на банкетной площадке"
+                      fill
+                      /* 480px = кап .efs__portrait-pos (≥1280) → DPR2 ровно 960
+                         device-px (натив источника), бакет 1200 вместо 1920. */
+                      sizes="(max-width: 1023px) 92vw, 480px"
+                      className="efs__portrait-img"
+                    />
+                  </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
 
-          {/* RIGHT — story column, pushed down 80px on desktop for the EA
-              asymmetric vertical offset (see EA-ANALYSIS.md §3.9). */}
-          <div
-            className="order-2 flex flex-col"
-            style={{ marginTop: "clamp(0px, 6vw, 80px)" }}
-          >
-            {/* Eyebrow */}
-            <motion.span className="ea-eyebrow" {...reveal(0)}>
+            {/* Карточка-сцена: внахлёст справа-снизу, белая рамка 4px.
+                Вход: clip «шторка» слева→направо + rotate −10°→−5°, delay 0.4s
+                после портрета. Hover (fine pointer): lift + выпрямление.
+                Клип слит с карточкой (правка волны-1): clip-path режет в
+                ЛОКАЛЬНЫХ координатах ДО transform — отдельная обёртка-клип
+                точного размера срезала белую рамку rotate-нутой карточки со
+                всех 4 сторон. «Шторка» теперь наклонена вместе с карточкой —
+                приемлемо (угол карточки). §34: строки clip-path одной
+                токен-структуры. */}
+            <motion.div
+              ref={sceneRef}
+              className="efs__scene-pos"
+              style={settled ? { y: sceneY } : undefined}
+            >
+              {/* Клип на ОБЁРТКЕ (не на карточке): clip-path режет и тень
+                  карточки — обёртка имеет поле под тень (.efs__scene-clip).
+                  §34: строки clip-path одной токен-структуры. */}
+              <motion.div
+                key={`sclip-${on}`}
+                className="efs__scene-clip"
+                {...(settled
+                  ? {
+                      initial: { clipPath: "inset(0% 100% 0% 0%)" },
+                      animate: sceneInView
+                        ? { clipPath: "inset(0% 0% 0% 0%)" }
+                        : undefined,
+                      transition: { duration: narrow ? 0.85 : 1.0, delay: 0.4, ease: EASE },
+                    }
+                  : {})}
+              >
+                <motion.div
+                  key={`scard-${on}`}
+                  className="efs__scene-card"
+                  {...(settled
+                    ? {
+                        initial: { rotate: -10 },
+                        animate: sceneInView ? { rotate: -5 } : undefined,
+                        whileHover: { rotate: 0, y: -6 },
+                        transition: { duration: narrow ? 0.85 : 1.0, delay: 0.4, ease: EASE },
+                      }
+                    : {})}
+                >
+                <div className="efs__scene-frame">
+                  <Image
+                    src="/media/c66/founder-scene-v3.webp"
+                    alt="Дмитрий Нилов за работой — накрытый банкетный стол: сервировка, зелень и свечи перед праздником"
+                    fill
+                    sizes="(max-width: 1023px) 46vw, 20vw"
+                    className="efs__scene-img"
+                  />
+                </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          </div>
+
+          {/* — — ПРАВАЯ: хроника одних рук — — */}
+          <div className="efs__body">
+            <motion.span
+              key={`eyebrow-${on}`}
+              className="ea-eyebrow efs__eyebrow"
+              {...fadeUp(0)}
+            >
               Основатель · Шеф-повар
             </motion.span>
 
-            {/* H2 — italic-as-fragment trailing phrase device */}
             <motion.h2
+              key={`h2-${on}`}
               id="ea-founder-story-headline"
-              className="ea-section-h2 mt-6"
-              {...reveal(0.08)}
-              aria-label="Откройте нашу историю."
+              className="efs__h2"
+              aria-label="Всё начинается с рук."
+              {...fadeUp(0.08)}
             >
-              Откройте нашу{" "}
-              <i className="ea-italic-fragment">историю.</i>
+              Всё начинается с <i>рук.</i>
             </motion.h2>
 
-            {/* Red 64×2px divider — EA signature */}
+            {/* Красный hairline 64×2 — EA signature. */}
             <motion.span
-              className="ea-divider-red mt-8"
-              {...reveal(0.16)}
+              key={`rule-${on}`}
+              className="ea-divider-red efs__divider"
+              aria-hidden="true"
+              {...fadeUp(0.16)}
             />
 
-            {/* 3 brand-story paragraphs */}
-            <div className="mt-8 space-y-5">
-              {STORY_PARAGRAPHS.map((para, i) => (
-                <motion.p
-                  key={para.slice(0, 24)}
-                  className="ea-body max-w-[44ch]"
-                  {...reveal(0.24 + i * 0.08)}
+            {/* Три минимальные главы — тезисно, воздух, stagger 100ms. */}
+            <div className="efs__chapters">
+              {CHAPTERS.map((chapter, i) => (
+                <motion.div
+                  key={`ch-${i}-${on}`}
+                  className="efs__chapter"
+                  {...fadeUp(0.22 + i * 0.1)}
                 >
-                  {para}
-                </motion.p>
+                  <h3 className="efs__chapter-label">{chapter.label}</h3>
+                  <p className="efs__chapter-text">{chapter.text}</p>
+                </motion.div>
               ))}
             </div>
 
-            {/* Stat row — 4 stats, huge Barlow numbers, hairline dividers.
-                NO icons, NO 3D tilt, NO glassmorphism (EA restraint). */}
-            <motion.div
-              className="mt-12"
-              {...reveal(0.5)}
-            >
-              <div
-                className="grid grid-cols-2 sm:grid-cols-4"
-                style={{
-                  background: "var(--ea-cream)",
-                  borderRadius: "4px",
-                }}
-              >
-                {STATS.map((stat, i) => (
-                  <div
-                    key={stat.label}
-                    className="relative flex flex-col items-center px-3 py-7 text-center"
-                  >
-                    {/* Hairline divider between stats (right edge of each cell
-                        except the last in the row). Shown only on sm+ so the
-                        mobile 2-col grid stays clean. */}
-                    {i < STATS.length - 1 && (
-                      <span
-                        aria-hidden="true"
-                        className="absolute right-0 top-1/2 hidden h-2/3 w-px -translate-y-1/2 sm:block"
-                        style={{
-                          background:
-                            "color-mix(in oklch, var(--ea-mauve) 35%, transparent)",
-                        }}
-                      />
-                    )}
-                    {/* Big Barlow number */}
-                    <span
-                      className="leading-none"
-                      style={{
-                        fontFamily: "var(--ea-font-eyebrow)",
-                        fontWeight: 700,
-                        fontSize: "clamp(2rem, 4vw, 3.5rem)",
-                        letterSpacing: "-0.02em",
-                        color: "var(--ea-ink)",
-                      }}
-                    >
-                      <CountUp
-                        to={stat.value}
-                        suffix={stat.suffix}
-                        reduce={reduce}
-                      />
-                    </span>
-                    {/* Small uppercase label — Cycle 40: floor raised to 12px
-                        (was clamp 10.4–12.5px, unreadable on mobile). */}
-                    <span
-                      className="mt-2"
-                      style={{
-                        fontFamily: "var(--ea-font-eyebrow)",
-                        fontWeight: 700,
-                        fontSize: "clamp(0.75rem, 0.85vw, 0.85rem)",
-                        letterSpacing: "0.16em",
-                        textTransform: "uppercase",
-                        color: "var(--ea-mauve)",
-                      }}
-                    >
-                      {stat.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
+            {/* Строка count-up: 19 / 2 400+ / 120 000+, hairline-делители,
+                tabular-nums. */}
+            <motion.div key={`stats-${on}`} className="efs__stats" {...fadeUp(0.4)}>
+              {STATS.map((stat) => (
+                <div key={stat.label} className="efs__stat">
+                  <span className="efs__stat-num">
+                    <CountUp to={stat.value} suffix={stat.suffix} reduce={reduce} />
+                  </span>
+                  <span className="efs__stat-label">{stat.label}</span>
+                </div>
+              ))}
             </motion.div>
 
-            {/* CTA — EA text-link with animated red arrow → smooth-scrolls
-                to #manifesto (the pinned «ПИР» scroll wow). */}
-            <motion.div className="mt-10" {...reveal(0.6)}>
-              <button
-                type="button"
-                onClick={scrollToMenu}
+            {/* Подпись «чернильным письмом»: clip слева→направо 900ms после
+                глав; под ней caps-роль. */}
+            <div ref={signRef} className="efs__sign-block">
+              <motion.div
+                key={`sign-${on}`}
+                className="efs__sign-clip"
+                {...(settled
+                  ? {
+                      initial: { clipPath: "inset(0% 100% 0% 0%)" },
+                      animate: signInView
+                        ? { clipPath: "inset(0% 0% 0% 0%)" }
+                        : undefined,
+                      transition: { duration: 0.9, delay: 0.15, ease: EASE },
+                    }
+                  : {})}
+              >
+                <span className="efs__sign">Дмитрий Нилов</span>
+              </motion.div>
+              {/* Роль живёт в eyebrow («Основатель · Шеф-повар») — в подписи
+                  классическая форма: имя+бренд+город (дубль роли снят). */}
+              <motion.p key={`role-${on}`} className="efs__sign-role" {...fadeUp(0.4)}>
+                Interfood Catering · Санкт-Петербург
+              </motion.p>
+            </div>
+
+            {/* CTA — ea-text-link + SVG-стрелка (канон), scrollToMenu с
+                lenis-фоллбеком (§33). <a href="#menu"> вместо button:
+                без JS работает нативный якорь, с JS — preventDefault +
+                плавный ретаргет-скролл (правка волны-1). */}
+            <motion.div key={`cta-${on}`} className="efs__cta" {...fadeUp(0.45)}>
+              <a
+                href="#menu"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToMenu();
+                }}
                 className="ea-text-link"
                 aria-label="Смотреть меню — перейти к разделу"
               >
@@ -370,11 +475,14 @@ export function EaFounderStory() {
                 >
                   <path d="M4 12h14M14 6l6 6-6 6" />
                 </svg>
-              </button>
+              </a>
             </motion.div>
           </div>
         </div>
       </div>
+
+      {/* CSS-only зерно поверх всей сцены (opacity 0.04, без JS). */}
+      <div className="efs__grain" aria-hidden="true" />
     </section>
   );
 }

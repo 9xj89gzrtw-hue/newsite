@@ -250,7 +250,7 @@ const jsonLd = {
     },
   ],
   founder: { "@type": "Person", name: "Нилов Дмитрий Игоревич" },
-  foundingDate: "2009",
+  foundingDate: "2007",
   areaServed: [
     { "@type": "City", name: "Санкт-Петербург" },
     { "@type": "AdministrativeArea", name: "Ленинградская область" },

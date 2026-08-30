@@ -459,7 +459,7 @@ export function SiteFooter() {
               ))}
             </ul>
             <p className="text-xs text-cream/60">
-              2 400+ мероприятий для компаний и частных клиентов с 2009 года.
+              2 400+ мероприятий для компаний и частных клиентов с 2007 года.
             </p>
           </motion.section>
         </div>
