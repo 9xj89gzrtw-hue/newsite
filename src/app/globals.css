@@ -4252,3 +4252,115 @@ header[data-scrolled="true"] [data-mega-panel] {
     transform: translateY(-92px);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   Task 2-c (Cycle 68): footer kinetic wordmark «INTERFOOD.» + gold
+   cursor spotlight. Декоративный якорь на месте удалённой полосы
+   подписки. Анимируются только transform/opacity/background-position.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Строка вордмарка: полный bleed, Oswald 600 (latin — глифы «INTERFOOD.»
+   целиком в latin-субсете, §35). position: relative — offsetParent для
+   измерения оффсетов букв (shimmer-тайл). */
+.fw-line {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  white-space: nowrap;
+  font-family: var(--font-display), "Oswald", system-ui, sans-serif;
+  font-size: clamp(3.4rem, 16.5vw, 17rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+/* Per-letter clip-маска: буква поднимается из-под неё (framer y:118%→0).
+   Паддинги расширяют clip-бокс (rotate/ глиф не режутся), отрицательные
+   маржины гасят лишний layout-размер — межбуквенный шаг остаётся
+   натуральным. em-based — масштабируется с clamp-шрифтом. */
+.fw-mask {
+  display: inline-block;
+  overflow: clip;
+  padding: 0.12em 0.08em 0.1em;
+  margin: -0.12em -0.08em -0.1em;
+}
+
+.fw-letter {
+  display: inline-block;
+  color: var(--cream);
+  will-change: transform;
+}
+/* Фирменная золотая точка бренда (без shimmer — постоянный якорь). */
+.fw-letter.is-dot {
+  color: var(--gold);
+}
+
+/* Золотой shimmer: один градиент-тайл шириной в строку (--fw-w), общий
+   для всех букв; --fw-sx = −offsetLeft буквы → тайлы выровнены, золотая
+   полоса непрерывно идёт по слову (порядок чтения). Анимация — только
+   background-position, гвард no-preference: reduce-юзерам — твёрдый
+   cream, никакого sweep. Класс вешается post-mount (JS-гейт settled). */
+.fw-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    var(--cream) 0%,
+    var(--cream) 36%,
+    color-mix(in srgb, var(--gold) 55%, var(--cream)) 45%,
+    #f3e3c3 50%,
+    var(--gold) 55%,
+    var(--cream) 64%,
+    var(--cream) 100%
+  );
+  background-size: var(--fw-w, 100%) 100%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fw-shimmer {
+    animation: fw-shine 8.5s linear infinite;
+  }
+}
+@keyframes fw-shine {
+  from {
+    background-position-x: var(--fw-sx, 0px);
+  }
+  to {
+    background-position-x: calc(var(--fw-sx, 0px) - var(--fw-w, 1000px));
+  }
+}
+
+/* Ховер-подъём буквы: transform на маске двигает букву ВМЕСТЕ с её
+   градиент-окном (непрерывность shimmer сохраняется). Только fine
+   pointer; под reduce — отключено. */
+@media (hover: hover) and (pointer: fine) {
+  .fw-mask {
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fw-mask:hover {
+    transform: translateY(-3.5%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fw-mask {
+    transition: none;
+  }
+  .fw-mask:hover {
+    transform: none;
+  }
+}
+
+/* Курсорный gold-spotlight: слой под контентом (z:-1 внутри isolate-
+   футера — над фоном, под текстом), рендерится только на fine-pointer
+   вне reduce (JS-гейт post-mount в site-footer.tsx). */
+.fw-spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}

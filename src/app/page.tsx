@@ -3,7 +3,6 @@ import { SiteHeader } from "@/components/catering/site-header";
 import { TottHero } from "@/components/catering/tott-hero";
 import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
 import { GammaMarquee } from "@/components/catering/gamma-marquee";
-import { CepEditorialDivider } from "@/components/catering/cep-editorial-divider";
 import { HaccServices } from "@/components/catering/hacc-services";
 import { HaccMenu } from "@/components/catering/hacc-menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
@@ -15,7 +14,6 @@ import { GammaSeparator } from "@/components/catering/gamma-separator";
 import { EaFaqAccordion } from "@/components/catering/ea-faq-accordion";
 import { CepInstagramGrid } from "@/components/catering/cep-instagram-grid";
 import { SiteFooter } from "@/components/catering/site-footer";
-import { BackToTop } from "@/components/catering/back-to-top";
 
 // Cycle 32 — Simplified 17-section catering site restructure.
 //
@@ -25,8 +23,8 @@ import { BackToTop } from "@/components/catering/back-to-top";
 // EA/TOTT/Gamma cycles 21-31) are condensed into a single coherent narrative:
 // hero → header → video → photo carousel → services → events → where-we-work →
 // menu → events video carousel → algorithm → delivery → calculator → about →
-// FAQ → instagram → form → footer. Three parallax photo bands (CepEditorialDivider,
-// TottParallaxBand, GammaSeparator) bridge the major acts for cinematic pacing.
+// FAQ → instagram → form → footer. Two parallax photo bands (GammaSeparator,
+// TottParallaxBand) bridge the major acts for cinematic pacing.
 //
 // SECTION ORDER (per task spec, "остальное убрать с сайта"):
 //
@@ -37,7 +35,10 @@ import { BackToTop } from "@/components/catering/back-to-top";
 //                               looping muted autoplay mp4 + "Кейтеринг как
 //                               *искусство*" overlay + Play pill + 2 CTAs.
 //    4. GammaMarquee          — infinite horizontal photo marquee (14 portrait photos).
-//    5. CepEditorialDivider   — PARALLAX BAND. Full-bleed photo breather, no text.
+//    5. GammaSeparator        — PARALLAX BAND. Full-bleed separator photo + tilted
+//                               "interfood" Marck Script watermark. Task 2-a: moved
+//                               here from the founder→FAQ gap — user swapped the
+//                               photo band below the carousel for this one.
 //
 //   ── ACT II: WHAT WE OFFER (services → events → venues → menu) ──
 //    6. EaServiceTabs        — 5-tab premium services (Свадьбы · Корпоратив ·
@@ -66,18 +67,18 @@ import { BackToTop } from "@/components/catering/back-to-top";
 //                              POST /api/lead). Anchors: #calculator (section top),
 //                              #contact (form zone).
 //   15. EaFounderStory       — founder-forward 2-col About + 3 count-up stats + CTA.
-//   16. GammaSeparator       — PARALLAX BAND. Full-bleed separator image + "interfood"
-//                               -6° handwritten watermark. Transition into FAQ.
-//   17. EaFaqAccordion       — minimalist 6-item accordion (resolves objections).
-//   18. CepInstagramGrid     — 3×3 IG grid with Reel play icons (social proof).
-//   19. SiteFooter           — dark navy footer with newsletter + 3-col + cities marquee.
-//   20. BackToTop            — floating ↑ button with circular scroll-progress ring.
+//                              Task 2-a: followed directly by FAQ (the separator
+//                              band between them moved up to section 5).
+//   16. EaFaqAccordion       — minimalist 6-item accordion (resolves objections).
+//   17. CepInstagramGrid     — 3×3 IG grid with Reel play icons (social proof).
+//   18. SiteFooter           — dark navy footer with newsletter + 3-col + cities marquee.
 //
 // PARALLAX BAND PLACEMENT (per user: "между некоторыми блоками можно оставить
 // классные фотки с параллакс эффектом, которые уже есть"):
-//   - CepEditorialDivider  between #4 carousel and #5 services — visual breather
+//   - GammaSeparator       between #4 photo marquee and #5 services — visual
+//                          breather (Task 2-a: moved from the founder→FAQ gap,
+//                          replacing CepEditorialDivider in this slot)
 //   - TottParallaxBand    between #8 menu and #9 events video carousel — cinematic pause
-//   - GammaSeparator       between #13 about and #14 FAQ — editorial transition
 //
 // REMOVED (per user: "остальное убрать с сайта") — these 30+ components remain
 // on disk for reference but are no longer rendered:
@@ -88,6 +89,13 @@ import { BackToTop } from "@/components/catering/back-to-top";
 //   GammaAccordion, GammaHaccordion, EaVenueNetwork, EaNamedTestimonials,
 //   EaCapabilityStrip, CepLocationsStrip (subsumed by EaVenuesSpotlight),
 //   EaPressStrip, EaCareersBlock, EaPhilosophyQuote, EaFinalCta, TottBestCatering.
+//
+// REMOVED in Task 2-a (user cleanup, files stay on disk per repo convention):
+//   CepEditorialDivider — the parallax band below the photo carousel was
+//   replaced by GammaSeparator (moved up from the founder→FAQ gap);
+//   BackToTop — floating ↑ button dropped together with the ambient-audio
+//   FAB and the chapter-nav scroll rail in layout.tsx (fewer floating
+//   overlays over the content).
 export const dynamic = "force-dynamic";
 
 export default function Home() {
@@ -129,11 +137,15 @@ export default function Home() {
              after the video block. */}
       <GammaMarquee />
 
-      {/* 5. CepEditorialDivider — PARALLAX BAND. Full-bleed Ken-Burns photo
-             breather, no text. Visual rest between Act I's photo carousel and
-             Act II's services block — gives the eye a moment of pause before the
-             next heavy content beat. */}
-      <CepEditorialDivider />
+      {/* 5. GammaSeparator — PARALLAX BAND. Cycle 31 gammacatering.com signature
+             full-bleed separator image between major sections (their
+             `.full-width-image.has-fixed-ratio` pattern). Pure visual rest — no
+             CTAs, no body copy, just the cinematic photo + centered -6° handwritten
+             "interfood" watermark (gamma's signature "tilted text effect") +
+             espresso theme-flip while the band is in view. Task 2-a: moved here
+             from the founder→FAQ gap — same full-bleed photo pause before Act II's
+             services rack that CepEditorialDivider used to provide. */}
+      <GammaSeparator />
 
       {/* ── ACT II: WHAT WE OFFER ── */}
 
@@ -213,31 +225,23 @@ export default function Home() {
               нашу *историю*." + named milestones (СБЕР, ГАЗПРОМ, ЯНДЕКС partnerships). */}
       <EaFounderStory />
 
-      {/* 16. GammaSeparator — PARALLAX BAND. Cycle 31 gammacatering.com signature
-              full-bleed separator image between major sections (their
-              `.full-width-image.has-fixed-ratio` pattern). Pure visual rest — no
-              CTAs, no body copy, just the cinematic photo + centered -6° handwritten
-              "interfood" watermark (gamma's signature "tilted text effect"). Sits
-              between the About and FAQ to give the eye a full-bleed photo pause. */}
-      <GammaSeparator />
-
-      {/* 17. EaFaqAccordion — Cycle 28 minimalist single-column 6-item accordion
+      {/* 16. EaFaqAccordion — Cycle 28 minimalist single-column 6-item accordion
               (no tabs, no search, no feedback). EA restraint — the typography IS
-              the design. Resolves objections before the contact form. */}
+              the design. Resolves objections before the contact form.
+              Task 2-a: follows the founder block directly — the GammaSeparator
+              band that used to sit between them now lives at section 5. */}
       <EaFaqAccordion />
 
-      {/* 18. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play icons.
+      {/* 17. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play icons.
               Follow-along social proof. */}
       <CepInstagramGrid />
 
-      {/* 19. SiteFooter — dark navy footer with newsletter + 3-col + cities marquee.
+      {/* 18. SiteFooter — dark navy footer with newsletter + 3-col + cities marquee.
               Полные реквизиты/соцсети — здесь (HaccBooking дублирует только
-              быстрые CTA-контакты, SPEC §2.10). */}
+              быстрые CTA-контакты, SPEC §2.10). Task 2-a: BackToTop (бывш. №20)
+              удалён — плавающая ↑-кнопка больше не рендерится (компонент остался
+              на диске). */}
       <SiteFooter />
-
-      {/* 20. BackToTop — floating ↑ button (appears on scroll > 500px) with
-              circular scroll-progress ring. */}
-      <BackToTop />
     </main>
   );
 }

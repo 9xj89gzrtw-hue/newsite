@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useMotionValue,
+  useSpring,
+  useMotionTemplate,
+} from "framer-motion";
 import {
   Phone,
   Mail,
-  MapPin,
-  ArrowRight,
   Heart,
-  CheckCircle2,
-  Loader2,
-  Sparkles,
   ChevronRight,
   Instagram,
   Send,
@@ -21,9 +22,7 @@ import {
   CONTACTS,
 } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
-import { Magnetic } from "@/components/motion/magnetic";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
-import { toast } from "sonner";
 
 /**
  * Stable current year — computed once on mount to avoid SSR/CSR
@@ -38,150 +37,7 @@ function useCurrentYear() {
   return year;
 }
 
-/**
- * NewsletterSignup — dark-themed Sopranos email signup.
- * Posts to /api/newsletter (Prisma Subscriber model).
- * Glassmorphism card on the dark navy footer.
- */
-function NewsletterSignup() {
-  const [email, setEmail] = useState("");
-  const [consent, setConsent] = useState(false);
-  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
-
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setStatus("error");
-      toast.error("Пожалуйста, введите корректный email");
-      return;
-    }
-    if (!consent) {
-      setStatus("error");
-      toast.error("Для подписки необходимо согласиться с политикой конфиденциальности");
-      return;
-    }
-    setStatus("loading");
-    try {
-      const res = await fetch("/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "footer" }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        if (data?.code === "ALREADY_SUBSCRIBED") {
-          setStatus("done");
-          toast.info("Вы уже подписаны — спасибо!");
-          return;
-        }
-        throw new Error(data?.error || "Subscription failed");
-      }
-      setStatus("done");
-      setEmail("");
-      toast.success("Готово! Сезонные меню и спецпредложения уже в пути.");
-    } catch (err) {
-      setStatus("error");
-      toast.error(err instanceof Error ? err.message : "Ошибка сети, попробуйте позже");
-    }
-  };
-
-  return (
-    <div className="rounded-2xl border border-cream/10 bg-cream/5 p-5 backdrop-blur-sm sm:p-6">
-      <div className="mb-3 flex items-center gap-2">
-        <Sparkles className="size-4 text-gold" aria-hidden="true" />
-        <span className="font-display text-lg uppercase tracking-wide text-cream">
-          Сезонные меню и спецпредложения
-        </span>
-      </div>
-      <p className="mb-4 text-sm text-cream/70">
-        Раз в месяц — свежие сезонные блюда, гастрономические тренды и
-        эксклюзивные предложения кейтеринга. Без спама, отписка в один клик.
-      </p>
-      <form onSubmit={onSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-start">
-        <div className="relative flex-1">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (status === "error" || status === "done") setStatus("idle");
-            }}
-            placeholder="Ваш email"
-            aria-label="Email для подписки на рассылку"
-            name="email"
-            required
-            disabled={status === "loading" || status === "done"}
-            className="w-full rounded-full border border-cream/20 bg-ink/50 px-4 py-3 text-sm text-cream placeholder:text-cream/50 focus:border-gold/50 focus:outline-none focus:ring-2 focus:ring-gold/20 transition-colors disabled:opacity-60 min-h-[44px]"
-          />
-        </div>
-        <Magnetic strength={0.25} className="flex flex-col">
-          <button
-            type="submit"
-            disabled={status === "loading" || status === "done"}
-            className="cta-gradient-punchy inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold to-terracotta px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-gold/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 min-h-[44px]"
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {status === "loading" ? (
-                <motion.span
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex items-center gap-2"
-                >
-                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                  Подписка…
-                </motion.span>
-              ) : status === "done" ? (
-                <motion.span
-                  key="done"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex items-center gap-2"
-                >
-                  <CheckCircle2 className="size-4" aria-hidden="true" />
-                  Готово!
-                </motion.span>
-              ) : (
-                <motion.span
-                  key="idle"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex items-center gap-2"
-                >
-                  Подписаться
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </button>
-        </Magnetic>
-        <label className="mt-3 flex min-h-[44px] items-start gap-2 text-[12px] text-cream/70 sm:mt-2">
-          <input
-            type="checkbox"
-            checked={consent}
-            onChange={(e) => setConsent(e.target.checked)}
-            required
-            className="mt-0.5 size-4 shrink-0 accent-gold"
-          />
-          <span>
-            Я соглашаюсь на обработку персональных данных в соответствии с{" "}
-            <a href="/privacy" className="text-gold hover:underline py-1.5 -my-1.5 inline-block">
-              политикой конфиденциальности
-            </a>
-            .
-          </span>
-        </label>
-      </form>
-    </div>
-  );
-}
-
-/** Навигация футера — каждая ссылка ведёт к уникальному разделу
-    (Cycle 38 fix: ранее «Свадьбы»/«Корпоративы»/«Гриль» вели на один и
-    тот же #services, а «Поднос» был невнятным ярлыком). */
+/** Nav */
 const FOOTER_NAV = [
   { label: "Главная", href: "#main-content" },
   { label: "Услуги", href: "#services" },
@@ -207,6 +63,9 @@ const columnVariants = {
   }),
 };
 
+/** Shared premium ease (same curve as founder block / EA sections). */
+const EASE = [0.22, 1, 0.36, 1] as const;
+
 /** One pass of the cities list for the marquee. */
 function CitiesTrack({ trackId = '' }: { trackId?: string }) {
   return (
@@ -226,25 +85,259 @@ function CitiesTrack({ trackId = '' }: { trackId?: string }) {
   );
 }
 
+/* ══════════════ Task 2-c — WOW-слой футера ══════════════
+   1) Гигантский кинетический вордмарк «INTERFOOD.» — визуальный якорь
+      на месте удалённой полосы подписки (newsletter удалён по запросу
+      владельца). Посимвольный подъём из-под маски (whileInView stagger,
+      лёгкий rotate), непрерывный золотой shimmer-сweep по буквам.
+   2) Курсорный gold-spotlight — radial-gradient на MotionValues +
+      rAF-spring (framer useSpring), только background/opacity,
+      pointer-events-none; рендерится ТОЛЬКО на fine-pointer
+      (hover:hover + pointer:fine) и вне prefers-reduced-motion.
+   §34/§35 дисциплина:
+   - mounted-гейт: SSR и первый клиентский рендер = полностью статичный
+     футер (в SSR-разметке нет opacity:0 — no-JS видит весь контент);
+   - settled = mounted && !reduce — ветвление анимационных пропсов только
+     через settled; key-ремонт контейнера вордмарка при флипе settled
+     («initial»
+     framer-motion не перевооружается пост-монтом, §35);
+   - spotlight и shimmer не рендерятся/не вешаются до mount;
+   - измерения букв (shimmer-тайл) — разовые layout-reads post-mount +
+     resize/fonts.ready, запись напрямую в DOM (classList/custom props),
+     ноль setState на кадр; анимации: transform/opacity/background-position. */
+
+/* Латиница «INTERFOOD.» — чистый Oswald latin-субсет (§35: кириллический
+   фоллбек не задействован). Точка — фирменный золотой акцент бренда. */
+const WORDMARK_GLYPHS = ["I", "N", "T", "E", "R", "F", "O", "O", "D", "."] as const;
+
+/* Варианты вордмарка. Триггер анимации — КОНТЕЙНЕР .fw-line: whileInView
+   на самих буквах не работает в принципе — буква в hidden сдвинута на
+   118% вниз и полностью клипается маской (overflow: clip), visible-бокс
+   пуст → IntersectionObserver всегда isIntersecting=false («курица и
+   яйцо»; замер live). Бокс .fw-line не клипается → IO стреляет на нём;
+   лейблы variants-пропагацией доходят до букв сквозь немоушн .fw-mask
+   (контекст React, DOM-вложенность не рвёт цепочку), staggerChildren
+   0.055s/буква — тот же каскад, что бывший delay: i * 0.055. */
+const WORDMARK_LINE_VARIANTS = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.055 } },
+};
+
+const WORDMARK_LETTER_VARIANTS = {
+  hidden: { y: "118%", rotate: 7 },
+  visible: {
+    y: "0%",
+    rotate: 0,
+    transition: { duration: 0.9, ease: EASE },
+  },
+};
+
+/**
+ * KineticWordmark — декоративный (aria-hidden; бренд-имя «Interfood.»
+ * остаётся видимым текстом в колонке «Контакты», дублирующего landmark
+ * нет). Буквы поднимаются из-под clip-маски с лёгким rotate. Триггер —
+ * контейнер .fw-line (initial="hidden" + whileInView="visible" +
+ * staggerChildren), буквы наследуют лейблы через variants-пропагацию:
+ * буква в hidden полностью клипается маской, её visible-бокс пуст и
+ * СОБСТВЕННЫЙ whileInView не стреляет никогда. Settled-гейт (§34/§35):
+ * до settled — ноль анимационных пропсов (SSR/no-JS/reduce видят
+ * вордмарк целиком); на флипе settled контейнер ремоунтится key-ремонтом
+ * (initial перевооружается только remount'ом), ключи букв стабильны.
+ * Золотой shimmer — один общий градиент-тайл шириной в строку,
+ * выровненный по всем буквам через измеренные --fw-sx/--fw-w,
+ * анимируется CSS keyframes по background-position (гвард
+ * prefers-reduced-motion: no-preference в globals.css). Ховер-подъём
+ * буквы — CSS на .fw-mask (fine-pointer гвард в CSS, transform двигает
+ * букву вместе с её градиентом).
+ */
+function KineticWordmark({ settled }: { settled: boolean }) {
+  const lineRef = useRef<HTMLDivElement>(null);
+  const maskRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
+  /* Shimmer-paint: разовое измерение строки + оффсетов букв (маски —
+     layout-позиции, transform ховера на offsetLeft не влияет), запись
+     custom-props в буквы напрямую. Повтор — на resize (clamp vw) и
+     document.fonts.ready (swap Oswald меняет метрики). Ноль ререндеров. */
+  useEffect(() => {
+    if (!settled) return;
+    const line = lineRef.current;
+    if (!line) return;
+    let alive = true;
+    const paint = () => {
+      if (!alive) return;
+      const w = Math.round(line.getBoundingClientRect().width);
+      maskRefs.current.forEach((mask) => {
+        if (!mask) return;
+        const letter = mask.firstElementChild as HTMLElement | null;
+        if (!letter || letter.classList.contains("is-dot")) return;
+        letter.style.setProperty("--fw-sx", `${-Math.round(mask.offsetLeft)}px`);
+        letter.style.setProperty("--fw-w", `${w}px`);
+        letter.classList.add("fw-shimmer");
+      });
+    };
+    paint();
+    let raf = 0;
+    const queue = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(paint);
+    };
+    window.addEventListener("resize", queue);
+    document.fonts?.ready.then(queue);
+    return () => {
+      alive = false;
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", queue);
+      maskRefs.current.forEach((mask) => {
+        const letter = mask?.firstElementChild as HTMLElement | null;
+        letter?.classList.remove("fw-shimmer");
+      });
+    };
+  }, [settled]);
+
+  return (
+    /* key-ремонт (§35) на КОНТЕЙНЕРЕ: флип settled ремоунтит весь сабтри,
+       initial="hidden" перевооружается. Контейнер — motion-родитель:
+       initial/whileInView/viewport живут на нём (его бокс не клипается),
+       лейблы «hidden»/«visible» спускаются в буквы пропагацией. */
+    <motion.div
+      key={settled ? "fw-line-a" : "fw-line-s"}
+      ref={lineRef}
+      className="fw-line"
+      data-footer-wordmark
+      aria-hidden="true"
+      {...(settled
+        ? {
+            initial: "hidden",
+            whileInView: "visible",
+            viewport: { once: true, margin: "-60px 0px -40px 0px" },
+            variants: WORDMARK_LINE_VARIANTS,
+          }
+        : {})}
+    >
+      {WORDMARK_GLYPHS.map((glyph, i) => {
+        const isDot = glyph === ".";
+        return (
+          <span
+            key={`fw-mask-${i}`}
+            className="fw-mask"
+            ref={(el) => {
+              maskRefs.current[i] = el;
+            }}
+          >
+            <motion.span
+              /* Лейблы приходят от контейнера (пропагация сквозь немоушн
+                 .fw-mask); собственных initial/whileInView у буквы НЕТ —
+                 они разорвали бы пропагацию. Ключ стабильный: ремоунт
+                 при флипе settled гарантирует контейнерный key. */
+              key={`fw-letter-${i}`}
+              className={isDot ? "fw-letter is-dot" : "fw-letter"}
+              style={{ transformOrigin: "18% 100%" }}
+              {...(settled ? { variants: WORDMARK_LETTER_VARIANTS } : {})}
+            >
+              {glyph}
+            </motion.span>
+          </span>
+        );
+      })}
+    </motion.div>
+  );
+}
+
+/**
+ * FooterSpotlight — мягкое золотое свечение, следующее за курсором.
+ * Монтируется только после mount на fine-pointer вне reduce (гейт в
+ * SiteFooter) — SSR-разметка не содержит этот слой. Позиция —
+ * MotionValues + useSpring (rAF-цикл framer), фон собирается
+ * useMotionTemplate: ноль setState на кадр. pointer-events-none.
+ */
+function FooterSpotlight() {
+  const ref = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(-1000);
+  const my = useMotionValue(-1000);
+  const sx = useSpring(mx, { stiffness: 150, damping: 28, mass: 0.6 });
+  const sy = useSpring(my, { stiffness: 150, damping: 28, mass: 0.6 });
+  const glow = useSpring(0, { stiffness: 110, damping: 30 });
+  const background = useMotionTemplate`radial-gradient(36rem circle at ${sx}px ${sy}px, color-mix(in srgb, var(--gold) 16%, transparent) 0%, transparent 68%)`;
+
+  useEffect(() => {
+    const el = ref.current;
+    const host = el?.parentElement; // <footer>
+    if (!el || !host) return;
+    /* rect кэшируется на enter/scroll/resize — pointermove читает только
+       clientX/Y (ноль layout-reads на движение). */
+    let rect: DOMRect | null = null;
+    const cache = () => {
+      rect = host.getBoundingClientRect();
+    };
+    const move = (e: PointerEvent) => {
+      if (!rect) cache();
+      if (!rect) return;
+      mx.set(e.clientX - rect.left);
+      my.set(e.clientY - rect.top);
+    };
+    const enter = (e: PointerEvent) => {
+      cache();
+      move(e);
+      glow.set(1);
+    };
+    const leave = () => glow.set(0);
+    host.addEventListener("pointerenter", enter);
+    host.addEventListener("pointermove", move);
+    host.addEventListener("pointerleave", leave);
+    window.addEventListener("scroll", cache, { passive: true });
+    window.addEventListener("resize", cache);
+    cache();
+    return () => {
+      host.removeEventListener("pointerenter", enter);
+      host.removeEventListener("pointermove", move);
+      host.removeEventListener("pointerleave", leave);
+      window.removeEventListener("scroll", cache);
+      window.removeEventListener("resize", cache);
+    };
+  }, [mx, my, glow]);
+
+  return (
+    <motion.div
+      ref={ref}
+      aria-hidden="true"
+      className="fw-spotlight"
+      style={{ background, opacity: glow }}
+    />
+  );
+}
+
 /**
  * SiteFooter — тёмный navy футер Interfood Catering.
  *
- * Layout (в стиле sopranoscatering.com):
+ * Layout (Task 2-c):
  * 1. «Сделано с любовью» (intro band, Great Vibes script + подзаголовок)
- * 2. Подписка на рассылку (тёмная glass-карточка)
- * 3. Трёхколоночный контент: Контакты / Навигация / Награды
+ * 2. Двухколоночный контент: Контакты (расширенная) / Навигация
+ *    — колонка «Нам доверяют» и полоса подписки удалены по запросу
+ *    владельца; факт «2 400+ мероприятий с 2007 года» сохранён в контактах.
+ * 3. Гигантский кинетический вордмарк «INTERFOOD.» (wow-якорь)
  * 4. «С гордостью обслуживаем» — маркие районов СПб
  * 5. Копирайт
  */
 export function SiteFooter() {
   const year = useCurrentYear();
   const reduce = useReducedMotion();
-  // C62 hydration-safety: reduce branches (motionProps + cities marquee tree)
-  // resolve only after mount — useReducedMotion() is false at SSR and true on
-  // a reduce-user's first client render; a direct branch = hydration mismatch.
+  // C62 hydration-safety: reduce/fine branches (motionProps + wordmark
+  // settled + spotlight tree) resolve only after mount — useReducedMotion()
+  // is false at SSR and true on a reduce-user's first client render; a
+  // direct branch = hydration mismatch.
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [finePointer, setFinePointer] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const sync = () => setFinePointer(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
   const reduceSettled = mounted && reduce;
+  // §34: settled-ветка (анимации включены) — только post-mount и вне reduce.
+  const settled = mounted && !reduce;
   const motionProps = reduceSettled
     ? { initial: false, animate: { opacity: 1, y: 0 } }
     : { initial: "hidden", whileInView: "visible", viewport: { once: true, margin: "-80px" } };
@@ -254,8 +347,13 @@ export function SiteFooter() {
       role="contentinfo"
       data-header-theme="dark"
       aria-label="Подвал сайта"
-      className="grain relative mt-auto overflow-hidden bg-ink text-cream"
+      /* isolate: stacking-context корень — spotlight с z-index:-1 живёт
+         над фоном футера и под контентом; overflow-x: clip (не hidden, §2). */
+      className="grain relative isolate mt-auto overflow-x-clip bg-ink text-cream"
     >
+      {/* Курсорный gold-spotlight — fine-pointer + не-reduce, post-mount */}
+      {mounted && !reduce && finePointer ? <FooterSpotlight /> : null}
+
       {/* Decorative top gold rule */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent" aria-hidden="true" />
 
@@ -291,21 +389,19 @@ export function SiteFooter() {
         </motion.div>
       </div>
 
-      {/* ============ Section 2 — Newsletter signup band ============ */}
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <NewsletterSignup />
-      </div>
-
-      {/* ============ Section 3 — Three-column main content ============ */}
+      {/* ============ Section 2 — Two-column main content ============
+          Task 2-c: колонка «Нам доверяют» удалена; сетка перебалансирована
+          5/12 → контакты шире и богаче (визуальный вес бренда), навигация —
+          компактная правая колонка с hairline-разделителем. */}
       <div className="mx-auto max-w-7xl px-5 py-14 md:px-8">
-        <div className="grid gap-10 md:grid-cols-3 md:gap-8">
-          {/* ---- Column 1: Контакты ---- */}
+        <div className="grid gap-12 md:grid-cols-5 md:gap-8 lg:gap-10">
+          {/* ---- Column 1: Контакты (широкая, витринная) ---- */}
           <motion.section
             {...motionProps}
             custom={0}
             variants={columnVariants}
             aria-labelledby="footer-contact-heading"
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-4 md:col-span-3"
           >
             <h2
               id="footer-contact-heading"
@@ -389,15 +485,27 @@ export function SiteFooter() {
                 <MessageCircle className="size-5 text-cream" aria-hidden="true" />
               </a>
             </div>
+
+            {/* Task 2-c: факт «2 400+ мероприятий с 2007 года» сохранён из
+                удалённой колонки «Нам доверяют» — как брендовая строка-стат
+                под hairline. Цифры каноничны (цикл 28 / c66-V9: 2007). */}
+            <p className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-cream/10 pt-4">
+              <span className="font-display text-2xl font-semibold tracking-wide text-gold">
+                2 400+
+              </span>
+              <span className="text-xs uppercase tracking-wider text-cream/60">
+                мероприятий с 2007 года
+              </span>
+            </p>
           </motion.section>
 
-          {/* ---- Column 2: Навигация ---- */}
+          {/* ---- Column 2: Навигация (компактная, hairline слева) ---- */}
           <motion.nav
             {...motionProps}
             custom={1}
             variants={columnVariants}
             aria-labelledby="footer-nav-heading"
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-4 md:col-span-2 md:border-l md:border-cream/10 md:pl-8 lg:pl-10"
           >
             <h2
               id="footer-nav-heading"
@@ -422,47 +530,15 @@ export function SiteFooter() {
               ))}
             </ul>
           </motion.nav>
-
-          {/* ---- Column 3: Клиенты и партнёры ---- */}
-          <motion.section
-            {...motionProps}
-            custom={2}
-            variants={columnVariants}
-            aria-labelledby="footer-awards-heading"
-            className="flex flex-col gap-4"
-          >
-            <h2
-              id="footer-awards-heading"
-              className="eyebrow-wide text-sm text-gold"
-            >
-              Нам доверяют
-            </h2>
-            <ul className="flex flex-col gap-2.5">
-              {[
-                "Сбербанк — корпоративные банкеты",
-                "Газпром — приёмы и фуршеты",
-                "Яндекс — офисные обеды и ивенты",
-                "«Гинза Проект» — ресторанные проекты",
-                "Отель «Хилтон Мойка 22» — банкеты",
-                "ООО «Спортинг» — события 100–350 гостей",
-              ].map((client) => (
-                <li
-                  key={client}
-                  className="flex items-start gap-2 text-sm text-cream/80"
-                >
-                  <ChevronRight
-                    className="mt-0.5 size-3.5 shrink-0 text-gold/60"
-                    aria-hidden="true"
-                  />
-                  <span>{client}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="text-xs text-cream/60">
-              2 400+ мероприятий для компаний и частных клиентов с 2007 года.
-            </p>
-          </motion.section>
         </div>
+      </div>
+
+      {/* ============ Section 3 — гигантский кинетический вордмарк ============
+          Task 2-c: визуальный якорь на месте удалённой полосы подписки.
+          Полный bleed, aria-hidden (бренд-имя читается в колонке «Контакты»),
+          не heading. overflow-x: clip — гвард от горизонтального скролла. */}
+      <div className="relative overflow-x-clip px-2 pb-8 pt-2 md:pb-12">
+        <KineticWordmark settled={settled} />
       </div>
 
       {/* ============ Section 4 — «С гордостью обслуживаем» маркие ============ */}

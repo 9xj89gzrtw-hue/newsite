@@ -25,18 +25,55 @@ import { SplitTextReveal } from "@/components/motion/split-text-reveal";
  * "Detailed / Fade / Slide / Ease" animation system, see analysis §6.1).
  * Respects `prefers-reduced-motion` — items snap to visible, no transform.
  *
+ * Media (task 2-b): REAL photos of THIS business (the company behind
+ * @nilov_catering — its own brand studio shoot, sourced from the company's
+ * site interfood-catering.ru after Instagram itself proved unreachable for
+ * anonymous scraping: profile page 429, web_profile_info 401, mirrors
+ * imginn/picuki/dumpor blocked by Cloudflare/login walls). Tile alts are
+ * honest literal descriptions verified by VLM (WM: НЕТ / PREMIUM: ДА).
+ * No usable mp4s existed in any reachable source, so the Play overlay stays
+ * a decorative (aria-hidden) Instagram-grid convention — alts describe
+ * photos, not video.
+ *
  * @see creativeedge-analysis.md §6.12 (Instagram grid)
  */
 const IG_TILES = [
-  "/media/cep/ig/ig-01.jpeg",
-  "/media/cep/ig/ig-02.jpeg",
-  "/media/cep/ig/ig-03.jpeg",
-  "/media/cep/ig/ig-04.jpeg",
-  "/media/cep/ig/ig-05.jpeg",
-  "/media/cep/ig/ig-06.jpeg",
-  "/media/cep/ig/ig-07.jpeg",
-  "/media/cep/ig/ig-08.jpeg",
-  "/media/cep/ig/ig-09.jpeg",
+  {
+    src: "/media/ig/ig-real-01.jpg",
+    alt: "Мини-канапе с кремом, ягодами и фруктовым пюре на хрустящей основе, выложены в ряд на чёрной зеркальной поверхности",
+  },
+  {
+    src: "/media/ig/ig-real-02.jpg",
+    alt: "Канапе с копчёным лососем, сливочным сыром и красной икрой на декоративных шпажках на чёрном фоне",
+  },
+  {
+    src: "/media/ig/ig-real-03.jpg",
+    alt: "Канапе на шпажках с сыром, прошутто, клубникой и манго на чёрной отражающей поверхности",
+  },
+  {
+    src: "/media/ig/ig-real-04.jpg",
+    alt: "Порционные квадратные стаканчики с капрезе: помидоры черри на шпажках, шарики моцареллы и зелень",
+  },
+  {
+    src: "/media/ig/ig-real-05.jpg",
+    alt: "Ассорти фингер-фуда для фуршета: закуски с лососем, ветчиной и морепродуктами, выложенные рядами на чёрном фоне",
+  },
+  {
+    src: "/media/ig/ig-real-06.jpg",
+    alt: "Брускетты на хрустящем багете с кремовым сыром, запечёнными креветками и вялеными томатами",
+  },
+  {
+    src: "/media/ig/ig-real-07.jpg",
+    alt: "Открытые сэндвичи на багете со слабосолёным лососем, сливочным сыром, каперсами и лаймом",
+  },
+  {
+    src: "/media/ig/ig-real-08.jpg",
+    alt: "Три порционных стакана с салатами из морепродуктов, украшенными зеленью и дольками лимона, на зеркальной поверхности",
+  },
+  {
+    src: "/media/ig/ig-real-09.jpg",
+    alt: "Жареные креветки, томаты черри и грибы на деревянных шпажках, поданные на чёрной каменной тарелке с розмарином",
+  },
 ] as const;
 
 /** Indices that get the Reel Play-icon overlay (every 3rd, 0-based). */
@@ -111,11 +148,11 @@ export function CepInstagramGrid() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
-        {IG_TILES.map((src, i) => {
+        {IG_TILES.map((tile, i) => {
           const isReel = REEL_INDICES.has(i);
           return (
             <motion.a
-              key={src}
+              key={tile.src}
               href={IG_PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
@@ -154,8 +191,8 @@ export function CepInstagramGrid() {
               >
                 <div className="relative aspect-square w-full">
                   <Image
-                    src={src}
-                    alt={`Фото ${i + 1} из ленты Instagram Interfood Catering — ${isReel ? "видео-ролик Reel с блюдом" : "блюдо или сервировка мероприятия"}`}
+                    src={tile.src}
+                    alt={tile.alt}
                     fill
                     sizes="(max-width: 768px) 33vw, 22vw"
                     className="object-cover transition-[filter,transform] duration-500 ease-out group-hover:scale-105 group-hover:saturate-150 group-hover:brightness-105"
