@@ -35,10 +35,41 @@ import * as React from "react";
  * Mobile (<1024px): sidebar display:none + body never gets has-sidebar
  * (body padding-left stays 0) → full width, no stripe.
  *
+ * Dark-section flip (R1, C67 wave D): the rail consumes the SAME dark-
+ * scheme signal as the sticky header (site-header.tsx FX5 v2). The header
+ * publishes its computed furniture scheme as the `data-header-scheme`
+ * attribute on <header>; a MutationObserver here (attribute-filtered, no
+ * scroll listener, zero per-frame work) syncs the rail's `data-scheme` to
+ * it — so over every [data-header-theme="dark"] section (founder story
+ * #about, video showcase, parallax band, footer) the rail flips to the
+ * ink variant on EXACTLY the same scrollY as the header (0px drift, one
+ * writer). SSR/first render = "light" → no hydration mine (§34).
+ *
  * @see .vertical-brand-label in src/app/globals.css
  */
 export function VerticalBrandLabel() {
   const [visible, setVisible] = React.useState(false);
+  // R1 (C67 wave D): mirrors the header's data-header-scheme. Starts
+  // "light" → SSR markup and the first client render are identical.
+  const [scheme, setScheme] = React.useState<"light" | "dark">("light");
+
+  // R1 (C67 wave D): consume the header's dark-scheme state. The header
+  // mounts in the same commit (layout.tsx) and effects run after the whole
+  // tree is committed, so it is always findable here; if it ever isn't, the
+  // rail simply stays light (same as SSR/no-JS) — it never goes dark
+  // without the header signal. Observer is disconnected on unmount.
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const header = document.querySelector("header[data-header-scheme]");
+    if (!header) return;
+    const sync = () => {
+      setScheme(header.getAttribute("data-header-scheme") === "dark" ? "dark" : "light");
+    };
+    sync();
+    const obs = new MutationObserver(sync);
+    obs.observe(header, { attributes: true, attributeFilter: ["data-header-scheme"] });
+    return () => obs.disconnect();
+  }, []);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
@@ -92,6 +123,7 @@ export function VerticalBrandLabel() {
       href="#hero"
       aria-label="Вернуться в начало — главный экран"
       className={`vertical-brand-label${visible ? " is-visible" : ""}`}
+      data-scheme={scheme}
     >
       <span className="vertical-brand-label__tick" />
       {/* Single vertical line: "INTERFOOD CATERING" reads as one

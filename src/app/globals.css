@@ -3755,7 +3755,13 @@ header[data-scrolled="true"] [data-mega-panel] {
   gap: 18px;
   /* Start hidden — fade in after scroll past hero (see .is-visible). */
   opacity: 0;
-  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  /* R1 (C67 wave D): background/border join the dark flip — same 300ms
+     color transition as the sticky header (transition-colors duration-300
+     in site-header.tsx). Opacity keeps its 0.6s hero fade-in timing. */
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   /* Anchor link semantics — the whole sidebar is a link to #hero. */
   text-decoration: none;
   color: inherit;
@@ -3769,6 +3775,8 @@ header[data-scrolled="true"] [data-mega-panel] {
   height: 36px;
   background: color-mix(in oklch, var(--ink, #1f2937) 25%, transparent);
   pointer-events: none;
+  /* R1 (C67 wave D): tick color follows the dark flip, 300ms like header. */
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .vertical-brand-label__text {
   font-family: var(--font-prata), "Playfair Display", Georgia, serif;
@@ -3791,6 +3799,8 @@ header[data-scrolled="true"] [data-mega-panel] {
 }
 .vertical-brand-label__word {
   display: inline;
+  /* R1 (C67 wave D): word color follows the dark flip, 300ms like header. */
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .vertical-brand-label__word--primary {
   /* "INTERFOOD" — ink/charcoal (the brand primary). */
@@ -3799,6 +3809,33 @@ header[data-scrolled="true"] [data-mega-panel] {
 .vertical-brand-label__word--accent {
   /* "CATERING" — gold (the accent). */
   color: var(--gold, #c9a063);
+}
+
+/* R1 (C67 wave D): dark-section variant. Over [data-header-theme="dark"]
+   sections (founder story #about, video showcase, parallax band, footer)
+   the sticky header flips to its dark glass — but this rail stayed bright
+   white, reading as a hard asymmetric seam (dark header / dark canvas from
+   x=72 / white stripe at the left edge; critic D1). The rail now consumes
+   the SAME signal — the header's data-header-scheme attribute (see
+   vertical-brand-label.tsx) — and paints the section ink #161312 (the
+   header's dark bg lab(6.16…) ≈ rgb(22,19,18) over the same ink), so the
+   canvas continues seamlessly to x=0. Text flips to cream + gold (both
+   decorative, ≥6:1 on ink); ticks cream@25%; divider cream@12% (light
+   twin uses ink@12%). Hero + light sections: attribute stays "light" —
+   zero change (verified pixel-identical, research/c67/fix/wave-d).
+   Mobile (<1024px): display:none regardless of scheme. */
+.vertical-brand-label[data-scheme="dark"] {
+  background: #161312;
+  border-right-color: rgba(247, 245, 245, 0.12);
+}
+.vertical-brand-label[data-scheme="dark"] .vertical-brand-label__word {
+  color: #f7f5f5;
+}
+.vertical-brand-label[data-scheme="dark"] .vertical-brand-label__word--accent {
+  color: #d4a373; /* header dark-variant gold (hover accent) */
+}
+.vertical-brand-label[data-scheme="dark"] .vertical-brand-label__tick {
+  background: rgba(247, 245, 245, 0.25);
 }
 
 /* Global body padding-left toggle. The sidebar occupies real space on

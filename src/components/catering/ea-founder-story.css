@@ -6,12 +6,13 @@
    outlined «НИЛОВ» (Playfair, кириллица ✓) на scrub-дрейфе, 3 главы-хроники,
    count-up строка, подпись Marck Script с «чернильным» clip-reveal.
 
-   Контраст (замер, на --efs-bg #161312, L≈0.0095):
-     --ea-cream #F7F5F5  ≈ 15.9:1 ✓ AAA
-     cream-86            ≈ 13:1   ✓ body
+   Контраст (замер, на --efs-bg #161312, L≈0.0095; research/c67/fix):
+     --ea-cream #F7F5F5  ≈ 17:1   ✓ AAA
+     cream-86            ≈ 14:1   ✓ body
      --efs-muted (62%)   ≈ 6.3:1  ✓ мелкий caps
      --efs-red-text #FF6B77 ≈ 6.4:1 ✓ мелкий красный (--ea-red #E71D3A даёт
-       лишь 3.9:1 — оставлен только для КРУПНОГО: h2 i, подпись — AA-large)
+       лишь 3.9:1 — оставлен только для КРУПНОГО h2 i; подпись переведена
+       на cream — F16, красная подпись была самым громким голосом)
    Self-contained scope: `.efs__*` + три scoped-оверрайда общих .ea-* классов.
    globals.css НЕ трогает. Вся декоративная геометрия — rem/% (§35).
    ============================================================================ */
@@ -37,15 +38,18 @@
 /* — — — — — Фоновые слои: bloom → слово → контент(z10) → зерно(z30) — — — — — */
 
 /* Мягкий тёплый radial-bloom: красный у портрета, свечной — у сцены.
-   Статичный (бесконечных анимаций нет — контракт цикла 66). */
+   Статичный (бесконечных анимаций нет — контракт цикла 66).
+   CX5 (волна-C): на DPR2 оба слоя были ниже порога заметности (замер
+   before/after в research/c67/fix/wave-c) — альфы подняты 0.09/0.05 →
+   0.12/0.07: читается как едва тёплое свечение, композицию не грязнит. */
 .efs__bloom {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 55% 42% at 14% 10%, rgba(231, 29, 58, 0.09) 0%, transparent 58%),
-    radial-gradient(ellipse 60% 48% at 88% 86%, rgba(255, 213, 178, 0.05) 0%, transparent 62%);
+    radial-gradient(ellipse 55% 42% at 14% 10%, rgba(231, 29, 58, 0.12) 0%, transparent 58%),
+    radial-gradient(ellipse 60% 48% at 88% 86%, rgba(255, 213, 178, 0.07) 0%, transparent 62%);
   background-repeat: no-repeat;
 }
 
@@ -62,7 +66,11 @@
   text-align: center;
   font-family: var(--font-serif);
   font-weight: 500;
-  font-size: clamp(4.25rem, 19vw, 17rem);
+  /* FX3 (WCAG 1.4.4, text resize 200%): рем-пол 4.25rem удваивался при html
+     32px (слово 136px на 390 — right 420 > 390). min(4.25rem, 19vw) не
+     зависит от рем-масштаба; при 100% значения те же (390 → 74px,
+     1440 → 274px, 1920 → 352px). F13: кап 17rem душпил слово на 1920 — 22rem. */
+  font-size: clamp(min(4.25rem, 19vw), 19vw, 22rem);
   line-height: 1;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -81,13 +89,15 @@
 }
 
 /* CSS-only зерно: SVG feTurbulence data-URI, поверх всего (кинематографическая
-   плёнка), opacity 0.04 — без JS, без анимации. */
+   плёнка), без JS, без анимации. CX5 (волна-C): 0.055 на DPR2 ниже порога
+   заметности (std-dev замер: research/c67/fix/wave-c) — 0.075: едва
+   читаемая плёнка, полос нет (гистограмма гладкая). */
 .efs__grain {
   position: absolute;
   inset: 0;
   z-index: 30;
   pointer-events: none;
-  opacity: 0.055;
+  opacity: 0.075;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='efs-grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23efs-grain)'/%3E%3C/svg%3E");
   background-size: 180px 180px;
 }
@@ -111,8 +121,9 @@
 
 /* Ожидаемый ход sticky (contract, замер оркестратора cycle 66): travel =
    bodyH − mediaH ≥ 600px на 1440 — пин живёт до ~0.45 высоты секции,
-   на 0.5 уже отпущен (top < 0). Растёт ТОЛЬКО воздухом между главами
-   (.efs__chapters gap) — НЕ текстом и НЕ новыми элементами. */
+   на 0.5 уже отпущен (top < 0). Растёт воздухом между главами
+   (.efs__chapters gap) и хвостовым воздухом ПОСЛЕ главы 3 (F15:
+   padding-bottom колонки) — НЕ текстом и НЕ новыми элементами. */
 .efs__grid > * {
   min-width: 0; /* §33: страховка min-width:auto рядом с overflow-clip */
 }
@@ -126,13 +137,16 @@
 }
 
 @media (max-width: 1023px) {
+  /* CX2 (волна-C): 3rem давали зазор карточка→eyebrow всего 19px (карточка
+     свешивается на 2rem). Правка волны-D (R2, критик D1): заявленные
+     «4rem → 35px» не подтверждались — замер @390 settled давал 10–20.5px,
+     т.к. карточка живёт на sceneY-скрабе −14…+18px (ea-founder-story.tsx)
+     и к концу секции доезжает вниз, съедая резерв. Резерв 4rem оставлен,
+     свес карточки урезан (см. .efs__scene-pos ниже) — вместе снова ≥30px
+     в окне соприсутствия карточки и eyebrow (замер wave-D). Desktop не
+     затронут — блок <1024. */
   .efs__media {
-    padding-bottom: 3rem;
-  }
-
-  /* На мобиле пина нет — большой desktop-гэп глав не нужен. */
-  .efs__chapters {
-    gap: 2.5rem;
+    padding-bottom: 4rem;
   }
 }
 
@@ -142,7 +156,8 @@
     gap: clamp(3rem, 5.5vw, 6rem);
   }
 
-  /* Sticky под фиксированной шапкой (~84px): top 110px (6.875rem, §35 rem). */
+  /* Sticky под фиксированной шапкой (69px — замер волны-D, R3; прежние
+     «~84px» — наследие референса talkofthetown): top 110px (6.875rem, §35). */
   .efs__media {
     position: sticky;
     top: 6.875rem;
@@ -227,9 +242,16 @@
 }
 
 @media (max-width: 1023px) {
+  /* R2 (волна-D, критик D1): −2rem сажало карточку на 32px ниже портрета —
+     вместе со sceneY-скрабом (+18px к концу секции) зазор до eyebrow
+     «Основатель · Шеф-повар» проседал до 10–20.5px settled @390 (замер
+     baseline wave-D). −1.25rem поднимает карточку на 12px: в окне
+     соприсутствия карточки и eyebrow зазор снова ≥30px при любом скролле,
+     свес 20px сохраняет внахлёст-композицию. Правый инсет 18px и desktop
+     не тронуты (замер wave-D). */
   .efs__scene-pos {
     right: -3%;
-    bottom: -2rem;
+    bottom: -1.25rem;
     width: 46%;
   }
 }
@@ -280,6 +302,24 @@
   padding-bottom: 2rem;
 }
 
+/* F15 (волна-A): ход sticky должен переживать чтение главы 3 (payoff).
+   Замер @1440: release ≈ 11060 при topDoc главы 3 ≈ 11305 — пин умирал
+   ровно в момент выхода главы. Хвостовой воздух после главы продлевает
+   travel (bodyH − mediaH) минимальным способом; мобайл (<1024, без пина)
+   не тронут — базовые 2rem. Блок ПОСЛЕ базового правила (specifity равная,
+   порядок решает — грабля F2). */
+@media (min-width: 1024px) {
+  .efs__body {
+    /* FX6 (волна-B): 22rem (352px) давали ~500px тихого хвоста после CTA
+       (F15-спейсер стоил лишнего скролла). 16rem — наибольший срез, при
+       котором замер @1440/@1920 держит контракт F15: глава 3 пересекает
+       линию 85% вьюпорта при живом пине (crossY < release), релиз без
+       нахлёста на следующую секцию, travel ≥ 600px. Замер:
+       research/c67/fix/wave-b/fx6-verify.mjs. */
+    padding-bottom: 16rem;
+  }
+}
+
 /* Scoped-оверрайд: .ea-eyebrow канонично красный #E71D3A — на ink это 3.9:1;
    для 13–15px caps поднимаем до --efs-red-text (6.4:1 ✓ AA). */
 .efs .efs__eyebrow {
@@ -290,18 +330,31 @@
   margin-top: 1.25rem;
   font-family: var(--ea-font-display);
   font-weight: 400;
-  font-size: clamp(2.5rem, 4.6vw, 3.9rem);
+  /* F1 (WCAG 1.4.4, text resize 200%): рем-пол при html 32px удваивался
+     (2.5rem → 80px) и «начинается» резалось overflow-x: clip на 390px
+     (right 461.6 > 390). Пол min(2.5rem, 11vw) не зависит от рем-масштаба;
+     при 100% значения не меняются (390 → 40px, 1920 → 62.4px). hyphens:auto
+     — аварийный перенос на экстремальных кеглях; при 100% слова помещаются
+     (замер: каждый word-range = 1 rect, переносов нет). */
+  font-size: clamp(min(2.5rem, 11vw), 4.6vw, 3.9rem);
+  hyphens: auto;
   line-height: 1.08;
   letter-spacing: -0.018em;
   color: var(--efs-cream);
   text-wrap: balance;
 }
 
-/* Italic-фрагмент — канон сайта; крупный кегль → AA-large (3.9:1 ≥ 3:1). */
+/* Italic-фрагмент — канон сайта; крупный кегль → AA-large (3.9:1 ≥ 3:1).
+   CX6 (волна-C): курсивное «рук.» читалось как дефолтный border-bottom
+   (критик). Делаем акцент НАМЕРЕННЫМ: кастомный hairline 2px, 50% красного,
+   offset 0.12em под базой — редакторская подчёркивающая черта, не UA-стиль.
+   Цвет слова не тронут (контраст тот же 3.9:1). */
 .efs__h2 i {
   font-style: italic;
   font-weight: 400;
   color: var(--ea-red);
+  border-bottom: 2px solid color-mix(in oklab, var(--ea-red) 50%, transparent);
+  padding-bottom: 0.12em;
 }
 
 .efs__divider {
@@ -321,6 +374,15 @@
   display: flex;
   flex-direction: column;
   gap: clamp(7.5rem, 17vh, 12rem);
+}
+
+/* F2 (волна-A): мобильный гэп жил ДО базового правила и молча перебивался
+   им (порядок решает при равной специфичности) — на 390 реально было
+   17vh ≈ 143px вместо 2.5rem. Блок перенесён ПОСЛЕ base. */
+@media (max-width: 1023px) {
+  .efs__chapters {
+    gap: 2.5rem;
+  }
 }
 
 .efs__chapter-label {
@@ -391,24 +453,48 @@
   color: var(--efs-muted);
 }
 
-/* Узкие экраны: статы столбиком, делители — горизонтальные hairline. */
-@media (max-width: 639px) {
+/* CX1 (волна-C): <1024 — компактная 3-в-ряд сетка (число над подписью,
+   выравнивание влево, вертикальные hairline-делители между ячейками).
+   Прежний столбик @390 давал строку 148px при мере 350px (~55% мёртвого
+   воздуха, рваные строки 148/78/102px). Замер после: высота строки ≤90px,
+   числа без переноса/клипа, подписи ≥12px (§36). Desktop ≥1024 не тронут
+   (байт-идентичные rect, verify wave-C). NBSP-группировка чисел сохранена
+   (toLocaleString ru-RU); nowrap на числе — от внутренней расклейки, не от
+   контента (группировка жива в самой строке). */
+@media (max-width: 1023px) {
   .efs__stats {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: stretch;
+    gap: 0;
   }
 
   .efs__stat {
-    padding-right: 0;
+    min-width: 0; /* §33: сетка рядом с overflow-clip */
+    padding: 0.35rem 0.5rem 0.45rem 0.875rem;
   }
 
+  .efs__stat:first-child {
+    padding-left: 0;
+  }
+
+  /* Вертикальный hairline на левом крае ячеек 2–3. */
   .efs__stat + .efs__stat::before {
     left: 0;
-    top: -0.55rem;
-    transform: none;
-    width: 100%;
-    height: 1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 2.4rem;
+  }
+
+  .efs__stat-num {
+    font-size: 1.5rem; /* «120 000+» держится в ~104px колонке без клипа */
+    white-space: nowrap;
+  }
+
+  .efs__stat-label {
+    margin-top: 0.3rem;
+    line-height: 1.35;
   }
 }
 
@@ -423,21 +509,29 @@
    отрицательными маржинами (лэйаут не сдвигается) — иначе descent
    чернильных росчерков Marck Script (≈9px ниже лайн-бокса, DPR-2 скан)
    срезался плоско нижней гранью inset(0%). Обёртка НЕ имеет кегля
-   подписи (наследует ~16px) — rem-значения от 56px (0.12/0.18/0.3em):
-   6.7/10/16.8px. Начальный inset(0% 100% 0% 0%) на расширенном боксе
-   по-прежнему прячет всё. */
+   подписи (наследует ~16px) — rem-значения от 56px (0.18/0.3em):
+   10/16.8px. F14 (волна-A): верхний пад 0.42rem = 6.7px срезал ~0.5px
+   верхнего росчерка — поднят до 0.5rem (8px, замер bbox глифов ≥2px
+   запас со всех сторон). Начальный inset(0% 100% 0% 0%) на расширенном
+   боксе по-прежнему прячет всё. */
 .efs__sign-clip {
   display: block;
-  padding: 0.42rem 0.75rem 1.05rem;
-  margin: -0.42rem -0.75rem -1.05rem;
+  padding: 0.5rem 0.75rem 1.05rem;
+  margin: -0.5rem -0.75rem -1.05rem;
 }
 
 .efs__sign {
   display: inline-block;
   font-family: var(--font-marck); /* Marck Script — cyrillic ✓ */
-  font-size: clamp(2.75rem, 4.5vw, 3.5rem);
+  /* FX3 (WCAG 1.4.4, text resize 200%): рем-пол 2.75rem удваивался (88px
+     @390 при html 32px) — подпись вылезала за кромку (right 413.4 > 390,
+     замер fx3-baseline). Пол min(2.75rem, 12vw) не зависит от рем-масштаба;
+     при 100% без изменений (390 → 44px, 1440/1920 → 56px). */
+  font-size: clamp(min(2.75rem, 12vw), 4.5vw, 3.5rem);
   line-height: 1.15;
-  color: var(--ea-red); /* крупный текст — AA-large 3.9:1 ✓ */
+  /* F16 (волна-A): красная подпись была самым громким голосом в комнате —
+   тише cream (≈17:1, как h2); красный остался только в h2 i и hairline. */
+  color: var(--efs-cream);
   transform: rotate(-2deg);
 }
 
@@ -445,7 +539,11 @@
   margin: 1rem 0 0;
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
-  font-size: 0.78rem;
+  /* FX3 (WCAG 1.4.4 @200%): рем-кегль удваивался (24.96px @390, html 32px) —
+     right 410 > 390 (замер fx3-baseline). min(0.78rem, 3.75vw) не зависит
+     от масштаба html: @100% @390 — те же 12.48px, @200% — 14.6px (растёт,
+     влезает), @320 @100% — 12px (пол §36 жив). */
+  font-size: min(0.78rem, 3.75vw);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--efs-muted);
@@ -464,9 +562,10 @@
 }
 
 /* Глобальный .ea-text-link гасит outline — возвращаем видимый focus-ring
-   (a11y: клавиатурная навигация по тёмной секции). */
+   (a11y: клавиатурная навигация по тёмной секции). F4 (волна-A): 1px @45%
+   cream давал 2.93:1 (<3:1 non-text) — 2px @90% ≥ 3:1 и заметен. */
 .efs .ea-text-link:focus-visible {
-  outline: 1px solid color-mix(in oklab, var(--efs-cream) 45%, transparent);
+  outline: 2px solid color-mix(in oklab, var(--efs-cream) 90%, transparent);
   outline-offset: 4px;
 }
 

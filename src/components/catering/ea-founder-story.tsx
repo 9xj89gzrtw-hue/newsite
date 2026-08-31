@@ -6,7 +6,6 @@ import {
   animate,
   motion,
   useInView,
-  useMotionValue,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -23,8 +22,9 @@ import "./ea-founder-story.css";
  * subtle motion; /nk.studio — юбилейная хроника с live-цифрами).
  *
  * ТЁМНАЯ editorial-секция (первая в нише about): тёплый ink #161312, cream
- * текст, зернистость CSS-only (SVG feTurbulence, opacity 0.04) + статичный
- * тёплый bloom. data-header-theme="dark".
+ * текст, зернистость CSS-only (SVG feTurbulence, opacity 0.055) + статичный
+ * тёплый bloom. data-header-theme="dark" — потребитель (флип шапки на
+ * тёмный вариант) реализован в site-header (FX5, волна-B c67).
  *
  * Структура (desktop ≥1024):
  *   ЛЕВАЯ (46%) — sticky (top 110px) дуэт-фото: портрет 3/4 (вход clip-path
@@ -32,8 +32,9 @@ import "./ea-founder-story.css";
  *   (белая рамка 4px, вход clip «шторка» слева→направо + rotate −10°→−5°,
  *   delay 0.4s; hover — lift + выпрямление). Дифференциальный scrub-дрейф
  *   фото по Y (±22px, противофаза) — MotionValues, ноль setState на кадр.
- *   За контентом на всю ширину низа — гигантское outlined «НИЛОВ» (Playfair,
- *   cyrillic ✓, stroke cream 15%) со scrub-дрейфом по X (±40px).
+ *   За контентом на всю ширину низа — гигантское outlined «Нилов» (в JSX
+ *   title-case, uppercase даёт CSS text-transform; Playfair, cyrillic ✓,
+ *   stroke cream 15%) со scrub-дрейфом по X (±40px).
  *   ПРАВАЯ (54%) — eyebrow «ОСНОВАТЕЛЬ · ШЕФ-ПОВАР», H2 «Всё начинается с
  *   рук.» (italic-фрагмент — канон сайта), красный hairline, 3 МИНИМАЛЬНЫЕ
  *   главы (2007 / Философия / Сегодня — все факты из прежнего копирайта,
@@ -58,27 +59,64 @@ import "./ea-founder-story.css";
  *
  * Доступность: landmark + aria-labelledby; декор (слово/bloom/зерно/делители)
  * aria-hidden; честные alt (VLM-сверка фактического содержимого кадров);
- * контраст: cream 15.9:1, muted 6.3:1, мелкий красный #FF6B77 6.4:1,
- * крупный --ea-red 3.9:1 (AA-large); видимый focus-ring на CTA.
+ * контраст (замер research/c67/fix): cream ≈17:1 (AAA), muted 6.3:1,
+ * мелкий красный #FF6B77 6.4:1; красный --ea-red остался только в h2 i и
+ * hairline (подпись переведена на cream, F16); focus-ring CTA 2px ≥3:1.
  */
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/* «35 человек», «2 400+», «120 000+» — из прежнего блока (цикл 28), не
-   выдуманы; «19 лет» = 2026 − 2007 (канон владельца: работаем с 2007 года,
-   как в hacc-booking V9) — канцелярит «на рынке» снят. «35 человек» живёт
-   в тексте главы 3, четвёртая стата прежнего блока не дублируется. */
-const STATS = [
-  { value: 19, suffix: "", label: "лет в Петербурге" },
+/* «2 400+», «120 000+» — из прежнего блока (цикл 28), не выдуманы; «19 лет»
+   считается от канона владельца (работаем с 2007 года, как в hacc-booking
+   V9) — не хардкод (F3, волна-A: в 2027-м стата врёт). «35 человек» и
+   «2 400+» из главы «Сегодня» сняты (F7): фигуры живут только в статах. */
+const FOUNDER_YEARS = new Date().getFullYear() - 2007;
+
+/* FX4 (волна-B): русская плюрализация — «19 лет» верно, но в 2028-м «21 лет»
+   уже неверно (21 → «год»). Каноническая тройка год/года/лет: mod10 1 → год;
+   2–4 → года; 0,5–9 → лет; исключение mod100 11–14 → лет
+   (1 год, 2 года, 5 лет, 11 лет, 21 год, 22 года, 25 лет). */
+function pluralRu(n: number, one: string, few: string, many: string): string {
+  const per100 = Math.abs(n) % 100;
+  if (per100 >= 11 && per100 <= 14) return many;
+  const per10 = Math.abs(n) % 10;
+  if (per10 === 1) return one;
+  if (per10 >= 2 && per10 <= 4) return few;
+  return many;
+}
+
+/* CX3 (волна-C): у «лет» подпись плюрализуется ПО КАДРАМ отсчёта — иначе
+   мид-флит читал «2 лет». plural-тройка + labelTail (хвост неизменен);
+   финальный label для SSR/no-JS/reduce остаётся прежней строкой. */
+type Stat = {
+  value: number;
+  suffix: string;
+  label: string;
+  plural?: readonly [string, string, string];
+  labelTail?: string;
+};
+
+const STATS: Stat[] = [
+  {
+    value: FOUNDER_YEARS,
+    suffix: "",
+    label: `${pluralRu(FOUNDER_YEARS, "год", "года", "лет")} в Петербурге`,
+    plural: ["год", "года", "лет"],
+    labelTail: " в Петербурге",
+  },
   { value: 2400, suffix: "+", label: "событий" },
   { value: 120000, suffix: "+", label: "гостей" },
-] as const;
+];
 
 /* Тезисные главы — сжатие прежних трёх абзацев (интонация founding myth). */
 const CHAPTERS = [
   {
     label: "2007",
-    text: "Одна печка, три повара и кухня на Петроградской стороне. Так начинался Interfood.",
+    // FX8 (волна-B): имя основателя жило только в подписи у самого низа —
+    // на мобиле до него доходили на ~85% прокрутки главы. Имя вплетено в
+    // главу-2007 (факт: подпись и alt уже называют Дмитрия Нилова).
+    // \u00A0 — имя не рвётся на переносе.
+    text: "Одна печка, три повара и съёмная кухня на Петроградской стороне. Так Дмитрий\u00A0Нилов начинал Interfood.",
   },
   {
     label: "Философия",
@@ -86,62 +124,100 @@ const CHAPTERS = [
   },
   {
     label: "Сегодня",
-    // \u00A0 — неразрывные пробелы в «2 400+»/«1 500»: число не рвётся
-    // переносом строки (minor-находка волны-1).
-    text: "35 человек в команде — и 2\u00A0400+ событий: от камерных свадеб на 20 гостей до приёмов на 1\u00A0500 персон в исторических особняках.",
+    // \u00A0 — неразрывные пробелы перед числами: число не отрывается от
+    // предлога и не рвётся внутри (minor-находка волны-1). F7 (волна-A):
+    // «2 400+» живёт только в стате ниже (без дублей цифр). FX7 (волна-B):
+    // «Берёмся за всё:» — единственная масс-маркет интонация секции,
+    // заменена на сенсорную подачу (B1, факты те же); ведущее «Сегодня»
+    // снято — оно уже в лейбле главы.
+    text: "Interfood накрывает стол и на\u00A0камерной свадьбе на\u00A020 гостей, и на приёме на\u00A01\u00A0500 персон — в исторических особняках города.",
   },
 ] as const;
 
 /**
- * CountUp — порт из Cycle 28 (без изменений): финальное значение рендерится
- * сразу (SSR/no-JS/reduce безопасно), при inView once — отсчёт 0→target
- * через Motion `animate()`. 3s-страховка, если IntersectionObserver молчит.
+ * CountUp — Cycle 67 (F8, волна-A: ноль ре-рендеров): финальное значение
+ * живёт в HTML сразу (SSR/no-JS/reduce видят его без JS), при inView once —
+ * отсчёт 0→target через Motion `animate()`, где onUpdate пишет textContent
+ * ИМПЕРАТИВНО (ноль setState на кадр — было ~130 ре-рендеров на стату).
+ * Страховка-таймер не нужна: без анимации в спане уже стоит финал.
+ *
+ * FX1 (волна-B): значение и суффикс — СОСЕДНИЕ узлы. Раньше onUpdate
+ * перезаписывал весь span («2 400+») и после анимации «+» исчезал;
+ * теперь пишется только в valueRef-узел, суффикс — статичный сиблинг
+ * (SSR/no-JS читают конкатенацию «2 400+», скринридер — «2 400, плюс»).
+ * B1-NIT: mid-flight значения квантуются (шаг 10 у тысяч, 100 у сотен
+ * тысяч) — «2 398» не мигает; последний кадр пишет точный target.
+ *
+ * CX3 (волна-C): подпись стата тоже рендерится здесь (сиблинг значения) —
+ * при заданном plural тройке она плюрализуется В ТОМ ЖЕ onUpdate
+ * («2 года», «3 года» … «19 лет»; финал = «19 лет в Петербурге», хвост
+ * labelTail бит-в-бит как в SSR). Reduce/no-JS/SSR: узел не трогается —
+ * в HTML уже финал. setState по-прежнему ноль.
  */
 function CountUp({
   to,
   suffix,
+  label,
+  plural,
+  labelTail,
   reduce,
 }: {
   to: number;
   suffix: string;
+  label: string;
+  plural?: readonly [string, string, string];
+  labelTail?: string;
   reduce: boolean | null;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
+  const valueRef = useRef<HTMLSpanElement>(null);
+  const labelRef = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const count = useMotionValue(0);
-  const [display, setDisplay] = useState(to.toLocaleString("ru-RU"));
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    // Reduced-motion: финальное значение сразу, без анимации.
-    if (reduce) {
-      setDisplay(to.toLocaleString("ru-RU"));
-      return;
-    }
-    if (!inView || hasAnimated.current) return;
+    // Reduced-motion / до inView: финальное значение уже в HTML — не трогаем.
+    if (reduce || !inView || hasAnimated.current) return;
     hasAnimated.current = true;
-    const controls = animate(count, to, {
+    const node = valueRef.current;
+    if (!node) return;
+    const pl = plural ?? null;
+    const tail = labelTail ?? null;
+    const labelNode = pl && tail ? labelRef.current : null;
+    const writeLabel = (v: number) => {
+      if (labelNode && pl && tail) {
+        labelNode.textContent = pluralRu(v, pl[0], pl[1], pl[2]) + tail;
+      }
+    };
+    const step = to >= 100000 ? 100 : to >= 1000 ? 10 : 1;
+    const controls = animate(0, to, {
       duration: 2.2,
       ease: EASE,
-      onUpdate: (v) => setDisplay(Math.round(v).toLocaleString("ru-RU")),
-      onComplete: () => setDisplay(to.toLocaleString("ru-RU")),
+      onUpdate: (v) => {
+        const q = Math.round(v / step) * step;
+        node.textContent = q.toLocaleString("ru-RU");
+        writeLabel(q); // CX3: «2 года» мид-флит, не «2 лет»
+      },
+      onComplete: () => {
+        node.textContent = to.toLocaleString("ru-RU");
+        writeLabel(to);
+      },
     });
-    return () => controls.stop();
-  }, [inView, to, count, reduce]);
-
-  // Страховка: если IntersectionObserver так и не сработал (редко, но бывает
-  // на очень длинных страницах) — показываем настоящее значение через 3s.
-  useEffect(() => {
-    if (reduce) return;
-    const timer = setTimeout(() => setDisplay(to.toLocaleString("ru-RU")), 3000);
-    return () => clearTimeout(timer);
-  }, [to, reduce]);
+    return () => controls.stop(); // unmount посреди отсчёта — стоп (F8)
+  }, [inView, to, reduce, plural, labelTail]);
 
   return (
-    <span ref={ref} suppressHydrationWarning>
-      {display}
-      {suffix}
-    </span>
+    <>
+      <span ref={ref} className="efs__stat-num" suppressHydrationWarning>
+        <span ref={valueRef} suppressHydrationWarning>
+          {to.toLocaleString("ru-RU")}
+        </span>
+        {suffix ? <span>{suffix}</span> : null}
+      </span>
+      <span ref={labelRef} className="efs__stat-label" suppressHydrationWarning>
+        {label}
+      </span>
+    </>
   );
 }
 
@@ -159,6 +235,12 @@ function CountUp({
  * пересчитывают rect элемента в момент вызова — дрейф поглощается повторами
  * (паттерн hacc-booking V7). В проде с кэшированными картинками дрейф мал,
  * но anchor-jump-навигация получает тот же риск — паттерн на оба случая.
+ *
+ * F5 (волна-A): безусловные ретаргеты на 650/1250ms насильно возвращали
+ * юзера, который во время полёта крутанул колесо вверх. ПЕРВОЕ намерение
+ * (wheel/touchstart/keydown, passive) отменяет отложенные таймеры — юзер-
+ * скролл побеждает. Страховочный таймер 2200ms чистит слушатели после
+ * приземления (полёт 1.1s + ретаргеты ≤ 1.75s).
  */
 function scrollToMenu() {
   if (typeof window === "undefined") return;
@@ -174,8 +256,24 @@ function scrollToMenu() {
     // элемента в момент вызова) — лэйаут-дрейф выше #menu (ленивые фото,
     // дев-оптимизация) поглощается повторами. Паттерн hacc-booking V7.
     lenis.scrollTo(target, { offset: 0, duration: 1.1 });
-    window.setTimeout(() => lenis.scrollTo?.(target, { offset: 0, duration: 0.7 }), 650);
-    window.setTimeout(() => lenis.scrollTo?.(target, { offset: 0, duration: 0.5 }), 1250);
+    const timers = [
+      window.setTimeout(() => lenis.scrollTo?.(target, { offset: 0, duration: 0.7 }), 650),
+      window.setTimeout(() => lenis.scrollTo?.(target, { offset: 0, duration: 0.5 }), 1250),
+    ];
+    // Отмена по первому юзер-намерению (см. F5 в докблоке). Взаимное снятие
+    // всех трёх слушателей; вызов после их же снятия — безопасен.
+    const cancelRetargets = () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      window.removeEventListener("wheel", cancelRetargets);
+      window.removeEventListener("touchstart", cancelRetargets);
+      window.removeEventListener("keydown", cancelRetargets);
+    };
+    window.addEventListener("wheel", cancelRetargets, { passive: true });
+    window.addEventListener("touchstart", cancelRetargets, { passive: true });
+    // FX9 (волна-B): keydown тоже passive — обработчик не вызывает
+    // preventDefault (только снимает таймеры и слушатели), нечему блокировать.
+    window.addEventListener("keydown", cancelRetargets, { passive: true });
+    window.setTimeout(cancelRetargets, 2200);
   } else {
     target.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -202,6 +300,14 @@ export function EaFounderStory() {
     return () => mq.removeEventListener("change", update);
   }, []);
 
+  // FX2 (волна-B): вход сцены (1.0s + delay 0.4) раньше наследовался
+  // возвратом из hover — после ухода курсора стояло ~505ms мёртвого delay
+  // и ~1.0s плавного возврата. sceneEntered взводится onAnimationComplete
+  // входа: ПЕРВЫЙ вход сохраняет delay 0.4s, каждый возврат из hover после
+  // — короткий (0.35s) и мгновенный. Пишется только в колбеке (React
+  // Compiler §37: ref-записи в рендере запрещены — использую state).
+  const [sceneEntered, setSceneEntered] = useState(false);
+
   const sectionRef = useRef<HTMLElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -218,13 +324,43 @@ export function EaFounderStory() {
   const sceneInView = useInView(sceneRef, { once: true, margin: "-60px" });
   const signInView = useInView(signRef, { once: true, margin: "-80px" });
 
+  // F19 (волна-A): на anchor-jump #about ленивая загрузка портрета гонка с
+  // clip-reveal — кадр «выскакивал» наполовину загруженным. Reveal стартаует
+  // только после img.decode() (race с 800ms-фоллбеком: reveal всегда
+  // срабатывает ≤800ms). Decode зовётся ТОЛЬКО при inView — loading="lazy"
+  // сохранён, вне вьюпорта ничего не форсируется. Reduce/no-JS: анимации нет
+  // (settled=false), гейт не участвует.
+  const [portraitReady, setPortraitReady] = useState(false);
+  useEffect(() => {
+    if (!portraitInView || portraitReady) return;
+    let cancelled = false;
+    const done = () => {
+      if (!cancelled) setPortraitReady(true);
+    };
+    const fallback = window.setTimeout(done, 800);
+    const img = portraitRef.current?.querySelector("img");
+    if (img) {
+      img.decode().then(done, done);
+    } else {
+      done();
+    }
+    return () => {
+      cancelled = true;
+      window.clearTimeout(fallback);
+    };
+  }, [portraitInView, portraitReady]);
+
   // Scrub-дрейф: один useScroll + useTransform-слайсы + useSpring —
   // MotionValues, ноль setState на кадр (§35). Только transform.
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const springOpts = { stiffness: 55, damping: 22, mass: 0.6 } as const;
+  // F10 (волна-A): 55/22 тащил упругий хвост (дрейф −32→+2px ~900ms после
+  // резкого стопа — скорость, накопленная скроллом, давала перелёт даже при
+  // формально overdamped пружине). 90/26 гасит заметно быстрее — замер в
+  // research/c67/fix.
+  const springOpts = { stiffness: 90, damping: 26, mass: 0.6 } as const;
   const wordX = useSpring(useTransform(scrollYProgress, [0, 1], [40, -40]), springOpts);
   const portraitY = useSpring(useTransform(scrollYProgress, [0, 1], [22, -22]), springOpts);
   const sceneY = useSpring(useTransform(scrollYProgress, [0, 1], [-14, 18]), springOpts);
@@ -284,9 +420,10 @@ export function EaFounderStory() {
                 {...(settled
                   ? {
                       initial: { clipPath: "inset(100% 0% 0% 0%)" },
-                      animate: portraitInView
-                        ? { clipPath: "inset(0% 0% 0% 0%)" }
-                        : undefined,
+                      animate:
+                        portraitInView && portraitReady // F19: ждать decode кадра
+                          ? { clipPath: "inset(0% 0% 0% 0%)" }
+                          : undefined,
                       transition: { duration: narrow ? 0.9 : 1.1, ease: EASE },
                     }
                   : {})}
@@ -296,18 +433,22 @@ export function EaFounderStory() {
                   {...(settled
                     ? {
                         initial: { scale: 1.12 },
-                        animate: portraitInView ? { scale: 1 } : undefined,
+                        animate:
+                          portraitInView && portraitReady // F19: ждать decode кадра
+                            ? { scale: 1 }
+                            : undefined,
                         transition: { duration: narrow ? 1.15 : 1.4, ease: EASE },
                       }
                     : {})}
                 >
                   <div className="efs__portrait-frame">
                     <Image
-                      src="/media/c66/founder-portrait-v3.webp"
+                      src="/media/c67/founder-portrait-v5.webp"
                       alt="Дмитрий Нилов, основатель Interfood Catering, в фирменном фартуке на банкетной площадке"
                       fill
                       /* 480px = кап .efs__portrait-pos (≥1280) → DPR2 ровно 960
-                         device-px (натив источника), бакет 1200 вместо 1920. */
+                         device-px (натив источника); бакет 1080 — ближайший в
+                         дефолтном deviceSizes, не 1920 (FX10b). */
                       sizes="(max-width: 1023px) 92vw, 480px"
                       className="efs__portrait-img"
                     />
@@ -353,17 +494,36 @@ export function EaFounderStory() {
                     ? {
                         initial: { rotate: -10 },
                         animate: sceneInView ? { rotate: -5 } : undefined,
-                        whileHover: { rotate: 0, y: -6 },
-                        transition: { duration: narrow ? 0.85 : 1.0, delay: 0.4, ease: EASE },
+                        // F6 (волна-A): hover-переход свой — короткий, без
+                        // delay 0.4; входной transition (1.0s + delay) больше
+                        // не наследуется жестом (hover отвечал через 250ms,
+                        // доезжал ~1.85s).
+                        whileHover: {
+                          rotate: 0,
+                          y: -6,
+                          transition: { duration: 0.3, ease: "easeOut" },
+                        },
+                        // FX2 (волна-B): возврат из hover больше не ездит на
+                        // входном delay 0.4 — после завершения входа
+                        // (onAnimationComplete → sceneEntered) возврат
+                        // 0.35s БЕЗ delay; самый первый вход — прежний
+                        // (1.0s + 0.4s). whileHover-in по-прежнему 0.3s.
+                        onAnimationComplete: () => setSceneEntered(true),
+                        transition: sceneEntered
+                          ? { duration: 0.35, ease: EASE }
+                          : { duration: narrow ? 0.85 : 1.0, delay: 0.4, ease: EASE },
                       }
                     : {})}
                 >
                 <div className="efs__scene-frame">
                   <Image
-                    src="/media/c66/founder-scene-v3.webp"
-                    alt="Дмитрий Нилов за работой — накрытый банкетный стол: сервировка, зелень и свечи перед праздником"
+                    src="/media/c67/founder-scene-v4.webp"
+                    alt="Дмитрий Нилов у накрытого банкетного стола — сервировка, зелень и свечи перед праздником"
                     fill
-                    sizes="(max-width: 1023px) 46vw, 20vw"
+                    /* F9 (волна-A): 20vw при 1920 DPR2 просил w=828 против
+                       достаточных 640 (слот карточки ~270px). Мобайл: 46vw
+                       покрывает слот карточки (46% ширины media) с запасом. */
+                    sizes="(max-width: 1023px) 46vw, 270px"
                     className="efs__scene-img"
                   />
                 </div>
@@ -386,7 +546,6 @@ export function EaFounderStory() {
               key={`h2-${on}`}
               id="ea-founder-story-headline"
               className="efs__h2"
-              aria-label="Всё начинается с рук."
               {...fadeUp(0.08)}
             >
               Всё начинается с <i>рук.</i>
@@ -415,14 +574,19 @@ export function EaFounderStory() {
             </div>
 
             {/* Строка count-up: 19 / 2 400+ / 120 000+, hairline-делители,
-                tabular-nums. */}
+                tabular-nums. CX3: подпись года рендерится в CountUp —
+                плюрализуется по кадрам отсчёта. */}
             <motion.div key={`stats-${on}`} className="efs__stats" {...fadeUp(0.4)}>
               {STATS.map((stat) => (
                 <div key={stat.label} className="efs__stat">
-                  <span className="efs__stat-num">
-                    <CountUp to={stat.value} suffix={stat.suffix} reduce={reduce} />
-                  </span>
-                  <span className="efs__stat-label">{stat.label}</span>
+                  <CountUp
+                    to={stat.value}
+                    suffix={stat.suffix}
+                    label={stat.label}
+                    plural={stat.plural}
+                    labelTail={stat.labelTail}
+                    reduce={reduce}
+                  />
                 </div>
               ))}
             </motion.div>
@@ -464,7 +628,6 @@ export function EaFounderStory() {
                   scrollToMenu();
                 }}
                 className="ea-text-link"
-                aria-label="Смотреть меню — перейти к разделу"
               >
                 Смотреть меню
                 <svg
@@ -481,7 +644,7 @@ export function EaFounderStory() {
         </div>
       </div>
 
-      {/* CSS-only зерно поверх всей сцены (opacity 0.04, без JS). */}
+      {/* CSS-only зерно поверх всей сцены (opacity 0.055, без JS) — FX10a. */}
       <div className="efs__grain" aria-hidden="true" />
     </section>
   );

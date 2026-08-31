@@ -65,7 +65,7 @@ import { BackToTop } from "@/components/catering/back-to-top";
 //                              + lead form + contacts in one receipt scene (nuqs state,
 //                              POST /api/lead). Anchors: #calculator (section top),
 //                              #contact (form zone).
-//   15. EaFounderStory       — founder-forward 2-col About + 4 count-up stats + CTA.
+//   15. EaFounderStory       — founder-forward 2-col About + 3 count-up stats + CTA.
 //   16. GammaSeparator       — PARALLAX BAND. Full-bleed separator image + "interfood"
 //                               -6° handwritten watermark. Transition into FAQ.
 //   17. EaFaqAccordion       — minimalist 6-item accordion (resolves objections).
@@ -209,7 +209,7 @@ export default function Home() {
       </Suspense>
 
       {/* 15. EaFounderStory — Cycle 28 founder-forward 2-col About: photo LEFT,
-              story + 4 count-up stats + CTA RIGHT. Italic-as-fragment "Откройте
+              story + 3 count-up stats + CTA RIGHT. Italic-as-fragment "Откройте
               нашу *историю*." + named milestones (СБЕР, ГАЗПРОМ, ЯНДЕКС partnerships). */}
       <EaFounderStory />
 

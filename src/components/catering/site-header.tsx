@@ -30,6 +30,24 @@ import { CONTACTS } from "@/lib/media";
  * — nav items are shown directly (talkofthetown shows them inline, not
  * behind a MENU button).
  *
+ * Dark-section flip (FX5, C67 wave B; v2 — CX4, wave C): sections across the
+ * site declare `data-header-theme="dark"` (founder story, video showcase,
+ * parallax band, footer, …). While ANY such section covers the vertical
+ * MIDPOINT of the sticky header band, the header flips to a dark variant:
+ * translucent ink glass (#161312/85) + cream text (≥ 4.5:1 AA; hover — gold).
+ * v1 used an IntersectionObserver whose root was exactly the header band —
+ * it flipped OUT only when a section FULLY left the band, so the light next
+ * section scrolled under a still-dark header (critic: ~816px perceived
+ * hold-over) and the 500ms crossfade read muddy. v2 trigger = band-midpoint
+ * coverage (rect.top <= bandMid && rect.bottom >= bandMid), evaluated on a
+ * rAF-throttled scroll handler; section document offsets are cached on
+ * resize, and getBoundingClientRect is read ONLY when the band midpoint is
+ * within ±1.5 viewport heights of a section's cached bounds (no per-frame
+ * layout reads when far away; near reads write the fresh rect back to the
+ * cache). Crossfade 500ms → 300ms. SSR/first render = light (state starts
+ * false): the attribute is an enhancement — no-JS/reduced-motion never flip,
+ * header stays light and readable (5.7:1) — no hydration mine (§34).
+ *
  * @see docs/talkofthetown-MINED-EXTRACTION.md (header structure)
  */
 
@@ -47,6 +65,9 @@ const NAV: NavItem[] = [
 export function SiteHeader() {
   const [stuck, setStuck] = useState(false);
   const [open, setOpen] = useState(false);
+  // FX5 (C67 wave B): a [data-header-theme="dark"] section occupies the
+  // header band right now. Starts false → SSR/first render = light.
+  const [themeDark, setThemeDark] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -76,6 +97,101 @@ export function SiteHeader() {
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // FX5 v2 (CX4, wave C): dark-section watcher. Trigger = band-midpoint
+  // coverage: dark iff a dark section's rect covers the header band's
+  // vertical midpoint. rAF-throttled scroll handler; document offsets cached
+  // on resize (+ refreshed from every near gBCR read — self-healing against
+  // lazy-layout drift); precise rect reads ONLY within ±1.5 viewport heights
+  // of cached bounds — zero per-frame layout reads when far away. rAF and
+  // listeners are cleaned up on unmount. No ref writes in render (§37).
+  //
+  // FX5-N2 (волна-D): инстантные программные прыжки по якорям (location.hash,
+  // прямая загрузка /#about) не гарантируют scroll-события после скачка, а
+  // дрейф лэйаута ПОСЛЕ прыжка (ленивые картинки, шрифты, late-mount блоки)
+  // вообще не порождает ни scroll, ни resize — кэш границ и bandMid стареют,
+  // шапка читает свет над тёмной секцией до первого реального скролла юзера
+  // (замер: founder top-in-vp 66px < bandMid 110px → scheme залипает «light»).
+  // Фикс: (1) evaluate однократно на монте — уже было (cache()+evaluate());
+  // (2) listener 'hashchange' → re-cache + evaluate на следующем кадре;
+  // (3) ResizeObserver на body — дрейф документа без скролла тоже пере-оцениваем
+  // (ResizeObserver доступен базово, в effect — React Compiler safe, §37).
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-header-theme="dark"]'),
+    );
+    if (sections.length === 0) return;
+
+    let bounds: Array<{ el: HTMLElement; top: number; bottom: number }> = [];
+    let bandMid = (header.offsetHeight || 84) / 2;
+    let raf = 0;
+
+    const cache = () => {
+      const docTop = window.scrollY;
+      bandMid = (header.offsetHeight || 84) / 2;
+      bounds = sections.map((el) => {
+        const r = el.getBoundingClientRect();
+        return { el, top: r.top + docTop, bottom: r.bottom + docTop };
+      });
+    };
+
+    const evaluate = () => {
+      raf = 0;
+      const docMid = window.scrollY + bandMid;
+      const reach = window.innerHeight * 1.5;
+      let dark = false;
+      for (const b of bounds) {
+        // Fast path: cached bounds say we are far away — no layout read.
+        if (docMid < b.top - reach || docMid > b.bottom + reach) continue;
+        const r = b.el.getBoundingClientRect();
+        // Self-heal the cache with the fresh rect (lazy layout drift).
+        const docTop = window.scrollY;
+        b.top = r.top + docTop;
+        b.bottom = r.bottom + docTop;
+        if (r.top <= bandMid && r.bottom >= bandMid) {
+          dark = true;
+          break;
+        }
+      }
+      setThemeDark(dark); // React bails out when the value is unchanged
+    };
+
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(evaluate);
+    };
+    const onResize = () => {
+      cache();
+      onScroll();
+    };
+    // FX5-N2: re-cache + re-evaluate без пользовательского скролла. Хэш-прыжок
+    // скачет мгновенно (scroll-margin-top:84px сажает секцию под шапку) и может
+    // совпасть с дрейфом лэйаута — старые doc-границы уводят fast-path мимо
+    // секции, поэтому пересобираем кэш ДО оценки кадра.
+    const reCacheAndEvaluate = () => {
+      cache();
+      onScroll();
+    };
+    const onHash = () => reCacheAndEvaluate();
+    // Дрейф лэйаута (картинки/шрифты/Suspense-вставки) меняет высоту body —
+    // ни scroll, ни resize при этом не приходят. RO догоняет геометрию.
+    const ro = new ResizeObserver(() => reCacheAndEvaluate());
+
+    cache();
+    evaluate();
+    ro.observe(document.body);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("hashchange", onHash);
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   // Lock body scroll when mobile menu open.
@@ -110,6 +226,10 @@ export function SiteHeader() {
   // with the hero, sticks at top, then becomes slightly translucent.
   // Background: solid white when scrolling into view; translucent white +
   // backdrop-blur when stuck (Avada sticky-header feel).
+  // FX5 (v2): dark variant — only while STUCK over a [data-header-theme=dark]
+  // section whose rect covers the header band midpoint (in flow, at the hero
+  // bottom, the top band is the hero itself — nothing to flip for).
+  const dark = stuck && themeDark;
 
   return (
     <>
@@ -117,12 +237,15 @@ export function SiteHeader() {
         ref={headerRef}
         role="banner"
         data-tott-state={stuck ? "stuck" : "flow"}
+        data-header-scheme={dark ? "dark" : "light"}
         inert={open}
         aria-hidden={open}
-        className={`sticky top-0 z-50 border-b border-border-line text-ink transition-colors duration-500 ${
-          stuck
-            ? "bg-white/60 shadow-[0_6px_24px_-14px_rgba(0,0,0,0.14)] backdrop-blur-lg"
-            : "bg-white"
+        className={`sticky top-0 z-50 border-b transition-colors duration-300 ${
+          dark
+            ? "border-[#F7F5F5]/10 bg-[#161312]/85 text-[#F7F5F5] shadow-[0_6px_24px_-14px_rgba(0,0,0,0.6)] backdrop-blur-lg"
+            : stuck
+              ? "border-border-line bg-white/60 text-ink shadow-[0_6px_24px_-14px_rgba(0,0,0,0.14)] backdrop-blur-lg"
+              : "border-border-line bg-white text-ink"
         }`}
       >
         <div
@@ -159,7 +282,10 @@ export function SiteHeader() {
               <a
                 key={n.label}
                 href={n.href}
-                className="tott-body min-h-[44px] flex items-center text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 hover:text-tott-burgundy"
+                className={`tott-body min-h-[44px] flex items-center text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 ${
+                  // FX5: burgundy hover dies on ink (≈1.6:1) — gold in dark.
+                  dark ? "hover:text-[#D4A373]" : "hover:text-tott-burgundy"
+                }`}
                 style={{ fontWeight: 700 }}
               >
                 {n.label}
@@ -178,7 +304,9 @@ export function SiteHeader() {
           <div className="flex items-center gap-3">
             <a
               href={CONTACTS.phoneHref}
-              className="tott-body hidden min-h-[44px] items-center gap-2 text-[15px] font-700 uppercase tracking-[0.04em] text-ink opacity-85 transition-all duration-300 hover:opacity-100 hover:text-tott-burgundy sm:inline-flex"
+              className={`tott-body hidden min-h-[44px] items-center gap-2 text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 sm:inline-flex ${
+                dark ? "text-[#F7F5F5] hover:text-[#D4A373]" : "text-ink hover:text-tott-burgundy"
+              }`}
               style={{ fontWeight: 700 }}
               aria-label={`Позвонить ${CONTACTS.phone}`}
             >
@@ -190,7 +318,11 @@ export function SiteHeader() {
                 border, black text, square corners, hover fills black. → #contact */}
             <a
               href="#contact"
-              className="tott-body hidden min-h-[44px] items-center justify-center border-2 border-black bg-transparent px-5 text-[13px] font-700 uppercase tracking-[0.08em] text-black transition-colors duration-300 hover:bg-black hover:text-white sm:inline-flex"
+              className={`tott-body hidden min-h-[44px] items-center justify-center border-2 bg-transparent px-5 text-[13px] font-700 uppercase tracking-[0.08em] transition-colors duration-300 sm:inline-flex ${
+                dark
+                  ? "border-[#F7F5F5]/80 text-[#F7F5F5] hover:bg-[#F7F5F5] hover:text-[#161312]"
+                  : "border-black text-black hover:bg-black hover:text-white"
+              }`}
               style={{ fontWeight: 700, borderRadius: 0 }}
               aria-label="Заказать кейтеринг"
             >
@@ -199,7 +331,9 @@ export function SiteHeader() {
             {/* Mobile: phone icon only */}
             <a
               href={CONTACTS.phoneHref}
-              className="min-w-[44px] min-h-[44px] flex items-center justify-center text-tott-burgundy transition-colors sm:hidden"
+              className={`min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors sm:hidden ${
+                dark ? "text-[#F7F5F5]" : "text-tott-burgundy"
+              }`}
               aria-label={`Позвонить ${CONTACTS.phone}`}
             >
               <Phone className="size-6" />
@@ -208,7 +342,9 @@ export function SiteHeader() {
             <button
               ref={triggerRef}
               onClick={() => setOpen(true)}
-              className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 text-ink transition-colors lg:hidden"
+              className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors lg:hidden ${
+                dark ? "text-[#F7F5F5]" : "text-ink"
+              }`}
               aria-label={open ? "Закрыть меню" : "Открыть меню"}
               aria-expanded={open ? "true" : "false"}
               aria-controls="mobile-menu"
