@@ -311,9 +311,14 @@
   content: "";
   position: absolute;
   left: 50%;
-  top: 26px;
+  /* W2-FIX (тач-таргет ≥40×40): прозрачная кликабельная зона поднята
+     до середины метки и выросла до 40px высоты (было 26/22 — 22px).
+     Визуал не меняется (зона прозрачная), низ — как был, уровнем ниже
+     метки. Верхний срез (середина цифры) почти не пересекается с
+     бегунком (thumb 9–35 внутри рельса, зона с 31) — драг жив. */
+  top: 13px;
   width: 48px;
-  height: 22px;
+  height: 40px;
   transform: translateX(-50%);
   pointer-events: auto;
 }
@@ -322,7 +327,9 @@
 .hb-slider__tick:last-of-type::after {
   left: auto;
   right: 0;
-  width: 38px;
+  /* W2-FIX: 38 → 44px — тач-таргет ≥40px и у крайнего тика (прижат
+     к правому краю, за вьюпорт не вылезает — растёт влево) */
+  width: 44px;
   transform: none;
 }
 .hb-slider__tick:focus-visible {
@@ -474,7 +481,9 @@
   border-radius: 12px;
   background: #fff;
   font-family: var(--hb-body-font);
-  font-size: 0.9rem;
+  /* W2-FIX: 14.4 → 16px — iOS Safari не зумит страницу при фокусе
+     на поле даты (зум срабатывает при <16px на любом вьюпорте) */
+  font-size: 1rem;
   color: var(--hb-ink);
   color-scheme: light;
 }
@@ -1653,4 +1662,17 @@
   .hb-block,
   .hb-contacts > *,
   .hb-paper { animation: none; }
+}
+
+/* ================================================== W2-FIX (волна 2):
+   видимые метки-пресеты слайдера кликабельны на десктопе (fine pointer).
+   Мобильный drag-фикс Cycle 65 (pointer-events:none на .hb-slider__tick,
+   чтобы тач-драг от тика не умирал на кнопке) сохраняется для coarse
+   pointer — на десктопе же клик по видимой цифре «50» раньше проваливался
+   в range под меткой и давал 51 гостя. Кнопка — z-index:2 НАД range,
+   её onClick ставит точное значение тика. Родительский .hb-slider__rail
+   имеет pointer-events:none, но auto на потомке ре-включает
+   hit-testing (то же работает и для ::after-полосы). */
+@media (hover: hover) and (pointer: fine) {
+  .hb-slider__tick { pointer-events: auto; }
 }

@@ -33,12 +33,20 @@ export function Preloader() {
       return;
     }
     setShow(true);
+    // W2-FIX: внутренний таймер cleanup + 900 → 1200ms. Exit-анимация
+    // панелей: 0.8s + 3×0.08s stagger = 1.04s — при 900ms последняя дверь
+    // обрывалась на полёте (AnimatePresence вырезал её раньше конца).
+    // 1200ms даёт полный дожор + 160ms запас на композицию кадра.
+    let exitTimer: ReturnType<typeof setTimeout> | undefined;
     const t = setTimeout(() => {
       setShow(false);
       sessionStorage.setItem("catering-preloaded", "1");
-      setTimeout(() => setDone(true), 900);
+      exitTimer = setTimeout(() => setDone(true), 1200);
     }, 1400);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      if (exitTimer) clearTimeout(exitTimer);
+    };
   }, []);
 
   if (done) return null;

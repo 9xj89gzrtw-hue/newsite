@@ -98,6 +98,9 @@ interface MenuCat extends MenuType {
   priceLabel: string;
   /** Сниматель возражения одной строкой под хуком (симуляции клиентов C59). */
   hookNote?: string;
+  /** W2-FIX: капс-лейбл для data-cursor корешка (1–2 слова, капсом
+      в бейдже курсора — см. cursor.tsx: label/preview). */
+  cursorLabel: string;
 }
 
 /**
@@ -112,13 +115,15 @@ const META: Record<
     ctaHref: string;
     priceLabel?: string;
     hookNote?: string;
+    cursorLabel: string;
   }
 > = {
-  buffet: { tint: "#F5EEE2", ctaLabel: "Рассчитать фуршет", ctaHref: "#calculator" },
+  buffet: { tint: "#F5EEE2", ctaLabel: "Рассчитать фуршет", ctaHref: "#calculator", cursorLabel: "ФУРШЕТ" },
   banquet: {
     tint: "#F6E0DB",
     ctaLabel: "Рассчитать банкет",
     ctaHref: "#calculator",
+    cursorLabel: "БАНКЕТ",
     // симуляция C59 (Виктор, 25 гостей): минимум «от 30» не должен повисать;
     // Мила (W6): крючок «дегустация» рядом с CTA (дегустация есть в FAQ)
     hookNote:
@@ -129,22 +134,25 @@ const META: Record<
     ctaLabel: "Заказать наборы",
     ctaHref: "#calculator",
     priceLabel: "за гостя",
+    cursorLabel: "ЗАКУСКИ",
   },
-  "coffee-break": { tint: "#F4DECD", ctaLabel: "Заказать кофе-брейк", ctaHref: "#calculator" },
+  "coffee-break": { tint: "#F4DECD", ctaLabel: "Заказать кофе-брейк", ctaHref: "#calculator", cursorLabel: "КОФЕ-БРЕЙК" },
   vegetarian: {
     tint: "#F6E9C9",
     ctaLabel: "Обсудить меню",
     ctaHref: "#contact",
+    cursorLabel: "ВЕГЕ МЕНЮ",
     // симуляция C59 (Анастасия/жюри-W3): мостик «вегетарианцы на общем банкете»
     hookNote:
       "Включим вегетарианские позиции и в общий банкет: смешанный состав — это норма.",
   },
-  bbq: { tint: "#F3E3E8", ctaLabel: "Рассчитать барбекю", ctaHref: "#calculator" },
+  bbq: { tint: "#F3E3E8", ctaLabel: "Рассчитать барбекю", ctaHref: "#calculator", cursorLabel: "БАРБЕКЮ" },
   "office-lunch": {
     tint: "#F5EEE2",
     ctaLabel: "Заказать обеды",
     ctaHref: "#contact",
     priceLabel: "за порцию",
+    cursorLabel: "ОБЕДЫ",
     // симуляция C59 (Елена): ответ про регулярность без выдуманных фактов
     hookNote:
       "Меню на неделю соберём под ваш офис: согласуем дни доставки и состав наборов.",
@@ -156,6 +164,7 @@ const FALLBACK_META = {
   ctaLabel: "Обсудить меню",
   ctaHref: "#contact",
   priceLabel: "за гостя",
+  cursorLabel: "МЕНЮ",
 };
 
 /** Если у пакета нет фото — показываем проверенный фуршетный кадр. */
@@ -816,6 +825,17 @@ function MenuRack({
                 }}
                 id={spineId(k)}
                 data-spine-index={k}
+                /* W2-FIX (ВАУ-фича курсора): на каждом корешке каталога —
+                   превью-фото выбранного пакета (120px карточка у курсора,
+                   cursor.tsx читает data-cursor-image с ближайшего
+                   интерактива; атрибут на самой кнопке = closest(button)).
+                   Бейдж-лейбл — data-cursor (1–2 слова капсом). Пока панель
+                   закрыта — превью фото пакета; открытая панель и так
+                   показывает это фото крупно (undefined → без превью). */
+                data-cursor={cat.cursorLabel}
+                data-cursor-image={
+                  !isOpen ? (cat.packages[pkgIdx]?.photo ?? FALLBACK_PHOTO) : undefined
+                }
                 className="hmenu__spine"
                 aria-expanded={isOpen}
                 aria-controls={panelId(k)}
@@ -939,6 +959,11 @@ function MenuRack({
                           type="button"
                           role="tab"
                           id={`${baseId}-pkg-${cat.id}-${pi}`}
+                          /* W2-FIX: строка меню с фото — превью пакета у
+                             курсора (см. spine выше), бейдж = имя ступени
+                             (скобочные уточнения срезаем — бейдж 1–2 слова) */
+                          data-cursor={p.name.split(" (")[0].toUpperCase()}
+                          data-cursor-image={p.photo ?? undefined}
                           className="hmenu__tab"
                           aria-selected={pi === pkgIdx}
                           aria-controls={`${baseId}-dishlist-${cat.id}`}

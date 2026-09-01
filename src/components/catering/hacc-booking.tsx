@@ -2613,7 +2613,7 @@ export function HaccBooking() {
                         <button
                           type="button"
                           onClick={openForm}
-                          data-cursor="inquiry"
+                          data-cursor="заявка"
                           className="hb-btn hb-btn--paper min-h-[52px] w-full justify-center"
                         >
                           Оставить заявку

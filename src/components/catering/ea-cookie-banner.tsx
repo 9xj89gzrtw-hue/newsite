@@ -49,8 +49,11 @@ const LINK_PRIVACY_HREF = "/privacy";
 const LINK_TERMS_HREF = "/terms";
 
 // Tailwind classnames hoisted so AnimatePresence child JSX stays readable.
+// W2-FIX: py-2.5 → py-4 (компенсация -my-4) — тач-таргет ссылки
+// 39 → ~43px (≥40px; инлайн-бокс даёт content ~11px + 2×16px паддинг)
+// при том же визуальном размере текста 10.5px.
 const LINK_CLASS =
-  "no-underline text-[var(--ea-red)] transition-colors hover:text-[var(--ea-red-deep)] hover:underline focus-visible:underline py-2.5 -my-2.5";
+  "no-underline text-[var(--ea-red)] transition-colors hover:text-[var(--ea-red-deep)] hover:underline focus-visible:underline py-4 -my-4";
 const BTN_OUTLINE_CLASS =
   "border border-[var(--ea-cream)] bg-transparent text-[var(--ea-cream)] hover:bg-white/10 focus-visible:bg-white/10";
 const BTN_SOLID_CLASS =

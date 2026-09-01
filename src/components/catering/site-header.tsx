@@ -373,11 +373,15 @@ export function SiteHeader() {
         </div>
       </header>
 
-      {/* Full-screen mobile menu — WHITE theme */}
+      {/* Full-screen mobile menu — WHITE theme.
+          W2-FIX: z-[60] → z-[90] — оверлей меню ВЫШЕ cookie-баннера
+          (fixed z-[80]): раньше баннер перекрывал нижний ряд меню
+          (телефон, mt-auto). Теперь открытое меню полностью над
+          баннером, телефон кликабелен. */}
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[60] flex flex-col bg-white px-6 py-6 lg:hidden"
+            className="fixed inset-0 z-[90] flex flex-col bg-white px-6 py-6 lg:hidden"
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
