@@ -375,6 +375,97 @@ export function GammaMarquee() {
     };
   }, [mounted, reducedMotion]);
 
+  // ── Task 5-C: scroll-velocity timeScale ──────────────────────────────
+  // The band reacts to scroll speed: fast scrolling accelerates the loop
+  // (playbackRate up to 2.2), scrolling up relaxes it (down to 0.6), and
+  // at rest it eases back to exactly 1. Implemented on the EXISTING
+  // compositor CSS keyframes via the Web Animations API — playbackRate
+  // changes never drag the animation back onto the main thread (a GSAP
+  // timeScale tween would reintroduce the Cycle 41 freeze).
+  //
+  // Perf: no always-on rAF. The loop wakes on scroll events (passive) and
+  // self-terminates ~0.2s after the last one, once the rate settles at 1.
+  // During pointer-drag the keyframes are `animation: none` (inline), so
+  // getAnimations() is empty and the loop is a no-op.
+  React.useEffect(() => {
+    if (!mounted || reducedMotion) return;
+    const track = trackRef.current;
+    if (!track) return;
+
+    const MAX_RATE = 2.2;
+    const MIN_RATE = 0.6;
+    /** px/ms at which the rate saturates at MAX_RATE (≈ fast flick). */
+    const SATURATION_V = 1.6;
+    /** Signed velocity: scrolling down speeds the band up, up slows it. */
+    const rateFor = (v: number) => {
+      const target = 1 + v * ((MAX_RATE - 1) / SATURATION_V);
+      return Math.max(MIN_RATE, Math.min(MAX_RATE, target));
+    };
+
+    let rafId = 0;
+    let running = false;
+    let lastY = window.scrollY;
+    let lastT = 0;
+    let vel = 0; // smoothed signed px/ms
+    let rate = 1;
+    let lastScrollAt = 0;
+
+    const apply = () => {
+      const anims = track.getAnimations();
+      for (const a of anims) {
+        if ((a as CSSAnimation).animationName === "gamma-marquee-scroll") {
+          a.playbackRate = rate;
+        }
+      }
+    };
+
+    const loop = (now: number) => {
+      const y = window.scrollY;
+      if (lastT > 0) {
+        const dt = Math.max(now - lastT, 1);
+        const v = (y - lastY) / dt;
+        vel = vel * 0.75 + v * 0.25;
+      }
+      lastY = y;
+      lastT = now;
+      // No fresh scroll events → decay toward rest.
+      const idle = now - lastScrollAt > 180;
+      if (idle) vel *= 0.88;
+      rate += (rateFor(vel) - rate) * 0.08;
+      if (idle && Math.abs(rate - 1) < 0.01) {
+        rate = 1;
+        apply();
+        running = false;
+        rafId = 0;
+        return;
+      }
+      apply();
+      rafId = requestAnimationFrame(loop);
+    };
+
+    const onScroll = () => {
+      lastScrollAt = performance.now();
+      if (!running) {
+        running = true;
+        lastT = 0;
+        rafId = requestAnimationFrame(loop);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = 0;
+      // Leave the animation at natural speed for whoever mounts next.
+      for (const a of track.getAnimations()) {
+        if ((a as CSSAnimation).animationName === "gamma-marquee-scroll") {
+          a.playbackRate = 1;
+        }
+      }
+    };
+  }, [mounted, reducedMotion]);
+
   return (
     <section
       ref={sectionRef}

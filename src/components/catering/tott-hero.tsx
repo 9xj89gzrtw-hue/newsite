@@ -20,8 +20,9 @@ import { useMounted } from "@/hooks/use-mounted";
  *     `.tott-border-frame` utility).
  *   - TOP-LEFT script accent (Nothing You Could Do) — mirrors their hero
  *     top-left script overlay ("bacon & bluecheese tartlet"). Ours:
- *     "food as art" — the Interfood brand tagline in their script font.
- *   - Centered stack: wordmark "Interfood." (Prata) + subtitle
+ *     "food as art" — the nilov catering brand tagline in their script font.
+ *   - Centered stack: wordmark "nilov / catering." (Prata, two lines,
+ *     gold dot) + subtitle
  *     "лучший кейтеринг Санкт-Петербурга" (Lato, tracked uppercase).
  *   - Scroll cue bottom-center (animated line + "SCROLL" eyebrow).
  *   - NO cities strip, NO long subhead (per task v2: лишняя информация
@@ -64,14 +65,14 @@ export function TottHero() {
     <section
       id="hero"
       data-header-theme="transparent"
-      aria-label="Interfood Catering — премиальный кейтеринг"
+      aria-label="nilov catering — лучший кейтеринг Санкт-Петербурга"
       className="relative min-h-[100svh] w-full overflow-hidden bg-black"
     >
       {/* Background image — LCP priority (next/image). Sits at z-0 and acts
           as the video poster (the video overlays it once playing). */}
       <Image
         src={HERO_POSTER}
-        alt="Премиальный банкетный стол — кейтеринг Interfood"
+        alt="Лучший банкетный стол — кейтеринг nilov catering"
         fill
         priority
         sizes="100vw"
@@ -114,7 +115,9 @@ export function TottHero() {
           ("Лучший кейтеринг" / "Санкт-Петербурга") via an explicit <br> that
           only shows on small screens (hidden sm:inline).
           Composition:
-            1. "Interfood." — massive high-contrast serif (Prata), gold dot
+            1. "nilov" / "catering." — massive high-contrast serif (Prata),
+               two explicit lines (block spans — никогда не рвётся посреди
+               слова, §1.5), gold dot after "catering"
             2. "food as art" — handwritten script (Nothing You Could Do),
                nestled tight below the wordmark (negative margin, signature)
             3. "ЛУЧШИЙ КЕЙТЕРИНГ" / "САНКТ-ПЕТЕРБУРГА" — small uppercase
@@ -129,31 +132,40 @@ export function TottHero() {
         animate={showStatic ? undefined : "visible"}
         variants={container}
       >
-        {/* Wordmark — Prata (high-contrast serif). Gold dot accent. Massive,
-            dominates the viewport. Mobile min raised so "food as art" is
-            always smaller (task v11): wordmark floor 4rem vs script floor
-            2.25rem keeps the hierarchy on narrow screens. */}
+        {/* Wordmark — Prata (high-contrast serif). Two stacked lines
+            "nilov" / "catering." — вау-композиция: широкая строка
+            "catering." (~4.1em) при 15vw занимает ~62vw — влезает и на
+            мобиле, и на десктопе. Разрыв строк — осознанный (block-спаны
+            по границе слов), mid-word перенос невозможен. Золотая точка
+            после "catering" — фирменный акцент. Mobile floor 3.5rem
+            держит иерархию над script-флор 2.25rem (task v11) и
+            гарантирует, что "catering." не упирается в px-6-поля на
+            320px-экранах. */}
         <motion.h1
           variants={rise}
           /* Cycle 40 SEO fix: the visible wordmark alone carries no keywords;
-             aria-label gives search engines «премиальный кейтеринг
+             aria-label gives search engines «лучший кейтеринг
              Санкт-Петербурга» without changing the visual design. */
-          aria-label="Interfood — премиальный кейтеринг Санкт-Петербурга"
+          aria-label="nilov catering — лучший кейтеринг Санкт-Петербурга"
           className="tott-display text-white"
           style={{
-            fontSize: "clamp(4rem, 14vw, 9.5rem)",
-            lineHeight: 0.92,
+            fontSize: "clamp(3.5rem, 15vw, 10rem)",
+            lineHeight: 0.93,
             letterSpacing: "-0.02em",
             textShadow: "0 2px 30px rgba(0,0,0,0.45)",
           }}
         >
-          Interfood<span style={{ color: "var(--gold)", marginLeft: "0.05em" }}>.</span>
+          <span className="block">nilov</span>
+          <span className="block">
+            catering<span style={{ color: "var(--gold)", marginLeft: "0.05em" }}>.</span>
+          </span>
         </motion.h1>
 
         {/* Script tagline — Nothing You Could Do (Latin script font). Nestles tight
             under the wordmark (negative mt) for a signature/underline feel.
-            Per user: "food as art" stays in English because it is phonetically
-            consonant with the company name "Interfood" (food ↔ Interfood).
+            Per user: "food as art" stays in English — латинский скрипт-акцент
+            над латинским вордмарком «nilov catering» (food ↔ catering),
+            фонетика и семантика читаются одинаково в обеих локáлях.
             Tilted -6° (rotate) for a handwritten signature gesture — mirrors
             gamma's tilted-accent device. The rotation is applied to an inner
             <span> so framer-motion's `rise` variant (opacity + y) on the
@@ -203,7 +215,7 @@ export function TottHero() {
             textShadow: "0 2px 20px rgba(0,0,0,0.4)",
           }}
         >
-          Премиальный кейтеринг
+          Лучший кейтеринг
           <br className="sm:hidden" />
           {" "}Санкт-Петербурга
         </motion.p>

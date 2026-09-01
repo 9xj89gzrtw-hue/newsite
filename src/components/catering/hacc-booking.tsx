@@ -1,10 +1,12 @@
 "use client";
 
 /**
- * HaccBooking — Cycle 64 «СМЕТА-ЧЕК INTERFOOD».
+ * HaccBooking — Cycle 64 «СМЕТА-ЧЕК NILOV CATERING» (ребрендинг task 7-E:
+ * Interfood → Nilov Catering во всех видимых текстах блока).
  * Объединённый блок: калькулятор → живой бумажный смета-чек на красной
  * панели → инлайн-форма заявки → успех (штамп + tear-off + конфетти).
- * Контакты-зона с live-бейджем и ленивой Яндекс-картой — низ той же секции.
+ * Контакты-зона с бейджем «Отвечаем в любое время» (task 7-E: live-статус
+ * Открыто/Закрыто и график офиса удалены) и ленивой Яндекс-картой — низ секции.
  *
  * Спецификация: research/c64/SPEC.md (12 контрактов §2 — соблюдены буквально,
  * см. карту контрактов в конце файла). Дизайн: research/c64/RESEARCH-DESIGN.md
@@ -23,8 +25,9 @@
  *  - Math.random — только в useMemo (конфетти; Fix5: № заявки приходит
  *    из API, локального генератора больше нет);
  *  - карта — IntersectionObserver-гейт (rootMargin 400px) + loading="lazy";
- *  - бесконечные анимации: в TSX — ноль (repeat: Infinity нет); Fix5 V11
- *    добавил ТРИ микро-CSS-анимации (печать-кольцо, 2 блика) — transform-only,
+ *  - бесконечные анимации: Fix5 V11 добавил ТРИ микро-CSS-анимации
+ *    (печать-кольцо, 2 блика); task 7-E — ОДИН framer-motion-пульс точки
+ *    бейджа «Отвечаем в любое время» (scale+opacity, 2.4s) — все transform-only,
  *    ≤2% элементов, гасятся prefers-reduced-motion (отступление от SPEC §4.5
  *    сознательное, по прямому запросу владельца «мало анимации»);
  *  - scroll-listener'ов нет вообще (IO + MutationObserver + rAF-коалесинг).
@@ -68,8 +71,9 @@
  *  - C3: постоянная плашка у минимума гостей (не исчезает за 120 мс);
  *  - C4: полный список «Включено» (без slice(0,3));
  *  - C5: строка доверия «16 лет · 2 400+ событий» у контактов (факты §0);
- *  - C6: обещание перезвона согласовано с бейджем (закрыто → без «15 минут»);
- *  - C7: «9:00–19:00», «Мы перезвоним…», «{N} ₽/чел» / «≈… · высокий сезон ×1,15».
+ *  - C6: обещание перезвона без часов — «Перезвоним сразу, как увидим заявку»
+ *    (task 7-E: live-статус офиса удалён, отвечаем в любое время);
+ *  - C7: «Мы перезвоним…», «{N} ₽/чел» / «≈… · высокий сезон ×1,15».
  *
  * Fix3 (task 11-fix3, правки волны-2: mobile + типографика):
  *  - M1: лифт sticky-бара над куки-баннером (--hbooking-cookie-h через
@@ -91,7 +95,7 @@
  *  - T3: единый формат телефона «+7 (911) 941-72-05» (formatPhoneDisplay);
  *  - T4: капс-шкала — 2 уровня (eyebrow 12.5/0.18em, label 11.5/0.14em);
  *  - T5: один красный на кнопку типа (канон соседей — red-deep, AA);
- *    бейдж: «Закрыто · откроется…» — пробел перед «·» восстановлен.
+ *    бейдж: задача 7-E сняла live-статус — точка золотая, пульс 2.4s.
  *  NOTE: блокер мобильного критика «форма не принимает ввод» ОПРОВЕРГНУТ
  *  измерением (probe/input-check: fill+pressSequentially работают на 1440 и
  *  390) — логика инпутов в этом таске НЕ трогалась.
@@ -151,9 +155,8 @@
  *  7. CustomEvent catering:calc-lead при успешном сабмите (addons: []) +
  *     слушатель catering:menu-select (строка И {typeId,guests} — оба шейпа);
  *  8. id="calculator" на секции, id="contact" на зоне формы;
- *  9. toast-канон «Перезвоним за 15 минут в рабочее время» (динамика C6
- *     fix2: офис ЗАКРЫТ → «Перезвоним в ближайшее рабочее время»); Office
- *     hours Europe/Moscow Пн–Пт 9–19, Сб 10–16, Вс закрыто;
+ *  9. toast-канон «Перезвоним сразу, как увидим заявку» (task 7-E: часы
+ *     офиса и live-статус удалены — заявки принимаем круглосуточно);
  * 10. CONTACTS из lib/config.ts, карта YANDEX_MAPS.embedSrc, lazy;
  * 11. mounted-гейты, aria-live (троттлинг 700мс), aria-pressed, fieldset/
  *     legend, 44px+, фокус в первое поле, reduced-motion → статика,
@@ -188,7 +191,6 @@ import {
   CalendarDays,
   Check,
   ChevronLeft,
-  Clock,
   Instagram,
   Loader2,
   Mail,
@@ -286,13 +288,6 @@ function formatPhoneDisplay(raw: string): string {
   return raw;
 }
 
-/** Часы офиса — ЕДИНЫ с OfficeHours contact.tsx (SPEC §2.9; C7: диапазон без пробелов). */
-const OFFICE_HOURS = {
-  weekdays: "Пн–Пт: 9:00–19:00",
-  saturday: "Сб: 10:00–16:00",
-  sunday: "Вс: закрыто",
-};
-
 /**
  * Канон сезона — ОДНА формулировка на весь блок (C1, task 9-fix2):
  * строка в чеке, сноска под чеком, подпись у даты. Никаких
@@ -346,8 +341,9 @@ const UNDECIDED_ID = "undecided";
 /** Конфетти — цвета бренда (ea-red/cep-red/cream/ink/gold), без неона. */
 const CONFETTI_COLORS = ["#E71D3A", "#FF360A", "#F7F5F5", "#1F2937", "#D4A373"];
 
-/** Fix5 V11: текст круговой печати (37 символов — шаг 9.73°). */
-const HB_SPIN_TEXT = "смета-чек · interfood · с 2007 года ·";
+/** Fix5 V11: текст круговой печати (шаг угла = 360/длине текста — любой
+ *  длины; task 7-E: interfood → nilov catering). */
+const HB_SPIN_TEXT = "смета-чек · nilov catering · с 2007 года ·";
 
 /** Катушка цифр odometer: 0–9 и дополнительный 0 на хвост 9→0. */
 const ODO_GLYPHS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
@@ -536,74 +532,35 @@ function TotalDelta({ total, animate }: { total: number; animate: boolean }) {
   );
 }
 
-/* ======================================================== LIVE-БЕЙДЖ ЧАСОВ */
+/* ============================================== БЕЙДЖ «В ЛЮБОЕ ВРЕМЯ» */
 
-function useOfficeStatus() {
-  const [status, setStatus] = useState<{ open: boolean; nextLabel: string }>({
-    open: false,
-    nextLabel: "",
-  });
-
-  useEffect(() => {
-    const compute = () => {
-      /* Weekday парсим в en-US («sat»/«wed»): ru-RU отдаёт «сб»/«ср», которые
-         НИКОГДА не совпадали с проверками ниже — бейдж всегда показывал
-         «Закрыто» даже в среду днём (живой баг, вскрылся при заводе
-         динамики C6 task 9-fix2; лейблы остаются русскими). */
-      const fmt = new Intl.DateTimeFormat("en-US", {
-        timeZone: "Europe/Moscow",
-        weekday: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
-      const parts = fmt.formatToParts(new Date());
-      const wd = (parts.find((p) => p.type === "weekday")?.value ?? "").toLowerCase();
-      const hr = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
-      const min = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
-      const time = hr * 60 + min;
-      if (["mon", "tue", "wed", "thu", "fri"].includes(wd)) {
-        const open = time >= 9 * 60 && time < 19 * 60;
-        setStatus({
-          open,
-          nextLabel: open ? "до 19:00" : time < 9 * 60 ? "откроется в 9:00" : "откроется в пн в 9:00",
-        });
-      } else if (wd === "sat") {
-        const open = time >= 10 * 60 && time < 16 * 60;
-        setStatus({
-          open,
-          nextLabel: open ? "до 16:00" : time < 10 * 60 ? "откроется в 10:00" : "откроется в пн в 9:00",
-        });
-      } else {
-        setStatus({ open: false, nextLabel: "откроется в пн в 9:00" });
-      }
-    };
-    compute();
-    const id = setInterval(compute, 60 * 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  return status;
-}
-
-/** Бейдж «Открыто/Закрыто» (Europe/Moscow, интервал 60с). Точка статичная —
- *  бесконечные pulse-анимации в этом файле запрещены (SPEC §4.5). */
-function OpenBadge() {
-  const status = useOfficeStatus();
+/**
+ * Task 7-E: бейдж «Отвечаем в любое время». Live-статус «Открыто/Закрыто»
+ * и график офиса удалены по требованию владельца: заявки читаем круглосуточно,
+ * обещание перезвона — «сразу, как увидим заявку», без привязки к часам.
+ * Точка — золотая (var(--gold)), мягко пульсирует: scale 1↔1.25 + opacity,
+ * 2.4s, transform-only, framer-motion. Отступление от «ноль бесконечных
+ * анимаций в TSX» (SPEC §4.5) — сознательное, по прямому запросу владельца;
+ * prefers-reduced-motion — статичная точка. SSR/первый рендер — статика
+ * (§34: анимационные ветки свапаются после монта).
+ */
+function AnytimeBadge() {
+  const mounted = useMounted();
+  const reduce = useReducedMotion();
+  const pulse = mounted && !reduce;
   return (
-    <span
-      className={`hb-badge ${status.open ? "hb-badge--open" : "hb-badge--closed"}`}
-      role="status"
-      title={status.nextLabel || undefined}
-    >
-      <span className="hb-badge__dot" aria-hidden="true" />
-      {/* T5 (task 11-fix3): middot с пробелами ВНУТРИ текстового узла —
-          раньше «Закрыто» + «· …» клеились без пробела (innerText читал
-          «Закрыто· откроется…»). Точка-статус отделена flex-gap обёртки. */}
-      <span>
-        {status.open ? "Открыто" : "Закрыто"}
-        {status.nextLabel ? ` · ${status.nextLabel}` : ""}
-      </span>
+    <span className="hb-badge">
+      <motion.span
+        className="hb-badge__dot"
+        style={{
+          background: "var(--gold)",
+          boxShadow: "0 0 0 3px color-mix(in srgb, var(--gold) 24%, transparent)",
+        }}
+        aria-hidden="true"
+        animate={pulse ? { scale: [1, 1.25, 1], opacity: [1, 0.75, 1] } : undefined}
+        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <span>Отвечаем в любое время</span>
     </span>
   );
 }
@@ -618,6 +575,47 @@ type ContactItem = {
   external?: boolean;
   highlight?: boolean;
 };
+
+/**
+ * Task 7-E: типографические глифы MAX / VK — у мессенджеров нет
+ * lucide-пиктограмм, поэтому буквы рисуются SVG-текстом в тот же слот,
+ * что иконки соседей (размер приходит className-ом size-4/size-5,
+ * viewBox масштабирует текст пропорционально). Наследует текущий
+ * font-family — тот же типографический тон, что подписи строк.
+ */
+function MessengerGlyph({
+  text,
+  fontSize,
+  className,
+}: {
+  text: string;
+  fontSize: number;
+  className?: string;
+}) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden="true" role="presentation">
+      <text
+        x="16"
+        y="20.5"
+        textAnchor="middle"
+        fontSize={fontSize}
+        fontWeight="800"
+        letterSpacing="0.5"
+        fill="currentColor"
+      >
+        {text}
+      </text>
+    </svg>
+  );
+}
+
+function MaxGlyph({ className }: { className?: string }) {
+  return <MessengerGlyph text="MAX" fontSize={9.5} className={className} />;
+}
+
+function VkGlyph({ className }: { className?: string }) {
+  return <MessengerGlyph text="VK" fontSize={11.5} className={className} />;
+}
 
 function useContactItems(): ContactItem[] {
   return useMemo(
@@ -641,6 +639,22 @@ function useContactItems(): ContactItem[] {
         label: formatPhoneDisplay(CONTACTS.telegram),
         href: CONTACTS.telegramHref,
         icon: Send,
+        external: true,
+      },
+      {
+        /* Task 7-E: MAX — мессенджер из CONTACTS (агент A, config.ts). */
+        sub: "MAX",
+        label: CONTACTS.max,
+        href: CONTACTS.maxHref,
+        icon: MaxGlyph,
+        external: true,
+      },
+      {
+        /* Task 7-E: VK — рядом с мессенджерами (был только в футере). */
+        sub: "VK",
+        label: CONTACTS.vk,
+        href: CONTACTS.vkHref,
+        icon: VkGlyph,
         external: true,
       },
       {
@@ -770,7 +784,7 @@ function LazyMap() {
         <>
           <iframe
             src={YANDEX_MAPS.embedSrc}
-            title="Interfood Catering на карте — Санкт-Петербург, ул. Полевая-Сабировская, 45к1"
+            title="Nilov Catering на карте — Санкт-Петербург, ул. Полевая-Сабировская, 45к1"
             className="hb-map__iframe"
             loading="lazy"
             sandbox="allow-scripts allow-same-origin allow-presentation"
@@ -797,9 +811,10 @@ function LazyMap() {
   );
 }
 
-/** Контакты-зона: бейдж + крупные ссылки (desktop) / тикер + карточки
- *  (mobile) + ленивая карта. Реквизиты/соцсети футера НЕ дублируются
- *  (SPEC §2.10) — только быстрые CTA-контакты, часы и карта.
+/** Контакты-зона: бейдж «Отвечаем в любое время» + крупные ссылки (desktop)
+ *  / тикер + карточки (mobile) + ленивая карта. Реквизиты/соцсети футера
+ *  НЕ дублируются (SPEC §2.10) — только быстрые CTA-контакты, мессенджеры
+ *  (WA/TG/MAX/VK, task 7-E) и карта.
  *  D5 (task 7-fix1): React.memo с единственным stable-ref пропом —
  *  смена гостей/типа не перерисовывает зону контактов вовсе. */
 const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTMLDivElement> }) {
@@ -812,13 +827,11 @@ const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTM
           <span className="ea-eyebrow">Контакты</span>
           <h3 className="hb-contacts__title">Быстрее всего — позвонить.</h3>
         </div>
-        <OpenBadge />
+        <AnytimeBadge />
       </div>
 
-      <p className="hb-contacts__hours">
-        <Clock className="size-4" aria-hidden="true" />
-        {OFFICE_HOURS.weekdays} · {OFFICE_HOURS.saturday} · {OFFICE_HOURS.sunday}
-      </p>
+      {/* Task 7-E: график офиса удалён — бейдж «Отвечаем в любое время»
+          заменяет live-статус и часы. */}
 
       {/* C5 (task 9-fix2) + Fix5 V9: строка доверия — только ВНЕВРЕМЕННЫЕ факты
           (владелец: «всё, что со временем устаревает, лучше не писать») —
@@ -893,7 +906,7 @@ const LeadForm = memo(function LeadForm({
   total: number;
   /** Fix5 V6: формат ещё не выбран — без цены, с необязательным комментарием. */
   undecided: boolean;
-  /** Обещание перезвона для тоста — динамическое от офиса (C6, task 9-fix2). */
+  /** Обещание перезвона для тоста — без привязки к часам (task 7-E). */
   toastPromise: string;
   onSuccess: (
     id: string | number | undefined,
@@ -1426,10 +1439,6 @@ function SuccessPanel({
         {/* C6+C7 (task 9-fix2): динамическое обещание, с заглавной. */}
         <p className="hb-success__script">{promiseLine}</p>
 
-        {/* Wave-4 (product-critic MINOR): часы работы рядом с обещанием перезвона —
-            юзер знает, КОГДА ждать звонка (C6-канон, один источник OFFICE_HOURS). */}
-        <p className="hb-success__hours">Часы работы: {OFFICE_HOURS.weekdays} · {OFFICE_HOURS.saturday}</p>
-
         <div className="hb-success__meta">{metaLine}</div>
 
         <button type="button" onClick={onReset} className="hb-btn hb-btn--ghost min-h-[44px]">
@@ -1838,9 +1847,6 @@ export function HaccBooking() {
   const reduce = useReducedMotion();
   /** mounted-гейт (C62): SSR/первый клиентский рендер = статика. */
   const settled = mounted && !reduce;
-  /** Статус офиса для динамического обещания перезвона (C6, task 9-fix2).
-   *  Бейдж в контактах держит СВОЙ экземпляр хука — канон бейджа не тронут. */
-  const office = useOfficeStatus();
 
   /* --- КОНТРАКТ 1: nuqs type/guests — те же парсеры, что в calculator.tsx,
          поэтому presetCalculator (history.replaceState) из hacc-menu
@@ -1956,19 +1962,11 @@ export function HaccBooking() {
     return () => window.clearTimeout(t);
   }, [guestsLocal, setGuestsParam]);
 
-  /* C6 (task 9-fix2): динамическое обещание перезвона — согласовано с бейджем
-     (офис ЗАКРЫТ → без «за 15 минут»). mounted-гейт: SSR/первый рендер =
-     канон, свап на «закрытую» версию — только после монта. */
-  const officeClosed = mounted && !office.open;
-  const ctaPromise = officeClosed
-    ? "Оставьте заявку — перезвоним в ближайшее рабочее время"
-    : "Перезвоним за 15 минут в рабочее время";
-  const toastPromise = officeClosed
-    ? "Перезвоним в ближайшее рабочее время"
-    : "Перезвоним за 15 минут в рабочее время";
-  const scriptPromise = officeClosed
-    ? "Мы перезвоним в ближайшее рабочее время"
-    : "Мы перезвоним за 15 минут в рабочее время";
+  /* Task 7-E: обещание перезвона — без привязки к часам офиса (бейдж
+     «Отвечаем в любое время»); один тон на CTA-нот, тост и квитанцию. */
+  const ctaPromise = "Перезвоним сразу, как увидим заявку";
+  const toastPromise = "Перезвоним сразу, как увидим заявку";
+  const scriptPromise = "Мы перезвоним сразу, как увидим заявку";
 
   /* КОНТРАКТ 7 (слушатель): catering:menu-select. menu.tsx шлёт detail=string
      (typeId); спящие компоненты могут прислать {typeId, guests} — понимаем оба. */
@@ -2447,7 +2445,7 @@ export function HaccBooking() {
                 ) : (
                   <>
                     Предварительная смета
-                    <span aria-hidden="true"> · Interfood</span>
+                    <span aria-hidden="true"> · Nilov Catering</span>
                   </>
                 )}
               </p>

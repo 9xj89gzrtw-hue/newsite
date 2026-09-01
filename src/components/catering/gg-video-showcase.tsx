@@ -13,8 +13,8 @@ import { TiltedAccent } from "@/components/catering/tilted-accent";
  *
  * Replicates ggcatering.com's signature "video-player" block: a full-bleed
  * ~720px-tall 16:9 section with a looping muted autoplay background video
- * (poster fallback if the mp4 fails), a dark-gradient overlay, an editorial
- * overlay (eyebrow + Playfair H2 with EA signature italic-as-fragment
+ * (poster fallback if the mp4 fails), a dark double-gradient scrim, an
+ * editorial overlay (Playfair H2 with EA signature italic-as-fragment
  * "искусство" in `--ea-red` + Russian subtitle + 2 CTA pills), and a
  * centered "Play"-pill button that toggles between two states:
  *
@@ -29,10 +29,10 @@ import { TiltedAccent } from "@/components/catering/tilted-accent";
  *   section.relative[data-header-theme=dark][aria-label]
  *   └─ div.aspect-video.relative
  *      ├─ video.absolute.inset-0.h-full.w-full.object-cover (decorative, aria-hidden)
- *      ├─ div.absolute.inset-0.bg-gradient-to-t.from-black/70.via-black/30.to-black/40 (overlay)
- *      ├─ div.absolute.inset-0.flex (overlay content — top-left aligned, padded)
+ *      ├─ div.absolute.inset-0 double scrim (radial pool behind the text
+ *      │   column + linear to-top base — Task 4-B readability hardening)
+ *      ├─ div.absolute.inset-0.flex (overlay content — bottom-left aligned, padded)
  *      │  ├─ TiltedAccent "видео" (-6° tilt, gamma signature)
- *      │  ├─ p.ea-eyebrow "НАШ ПОДХОД" (gold, Barlow Semi Condensed Bold)
  *      │  ├─ h2 "Кейтеринг как <i>искусство</i>" (Playfair Display, white, italic fragment red)
  *      │  ├─ p subtitle (white/85, max-w-2xl)
  *      │  └─ div flex gap-4 — 2 CTA pills ("Смотреть меню" → #menu, "Рассчитать стоимость" → #calculator)
@@ -114,10 +114,10 @@ export function GgVideoShowcase() {
       className="relative w-full bg-black"
     >
       {/* Video frame — GGCatering's 16:9 "aspect-video" on desktop.
-          On mobile the editorial overlay (tilted accent + eyebrow + H2 +
+          On mobile the editorial overlay (tilted accent + H2 +
           body + 2 CTAs ≈ 420px) does NOT fit inside a 16:9 frame (219px at
           390px width) — `justify-end` then overflows the content UPWARD
-          above the section's top edge, making "НАШ ПОДХОД" / "ИСКУССТВО"
+          above the section's top edge, making "ИСКУССТВО"
           bleed into the hero above. Fix: a generous min-height on mobile
           (560px fits the overlay with breathing room), restoring
           aspect-video only at md+ where the viewport is wide enough for
@@ -162,55 +162,60 @@ export function GgVideoShowcase() {
           </video>
         )}
 
-        {/* Dark gradient overlay — bottom-heavier for the editorial
-            text sitting at lower-left, with a softer top scrim so the
-            page header (overlaid white-on-video) remains legible. */}
+        {/* Dark scrim — Task 4-B readability hardening. Two stacked
+            gradients keep the editorial copy WCAG-legible over the video
+            both on PAUSE and in MOTION, while the top-right of the frame
+            stays clear so the video itself remains visible:
+            1) radial — pools black (0.55 → 0) behind the bottom-left text
+               column where H2 / subtitle / CTAs sit;
+            2) linear to-top — 0.78 bottom (base, up from 0.70), 0.35 mid,
+               0.40 top (soft scrim so the overlaid page header stays
+               legible). */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/40"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(130% 90% at 20% 100%, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.28) 48%, rgba(0, 0, 0, 0) 100%), linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0.40) 100%)",
+          }}
         />
 
-        {/* Editorial overlay — top-left aligned with breathing padding.
+        {/* Editorial overlay — bottom-left aligned with breathing padding.
             z-10 so it sits above the gradient scrim. */}
         <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-14 lg:p-20">
           {/* Tilted handwritten accent — gamma signature -6° tilt, sits
-              as a small marginalia above the eyebrow. */}
-          <TiltedAccent text="видео" className="mb-6 block" />
-
-          {/* Eyebrow — Barlow Semi Condensed Bold, uppercase, gold. */}
-          <motion.p
-            {...reveal(0)}
-            className="mb-4"
-            style={{
-              fontFamily: "var(--ea-font-eyebrow)",
-              fontWeight: 700,
-              fontSize: "0.85rem",
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "var(--gold)",
-            }}
+              as a small marginalia above the H2 (Task 4-B: eyebrow removed
+              at the owner's request). Inline drop-shadow keeps the red
+              script legible over the video. */}
+          <div
+            className="mb-6"
+            style={{ filter: "drop-shadow(0 2px 14px rgba(0, 0, 0, 0.45))" }}
           >
-            НАШ ПОДХОД
-          </motion.p>
+            <TiltedAccent text="видео" className="block" />
+          </div>
 
           {/* H2 — Playfair Display, white. The word "искусство" is wrapped
               in <i> per the EA signature italic-as-fragment device
-              (globals.css `.ea-section-h2 i` colors it `var(--ea-red)`). */}
+              (globals.css `.ea-section-h2 i` colors it `var(--ea-red)`).
+              Task 4-B: text-shadow for contrast in motion. */}
           <motion.h2
-            {...reveal(0.08)}
+            {...reveal(0)}
             className="ea-section-h2 mb-8 mt-2 max-w-4xl text-white"
+            style={{ textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)" }}
           >
             Кейтеринг как <i>искусство</i>
           </motion.h2>
 
-          {/* Subtitle — white @ 85%, max-w-2xl editorial column. */}
+          {/* Subtitle — white @ 85%, max-w-2xl editorial column.
+              Task 4-B: text-shadow for contrast in motion. */}
           <motion.p
-            {...reveal(0.16)}
+            {...reveal(0.08)}
             className="mb-8 max-w-2xl text-white/85"
             style={{
               fontFamily: "var(--ea-font-body)",
               fontSize: "clamp(1rem, 1.1vw, 1.1rem)",
               lineHeight: 1.6,
+              textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)",
             }}
           >
             Каждое блюдо — это режиссура вкуса, света и сервиса. От идеи
@@ -222,7 +227,7 @@ export function GgVideoShowcase() {
               border + white text; on hover darken the bg + slightly tint
               the border. Mobile stacks vertically, md+ sit side-by-side. */}
           <motion.div
-            {...reveal(0.24)}
+            {...reveal(0.16)}
             className="flex flex-col gap-3 sm:flex-row sm:gap-4"
           >
             {CTAS.map((cta) => (
@@ -235,6 +240,7 @@ export function GgVideoShowcase() {
                   fontWeight: 500,
                   fontSize: "0.9rem",
                   letterSpacing: "0.04em",
+                  textShadow: "0 1px 16px rgba(0, 0, 0, 0.5)",
                 }}
               >
                 {cta.label}
@@ -288,7 +294,7 @@ export function GgVideoShowcase() {
                 <path d="M8 5v14l11-7z" />
               )}
             </svg>
-            {expanded ? "Пауза" : "Смотреть видео"}
+            {expanded ? "Пауза" : "Смотреть"}
           </span>
         </button>
       </div>

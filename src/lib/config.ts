@@ -11,10 +11,12 @@
  */
 
 export const SITE_CONFIG = {
-  // Brand
-  brandName: "Interfood.",
+  // Brand — ребрендинг 3-A: Interfood → nilov catering (wordmark-стиль
+  // со строчной буквы и золотой точкой; brandNameFull — юридическое имя,
+  // не трогать).
+  brandName: "nilov catering.",
   brandNameFull: "Интерфуд Кейтеринг (NILOV CATERING)",
-  brandShort: "Interfood",
+  brandShort: "nilov catering",
   slogan: "Кейтеринг, в котором чувствуют",
 
   // Domain — set via env (Timeweb/Vercel/any host)
@@ -55,8 +57,9 @@ export const LEGAL_INFO = {
  * Sourced from the original interfood-catering.ru/contacts page.
  */
 export const CONTACTS = {
-  phone: "+7 (812) 919-59-11",
-  phoneHref: "tel:+78129195911",
+  // 3-A: телефон владельца +7 (911) 941-72-05 (был +7 (812) 919-59-11)
+  phone: "+7 (911) 941-72-05",
+  phoneHref: "tel:+79119417205",
   whatsapp: "+7 911 941-72-05",
   whatsappHref: "https://wa.me/79119417205",
   telegram: "+7 911 941-72-05",
@@ -65,6 +68,9 @@ export const CONTACTS = {
   instagramHref: "https://www.instagram.com/nilov_catering",
   vk: "nilovcatering",
   vkHref: "https://vk.com/nilovcatering",
+  // 3-A: MAX-мессенджер (max.ru) — рядом с VK в соцсетях футера.
+  max: "nilovcatering",
+  maxHref: "https://max.ru/nilovcatering",
   city: "Санкт-Петербург",
   email: "interfood-catering@yandex.ru",
   // Cycle 65: публичный адрес офиса (владелец: «в контактах адрес другой —

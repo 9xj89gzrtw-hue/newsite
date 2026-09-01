@@ -76,6 +76,18 @@ type MotionH2Props = ComponentProps<typeof motion.h2>;
 type MotionPProps = ComponentProps<typeof motion.p>;
 type MotionSvgProps = ComponentProps<typeof motion.svg>;
 
+/* Task 5-C: hover-row choreography — the question slides right (x +6px)
+ * while a thin gold hairline fades in on the left. Variant labels
+ * propagate from the row's whileHover="hover"; transform/opacity only. */
+const questionVariants = {
+  rest: { x: 0 },
+  hover: { x: 6, transition: { duration: 0.28, ease: EASE } },
+};
+const goldLineVariants = {
+  rest: { opacity: 0, transition: { duration: 0.3, ease: EASE } },
+  hover: { opacity: 1, transition: { duration: 0.22, ease: EASE } },
+};
+
 /**
  * Plus glyph — two crossed lines (vertical + horizontal) rendered as SVG
  * strokes. Rotates 45° → × when `isOpen`. Motion animates the rotation;
@@ -252,8 +264,11 @@ export function EaFaqAccordion() {
                 }}
                 {...triggerReveal}
               >
-                {/* Click target — full row (button role + keyboard). */}
-                <div
+                {/* Click target — full row (button role + keyboard).
+                    Task 5-C: motion.div with whileHover variant — the
+                    question x-shift + gold hairline below answer to it.
+                    Disabled entirely under prefers-reduced-motion. */}
+                <motion.div
                   role="button"
                   tabIndex={0}
                   aria-expanded={isOpen}
@@ -262,6 +277,9 @@ export function EaFaqAccordion() {
                   onClick={() => toggle(i)}
                   onKeyDown={onKey(i)}
                   className="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full focus-visible:after:w-full"
+                  initial="rest"
+                  animate="rest"
+                  whileHover={reduce ? undefined : "hover"}
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -280,14 +298,39 @@ export function EaFaqAccordion() {
                     outline: "none",
                   }}
                 >
-                  <span style={{ flex: "1 1 auto" }}>{item.q}</span>
+                  {/* Thin gold hairline left of the question (brand gold),
+                      opacity-only, absolutely placed inside the row's
+                      side padding — never affects layout. */}
+                  <motion.span
+                    aria-hidden="true"
+                    variants={goldLineVariants}
+                    style={{
+                      position: "absolute",
+                      left: "-14px",
+                      top: "1.2rem",
+                      bottom: "1.2rem",
+                      width: "2px",
+                      background: "var(--gold)",
+                      borderRadius: "1px",
+                      opacity: 0,
+                      pointerEvents: "none",
+                    }}
+                  />
+                  <motion.span
+                    variants={questionVariants}
+                    style={{ flex: "1 1 auto" }}
+                  >
+                    {item.q}
+                  </motion.span>
                   <PlusGlyph isOpen={isOpen} reduce={reduce} />
-                </div>
+                </motion.div>
 
-                {/* Cycle 41 SSR fix: the answer is ALWAYS in the DOM
-                    (server-rendered for crawlers + no-JS users) and
-                    collapses via the grid-template-rows 0fr→1fr trick —
-                    no AnimatePresence unmounting. */}
+                {/* Task 5-C: the answer opens with a SPRING height
+                    animation (framer-motion height:"auto" — the brief's
+                    explicit recipe). The answer is ALWAYS in the DOM
+                    (server-rendered for crawlers + no-JS users): height 0 +
+                    overflow hidden clips it while closed. Reduced-motion →
+                    instant swap (duration 0). */}
                 <motion.div
                   id={panelId}
                   role="region"
@@ -297,21 +340,29 @@ export function EaFaqAccordion() {
                     reduce
                       ? undefined
                       : {
-                          gridTemplateRows: isOpen ? "1fr" : "0fr",
+                          height: isOpen ? "auto" : 0,
                           opacity: isOpen ? 1 : 0,
                         }
                   }
                   transition={
-                    reduce ? { duration: 0 } : { duration: 0.34, ease: EASE }
+                    reduce
+                      ? { duration: 0 }
+                      : {
+                          height: {
+                            type: "spring",
+                            stiffness: 260,
+                            damping: 30,
+                          },
+                          opacity: { duration: 0.25 },
+                        }
                   }
                   style={{
-                    display: "grid",
-                    gridTemplateRows: isOpen ? "1fr" : "0fr",
+                    height: isOpen ? "auto" : 0,
                     opacity: isOpen ? 1 : 0,
+                    overflow: "hidden",
                   }}
                 >
-                  {/* Grid-row collapse requires the child to clip overflow. */}
-                  <div style={{ overflow: "hidden", minHeight: 0 }}>
+                  <div>
                       <p
                         style={{
                           fontFamily: "var(--ea-font-body)",

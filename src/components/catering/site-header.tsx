@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
 import { CONTACTS } from "@/lib/media";
@@ -251,25 +252,42 @@ export function SiteHeader() {
         <div
           className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 transition-all duration-500 md:px-8"
         >
-          {/* Logo LEFT — Prata wordmark (their display serif).
-              Cycle 31.3: hidden on desktop (lg:hidden span + lg:opacity-0
-              anchor) again, per user request: "INTERFOOD с хедера убрать на
-              декстопной версии". The vertical sidebar (visible after the
-              hero) carries the brand name on the left edge, so the desktop
-              header no longer needs the wordmark. The home link stays as
-              an invisible 44×44 click target (lg:opacity-0 with hover hint)
-              for accessibility. Mobile (<lg) keeps the full wordmark —
-              mobile has no sidebar. */}
+          {/* Logo LEFT — NILOV round badge (Task 6-D, nilov rebrand).
+              Cycle 31.3 history: the Prata wordmark used to be hidden on
+              desktop (lg:opacity-0 anchor) because the vertical sidebar
+              carried the brand. Now the round badge (40px mobile / 36px
+              desktop) IS the desktop brand mark — small and quiet, before
+              the nav. Mobile (<lg) keeps badge + Prata wordmark
+              ("nilov catering.") — mobile has no sidebar.
+              Micro-wow: whileHover springs the badge a few degrees
+              (transform only). Dark scheme (FX5): thin gold ring keeps the
+              black circle readable against the ink-glass header. */}
           <a
             href="#main-content"
-            className="min-h-[44px] lg:min-w-[44px] flex items-center transition-opacity duration-300 hover:opacity-80 lg:opacity-0 lg:hover:opacity-30 lg:focus-visible:opacity-60"
-            aria-label="Interfood Catering — главная"
+            className="min-h-[44px] lg:min-w-[44px] flex items-center gap-3 transition-opacity duration-300 hover:opacity-80"
+            aria-label="nilov catering — главная"
           >
+            <motion.span
+              className={`relative flex size-10 lg:size-9 shrink-0 items-center justify-center rounded-full transition-shadow duration-300 ${
+                dark ? "ring-1 ring-gold/60" : ""
+              }`}
+              whileHover={{ rotate: -6 }}
+              transition={{ type: "spring", stiffness: 300, damping: 16 }}
+            >
+              <Image
+                src="/brand/logo-128.png"
+                alt="Логотип nilov catering — круглый бейдж"
+                width={128}
+                height={128}
+                priority
+                className="size-10 lg:size-9"
+              />
+            </motion.span>
             <span
-              className="tott-display text-2xl md:text-[28px] lg:hidden"
+              className="tott-display text-[20px] md:text-[26px] lg:hidden whitespace-nowrap"
               style={{ letterSpacing: "0.005em", fontWeight: 400 }}
             >
-              Interfood<span style={{ color: "var(--gold)" }}>.</span>
+              nilov&nbsp;catering<span style={{ color: "var(--gold)" }}>.</span>
             </span>
           </a>
 
@@ -390,7 +408,7 @@ export function SiteHeader() {
           >
             <div className="flex items-center justify-between">
               <span className="tott-display text-3xl text-ink">
-                Interfood<span style={{ color: "var(--gold)" }}>.</span>
+                nilov&nbsp;catering<span style={{ color: "var(--gold)" }}>.</span>
               </span>
               <button
                 ref={closeBtnRef}
@@ -436,7 +454,7 @@ export function SiteHeader() {
       {/* Mobile FABs — phone (bottom) */}
       <a
         href={CONTACTS.phoneHref}
-        aria-label="Позвонить Interfood Catering"
+        aria-label="Позвонить nilov catering"
         className="fixed bottom-6 right-6 z-[70] flex size-14 items-center justify-center rounded-full bg-tott-burgundy text-white shadow-lg shadow-tott-burgundy/30 transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
       >
         <Phone className="size-6" />

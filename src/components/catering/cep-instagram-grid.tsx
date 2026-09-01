@@ -87,6 +87,12 @@ export function CepInstagramGrid() {
   const shouldAnimate = mounted && !reduce;
 
   // Staggered container — children fade+slide in with 60ms stagger.
+  // Task 5-C: tiles now also enter with a light alternating rotate
+  // (±2°, «влетают с лёгким rotate и y-offset» — cascade reads as a wave
+  // across the 3×3, especially on mobile where this reveal is the main
+  // entrance moment). Variant functions receive the tile index via
+  // `custom` — transform/opacity only, gated by shouldAnimate (reduce →
+  // static, per the motion rules).
   const containerVariants = {
     hidden: {},
     visible: {
@@ -97,12 +103,14 @@ export function CepInstagramGrid() {
     },
   };
   const itemVariants = {
-    hidden: shouldAnimate
-      ? { opacity: 0, y: 28 }
-      : { opacity: 1, y: 0 },
+    hidden: (i: number) =>
+      shouldAnimate
+        ? { opacity: 0, y: 24, rotate: i % 2 === 0 ? 1.5 : -1.5 }
+        : { opacity: 1, y: 0, rotate: 0 },
     visible: {
       opacity: 1,
       y: 0,
+      rotate: 0,
       transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
     },
   };
@@ -156,9 +164,10 @@ export function CepInstagramGrid() {
               href={IG_PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Instagram Interfood Catering — фото ${i + 1} из ленты (открывает профиль)`}
+              aria-label={`Instagram nilov catering — фото ${i + 1} из ленты (открывает профиль)`}
               className="group relative block aspect-square overflow-hidden bg-black/5"
               variants={itemVariants}
+              custom={i}
             >
               {/*
                 Cycle 34 WOW graft — sondaven.com staggered alternating
@@ -189,16 +198,27 @@ export function CepInstagramGrid() {
                 delay={i * 0.05}
                 className="absolute inset-0"
               >
-                <div className="relative aspect-square w-full">
+                {/* Task 5-C hover: photo zoom (scale-[1.06]) is joined
+                    by a card lift — the lift lives on THIS wrapper (not on
+                    motion.a, whose transform belongs to framer entrance) and
+                    is transform-only. motion-reduce keeps it static. */}
+                <div className="relative aspect-square w-full transition-transform duration-500 ease-out group-hover:-translate-y-1.5 motion-reduce:transform-none motion-reduce:transition-none">
                   <Image
                     src={tile.src}
                     alt={tile.alt}
                     fill
                     sizes="(max-width: 768px) 33vw, 22vw"
-                    className="object-cover transition-[filter,transform] duration-500 ease-out group-hover:scale-105 group-hover:saturate-150 group-hover:brightness-105"
+                    className="object-cover transition-[filter,transform] duration-500 ease-out group-hover:scale-[1.06] group-hover:saturate-150 group-hover:brightness-105 motion-reduce:transform-none motion-reduce:transition-[filter]"
                   />
                 </div>
               </ClipPathReveal>
+
+              {/* Task 5-C hover: gold frame fades in around the tile
+                  (opacity 0→1 only — no layout, no paint-heavy filter). */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 border-2 border-gold opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              />
 
               {/* Reel Play icon — always visible but subtle (CEP shows it always) */}
               {isReel && (

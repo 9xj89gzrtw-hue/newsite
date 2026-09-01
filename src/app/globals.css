@@ -409,19 +409,14 @@ html.lenis body {
   overflow: hidden;
 }
 
-/* Custom cursor — hide native on fine pointers ONLY when class is present */
+/* Custom cursor — hide native on fine pointers ONLY while the gold cursor
+   is enabled (Task 5-C: the class is toggled by cursor.tsx in sync with
+   `(pointer: fine) and (min-width: 768px)`, so a narrow desktop window
+   always keeps its system cursor). Universal `*` rule: the dot+ring IS the
+   cursor everywhere, not just on the old interactive-element list. */
 @media (pointer: fine) {
-  body.catering-cursor {
-    cursor: none !important;
-  }
-  body.catering-cursor a,
-  body.catering-cursor button,
-  body.catering-cursor [data-cursor],
-  body.catering-cursor input,
-  body.catering-cursor select,
-  body.catering-cursor textarea,
-  body.catering-cursor label,
-  body.catering-cursor [role="button"] {
+  body.catering-cursor,
+  body.catering-cursor * {
     cursor: none !important;
   }
 }
@@ -4363,4 +4358,72 @@ header[data-scrolled="true"] [data-mega-panel] {
   inset: 0;
   z-index: -1;
   pointer-events: none;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   Task 5-C (курсор + вау-эффекты): новые утилиты — ВСЕ анимации только
+   transform/opacity (RULES §5), reduce-гварды обязательны.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── gamma-marquee: hover-фокус карточки + затемнение соседей ──
+   Pure CSS (compositor, no React re-renders): карточка приподнимается
+   (y -6, scale 1.04) с «пружинным» cubic-bezier (overshoot), остальные
+   слегка затемняются — :has() выбирает «какая-то карточка ховерится».
+   Только fine-pointer + hover; при драге ленты (data-dragging на секции)
+   эффект отключён, чтобы карточка не «летела» под пальцем; под
+   prefers-reduced-motion — статика. */
+@media (hover: hover) and (pointer: fine) {
+  .gamma-marquee__item {
+    transition:
+      transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.3s ease;
+  }
+  .gamma-marquee:not([data-dragging]) .gamma-marquee__item:hover {
+    transform: translateY(-6px) scale(1.04);
+  }
+  .gamma-marquee:not([data-dragging]):has(.gamma-marquee__item:hover)
+    .gamma-marquee__item:not(:hover) {
+    opacity: 0.62;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gamma-marquee__item {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* ── motion/tilt-card: 3D-наклон с glare-бликом ──
+   Сам наклон считает framer-motion (rotateX/Y, transform-only). Glare —
+   статичный ::after radial-gradient, анимируется ТОЛЬКО opacity (никаких
+   background-position на кадр). border-radius: inherit — блик повторяет
+   скругление карточки. */
+.tilt-card {
+  position: relative;
+}
+.tilt-card__glare::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 50% 0%,
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0) 55%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .tilt-card__glare:hover::after {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tilt-card__glare::after {
+    transition: none;
+    opacity: 0;
+  }
 }

@@ -86,7 +86,8 @@ function CitiesTrack({ trackId = '' }: { trackId?: string }) {
 }
 
 /* ══════════════ Task 2-c — WOW-слой футера ══════════════
-   1) Гигантский кинетический вордмарк «INTERFOOD.» — визуальный якорь
+   1) Гигантский кинетический вордмарк «NILOV CATERING.» (две строки
+      «NILOV» / «CATERING.») — визуальный якорь
       на месте удалённой полосы подписки (newsletter удалён по запросу
       владельца). Посимвольный подъём из-под маски (whileInView stagger,
       лёгкий rotate), непрерывный золотой shimmer-сweep по буквам.
@@ -106,22 +107,34 @@ function CitiesTrack({ trackId = '' }: { trackId?: string }) {
      resize/fonts.ready, запись напрямую в DOM (classList/custom props),
      ноль setState на кадр; анимации: transform/opacity/background-position. */
 
-/* Латиница «INTERFOOD.» — чистый Oswald latin-субсет (§35: кириллический
-   фоллбек не задействован). Точка — фирменный золотой акцент бренда. */
-const WORDMARK_GLYPHS = ["I", "N", "T", "E", "R", "F", "O", "O", "D", "."] as const;
+/* Латиница «NILOV CATERING.» — чистый Oswald latin-субсет (§35: кириллический
+   фоллбек не задействован). Точка — фирменный золотой акцент бренда.
+   Ребрендинг 3-A (Interfood → nilov catering): ДВЕ строки «NILOV» /
+   «CATERING.» — одна строка из 15 глифов Oswald при исходном
+   clamp(3.4rem, 16.5vw, 17rem) из .fw-line давала бы ~130vw (горизонтальное
+   переполнение), а ужимание font-size убивало бы «гигантскость» вордмарка;
+   две строки сохраняют исходный масштаб без правок globals.css (файл —
+   владение другого агента). Широкая строка «CATERING.» ≈ 5em × 16.5vw ≈
+   82vw ≤ 100vw на всех брейкпоинтах. */
+const WORDMARK_LINES = [
+  ["N", "I", "L", "O", "V"],
+  ["C", "A", "T", "E", "R", "I", "N", "G", "."],
+] as const;
 
-/* Варианты вордмарка. Триггер анимации — КОНТЕЙНЕР .fw-line: whileInView
+/* Варианты вордмарка (per-line). Триггер анимации — КОНТЕЙНЕР .fw-line: whileInView
    на самих буквах не работает в принципе — буква в hidden сдвинута на
    118% вниз и полностью клипается маской (overflow: clip), visible-бокс
    пуст → IntersectionObserver всегда isIntersecting=false («курица и
    яйцо»; замер live). Бокс .fw-line не клипается → IO стреляет на нём;
    лейблы variants-пропагацией доходят до букв сквозь немоушн .fw-mask
    (контекст React, DOM-вложенность не рвёт цепочку), staggerChildren
-   0.055s/буква — тот же каскад, что бывший delay: i * 0.055. */
-const WORDMARK_LINE_VARIANTS = {
+   0.055s/буква — тот же каскад, что бывший delay: i * 0.055. Вторая
+   строка получает delayChildren = lineIndex × 0.26s — каскад идёт
+   «волной» сверху вниз, а не двумя одновременными параллелями. */
+const wordmarkLineVariants = (lineIndex: number) => ({
   hidden: {},
-  visible: { transition: { staggerChildren: 0.055 } },
-};
+  visible: { transition: { staggerChildren: 0.055, delayChildren: lineIndex * 0.26 } },
+});
 
 const WORDMARK_LETTER_VARIANTS = {
   hidden: { y: "118%", rotate: 7 },
@@ -133,7 +146,9 @@ const WORDMARK_LETTER_VARIANTS = {
 };
 
 /**
- * KineticWordmark — декоративный (aria-hidden; бренд-имя «Interfood.»
+ * KineticWordmark — ОДНА строка кинетического вордмарка (3-A: строк две —
+ * «NILOV» и «CATERING.», рендерятся двумя экземплярами компонента).
+ * Декоративный (aria-hidden; бренд-имя «nilov catering.»
  * остаётся видимым текстом в колонке «Контакты», дублирующего landmark
  * нет). Буквы поднимаются из-под clip-маски с лёгким rotate. Триггер —
  * контейнер .fw-line (initial="hidden" + whileInView="visible" +
@@ -150,7 +165,15 @@ const WORDMARK_LETTER_VARIANTS = {
  * буквы — CSS на .fw-mask (fine-pointer гвард в CSS, transform двигает
  * букву вместе с её градиентом).
  */
-function KineticWordmark({ settled }: { settled: boolean }) {
+function KineticWordmark({
+  settled,
+  glyphs,
+  lineIndex = 0,
+}: {
+  settled: boolean;
+  glyphs: readonly string[];
+  lineIndex?: number;
+}) {
   const lineRef = useRef<HTMLDivElement>(null);
   const maskRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
@@ -198,9 +221,10 @@ function KineticWordmark({ settled }: { settled: boolean }) {
     /* key-ремонт (§35) на КОНТЕЙНЕРЕ: флип settled ремоунтит весь сабтри,
        initial="hidden" перевооружается. Контейнер — motion-родитель:
        initial/whileInView/viewport живут на нём (его бокс не клипается),
-       лейблы «hidden»/«visible» спускаются в буквы пропагацией. */
+       лейблы «hidden»/«visible» спускаются в буквы пропагацией. Ключ —
+       уникальный per-line (два экземпляра в 3-A). */
     <motion.div
-      key={settled ? "fw-line-a" : "fw-line-s"}
+      key={`fw-line-${lineIndex}-${settled ? "a" : "s"}`}
       ref={lineRef}
       className="fw-line"
       data-footer-wordmark
@@ -210,11 +234,11 @@ function KineticWordmark({ settled }: { settled: boolean }) {
             initial: "hidden",
             whileInView: "visible",
             viewport: { once: true, margin: "-60px 0px -40px 0px" },
-            variants: WORDMARK_LINE_VARIANTS,
+            variants: wordmarkLineVariants(lineIndex),
           }
         : {})}
     >
-      {WORDMARK_GLYPHS.map((glyph, i) => {
+      {glyphs.map((glyph, i) => {
         const isDot = glyph === ".";
         return (
           <span
@@ -307,14 +331,15 @@ function FooterSpotlight() {
 }
 
 /**
- * SiteFooter — тёмный navy футер Interfood Catering.
+ * SiteFooter — тёмный navy футер nilov catering.
  *
  * Layout (Task 2-c):
  * 1. «Сделано с любовью» (intro band, Great Vibes script + подзаголовок)
  * 2. Двухколоночный контент: Контакты (расширенная) / Навигация
  *    — колонка «Нам доверяют» и полоса подписки удалены по запросу
  *    владельца; факт «2 400+ мероприятий с 2007 года» сохранён в контактах.
- * 3. Гигантский кинетический вордмарк «INTERFOOD.» (wow-якорь)
+ * 3. Гигантский кинетический вордмарк «NILOV CATERING.» (wow-якорь,
+ *    две строки «NILOV» / «CATERING.» — ребрендинг 3-A)
  * 4. «С гордостью обслуживаем» — маркие районов СПб
  * 5. Копирайт
  */
@@ -411,7 +436,7 @@ export function SiteFooter() {
             </h2>
 
             <span className="font-display text-3xl font-bold uppercase tracking-[0.02em] text-cream">
-              Interfood<span className="text-gold">.</span>
+              nilov catering<span className="text-gold">.</span>
             </span>
 
             <address className="not-italic text-sm leading-relaxed text-cream/80">
@@ -446,22 +471,33 @@ export function SiteFooter() {
               </a>
             </div>
 
-            {/* Соцсети */}
+            {/* Соцсети — VK / MAX / Instagram / Telegram / WhatsApp.
+                MAX (max.ru/nilovcatering) — российский мессенджер, бейдж
+                в том же стиле, что VK (font-display-спан, не иконка). */}
             <div className="mt-2 flex items-center gap-3">
               <a
                 href={CONTACTS.vkHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Interfood Catering в ВКонтакте (открывается в новой вкладке)"
+                aria-label="nilov catering в ВКонтакте (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
               >
                 <span className="font-display text-xs font-bold uppercase text-cream">VK</span>
               </a>
               <a
+                href={CONTACTS.maxHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="nilov catering в MAX (открывается в новой вкладке)"
+                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+              >
+                <span className="font-display text-xs font-bold uppercase text-cream">MAX</span>
+              </a>
+              <a
                 href={CONTACTS.instagramHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Interfood Catering в Instagram (открывается в новой вкладке)"
+                aria-label="nilov catering в Instagram (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
               >
                 <Instagram className="size-5 text-cream" aria-hidden="true" />
@@ -470,7 +506,7 @@ export function SiteFooter() {
                 href={CONTACTS.telegramHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Interfood Catering в Telegram (открывается в новой вкладке)"
+                aria-label="nilov catering в Telegram (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
               >
                 <Send className="size-5 text-cream" aria-hidden="true" />
@@ -536,9 +572,19 @@ export function SiteFooter() {
       {/* ============ Section 3 — гигантский кинетический вордмарк ============
           Task 2-c: визуальный якорь на месте удалённой полосы подписки.
           Полный bleed, aria-hidden (бренд-имя читается в колонке «Контакты»),
-          не heading. overflow-x: clip — гвард от горизонтального скролла. */}
+          не heading. overflow-x: clip — гвард от горизонтального скролла.
+          3-A: ДВЕ строки «NILOV» / «CATERING.» — два экземпляра
+          KineticWordmark; каждая .fw-line — width:100% + flex-центрировка,
+          блоки складываются в столбец без обёртки. */}
       <div className="relative overflow-x-clip px-2 pb-8 pt-2 md:pb-12">
-        <KineticWordmark settled={settled} />
+        {WORDMARK_LINES.map((glyphs, lineIndex) => (
+          <KineticWordmark
+            key={`fw-row-${lineIndex}`}
+            settled={settled}
+            glyphs={glyphs}
+            lineIndex={lineIndex}
+          />
+        ))}
       </div>
 
       {/* ============ Section 4 — «С гордостью обслуживаем» маркие ============ */}

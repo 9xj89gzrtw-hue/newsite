@@ -50,10 +50,9 @@
   /* Hide default scrollbar — replaced by custom progress bar below. */
   scrollbar-width: none;
   -ms-overflow-style: none;
-  /* Edge-fade mask so the cut tile on the right reads as intentional
-     overflow rather than a broken layout. (Forked from ea-events-portfolio.css.) */
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 92%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 3%, black 92%, transparent 100%);
+  /* Task 4-B: the edge-fade mask-image (transparent → black → transparent)
+     was REMOVED at the owner's request — the cut tile on the right now has
+     crisp, unblurred edges. No mask/blur on the scroller or tiles anymore. */
 }
 
 .ea-evt-video__scroller::-webkit-scrollbar {

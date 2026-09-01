@@ -674,7 +674,11 @@ function HaccRack({
           >
             {/* — — — spine: the vertical "корешок" click target — — */}
             <h3 className="hacc__spine-heading">
-              <button
+              {/* Task 5-C: motion.button — whileTap scale 0.98 gives the
+                  tactile press feedback the mobile cards asked for
+                  (JS-driven transform: no CSS transition conflict with
+                  the gamma flex-basis choreography; off under reduce). */}
+              <motion.button
                 type="button"
                 ref={(el) => {
                   spineRefs.current[k] = el;
@@ -692,6 +696,7 @@ function HaccRack({
                 onClick={() => open(k, true)}
                 onMouseEnter={() => onSpineEnter(k)}
                 onMouseLeave={clearHoverIntent}
+                whileTap={reduceSettled ? undefined : { scale: 0.98 }}
               >
                 {/* cycle-55: spine numbers REMOVED — the user asked twice
                     what they're for; the honest answer was "nothing". The
@@ -717,7 +722,7 @@ function HaccRack({
                     aria-hidden="true"
                   />
                 ) : null}
-              </button>
+              </motion.button>
             </h3>
 
             {/* — — — open panel: fixed-width, clipped while closed — — */}
@@ -742,13 +747,27 @@ function HaccRack({
                 {/* media with perpetual Ken Burns drift. `loading` follows
                     the open state: closed panels stay lazy (nothing to see
                     inside a clipped spine), the open panel loads eagerly so
-                    the photo is there the moment the wipe reveals it. */}
+                    the photo is there the moment the wipe reveals it.
+                    Task 5-C: on OPEN the bleed wrapper plays a one-shot Ken
+                    Burns zoom (scale 1 → 1.06 over 6s ease-out) on top of
+                    the perpetual img drift — transform-only, composes with
+                    the x/y parallax springs, initial={false} so nothing
+                    serializes into SSR HTML (C62). */}
                 <figure className="hacc__media">
                   {/* parallax bleed wrapper — larger than the figure so the
                       spring translate never reveals the tint at the edges */}
                   <motion.div
                     className="hacc__media-inner"
                     style={{ x: parallaxX, y: parallaxY }}
+                    initial={false}
+                    animate={
+                      reduceSettled ? undefined : { scale: isOpen ? 1.06 : 1 }
+                    }
+                    transition={
+                      isOpen && !reduceSettled
+                        ? { duration: 6, ease: "easeOut" }
+                        : { duration: 0.9, ease: EASE }
+                    }
                   >
                     <SmartImage
                       src={s.media}

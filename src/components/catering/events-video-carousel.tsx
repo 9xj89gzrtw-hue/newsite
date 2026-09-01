@@ -15,8 +15,9 @@
  *
  * EA design language grafted:
  *  - Cream section bg (var(--ea-cream)).
- *  - TiltedAccent handwritten marginalia ("события") above the eyebrow —
- *    a human handwritten gesture opening the "events video" beat.
+ *  - (Task 4-B: the TiltedAccent handwritten marginalia + the word
+ *    «кухня» in copy were removed at the owner's request — the eyebrow
+ *    now opens the beat directly.)
  *  - Italic-as-fragment H2 ("События, которые мы *создаём*." → italic + red).
  *  - Eyebrow (Barlow Semi Condensed Bold) + H2 (Playfair) + meta (Poppins).
  *  - Bottom overlay panel (gradient → rgba(0,0,0,0.78)) with category tag +
@@ -51,7 +52,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
-import { TiltedAccent } from "@/components/catering/tilted-accent";
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
 import "./events-video-carousel.css";
 
@@ -101,7 +101,7 @@ const TILES: EventTile[] = [
     poster: "/media/event-02.jpg",
     category: "Горячее",
     title: "Тортелини с овощами",
-    meta: "Основная подача · кухня в работе",
+    meta: "Основная подача · в работе",
     videoAlt: "Видео: тортелини с овощами — горячая подача",
   },
   {
@@ -115,7 +115,7 @@ const TILES: EventTile[] = [
   {
     video: "/media/clips/catering-clip-4.mp4",
     poster: "/media/event-04.jpg",
-    category: "Кухня шефа",
+    category: "Мастерство шефа",
     title: "Авторское горячее",
     meta: "Мясо с гарниром · plated main",
     videoAlt: "Видео: авторское горячее блюдо с мясом и гарниром",
@@ -305,7 +305,8 @@ export function EventsVideoCarousel() {
       className="ea-evt-video ea-section ea-section--cream"
     >
       <div className="ea-container ea-container--wide">
-        {/* Header — TiltedAccent + eyebrow + H2 (italic-as-fragment) + subtitle. */}
+        {/* Header — eyebrow + H2 (italic-as-fragment) + subtitle.
+            (Task 4-B: TiltedAccent «кухня» removed; wording updated.) */}
         <motion.div
           className="ea-evt-video__top"
           initial={reduceSettled ? false : { opacity: 0, y: 24 }}
@@ -314,8 +315,7 @@ export function EventsVideoCarousel() {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <div className="ea-evt-video__heading-block">
-            <TiltedAccent text="кухня" className="mb-3 block" />
-            <span className="ea-eyebrow">Видео с нашей кухни</span>
+            <span className="ea-eyebrow">Видео с наших мероприятий</span>
             <h2 className="ea-section-h2 ea-evt-video__h2">
               {"Блюда, которые мы "}
               <i className="ea-italic-fragment">создаём</i>

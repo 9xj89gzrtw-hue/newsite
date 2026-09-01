@@ -7,9 +7,9 @@ import * as React from "react";
  *
  * Cycle 31.3 (2026-08-22): per user request —
  *   "убрать белую полоску с херо, она должна начинаться сразу после него.
- *    INTERFOOD CATERING сделать в одну строку.
+ *    NILOV CATERING сделать в одну строку.
  *    сделать чтобы когда кликаю на него перебрасывало на главный экран.
- *    INTERFOOD с хедера убрать на декстопной версии"
+ *    NILOV с хедера убрать на декстопной версии"
  *
  * Changes from 31.2:
  *   - The sidebar now STARTS AFTER THE HERO. On the hero screen, body
@@ -19,13 +19,13 @@ import * as React from "react";
  *     animates 0→72px (synchronized with the sidebar's opacity fade-in)
  *     so the content shifts right smoothly as the stripe appears.
  *   - The two words are now in ONE VERTICAL LINE (not stacked in two
- *     rows). "INTERFOOD CATERING" reads as a single continuous vertical
+ *     rows). "NILOV CATERING" reads as a single continuous vertical
  *     string — matches gamma's "GAMMACATERING" single-string colophon.
  *     The two word spans are inline inside the single writing-mode
  *     vertical-rl text line, separated by a normal whitespace.
  *   - The sidebar is now CLICKABLE — wrapped in <a href="#hero"> so
  *     clicking anywhere on it scrolls to the top (hero). cursor:pointer.
- *   - Header wordmark "Interfood." hidden on desktop (lg+) again — see
+ *   - Header wordmark "nilov catering." hidden on desktop (lg+) again — see
  *     site-header.tsx.
  *
  * Scroll-gating: `scrollY > 0.85 * innerHeight` → toggle body.has-sidebar
@@ -126,13 +126,13 @@ export function VerticalBrandLabel() {
       data-scheme={scheme}
     >
       <span className="vertical-brand-label__tick" />
-      {/* Single vertical line: "INTERFOOD CATERING" reads as one
+      {/* Single vertical line: "NILOV CATERING" reads as one
           continuous string. The two word spans are inline, separated by
           a normal whitespace. writing-mode: vertical-rl + rotate(180deg)
           orients the whole line vertically (bottom-to-top). */}
       <span className="vertical-brand-label__text">
         <span className="vertical-brand-label__word vertical-brand-label__word--primary">
-          INTERFOOD
+          NILOV
         </span>{" "}
         <span className="vertical-brand-label__word vertical-brand-label__word--accent">
           CATERING

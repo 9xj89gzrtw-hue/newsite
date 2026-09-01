@@ -1234,6 +1234,50 @@ export function HaccMenu() {
           блюдо или соберите смешанный уровень — это нормальная практика.
         </p>
       </div>
+
+      {/* Task 7-E: «Не нашли нужное?» — мостик к индивидуальному меню.
+          Заголовок — Marck Script-акцент с наклоном (тот же приём, что
+          корешки рэка); золотая линейка перекликается с пульс-точкой бейджа
+          «Отвечаем в любое время» в блоке заявки. CTA ведёт на #contact —
+          тот же якорь, что «Обсудить меню» вегетарианского и офисного
+          каталогов. Вход — whileInView (y+opacity, transform-only),
+          hydration-гейт как у шапки секции (C62 §34). */}
+      <div className="ea-container ea-container--wide">
+        <motion.div
+          className="mt-10 md:mt-14"
+          initial={headReduceSettled ? false : { opacity: 0, y: 26 }}
+          whileInView={headReduceSettled ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, ease: EASE }}
+        >
+          <p className="hmenu__rack-label">Своё меню</p>
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
+            <div>
+              <h3 className="tott-script-ru origin-left -rotate-3 text-[length:clamp(1.8rem,2.6vw,2.75rem)] leading-[1.08] text-[color:var(--hmenu-ink)]">
+                Не нашли нужное?
+              </h3>
+              <span
+                className="mt-2 block h-[3px] w-14 rounded-full bg-gold"
+                aria-hidden="true"
+              />
+              <p className="hmenu__lede">
+                Составим меню специально под ваше событие — под бюджет, кухню
+                и повод.
+              </p>
+            </div>
+            <Magnetic className="hmenu__cta-wrap" strength={0.17}>
+              <a
+                href="#contact"
+                className="ea-outline-btn hmenu__cta"
+                aria-label="Обсудить меню — составим под ваше событие"
+              >
+                Обсудить меню
+                <ArrowUpRight aria-hidden="true" />
+              </a>
+            </Magnetic>
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }

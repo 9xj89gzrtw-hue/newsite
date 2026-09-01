@@ -142,13 +142,13 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-      
+      { url: "/favicon.ico", sizes: "any" },
     ],
     apple: "/apple-touch-icon.png",
   },
   title: {
-    default: "Interfood Catering — Кейтеринг в Санкт-Петербурге от 650 ₽/чел",
-    template: "%s | Interfood Catering",
+    default: "nilov catering — Кейтеринг в Санкт-Петербурге от 650 ₽/чел",
+    template: "%s | nilov catering",
   },
   description:
     "«Еда как искусство» — выездной кейтеринг полного цикла в СПб. Фуршет от 2450₽, банкет от 4470₽, кофе-брейк от 900₽, обеды в офис от 650₽ за человека. Рассчитайте стоимость онлайн за 30 секунд.",
@@ -159,24 +159,23 @@ export const metadata: Metadata = {
     "фуршет",
     "банкет",
     "выездной ресторан",
-    "Interfood",
     "nilov catering",
   ],
-  authors: [{ name: "Interfood Catering" }],
+  authors: [{ name: "nilov catering" }],
   alternates: { canonical: "/", languages: { "ru-RU": "/", "x-default": "/" } },
   openGraph: {
-    title: "Interfood Catering — Кейтеринг в Санкт-Петербурге",
+    title: "nilov catering — Кейтеринг в Санкт-Петербурге",
     description:
       "Выездной кейтеринг полного цикла. Видео, фото, интерактивный калькулятор стоимости.",
     type: "website",
     locale: "ru_RU",
     url: siteUrl,
-    siteName: "Interfood Catering",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Interfood Catering — банкет в Санкт-Петербурге" }],
+    siteName: "nilov catering",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — круглый бейдж, кейтеринг Санкт-Петербурга" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Interfood Catering — Кейтеринг в Санкт-Петербурге",
+    title: "nilov catering — Кейтеринг в Санкт-Петербурге",
     description: "Выездной кейтеринг полного цикла. Рассчитайте стоимость онлайн.",
     images: ["/og-image.jpg"],
   },
@@ -206,12 +205,12 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "CateringService",
   "@id": siteUrl + "#organization",
-  name: "Interfood Catering",
+  name: "nilov catering",
   alternateName: "NILOV CATERING",
   description: "«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Фуршет от 2450₽, банкет от 4470₽, кофе-брейк от 900₽, обеды в офис от 650₽ за человека.",
   url: siteUrl,
   image: siteUrl + "/og-image.jpg",
-  logo: siteUrl + "/logo.svg",
+  logo: siteUrl + "/brand/logo-512.png",
   telephone: CONTACTS.phone,
   email: CONTACTS.email,
   priceRange: "₽₽₽",
@@ -330,6 +329,10 @@ export default function RootLayout({
         {/* Preconnect hints for external domains */}
         <link rel="preconnect" href="https://www.instagram.com" />
         <link rel="preconnect" href="https://yandex.ru" />
+        {/* Task 6-D: preloader badge must be pixel-ready within its 1.4s
+            life on a cold first visit — start fetching the 41KB PNG at HTML
+            parse time, before the hero media saturates the connection pool. */}
+        <link rel="preload" as="image" href="/brand/logo-256.png" />
       </head>
       <body className="antialiased bg-background text-foreground">
         <a href="#main-content" className="skip-link">
@@ -363,9 +366,9 @@ export default function RootLayout({
         <Toaster />
         <noscript>
           <div style={{ padding: '2rem', fontFamily: 'sans-serif', textAlign: 'center' }}>
-            <h1>Interfood.</h1>
+            <h1>nilov catering.</h1>
             <p>Для работы сайта необходимо включить JavaScript.</p>
-            <p style={{ marginTop: '1rem' }}>Позвоните: <a href="tel:+78129195911">+7 (812) 919-59-11</a></p>
+            <p style={{ marginTop: '1rem' }}>Позвоните: <a href={CONTACTS.phoneHref}>{CONTACTS.phone}</a></p>
           </div>
         </noscript>
       </body>
