@@ -225,7 +225,7 @@ export function EaCookieBanner() {
         >
           <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-1.5 px-3 py-2 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-3 md:px-12">
             <p
-              className="m-0 max-w-[68ch] truncate text-[10.5px] leading-snug sm:truncate-none sm:text-[13px]"
+              className="m-0 max-w-[68ch] text-[10.5px] leading-snug sm:text-[13px]"
               style={{
                 fontFamily: "var(--ea-font-body)",
                 color: "color-mix(in srgb, var(--ea-cream) 85%, transparent)",

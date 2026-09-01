@@ -110,7 +110,9 @@ export function TottHero() {
       <span className="tott-border-frame z-[3]" aria-hidden="true" />
 
       {/* CENTERED brand stack — per task v10: 3 lines, shifted DOWN for
-          better optical balance (translateY +60px instead of -40px), "food
+          better optical balance (W1-FIX: translateY +40px — при +60px на
+          1440×900 eyebrow «ЛУЧШИЙ КЕЙТЕРИНГ…» пересекался со scroll-cue
+          «ЛИСТАЙТЕ»; +40 + bottom-12 (было bottom-28) дают зазор ≥8px), "food
           as art" made larger, and the eyebrow label wraps cleanly on mobile
           ("Лучший кейтеринг" / "Санкт-Петербурга") via an explicit <br> that
           only shows on small screens (hidden sm:inline).
@@ -127,7 +129,7 @@ export function TottHero() {
                script pair.
           Text-shadow on white text for video-bg legibility. */}
       <motion.div
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center [transform:translateY(60px)]"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center [transform:translateY(40px)]"
         initial={showStatic ? false : "hidden"}
         animate={showStatic ? undefined : "visible"}
         variants={container}
@@ -178,7 +180,10 @@ export function TottHero() {
           style={{
             fontSize: "clamp(2.25rem, 6vw, 4.5rem)",
             lineHeight: 1,
-            marginTop: "-0.5rem",
+            /* W1-FIX: -0.5rem давал пересечение line-box'ов «catering.» и
+               «food as art» на 8px @390×844 (замер критика); 0.25rem
+               даёт 4px зазор. */
+            marginTop: "0.25rem",
             textShadow: "0 2px 30px rgba(0,0,0,0.45)",
           }}
         >
@@ -221,9 +226,11 @@ export function TottHero() {
         </motion.p>
       </motion.div>
 
-      {/* Scroll cue bottom-center (sits above the docked nav). */}
+      {/* Scroll cue bottom-center (sits above the docked nav). W1-FIX:
+          bottom-12 (was bottom-28) — at 1440×900 the cue overlapped the
+          eyebrow label; measured gap after the fix ≥8px. */}
       <motion.div
-        className="absolute bottom-28 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2"
+        className="absolute bottom-12 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2"
         initial={showStatic ? false : { opacity: 0 }}
         animate={showStatic ? undefined : { opacity: 1, transition: { delay: 1.3, duration: 0.8 } }}
         aria-hidden="true"

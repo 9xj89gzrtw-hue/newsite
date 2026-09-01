@@ -86,10 +86,10 @@ import { TiltedAccent } from "@/components/catering/tilted-accent";
 type Step = { num: string; verb: string; body: string };
 
 /**
- * SPEC c63 copy + wave-1 pass + wave-2 G (step-02 gains the page-verified
- * response scope — the Contact block promises «перезвоним в течение 15 минут
- * в рабочее время», so «в рабочее время» is fact, and the line stays ≤90
- * chars). \u00A0 (NBSP) binds the orphan pairs measured by the wave-2 critics
+ * SPEC c63 copy + wave-1 pass + wave-2 G (step-02: W1-FIX — «в рабочее
+ * время» убрано: Contact/FAQ-блоки теперь обещают «отвечаем в любое время»,
+ * формулировка «перезвоним сразу, как увидим заявку» не противоречит им).
+ * \u00A0 (NBSP) binds the orphan pairs measured by the wave-2 critics
  * (D): without them the last rendered line strands a lone word —
  * «предлагаем.» (02 @1024/1920), «и не было.» (04 @1920), «полночь.»
  * (01 @320), «празднике.» (03 @320).
@@ -99,7 +99,7 @@ const STEPS: Step[] = [
   {
     num: "02",
     verb: "Созвон",
-    body: "Разговор вместо анкеты: перезвоним в рабочее время — слушаем вас, уточняем,\u00A0предлагаем.",
+    body: "Разговор вместо анкеты: перезвоним сразу, как увидим заявку — слушаем вас, уточняем,\u00A0предлагаем.",
   },
   {
     num: "03",

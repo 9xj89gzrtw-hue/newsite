@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
-import { TiltedAccent } from "@/components/catering/tilted-accent";
 
 /**
  * GgVideoShowcase — Cycle 31, Task 4-C.
@@ -31,8 +30,8 @@ import { TiltedAccent } from "@/components/catering/tilted-accent";
  *      ├─ video.absolute.inset-0.h-full.w-full.object-cover (decorative, aria-hidden)
  *      ├─ div.absolute.inset-0 double scrim (radial pool behind the text
  *      │   column + linear to-top base — Task 4-B readability hardening)
- *      ├─ div.absolute.inset-0.flex (overlay content — bottom-left aligned, padded)
- *      │  ├─ TiltedAccent "видео" (-6° tilt, gamma signature)
+ *      ├─ div.absolute.inset-0.flex (overlay content — bottom-left aligned,
+ *      │  padded — W1-FIX: tilted accent "видео" removed)
  *      │  ├─ h2 "Кейтеринг как <i>искусство</i>" (Playfair Display, white, italic fragment red)
  *      │  ├─ p subtitle (white/85, max-w-2xl)
  *      │  └─ div flex gap-4 — 2 CTA pills ("Смотреть меню" → #menu, "Рассчитать стоимость" → #calculator)
@@ -129,7 +128,7 @@ export function GgVideoShowcase() {
         {!expanded && (
           <img
             src="/media/hero-premium/hero-premium-6.jpg"
-            alt="Банкетный зал Interfood: сервированный стол с блюдами высокой кухни"
+            alt="Банкетный зал nilov catering: сервированный стол с блюдами высокой кухни"
             loading="lazy"
             decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
@@ -183,25 +182,21 @@ export function GgVideoShowcase() {
         {/* Editorial overlay — bottom-left aligned with breathing padding.
             z-10 so it sits above the gradient scrim. */}
         <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-14 lg:p-20">
-          {/* Tilted handwritten accent — gamma signature -6° tilt, sits
-              as a small marginalia above the H2 (Task 4-B: eyebrow removed
-              at the owner's request). Inline drop-shadow keeps the red
-              script legible over the video. */}
-          <div
-            className="mb-6"
-            style={{ filter: "drop-shadow(0 2px 14px rgba(0, 0, 0, 0.45))" }}
-          >
-            <TiltedAccent text="видео" className="block" />
-          </div>
-
           {/* H2 — Playfair Display, white. The word "искусство" is wrapped
               in <i> per the EA signature italic-as-fragment device
               (globals.css `.ea-section-h2 i` colors it `var(--ea-red)`).
-              Task 4-B: text-shadow for contrast in motion. */}
+              Task 4-B: text-shadow for contrast in motion. W1-FIX: the
+              unlayered `.ea-section-h2` rule (color: var(--ea-ink)) beats
+              the layered Tailwind `text-white` utility — an inline
+              `color: "#fff"` (inline beats both) keeps the H2 white over
+              the dark video. */}
           <motion.h2
             {...reveal(0)}
             className="ea-section-h2 mb-8 mt-2 max-w-4xl text-white"
-            style={{ textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)" }}
+            style={{
+              color: "#fff",
+              textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)",
+            }}
           >
             Кейтеринг как <i>искусство</i>
           </motion.h2>
