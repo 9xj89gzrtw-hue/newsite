@@ -18,21 +18,38 @@ import { motion, AnimatePresence } from "framer-motion";
  * The caption "NILOV CATERING" fades in under the badge. Exit: the badge
  * cluster fades out just BEFORE the doors sweep up (it rides the first
  * panel), doors keep their original y:-100% stagger choreography.
- * prefers-reduced-motion: the gate below returns early — the preloader
- * never renders at all (unchanged behavior).
+ * prefers-reduced-motion: the effect below removes the doors instantly on
+ * mount — the preloader never animates at all.
+ *
+ * W4-FIX (FOUC/SSR-двери): `show` starts as TRUE so the doors are part of
+ * the SSR HTML — previously useState(false) + a post-hydration effect
+ * meant the hero flashed for a frame BEFORE the doors appeared (SSR markup
+ * had no preloader at all). Now the first painted frame is always the
+ * doors; the effect decides immediately: reduced-motion → remove; session
+ * flag (repeat visit) → remove; otherwise run the 1400ms dwell + 1200ms
+ * exit as before. No-JS fallback: layout.tsx ships a <noscript> style that
+ * hides [data-preloader-root] so the doors never trap a JS-less visitor
+ * (see the data-preloader-root attribute on the root below).
  */
 export function Preloader() {
-  const [show, setShow] = useState(false);
+  // W4-FIX: TRUE из SSR — двери в первом кадре (см. докстринг выше).
+  const [show, setShow] = useState(true);
   const [done, setDone] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (sessionStorage.getItem("catering-preloaded")) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Двери уже в HTML — убираем их мгновенно, без анимаций.
       setDone(true);
       return;
     }
-    setShow(true);
+    if (sessionStorage.getItem("catering-preloaded")) {
+      // Повторный заход за сессию: двери из SSR гасим сразу (без exit-облёта).
+      setShow(false);
+      setDone(true);
+      return;
+    }
+    // show уже true (SSR-двери) — просто ставим таймеры.
     // W2-FIX: внутренний таймер cleanup + 900 → 1200ms. Exit-анимация
     // панелей: 0.8s + 3×0.08s stagger = 1.04s — при 900ms последняя дверь
     // обрывалась на полёте (AnimatePresence вырезал её раньше конца).
@@ -56,6 +73,7 @@ export function Preloader() {
     <AnimatePresence>
       {show && (
         <motion.div
+          data-preloader-root
           className="fixed inset-0 z-[10000] flex"
           initial={{ opacity: 1 }}
           exit={{ opacity: 1 }}

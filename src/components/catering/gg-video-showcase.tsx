@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
 
@@ -11,8 +11,11 @@ import { useMounted } from "@/hooks/use-mounted";
  * structure (right after hero #1 + header #2, before photo carousel #4).
  *
  * Replicates ggcatering.com's signature "video-player" block: a full-bleed
- * ~720px-tall 16:9 section with a looping muted autoplay background video
- * (poster fallback if the mp4 fails), a dark double-gradient scrim, an
+ * ~720px-tall 16:9 section with a looping muted background video (W4-FIX:
+ * the <video> is ALWAYS mounted with preload="none" — no bytes are fetched
+ * until play() — and an IntersectionObserver starts the muted loop when the
+ * section enters the viewport / pauses it when it leaves; the poster
+ * attribute covers the pre-play frame), a dark double-gradient scrim, an
  * editorial overlay (Playfair H2 with EA signature italic-as-fragment
  * "искусство" in `--ea-red` + Russian subtitle + 2 CTA pills), and a
  * centered "Play"-pill button that toggles between two states:
@@ -78,20 +81,76 @@ export function GgVideoShowcase() {
   const reduce = useReducedMotion();
   const animate = mounted && !reduce;
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [expanded, setExpanded] = useState(false);
 
-  /** Toggle the play-pill. Cycle 38 perf fix: the video no longer
-   *  autoplays in the background — the same 5 MB mculinary-hero.mp4 was
-   *  downloaded twice in parallel (hero + this block), starving the
-   *  browser connection pool. Now a static poster renders by default and
-   *  the <video> element only mounts on first click (user gesture →
-   *  autoplay with sound is guaranteed to succeed). */
+  /** W4-FIX: React doesn't serialize the `muted` attribute into SSR HTML
+   *  (known #10389) — pin the DOM property on mount so the muted autoplay
+   *  below is never rejected. togglePlay owns `muted` afterwards. */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) video.muted = true;
+  }, []);
+
+  /** W4-FIX «видео-вау»: the clip plays as a muted loop as soon as the
+   *  section is near the viewport (muted autoplay is always permitted) and
+   *  pauses when it scrolls away — the 1.5MB catering-clip-2.mp4 is a
+   *  DIFFERENT url from the hero's mculinary-hero.mp4 and preload="none"
+   *  keeps it out of the critical path above the fold. IO rootMargin 100px
+   *  starts playback just before the section is revealed. Cleanup pauses
+   *  on unmount. prefers-reduced-motion: no IO at all — the poster stays
+   *  and the clip plays only after a user click. */
+  useEffect(() => {
+    if (reduce) return;
+    const section = sectionRef.current;
+    const video = videoRef.current;
+    if (!section || !video) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          // Muted in teaser state; when expanded (sound on) the prior
+          // click counts as user activation, so unmuted play() is allowed
+          // too — a rejection just leaves the native controls in charge.
+          void video.play().catch(() => {
+            /* autoplay rejected — poster / controls stay */
+          });
+        } else {
+          video.pause();
+        }
+      },
+      { rootMargin: "100px" },
+    );
+    io.observe(section);
+    return () => {
+      io.disconnect();
+      video.pause();
+    };
+  }, [reduce]);
+
+  /** Toggle the play-pill: expanded → unmuted + native controls (user
+   *  gesture, so play-with-sound is guaranteed); collapsed → back to the
+   *  muted looping teaser (the loop keeps running). W4-FIX: collapsing no
+   *  longer pauses the clip — the muted b-roll continues. */
   const togglePlay = () => {
     const next = !expanded;
     setExpanded(next);
-    if (!next && videoRef.current) {
-      videoRef.current.pause();
+    const video = videoRef.current;
+    if (!video) return;
+    if (next) {
+      video.controls = true;
+      video.muted = false;
+      void video.play().catch(() => {
+        /* rejected — the user can press play in the native controls */
+      });
+    } else {
+      video.controls = false;
+      video.muted = true;
+      // Keep the muted loop alive (IO will pause it once offscreen).
+      if (video.paused) {
+        void video.play().catch(() => {});
+      }
     }
   };
 
@@ -108,6 +167,7 @@ export function GgVideoShowcase() {
 
   return (
     <section
+      ref={sectionRef}
       aria-label="Видео: как мы работаем"
       data-header-theme="dark"
       className="relative w-full bg-black"
@@ -122,44 +182,25 @@ export function GgVideoShowcase() {
           aspect-video only at md+ where the viewport is wide enough for
           16:9 to hold the content. */}
       <div className="relative min-h-[560px] w-full md:aspect-video md:min-h-0">
-        {/* Static poster by default — the <video> mounts only after the
-            user clicks the Play pill (Cycle 38 perf fix: no second
-            parallel download of mculinary-hero.mp4). */}
-        {!expanded && (
-          <img
-            src="/media/hero-premium/hero-premium-6.jpg"
-            alt="Банкетный зал nilov catering: сервированный стол с блюдами высокой кухни"
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        )}
-        {expanded && (
-          <video
-            ref={(el) => {
-              videoRef.current = el;
-              // Explicit play() on mount: autoplay-with-sound inside a real
-              // click handler is allowed, but some browsers still need the
-              // imperative nudge (Cycle 40 — critic saw a paused video).
-              if (el) {
-                el.controls = true;
-                el.muted = false;
-                void el.play().catch(() => {
-                  /* autoplay rejected — user can press play in the controls */
-                });
-              }
-            }}
-            autoPlay
-            controls
-            playsInline
-            preload="metadata"
-            poster="/media/hero-premium/hero-premium-6.jpg"
-            aria-label="Видео: как мы работаем"
-            className="absolute inset-0 h-full w-full object-cover"
-          >
-            <source src="/media/clips/catering-clip-2.mp4" type="video/mp4" />
-          </video>
-        )}
+        {/* W4-FIX: ALWAYS-mounted <video> — muted looping teaser, started
+            by the IntersectionObserver above and paused offscreen.
+            preload="none": the browser downloads nothing until play(); the
+            poster attribute covers the pre-play frame (the old static
+            <img> is gone — the video poster replaces it 1:1). The clip
+            (1.5MB catering-clip-2.mp4) differs from the hero video url, so
+            nothing is fetched in parallel with the hero. */}
+        <video
+          ref={videoRef}
+          muted
+          loop
+          playsInline
+          preload="none"
+          poster="/media/hero-premium/hero-premium-6.jpg"
+          aria-label="Видео: как мы работаем — приготовление и подача блюд"
+          className="absolute inset-0 h-full w-full object-cover"
+        >
+          <source src="/media/clips/catering-clip-2.mp4" type="video/mp4" />
+        </video>
 
         {/* Dark scrim — Task 4-B readability hardening. Two stacked
             gradients keep the editorial copy WCAG-legible over the video
@@ -271,9 +312,11 @@ export function GgVideoShowcase() {
             letterSpacing: "0.04em",
           }}
         >
-          {/* Inline play/pause glyph + label. When expanded, swap to a
-              "Pause" affordance — though the underlying behavior is
-              mute-toggle, the icon shift signals the new state. */}
+          {/* Inline glyph + label. Collapsed (teaser): play glyph +
+              «Смотреть». Expanded: mute glyph + «Выключить звук» — W4-FIX:
+              collapsing no longer pauses the clip (the muted b-roll keeps
+              looping), so the "Pause" affordance was wrong; the pill now
+              truthfully reads as a sound toggle. */}
           <span className="inline-flex items-center gap-2">
             <svg
               viewBox="0 0 24 24"
@@ -284,12 +327,12 @@ export function GgVideoShowcase() {
               fill="currentColor"
             >
               {expanded ? (
-                <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+                <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
               ) : (
                 <path d="M8 5v14l11-7z" />
               )}
             </svg>
-            {expanded ? "Пауза" : "Смотреть"}
+            {expanded ? "Выключить звук" : "Смотреть"}
           </span>
         </button>
       </div>

@@ -106,6 +106,10 @@ export default function Home() {
       tabIndex={-1}
       className="flex min-h-screen flex-col bg-cream outline-none"
     >
+      {/* W4-AUDIT NOTE: espresso theme-flip (GammaSeparator) остаётся скрытым
+          под bg-cream — секции сидят на захардкоженном --ea-cream с тёмным
+          текстом, раскрытие флипа = отдельная дизайн-задача (риск контраста).
+          Решение: не трогать в этой сессии. */}
       {/* ── ACT I: BRAND PROMISE ── */}
 
       {/* 1. TottHero — Cycle 30 Talk of the Town hero graft. Full-viewport

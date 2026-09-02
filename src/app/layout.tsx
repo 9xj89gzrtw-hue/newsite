@@ -386,6 +386,16 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
         <Preloader />
+        {/* W4-FIX: прелоадер теперь рендерит двери уже в SSR-HTML (FOUC-фикс).
+            Без JS они закрыли бы сайт навсегда — глушим корень прелоадера
+            noscript-стилем, чтобы no-JS посетитель сразу видел страницу. */}
+        <noscript>
+          <style
+            dangerouslySetInnerHTML={{
+              __html: "[data-preloader-root]{display:none!important}",
+            }}
+          />
+        </noscript>
         <CustomCursor />
         <GrainOverlay />
         <VerticalBrandLabel />

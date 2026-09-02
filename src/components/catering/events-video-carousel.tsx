@@ -38,6 +38,17 @@
  *  - Subtle motion.div fade-up on header (respects reduced-motion).
  *  - Pauses autoplay entirely while the modal is open (activeIndex !== null).
  *
+ * W4-FIX (hover-тизер): every tile renders a <video muted loop playsInline
+ * preload="none"> ON TOP of its poster (the video's own poster attribute
+ * shows the identical frame, so the static look is unchanged). The teaser
+ * plays ONLY on card hover, ONLY on fine-pointer devices
+ * (matchMedia("(hover: hover) and (pointer: fine)")), ONLY while the section
+ * is intersecting the viewport (IO gate) and NEVER more than one at a time
+ * (entering a card pauses its siblings). preload="none" keeps the mp4s out
+ * of the network until the first hover; coarse-pointer (touch) users see
+ * the static poster; prefers-reduced-motion disables hover videos entirely.
+ * The modal (unmuted + controls) and the «Смотреть видео» pill are unchanged.
+ *
  * Mobile: STILL horizontal scroll — no grid collapse. This is the magazine
  * horizontal-read signature (per EA + Ridgewells editorial layer brief).
  *
@@ -49,7 +60,7 @@
  * @see docs/reference-library/elegant-affairs/BRAND-CONTEXT.md §2.5
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
@@ -135,6 +146,83 @@ export function EventsVideoCarousel() {
 
   /** activeIndex !== null → fullscreen modal open with that tile's video. */
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  /* ── W4-FIX: hover-видео-тизеры (десктоп, fine pointer) ─────────────────
+   *
+   * Per-tile teaser <video> elements (see the <li> render below). The gate
+   * resolves once on the client — it only affects event-handler behaviour,
+   * never the rendered DOM, so SSR/hydration markup stays identical. */
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const hoverVideosRef = useRef<Array<HTMLVideoElement | null>>([]);
+  const inViewRef = useRef(false);
+  const canHoverVideo = useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches,
+    [],
+  );
+
+  /** React doesn't serialize the `muted` attribute into SSR HTML — pin the
+   *  DOM property on mount so hover play() (muted) is never rejected. */
+  useEffect(() => {
+    hoverVideosRef.current.forEach((v) => {
+      if (v) v.muted = true;
+    });
+  }, []);
+
+  /** IO-гейт: вне вьюпорта тизеры не играют ВООБЩЕ — при выходе гасим все
+   *  (в т.ч. случайно оставшийся играющим) и запрещаем новый hover-play. */
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        inViewRef.current = entry.isIntersecting;
+        if (!entry.isIntersecting) {
+          hoverVideosRef.current.forEach((v) => {
+            if (v && !v.paused) v.pause();
+          });
+        }
+      },
+      { rootMargin: "100px" },
+    );
+    io.observe(section);
+    return () => io.disconnect();
+  }, []);
+
+  /** Hover = ровно ОДНО играющее видео: вход в карточку ставит её и глушит
+   *  остальных; выход — пауза этой. Гейты: fine pointer, не reduced-motion,
+   *  секция в вьюпорте, модалка закрыта. */
+  const playHoverVideo = (i: number) => {
+    if (!canHoverVideo || reduce || activeIndex !== null) return;
+    if (!inViewRef.current) return;
+    hoverVideosRef.current.forEach((v, j) => {
+      if (!v) return;
+      if (j === i) {
+        if (v.paused) {
+          void v.play().catch(() => {
+            /* rejected — the static poster stays */
+          });
+        }
+      } else if (!v.paused) {
+        v.pause();
+      }
+    });
+  };
+
+  const pauseHoverVideo = (i: number) => {
+    const v = hoverVideosRef.current[i];
+    if (v && !v.paused) v.pause();
+  };
+
+  /** Модалка открыта — её видео (со звуком) должно играть одно: глушим
+   *  hover-тизеры. */
+  const pauseHoverVideos = useCallback(() => {
+    hoverVideosRef.current.forEach((v) => {
+      if (v && !v.paused) v.pause();
+    });
+  }, []);
 
   /**
    * Advance the scroller by one card-width + gap. When at the end, wrap
@@ -281,13 +369,17 @@ export function EventsVideoCarousel() {
   // there on close (previously focus fell to <body> — keyboard users lost
   // their place on the page).
   const openerRef = useRef<HTMLButtonElement | null>(null);
-  const openModal = useCallback((i: number) => {
-    openerRef.current =
-      document.activeElement instanceof HTMLButtonElement
-        ? document.activeElement
-        : null;
-    setActiveIndex(i);
-  }, []);
+  const openModal = useCallback(
+    (i: number) => {
+      pauseHoverVideos();
+      openerRef.current =
+        document.activeElement instanceof HTMLButtonElement
+          ? document.activeElement
+          : null;
+      setActiveIndex(i);
+    },
+    [pauseHoverVideos],
+  );
   const closeModal = useCallback(() => {
     setActiveIndex(null);
     requestAnimationFrame(() => openerRef.current?.focus());
@@ -300,6 +392,7 @@ export function EventsVideoCarousel() {
 
   return (
     <section
+      ref={sectionRef}
       id="events-video-carousel"
       aria-label="Видео мероприятий"
       className="ea-evt-video ea-section ea-section--cream"
@@ -344,12 +437,13 @@ export function EventsVideoCarousel() {
               role="group"
               aria-roledescription="slide"
               aria-label={`Видео ${i + 1} из ${TILES.length}: ${tile.title}`}
+              onMouseEnter={() => playHoverVideo(i)}
+              onMouseLeave={() => pauseHoverVideo(i)}
             >
-              {/* Poster image only — video loads exclusively in the modal
-                  (click-to-play). Cycle 38 perf fix: 4 autoplaying <video>
-                  elements with the same 5 MB src starved the browser's
-                  connection pool, breaking images and freezing the main
-                  thread. Posters keep the visual identity per tile. */}
+              {/* Poster image — the visual base of the tile (alt text carries
+                  the content description for AT; eager: tiles live in a
+                  horizontal scroller — lazy images horizontally off-screen
+                  never load and read as "broken" to audits). */}
               <ClipPathReveal
                 direction="alternate"
                 index={i}
@@ -360,13 +454,33 @@ export function EventsVideoCarousel() {
                   className="ea-evt-video__video"
                   src={tile.poster}
                   alt={tile.videoAlt}
-                  /* eager: tiles live in a horizontal scroller — lazy images
-                     horizontally off-screen never load and read as "broken"
-                     to audits (same fix as Cycle 33 menu carousel). */
                   loading="eager"
                   decoding="async"
                 />
               </ClipPathReveal>
+
+              {/* W4-FIX hover-тизер: <video> ALWAYS in the DOM above the
+                  poster (same .ea-evt-video__video class → same absolute
+                  fill + hover scale). preload="none" + poster → the browser
+                  fetches nothing until play() and shows the poster frame,
+                  so the static look is pixel-identical. Plays only on hover
+                  (fine pointer, section in view, one at a time) — see
+                  playHoverVideo above. Decorative: aria-hidden, the img alt
+                  carries the description. */}
+              <video
+                ref={(el) => {
+                  hoverVideosRef.current[i] = el;
+                }}
+                className="ea-evt-video__video"
+                src={tile.video}
+                poster={tile.poster}
+                muted
+                loop
+                playsInline
+                preload="none"
+                aria-hidden="true"
+                tabIndex={-1}
+              />
 
               {/* Bottom gradient overlay — rgba(0,0,0,0.78) → transparent. */}
               <div className="ea-evt-video__overlay" aria-hidden="true" />
