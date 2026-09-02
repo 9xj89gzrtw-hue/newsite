@@ -34,7 +34,8 @@ import "./ea-founder-story.css";
  *   фото по Y (±22px, противофаза) — MotionValues, ноль setState на кадр.
  *   За контентом на всю ширину низа — гигантское outlined «Нилов» (в JSX
  *   title-case, uppercase даёт CSS text-transform; Playfair, cyrillic ✓,
- *   stroke cream 15%) со scrub-дрейфом по X (±40px).
+ *   stroke cream 15%) со scrub-дрейфом по X (±40px; на <768 — ±14px,
+ *   FIX-6/W1-A MINOR-1, вместе с мобильным капом 16.5vw в CSS).
  *   ПРАВАЯ (54%) — eyebrow «ОСНОВАТЕЛЬ · ШЕФ-ПОВАР», H2 «Всё начинается с
  *   рук.» (italic-фрагмент — канон сайта), красный hairline, 3 МИНИМАЛЬНЫЕ
  *   главы (2007 / Философия / Сегодня — все факты из прежнего копирайта,
@@ -300,6 +301,25 @@ export function EaFounderStory() {
     return () => mq.removeEventListener("change", update);
   }, []);
 
+  // FIX-6 (W1-A MINOR-1): амплитуда X-дрейфа «НИЛОВ» на узких экранах.
+  // Тот же §34-паттерн, что narrow выше: post-mount matchMedia — SSR и
+  // первый клиентский рендер совпадают (false = десктопная амплитуда),
+  // свап амплитуды после монта. Перевооружение честное: в framer-12
+  // useCombineMotionValues пересчитывает combine-замыкание синхронно в
+  // каждом рендере (updateValue() в теле хука) — при флипе wordNarrow
+  // useTransform тут же пересобирается с новой амплитудой, пружина
+  // перевозит значение плавно. settled-гейт ниже прикручивает x только
+  // после монта — флеша десктопной амплитуды на мобиле нет (оба setState
+  // из одного flush эффектов монта — один ререндер).
+  const [wordNarrow, setWordNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setWordNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
   // FX2 (волна-B): вход сцены (1.0s + delay 0.4) раньше наследовался
   // возвратом из hover — после ухода курсора стояло ~505ms мёртвого delay
   // и ~1.0s плавного возврата. sceneEntered взводится onAnimationComplete
@@ -361,7 +381,17 @@ export function EaFounderStory() {
   // формально overdamped пружине). 90/26 гасит заметно быстрее — замер в
   // research/c67/fix.
   const springOpts = { stiffness: 90, damping: 26, mass: 0.6 } as const;
-  const wordX = useSpring(useTransform(scrollYProgress, [0, 1], [40, -40]), springOpts);
+  // FIX-6 (W1-A MINOR-1): ±40px на <768 при word-боксе во всю ширину секции
+  // держали глифы в 8.95px от кромок overflow-x:clip на 390 (реальный текст
+  // Playfair-500 ≈3.94em/слово; на 320 — 0.2px, обводка резалась). <768 —
+  // ±14: с мобильным капом 16.5vw (ea-founder-story.css) инвариант задачи
+  // «слово + 2×амплитуда ≤ 100vw» выполняется с запасом ≥50px на 320–414.
+  // 768–1023 и desktop ≥1024 — прежние ±40 (там запас; десктоп не тронут).
+  const wordAmp = wordNarrow ? 14 : 40;
+  const wordX = useSpring(
+    useTransform(scrollYProgress, [0, 1], [wordAmp, -wordAmp]),
+    springOpts,
+  );
   const portraitY = useSpring(useTransform(scrollYProgress, [0, 1], [22, -22]), springOpts);
   const sceneY = useSpring(useTransform(scrollYProgress, [0, 1], [-14, 18]), springOpts);
 

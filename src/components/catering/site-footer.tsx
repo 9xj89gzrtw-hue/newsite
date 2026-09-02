@@ -649,7 +649,11 @@ export function SiteFooter() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-xs text-cream/50 md:flex-row md:px-8">
           <div className="flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-4">
             <p className="text-center md:text-left">
-              © {year ?? 2025} {SITE_CONFIG.brandName}, Санкт-Петербург · Все права защищены
+              {/* FIX-5 (W1-D NIT): SITE_CONFIG.brandName несёт фирменную
+                  хвостовую точку («nilov catering.») — уместную в вордмарке,
+                  но дающую «nilov catering.,» в копирайте. Здесь бренд без
+                  точки; config.ts не трогаем (чужой файл). */}
+              © {year ?? 2025} {SITE_CONFIG.brandName.replace(/\.$/, "")}, Санкт-Петербург · Все права защищены
             </p>
             {/* Cycle 39 fix: legal document links — /offer was an orphan page,
                 /terms required by the cookie banner. */}

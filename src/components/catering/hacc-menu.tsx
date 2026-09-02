@@ -73,7 +73,6 @@ import {
 import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
 import { MENU_TYPES, formatRUB, type MenuType } from "@/lib/pricing";
-import { generateMenuPdf } from "@/lib/pdf-client";
 import "./hacc-menu.css";
 
 /* ------------------------------------------------------------------ config */
@@ -1155,6 +1154,12 @@ export function HaccMenu() {
     setPdfBusy(true);
     setPdfError(false);
     try {
+      // FIX-4 [F4, W1-D]: jspdf+pako (~127КБ) больше НЕ в стартовом бандле —
+      // статический импорт заменён на dynamic по клику. Кнопка уже в
+      // loading-состоянии: disabled + «Готовим PDF…» (первый клик — чанк
+      // качается ~200–500ms, последующие — из кэша модулей). API pdf-client
+      // не менялся: generateMenuPdf("all") как раньше.
+      const { generateMenuPdf } = await import("@/lib/pdf-client");
       await generateMenuPdf("all");
     } catch {
       setPdfError(true);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
@@ -43,6 +44,8 @@ export function TottHero() {
   const reduce = useReducedMotion();
   const mounted = useMounted();
   const showStatic = mounted && Boolean(reduce);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const container = {
     hidden: {},
@@ -61,8 +64,59 @@ export function TottHero() {
         visible: { opacity: 1, transition: { duration: 0.7, ease: "easeOut" as const } },
       };
 
+  /* FIX-4 [F2, W1-D] §39 «живое видео без фриза: IO + preload="none"» —
+   * тот же паттерн, что gg-video-showcase.tsx:192-203. Раньше <video
+   * autoPlay> качал 5.16MB mculinary-hero.mp4 в критическом пути парсинга
+   * HTML (~6.1MB начального трафика, замер W1-D). Теперь: preload="none" —
+   * байты не запрашиваются, пока play() не вызван IO-гейтом; IO
+   * (rootMargin 100px) мгновенно стартует play при появлении секции в
+   * вьюпорте — hero виден с первой секунды, поэтому визуально НИЧЕГО не
+   * меняется (тот же autoplay-эффект, только запрос видео уходит после
+   * гидрации, а не блокирует начальный HTML); при уходе из вьюпорта —
+   * pause (экономия трафика на фоне ниже фолда). poster — существующее
+   * hero-фото (HERO_POSTER), дедуплицируется с poster-атрибутом
+   * gg-video-showcase (тот же URL).
+   *
+   * prefers-reduced-motion: IO не создаём — видео не играет, остаётся
+   * статичный постер (next/image z-0) — эталонный паттерн §39.
+   */
+  useEffect(() => {
+    if (reduce) return;
+    const section = sectionRef.current;
+    const video = videoRef.current;
+    if (!section || !video) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          // Muted-луп — разрешён всегда; отказ просто оставляет постер.
+          void video.play().catch(() => {
+            /* autoplay rejected — poster image stays */
+          });
+        } else {
+          video.pause();
+        }
+      },
+      { rootMargin: "100px" },
+    );
+    io.observe(section);
+    return () => {
+      io.disconnect();
+      video.pause();
+    };
+  }, [reduce]);
+
+  /** FIX-4: React не сериализует атрибут `muted` в SSR-HTML (known
+   *  React #10389) — пиним DOM-свойство на монте, чтобы muted-autoplay
+   *  из IO-гейта никогда не отклонялся (как в gg-video-showcase). */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) video.muted = true;
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       id="hero"
       data-header-theme="transparent"
       aria-label="nilov catering — лучший кейтеринг Санкт-Петербурга"
@@ -82,13 +136,19 @@ export function TottHero() {
       {/* Background video — cinematic motion (replaces talkofthetown's static
           hero photo per task brief). Overlays the poster image (z-10) once it
           begins playing. object-cover fills viewport; muted + playsInline for
-          autoplay + iOS compliance. */}
+          autoplay + iOS compliance.
+          FIX-4 [F2]: preload="none" + IO-гейт (см. эффект выше) — 5.16MB
+          уходит из критического пути; poster = HERO_POSTER (дедуп с
+          gg-video-showcase). autoPlay-атрибут убран — старт выдаёт IO,
+          hero в вьюпорте с первой секунды, визуал не меняется. */}
       <video
+        ref={videoRef}
         className="absolute inset-0 z-[1] size-full object-cover"
-        autoPlay
         muted
         loop
         playsInline
+        preload="none"
+        poster={HERO_POSTER}
         aria-hidden="true"
       >
         <source src={HERO_VIDEO} type="video/mp4" />

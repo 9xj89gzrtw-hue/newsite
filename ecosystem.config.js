@@ -15,6 +15,9 @@ module.exports = {
       env: {
         NODE_ENV: "development",
         PORT: 3001,
+        // Cycle 70: sqlite dev-БД newsite (absolute — prisma walks up for .env,
+        // parent sandbox .env must NOT capture this var)
+        DATABASE_URL: "file:/home/z/my-project/newsite/db/custom.db",
       },
       instances: 1,
       exec_mode: "fork",

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     description: "Условия использования сайта и кейтеринговых услуг.",
     type: "website",
     url: "/terms",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — выездной кейтеринг в Санкт-Петербурге" }],
   },
   twitter: {
     card: "summary",

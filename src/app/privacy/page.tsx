@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     description: "Как мы защищаем ваши персональные данные в соответствии с 152-ФЗ.",
     type: "website",
     url: "/privacy",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — выездной кейтеринг в Санкт-Петербурге" }],
   },
   twitter: {
     card: "summary",

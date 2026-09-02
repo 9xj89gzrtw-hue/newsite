@@ -239,10 +239,12 @@ export const viewport: Viewport = {
   ],
 };
 
-/** JSON-LD structured data for Yandex/Google (LocalBusiness + CateringService) */
+/** JSON-LD structured data for Yandex/Google (LocalBusiness + FoodEstablishment).
+ * FIX-3: "CateringService" не существует в schema.org — валидаторы
+ * Google/Yandex отвергают тип; заменён на валидный FoodEstablishment. */
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "CateringService",
+  "@type": "FoodEstablishment",
   "@id": siteUrl + "#organization",
   name: "nilov catering",
   alternateName: "NILOV CATERING",
@@ -320,7 +322,7 @@ const faqJsonLd = {
       name: "Что входит в стоимость?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Еда, доставка, сервировка, посуда, текстиль, повар и официанты на месте, а также лёгкое цветочное сопровождение на столах. Не входит: аренда площадки, алкоголь, музыка и расширенное флористическое оформление — поможем организовать по запросу.",
+        text: "Еда, доставка, сервировка, посуда, текстиль, повар и официанты на месте, а также лёгкое цветочное сопровождение на столах (как во всех пакетах меню); доставка в пределах КАД — за КАД по договорённости. Не входит: аренда площадки, алкоголь, музыка и расширенное флористическое оформление — поможем организовать по запросу.",
       },
     },
     {

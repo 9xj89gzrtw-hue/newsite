@@ -922,6 +922,17 @@ const LeadForm = memo(function LeadForm({
   const [comment, setComment] = useState("");
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<FormStatus>("idle");
+  /** FIX-1 (task 2, критик B MINOR — двойной POST /api/lead, 34 мс):
+   *  гейт `status === "loading"` — это React-state: два submit-события в
+   *  одном окне ре-рендера читают ОДИНАКОВЫЙ стейл "idle" и ОБА идут в
+   *  fetch → на сервере дубли-заявки. Ref-лок — синхронный: check-and-set
+   *  в том же тике, второй вход игнорируется ещё до fetch. Снимается
+   *  ТОЛЬКО по завершению (ошибка сети / не-ок ответ); на успехе НЕ
+   *  снимается — форма размонтируется (stage→success, новый цикл = новый
+   *  ref=false), а если вдруг не размонтируется — дубль всё равно
+   *  невозможен. Чтение/запись — только в обработчике события, не в
+   *  рендере (React Compiler §37 это разрешает). */
+  const submitInFlightRef = useRef(false);
   const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean }>({});
   const nameRef = useRef<HTMLInputElement>(null);
   /** M5 (task 11-fix3): контейнер шага 2 — цель скролла после «Далее». */
@@ -1000,10 +1011,13 @@ const LeadForm = memo(function LeadForm({
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (status === "loading") return;
+    /* FIX-1 task 2: синхронный лок — переживает стейл-стейт (см. реф выше). */
+    if (submitInFlightRef.current) return;
     if (!consent) {
       toast.error("Необходимо согласие на обработку персональных данных");
       return;
     }
+    submitInFlightRef.current = true;
     setStatus("loading");
     try {
       const res = await fetch("/api/lead", {
@@ -1042,6 +1056,7 @@ const LeadForm = memo(function LeadForm({
         }
         toast.error(serverError || "Не удалось отправить заявку. Позвоните нам напрямую.");
         setStatus("idle");
+        submitInFlightRef.current = false;
         return;
       }
 
@@ -1068,6 +1083,7 @@ const LeadForm = memo(function LeadForm({
         toast.error("Не удалось отправить. Позвоните нам напрямую.");
       }
       setStatus("idle");
+      submitInFlightRef.current = false;
     }
   };
 
@@ -2121,7 +2137,34 @@ export function HaccBooking() {
     [],
   );
 
-  const resetToCalc = useCallback(() => setStage("calc"), []);
+  /* FIX-1 (task 1+3, волна-1 критик B MAJOR/NIT): раньше ресет писал
+     stage="calc" — «Отправить ещё одну заявку» убивал форму: зона
+     схлопывалась (grid 0fr), .hb-zone__body получал inert=true (вся форма
+     выпадала из a11y-дерева), поднявшаяся .hb-contacts перекрывала поле
+     ТЕЛЕФОН («covered by», fill не менял value), восстановление — только
+     полным reload. Ресет обязан открывать РАБОЧУЮ форму:
+     - stage "form" — зона раскрыта (data-open), inert снят, CTA-зона
+       панели сворачивается (aria-hidden+inert, как при обычном открытии
+       формы) — путь ровно тот же, что у openForm, только без скролла
+       (юзер уже у зоны);
+     - LeadForm монтируется заново (success его размонтировал): шаг 1,
+       пустые поля — draft удалён при 201, подтягиваться нечему;
+     - дата сбрасывается к дефолту (NIT: имя/телефон чистились, дата
+       переживала ресет — дата живёт в родителе, вне формы);
+     - leadId затирается — квитанция прошлого цикла не подтекает;
+     - фокус — в первое поле (кнопка ресета только что размонтировалась,
+       иначе фокус падает на body; mounted-гейт §34 не нужен — фокус
+       ставится только по пользовательскому клику). */
+  const resetToForm = useCallback(() => {
+    setLeadId(undefined);
+    setDate("");
+    setStage("form");
+    /* LeadForm монтируется следующим коммитом — таймер 120 мс даёт
+       React закрепить DOM (скролл не трогаем: сцена уже перед глазами). */
+    window.setTimeout(() => {
+      document.getElementById("hb-name")?.focus({ preventScroll: true });
+    }, 120);
+  }, []);
 
   /** D5 (task 7-fix1): stable-колбек для memo-сетке типов (TypeGrid). */
   const handleTypeSelect = useCallback((id: string) => setTypeId(id), [setTypeId]);
@@ -2384,7 +2427,7 @@ export function HaccBooking() {
                       leadId={leadId}
                       metaLine={successMeta}
                       promiseLine={scriptPromise}
-                      onReset={resetToCalc}
+                      onReset={resetToForm}
                       settled={settled}
                     />
                   ) : (
@@ -2613,7 +2656,7 @@ export function HaccBooking() {
                 <div className="hb-cta-zone__clip">
                   {stage === "success" ? (
                     <p className="hb-again-row">
-                      <button type="button" onClick={resetToCalc} className="hb-panel__again">
+                      <button type="button" onClick={resetToForm} className="hb-panel__again">
                         Отправить ещё одну заявку
                       </button>
                     </p>

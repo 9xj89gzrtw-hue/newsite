@@ -4240,11 +4240,40 @@ header[data-scrolled="true"] [data-mega-panel] {
 
 
 /* ── Cycle 41: while the cookie banner is open (bottom-docked), lift the
-   mobile phone FAB above it so both remain reachable. ── */
+   mobile phone FAB above it so both remain reachable.
+   FIX-5 (Cycle 70): селектор верифицирован побайтово (od -c: 61 5b 68
+   72 65 66 5e 3d = a + [href^=) и через CSSOM вживую — правило валидно
+   и матчит phone-FAB (fixed bottom-6 right-6, lg:hidden). «Сломанный»
+   селектор из аудита W1 — артефакт отображения терминала, съедающего
+   последовательность [h. Высота баннера на мобиле — 96px (замер FIX-5
+   agent-browser, 390×844, после поднятия кнопок до 44px),
+   translateY(-92px) поднимает FAB (низ был на 24px + 56px роста →
+   116px от низа) с запасом 20px над баннером. ── */
 @media (max-width: 1023px) {
   body.cookie-banner-open a[href^="tel:"][class*="fixed"] {
-    /* banner ≈ 170–250px tall on mobile; 180px clears it with margin */
+    /* FAB: bottom-6 (24px) + size-14 (56px) → верх на 80px от низа;
+       баннер 96px → лифт -92px даёт запас 20px над баннером */
     transform: translateY(-92px);
+  }
+}
+
+/* FIX-5 (Cycle 70, W1-A MINOR): пока cookie-баннер открыт (fixed снизу,
+   z-80), он перекрывал нижнюю строку копирайта футера. Резервируем место
+   паддингом на body: высоты баннера измерены agent-browser'ом ПОСЛЕ
+   поднятия кнопок до 44px — десктоп 1920 — 69px (одна строка, sm+),
+   мобайл 390 — 96px (<640px, две строки); паддинг с запасом 7/12px.
+   Без transition: padding на body — layout-свойство, анимация дёргает
+   скролл (плавность не нужна — класс появляется вместе с баннером до
+   первого скролла вниз). env(safe-area-inset-bottom) повторяет
+   safe-area-инсет самого баннера. Класс ставится ea-cookie-banner.tsx
+   СТРОГО по visible и снимается после выбора (раньше — только при
+   unmount корневого компонента, т.е. никогда; см. FIX-5 в компоненте). */
+body.cookie-banner-open {
+  padding-bottom: 76px;
+}
+@media (max-width: 639px) {
+  body.cookie-banner-open {
+    padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
   }
 }
 

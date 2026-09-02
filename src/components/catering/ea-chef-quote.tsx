@@ -8,7 +8,7 @@ import { motion, useReducedMotion } from "framer-motion";
  *
  * Full-bleed editorial chef-quote moment. Grafts EA's founder-as-voice pattern
  * (BRAND-CONTEXT.md §3.5 About pitch + EA-ANALYSIS.md §4.5 italic-as-fragment
- * typographic device) onto Interfood's cinematic editorial design language.
+ * typographic device) onto nilov catering's cinematic editorial design language.
  *
  * Sits between Manifesto and Menu in the client journey (orchestrator wires it
  * in Step 5). Provides a "human beat" — the founder's own voice — between the
@@ -26,7 +26,7 @@ import { motion, useReducedMotion } from "framer-motion";
  *   - Quote text in Playfair Display italic — clamp(1.75rem → 2.5rem),
  *     line-height 1.3, color cream (#F7F5F5).
  *   - Below: red 64×2px horizontal divider (.ea-divider-red) + signature
- *     "— Дмитрий Нилов, шеф-повар Interfood Catering" in Montserrat 500,
+ *     "— Дмитрий Нилов, шеф-повар nilov catering" in Montserrat 500,
  *     letter-spacing 0.05em, color cream.
  *
  * Animation: Motion `whileInView` + `viewport={{ once: true }}`. Quote text
@@ -48,7 +48,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const QUOTE_TEXT =
   "Еда — это ритуал. Не меню, не список калорий, не логистика. Ритуал, в котором каждая деталь — от первого ножа до последнего бокала — служит одному: моменту, который гости запомнят на всю жизнь.";
 
-const QUOTE_ATTRIBUTION = "— Дмитрий Нилов, шеф-повар Interfood Catering";
+const QUOTE_ATTRIBUTION = "— Дмитрий Нилов, шеф-повар nilov catering";
 
 export function EaChefQuote() {
   const reduce = useReducedMotion();
@@ -99,7 +99,7 @@ export function EaChefQuote() {
       {/* Full-bleed chef photo background */}
       <Image
         src="/media/event-chef-action.jpg"
-        alt="Шеф-повар Дмитрий Нилов за работой на кухне Interfood Catering"
+        alt="Шеф-повар Дмитрий Нилов за работой на кухне nilov catering"
         fill
         sizes="100vw"
         priority={false}

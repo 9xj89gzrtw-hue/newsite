@@ -800,8 +800,12 @@
 .hb-panel__again {
   display: inline-flex;
   align-items: center;
-  min-height: 24px;
-  padding: 0.25rem 0.35rem;
+  /* FIX-1 (task 4, критик A MINOR): 24px → 44px — tap-стандарт. Визуал
+     не меняется (инлайн-текст-ссылка центруется по align-items, растёт
+     только прозрачная высота ряда); row поднимается сам (схлопывающийся
+     grid .hb-cta-zone). */
+  min-height: 44px;
+  padding: 0.25rem 0.6rem;
   border: 0;
   background: none;
   font-family: var(--hb-body-font);

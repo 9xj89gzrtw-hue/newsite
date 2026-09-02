@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { CSSProperties } from "react";
 
@@ -23,15 +23,16 @@ import type { CSSProperties } from "react";
  *     re-shows). Otherwise hide if ANY active choice exists.
  *   - AnimatePresence + motion.div slide-in from top (y: -100 → 0, 400ms
  *     ease-out); slide-out on dismiss. prefers-reduced-motion → opacity only.
- *   - role="region" + aria-label="Cookie consent". Focus trap inside the
- *     banner; Tab cycles within text links + buttons. Escape NOT bound
- *     (not modal). Body scroll NOT locked.
+ *   - role="region" + aria-label="Cookie consent". NOT a dialog and NOT
+ *     modal: NO focus trap — Tab moves through the links/buttons and
+ *     continues into the page naturally (FIX-5, WCAG 2.1.2 / W1-D F5).
+ *     Escape NOT bound. Body scroll NOT locked.
  *   - "Accept all" enables analytics — actual Yandex.Metrika loading is
  *     handled elsewhere; this stub just console.logs (per Cycle 28 spec §4).
  *
- * z-[60] matches the existing cookie-consent.tsx pattern (above site-header
- * z-50 + announcement-bar z-55, below the mobile-menu overlay which renders
- * later in the DOM so stacks above naturally).
+ * z-[80] (Cycle 39 bottom-dock keeps the sticky header visible; above
+ * site-header z-50 + announcement-bar z-55, below the mobile-menu overlay
+ * which renders later in the DOM so stacks above naturally).
  */
 
 const DISMISS_DAYS = 14;
@@ -72,7 +73,9 @@ const BTN_BASE_STYLE: CSSProperties = {
   cursor: "pointer",
   transition:
     "background-color 200ms ease, border-color 200ms ease, color 200ms ease",
-  minHeight: 40,
+  /* FIX-5 (W1-D NIT): тач-таргет 40 → 44px (WCAG 2.5.5 / Apple HIG);
+     на 390px все три кнопки остаются в один ряд (замер в worklog). */
+  minHeight: 44,
   minWidth: 44,
 };
 
@@ -137,47 +140,36 @@ function writeChoice(choice: Choice): void {
 export function EaCookieBanner() {
   const [visible, setVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
-  const bannerRef = useRef<HTMLDivElement>(null);
 
   // Mount: clear stale (>14 days) choices, then decide whether to show.
   useEffect(() => {
     clearStaleChoices();
-    const show = !hasActiveChoice();
-    setVisible(show);
-    // Cycle 41: flag on <body> so fixed elements (phone FAB) can shift out
-    // of the banner's footprint while it is open.
-    document.body.classList.toggle("cookie-banner-open", show);
-    return () => document.body.classList.remove("cookie-banner-open");
+    setVisible(!hasActiveChoice());
   }, []);
+
+  // Cycle 41 / FIX-5: flag on <body> so fixed elements (phone FAB) can
+  // shift out of the banner's footprint while it is open and globals.css
+  // can reserve bottom padding (footer copyright overlap). Synced to
+  // `visible`: previously the class was set once on mount and only the
+  // component-unmount cleanup removed it — but this component stays
+  // mounted forever (only the inner motion.div unmounts), so the flag
+  // (and any CSS hooked on it) stuck on <body> after the visitor made
+  // their choice.
+  useEffect(() => {
+    document.body.classList.toggle("cookie-banner-open", visible);
+    return () => document.body.classList.remove("cookie-banner-open");
+  }, [visible]);
 
   // Cycle 40 fix: NO programmatic focus on the first link — it painted a
   // persistent focus ring for every visitor (focus() ≠ :focus-visible).
   // Keyboard users reach the banner naturally via Tab (it's early in DOM
-  // order); the focus trap below keeps them inside once they arrive.
-
-  // Focus trap inside the banner — Tab cycles within text links + buttons.
-  useEffect(() => {
-    if (!visible || !bannerRef.current) return;
-    const node = bannerRef.current;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
-      const focusable = node.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled])',
-      );
-      if (focusable.length < 2) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    node.addEventListener("keydown", handler);
-    return () => node.removeEventListener("keydown", handler);
-  }, [visible]);
+  // order).
+  //
+  // FIX-5 (W1-D F5, WCAG 2.1.2 «No keyboard trap»): this banner is a
+  // NON-modal region, so there is deliberately NO focus trap — the old
+  // keydown handler cycled Tab inside the banner forever (Политика →
+  // Условия → Принять → Политика). Removed; Tab now leaves the banner in
+  // natural DOM order.
 
   const decide = (choice: Choice) => {
     writeChoice(choice);
@@ -208,7 +200,6 @@ export function EaCookieBanner() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          ref={bannerRef}
           role="region"
           aria-label="Уведомление об использовании cookies"
           data-component="ea-cookie-banner"

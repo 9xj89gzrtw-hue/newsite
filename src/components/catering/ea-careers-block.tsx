@@ -10,17 +10,17 @@ import "./ea-careers-block.css";
 /**
  * EaCareersBlock — Cycle 28 ea-* editorial layer.
  *
- * First-class careers / recruitment section. Fills gap P0-3 (Interfood has
- * NO careers section in the 33-section homepage flow — see
+ * First-class careers / recruitment section. Fills gap P0-3 (nilov catering
+ * has NO careers section in the 33-section homepage flow — see
  * docs/WOLFGANG-PUCK-DESIGN-ANALYSIS.md §8 + §15). Catering is labor-
- * intensive — Interfood operates in SPb + Moscow + All-Russia, so
+ * intensive — the company operates in SPb + Moscow + All-Russia, so
  * recruitment traffic could equal inquiry traffic in volume. This block
  * elevates recruitment to a first-class homepage conversion path,
  * mirroring how Wolfgang Puck Catering places "Now Hiring in a City Near
  * You" in the homepage flow between the World strip and the Footer.
  *
  * Adaptation of Wolfgang Puck's "Now Hiring" alternating CTA block to
- * Interfood's EA editorial language:
+ * nilov catering's EA editorial language:
  *   - Espresso dark surface (#1A1411 — warm coffee-black, slightly warmer
  *     than the pure-black bookend sections [29] philosophy quote + [33]
  *     final CTA — gives the dark beat a roasted warmth).
@@ -34,7 +34,7 @@ import "./ea-careers-block.css";
  *     + secondary `СМОТРЕТЬ ВАКАНСИИ` (cream-outline, cream text →
  *     #contact, fills cream on hover with text flipping to espresso).
  *   - Stat strip: 3 inline stats (180+ команда / 16+ лет на рынке /
- *     2400+ событий) with red numbers and thin red vertical dividers —
+ *     2 400+ событий) with red numbers and thin red vertical dividers —
  *     reuses the numbers from CepRedStats + EaFounderStory for cross-
  *     section numeric consistency.
  *
@@ -80,7 +80,7 @@ import "./ea-careers-block.css";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** Benefit bullets — original Interfood copy, Russian only. */
+/** Benefit bullets — original nilov catering copy, Russian only. */
 const BENEFITS = [
   "Обучение у шеф-повара — от баз до авторской кухни",
   "События уровня Сбербанка, Яндекса и Газпрома в портфолио",
@@ -88,11 +88,13 @@ const BENEFITS = [
 ] as const;
 
 /** Stat strip — reuses numbers from CepRedStats + EaFounderStory for
- *  cross-section numeric consistency (180+ команда · 16+ лет · 2400+ событий). */
+ *  cross-section numeric consistency (180+ команда · 16+ лет · 2 400+ событий). */
 const STATS = [
   { num: "180+", label: "команда" },
   { num: "16+", label: "лет на рынке" },
-  { num: "2400+", label: "событий" },
+  /* «2\u00A0400+» — неразрывный пробел: число не рвётся на переносе,
+     формат тысяч единый с футером и строкой доверия (W1-A, nit о разнобое). */
+  { num: "2\u00A0400+", label: "событий" },
 ] as const;
 
 type MotionDivProps = ComponentProps<typeof motion.div>;
@@ -178,7 +180,7 @@ export function EaCareersBlock() {
             />
 
             <motion.p className="ea-careers__lead" {...reveal(0.24)}>
-              Interfood — это команда из 180+ поваров, официантов и
+              nilov catering — это команда из 180+ поваров, официантов и
               организаторов. Мы растём и ищем людей, для которых еда — это
               призвание.
             </motion.p>
@@ -219,7 +221,7 @@ export function EaCareersBlock() {
             <motion.div
               className="ea-careers__stats"
               {...reveal(0.7)}
-              aria-label="Ключевые цифры Interfood: 180+ команда, 16+ лет на рынке, 2400+ событий"
+              aria-label={`Ключевые цифры nilov catering: 180+ команда, 16+ лет на рынке, 2\u00A0400+ событий`}
             >
               {STATS.map((stat, i) => (
                 <div key={stat.label} className="ea-careers__stat">
@@ -254,7 +256,7 @@ export function EaCareersBlock() {
               >
                 <SmartImage
                   src="/media/concept-crew.jpg"
-                  alt="Команда поваров Interfood Catering за работой — приготовление блюд на выездном мероприятии"
+                  alt="Команда поваров nilov catering за работой — приготовление блюд на выездном мероприятии"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="ea-careers__image"

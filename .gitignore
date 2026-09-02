@@ -114,6 +114,16 @@ docs/reference-library/saltblock/hover-*.png
 # agent-ctx — subagent work records (transient, worklog.md is canonical)
 /agent-ctx/
 
+# Cycle 70 — CRITICAL FIX: global `*.png` rule above silently excluded
+# public/brand/logo-*.png from git → logo 404 on every page in fresh clones.
+# Re-include ALL production brand PNGs explicitly (negation must stay AFTER *.png).
+!public/brand/*.png
+!public/favicon-32.png
+!public/icon-192.png
+!public/icon-512.png
+!public/apple-touch-icon.png
+!public/og-image.jpg
+
 # verification screenshots (created during VLM critique loops)
 docs/loop*.png
 docs/new-*.png

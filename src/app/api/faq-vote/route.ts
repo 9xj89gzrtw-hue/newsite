@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import crypto from "node:crypto";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/**
+ * FIX-4 [F8, W1-D]: простые длины-лимиты ДО записи в БД (zod уже в deps):
+ *   - question: trim, 1..500 символов;
+ *   - vote: строго "up" | "down".
+ * Rate-limit НЕ добавляем (отдельная задача, W1-D F8 частично).
+ */
+const QuestionSchema = z
+  .string()
+  .trim()
+  .min(1, "Question text is required")
+  .max(500, "Вопрос слишком длинный (макс. 500 символов)");
 
 /**
  * POST /api/faq-vote — record a user's vote on a FAQ answer ("Was this helpful?").
@@ -12,20 +25,29 @@ export const dynamic = "force-dynamic";
  * Idempotent: one vote per (questionHash + IP + UA) — user can change their
  * vote, but only their latest vote is kept (upserted).
  *
- * FALLBACK: If DB is unavailable, logs and returns success (demo mode).
+ * FIX-4 [F10, W1-D]: при недоступности БД больше НЕТ фейкового 201
+ * «success (demo mode)» — тихая потеря голоса. Отвечаем честный 503
+ * `{ ok: false, error }`.
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const question = String(body?.question ?? "").trim();
-    const vote = String(body?.vote ?? "").toLowerCase();
 
-    if (!question) {
+    const questionResult = QuestionSchema.safeParse(
+      typeof body?.question === "string" ? body.question : "",
+    );
+    if (!questionResult.success) {
       return NextResponse.json(
-        { ok: false, error: "Question text is required" },
+        {
+          ok: false,
+          error: questionResult.error.issues[0]?.message ?? "Question is required",
+        },
         { status: 400 },
       );
     }
+    const question = questionResult.data;
+
+    const vote = String(body?.vote ?? "").toLowerCase();
     if (vote !== "up" && vote !== "down") {
       return NextResponse.json(
         { ok: false, error: "Vote must be 'up' or 'down'" },
@@ -89,11 +111,15 @@ export async function POST(req: NextRequest) {
         { status: 201 },
       );
     } catch (dbError) {
-      // Fallback: DB unavailable — return success for demo mode
-
+      // FIX-4 [F10]: БД недоступна — честный 503, никаких фейковых 201.
+      console.error("[api/faq-vote] DB write failed:", dbError);
       return NextResponse.json(
-        { ok: true, id: `vote-${Date.now()}`, vote, stored: true },
-        { status: 201 },
+        {
+          ok: false,
+          error:
+            "Сервис голосования временно недоступен — попробуйте позже. Ваш голос не сохранён.",
+        },
+        { status: 503 },
       );
     }
   } catch (e) {

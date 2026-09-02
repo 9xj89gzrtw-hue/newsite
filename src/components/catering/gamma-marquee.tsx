@@ -174,7 +174,13 @@ function PhotoTile({
         fill
         sizes="(max-width: 768px) 280px, 300px"
         className="gamma-marquee__img absolute inset-0 h-full w-full object-cover"
-        loading="eager"
+        // FIX-4 [F3, W1-D]: было loading="eager" — React 19 SSR
+        // автоэмитит <link rel=preload as=image> для каждого <img> без
+        // loading="lazy" → 14 marquee-фото ниже фолда уходили в <head> как
+        // preload-и (19 SSR image-preload, из них 14 — marquee). Убираем
+        // eager — next/image по умолчанию ставит loading="lazy": preload-
+        // link-и исчезают, фото грузятся по мере захода в вьюпорт
+        // (горизонтальный скролл ленты подводит их в зону IO сам).
         // draggable=false so the user can't accidentally trigger the
         // browser's native image-drag gesture over the marquee (which
         // would otherwise interfere with the GSAP-driven motion).

@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  // FIX-4 [F15, W1-D]: убрать рекламный X-Powered-By: Next.js из ответов
+  // (замер W1-D: заголовок присутствовал). Никакого функционала не несёт.
+  poweredByHeader: false,
   // Hide the Next.js dev mode "N issues" indicator badge (Cycle 45 — was
   // showing in spiral screenshots and looked like a browser error).
   devIndicators: false,

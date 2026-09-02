@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -7,30 +8,64 @@ export const dynamic = "force-dynamic";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
+ * FIX-4 [F8, W1-D]: простые длины-лимиты ДО записи в БД (zod уже в deps):
+ *   - email: trim + lowercase, ≤254 (RFC max), формат по EMAIL_REGEX;
+ *   - source: trim, ≤100, optional.
+ * Rate-limit НЕ добавляем (отдельная задача, W1-D F8 частично).
+ */
+const EmailSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .max(254, "Email слишком длинный (макс. 254 символа)")
+  .regex(EMAIL_REGEX, "Некорректный формат email");
+
+const SourceSchema = z
+  .string()
+  .trim()
+  .max(100, "Поле source слишком длинное (макс. 100 символов)")
+  .optional()
+  .nullable();
+
+/**
  * POST /api/newsletter — subscribe an email with 152-ФЗ consent proof.
  * Stores consent timestamp + IP + User-Agent as legal proof of consent.
  *
- * FALLBACK: If DB is unavailable, logs and returns success (demo mode).
  * Idempotent: re-subscribing an existing email returns 200 with code ALREADY_SUBSCRIBED.
+ *
+ * FIX-4 [F10, W1-D]: при недоступности БД больше НЕТ фейкового 201
+ * «success (demo mode)» — тихая потеря подписки. Отвечаем честный 503
+ * `{ ok: false, error }` — клиент показывает ошибку, пользователь знает,
+ * что подписка не сохранилась.
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const email = String(body?.email ?? "").trim().toLowerCase();
-    const source = body?.source ? String(body.source) : null;
 
-    if (!email) {
+    const rawEmail = typeof body?.email === "string" ? body.email : "";
+    if (!rawEmail.trim()) {
       return NextResponse.json(
         { ok: false, error: "Email обязателен" },
         { status: 400 },
       );
     }
-    if (!EMAIL_REGEX.test(email)) {
+    const emailResult = EmailSchema.safeParse(rawEmail);
+    if (!emailResult.success) {
       return NextResponse.json(
-        { ok: false, error: "Некорректный формат email" },
+        {
+          ok: false,
+          error: emailResult.error.issues[0]?.message ?? "Некорректный email",
+        },
         { status: 400 },
       );
     }
+    const email = emailResult.data;
+
+    const sourceResult = SourceSchema.safeParse(
+      typeof body?.source === "string" ? body.source : null,
+    );
+    const source =
+      sourceResult.success && sourceResult.data ? sourceResult.data : null;
 
     // 152-ФЗ compliance: capture consent proof metadata
     const consentIp =
@@ -89,11 +124,15 @@ export async function POST(req: NextRequest) {
         { status: 201 },
       );
     } catch (dbError) {
-      // Fallback: DB unavailable — return success for demo mode
-
+      // FIX-4 [F10]: БД недоступна — честный 503, никаких фейковых 201.
+      console.error("[api/newsletter] DB write failed:", dbError);
       return NextResponse.json(
-        { ok: true, id: `sub-${Date.now()}`, code: "SUBSCRIBED", stored: true },
-        { status: 201 },
+        {
+          ok: false,
+          error:
+            "Сервис подписки временно недоступен — попробуйте позже. Ваш email не сохранён.",
+        },
+        { status: 503 },
       );
     }
   } catch (e) {

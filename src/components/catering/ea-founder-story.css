@@ -55,7 +55,8 @@
 
 /* Гигантское outlined «НИЛОВ» — signature-typography (research §2.7).
    Playfair Display (cyrillic ✓), stroke cream 15%, fill transparent.
-   Низ секции на всю ширину; scrub-дрейф по X (±40px) через MotionValue. */
+   Низ секции на всю ширину; scrub-дрейф по X (±40px, <768 — ±14px,
+   FIX-6) через MotionValue. Мобильный кап кегля — FIX-6-блок ниже. */
 .efs__word {
   position: absolute;
   left: 0;
@@ -85,6 +86,24 @@
 @supports not (-webkit-text-stroke: 1px #ffffff) {
   .efs__word {
     color: color-mix(in oklab, var(--ea-cream) 6%, transparent);
+  }
+}
+
+/* FIX-6 (W1-A MINOR-1, Cycle 70): мобильный кап слова. Замер аудита
+   «right=430 при 390» — бокс ЭЛЕМЕНТА (left:0/right:0 = вся ширина
+   секции) + дрейф x:+40, глифы там не жили: реальный текст Playfair-500
+   ≈3.94em/слово = 292px @74.1px, край 381.05 — запас 8.95px. Но запас
+   тонкий (на 320 — 0.2px, обводка резалась), поэтому инвариант задачи
+   «слово + 2×амплитуда дрейфа ≤ 100vw» приводим в запас по консервативной
+   модели ширины ≈5.3em/слово: 16.5vw → 341px + 2×14 (дрейф <768,
+   ea-founder-story.tsx) = 369 ≤ 390. Пол FX3 сохранён: min(4.25rem,
+   16.5vw) не зависит от рем-масштаба (кегль не удваивается при text
+   resize 200%). Desktop ≥1024 не тронут — базовый clamp выше: 1440 →
+   273.6px, 1920 → 352px (кап 22rem). Блок ПОСЛЕ базового правила и
+   @supports (одинаковая специфичность — порядок решает, грабля F2). */
+@media (max-width: 1023px) {
+  .efs__word {
+    font-size: clamp(min(4.25rem, 16.5vw), 16.5vw, 22rem);
   }
 }
 

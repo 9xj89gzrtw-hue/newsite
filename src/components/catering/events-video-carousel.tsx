@@ -61,6 +61,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
@@ -441,39 +442,46 @@ export function EventsVideoCarousel() {
               onMouseLeave={() => pauseHoverVideo(i)}
             >
               {/* Poster image — the visual base of the tile (alt text carries
-                  the content description for AT; eager: tiles live in a
-                  horizontal scroller — lazy images horizontally off-screen
-                  never load and read as "broken" to audits). */}
+                  the content description for AT).
+                  FIX-4 [F3, W1-D]: было сырой <img loading="eager"> — 4
+                  постера качались сразу (~640КБ, карусель ниже фолда) +
+                  React 19 SSR автоэмитил <link rel=preload as=image> для
+                  каждого eager-<img>. Теперь next/image (fill + lazy по
+                  умолчанию): постеры оптимизируются в webp и грузятся
+                  только при заходе карусели во вьюпорт. */}
               <ClipPathReveal
                 direction="alternate"
                 index={i}
                 duration={0.8}
                 className="absolute inset-0"
               >
-                <img
+                <Image
                   className="ea-evt-video__video"
                   src={tile.poster}
                   alt={tile.videoAlt}
-                  loading="eager"
-                  decoding="async"
+                  fill
+                  sizes="(max-width: 767px) 280px, 320px"
                 />
               </ClipPathReveal>
 
               {/* W4-FIX hover-тизер: <video> ALWAYS in the DOM above the
                   poster (same .ea-evt-video__video class → same absolute
-                  fill + hover scale). preload="none" + poster → the browser
-                  fetches nothing until play() and shows the poster frame,
-                  so the static look is pixel-identical. Plays only on hover
-                  (fine pointer, section in view, one at a time) — see
-                  playHoverVideo above. Decorative: aria-hidden, the img alt
-                  carries the description. */}
+                  fill + hover scale). preload="none" + без poster-атрибута
+                  (FIX-4: poster-атрибут браузер качает сразу при вставке
+                  элемента, даже с preload="none" — это держало ~640КБ
+                  сырых постеров в начальной загрузке; визуальную базу
+                  плитки несёт next/image ниже, видео прозрачно до
+                  первого play) — браузер не запрашивает НИЧЕГО до
+                  первого hover-play. Plays only on hover (fine pointer,
+                  section in view, one at a time) — see playHoverVideo
+                  above. Decorative: aria-hidden, the img alt carries the
+                  description. */}
               <video
                 ref={(el) => {
                   hoverVideosRef.current[i] = el;
                 }}
                 className="ea-evt-video__video"
                 src={tile.video}
-                poster={tile.poster}
                 muted
                 loop
                 playsInline

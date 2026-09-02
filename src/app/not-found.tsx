@@ -5,7 +5,7 @@ import { CONTACTS } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Страница не найдена",
-  description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с Interfood Catering.",
+  description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с nilov catering.",
   robots: { index: false, follow: true },
 };
 
