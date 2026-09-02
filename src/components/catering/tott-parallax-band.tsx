@@ -50,7 +50,7 @@ import { SplitTextReveal } from "@/components/motion/split-text-reveal";
  * touches the layer (would kill the fixed attachment again).
  *
  * Composition:
- *   - `.tott-parallax` bg: /media/c62/interfood-olive-trees-1920.webp
+ *   - `.tott-parallax` bg: /media/c62/nilov-olive-trees-1920.webp
  *     (Cycle 62: single optimized asset — the old build downloaded the raw
  *     657KB JPG for the CSS layer AND a next/image webp copy hidden beneath;
  *     new webp q75 512KB replaces both, new folder+filename = cache-bust per
@@ -68,7 +68,7 @@ import { SplitTextReveal } from "@/components/motion/split-text-reveal";
  *      row-correlation err ≪ ±1px err)
  */
 
-const BAND_BG = "/media/c62/interfood-olive-trees-1920.webp";
+const BAND_BG = "/media/c62/nilov-olive-trees-1920.webp";
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function TottParallaxBand() {
