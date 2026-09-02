@@ -196,6 +196,25 @@ export function SiteHeader() {
   }, []);
 
   // Lock body scroll when mobile menu open.
+  // W3-FIX (edge case): при resize через lg-брейкпоинт с открытым меню
+  // (390→1440, поворот/девтулзы) кнопка-бургер исчезает, меню остаётся
+  // «висеть» открытым, а body остаётся в scroll-lock. Закрываем меню
+  // автоматом при переходе на десктоп — lock снимается штатным эффектом.
+  useEffect(() => {
+    if (!open) return;
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setOpen(false);
+    };
+    // Уже десктоп при открытии (экзотика) — закрываем сразу.
+    if (mq.matches) {
+      setOpen(false);
+      return;
+    }
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [open]);
+
   useEffect(() => {
     if (open) {
       const scrollY = window.scrollY;

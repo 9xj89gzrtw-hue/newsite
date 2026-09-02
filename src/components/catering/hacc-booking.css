@@ -301,7 +301,10 @@
   font-weight: 600;
   font-size: 0.68rem;
   letter-spacing: 0.06em;
-  color: color-mix(in srgb, var(--hb-ink) 38%, transparent);
+  /* W3-FIX (a11y/контраст): неактивные тики — 12px КЛИКАБЕЛЬНЫЕ кнопки,
+     38% ink на #F7F5F5 давало 2.27:1. 62% ≈ 4.5:1. Активный тик
+     (--hb-red-deep, правило ниже) не тронут. */
+  color: color-mix(in srgb, var(--hb-ink) 62%, transparent);
   pointer-events: none;
   z-index: 2;
   cursor: pointer;

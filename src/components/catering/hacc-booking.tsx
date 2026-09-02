@@ -1908,7 +1908,17 @@ export function HaccBooking() {
      Fix5 V4: кламп применяется к локальному зеркалу (URL пишется дебаунсом). */
   const guestsClamped = Math.min(GUESTS_MAX, Math.max(guestsLocal, effMin));
 
-  const minToday = useMemo(() => todayIso(), []);
+  /* W3-FIX (hydration-risk): todayIso() читает new Date() — на SSR (UTC) и
+   * первом клиентском рендере (МСК) даты расходятся с 00:00 до 03:00 по
+   * Москве, и min-атрибут date-инпута даёт hydration-mismatch. Схема:
+   * SSR/первый клиентский рендер — пустая строка (min не рендерится),
+   * реальное «сегодня» ставится в useEffect ПОСЛЕ маунта — билд
+   * server/client идентичен, ограничение прошлых дат появляется сразу после
+   * гидрации. dateInvalid до маунта = false (согласованно на обеих сторонах). */
+  const [minToday, setMinToday] = useState("");
+  useEffect(() => {
+    setMinToday(todayIso());
+  }, []);
 
   /* Q2 (task 9-fix2): прошедшая дата, введённая вручную, больше не «молчит» —
      под полем появляется подсказка, а из расчёта дата исключается
@@ -2340,7 +2350,7 @@ export function HaccBooking() {
                 <input
                   id="hb-date"
                   type="date"
-                  min={minToday}
+                  min={minToday || undefined}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   className="hb-date__input"

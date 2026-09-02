@@ -13,6 +13,18 @@ import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 
+/*
+ * W3-FIX (LCP): next/font по умолчанию ставит rel=preload на КАЖДЫЙ woff2
+ * (39 файлов ≈ 1МБ) — все они конкурируют с hero-медиа за первые байты
+ * соединения. Preload оставлен ТОЛЬКО шрифтам первого экрана (hero):
+ *   - Prata                — wordmark hero (LCP-текст);
+ *   - Nothing You Could Do — script «food as art» (hero-оверлей);
+ *   - Lato                 — eyebrow/scroll подписи hero.
+ * Все остальные — preload: false: шрифты НЕ удаляются и грузятся тем же
+ * CSS-ом с display:swap (визуал не меняется), просто по мере надобности,
+ * а не на старте. Oswald (wordmark футера — ниже fold) тоже без preload.
+ */
+
 // Sopranos Catering typography — Oswald (display/condensed uppercase),
 // Karla (body, humanist sans), Great Vibes (script accent for "Welcome to").
 // All loaded via next/font/google — self-hosted at runtime, no external requests.
@@ -21,6 +33,8 @@ const oswald = Oswald({
   subsets: ["latin", "latin-ext"],
   weight: ["200", "300", "400", "500", "600", "700"],
   display: "swap",
+  /* W3-FIX: wordmark футера — ниже fold, preload не нужен. */
+  preload: false,
 });
 
 const karla = Karla({
@@ -28,6 +42,8 @@ const karla = Karla({
   subsets: ["latin", "latin-ext"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
+  /* W3-FIX: body-фолбэк, не LCP-критичен. */
+  preload: false,
 });
 
 const greatVibes = Great_Vibes({
@@ -35,6 +51,8 @@ const greatVibes = Great_Vibes({
   subsets: ["latin"],
   weight: ["400"],
   display: "swap",
+  /* W3-FIX: акценты ниже fold. */
+  preload: false,
 });
 
 const playfair = Playfair_Display({
@@ -42,6 +60,8 @@ const playfair = Playfair_Display({
   subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
+  /* W3-FIX: не LCP-критичен. */
+  preload: false,
 });
 
 // Concept-Catering.de aesthetic — Barlow Semi Condensed (ultra-bold condensed
@@ -51,6 +71,8 @@ const barlow = Barlow_Semi_Condensed({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
+  /* W3-FIX: тёмный «wow»-слой ниже fold. */
+  preload: false,
 });
 
 // Global Gourmet (ggcatering.com) — Montserrat as Poppins-replacement.
@@ -64,6 +86,8 @@ const poppins = Montserrat({
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
   display: "swap",
+  /* W3-FIX: gg-секции ниже fold. */
+  preload: false,
 });
 
 // Cycle 27 — Creative Edge Parties (creativeedgeparties.com) self-hosted
@@ -78,12 +102,16 @@ const neutraDisplay = localFont({
   src: "../../public/fonts/Neutra2Display-Light.woff2",
   variable: "--font-neutra-display",
   display: "swap",
+  /* W3-FIX: CEP-заголовки ниже fold. */
+  preload: false,
 });
 
 const neutraText = localFont({
   src: "../../public/fonts/Neutra2Text_book.woff2",
   variable: "--font-neutra-text",
   display: "swap",
+  /* W3-FIX: CEP-текст ниже fold. */
+  preload: false,
 });
 
 // ===== TALK OF THE TOWN (talkofthetownatlanta.com) FONTS — Cycle 30 =====
@@ -105,6 +133,7 @@ const prata = Prata({
   subsets: ["latin"],
   weight: ["400"],
   display: "swap",
+  /* W3-FIX: hero wordmark — preload ОСТАВЛЕН (LCP-критичный). */
 });
 
 const nothingYouCouldDo = Nothing_You_Could_Do({
@@ -112,13 +141,21 @@ const nothingYouCouldDo = Nothing_You_Could_Do({
   subsets: ["latin"],
   weight: ["400"],
   display: "swap",
+  /* W3-FIX: script «food as art» на hero — preload ОСТАВЛЕН. */
 });
 
 const lato = Lato({
   variable: "--font-lato",
   subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "700"],
+  /* W3-FIX: 300 исключён — НЕ ИСПОЛЬЗУЕТСЯ нигде (tott-body/site-header/
+     tott-cta-btn/tott-eyebrow/spiral — только 400 и 700; все прочие
+     font-weight:300 в проекте — Karla/Barlow/IBM Plex Mono/Montserrat,
+     не Lato). Без него preload-набор Lato = 4 файла (400/700 × latin/
+     latin-ext) вместо 6. Если 300 когда-нибудь понадобится — верни вес,
+     файл подтянется CSS-ом (просто без preload). */
+  weight: ["400", "700"],
   display: "swap",
+  /* W3-FIX: eyebrow/scroll hero — preload ОСТАВЛЕН. */
 });
 
 // Marck Script — Cyrillic-capable handwritten script (task v5). Nothing You
@@ -133,6 +170,8 @@ const marck = Marck_Script({
   subsets: ["latin", "latin-ext", "cyrillic"],
   weight: ["400"],
   display: "swap",
+  /* W3-FIX: ru-скрипт акценты ниже fold. */
+  preload: false,
 });
 
 const siteUrl = SITE_CONFIG.url;

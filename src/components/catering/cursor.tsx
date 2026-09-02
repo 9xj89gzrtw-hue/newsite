@@ -43,8 +43,13 @@ import {
  *    via scale, the dot grows via scale, the ripple scales;
  *  - mousemove is rAF-coalesced (one frame = one batch of motion-value
  *    writes + at most one rect read, and only while magnetizing);
- *  - React state (hover/label/preview) flips only when the hovered
- *    ELEMENT IDENTITY changes — no re-render storm while sweeping;
+ *  - React state: `hovering` flips only when the hovered ELEMENT IDENTITY
+ *    changes (no re-render storm while sweeping inside one element);
+ *    `data-cursor` / `data-cursor-image` attributes are RE-READ every
+ *    coalesced frame (two getAttribute calls, no layout) — hacc-menu flips
+ *    data-cursor-image off when its panel opens while the pointer stays on
+ *    the same element, so a cached value would leave a stale 120px photo
+ *    hovering over the open panel. setState fires only on value change;
  *  - listeners are passive.
  *
  * Gates: (pointer: fine) AND (min-width: 768px) — the body class
@@ -105,6 +110,10 @@ export function CustomCursor() {
   const pendingEventRef = useRef<MouseEvent | null>(null);
   const hoverElRef = useRef<HTMLElement | null>(null);
   const magnetElRef = useRef<HTMLElement | null>(null);
+  /** Mirrors of label/previewImage — lets the rAF frame compare against the
+   *  committed value without re-subscribing the effect on every label change. */
+  const labelRef = useRef("");
+  const previewRef = useRef("");
   const seenRef = useRef(false);
   const rippleIdRef = useRef(0);
 
@@ -152,8 +161,9 @@ export function CustomCursor() {
       dotX.set(px);
       dotY.set(py);
 
-      // Interactive detection — state flips only on element IDENTITY
-      // change, so sweeping the pointer inside one element never re-renders.
+      // Interactive detection — the `hovering` boolean + magnet target flip
+      // only on element IDENTITY change, so sweeping the pointer inside one
+      // element never re-renders. Attributes are NOT gated — see below.
       const t = ev.target as HTMLElement | null;
       const interactive =
         t && typeof t.closest === "function"
@@ -161,22 +171,34 @@ export function CustomCursor() {
           : null;
       if (interactive !== hoverElRef.current) {
         hoverElRef.current = interactive;
-        if (interactive) {
-          setHovering(true);
-          setLabel(interactive.getAttribute("data-cursor") || "");
-          // data-cursor-image: 120px photo preview (hacc menu/services).
-          setPreviewImage(interactive.getAttribute("data-cursor-image") || "");
-          magnetElRef.current =
-            typeof interactive.matches === "function" &&
-            interactive.matches(MAGNET_SELECTOR)
-              ? interactive
-              : null;
-        } else {
-          setHovering(false);
-          setLabel("");
-          setPreviewImage("");
-          magnetElRef.current = null;
-        }
+        setHovering(Boolean(interactive));
+        magnetElRef.current =
+          interactive &&
+          typeof interactive.matches === "function" &&
+          interactive.matches(MAGNET_SELECTOR)
+            ? interactive
+            : null;
+      }
+
+      // W3-FIX (stale-preview race): re-read data-cursor / data-cursor-image
+      // EVERY frame, not only on element change. hacc-menu keeps the same
+      // hovered element (the menu root) but flips data-cursor-image to
+      // undefined when its panel opens — an identity-gated read would cache
+      // the old photo and leave a 120px preview floating over the open panel
+      // until the pointer leaves. getAttribute ×2 per move is cheap (no
+      // layout); setState fires only when the value actually changes.
+      const nextLabel =
+        (interactive && interactive.getAttribute("data-cursor")) || "";
+      if (nextLabel !== labelRef.current) {
+        labelRef.current = nextLabel;
+        setLabel(nextLabel);
+      }
+      // data-cursor-image: 120px photo preview (hacc menu/services).
+      const nextPreview =
+        (interactive && interactive.getAttribute("data-cursor-image")) || "";
+      if (nextPreview !== previewRef.current) {
+        previewRef.current = nextPreview;
+        setPreviewImage(nextPreview);
       }
 
       // Magnet: pull the ring 30% toward the hovered element's center.

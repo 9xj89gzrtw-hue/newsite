@@ -117,7 +117,7 @@ const TILES: EventTile[] = [
     poster: "/media/event-04.jpg",
     category: "Мастерство шефа",
     title: "Авторское горячее",
-    meta: "Мясо с гарниром · plated main",
+    meta: "Мясо с гарниром · порционная подача",
     videoAlt: "Видео: авторское горячее блюдо с мясом и гарниром",
   },
 ];
