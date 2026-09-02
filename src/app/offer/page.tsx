@@ -4,18 +4,18 @@ import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Публичная оферта",
   description:
-    "Условия оказания кейтеринговых услуг: стоимость, порядок оплаты, расторжение договора. Interfood Catering, Санкт-Петербург.",
+    "Условия оказания кейтеринговых услуг: стоимость, порядок оплаты, расторжение договора. nilov catering, Санкт-Петербург.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/offer" },
   openGraph: {
-    title: "Публичная оферта — Interfood Catering",
+    title: "Публичная оферта — nilov catering",
     description: "Условия оказания кейтеринговых услуг: стоимость, порядок оплаты.",
     type: "website",
     url: "/offer",
   },
   twitter: {
     card: "summary",
-    title: "Публичная оферта — Interfood Catering",
+    title: "Публичная оферта — nilov catering",
     description: "Условия оказания кейтеринговых услуг: стоимость, порядок оплаты.",
   },
 };

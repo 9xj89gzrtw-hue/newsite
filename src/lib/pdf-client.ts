@@ -146,10 +146,10 @@ export async function buildMenuCatalogDoc(typeId = "all"): Promise<jsPDF> {
   doc.setLineCap("round");
 
   doc.setProperties({
-    title: "Каталог меню — Interfood Catering",
+    title: "Каталог меню — nilov catering",
     subject: "Кейтеринг полного цикла · Санкт-Петербург",
-    author: "Interfood Catering",
-    creator: "interfood-catering.ru",
+    author: "nilov catering",
+    creator: "nilov catering",
   });
 
   if (types.length > 1) {
@@ -177,8 +177,8 @@ export async function generateMenuPdf(typeId: string): Promise<void> {
 
   const filename =
     types.length > 1
-      ? "Catalog-Interfood-Catering.pdf"
-      : `Menu-${types[0].label}-Interfood.pdf`;
+      ? "Catalog-nilov-catering.pdf"
+      : `Menu-${types[0].label}-nilov.pdf`;
   doc.save(filename);
 }
 
@@ -202,8 +202,8 @@ function drawCover(doc: jsPDF) {
   doc.setTextColor(...C.cream);
   doc.setFont("Marck", "normal");
   doc.setFontSize(54);
-  doc.text("Interfood", PAGE.mL, 96);
-  const brandW = doc.getTextWidth("Interfood");
+  doc.text("nilov catering", PAGE.mL, 96);
+  const brandW = doc.getTextWidth("nilov catering");
   doc.setFillColor(...C.red);
   doc.circle(PAGE.mL + brandW + 4.5, 92.5, 1.7, "F");
 
@@ -264,7 +264,7 @@ function drawCover(doc: jsPDF) {
   doc.setFont("Roboto", "normal");
   doc.setFontSize(8.5);
   doc.text(
-    `${CONTACTS.email}  ·  ${CONTACTS.city}  ·  interfood-catering.ru`,
+    `${CONTACTS.email}  ·  ${CONTACTS.city}  ·  ${CONTACTS.phone}`,
     PAGE.mL,
     269,
   );
@@ -538,7 +538,7 @@ function drawBackCover(doc: jsPDF) {
   doc.setFont("Roboto", "normal");
   doc.setFontSize(9);
   doc.text(
-    `${CONTACTS.city}  ·  interfood-catering.ru`,
+    `${CONTACTS.city}  ·  ${CONTACTS.phone}`,
     PAGE.mL,
     198,
   );
@@ -547,8 +547,8 @@ function drawBackCover(doc: jsPDF) {
   doc.setTextColor(...C.cream);
   doc.setFont("Marck", "normal");
   doc.setFontSize(22);
-  doc.text("Interfood", PAGE.mL, 258);
-  const brandW = doc.getTextWidth("Interfood");
+  doc.text("nilov catering", PAGE.mL, 258);
+  const brandW = doc.getTextWidth("nilov catering");
   doc.setFillColor(...C.red);
   doc.circle(PAGE.mL + brandW + 2.6, 255.5, 1.2, "F");
   doc.setTextColor(...C.coverMuted);
@@ -575,7 +575,7 @@ function drawPageFooters(doc: jsPDF, hasCover: boolean) {
     doc.setTextColor(...C.faint);
     doc.setFont("Roboto", "normal");
     doc.setFontSize(7);
-    doc.text("Interfood Catering · Санкт-Петербург", PAGE.mL, 284);
+    doc.text("nilov catering · Санкт-Петербург", PAGE.mL, 284);
     doc.text(
       `${CONTACTS.phone}  ·  ${String(i).padStart(2, "0")} / ${String(total).padStart(2, "0")}`,
       PAGE.w - PAGE.mR,

@@ -4,18 +4,18 @@ import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Пользовательское соглашение",
   description:
-    "Условия использования сайта interfood-catering: правила пользования, интеллектуальная собственность, ответственность. Interfood Catering, Санкт-Петербург.",
+    "Условия использования сайта nilov catering: правила пользования, интеллектуальная собственность, ответственность. nilov catering, Санкт-Петербург.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/terms" },
   openGraph: {
-    title: "Пользовательское соглашение — Interfood Catering",
+    title: "Пользовательское соглашение — nilov catering",
     description: "Условия использования сайта и кейтеринговых услуг.",
     type: "website",
     url: "/terms",
   },
   twitter: {
     card: "summary",
-    title: "Пользовательское соглашение — Interfood Catering",
+    title: "Пользовательское соглашение — nilov catering",
     description: "Условия использования сайта и кейтеринговых услуг.",
   },
 };

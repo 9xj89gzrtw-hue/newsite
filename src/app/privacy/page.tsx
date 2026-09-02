@@ -4,18 +4,18 @@ import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Политика конфиденциальности",
   description:
-    "Как мы собираем, храним и защищаем ваши персональные данные в соответствии с 152-ФЗ. Interfood Catering, СПб.",
+    "Как мы собираем, храним и защищаем ваши персональные данные в соответствии с 152-ФЗ. nilov catering, СПб.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/privacy" },
   openGraph: {
-    title: "Политика конфиденциальности — Interfood Catering",
+    title: "Политика конфиденциальности — nilov catering",
     description: "Как мы защищаем ваши персональные данные в соответствии с 152-ФЗ.",
     type: "website",
     url: "/privacy",
   },
   twitter: {
     card: "summary",
-    title: "Политика конфиденциальности — Interfood Catering",
+    title: "Политика конфиденциальности — nilov catering",
     description: "Как мы защищаем ваши персональные данные в соответствии с 152-ФЗ.",
   },
 };
