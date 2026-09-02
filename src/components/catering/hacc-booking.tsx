@@ -159,6 +159,14 @@
  *    безопасна (контент поповера — только после открытия, триггер одинаков
  *    на SSR/клиенте) — детали в докблоке HbDateField.
  *
+ * W3 (cycle-71, волна-3 — K6-CRITICAL «нулевая аналитика»):
+ *  - блок — ЕДИНЫЙ монтаж document-level listener'а кликов по контактам
+ *    (tel:/мессенджеры, passive, cleanup) + воронка целей Метрики:
+ *    CALC_START (первое касание контролов, once-ref) → FORM_OPEN
+ *    (реальный переход stage→form) → FORM_STEP2 (успешный «Далее») →
+ *    LEAD_SUBMIT (201, рядом с конфетти). Все вызовы — trackGoal из
+ *    lib/analytics.ts: без env-ID это noop, сайт не меняется.
+ *
  * Контракты SPEC §2 — карта реализации:
  *  1. nuqs type/guests (parseAsString/parseAsInteger; Fix5: defaults
  *     banquet/30, guests — через локальное зеркало + debounced-коммит 500мс,
@@ -231,6 +239,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useMounted } from "@/hooks/use-mounted";
 import { CONTACTS } from "@/lib/config";
+import { anchorClickGoal, GOALS, trackGoal } from "@/lib/analytics";
 import { YANDEX_MAPS } from "@/lib/media";
 import {
   MENU_TYPES,
@@ -1032,6 +1041,9 @@ const LeadForm = memo(function LeadForm({
       return;
     }
     setStep(1);
+    /* W3 / K6-CRITICAL: успешный «Далее» — шаг воронки FORM_STEP2
+       (спам исключён: событие только на валидном переходе 1→2). */
+    trackGoal(GOALS.FORM_STEP2);
   };
 
   /* M5a (task 11-fix3): после перехода — плавный скролл к шагу 2 + фокус на
@@ -1127,6 +1139,9 @@ const LeadForm = memo(function LeadForm({
       /* C71 (Task 1-c2): золотой салют из формы — эмоциональная точка
        * конверсии (reduce-motion → noop внутри утилиты, анти-спам ≤2). */
       fireGoldConfetti(formEl);
+      /* W3 / K6-CRITICAL: LEAD_SUBMIT — терминальная цель воронки (201),
+       * рядом с салютом. Форма после успеха размонтируется — дублей нет. */
+      trackGoal(GOALS.LEAD_SUBMIT);
       /* КОНТРАКТ 7: снимок расчёта — из пропсов формы. LeadForm —
          React.memo, и он НЕ пересобирается на кадрах драга только
          потому, что handleSuccess — стабильная ссылка (useCallback с
@@ -2097,6 +2112,44 @@ export function HaccBooking() {
   const ctaZoneRef = useRef<HTMLDivElement>(null);
   const contactsZoneRef = useRef<HTMLDivElement>(null);
 
+  /* ══ W3 / K6-CRITICAL (задача 1c–1d): цели Метрики ═════════════════════
+     Единственный монтаж document-level listener'а кликов по контактам
+     (passive; классификация tel:/мессенджеры — lib/analytics.ts) + once-гейт
+     CALC_START. События не спамят: CALC_START — once per page view (ref),
+     FORM_OPEN — на РЕАЛЬНОМ переходе stage→form (эффект ниже), FORM_STEP2
+     и LEAD_SUBMIT — только валидные действия пользователя. Всё — noop без
+     env-ID (см. lib/analytics.ts). */
+  const calcStartedRef = useRef(false);
+  const fireCalcStart = useCallback(() => {
+    if (calcStartedRef.current) return;
+    calcStartedRef.current = true;
+    trackGoal(GOALS.CALC_START);
+  }, []);
+
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest("a[href]");
+      if (!anchor) return;
+      const hit = anchorClickGoal(anchor.getAttribute("href") ?? "");
+      if (hit) trackGoal(hit.goal, hit.params);
+    };
+    document.addEventListener("click", onDocClick, { passive: true });
+    return () => document.removeEventListener("click", onDocClick);
+  }, []);
+
+  /* W3: FORM_OPEN — ровно на переходе calc|success → form (клик CTA
+     «Оставить заявку», sticky-bar, якорь #contact из шапки/футера/оферты,
+     ресет «Отправить ещё одну заявку» — все пути раскрытия формы). */
+  const prevStageRef = useRef(stage);
+  useEffect(() => {
+    if (prevStageRef.current !== "form" && stage === "form") {
+      trackGoal(GOALS.FORM_OPEN);
+    }
+    prevStageRef.current = stage;
+  }, [stage]);
+
   const current = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
   /** Fix5 V6: «Ещё решаю» — псевдо-тип без цены/формата. */
   const isUndecided = typeId === UNDECIDED_ID;
@@ -2349,8 +2402,26 @@ export function HaccBooking() {
     }, 120);
   }, []);
 
-  /** D5 (task 7-fix1): stable-колбек для memo-сетке типов (TypeGrid). */
-  const handleTypeSelect = useCallback((id: string) => setTypeId(id), [setTypeId]);
+  /** D5 (task 7-fix1): stable-колбек для memo-сетке типов (TypeGrid).
+   *  W3: заодно CALC_START — первое касание контролов (once per page view,
+   *  ref-гейт в fireCalcStart). */
+  const handleTypeSelect = useCallback(
+    (id: string) => {
+      fireCalcStart();
+      setTypeId(id);
+    },
+    [setTypeId, fireCalcStart],
+  );
+
+  /* W3: дата — выбор дня в пикере = взаимодействие с калькулятором
+     (очистка/"" не считается). Стабильная ссылка — HbDateField.memo. */
+  const handleDateChange = useCallback(
+    (iso: string) => {
+      if (iso) fireCalcStart();
+      setDate(iso);
+    },
+    [fireCalcStart],
+  );
 
   /* aria-live итога — троттлинг 700 мс (SPEC §2.11), обновляется только
      «на восстановление» после остановки изменений, не на каждый кадр.
@@ -2453,7 +2524,10 @@ export function HaccBooking() {
                       type="button"
                       className={`hb-slider__tick ${guestsClamped >= tick ? "hb-slider__tick--on" : ""}`}
                       style={{ left: `${sliderPos(tick, effMin) * 100}%` }}
-                      onClick={() => setGuestsLocal(Math.min(GUESTS_MAX, Math.max(effMin, tick)))}
+                      onClick={() => {
+                        fireCalcStart();
+                        setGuestsLocal(Math.min(GUESTS_MAX, Math.max(effMin, tick)));
+                      }}
                       aria-label={`Установить ${tick} ${guestsLabel(tick)}`}
                     >
                       {tick}
@@ -2468,13 +2542,18 @@ export function HaccBooking() {
                   max={1000}
                   step={1}
                   value={Math.round(sliderPos(guestsClamped, effMin) * 1000)}
-                  onChange={(e) => setGuestsFrame(guestsFromPos(Number(e.target.value) / 1000, effMin))}
+                  onChange={(e) => {
+                    fireCalcStart();
+                    setGuestsFrame(guestsFromPos(Number(e.target.value) / 1000, effMin));
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "ArrowUp" || e.key === "ArrowRight") {
                       e.preventDefault();
+                      fireCalcStart();
                       setGuestsLocal((g) => Math.min(GUESTS_MAX, Math.max(effMin, g) + 1));
                     } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
                       e.preventDefault();
+                      fireCalcStart();
                       setGuestsLocal((g) => Math.max(effMin, g - 1));
                     }
                   }}
@@ -2499,7 +2578,10 @@ export function HaccBooking() {
                   <span className="hb-slider__edit">
                     <button
                       type="button"
-                      onClick={() => setGuestsLocal((g) => Math.max(effMin, Math.min(GUESTS_MAX, g) - 1))}
+                      onClick={() => {
+                        fireCalcStart();
+                        setGuestsLocal((g) => Math.max(effMin, Math.min(GUESTS_MAX, g) - 1));
+                      }}
                       className="hb-step-btn"
                       aria-label="Меньше на одного гостя"
                     >
@@ -2515,6 +2597,8 @@ export function HaccBooking() {
                       onChange={(e) => {
                         const digits = e.target.value.replace(/\D/g, "").slice(0, 3);
                         setGuestsDraft(digits);
+                        /* W3: набор числа — уже взаимодействие с калькулятором. */
+                        if (digits) fireCalcStart();
                       }}
                       onBlur={() => {
                         if (guestsDraft != null && guestsDraft !== "") {
@@ -2535,7 +2619,10 @@ export function HaccBooking() {
                     />
                     <button
                       type="button"
-                      onClick={() => setGuestsLocal((g) => Math.min(GUESTS_MAX, Math.max(effMin, g) + 1))}
+                      onClick={() => {
+                        fireCalcStart();
+                        setGuestsLocal((g) => Math.min(GUESTS_MAX, Math.max(effMin, g) + 1));
+                      }}
                       className="hb-step-btn"
                       aria-label="Больше на одного гостя"
                     >
@@ -2584,7 +2671,7 @@ export function HaccBooking() {
                   value={date}
                   minIso={minToday}
                   invalid={dateInvalid}
-                  onChange={setDate}
+                  onChange={handleDateChange}
                 />
               </div>
               {/* Q2 (task 9-fix2): прошедшая дата — инлайн-подсказка (polite). */}
@@ -2807,6 +2894,17 @@ export function HaccBooking() {
                         Дата события: {humanDate}
                       </PrintLine>
                     )}
+                    {/* W3 / K6 MINOR (задача 5): дегустационный триггер у чека —
+                        ФАКТ из FAQ (ea-faq-accordion FAQ_ITEMS: «приватную
+                        дегустацию в нашей студии на Петроградке. Шесть блюд…
+                        3500 ₽/чел. Сумма возвращается при заказе от 50 гостей»),
+                        дословные числа, ноль выдумки. Стиль — caption 13px
+                        (12.5 на <768), ink-63% ≥4.5:1 на бумаге (D5): не
+                        конкурирует с CTA под панелью, живёт в подоле чека
+                        ровно пока CTA виден (схлопывается вместе с notes). */}
+                    <p className="hb-note hb-note--tasting">
+                      {"Дегустация меню в студии — 3\u00A0500\u00A0₽ с человека, вернём при заказе от 50\u00A0гостей"}
+                    </p>
                   </div>
                 </div>
 

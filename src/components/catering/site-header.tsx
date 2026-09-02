@@ -63,6 +63,12 @@ const NAV: NavItem[] = [
   { href: "#contact", label: "Контакты" },
 ];
 
+/* W3 (K5 MAJOR, задача 3): пауза между закрытием меню и якорной
+   навигацией. Последний такт unlock-restore — таймер 120 мс (+rAF);
+   280 мс гарантированно ПОСЛЕ него, но ещё до конца exit-анимации
+   оверлея (0.5 с) — прыжок под скрывающимся меню незаметен. */
+const DRAWER_NAV_DELAY_MS = 280;
+
 export function SiteHeader() {
   const [stuck, setStuck] = useState(false);
   const [open, setOpen] = useState(false);
@@ -293,6 +299,44 @@ export function SiteHeader() {
     };
   }, [open]);
 
+  /* W3 (K5 MAJOR, задача 3) — закрыть меню и уйти по якорю.
+   *
+   * ПРОБЛЕМА (замер W3, research/c71/w3-probe-menu.mjs): у пунктов
+   * дровера href="#menu" + onClick={close} — дефолтная якорная навигация
+   * срабатывает ЕЩЁ В scroll-lock'е (body fixed, документ схлопнут), а
+   * затем unlock-restore возвращает страницу на сохранённую позицию:
+   * 1200 → клик «Меню» → остались на 1200, секция ниже на 3609px. Якорь
+   * «не работает» для всех пунктов мобильного меню.
+   *
+   * ФИКС: preventDefault + навигация ПОСЛЕ restore (DRAWER_NAV_DELAY_MS):
+   * 1) тот же хэш в URL — location.hash (нативный прыжок с учётом
+   *    scroll-margin-top секций + hashchange-события: #contact открывает
+   *    форму в hacc-booking, FX5-N2 перекеширует шапку);
+   * 2) если хэш УЖЕ равен цели (повторный клик) — hashchange не придёт,
+   *    скроллим руками через __lenis (§33) с нативным фоллбеком.
+   * Десктоп (nav в шапке) не затронут — там якоря работают без lock'а. */
+  const closeAndNavigate = (href: string) => {
+    setOpen(false);
+    window.setTimeout(() => {
+      if (window.location.hash !== href) {
+        window.location.hash = href;
+        return;
+      }
+      const el = document.querySelector(href);
+      if (!el) return;
+      const lenis = (
+        window as unknown as {
+          __lenis?: { scrollTo?: (t: Element, o?: object) => void };
+        }
+      ).__lenis;
+      if (typeof lenis?.scrollTo === "function") {
+        lenis.scrollTo(el, { offset: -96, duration: 0.9 });
+      } else {
+        el.scrollIntoView({ block: "start" });
+      }
+    }, DRAWER_NAV_DELAY_MS);
+  };
+
   // Header is `position: sticky; top: 0` and sits in normal flow AFTER the
   // 100vh hero (see page.tsx). Per task v5: "хеадер сначала находится внизу
   // секции херо и его даже не видно, потом херо вместе с ним мотается вверх и
@@ -503,7 +547,12 @@ export function SiteHeader() {
                 <motion.a
                   key={n.label + i}
                   href={n.href}
-                  onClick={() => setOpen(false)}
+                  /* W3: closeAndNavigate — см. докблок выше (якорь из-под
+                     scroll-lock'а не долетал). Десктопный nav не тронут. */
+                  onClick={(e) => {
+                    e.preventDefault();
+                    closeAndNavigate(n.href);
+                  }}
                   className="tott-body group py-4 min-h-[44px] flex items-center justify-between border-b border-border-line/50 text-2xl font-700 text-ink transition-colors hover:text-tott-burgundy"
                   style={{ fontWeight: 700 }}
                   initial={{ opacity: 0, x: -30 }}
@@ -523,6 +572,25 @@ export function SiteHeader() {
               >
                 <Phone className="size-5" />
                 {CONTACTS.phone}
+              </a>
+              {/* W3 (K5 MAJOR, задача 3): основная CTA в мобильном меню —
+                  раньше в дровере был ТОЛЬКО телефон (критик K5: «в моб.
+                  бургер-меню нет CTA»). Стиль — существующий язык кнопок
+                  сайта (десктопная «Заказать» в шапке: чёрная рамка 2px,
+                  uppercase Barlow Semi Cond, hover-инверсия), тач ≥48px.
+                  → #calculator (калькулятор — конверсионный центр секции);
+                  клик закрывает меню и навигирует как пункты выше. */}
+              <a
+                href="#calculator"
+                onClick={(e) => {
+                  e.preventDefault();
+                  closeAndNavigate("#calculator");
+                }}
+                className="tott-body flex min-h-[48px] w-full items-center justify-center border-2 border-black bg-transparent px-5 py-3 text-[15px] font-700 uppercase tracking-[0.08em] text-black transition-colors duration-300 hover:bg-black hover:text-white"
+                style={{ fontWeight: 700, borderRadius: 0 }}
+                aria-label="Оставить заявку — к калькулятору стоимости"
+              >
+                Оставить заявку
               </a>
             </div>
           </motion.div>

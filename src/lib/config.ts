@@ -82,9 +82,21 @@ export const CONTACTS = {
 
 /**
  * Analytics — Yandex.Metrika (Russian, 152-ФЗ-compliant if data stays in RF).
- * Loaded ONLY after cookie consent (see CookieConsent component).
- * Tag number set via NEXT_PUBLIC_YANDEX_METRIKA env var.
+ * Loaded ONLY after cookie consent (ea-cookie-banner → lib/analytics.ts).
+ *
+ * W3 / K6-CRITICAL (cycle-71): ЕДИНЫЙ источник ID для всего сайта — эта
+ * константа (её читает src/lib/analytics.ts). Ключи: приоритет —
+ * NEXT_PUBLIC_YANDEX_METRIKA_ID, легаси-синоним NEXT_PUBLIC_YANDEX_METRIKA.
  */
 export const ANALYTICS = {
-  yandexMetrikaId: process.env.NEXT_PUBLIC_YANDEX_METRIKA || "",
-};
+  // W3 / K6-CRITICAL (cycle-71): приоритет — канонический ключ
+  // NEXT_PUBLIC_YANDEX_METRIKA_ID (инструкция «как включить» — в докблоке
+  // src/lib/analytics.ts); NEXT_PUBLIC_YANDEX_METRIKA — легаси-синоним,
+  // чтобы уже настроенные деплой-конфиги не отвалились. ПУСТО (по
+  // умолчанию) = аналитика выключена: loadMetrika/trackGoal — noop,
+  // ноль сторонних запросов, ноль ошибок.
+  yandexMetrikaId:
+    process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID ||
+    process.env.NEXT_PUBLIC_YANDEX_METRIKA ||
+    "", /* W3-SPY-TEMP откачен после V3-верификации: по умолчанию выкл (noop) */
+} as const;

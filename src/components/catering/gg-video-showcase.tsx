@@ -175,7 +175,7 @@ export function GgVideoShowcase() {
   return (
     <section
       ref={sectionRef}
-      aria-label="Видео: как мы работаем"
+      aria-label="Видео: кейтеринг как искусство"
       data-header-theme="dark"
       className="relative w-full bg-black"
     >
@@ -203,7 +203,7 @@ export function GgVideoShowcase() {
           playsInline
           preload="none"
           poster="/media/hero-premium/hero-premium-6.jpg"
-          aria-label="Видео: как мы работаем — приготовление и подача блюд"
+          aria-label="Видео: кейтеринг как искусство — приготовление и подача блюд"
           className="absolute inset-0 h-full w-full object-cover"
         >
           <source src="/media/clips/catering-clip-2.mp4" type="video/mp4" />

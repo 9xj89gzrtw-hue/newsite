@@ -1076,6 +1076,15 @@
 /* C1 (task 9-fix2): сноска сезона — спокойная ink-60%, мелкая. */
 .hb-note--season { color: color-mix(in srgb, var(--hb-ink) 60%, transparent); }
 
+/* W3 / K6 MINOR (задача 5): дегустационный триггер — caption в подоле чека.
+   Факт из FAQ: 3500 ₽/чел, возврат при заказе от 50 гостей. 13px (12.5 на
+   <768 — микрокегль-правило T2 ниже), ink-63% ≥4.5:1 на бумаге (D5-норма),
+   не отвлекает от CTA-кнопки под панелью. */
+.hb-note--tasting {
+  padding-top: 0.4rem;
+  font-size: 0.8125rem; /* 13px */
+}
+
 /* отрывной хвост (успех) */
 
 .hb-tearoff {
@@ -1547,6 +1556,7 @@
   .hb-cta-note,
   .hb-paper__type { font-size: 0.78125rem; }   /* 11.84 → 12.5px */
   .hb-total__per { font-size: 0.84375rem; }    /* 12.48 → 13.5px */
+  .hb-note--tasting { font-size: 0.78125rem; } /* W3: 13 → 12.5px (12–13 капс) */
 }
 
 /* ================================================== X4 (task 13-fix4):

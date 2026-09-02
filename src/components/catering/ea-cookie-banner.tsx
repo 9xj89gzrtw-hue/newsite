@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { CSSProperties } from "react";
+import { loadMetrika } from "@/lib/analytics";
 
 /**
  * EaCookieBanner — Elegant Affairs single-line cookie banner (Cycle 28).
@@ -35,8 +36,10 @@ import type { CSSProperties } from "react";
  *     modal: NO focus trap — Tab moves through the links/buttons and
  *     continues into the page naturally (FIX-5, WCAG 2.1.2 / W1-D F5).
  *     Escape NOT bound. Body scroll NOT locked.
- *   - "Accept all" enables analytics — actual Yandex.Metrika loading is
- *     handled elsewhere; this stub just console.logs (per Cycle 28 spec §4).
+ *   - "Accept all" enables analytics — W3 (cycle-71): Yandex.Metrika now
+ *     actually loads via lib/analytics.ts loadMetrika() (env-gated, noop
+ *     without NEXT_PUBLIC_YANDEX_METRIKA_ID; the Cycle-28 console.log stub
+ *     is retired). Reload with a live accepted-choice also loads it on mount.
  *
  * z-[80] (Cycle 39 bottom-dock keeps the sticky header visible; above
  * site-header z-50 + announcement-bar z-55, below the mobile-menu overlay
@@ -151,14 +154,33 @@ function writeChoice(choice: Choice): void {
   }
 }
 
+/**
+ * W3 / K6-CRITICAL: живой (не просроченный) consent именно на
+ * АНАЛИТИЧЕСКУЮ категорию — только «Принять все» (KEYS.accepted).
+ * «Только необходимые»/«Отклонить» метрику НЕ включают.
+ */
+function hasActiveAnalyticsConsent(): boolean {
+  try {
+    const raw = window.localStorage.getItem(KEYS.accepted);
+    return !!raw && !isExpired(parseStamp(raw));
+  } catch {
+    return false; // localStorage unavailable — не включаем метрику.
+  }
+}
+
 export function EaCookieBanner() {
   const [visible, setVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
   // Mount: clear stale (>14 days) choices, then decide whether to show.
+  // W3 / K6-CRITICAL: консент на аналитику выдан ранее (не просрочен) →
+  // грузим Метрику сразу, не дожидаясь повторного показа баннера
+  // (баннер при живом выборе не показывается вовсе). Без env-ID и это
+  // loadMetrika — безопасный noop.
   useEffect(() => {
     clearStaleChoices();
     setVisible(!hasActiveChoice());
+    if (hasActiveAnalyticsConsent()) loadMetrika();
   }, []);
 
   // Cycle 41 / FIX-5: flag on <body> so fixed elements (phone FAB) can
@@ -189,10 +211,13 @@ export function EaCookieBanner() {
     writeChoice(choice);
     setVisible(false);
     if (choice === "accepted") {
-      // Analytics loader hook lives elsewhere (Cycle 28 spec — TBD).
-      // For now, just log the consent decision so it's visible in dev.
+      // W3 / K6-CRITICAL: реальный загрузчик Яндекс.Метрики вместо
+      // console.log-заглушки (Cycle 28 «TBD»). Скрипт ставится ТОЛЬКО
+      // здесь и при живом консенте на монте (см. выше) — до «Принять
+      // все» ноль сторонних запросов. Без env-ID — noop (см. analytics.ts).
+      loadMetrika();
       console.info(
-        "[ea-cookie-banner] analytics consent granted — Yandex.Metrika loader TBD",
+        "[ea-cookie-banner] analytics consent granted — Yandex.Metrika loader invoked",
       );
     }
   };

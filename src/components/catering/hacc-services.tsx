@@ -59,6 +59,7 @@ import {
   useSpring,
 } from "framer-motion";
 import { ArrowUpRight, MousePointer2, Plus } from "lucide-react";
+import { MENU_TYPES } from "@/lib/pricing";
 
 import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
@@ -104,6 +105,10 @@ interface HaccService {
   mediaAlt: string;
   ctaLabel: string;
   ctaHref: string;
+  /** C71-W3 (K6-CRITICAL): для ctaHref="#calculator" — id формата
+   * lib/pricing.ts для преселекта в калькуляторе (иначе дефолт-банкет
+   * шокирует ценой +82% после карточки «фуршет от 2 450 ₽»). */
+  calcType?: string;
 }
 
 /**
@@ -112,6 +117,20 @@ interface HaccService {
  * event FORMATS (what kind of event), rack B is SERVICES & extras (what we
  * additionally deliver at any event).
  */
+/** Калькулятор читает ?type=… через nuqs (подхватывает history.replaceState) —
+ *  тот же контракт, что presetCalculator в hacc-menu.tsx: CTA услуг теперь
+ *  тоже ставит ?type=&guests= (K6-CRITICAL: без преселекта «Рассчитать
+ *  фуршет» открывал дефолт-банкет 134 100 ₽ — ценовой шок +82%). */
+function presetCalculator(typeId: string, guests: number) {
+  if (typeof window === "undefined") return;
+  window.history.replaceState(null, "", `/?type=${typeId}&guests=${guests}#calculator`);
+}
+
+/** Минимум гостей формата (lib/pricing.ts) — для преселекта из услуг. */
+const CALC_MIN_GUESTS: Record<string, number> = Object.fromEntries(
+  MENU_TYPES.map((m) => [m.id, m.minGuests]),
+);
+
 const SERVICES: HaccService[] = [
   {
     id: "furshety",
@@ -129,6 +148,10 @@ const SERVICES: HaccService[] = [
     mediaAlt: "Фуршетные закуски и канапе на подаче",
     ctaLabel: "Рассчитать фуршет",
     ctaHref: "#calculator",
+    /* C71-W3 (K6-CRITICAL): преселект типа в калькуляторе — юзер читал
+       «фуршет от 2 450 ₽», кликал и получал дефолт «Банкет 134 100 ₽»
+       (+82% шок цены). Мэппинг id услуги → id формата lib/pricing.ts. */
+    calcType: "buffet",
   },
   {
     id: "bankety",
@@ -144,6 +167,7 @@ const SERVICES: HaccService[] = [
     mediaAlt: "Банкетный ужин в зале с полным накрытием столов",
     ctaLabel: "Рассчитать банкет",
     ctaHref: "#calculator",
+    calcType: "banquet",
   },
   {
     id: "svadby",
@@ -188,6 +212,7 @@ const SERVICES: HaccService[] = [
     mediaAlt: "Кофе-брейк: круассаны, пирог и кофе с латте-артом",
     ctaLabel: "Заказать кофе-брейк",
     ctaHref: "#calculator",
+    calcType: "coffee-break",
   },
   {
     id: "barbekyu",
@@ -204,6 +229,7 @@ const SERVICES: HaccService[] = [
     mediaAlt: "Стейк на кости жарится на живых углях",
     ctaLabel: "Рассчитать барбекю",
     ctaHref: "#calculator",
+    calcType: "bbq",
   },
   {
     id: "bar",
@@ -249,6 +275,7 @@ const SERVICES: HaccService[] = [
     mediaAlt: "Прозрачные коробки с закусками: виноград, сыр, оливки, крекеры и макаруны, перевязанные верёвкой",
     ctaLabel: "Заказать боксы",
     ctaHref: "#calculator",
+    calcType: "snack-box",
   },
   {
     id: "torty",
@@ -794,6 +821,18 @@ function HaccRack({
                       href={s.ctaHref}
                       className="ea-outline-btn hacc__cta"
                       aria-label={`${s.ctaLabel} — ${s.title}`}
+                      /* C71-W3 (K6-CRITICAL): преселект формата до перехода —
+                       * калькулятор (nuqs-хуки) подхватит ?type=&guests= из
+                       * history.replaceState (контракт hacc-menu). */
+                      onClick={
+                        s.ctaHref === "#calculator" && s.calcType
+                          ? () =>
+                              presetCalculator(
+                                s.calcType as string,
+                                CALC_MIN_GUESTS[s.calcType] ?? 30,
+                              )
+                          : undefined
+                      }
                     >
                       {s.ctaLabel}
                       <ArrowUpRight aria-hidden="true" />

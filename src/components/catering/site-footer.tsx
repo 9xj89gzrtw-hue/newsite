@@ -448,6 +448,27 @@ export function SiteFooter() {
               {CONTACTS.address}
             </address>
 
+            {/* W3 (K5 MAJOR, задача 4): легенда трёх адресов. Критик K5:
+                «Полевая-Сабировская 45к1 (footer) vs Большая Морская 18/33
+                (оферта) vs студия на Петроградке (FAQ) — три адреса без
+                пояснения». Легенда связывает витринный адрес офиса (выше) с
+                юридическим (LEGAL_INFO.legalAddress — тот же источник, что
+                /offer) — адреса сами НЕ меняются. Назначение Полевой не
+                выдумываем: на сайте (llms.txt/config) она = «офис», поэтому
+                просто связка. Студия на Петроградке живёт в своём контексте
+                (FAQ/услуги дегустации) — легенда не трогает.
+                text-xs + cream/60 = 5.81:1 на тёмном футере (замер D2). */}
+            <p className="text-xs leading-relaxed text-cream/60">
+              Юридический адрес: {LEGAL_INFO.legalAddress} — реквизиты в{" "}
+              <a
+                href="/offer"
+                className="underline-offset-2 transition-colors hover:text-gold hover:underline"
+              >
+                оферте
+              </a>
+              .
+            </p>
+
             <div className="flex flex-col gap-2 text-sm">
               <a
                 href={`mailto:${CONTACTS.email}`}
