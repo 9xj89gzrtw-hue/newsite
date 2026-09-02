@@ -394,6 +394,22 @@
   gap: 0.75rem;
   margin-top: 0.2rem;
 }
+/* C71-FIX (Task 1, audit A1 MAJOR — «слайдер перекрывает input»):
+   тач-полоса тика (::after, 48×40, W2-контракт ≥40×40) свисает до y 71
+   от верха рельса (рельс 44px): при margin 0.2rem ряд ручного ввода
+   начинался на y 47 — верхние 24px бокса input.hb-guests-input были
+   накрыты прозрачной полосой, клик в центр поля ставил пресет (замер C71
+   elementsFromPoint: BUTTON.hb-slider__tick > INPUT; реальный клик дал
+   value 200, activeElement = tick). На НЕ-fine указателях (там ::after —
+   активный тач-таргет) расчищаем 32px под рельсом: ряд ввода опускается
+   на y 76, полоса кончается на 71 → 5px клиренса, input не перекрыт ни в
+   одной точке. Fine pointer не тронут (компоновка прежняя, 0.2rem) —
+   там ::after выключен (см. дополнение в W2-FIX-блоке в конце файла).
+   КООРДИНАЦИЯ: если геометрия ::after меняется (top/height), этот
+   margin обязан держать input-top ≥ zone-bottom + 4px. */
+@media not all and (pointer: fine) {
+  .hb-slider__adjust { margin-top: 2rem; }
+}
 /* Fix5 V2: группа ручного ввода количества — [−1] [ввод] [+1] */
 .hb-slider__edit { display: inline-flex; align-items: center; gap: 0.4rem; }
 .hb-guests-input {
@@ -1728,4 +1744,12 @@
    hit-testing (то же работает и для ::after-полосы). */
 @media (hover: hover) and (pointer: fine) {
   .hb-slider__tick { pointer-events: auto; }
+  /* C71-FIX (Task 1, audit A1 MAJOR): на fine pointer полоса ::after
+     ИЗБЫТОЧНА — кнопка-тик выше уже кликабельна целиком (её onClick и
+     есть «ровно это число», §39). Прозрачная 40px-полоса продолжала
+     свисать из рельса вниз и перехватывала клики уже в ряду ручного
+     ввода (пресет вместо фокуса в поле). Выключаем её на мышиных
+     устройствах: точность мыши целятся в видимую цифру-кнопку, а
+     невидимых хит-зон под контролами больше нет. */
+  .hb-slider__tick::after { pointer-events: none; }
 }

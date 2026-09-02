@@ -98,6 +98,66 @@ import { SiteFooter } from "@/components/catering/site-footer";
 //   overlays over the content).
 export const dynamic = "force-dynamic";
 
+/* Task 1-b (cycle-71): FAQPage JSON-LD перенесён ИЗ layout.tsx — гайдлайн
+ * Google: схема FAQ должна жить на странице с ВИДИМЫМ FAQ-контентом
+ * (EaFaqAccordion — секция 16 этой страницы; на /offer /privacy /terms
+ * видимого FAQ нет). Тексты 1-в-1 зеркалят FAQ_ITEMS из
+ * ea-faq-accordion.tsx (Cycle 39). */
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Какой минимальный заказ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Банкеты — от 30 гостей, фуршеты — от 20, кофе-брейки — от 15, барбекю — от 20, обеды в офис — от 10. Для меньших форматов есть доставка закусок в индивидуальной упаковке.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "За сколько дней нужно бронировать?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Свадьбы и банкеты — за 14–30 дней. Корпоративные обеды — за 3 рабочих дня. Срочные заказы (24 часа) — возможны с наценкой 25%.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Что входит в стоимость?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Еда, доставка, сервировка, посуда, текстиль, повар и официанты на месте, а также лёгкое цветочное сопровождение на столах (как во всех пакетах меню); доставка в пределах КАД — за КАД по договорённости. Не входит: аренда площадки, алкоголь, музыка и расширенное флористическое оформление — поможем организовать по запросу.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Можете учесть аллергии и диеты?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Да. Вегетарианское, веганское, безглютеновое, халяль, кошер — без доплат. Специфические аллергии просим сообщить за 7 дней.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Как происходит оплата?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Предоплата 30% при подтверждении заказа, окончательный расчёт — не позднее 3 дней до мероприятия (условия публичной оферты). Работаем с юр. лицами по безналичному расчёту.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Есть ли дегустация перед заказом?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Да. Запишитесь на приватную дегустацию в нашей студии на Петроградке. Шесть блюд из вашего будущего меню за 45 минут — 3500 ₽/чел. Сумма возвращается при заказе от 50 гостей.",
+      },
+    },
+  ],
+};
+
 export default function Home() {
   return (
     <main
@@ -246,6 +306,14 @@ export default function Home() {
               удалён — плавающая ↑-кнопка больше не рендерится (компонент остался
               на диске). */}
       <SiteFooter />
+
+      {/* Task 1-b (cycle-71): FAQPage JSON-LD (перенос из layout.tsx) —
+          schema живёт там, где есть видимый FAQ-контент (секция 16,
+          EaFaqAccordion выше). Server component — рендер в SSR-HTML. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
     </main>
   );
 }

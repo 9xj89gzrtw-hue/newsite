@@ -82,6 +82,7 @@ import {
 } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
 import { TiltedAccent } from "@/components/catering/tilted-accent";
+import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 
 type Step = { num: string; verb: string; body: string };
 
@@ -234,8 +235,13 @@ export function CepProcess() {
               sentence case, ≤64px, lh 1.08) exactly as in «Что важно знать» /
               «Откройте нашу историю». Baseline-locked to the counter line via
               items-end below. The trailing period is the site's editorial
-              signature (wave-2 G.3); the aria-label above stays period-free. */}
-          <h2 className="ea-section-h2">Как мы работаем.</h2>
+              signature (wave-2 G.3); the aria-label above stays period-free.
+              C71: слова поднимаются каскадом (SplitTextReveal, дефолты SPEC:
+              words / stagger 0.06 / 0.7s / [0.22,1,0.36,1]) — визуальный стиль
+              H2 не меняется: тот же класс на том же h2. */}
+          <SplitTextReveal as="h2" className="ea-section-h2">
+            Как мы работаем.
+          </SplitTextReveal>
           {/* Counter line — visible on mobile too (wave-1 J.3); wraps under
               the H2 on narrow screens, which is fine. Mobile 13px = body
               size (wave-2 height pass); desktop keeps the SPEC 15px. */}

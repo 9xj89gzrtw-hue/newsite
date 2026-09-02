@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
+import { VelocitySkew } from "@/components/motion/velocity-skew";
 
 /**
  * GammaSeparator — Cycle 31 (gammacatering.com signature full-bleed separator)
@@ -24,6 +25,18 @@ import { SplitTextReveal } from "@/components/motion/split-text-reveal";
  *    (--font-marck), rotated -6° (gamma's signature tilt), white at 70%
  *    opacity, font-size clamp(2rem, 4vw, 3.5rem) — gamma's "Gamma is a
  *    feeling" -6° handwritten accent applied to our separator.
+ *
+ * Cycle 71 WOW-typo graft (velocity-«живой материал» + scroll-driven zoom):
+ *  - Контентный врапер полосы (фото + оверлей + вордмарк) обёрнут VelocitySkew:
+ *    при быстрой прокрутке вся полоса чуть «запинается» (skewY, кламп ±4°/±3°)
+ *    и упруго возвращается — transform-only, MotionValue-цепочка без ререндеров.
+ *    Обёртка ВНУТРИ ClipPathReveal (не предок фото — fixed-attachment тут нет,
+ *    грабля §34 не применима, next/image — absolute).
+ *  - На самом <img> — data-sd-zoom: нативный CSS scroll-driven zoom
+ *    (scale 1.08→1.0 по entry-диапазону, @supports-гейт в globals.css,
+ *    браузеры без поддержки и reduce-юзеры видят статичное фото). Фото —
+ *    чистый CSS-слой (framer анимирует только предка-обёртку), конфликтов
+ *    WAAPI/JS нет.
  *
  * Cycle 34 WOW graft (sondaven.com):
  *  - `data-theme-flip="espresso"` flips the html root `--background` to night
@@ -76,7 +89,14 @@ export function GammaSeparator() {
         the per-char drop-in animation.
       */}
       <ClipPathReveal direction="left" duration={1.0} className="absolute inset-0">
-        <div className="relative w-full" style={{ height: SEPARATOR_HEIGHT }}>
+        {/* VelocitySkew (C71): контентный врапер полосы — вся полоса «живой
+            материал» на скролле (фото + оверлей + вордмарк единым объектом).
+            Роль height-обёртки сохранена: relative + clamp-высота — контейнер
+            для next/image fill. */}
+        <VelocitySkew
+          className="relative w-full"
+          style={{ height: SEPARATOR_HEIGHT }}
+        >
           <Image
             src="/media/gamma/gamma-catering-separator.jpg"
             alt=""
@@ -84,6 +104,9 @@ export function GammaSeparator() {
             sizes="100vw"
             priority={false}
             className="gamma-separator__img object-cover"
+            /* C71: CSS scroll-driven zoom (entry-диапазон), @supports-гейт в
+               globals.css; статика без поддержки/reduce */
+            data-sd-zoom
           />
           {/* Subtle left/right darkening — depth + legible accent backdrop. */}
           <div
@@ -104,7 +127,7 @@ export function GammaSeparator() {
               nilov catering
             </SplitTextReveal>
           </span>
-        </div>
+        </VelocitySkew>
       </ClipPathReveal>
     </section>
   );

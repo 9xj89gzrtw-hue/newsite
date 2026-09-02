@@ -62,6 +62,8 @@ import { ArrowUpRight, MousePointer2, Plus } from "lucide-react";
 
 import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
+import { ScrambleText } from "@/components/motion/scramble-text";
+import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 import "./hacc-services.css";
 
 /* ------------------------------------------------------------------ config */
@@ -924,10 +926,25 @@ export function HaccServices() {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <div className="hacc__head-text">
-            <span className="ea-eyebrow">Форматы и сервисы</span>
+            {/* C71: eyebrow собирается перебором символов (ScrambleText):
+                тот же класс/шрифт/цвет, a11y — aria-label + aria-hidden узел. */}
+            <ScrambleText className="ea-eyebrow" delayMs={150}>
+              Форматы и сервисы
+            </ScrambleText>
+            {/* C71: H2 — слова поднимаются каскадом (SplitTextReveal, дефолты
+                SPEC: words / stagger 0.06 / 0.7s / [0.22,1,0.36,1]). Визуальный
+                стиль не меняется: те же id/классы, тот же <i>-фрагмент —
+                сплит-спаны живут ВНУТРИ h2, курсив-кусок наследует
+                .ea-italic-fragment как раньше. */}
             <h2 id="hacc-heading" className="ea-section-h2">
-              {"Сначала формат. "}
-              <i className="ea-italic-fragment">Потом меню.</i>
+              <SplitTextReveal as="span" mode="words">
+                Сначала формат.
+              </SplitTextReveal>{" "}
+              <i className="ea-italic-fragment">
+                <SplitTextReveal as="span" mode="words" delay={0.12}>
+                  Потом меню.
+                </SplitTextReveal>
+              </i>
             </h2>
             <p className="hacc__lede">
               От кофе-брейка на двадцать персон до свадьбы на пятьсот гостей:

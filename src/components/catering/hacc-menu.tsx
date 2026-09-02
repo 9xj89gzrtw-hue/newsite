@@ -72,6 +72,8 @@ import {
 
 import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
+import { ScrambleText } from "@/components/motion/scramble-text";
+import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 import { MENU_TYPES, formatRUB, type MenuType } from "@/lib/pricing";
 import "./hacc-menu.css";
 
@@ -1201,10 +1203,25 @@ export function HaccMenu() {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <div className="hmenu__head-text">
-            <span className="ea-eyebrow">Каталог меню</span>
+            {/* C71: eyebrow собирается перебором символов (ScrambleText):
+                тот же класс/шрифт/цвет, a11y — aria-label + aria-hidden узел. */}
+            <ScrambleText className="ea-eyebrow" delayMs={150}>
+              Каталог меню
+            </ScrambleText>
+            {/* C71: H2 — слова поднимаются каскадом (SplitTextReveal, дефолты
+                SPEC: words / stagger 0.06 / 0.7s / [0.22,1,0.36,1]). Визуальный
+                стиль не меняется: те же id/классы, тот же <i>-фрагмент —
+                сплит-спаны живут ВНУТРИ h2, курсив-кусок наследует
+                .ea-italic-fragment как раньше. */}
             <h2 id="hmenu-heading" className="ea-section-h2">
-              {"Настоящие блюда. "}
-              <i className="ea-italic-fragment">Честные цены.</i>
+              <SplitTextReveal as="span" mode="words">
+                Настоящие блюда.
+              </SplitTextReveal>{" "}
+              <i className="ea-italic-fragment">
+                <SplitTextReveal as="span" mode="words" delay={0.12}>
+                  Честные цены.
+                </SplitTextReveal>
+              </i>
             </h2>
             <p className="hmenu__lede">
               Семь каталогов — от канапе до мангала. Раскройте каталог:

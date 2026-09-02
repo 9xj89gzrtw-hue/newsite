@@ -11,6 +11,10 @@ import {
 } from "framer-motion";
 import { TottReveal } from "./tott-reveal";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
+import {
+  VelocitySkew,
+  useVelocitySkewDeg,
+} from "@/components/motion/velocity-skew";
 
 /**
  * TottParallaxBand — Talk of the Town (talkofthetownatlanta.com) parallax
@@ -62,6 +66,14 @@ import { SplitTextReveal } from "@/components/motion/split-text-reveal";
  *   - 5px cream border frame (their SR7 decorative border shape).
  *   - `data-theme-flip="cream"` resets the espresso theme on entry.
  *
+ * Cycle 71 WOW graft («живой материал»): контентный стек (z-10) обёрнут
+ * VelocitySkew — при быстрой прокрутке вся цитата-полоса чуть «запинается»
+ * (skewY, кламп ±4°/±3°) и упруго возвращается. Фото-слой НА ДЕСКТОПЕ не
+ * тронут (любой transform в цепочке предков убил бы background-attachment:
+ * fixed — §34, гравля C62): скос фото вплетён в УЖЕ существующий drift-
+ * transform и включён только на coarse (там fixed-attachment выключен
+ * CSS-фоллбэком, y±7% + skewY — один составной transform того же элемента).
+ *
  * @see docs/talkofthetown-MINED-EXTRACTION.md (parallax sections)
  * @see research/c62/parallax-verify.mjs (proof harness — must report
  *      attachment:fixed, 0 breaker ancestors, best shift = 0px with
@@ -99,6 +111,10 @@ export function TottParallaxBand() {
   const driftRaw = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
   const drift = useSpring(driftRaw, { stiffness: 90, damping: 26, mass: 0.4 });
 
+  /** C71: velocity-skew фото-слоя — ТОЛЬКО на coarse (driftActive), тем же
+   * transform-узлом, что и drift; десктоп остаётся чистым (fixed §34). */
+  const photoSkew = useVelocitySkewDeg();
+
   const driftActive = isCoarse && !reduce;
 
   return (
@@ -127,7 +143,7 @@ export function TottParallaxBand() {
           }
           style={
             driftActive
-              ? { backgroundImage: `url('${BAND_BG}')`, y: drift }
+              ? { backgroundImage: `url('${BAND_BG}')`, y: drift, skewY: photoSkew }
               : { backgroundImage: `url('${BAND_BG}')` }
           }
           aria-hidden="true"
@@ -185,8 +201,10 @@ export function TottParallaxBand() {
 
       {/* Centered content. Soft inherited text-shadow (C62 seal note) lifts
           the olive script + body copy off the busy foliage without touching
-          the TOTT palette. */}
-      <div className="relative z-10 mx-auto max-w-3xl px-6 text-center text-white [text-shadow:0_1px_18px_rgba(0,0,0,0.5),0_0_2px_rgba(0,0,0,0.35)]">
+          the TOTT palette. C71: стек обёрнут VelocitySkew (сиблинг фото-слоя,
+          не предок — цепочка предков фото чиста, §34) — «живой материал»
+          на быстрой прокрутке. */}
+      <VelocitySkew className="relative z-10 mx-auto max-w-3xl px-6 text-center text-white [text-shadow:0_1px_18px_rgba(0,0,0,0.5),0_0_2px_rgba(0,0,0,0.35)]">
         <TottReveal
           variant="fade-left"
           as="p"
@@ -228,7 +246,7 @@ export function TottParallaxBand() {
         >
           <span style={{ color: "var(--tott-olive)" }}>nilov catering · с 2007 года</span>
         </TottReveal>
-      </div>
+      </VelocitySkew>
     </section>
   );
 }

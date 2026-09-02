@@ -77,11 +77,23 @@ export function TottHero() {
    * hero-фото (HERO_POSTER), дедуплицируется с poster-атрибутом
    * gg-video-showcase (тот же URL).
    *
+   * C71-FIX (Task 3, audit A1 MINOR — 5.16MB видео качалось и на mobile
+   * 390×844: 5.5MB из ~7MB трансфера): mobile-first гейт — на coarse
+   * pointer ИЛИ ширине <768px IO не создаётся ВООБЩЕ, play() нечем
+   * звать → при preload="none" браузер не запрашивает ни байта видео,
+   * hero живёт на постере (HERO_POSTER уже LCP-priority <Image> — тот
+   * же кадр, дедуп с poster-атрибутом; в hero нет контрола
+   * воспроизведения — §39: «если нет — просто постер без видео на
+   * мобиле»). Десктоп без изменений: видео = LCP-стратегия как раньше.
+   * Решение принимается один раз на монте (device-характеристика;
+   * расширение окна после монт-решения видео не включает — осознанно).
+   *
    * prefers-reduced-motion: IO не создаём — видео не играет, остаётся
    * статичный постер (next/image z-0) — эталонный паттерн §39.
    */
   useEffect(() => {
     if (reduce) return;
+    if (window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768) return;
     const section = sectionRef.current;
     const video = videoRef.current;
     if (!section || !video) return;

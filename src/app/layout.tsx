@@ -11,7 +11,14 @@ import { GrainOverlay } from "@/components/catering/grain";
 import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
 import { NuqsAdapter } from "nuqs/adapters/next";
-import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
+import { CONTACTS } from "@/lib/config";
+import {
+  SITE_URL,
+  PHONE_E164,
+  EMAIL,
+  FOUNDED_YEAR,
+  SOCIALS,
+} from "@/lib/site-config";
 
 /*
  * W3-FIX (LCP): next/font по умолчанию ставит rel=preload на КАЖДЫЙ woff2
@@ -174,7 +181,9 @@ const marck = Marck_Script({
   preload: false,
 });
 
-const siteUrl = SITE_CONFIG.url;
+// Task 1-b (cycle-71): домен — из единого источника фактов site-config.ts
+// (при переезде на свой домен правится одна строка там / env NEXT_PUBLIC_SITE_URL).
+const siteUrl = SITE_URL;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -233,18 +242,28 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  /* C71: унификация с manifest.json (#0A0908) и палитрой сайта —
+   * light-хром = крем дизайн-системы #F7F5F5 (было #F9FAFB — чужой тон),
+   * dark-хром = брендовый espresso #0A0908 (было #1F2937 — ink-серый). */
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F9FAFB" },
-    { media: "(prefers-color-scheme: dark)", color: "#1F2937" },
+    { media: "(prefers-color-scheme: light)", color: "#F7F5F5" },
+    { media: "(prefers-color-scheme: dark)", color: "#0A0908" },
   ],
 };
 
 /** JSON-LD structured data for Yandex/Google (LocalBusiness + FoodEstablishment).
- * FIX-3: "CateringService" не существует в schema.org — валидаторы
- * Google/Yandex отвергают тип; заменён на валидный FoodEstablishment. */
+ * FIX-3 (история): "CateringService" не существует в schema.org — валидаторы
+ * Google/Yandex отвергают тип.
+ * Task 1-b (cycle-71): тип из ТЗ "CateringBusiness" ТОЖЕ не существует —
+ * живая проверка https://schema.org/CateringBusiness → 404 (как и у
+ * несуществующих терминов; контроль: FoodEstablishment/LocalBusiness → 200).
+ * Валидный максимум специфичности для кейтеринга — пара
+ * ["FoodEstablishment", "LocalBusiness"]: FoodEstablishment уточняет
+ * LocalBusiness, LocalBusiness даёт локальные поля (geo, openingHours).
+ * Телефон приведён к E.164 (+79119417205), домен/соцсети/год — из site-config.ts. */
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "FoodEstablishment",
+  "@type": ["FoodEstablishment", "LocalBusiness"],
   "@id": siteUrl + "#organization",
   name: "nilov catering",
   alternateName: "NILOV CATERING",
@@ -252,17 +271,43 @@ const jsonLd = {
   url: siteUrl,
   image: siteUrl + "/og-image.jpg",
   logo: siteUrl + "/brand/logo-512.png",
-  telephone: CONTACTS.phone,
-  email: CONTACTS.email,
+  telephone: PHONE_E164,
+  email: EMAIL,
   priceRange: "₽₽₽",
   currenciesAccepted: "RUB",
   paymentAccepted: "Наличные, Безналичный расчёт, Банковский перевод",
   sameAs: [
-    "https://www.instagram.com/nilov_catering",
-    "https://wa.me/79119417205",
-    "https://vk.com/nilovcatering",
-    "https://t.me/+79119417205",
+    SOCIALS.instagram,
+    SOCIALS.whatsapp,
+    SOCIALS.vk,
+    SOCIALS.telegram,
+    SOCIALS.max,
   ],
+  /* Task 1-b: только форматы, реально представленные на сайте
+   * (hacc-services: Фуршеты/Банкеты/Свадьбы/Корпоратив/Кофе-брейки/Барбекю/
+   * Выездной бар/Шоу-станции/Гастро-боксы/Торты на заказ/Вегетарианское и
+   * халяль + услуги из /offer: шоколадные фонтаны, выездная регистрация,
+   * обеды в офис). Ничего не выдумано. */
+  knowsAbout: [
+    "Фуршеты",
+    "Банкеты",
+    "Свадебный кейтеринг",
+    "Корпоративный кейтеринг",
+    "Кофе-брейки",
+    "Выездное барбекю",
+    "Обеды в офис",
+    "Доставка закусок (гастро-боксы)",
+    "Выездной бар",
+    "Шоу-станции",
+    "Торты на заказ",
+    "Вегетарианское меню",
+    "Халяль",
+    "Шоколадные фонтаны",
+    "Выездная регистрация",
+  ],
+  /* Кухня — по фактическому меню: оливье/борщ/винегрет/буженина (русская),
+   * брускетты/нисуаз/песто/пармская ветчина/дорада (европейская). */
+  servesCuisine: ["Русская", "Европейская"],
   address: {
     "@type": "PostalAddress",
     addressCountry: "RU",
@@ -288,67 +333,10 @@ const jsonLd = {
     },
   ],
   founder: { "@type": "Person", name: "Нилов Дмитрий Игоревич" },
-  foundingDate: "2007",
+  foundingDate: `${FOUNDED_YEAR}`,
   areaServed: [
     { "@type": "City", name: "Санкт-Петербург" },
     { "@type": "AdministrativeArea", name: "Ленинградская область" },
-  ],
-};
-
-/** Cycle 39: FAQPage structured data — mirrors FAQ_ITEMS from
- *  ea-faq-accordion.tsx so search engines can render rich FAQ snippets. */
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "Какой минимальный заказ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Банкеты — от 30 гостей, фуршеты — от 20, кофе-брейки — от 15, барбекю — от 20, обеды в офис — от 10. Для меньших форматов есть доставка закусок в индивидуальной упаковке.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "За сколько дней нужно бронировать?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Свадьбы и банкеты — за 14–30 дней. Корпоративные обеды — за 3 рабочих дня. Срочные заказы (24 часа) — возможны с наценкой 25%.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Что входит в стоимость?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Еда, доставка, сервировка, посуда, текстиль, повар и официанты на месте, а также лёгкое цветочное сопровождение на столах (как во всех пакетах меню); доставка в пределах КАД — за КАД по договорённости. Не входит: аренда площадки, алкоголь, музыка и расширенное флористическое оформление — поможем организовать по запросу.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Можете учесть аллергии и диеты?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Да. Вегетарианское, веганское, безглютеновое, халяль, кошер — без доплат. Специфические аллергии просим сообщить за 7 дней.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Как происходит оплата?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Предоплата 30% при подтверждении заказа, окончательный расчёт — не позднее 3 дней до мероприятия (условия публичной оферты). Работаем с юр. лицами по безналичному расчёту.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Есть ли дегустация перед заказом?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Да. Запишитесь на приватную дегустацию в нашей студии на Петроградке. Шесть блюд из вашего будущего меню за 45 минут — 3500 ₽/чел. Сумма возвращается при заказе от 50 гостей.",
-      },
-    },
   ],
 };
 
@@ -383,10 +371,11 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-        />
+        {/* Task 1-b (cycle-71): FAQPage JSON-LD перенесён в src/app/page.tsx —
+            гайдлайн Google: разметка FAQ допустима только на странице с
+            ВИДИМЫМ FAQ-контентом (EaFaqAccordion есть на главной, на
+            /offer /privacy /terms его нет). Здесь остаётся только
+            организация (FoodEstablishment + LocalBusiness). */}
         <Preloader />
         {/* W4-FIX: прелоадер теперь рендерит двери уже в SSR-HTML (FOUC-фикс).
             Без JS они закрыли бы сайт навсегда — глушим корень прелоадера

@@ -12,12 +12,15 @@ export const metadata: Metadata = {
     description: "Условия использования сайта и кейтеринговых услуг.",
     type: "website",
     url: "/terms",
+    locale: "ru_RU",
+    siteName: "nilov catering",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — выездной кейтеринг в Санкт-Петербурге" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Пользовательское соглашение — nilov catering",
     description: "Условия использования сайта и кейтеринговых услуг.",
+    images: ["/og-image.jpg"],
   },
 };
 

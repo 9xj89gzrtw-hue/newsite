@@ -3,10 +3,32 @@ import Link from "next/link";
 import { Phone, Home, UtensilsCrossed } from "lucide-react";
 import { CONTACTS } from "@/lib/config";
 
+/* Task 1-b (cycle-71): собственный OG для 404 — раньше страница наследовала
+ * og:title/og:description/og:url главной (портят превью в соцсетях при
+ * переходе по битой ссылке). Next 16: not-found.tsx поддерживает export
+ * metadata (title/description уже работали) — openGraph/twitter тоже
+ * рендерятся, проверено curl-ом /nonexistent в верификации Task 1-b.
+ * canonical = "/" (консолидация веса на главную; сама 404 — noindex). */
 export const metadata: Metadata = {
   title: "Страница не найдена",
   description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с nilov catering.",
   robots: { index: false, follow: true },
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Страница не найдена | nilov catering",
+    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с nilov catering.",
+    type: "website",
+    url: "/",
+    locale: "ru_RU",
+    siteName: "nilov catering",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — кейтеринг Санкт-Петербурга" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Страница не найдена | nilov catering",
+    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с nilov catering.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function NotFound() {

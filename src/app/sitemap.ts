@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
-import { SITE_CONFIG } from "@/lib/config";
+import { SITE_URL_BASE } from "@/lib/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = SITE_CONFIG.url.replace(/\/$/, "");
+  // Task 1-b (cycle-71): домен — из site-config.ts (единый источник фактов).
+  const base = SITE_URL_BASE;
   const now = new Date();
   return [
     { url: `${base}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },

@@ -4456,3 +4456,41 @@ body.cookie-banner-open {
     opacity: 0;
   }
 }
+
+
+/* ===== CYCLE-71 WOW-TYPO LAYER (Task 1-c1 — единственный владелец блока) =====
+   Нативный scroll-driven CSS-слой — прогрессивное улучшение поверх
+   framer-эффектов (R1-report §1: 90%+ браузеров, композитор, 0ms INP).
+   ФОЛЛБЭК: браузеры без animation-timeline (Firefox за флагом) видят
+   статичную картинку — атрибут только УСИЛИВАЕТ, базовая вёрстка не меняется.
+   Вешается ТОЛЬКО на чистые CSS-слои (img внутри overflow-hidden контейнера),
+   не на элементы, анимируемые framer (грабля WAAPI/JS-конфликта). */
+
+/* data-sd-zoom: медленный zoom 1.08 → 1.0, пока элемент входит во вьюпорт
+   (entry-диапазон). «Виртуальная» длительность 1s (игнорируется таймлайном,
+   но задаёт темп линейности для не-таймлайновых фоллбеков-заглушек). */
+@keyframes sd-zoom-in {
+  from { transform: scale(1.08); }
+  to   { transform: scale(1); }
+}
+
+@supports (animation-timeline: view()) {
+  /* reduce-гейт ВНУТРИ supports: no-preference — анимация вешается только
+     тем, кто не просил покоя. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sd-zoom] {
+      animation: sd-zoom-in 1s linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+
+/* §Заповедь reduce: никакой scroll-driven анимации при prefers-reduced-
+   motion (правило ПОСЛЕ supports-блока — тот же specificity, поздний в
+   файле побеждает при пересечении условий). */
+@media (prefers-reduced-motion: reduce) {
+  [data-sd-zoom] {
+    animation: none;
+  }
+}

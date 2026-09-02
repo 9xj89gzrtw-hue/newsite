@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { ComponentProps, KeyboardEvent } from "react";
+import { ScrambleText } from "@/components/motion/scramble-text";
 
 /**
  * EaFaqAccordion — Elegant Affairs minimalist single-column FAQ accordion.
@@ -179,13 +180,15 @@ export function EaFaqAccordion() {
     >
       <div className="ea-container ea-container--narrow">
         {/* Eyebrow — mauve (overrides the default ea-eyebrow red since the
-            section is the calm FAQ block, not the brand-red CTA moment). */}
+            section is the calm FAQ block, not the brand-red CTA moment).
+            C71: перебор символов на входе (ScrambleText) — класс/цвет/шрифт
+            не меняются, a11y: aria-label + aria-hidden видимый узел. */}
         <motion.p
           className="ea-eyebrow text-center"
           style={{ color: "var(--ea-mauve)" }}
           {...reveal(0)}
         >
-          Вопросы · Ответы
+          <ScrambleText delayMs={150}>Вопросы · Ответы</ScrambleText>
         </motion.p>
 
         {/* H2 with italic-as-fragment trailing phrase ("знать" in red). */}

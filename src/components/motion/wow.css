@@ -1,0 +1,64 @@
+/* ==========================================================================
+   wow.css — стили интерактивных вау-эффектов волны 1 (Task ID: 1-c2).
+   Импортируется ТОЛЬКО из src/components/motion/{image-trail,gold-dust,
+   tap-feedback}.tsx. globals.css ведёт другой агент — сюда не лезем.
+   Палитра: espresso/cream/gold #C9A227. Никаких синих/indigo.
+   ========================================================================== */
+
+/* --- 1. ImageTrail — слой шлейфа фото блюд за пальцем/курсором ----------- */
+/* Слой создаётся императивно в <body> (position:fixed независим от
+   transform-предков секции). Всё внутри pointer-events:none — не мешает
+   кликам по плиткам грида. z-40: под sticky-хедером (z-50), над контентом. */
+.it-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+/* Карточка-«искра» пула. Базовое состояние opacity:0 — видимость
+   управляется WAAPI-анимацией спавна (transform+opacity, fill none →
+   после завершения сами возвращаются к базе). Никакого layout: карточка
+   абсолютна, позиционируется translate3d. */
+.it-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(201, 162, 39, 0.35); /* тонкая золотая рамка */
+  will-change: transform, opacity;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+/* --- 2. GoldDust — canvas золотой пыли над видео -------------------------- */
+/* absolute внутри relative-контейнера видео-секции: над скримом (позже
+   в DOM), под контентом (контент z-10). Размер ведёт JS по ResizeObserver. */
+.gold-dust-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* --- 3. TapFeedback — тап-отклик на coarse-указателях (тач) --------------- */
+/* Только (pointer: coarse) — на десктопной мыши нет; только :active —
+   hover не трогаем; сила лёгкая (scale 0.96, 100ms). Элементы с
+   инлайн-transform от framer-motion не затрагиваются (инлайн-стиль
+   сильнее селектора — конфликт масштаба исключён архитектурно).
+   Opt-out для особых случаев: атрибут data-no-tap.
+   reduce-motion — гейт: микро-масштаб тоже движение. */
+@media (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  button:not([data-no-tap]):active,
+  a:not([data-no-tap]):active,
+  [role="button"]:not([data-no-tap]):active,
+  summary:not([data-no-tap]):active {
+    transform: scale(0.96);
+    transition: transform 100ms ease-out;
+  }
+}

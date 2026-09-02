@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
+import { GoldDust } from "@/components/motion/gold-dust";
+import { useHapticFeedback } from "@/components/motion/tap-feedback";
 
 /**
  * GgVideoShowcase — Cycle 31, Task 4-C.
@@ -80,6 +82,11 @@ export function GgVideoShowcase() {
   const mounted = useMounted();
   const reduce = useReducedMotion();
   const animate = mounted && !reduce;
+
+  // Волна 1 / Task 1-c2: единый document-level тап-хаптик (вибрация 8ms
+  // на тапах по button/a/[role=button]; iOS молча скипает — нет API).
+  // Монтируется РОВНО ОДИН раз на страницу — здесь. Не дублировать.
+  useHapticFeedback();
 
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -219,6 +226,14 @@ export function GgVideoShowcase() {
               "radial-gradient(130% 90% at 20% 100%, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.28) 48%, rgba(0, 0, 0, 0) 100%), linear-gradient(to top, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0.40) 100%)",
           }}
         />
+
+        {/* Волна 1 / Task 1-c2: GoldDust — золотая пыль над видео.
+            Канвас absolute inset-0, pointer-events:none: по DOM-порядку
+            НАД видео-скримом (частицы полнотелые поверх затемнения —
+            читаются золотом на тёмном), ПОД редакционным контентом
+            (контент z-10, Play z-20). rAF с паузами вне вьюпорта,
+            reduce-motion → не рендерится. */}
+        <GoldDust />
 
         {/* Editorial overlay — bottom-left aligned with breathing padding.
             z-10 so it sits above the gradient scrim. */}

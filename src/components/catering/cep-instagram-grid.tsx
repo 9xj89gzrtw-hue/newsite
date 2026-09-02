@@ -8,6 +8,7 @@ import { useMounted } from "@/hooks/use-mounted";
 import { CONTACTS } from "@/lib/config";
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
+import { ImageTrail } from "@/components/motion/image-trail";
 
 /**
  * CepInstagramGrid — Creative Edge Parties §6.12 "FOLLOW ALONG" grid.
@@ -79,7 +80,7 @@ const IG_TILES = [
 /** Indices that get the Reel Play-icon overlay (every 3rd, 0-based). */
 const REEL_INDICES = new Set<number>([2, 5, 8]);
 
-const IG_PROFILE_URL = "https://www.instagram.com/nilov_catering/";
+const IG_PROFILE_URL = "https://www.instagram.com/nilov_catering"; // C71: единый href без trailing slash (NIT A1#11)
 
 export function CepInstagramGrid() {
   const mounted = useMounted();
@@ -238,6 +239,14 @@ export function CepInstagramGrid() {
           );
         })}
       </motion.div>
+
+      {/* Волна 1 / Task 1-c2: ImageTrail — ГЛАВНЫЙ мобильный вау секции.
+          Свайп/скролл пальцем (или движение мыши) по секции оставляет
+          шлейф карточек-«искр» с фото блюд (позиция гейтится rect-ом этой
+          секции). Слой fixed на body, pointer-events:none — клики по
+          плиткам и нативный скролл не затрагиваются. reduce-motion —
+          компонент пассивен. */}
+      <ImageTrail />
     </section>
   );
 }

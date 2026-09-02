@@ -222,6 +222,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
+import { fireGoldConfetti } from "@/components/motion/gold-confetti";
 import { ru as ruDayPickerLocale } from "react-day-picker/locale";
 
 import { Magnetic } from "@/components/motion/magnetic";
@@ -964,6 +965,9 @@ const LeadForm = memo(function LeadForm({
   const submitInFlightRef = useRef(false);
   const [errors, setErrors] = useState<{ name?: boolean; phone?: boolean }>({});
   const nameRef = useRef<HTMLInputElement>(null);
+  /** C71-FIX (Task 2, audit A1 MINOR): фокус на первое невалидное поле —
+   *  телефон, если имя валидно (см. goNext). */
+  const phoneRef = useRef<HTMLInputElement>(null);
   /** M5 (task 11-fix3): контейнер шага 2 — цель скролла после «Далее». */
   const step2Ref = useRef<HTMLDivElement>(null);
 
@@ -1018,7 +1022,15 @@ const LeadForm = memo(function LeadForm({
   const goNext = () => {
     const nextErrors = { name: !nameValid, phone: !phoneValid };
     setErrors(nextErrors);
-    if (nextErrors.name || nextErrors.phone) return;
+    if (nextErrors.name || nextErrors.phone) {
+      /* C71-FIX (Task 2, audit A1 MINOR): без этого пользователь видел
+       * красную рамку/текст ошибки, но фокус оставался на кнопке «Далее»
+       * — невалидное поле приходилось искать глазами. Переносим фокус на
+       * ПЕРВОЕ невалидное (имя → телефон); focus() подскроллит поле в
+       * кадр, role="alert" у .hb-err озвучит причину. */
+      (nextErrors.name ? nameRef.current : phoneRef.current)?.focus();
+      return;
+    }
     setStep(1);
   };
 
@@ -1044,6 +1056,10 @@ const LeadForm = memo(function LeadForm({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    /* C71 (Task 1-c2 integration): захват формы ДО await — synthetic event
+     * currentTarget обнуляется после асинхронного ожидания (React-грабля);
+     * нужен как точка разлёта золотого салюта при успехе. */
+    const formEl = e.currentTarget as HTMLElement;
     if (status === "loading") return;
     /* FIX-1 task 2: синхронный лок — переживает стейл-стейт (см. реф выше). */
     if (submitInFlightRef.current) return;
@@ -1101,6 +1117,9 @@ const LeadForm = memo(function LeadForm({
         // non-critical
       }
       toast.success(`Заявка принята! ${toastPromise}.`);
+      /* C71 (Task 1-c2): золотой салют из формы — эмоциональная точка
+       * конверсии (reduce-motion → noop внутри утилиты, анти-спам ≤2). */
+      fireGoldConfetti(formEl);
       /* КОНТРАКТ 7: снимок расчёта — из пропсов формы (родительский
          handleSuccess полностью стабилен — React Compiler сохраняет memo). */
       onSuccess(data?.id, {
@@ -1206,6 +1225,7 @@ const LeadForm = memo(function LeadForm({
                 </label>
                 <input
                   id="hb-phone"
+                  ref={phoneRef}
                   className={field}
                   type="tel"
                   value={phone}
