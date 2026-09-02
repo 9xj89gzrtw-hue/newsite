@@ -2658,3 +2658,74 @@ Stage Summary:
 - Мобайл 390×844: reload → скролл вниз → все 10 букв ty=0; горизонтальный overflow 0 (scrollWidth−clientWidth). errors: 0 (exit 0, пусто) на десктопе и мобайле. SSR-разметка содержит class="fw-line" с буквами без анимационных состояний (settled=false ветка).
 - prefers-reduced-motion в браузере проверки: false (отмечено); код-подтверждение reduce-пути по чтению: reduce → settled=mounted&&!reduce=false → у контейнера и букв ноль motion-пропсов (статичный видимый вордмарк), shimmer-анимация в CSS под гвардом no-preference — путь замерен косвенно (нет анимационных пропсов в DOM до settled; анимационная ветка и статичная — взаимоисключающие по коду).
 - Коммит НЕ делался (по заданию); git diff --stat в конце отчёта (site-footer.tsx внутри большого некоммиченного diff Task 2-c). Открытых дефектов нет.
+
+---
+
+# Cycle 69 — NILOV CATERING rebrand + wow-upgrade (2026-09-01/02)
+
+## Task Information
+- **Task ID**: c69 (координатор Z.ai + ~15 субагентов)
+- **Date**: 2026-09-01 → 02
+- **Status**: ✅ SHIP (6 волн критиков: REJECT → REJECT → APPROVE → OK/PASS → NO-SHIP → SHIP)
+
+## Что сделано
+1. **Ребрендинг Interfood → nilov catering** по всему рендеру: hero (2-строчный
+   wordmark «nilov / catering.» + «Лучший»), vertical sidebar NILOV CATERING,
+   gamma-separator watermark, футер NILOV/CATERING (per-line rise), founder-story,
+   tott-parallax-band, PDF-каталог (pdf-client: обложка/футеры/props/имена файлов),
+   offer/terms/privacy meta, JSON-LD, event-01.png постер (новый бейдж с золотым
+   кольцом поверх старого красного лого), ассет interfood-olive-trees → nilov-.
+   Остались ТОЛЬКО: email interfood-catering@yandex.ru (реальный ящик), юр. имя
+   (LEGAL_INFO), нерендерящиеся легаси-компоненты (конвенция репо).
+2. **Контакты**: телефон только +7 (911) 941-72-05; добавлены MAX
+   (max.ru/nilovcatering) и VK в футер + контакты-зону сметы; бейдж
+   Открыто/Закрыто + HOURS удалены → «Отвечаем в любое время» (золотая
+   пульс-точка); все «в рабочее время» вычищены (faq, cep-process).
+3. **Видео**: gg-showcase — eyebrow «НАШ ПОДХОД» и TiltedAccent «видео» убраны,
+   double-scrim + text-shadow (H2 color #fff ИНЛАЙН — unlayered .ea-section-h2
+   перебивает Tailwind text-white!), «Смотреть» вместо «Смотреть видео»;
+   ЖИВОЕ muted-loop видео (IO play/pause rootMargin 100px, preload=none,
+   Play-пилюля = честный звук-toggle); карусель — «Видео с наших мероприятий»,
+   TiltedAccent «кухня» удалён, edge-fade mask снят, hover-тизеры на fine
+   pointer (1 видео одновременно, preload=none).
+4. **Курсор**: полный редизайн — золотые dot (7px instant) + ring (44→64px spring
+   250/25), magnetic (30% к центру, clamp ±48), click-ripple, label/превью
+   сохранены, БЕЗ mix-blend; атрибуты data-cursor* перечитываются КАЖДЫЙ
+   mousemove (stale-preview фикс); data-cursor-image подключён к корешкам
+   hacc-меню.
+5. **Вау**: marquee playbackRate 0.6–2.2 по scroll-velocity (WAAPI);
+   IG-грид stagger+zoom+gold; FAQ spring-высота + hover-сдвиг; hacc-services
+   мобильный stagger + Ken Burns; tilt-card.tsx (reusable).
+6. **Брендинг-ассеты**: favicon.ico (16/32/48) + 32/apple 180/192/512 + manifest
+   из круглого лого (чёрный фон + золотая рамка — рамка ПОВЕРХ бейджа, не под);
+   og-image 1200×630 (лого + Prata-стиль текст + золотая точка); лого-бейдж в
+   хедере (моб 40/дескт 36, gold-ring на dark-схеме, hover rotate);
+   прелоадер — лого spring + 2 пульс-кольца + SSR-двери (FOUC-фикс) +
+   noscript-страховка.
+7. **Меню**: блок «Не нашли нужное? Составим меню...» + Magnetic-CTA #contact.
+8. **UX-фиксы волн**: тики слайдера pointer-events:auto на fine pointer
+   (клик по цифре = ровно N, не N+1) + тач ≥40px; input[type=date] 16px;
+   cookie-баннер ссылки ≥40px; бургер z-[90] над cookie (телефон тапается);
+   авто-закрытие бургера при resize через lg (scroll-lock edge); hero
+   коллизия ЛИСТАЙТЕ/eyebrow (bottom-12 + translateY 40); «food as art»
+   marginTop 0.25rem; контраст тиков 62% ink (4.76:1); minToday в useEffect
+   (hydration-safe); font-preload 38 файлов → 6 (Prata/NYCD/Lato, −93%);
+   preloader exit 1200ms + cleanup; «plated main» → «порционная подача».
+
+## Уроки (в AGENTS.md §11)
+- Критики видят только то, о чём спрашивают: PDF-каталог с 16× Interfood жил
+  5 волн — попал в чеклист только на W5. Аудит-чеклист обязан включать:
+  скачиваемые ассеты, meta ВСЕХ страниц, имена файлов, PDF/DOCX-генераторы.
+- Unlayered CSS-класс (`.ea-section-h2`) перебивает Tailwind-utility
+  (text-white): цвет на тёмный/фото-фон — только инлайн или слой-проверка.
+- jsPDF: getTextWidth для точки брэнда пересчитывается после смены текста —
+  двухсловный брэнд влезает в 54pt Marck на A4 (166mm контента).
+- PM2 + 2 инстанса Chrome на 4GB — OOM рендерера; верифицировать по одному.
+- Espresso theme-flip скрыт под bg-cream main: секции на захардкоженном
+  --ea-cream, раскрытие = отдельная дизайн-задача (риск контраста текста).
+
+## Артефакты
+- Коммиты: 92503a7 → fe4f832 (8 push в main)
+- PM2: interfood-catering-dev, port 3001 (3000 — родительский sandbox)
+- Лого: /home/z/my-project/download/nilov-logo/ (6 вариантов) + public/brand/
+- Генератор иконок: scripts/gen-nilov-icons.py
