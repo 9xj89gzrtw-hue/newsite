@@ -73,13 +73,17 @@ export function SiteHeader() {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const headerRef = useRef<HTMLElement>(null);
 
-  // Focus management for mobile menu dialog
+  // Focus management for mobile menu dialog.
+  // K2-F1: focus() БЕЗ preventScroll скроллит элемент во вьюпорт — на
+  // закрытии меню это один из источников прыжка scroll-позиции (замер
+  // критика: 900 → закрыл → 458). Фокус не должен управлять прокруткой:
+  // позицию восстанавливает scroll-lock-эффект ниже.
   const prevOpen = useRef(false);
   useEffect(() => {
     if (open && !prevOpen.current) {
-      setTimeout(() => closeBtnRef.current?.focus(), 100);
+      setTimeout(() => closeBtnRef.current?.focus({ preventScroll: true }), 100);
     } else if (!open && prevOpen.current) {
-      triggerRef.current?.focus();
+      triggerRef.current?.focus({ preventScroll: true });
     }
     prevOpen.current = open;
   }, [open]);
@@ -215,22 +219,73 @@ export function SiteHeader() {
     return () => mq.removeEventListener("change", onChange);
   }, [open]);
 
+  // K2-F1 (Task 1, MAJOR): v1 хранил позицию в body.style.top и читал её в
+  // else-ветке ЭТОГО эффекта при закрытии. React запускает cleanup прежнего
+  // прогона ДО тела нового — cleanup затирал style.top ещё до чтения, и
+  // window.scrollTo(0, -top) НЕ ВЫПОЛНЯЛСЯ НИКОГДА: страница оставалась на
+  // «случайной» позиции (замер K2: 900 → открыл → 0 → закрыл → 458; из 3000
+  // тоже 458, детерминированно — прыжок давали focus() триггера без
+  // preventScroll + Lenis-петля со стейл-таргетом).
+  // v2: позиция хранится в ref (переживает cleanup), wasLocked гейтит
+  // маунт-прогон (иначе первый else скроллил бы страницу в 0 при загрузке),
+  // restore — двухтактный (синхронно + rAF + 120мс таймер: переживает
+  // Lenis-петлю первого кадра и late-layout), через window.__lenis с
+  // immediate:true (грабля §2/§33: голый window.scrollTo Lenis перебивает
+  // своим таргетом; immediate синхронизирует и таргет, и позицию) с
+  // нативным фоллбеком (reduce-motion / Lenis нет).
+  const savedScrollYRef = useRef(0);
+  const wasLockedRef = useRef(false);
   useEffect(() => {
+    let raf = 0;
+    let timer = 0;
     if (open) {
       const scrollY = window.scrollY;
+      savedScrollYRef.current = scrollY;
+      wasLockedRef.current = true;
       document.body.style.overflow = "hidden";
       document.body.style.position = "fixed";
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = "100%";
-    } else {
-      const scrollY = document.body.style.top;
+    } else if (wasLockedRef.current) {
+      wasLockedRef.current = false;
+      const target = savedScrollYRef.current;
       document.body.style.overflow = "";
       document.body.style.position = "";
       document.body.style.top = "";
       document.body.style.width = "";
-      if (scrollY) window.scrollTo(0, -parseInt(scrollY || "0", 10));
+      // Восстановление. Стили сняты — документ снова скроллится; переход
+      // «fixed top:-900» → «static + scrollTo(900)» визуально идентичен
+      // (контент под оверлеем не сдвигается), поэтому прыжок мгновенный.
+      // ТОНКОСТЬ (замер): во время lock документ «схлопнут» (body fixed →
+      // высота 844) — внутренний limit Lenis успевает устареть до 0, и
+      // lenis.scrollTo(900, immediate) МОЛЧА клампит таргет к limit →
+      // страница остаётся на 0. Поэтому ПЕРЕД scrollTo дёргаем публичный
+      // lenis.resize() (пересчёт геометрии) и force:true (не игнорировать
+      // вызов). Без Lenis — нативный scrollTo.
+      const restore = () => {
+        if (Math.abs(window.scrollY - target) <= 2) return;
+        const lenis = (
+          window as unknown as {
+            __lenis?: {
+              resize?: () => void;
+              scrollTo?: (t: number, o?: { immediate?: boolean; force?: boolean }) => void;
+            };
+          }
+        ).__lenis;
+        if (typeof lenis?.scrollTo === "function") {
+          lenis.resize?.();
+          lenis.scrollTo(target, { immediate: true, force: true });
+        } else {
+          window.scrollTo(0, target);
+        }
+      };
+      restore();
+      raf = requestAnimationFrame(restore);
+      timer = window.setTimeout(restore, 120);
     }
     return () => {
+      if (raf) cancelAnimationFrame(raf);
+      if (timer) window.clearTimeout(timer);
       document.body.style.overflow = "";
       document.body.style.position = "";
       document.body.style.top = "";

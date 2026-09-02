@@ -19,6 +19,15 @@ const QuestionSchema = z
   .max(500, "Вопрос слишком длинный (макс. 500 символов)");
 
 /**
+ * K4 (cycle-71, F3): маркер Prisma unique-constraint violation (P2002) —
+ * гонка findUnique→create (см. newsletter/route.ts, тот же паттерн).
+ */
+const isUniqueViolation = (e: unknown): boolean =>
+  typeof e === "object" &&
+  e !== null &&
+  (e as { code?: string }).code === "P2002";
+
+/**
  * POST /api/faq-vote — record a user's vote on a FAQ answer ("Was this helpful?").
  *
  * 152-ФЗ compliant: captures consent proof metadata (IP + User-Agent).
@@ -28,6 +37,9 @@ const QuestionSchema = z
  * FIX-4 [F10, W1-D]: при недоступности БД больше НЕТ фейкового 201
  * «success (demo mode)» — тихая потеря голоса. Отвечаем честный 503
  * `{ ok: false, error }`.
+ *
+ * K4 (cycle-71, F3): TOCTOU-гонка findUnique→create закрыта ловушкой P2002 →
+ * update-ветка (last-write-wins — та же семантика, что в основном пути).
  */
 export async function POST(req: NextRequest) {
   try {
@@ -70,6 +82,15 @@ export async function POST(req: NextRequest) {
       .digest("hex")
       .slice(0, 64);
 
+    /** Данные последнего голоса — общие для основной update-ветки и
+     * P2002-ретрая (K4, F3). */
+    const voteData = {
+      vote,
+      consentIp,
+      userAgent,
+      questionText: question,
+    };
+
     try {
       // Upsert — if this question was voted on before, update the vote.
       // (Single row per question — latest vote wins. For per-user votes,
@@ -84,12 +105,7 @@ export async function POST(req: NextRequest) {
       if (existing) {
         const updated = await db.faqVote.update({
           where: { questionHash },
-          data: {
-            vote,
-            consentIp,
-            userAgent,
-            questionText: question,
-          },
+          data: voteData,
         });
         return NextResponse.json(
           { ok: true, id: updated.id, vote: updated.vote },
@@ -97,19 +113,37 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const created = await db.faqVote.create({
-        data: {
-          questionHash,
-          questionText: question,
-          vote,
-          consentIp,
-          userAgent,
-        },
-      });
-      return NextResponse.json(
-        { ok: true, id: created.id, vote: created.vote },
-        { status: 201 },
-      );
+      try {
+        const created = await db.faqVote.create({
+          data: {
+            questionHash,
+            questionText: question,
+            vote,
+            consentIp,
+            userAgent,
+          },
+        });
+        return NextResponse.json(
+          { ok: true, id: created.id, vote: created.vote },
+          { status: 201 },
+        );
+      } catch (raceError) {
+        // K4 (cycle-71, F3): проиграли гонку findUnique→create — параллельный
+        // голос успел вставить строку по этому questionHash (P2002). Отвечаем
+        // update-веткой — та же last-write-wins семантика, без 500. Реальный
+        // сбой БД уходит во внешний catch → 503.
+        if (isUniqueViolation(raceError)) {
+          const updated = await db.faqVote.update({
+            where: { questionHash },
+            data: voteData,
+          });
+          return NextResponse.json(
+            { ok: true, id: updated.id, vote: updated.vote },
+            { status: 200 },
+          );
+        }
+        throw raceError;
+      }
     } catch (dbError) {
       // FIX-4 [F10]: БД недоступна — честный 503, никаких фейковых 201.
       console.error("[api/faq-vote] DB write failed:", dbError);

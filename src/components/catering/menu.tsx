@@ -722,6 +722,14 @@ export function Menu() {
 
 /**
  * Tilt card wrapper component for 3D hover effect
+ *
+ * K4 (cycle-71, F3): mounted-гейт по образцу motion/tilt-card.tsx (§34).
+ * `prefersReducedMotion` приходит из useReducedMotion() родителя: на SSR он
+ * false, а на первом рендере reduce-клиента true — прямое ветвление дерева
+ * давало hydration mismatch (React перегенерировал поддерево). Первый
+ * клиентский рендер ОБЯЗАН совпадать с серверным (motion.div-ветка с
+ * rotateX/rotateY — значения 0 = тождественный transform); статичная ветка
+ * поднимается только после mount (пост-гидрационный апдейт — легален).
  */
 function TiltCard({ 
   children, 
@@ -733,6 +741,9 @@ function TiltCard({
   prefersReducedMotion?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  // §34/C62 hydration-гейт — см. докблок выше.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -760,7 +771,7 @@ function TiltCard({
     mouseY.set(0);
   }, [mouseX, mouseY, prefersReducedMotion]);
 
-  if (prefersReducedMotion) {
+  if (mounted && prefersReducedMotion) {
     return <div className={className}>{children}</div>;
   }
 

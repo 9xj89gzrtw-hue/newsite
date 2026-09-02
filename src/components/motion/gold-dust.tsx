@@ -36,10 +36,9 @@ type Dust = {
   y: number;
   /** Радиус, px (0.5–2). */
   r: number;
-  /** Цвет (палитра золота). */
-  cr: number;
-  cg: number;
-  cb: number;
+  /** Индекс цвета в PALETTE (K4, F3: вместо трёх чисел cr/cg/cb — палитра
+   * конечна, индекс адресует прекэшированные fillStyle-строки). */
+  ci: number;
   /** Базовая альфа 0.15–0.4. */
   a: number;
   /** Скорость дрейфа вверх, px/кадр. */
@@ -61,21 +60,33 @@ const PALETTE: ReadonlyArray<readonly [number, number, number]> = [
   [138, 109, 31], // #8A6D1F
 ];
 
+/* K4 (cycle-71, F3): micro-perf. Раньше `rgba(...)` + toFixed(3) собирались
+   на каждую частицу на каждый кадр (~4.3k строк/с при 72 частицах — чистый
+   мусор для GC). Теперь: строки прекэшированы по (палитра × alpha-ступени),
+   в кадре — только числовой lookup FILL_STYLES[ci][step], ноль аллокаций.
+   65 ступеней на диапазон [0, ALPHA_MAX=0.5] → шаг ~0.0078: мерцание
+   (амплитуда ≤±15% от базовой 0.15–0.4) проходит через ~7 ступеней —
+   визуально неотличимо от прежнего toFixed(3). */
+const ALPHA_MAX = 0.5; // потолок реальных альф: 0.4 × 1.0 = 0.4 (+запас)
+const ALPHA_STEPS = 64;
+const FILL_STYLES: string[][] = PALETTE.map(([cr, cg, cb]) => {
+  const row: string[] = [];
+  for (let i = 0; i <= ALPHA_STEPS; i++) {
+    const a = Math.min(ALPHA_MAX, (i / ALPHA_STEPS) * ALPHA_MAX);
+    row.push(`rgba(${cr}, ${cg}, ${cb}, ${a.toFixed(3)})`);
+  }
+  return row;
+});
+
 const rand = (min: number, max: number): number => min + Math.random() * (max - min);
 
 const makeDust = (x: number, y: number): Dust => {
-  const [cr, cg, cb] = PALETTE[Math.floor(Math.random() * PALETTE.length)] as readonly [
-    number,
-    number,
-    number,
-  ];
+  const ci = Math.floor(Math.random() * PALETTE.length);
   return {
     x,
     y,
     r: rand(0.5, 2),
-    cr,
-    cg,
-    cb,
+    ci,
     a: rand(0.15, 0.4),
     vy: rand(0.06, 0.2),
     swayAmp: rand(0.5, 2.2),
@@ -174,9 +185,14 @@ export function GoldDust() {
         const x =
           p.x + Math.sin(t * p.swaySpeed + p.swayPhase) * p.swayAmp + px * p.depth;
         const y = p.y + py * p.depth;
-        // мерцание в пределах 0.85–1.0 от базовой альфы (±15%)
+        // мерцание в пределах 0.85–1.0 от базовой альфы (±15%), затем —
+        // квантование в прекэшированную rgba-строку (K4, F3: ноль аллокаций)
         const a = p.a * (0.85 + 0.15 * Math.sin(t * 0.0012 + p.twinkle));
-        ctx.fillStyle = `rgba(${p.cr}, ${p.cg}, ${p.cb}, ${a.toFixed(3)})`;
+        const step = Math.min(
+          ALPHA_STEPS,
+          Math.max(0, Math.round((a / ALPHA_MAX) * ALPHA_STEPS)),
+        );
+        ctx.fillStyle = FILL_STYLES[p.ci][step];
         ctx.beginPath();
         ctx.arc(x, y, p.r, 0, Math.PI * 2);
         ctx.fill();

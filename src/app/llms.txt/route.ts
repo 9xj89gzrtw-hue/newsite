@@ -81,7 +81,8 @@ export function GET(): Response {
     `- [ВКонтакте](${SOCIALS.vk}): сообщество компании, новости и кейсы.`,
     `- [Telegram](${SOCIALS.telegram}): прямая переписка с менеджером (номер ${PHONE_PRETTY}).`,
     `- [WhatsApp](${SOCIALS.whatsapp}): быстрый расчёт и бронирование (номер ${PHONE_PRETTY}).`,
-    `- [MAX](${SOCIALS.max}): официальный аккаунт в российском мессенджере MAX.`,
+    /* F2 (K3-MINOR): MAX удалён — max.ru/nilovcatering отвечает 404,
+       профиля не существует (та же мёртвая ссылка была в JSON-LD sameAs). */
     ``,
   ].join("\n");
 

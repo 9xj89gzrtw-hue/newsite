@@ -14,8 +14,16 @@ import type { CSSProperties } from "react";
  * black bg, 1px red bottom border, cream text, 3 small Barlow Semi Condensed
  * Bold uppercase buttons aligned right (EA-ANALYSIS.md §1, §2, §3.15, §5.4).
  * Restraint principle: ONE accent moment per block — only "Accept all"
- * is filled (red bg + red border). Reject + Essential-only are 1px cream
- * outlines on transparent bg.
+ * is filled.
+ *
+ * F4 / K1 MINOR (cycle-71 рестайл «палитра-энтропия»): красная рамка +
+ * красные ссылки на тёмно-золотом сайте → бренд-рестайл в золото/тёмное:
+ * рамка #C9A227, тёмная espresso-панель rgba(10,9,8,.97), ссылки золотые
+ * (#C9A227 = 8.38:1 на панели; hover #E5C76B = 12.27:1), solid-кнопка —
+ * золотая заливка с espresso-текстом (8.22:1), outline-кнопки — крем на
+ * тёмном (18.65:1). Дисклеймер 10.5px → 12px (мобайл) / 13px (sm) — K2
+ * «cookie-дисклеймер 10.5px». Логика консента НЕ тронута: 3 ключа
+ * localStorage, 14-дневный re-prompt, console.info при accepted.
  *
  * BEHAVIOUR (mirrors announcement-bar.tsx 14-day re-prompt pattern):
  *   - 3 localStorage keys, each suffixed `:YYYY-MM-DD`. On mount, sweep all
@@ -51,14 +59,20 @@ const LINK_TERMS_HREF = "/terms";
 
 // Tailwind classnames hoisted so AnimatePresence child JSX stays readable.
 // W2-FIX: py-2.5 → py-4 (компенсация -my-4) — тач-таргет ссылки
-// 39 → ~43px (≥40px; инлайн-бокс даёт content ~11px + 2×16px паддинг)
-// при том же визуальном размере текста 10.5px.
+// ~43px → 44px при 12px-тексте (инлайн-бокс 12px + 2×16px паддинг);
+// визуальный размер строки не меняется (-my-4 компенсирует).
+// F4: ссылки — золото на тёмной панели (#C9A227 = 8.38:1, hover #E5C76B
+// = 12.27:1); было var(--ea-red) #E71D3A на чёрном ≈ 3.9:1 FAIL.
 const LINK_CLASS =
-  "no-underline text-[var(--ea-red)] transition-colors hover:text-[var(--ea-red-deep)] hover:underline focus-visible:underline py-4 -my-4";
+  "no-underline text-[#C9A227] transition-colors hover:text-[#E5C76B] hover:underline focus-visible:underline py-4 -my-4";
+// Outline-кнопки — крем на тёмной панели (18.65:1) — уже в бренде.
 const BTN_OUTLINE_CLASS =
   "border border-[var(--ea-cream)] bg-transparent text-[var(--ea-cream)] hover:bg-white/10 focus-visible:bg-white/10";
+// F4: solid-кнопка — золотая заливка + espresso-текст (8.22:1; белый на
+// золоте = 2.42:1 FAIL, поэтому текст тёмный); hover — плотнее-золото
+// #B08D22 (6.33:1). Была красная заливка с крем-текстом.
 const BTN_SOLID_CLASS =
-  "border border-[var(--ea-red)] bg-[var(--ea-red)] text-[var(--ea-cream)] hover:border-[var(--ea-red-deep)] hover:bg-[var(--ea-red-deep)] focus-visible:border-[var(--ea-red-deep)] focus-visible:bg-[var(--ea-red-deep)]";
+  "border border-[#C9A227] bg-[#C9A227] text-[#0A0908] hover:border-[#B08D22] hover:bg-[#B08D22] focus-visible:border-[#B08D22] focus-visible:bg-[#B08D22]";
 
 const BTN_BASE_STYLE: CSSProperties = {
   fontFamily: "var(--ea-font-eyebrow)",
@@ -204,11 +218,14 @@ export function EaCookieBanner() {
           aria-label="Уведомление об использовании cookies"
           data-component="ea-cookie-banner"
           /* Cycle 39 fix: docked to the BOTTOM — previously top-0 z-60 exactly
-             covered the sticky header (nav/phone/CTA invisible until consent). */
+             covered the sticky header (nav/phone/CTA invisible until consent).
+             F4: тёмная espresso-панель бренда + золотая рамка (была чёрная с
+             красной рамкой — K1 «вне бренда»); backdrop-контент под ней
+             просвечивает на 3% — безопасно, панель остаётся ~непрозрачной. */
           className="fixed inset-x-0 bottom-0 z-[80] w-full"
           style={{
-            background: "rgba(0, 0, 0, 0.96)",
-            borderTop: "1px solid var(--ea-red)",
+            background: "rgba(10, 9, 8, 0.97)",
+            borderTop: "1px solid #C9A227",
             color: "var(--ea-cream)",
             paddingBottom: "env(safe-area-inset-bottom, 0px)",
           }}
@@ -219,7 +236,7 @@ export function EaCookieBanner() {
         >
           <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-1.5 px-3 py-2 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-3 md:px-12">
             <p
-              className="m-0 max-w-[68ch] text-[10.5px] leading-snug sm:text-[13px]"
+              className="m-0 max-w-[68ch] text-[12px] leading-snug sm:text-[13px]"
               style={{
                 fontFamily: "var(--ea-font-body)",
                 color: "color-mix(in srgb, var(--ea-cream) 85%, transparent)",
@@ -245,11 +262,15 @@ export function EaCookieBanner() {
               </a>.
             </p>
             <div className="flex w-full shrink-0 flex-row flex-wrap items-center justify-end gap-1.5 sm:w-auto sm:gap-2 md:gap-3">
+              {/* F4: применяю осиротевшие (C59) BTN_*_CLASS — дизайн-интент
+                  докстринга «один акцент: filled Accept + outline остальные»
+                  не рендерился вовсе (замер: все 3 кнопки прозрачные без рамок).
+                  Теперь: outline-крем × 2 + золотая заливка у «Принять все». */}
               <button
                 type="button"
                 onClick={() => decide("rejected")}
                 style={BTN_BASE_STYLE}
-                className="px-2.5 py-2 text-[10.5px] sm:px-4 sm:text-[12px]"
+                className={`${BTN_OUTLINE_CLASS} px-2.5 py-2 text-[12px] sm:px-4 sm:text-[13px]`}
               >
                 Отклонить
               </button>
@@ -257,7 +278,7 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("essential")}
                 style={BTN_BASE_STYLE}
-                className="px-2.5 py-2 text-[10.5px] sm:px-4 sm:text-[12px]"
+                className={`${BTN_OUTLINE_CLASS} px-2.5 py-2 text-[12px] sm:px-4 sm:text-[13px]`}
               >
                 <span className="sm:hidden">Необходимые</span>
                 <span className="hidden sm:inline">Только необходимые</span>
@@ -266,7 +287,7 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("accepted")}
                 style={BTN_BASE_STYLE}
-                className="px-2.5 py-2 text-[10.5px] sm:px-4 sm:text-[12px]"
+                className={`${BTN_SOLID_CLASS} px-2.5 py-2 text-[12px] sm:px-4 sm:text-[13px]`}
               >
                 Принять все
               </button>

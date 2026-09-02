@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { memoryLeadStore } from "@/lib/lead-store";
+import { PHONE_PRETTY } from "@/lib/site-config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,8 +15,14 @@ const PHONE_REGEX = /^(\+7|7|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]
 /**
  * POST /api/lead — create a lead with 152-ФЗ consent proof.
  * Stores consent timestamp + IP + User-Agent as legal proof of consent.
- * 
- * FALLBACK: If DB is unavailable, logs the lead and returns success (demo mode).
+ *
+ * K4 (cycle-71, F3): фейкового успеха при падении БД больше НЕТ. Раньше
+ * лид писался в module-local массив (который никто никогда не читал) и
+ * клиенту отдавался 201 «Заявка принята» → пользователь видел успех и
+ * конфетти, а лид терялся бесследно. Теперь: честный 503 + структурный
+ * console.error со ВСЕМИ полями лида (восстановление из логов сервера).
+ * Клиент hacc-booking показывает toast с текстом из тела ответа и НЕ
+ * запускает конфетти на не-2xx — см. его обработку `!res.ok`.
  */
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown> | null;
@@ -85,7 +91,9 @@ export async function POST(req: NextRequest) {
     const consentIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
     const userAgent = req.headers.get("user-agent") || null;
 
-    // Try to save to DB; fall back to in-memory store on failure.
+    // K4 (cycle-71, F3): единственная честная стратегия при сбое записи.
+    // Module-local фоллбэк (lead-store.ts) удалён — он давал ложное чувство
+    // безопасности: в проде его никто не читал, лид терялся молча.
     try {
       const lead = await db.lead.create({
         data: {
@@ -105,21 +113,46 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({ ok: true, id: String(lead.id) }, { status: 201 });
     } catch (dbError) {
-      // In-memory fallback — persists within server process lifetime.
-      const lead = memoryLeadStore.create({
-        name,
-        phone,
-        email,
-        eventType,
-        guests,
-        budget,
-        message,
-        consentAccepted: true,
-        consentDate: new Date(),
-        consentIp,
-        userAgent,
-      });
-      return NextResponse.json({ ok: true, id: String(lead.id) }, { status: 201 });
+      // Лид не сохранён — это потерянный бизнес. Двухступенчатая страховка:
+      //  1) структурный лог со ВСЕМИ полями (timestamp + payload + ошибка) —
+      //     из него лид восстанавливается руками по логам сервера;
+      //  2) 503 + человекочитаемая ошибка — клиент показывает toast,
+      //     конфетти (только на 2xx) не срабатывает, пользователь знает,
+      //     что заявка НЕ прошла, и может позвонить.
+      console.error(
+        "[api/lead] DB write FAILED — lead NOT saved, recover manually from payload:",
+        JSON.stringify(
+          {
+            at: new Date().toISOString(),
+            lead: {
+              name,
+              phone,
+              email,
+              eventType,
+              guests,
+              budget,
+              message,
+              consentAccepted: true,
+              consentDate: new Date().toISOString(),
+              consentIp,
+              userAgent,
+            },
+            error:
+              dbError instanceof Error
+                ? { name: dbError.name, message: dbError.message }
+                : String(dbError),
+          },
+          null,
+          2,
+        ),
+      );
+      return NextResponse.json(
+        {
+          ok: false,
+          error: `Сервис заявок временно недоступен — заявка не сохранилась. Позвоните нам: ${PHONE_PRETTY}, примем заказ по телефону.`,
+        },
+        { status: 503 },
+      );
     }
   } catch (e) {
     return NextResponse.json(

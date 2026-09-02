@@ -183,7 +183,13 @@
   font-size: 0.75rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--ea-red);
+  /* F4 / K2 MAJOR (контраст): было var(--ea-red) #E71D3A на тёмной плитке
+     #1A1A1A = 3.84:1 при 12px bold (FAIL AA <4.5). Глобальную --ea-red не
+     трогаю (крем-секции её держат) — локально для ТЁМНОГО фона плитки
+     осветляю фирменный красный до #FF7A85 = 6.94:1 ✓ AA (тот же hue,
+     светлая версия для dark-bg; текст-тень сохранена). Используется и в
+     модалке (тёмный фон rgba(0,0,0,0.92) — контраст ещё выше). */
+  color: #ff7a85;
   margin: 0;
   /* Lift the red tag above the dark overlay so it pops — EA signature. */
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);

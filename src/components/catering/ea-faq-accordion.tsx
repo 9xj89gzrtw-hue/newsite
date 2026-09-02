@@ -181,11 +181,16 @@ export function EaFaqAccordion() {
       <div className="ea-container ea-container--narrow">
         {/* Eyebrow — mauve (overrides the default ea-eyebrow red since the
             section is the calm FAQ block, not the brand-red CTA moment).
-            C71: перебор символов на входе (ScrambleText) — класс/цвет/шрифт
-            не меняются, a11y: aria-label + aria-hidden видимый узел. */}
+            C71: перебор символов на входе (ScrambleText) — класс/шрифт/цвет
+            не меняются, a11y: aria-label + aria-hidden видимый узел.
+            F4 / K2 MAJOR (контраст): инлайн-оверрайд был var(--ea-mauve)
+            #A18A8A на креме #F7F5F5 = 2.97:1 (FAIL для clamp 13–15.2px
+            bold). Глобальную переменную НЕ трогаю (она используется и
+            крупно — дивайдеры/карусельные точки), затемняю ТОЛЬКО здесь:
+            #7A6362 = 5.10:1 ✓ AA. */}
         <motion.p
           className="ea-eyebrow text-center"
-          style={{ color: "var(--ea-mauve)" }}
+          style={{ color: "#7A6362" }}
           {...reveal(0)}
         >
           <ScrambleText delayMs={150}>Вопросы · Ответы</ScrambleText>

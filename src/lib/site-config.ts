@@ -43,14 +43,16 @@ export const GUESTS_SERVED = 120000 as const;
 
 /**
  * Соцсети компании (все — из site-footer.tsx / CONTACTS / JSON-LD sameAs).
- * MAX — пятая иконка футера (max.ru/nilovcatering), включена для полноты.
+ * F2 (K3-MINOR): max.ru/nilovcatering УДАЛЁН — профиль не существует
+ * (curl 404), ссылка была мёртвой в sameAs/llms.txt. Видимая иконка MAX
+ * в футере осталась (site-footer.tsx читает lib/config.ts — чужой файл,
+ * отдан F4/оркестратору на решение).
  */
 export const SOCIALS = {
   instagram: "https://www.instagram.com/nilov_catering",
   vk: "https://vk.com/nilovcatering",
   telegram: "https://t.me/+79119417205",
   whatsapp: "https://wa.me/79119417205",
-  max: "https://max.ru/nilovcatering",
 } as const;
 
 export type Socials = typeof SOCIALS;

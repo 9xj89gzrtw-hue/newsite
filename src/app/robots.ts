@@ -44,10 +44,15 @@ const AI_AGENTS = [
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      // Каждому AI-боту — своя группа с явным Allow: /
+      // Каждому AI-боту — своя группа с явным Allow: /.
+      // F2 (K3-NIT): Disallow: /api/ добавлен и в AI-группы — раньше
+      // служебные эндпоинты были закрыты ТОЛЬКО в группе `*`; бот с
+      // собственной группой (GPTBot и др.) читает СВОЮ группу и мог
+      // индексировать /api/lead, /api/newsletter, /api/faq-vote.
       ...AI_AGENTS.map((userAgent) => ({
         userAgent,
         allow: "/",
+        disallow: ["/api/"],
       })),
       // Общее правило для всех остальных: /api/ — служебные эндпоинты форм.
       {

@@ -111,11 +111,13 @@ export function TottParallaxBand() {
   const driftRaw = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
   const drift = useSpring(driftRaw, { stiffness: 90, damping: 26, mass: 0.4 });
 
-  /** C71: velocity-skew фото-слоя — ТОЛЬКО на coarse (driftActive), тем же
-   * transform-узлом, что и drift; десктоп остаётся чистым (fixed §34). */
-  const photoSkew = useVelocitySkewDeg();
-
   const driftActive = isCoarse && !reduce;
+
+  /** C71: velocity-skew фото-слоя — ТОЛЬКО на coarse (driftActive), тем же
+   * transform-узлом, что и drift; десктоп остаётся чистым (fixed §34).
+   * F3-рекомендация: enabled-гейт закрыл пустой rAF-трафик цепочки
+   * velocity→spring на десктопе, где результат не прикреплён к стилям. */
+  const photoSkew = useVelocitySkewDeg(4, 3, { enabled: driftActive });
 
   return (
     <section
@@ -222,7 +224,11 @@ export function TottParallaxBand() {
           mode="chars"
           stagger={0.03}
           delay={0.15}
-          className="font-serif text-white"
+          /* C71 (K1-MINOR): заголовок полосы наследовал 16px контейнера —
+             слом иерархии H2. Крупный кинематографичный кегль, clamp по
+             вьюпортам (K2: на 390px не должен рвать строку — проверено
+             переносом по словам, не посимвольно). */
+          className="font-serif text-white text-3xl sm:text-4xl md:text-5xl leading-tight"
         >
           Еда — это ритуал.
         </SplitTextReveal>

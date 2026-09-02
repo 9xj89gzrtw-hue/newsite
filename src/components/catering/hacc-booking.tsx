@@ -1070,9 +1070,16 @@ const LeadForm = memo(function LeadForm({
     submitInFlightRef.current = true;
     setStatus("loading");
     try {
+      /* K4-F1 (Task 5): таймаут 15с —fetch без AbortSignal мог висеть
+       * бесконечно (мёртвый upstream/потеря сети на середине): кнопка
+       * «Отправляем…» и submitInFlightRef оставались залочены навсегда.
+       * AbortSignal.timeout отвергает промис DOMException(name=
+       * "TimeoutError") — он уходит в catch ниже (НЕ TypeError),
+       * там отдельный тост и штатный ресет состояния. */
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(15_000),
         body: JSON.stringify({
           name,
           phone: normalizePhone(phone),
@@ -1120,8 +1127,13 @@ const LeadForm = memo(function LeadForm({
       /* C71 (Task 1-c2): золотой салют из формы — эмоциональная точка
        * конверсии (reduce-motion → noop внутри утилиты, анти-спам ≤2). */
       fireGoldConfetti(formEl);
-      /* КОНТРАКТ 7: снимок расчёта — из пропсов формы (родительский
-         handleSuccess полностью стабилен — React Compiler сохраняет memo). */
+      /* КОНТРАКТ 7: снимок расчёта — из пропсов формы. LeadForm —
+         React.memo, и он НЕ пересобирается на кадрах драга только
+         потому, что handleSuccess — стабильная ссылка (useCallback с
+         пустыми зависимостями в родителе, §28), а остальные пропсы —
+         дебаунс-значения. React Compiler в проекте НЕ включён —
+         стабильность достигается вручную (было: комментарий врал про
+         «компилятор сохраняет memo»). */
       onSuccess(data?.id, {
         // typeId-пропс уже нормализован родителем (undecided → "undecided")
         typeId,
@@ -1130,7 +1142,12 @@ const LeadForm = memo(function LeadForm({
         total,
       });
     } catch (err) {
-      if (err instanceof TypeError) {
+      /* K4-F1 (Task 5): прерванный по таймауту fetch — отдельная причина
+       * с честным текстом «сервер не отвечает»; статус и лок ниже
+       * разблокируют повторную отправку. */
+      if (err instanceof DOMException && err.name === "TimeoutError") {
+        toast.error("Сервер не отвечает — попробуйте ещё раз или позвоните нам напрямую.");
+      } else if (err instanceof TypeError) {
         toast.error("Нет связи с сервером. Проверьте интернет-соединение и попробуйте ещё раз.");
       } else {
         toast.error("Не удалось отправить. Позвоните нам напрямую.");

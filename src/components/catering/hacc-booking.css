@@ -62,7 +62,9 @@
 .hb-lede {
   margin-top: 0.9rem;
   max-width: 58ch;
-  font-size: 0.95rem;
+  /* K2-F1 (Task 4): 15.2 → 16px — читабельный лид-абзац секции.
+     Критик K2: «59/112 абзацев = 15.2px < 16px базы». */
+  font-size: 1rem;
   line-height: 1.7;
   color: color-mix(in srgb, var(--hb-ink) 76%, transparent);
 }
@@ -531,17 +533,39 @@
   color: color-mix(in srgb, var(--hb-ink) 45%, transparent);
 }
 
-/* FIX-7: поповер календаря (Radix-портал). --cell-size перекрывает шадсн-овские
-   2rem → 2.5rem: тач-цели дней 40px (стандарт тач-зоны §39), ширина ~322px —
-   влезает в колонку слева на 390. На ≤360 клетка уже (35px → ширина ~296) —
-   влезает даже в 320-вьюпорт. */
+/* FIX-7: поповер календаря (Radix-портал).
+   K2-F1 (Task 2, MAJOR): v1 вешал --cell-size на сам .hb-date__pop — и это
+   НЕ РАБОТАЛО: корень календаря (data-slot=calendar) несёт СОБСТВЕННОЕ
+   объявление [--cell-size:--spacing(8)] (тайвиндовый класс шадсн = 32px),
+   а собственная декларация элемента всегда сильнее НАСЛЕДУЕМОГО значения
+   от родителя — замер критика K2: все 35 кнопок дней и month-nav 32×32
+   при «перекрывающем» 2.5rem в поповере (диалог 266×309).
+   v2 таргетит корень календаря напрямую — селектор (0,2,0) бьёт
+   тайвиндовый (0,1,0):
+   - ≥375px: --cell-size 2.5rem = 40px тач-цели (стандарт §39); ширина
+     поповера ≈ 322px (7×40 + p-3×2 календаря + паддинги/рамка) — влезает
+     в 390-вьюпорт от левого края триггера (Radix-коллизии докрутят).
+   - <375px (360/320-экраны): 2.375rem = 38px + расширенная хит-зона
+     ::after ±1px (=40px хит) — поповер ≈ 306px, влезает даже в 320. */
 .hb-date__pop {
   width: auto;
   padding: 0.5rem;
+}
+.hb-date__pop [data-slot="calendar"] {
   --cell-size: 2.5rem;
 }
 @media (max-width: 374.98px) {
-  .hb-date__pop { --cell-size: 2.125rem; }
+  .hb-date__pop [data-slot="calendar"] { --cell-size: 2.375rem; }
+  /* хит-зона: прозрачная ::after ±1px вокруг 38px-кнопки дня (=40px
+     тап без визуальных изменений; соседние зоны перекрываются на 1px —
+     незначимо) */
+  .hb-date__pop [data-slot="calendar"] table button { position: relative; }
+  .hb-date__pop [data-slot="calendar"] table button::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+  }
 }
 
 /* ============================================== ЗОНА ФОРМЫ (id="contact") */
@@ -1354,7 +1378,10 @@
   color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
 }
 .hb-clink__value {
-  font-size: 0.95rem;
+  /* K2-F1 (Task 4): 15.2 → 16px — читаемые значения контактов (телефон/
+     почта/адрес) — не «плотный UI», а подписи-описания; flex-колонка
+     min-width:0 + overflow-wrap — роста кегля макет не боится. */
+  font-size: 1rem;
   font-weight: 600;
   color: var(--hb-ink);
   overflow-wrap: break-word;
@@ -1700,6 +1727,32 @@
 .hbooking :is(.hb-btn, .hb-type, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-consent__link, .hb-date__trigger, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input):focus-visible {
   outline: 2px solid var(--gold, #d4a373);
   outline-offset: 2px;
+}
+
+/* ================================================== K2-F1 (Task 6): ТАЧ-
+   ЭРГОНОМИКА — touch-action: manipulation на тап-таргетах секции.
+   Критик K2 (MINOR): touch-action=auto на всех 164 интерактивах — риск
+   double-tap-zoom с задержкой ~300мс до второго тапа (iOS<13/старые
+   Android). manipulation УБИРАЕТ только double-tap-zoom: пан и пинч
+   остаются разрешёнными — свайп-скролл страницы жив.
+   СОЗНАТЕЛЬНО НЕ ТРОНУТЫ (грабля «не сломай свайпы»):
+   - input[type=range] (слайдер гостей) — драг бегунка управляется UA;
+   - .hb-slider__rail/.hb-lines/.hb-ticker/.hb-map и прочие скролл/
+     жест-контейнеры — там нужны жесты по умолчанию (карта после
+     активации панамируется, тикер — hover-пауза без тапов);
+   - тики слайдера: сама кнопка на coarse pointer-events:none (C65) —
+     правило безвредно, но осмысленно только для ::after-хит-полосы
+     (тап-пресет: манипуляция ок, драг сквозь полосу по-прежнему
+     уходит в range — тач-события резолвятся в инпут).
+   Поповер календаря порталируется ВНЕ .hbooking — таргетим отдельно. */
+.hbooking :is(a, button, label) {
+  touch-action: manipulation;
+}
+.hbooking input:not([type="range"]) {
+  touch-action: manipulation;
+}
+.hb-date__pop button {
+  touch-action: manipulation;
 }
 
 @media (prefers-reduced-motion: reduce) {

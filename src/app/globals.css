@@ -133,6 +133,45 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ============================================================================
+   F2 FONT CONSOLIDATION (cycle-71, K1-CRITICAL): 12 → 5 семейств.
+
+   Загрузка next/font осталась только у Prata (--font-prata), Playfair
+   Display (--font-serif), Barlow Semi Condensed (--font-barlow), Karla
+   (--font-sans) и Marck Script (--font-marck) — см. layout.tsx. Семь
+   семейств (Oswald, Montserrat, Lato, Great Vibes, Nothing You Could Do,
+   Neutra2Display, Neutra2Text) больше НЕ загружаются, но их переменные
+   остались в коде десятков компонентов. Чтобы не править компоненты,
+   переменные объявлены здесь АЛИАСАМИ на <html> (= :root) и перенаправлены
+   на живые семейства пятёрки:
+
+     --font-display        (был Oswald)              → Barlow Semi Condensed
+     --font-poppins        (был Montserrat)          → Barlow Semi Condensed
+     --font-lato           (был Lato)                → Karla
+     --font-script         (был Great Vibes)         → Marck Script
+     --font-nothing        (был Nothing You Could Do) → Marck Script
+     --font-neutra-display (был Neutra2Display-Light) → Playfair Display
+     --font-neutra-text    (был Neutra2Text_Book)     → Karla
+
+  next/font ставит живые переменные классом на <html> (Cycle 49 font-fix);
+   алиасы ниже каскадируют всем потребителям var(--font-*) и цепочкам вида
+   var(--ea-font-body) → var(--font-poppins) → … без единой правки в
+   компонентах. Кириллица: Barlow/Karla не содержат кириллических сабсетов —
+   русские глифы в ex-Montserrat/Oswald-слотах рендерятся метрик-
+   фолбэком в системный sans (как это УЖЕ происходит сегодня для всего
+   Karla-текста); Playfair/Marck несут полную кириллицу сами.
+   ============================================================================ */
+
+html {
+  --font-display: var(--font-barlow);
+  --font-poppins: var(--font-barlow);
+  --font-lato: var(--font-sans);
+  --font-script: var(--font-marck);
+  --font-nothing: var(--font-marck);
+  --font-neutra-display: var(--font-serif);
+  --font-neutra-text: var(--font-sans);
+}
+
 :root {
   --radius: 0.5rem;
 
@@ -246,8 +285,14 @@
      Fraunces (variable serif w/ WONK + SOFT axes) replaces Reckless TRIAL for the
      italic-as-fragment trailing-phrase device ("Cooking is love made *visible.*").
      Blush #F1ECEC + Cream #F7F5F5 surfaces alternate for editorial two-tone rhythm. */
-  --ea-red:        #E71D3A;   /* signature accent — eyebrows, arrows, hovers, quote marks, dividers */
+  --ea-red:        #E71D3A;   /* signature accent — заливки кнопок, стрелки, буллеты, ховеры (НЕ текст) */
   --ea-red-deep:   #B91431;   /* hover/pressed state */
+  /* F2 (K1-MAJOR): текстовый красный на креме #F7F5F5. #E71D3A давал 4.17:1
+     (FAIL для 13px надзаголовков/ссылок), #B91431 даёт 6.01:1 (≥4.5 AA,
+     расчёт: L(#B91431)=0.1097, L(#F7F5F5)=0.9092 → 0.9592/0.1597).
+     Семантика: ТОЛЬКО color-текста; заливки кнопок (белый на #E71D3A =
+     4.54:1) и бордеры НЕ переводить. */
+  --ea-red-text:   #B91431;
   --ea-mauve:      #A18A8A;   /* dividers, button text, carousel dots, meta (warm taupe grey) */
   --ea-blush:      #F1ECEC;   /* premium-section bg (founder story, philosophy quote, secret ingredient) */
   --ea-blush-deep: #DECBCB;   /* journal badge bg, card hover bg */
@@ -3364,7 +3409,7 @@ header[data-scrolled="true"] [data-mega-panel] {
 
 :root {
   --ea-font-display: var(--font-serif);    /* Playfair Display (italic-capable) — Fraunces upgrade TODO */
-  --ea-font-body: var(--font-poppins);      /* Montserrat for body — neutral grotesque */
+  --ea-font-body: var(--font-poppins);      /* F2: ex-Montserrat → через алиас = Barlow Semi Condensed */
   --ea-font-eyebrow: var(--font-barlow);   /* Barlow Semi Condensed Bold — uppercase eyebrows */
   --ea-radius-square: 0;
   --ea-radius-soft: 4px;
@@ -3380,7 +3425,8 @@ header[data-scrolled="true"] [data-mega-panel] {
   font-size: clamp(0.8125rem, 1.05vw, 0.95rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--ea-red);
+  /* F2: текст 13px → --ea-red-text (был --ea-red 4.17:1 → 6.01:1 AA) */
+  color: var(--ea-red-text);
   display: inline-block;
 }
 
@@ -3397,14 +3443,17 @@ header[data-scrolled="true"] [data-mega-panel] {
 .ea-section-h2 em {
   font-style: italic;
   font-weight: 400;
-  color: var(--ea-red);
+  /* F2: крупный текст проходил AA-large и на 4.17:1, но унифицируем
+     текстовый красный с остальными (6.01:1) — меньше красных в палитре. */
+  color: var(--ea-red-text);
 }
 
 /* Italic-as-fragment trailing phrase device (EA signature) */
 .ea-italic-fragment {
   font-style: italic;
   font-weight: 400;
-  color: var(--ea-red);
+  /* F2: body-размер 16px italic → --ea-red-text (4.17 → 6.01 AA) */
+  color: var(--ea-red-text);
 }
 
 .ea-body {
@@ -3451,7 +3500,8 @@ header[data-scrolled="true"] [data-mega-panel] {
 
 .ea-text-link:hover,
 .ea-text-link:focus-visible {
-  color: var(--ea-red);
+  /* F2: ховер-состояние ссылки — тоже текст → --ea-red-text */
+  color: var(--ea-red-text);
   outline: none;
 }
 
@@ -3486,7 +3536,10 @@ header[data-scrolled="true"] [data-mega-panel] {
   font-size: clamp(0.85rem, 1vw, 1rem);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ea-red);
+  /* F2: прозрачная кнопка = красный ТЕКСТ 13.6–16px на креме →
+     --ea-red-text (4.17 → 6.01:1). Заливка на ховере осталась --ea-red
+     (белый на #E71D3A = 4.54:1) — это заливка, её не трогаем. */
+  color: var(--ea-red-text);
   background: transparent;
   border: 1px solid var(--ea-red);
   border-radius: var(--ea-radius-square);
@@ -4007,7 +4060,9 @@ header[data-scrolled="true"] [data-mega-panel] {
   font-weight: 400;
   font-size: clamp(1.45rem, 2.6vw, 2rem);
   line-height: 1.05;
-  color: var(--ea-red);
+  /* F2: рукописный акцент 23–32px — на мобильном 23.2px < порога AA-large
+     24px → переводим на --ea-red-text (6.01:1 на креме) */
+  color: var(--ea-red-text);
   display: inline-block;
   transform: rotate(-3deg);
   transform-origin: left center;
@@ -4493,4 +4548,30 @@ body.cookie-banner-open {
   [data-sd-zoom] {
     animation: none;
   }
+}
+
+/* ============================================================================
+   F2 (cycle-71, K4-MAJOR): .js-gate — no-JS видимость страницы.
+
+   SSR-HTML содержит 162 инлайн `opacity:0` (framer-motion initial для
+   ревилов) + сдвиговые transform. Без JS контент ниже hero остаётся
+   навсегда невидимым. Инлайн-скрипт в <head> (layout.tsx, синхронный,
+   до первого пейнта) ставит класс `js` на <html>:
+     • JS есть  → класс стоит, правило ниже НЕ срабатывает — вёрстка с
+       анимациями не меняется вообще;
+     • JS нет   → класса нет → правило раскрывает framer-инициализации.
+
+   SCOPING (не blanket `[style]`!): React-SSR сериализует инлайн-стили без
+   пробелов, точное значение `0` отделяется `;` либо концом атрибута —
+   селекторы ниже матчат ТОЛЬКО такие сигнатуры framer-инициализаций.
+   Дизайн-трансформы и фракционные декоративные прозрачности
+   (rotate(-6deg) скрипт-оверлея hero, Ken-Burns scale(1.06/1.15),
+   opacity:0.34/0.3, next/image position-стили) НЕ подпадают под правило
+   и сохраняют задуманный вид без JS.
+   !important обязателен: инлайн-стиль бьётся только так.
+   ============================================================================ */
+html:not(.js) [style*="opacity:0;"],
+html:not(.js) [style$="opacity:0"] {
+  opacity: 1 !important;
+  transform: none !important;
 }

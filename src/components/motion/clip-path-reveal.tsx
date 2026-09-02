@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type ClipDirection = "top" | "right" | "bottom" | "left" | "alternate";
@@ -28,25 +28,9 @@ interface ClipPathRevealProps {
 }
 
 /**
- * inset() builders per direction. `t` is the clipped percentage (100 = fully
- * hidden, 0 = fully revealed). The non-animated sides stay at 0 so the shape
- * of the string is constant and Framer Motion can interpolate token-by-token.
- *
- *   top    → inset(t% 0 0 0)   reveals top→bottom
- *   right  → inset(0 t% 0 0)   reveals right→left
- *   bottom → inset(0 0 t% 0)   reveals bottom→top
- *   left   → inset(0 0 0 t%)   reveals left→right
+ * Порядок сторон для `direction='alternate'` — индекс % 4 задаёт сторону
+ * входа (паттерн Sondaven: чередование направлений в каскаде карточек).
  */
-const INSETS: Record<
-  Exclude<ClipDirection, "alternate">,
-  (t: number) => string
-> = {
-  top: (t) => `inset(${t}% 0 0 0)`,
-  right: (t) => `inset(0 ${t}% 0 0)`,
-  bottom: (t) => `inset(0 0 ${t}% 0)`,
-  left: (t) => `inset(0 0 0 ${t}%)`,
-};
-
 const ALTERNATE_CYCLE = [
   "bottom",
   "left",
@@ -57,24 +41,35 @@ const ALTERNATE_CYCLE = [
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 /**
- * ClipPathReveal — directional `clip-path: inset(...)` reveal with a subtle
- * inner zoom (1.15 → 1.0). The Sondaven / Floema signature photo reveal.
+ * ClipPathReveal — направленный photo-reveal (имя историческое: компонент
+ * начинал с `clip-path: inset(...)`, см. git-историю и §34 ниже; сегодня
+ * маска заменена на opacity + направленный y/x-сдвиг — имя сохранено ради
+ * стабильности импортов у 7 потребителей). Внутренний слой доводит образ
+ * зумом 1.15 → 1.0 — премиальный «Sondaven push-out»-приём.
  *
- * - `framer-motion` (matches `magnetic.tsx`, `cursor.tsx`, `delivery-block.tsx`
- *   which all use framer-motion — keeps a single motion library to avoid
- *   motion/react × framer-motion context conflicts). Uses `useInView` hook +
- *   imperative `animate` prop (NOT `whileInView`) — the imperative `animate`
- *   prop driven by the `useInView` boolean animates `clip-path` correctly
- *   (whileInView only animates transform/opacity reliably).
- * - transform / clip-path / opacity only — GPU-composited, never touches
- *   layout (RULES §5).
- * - `prefers-reduced-motion`: renders children in a plain `<div>`, no clip,
- *   no scale.
- * - `relative h-full w-full` on the inner zoom wrapper so `fill`-positioned
- *   children (next/image `fill`, absolute overlays) inherit the outer
- *   wrapper's height AND have a positioned parent — without `relative`,
- *   next/image `fill` warns "parent with invalid position: static" and the
- *   image collapses to 0 height.
+ * АКТУАЛЬНАЯ механика (K4, cycle-71 F3 — комментарии синхронизированы
+ * с кодом; прежний комментарий врал про «imperative animate + useInView,
+ * НЕ whileInView» — код всегда использовал whileInView):
+ * - внешний `motion.div`: `whileInView` анимирует opacity 0→1 + y (±40px,
+ * по направлению bottom/top) или x (±40px, left/right), viewport
+ *   `{ once, margin: "-80px" }`;
+ * - внутренний `motion.div`: `whileInView` масштаб 1.15 → 1 тем же
+ *   transition (duration/delay/EASE [0.22, 1, 0.36, 1]).
+ * - `framer-motion` (единая моушн-библиотека сайта — как magnetic.tsx,
+ *   cursor.tsx, delivery-block.tsx; motion/react × framer-motion
+ *   микса нет — контексты не конфликтуют).
+ * - transform / opacity only — GPU-композит, никогда не трогает layout
+ *   (RULES §5).
+ * - `prefers-reduced-motion`: дети в простом `<div>`, без зума и сдвига.
+ * - `relative h-full w-full` на внутреннем зум-слое — чтобы `fill`-дети
+ *   (next/image `fill`, абсолютные оверлеи) наследовали высоту внешней
+ *   обёртки И видели позиционированного родителя (иначе next/image
+ *   предупреждает "parent with invalid position: static" и схлопывается).
+ * - will-change НЕ ставим (§34 / K4 F3): постоянный `will-change: transform`
+ *   на ~20 инстансах держал лишние композит-слои, а в C34 ещё и убивал
+ *   `background-attachment: fixed` у потомков (transform-предок =
+ *   containing block). Браузер сам промоутит слой на время transform-
+ *   анимации — ручного хинта не нужно (замеров, требующих его, нет).
  */
 export function ClipPathReveal({
   children,
@@ -85,7 +80,6 @@ export function ClipPathReveal({
   once = true,
   className,
 }: ClipPathRevealProps) {
-  const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   // C62 hydration-safety: branch the tree on reduce ONLY after mount —
   // useReducedMotion() is false at SSR and true on a reduce-user's first
@@ -93,7 +87,6 @@ export function ClipPathReveal({
   // regenerated the whole page tree). First client render must match SSR.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const inView = useInView(ref, { once, margin: "-80px" });
 
   const resolvedDir: Exclude<ClipDirection, "alternate"> =
     direction === "alternate"
@@ -104,7 +97,6 @@ export function ClipPathReveal({
     return <div className={className}>{children}</div>;
   }
 
-  const insetFn = INSETS[resolvedDir];
   const transition = { duration, delay, ease: EASE };
 
   // Directional y-offset — gives each direction a subtle directional feel
@@ -118,7 +110,6 @@ export function ClipPathReveal({
 
   return (
     <motion.div
-      ref={ref}
       className={cn("relative", className)}
       initial={{ opacity: 0, y: dirOffset, x: dirX }}
       whileInView={{ opacity: 1, y: 0, x: 0 }}
@@ -136,7 +127,6 @@ export function ClipPathReveal({
           wrapper's height down so `fill` children fill the reveal area. */}
       <motion.div
         className="relative h-full w-full"
-        style={{ willChange: "transform" }}
         initial={{ scale: 1.15 }}
         whileInView={{ scale: 1 }}
         viewport={{ once, margin: "-80px" }}

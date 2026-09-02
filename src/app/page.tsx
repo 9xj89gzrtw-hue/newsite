@@ -96,7 +96,12 @@ import { SiteFooter } from "@/components/catering/site-footer";
 //   BackToTop — floating ↑ button dropped together with the ambient-audio
 //   FAB and the chapter-nav scroll rail in layout.tsx (fewer floating
 //   overlays over the content).
-export const dynamic = "force-dynamic";
+//
+// F2 (cycle-71, K4-MAJOR): `export const dynamic = "force-dynamic"` УДАЛЁН.
+// Витрина полностью статична: все компоненты — клиентские, серверных
+// запросов/Prisma в дереве страницы нет, nuqs-стейта хватает Suspense.
+// force-dynamic глушил HTML-кэш на проде (no-store) — каждый запрос
+// обходился полным SSR. Теперь страница пререндерится и кэшируется.
 
 /* Task 1-b (cycle-71): FAQPage JSON-LD перенесён ИЗ layout.tsx — гайдлайн
  * Google: схема FAQ должна жить на странице с ВИДИМЫМ FAQ-контентом

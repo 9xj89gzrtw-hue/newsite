@@ -117,9 +117,44 @@ export function ImageTrail() {
     let lastY = 0;
     let spawnCount = 0;
 
-    const insideHost = (x: number, y: number): boolean => {
+    /* --- кэш геометрии секции (K4, cycle-71 F3: micro-perf) ------------------
+       Раньше insideHost звал getBoundingClientRect на КАЖДЫЙ pointermove/
+       touchmove — форс-синхронный layout на ровном месте (соседние секции
+       анимируют высоту/позиции). Теперь геометрия кэшируется в
+       document-координатах (top/bottom + scrollY): вертикальный скролл её
+       НЕ инвалидирует — пересчёт по живому window.scrollY (дёшево, без
+       layout), а ревалидация по resize/скролл-затиханию (debounce 200ms)
+       ловит реальные переверстки (адаптив, аккордеоны выше по потоку).
+       Горизонтального скролла на странице нет — left/right
+       viewport-стабильны. -------------------------------------------------- */
+    let hostLeft = 0;
+    let hostRight = 0;
+    let hostDocTop = 0;
+    let hostDocBottom = 0;
+    const measureHost = () => {
       const r = host.getBoundingClientRect();
-      return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+      hostLeft = r.left;
+      hostRight = r.right;
+      hostDocTop = r.top + window.scrollY;
+      hostDocBottom = r.bottom + window.scrollY;
+    };
+    measureHost();
+    let revalidateTimer: ReturnType<typeof setTimeout> | undefined;
+    const scheduleRevalidate = () => {
+      clearTimeout(revalidateTimer);
+      revalidateTimer = setTimeout(measureHost, 200);
+    };
+    window.addEventListener("resize", scheduleRevalidate, { passive: true });
+    window.addEventListener("scroll", scheduleRevalidate, { passive: true });
+
+    const insideHost = (x: number, y: number): boolean => {
+      const sy = window.scrollY;
+      return (
+        x >= hostLeft &&
+        x <= hostRight &&
+        y >= hostDocTop - sy &&
+        y <= hostDocBottom - sy
+      );
     };
 
     const spawn = (x: number, y: number, coarse: boolean) => {
@@ -193,6 +228,9 @@ export function ImageTrail() {
     return () => {
       document.removeEventListener("pointermove", onPointerMove);
       document.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("resize", scheduleRevalidate);
+      window.removeEventListener("scroll", scheduleRevalidate);
+      clearTimeout(revalidateTimer);
       warmIo.disconnect();
       for (const card of cards) {
         for (const anim of card.getAnimations()) anim.cancel();

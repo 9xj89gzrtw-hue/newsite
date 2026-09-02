@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
+import type { CSSProperties } from "react";
 
 /**
  * TottHero — Talk of the Town (talkofthetownatlanta.com) hero graft (Cycle 30).
@@ -39,6 +40,41 @@ import { useMounted } from "@/hooks/use-mounted";
  */
 const HERO_VIDEO = "/media/mculinary/mculinary-hero.mp4";
 const HERO_POSTER = "/media/hero-premium/hero-premium-6.jpg";
+
+/* ════════════ Cycle-71 / F4 — CTA-пара в hero (K1 MAJOR: «hero без единого
+   тапабельного действия», elementFromPoint(720,40) = декоративный div) ════════════
+
+   Две кнопки в существующем языке сайта (максимальная консистентность):
+   - pill-геометрия rounded-full + Barlow Semi Condensed Bold uppercase с
+     трекингом — тот же рецепт, что CTA-пилюли gg-video-showcase и кнопки
+     hacc-booking (--hb-caps = var(--ea-font-eyebrow) = Barlow Semi Condensed);
+   - ЗАЛИВКА: брендовое золото #C9A227 + espresso-текст #0A0908 — 8.22:1
+     (белый на золоте = 2.42:1 FAIL, поэтому текст тёмный; белый на #E71D3A
+     = 4.53:1 — впритык, забраковано);
+   - ОУТЛАЙН: рамка золото #C9A227 (8.22:1 против тёмного hero как UI-контроль
+     ≥3:1) + кремовый текст #F7F5F5 (≥11:1 на скриме) + лёгкая text-shadow
+     как у gg-пилюль на видео;
+   - тач-таргет ≥48px (K2/F5-стандарт), на мобиле — колонкой, на sm+ — в ряд;
+   - глобальные правила сайта работают сами: :focus-visible → золотой outline
+     (globals.css), button/a :active → scale(0.96) (тап-фидбек K2).
+   Палитра — cycle-71 (оркестратор): espresso #0A0908, золото #C9A227,
+   cream #F7F5F5. НИКАКИХ синих/indigo. */
+const CTA_BASE_CLASS =
+  "inline-flex min-h-[48px] items-center justify-center rounded-full px-6 text-center transition-colors duration-300 sm:px-8";
+const CTA_PRIMARY_CLASS = `${CTA_BASE_CLASS} bg-[#C9A227] text-[#0A0908] hover:bg-[#B08D22]`;
+const CTA_OUTLINE_CLASS = `${CTA_BASE_CLASS} border border-[#C9A227] text-cream hover:border-[#E5C76B] hover:bg-[#C9A227]/15`;
+const CTA_TEXT_STYLE: CSSProperties = {
+  fontFamily: "var(--ea-font-eyebrow)",
+  fontWeight: 700,
+  fontSize: "0.8rem",
+  lineHeight: 1.2,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+};
+const CTA_OUTLINE_TEXT_STYLE: CSSProperties = {
+  ...CTA_TEXT_STYLE,
+  textShadow: "0 1px 16px rgba(0, 0, 0, 0.5)",
+};
 
 export function TottHero() {
   const reduce = useReducedMotion();
@@ -133,6 +169,14 @@ export function TottHero() {
       data-header-theme="transparent"
       aria-label="nilov catering — лучший кейтеринг Санкт-Петербурга"
       className="relative min-h-[100svh] w-full overflow-hidden bg-black"
+      /* F4 / задача 2 (K1 MAJOR «first-paint крем-вспышка»): инлайновый
+         SSR-гейт — тёмный espresso-фон секции сериализуется прямо в HTML,
+         первый кадр под (ещё не загрузившимся) постером гарантированно
+         тёмный = итоговому виду. Инлайн-стиль сильнее Tailwind-класса
+         bg-black, поэтому класс оставлен как дублирующий фолбэк.
+         САМА вспышка — двери прелоадера (preloader.tsx, крем-градиент
+         from-cream to-parchment, чужой файл) — см. отчёт F4. */
+      style={{ backgroundColor: "#0A0908" }}
     >
       {/* Background image — LCP priority (next/image). Sits at z-0 and acts
           as the video poster (the video overlays it once playing). */}
@@ -233,6 +277,12 @@ export function TottHero() {
           <span className="block">
             catering<span style={{ color: "var(--gold)", marginLeft: "0.05em" }}>.</span>
           </span>
+          {/* F4 / K3 SEO: визуально невидимое продолжение вордмарка — ключи
+              «кейтеринг в Санкт-Петербурге» попадают в текстовое содержание
+              H1 (Tailwind sr-only = clip-паттерн, см. stage-services.tsx).
+              aria-label H1 уже несёт «лучший кейтеринг Санкт-Петербурга» —
+              видимая часть «nilov catering» вложена в него (WCAG 2.5.3). */}
+          <span className="sr-only"> — кейтеринг в Санкт-Петербурге</span>
         </motion.h1>
 
         {/* Script tagline — Nothing You Could Do (Latin script font). Nestles tight
@@ -287,7 +337,9 @@ export function TottHero() {
             letterSpacing: "0.35em",
             fontWeight: 700,
             textTransform: "uppercase",
-            marginTop: "2.5rem",
+            /* F4: 2.5rem → 2rem — вертикальный бюджет под CTA-пару ниже
+               (замер: зазор до scroll-cue «ЛИСТАЙТЕ» ≥8px, W1-стандарт). */
+            marginTop: "2rem",
             paddingLeft: "0.35em",
             textShadow: "0 2px 20px rgba(0,0,0,0.4)",
           }}
@@ -296,6 +348,33 @@ export function TottHero() {
           <br className="sm:hidden" />
           {" "}Санкт-Петербурга
         </motion.p>
+
+        {/* F4 (K1 MAJOR): CTA-пара — раньше в hero было 0 тапабельных
+            действий (хедер докается только после 900px скролла). Обе —
+            якорные ссылки на СУЩЕСТВУЮЩИЕ секции (#menu — menu.tsx:402 /
+            hacc-menu.tsx:1175, #calculator — hacc-booking.tsx:2366):
+            мгновенный отклик без перезагрузки, Lenis-скролл по якорю
+            работает (проверено замером ниже). Вариант rise — общий
+            стаггер-каскад hero (reduce-motion → без анимации). */}
+        <motion.div
+          variants={rise}
+          className="mt-6 flex flex-col items-center gap-3 sm:mt-7 sm:flex-row sm:justify-center sm:gap-4"
+        >
+          <a
+            href="#menu"
+            className={CTA_PRIMARY_CLASS}
+            style={CTA_TEXT_STYLE}
+          >
+            Смотреть меню
+          </a>
+          <a
+            href="#calculator"
+            className={CTA_OUTLINE_CLASS}
+            style={CTA_OUTLINE_TEXT_STYLE}
+          >
+            Рассчитать стоимость
+          </a>
+        </motion.div>
       </motion.div>
 
       {/* Scroll cue bottom-center (sits above the docked nav). W1-FIX:

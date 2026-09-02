@@ -276,7 +276,9 @@ export function GgVideoShowcase() {
 
           {/* CTA pills — 2 anchors, rounded-full, transparent bg + white
               border + white text; on hover darken the bg + slightly tint
-              the border. Mobile stacks vertically, md+ sit side-by-side. */}
+              the border. Mobile stacks vertically, md+ sit side-by-side.
+              K2-F1 (Task 3): min-h-[44px] — тач-таргет ≥44 (замер критика:
+              41px на части вьюпортов). */}
           <motion.div
             {...reveal(0.16)}
             className="flex flex-col gap-3 sm:flex-row sm:gap-4"
@@ -285,7 +287,7 @@ export function GgVideoShowcase() {
               <a
                 key={cta.href}
                 href={cta.href}
-                className="inline-flex items-center justify-center rounded-full border border-white/80 px-6 py-3 text-center text-white transition-colors duration-300 hover:bg-white hover:text-black"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/80 px-6 py-3 text-center text-white transition-colors duration-300 hover:bg-white hover:text-black"
                 style={{
                   fontFamily: "var(--ea-font-eyebrow)",
                   fontWeight: 500,
@@ -304,7 +306,9 @@ export function GgVideoShowcase() {
             GGCatering's signature interaction: a 1px-white-border pill
             centered over the video, clicking it swaps the muted teaser
             for the full player. We don't have a separate full-video URL,
-            so we toggle `muted` + `controls` on the same element. */}
+            so we toggle `muted` + `controls` on the same element.
+            K2-F1 (Task 3): тач-таргет — min-height 44px + flex-центровка
+            (замер критика: 119×41 < 44). */}
         <button
           type="button"
           onClick={togglePlay}
@@ -314,7 +318,7 @@ export function GgVideoShowcase() {
               ? "Выключить звук и скрыть элементы управления видео"
               : "Включить звук и показать элементы управления видео"
           }
-          className="group absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-500 hover:opacity-90"
+          className="group absolute left-1/2 top-1/2 z-20 inline-flex min-h-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center transition-opacity duration-500 hover:opacity-90"
           style={{
             background: "transparent",
             color: "#fff",

@@ -447,7 +447,10 @@ function Preview({ active, index, total }: { active: AtServiceItem; index: numbe
             />
             <SmartImage
               src={active.image}
-              alt=""
+              /* C71 (K3-MINOR): видимое крупное превью было с alt="" — теря
+                 индексации Яндекс/Google Картинок; честный alt из активного
+                 заголовка услуги. */
+              alt={`${active.title} — кейтеринг nilov catering`}
               fill
               sizes="(min-width: 1024px) 40vw, 100vw"
               className="at-svc__preview-img"

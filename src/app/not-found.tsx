@@ -32,19 +32,34 @@ export const metadata: Metadata = {
 };
 
 export default function NotFound() {
+  /* F4 / K1 MINOR (cycle-71): светлая 404 вне тёмного бренда → рестайл в
+   * тёмную бренд-страницу: espresso-фон #0A0908, кремовый текст, золотые
+   * акценты #C9A227 (контрасты посчитаны: gold на espresso = 8.22:1,
+   * cream = 18.32:1, cream/75 = 10.29:1 — всё ≥4.5 AA), ghost-404 —
+   * золотой контур (декоративный, aria-hidden). Кнопки: «На главную» —
+   * золотая заливка с espresso-текстом (8.22:1), «Смотреть меню»/телефон —
+   * outline-gold с кремовым текстом. Metadata-экспорт НЕ тронут (Task 1-b,
+   * свежие OG/noindex/canonical — см. докстринг выше). */
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-cream px-5 py-20 text-center">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-[#0A0908] px-5 py-20 text-center">
       <div className="mx-auto max-w-md">
-        <span className="font-mono text-xs uppercase tracking-[0.3em] text-bordeaux">
+        <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#C9A227]">
           Ошибка 404
         </span>
-        <p className="mt-4 font-display text-7xl font-bold text-ink/30 md:text-8xl" aria-hidden="true">
+        <p
+          className="mt-4 font-display text-7xl font-bold md:text-8xl"
+          aria-hidden="true"
+          style={{
+            color: "rgba(201, 162, 39, 0.14)",
+            WebkitTextStroke: "1.5px rgba(201, 162, 39, 0.55)",
+          }}
+        >
           404
         </p>
-        <h1 className="mt-2 font-display text-2xl text-ink md:text-3xl">
+        <h1 className="mt-2 font-display text-2xl text-cream md:text-3xl">
           Страница не найдена
         </h1>
-        <p className="mt-4 text-base text-ink/70">
+        <p className="mt-4 text-base text-cream/75">
           Возможно, страница была перемещена или удалена. Вернитесь на главную
           или свяжитесь с нами — поможем организовать ваше мероприятие.
         </p>
@@ -52,21 +67,21 @@ export default function NotFound() {
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-bordeaux px-7 py-3 text-sm font-medium text-cream transition-colors hover:bg-bordeaux/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordeaux"
+            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#C9A227] px-7 py-3 text-sm font-medium text-[#0A0908] transition-colors hover:bg-[#B08D22] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
           >
             <Home className="size-4" />
             На главную
           </Link>
           <Link
             href="/#menu"
-            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-border-line bg-white px-7 py-3 text-sm font-medium text-ink transition-colors hover:bg-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordeaux"
+            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#C9A227] bg-transparent px-7 py-3 text-sm font-medium text-cream transition-colors hover:border-[#E5C76B] hover:bg-[#C9A227]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
           >
             <UtensilsCrossed className="size-4" />
             Смотреть меню
           </Link>
           <a
             href={CONTACTS.phoneHref}
-            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-border-line bg-white px-7 py-3 text-sm font-medium text-ink transition-colors hover:bg-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bordeaux"
+            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#C9A227] bg-transparent px-7 py-3 text-sm font-medium text-cream transition-colors hover:border-[#E5C76B] hover:bg-[#C9A227]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
           >
             <Phone className="size-4" />
             {CONTACTS.phone}

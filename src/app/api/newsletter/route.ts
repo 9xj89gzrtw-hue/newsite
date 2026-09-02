@@ -28,6 +28,17 @@ const SourceSchema = z
   .nullable();
 
 /**
+ * K4 (cycle-71, F3): маркер Prisma unique-constraint violation (P2002) —
+ * гонка findUnique→create: параллельный POST успел вставить строку между
+ * нашим чтением и записью. Сигнатурная проверка вместо импорта класса
+ * из @prisma/client/runtime (легче и не тащит рантайм в бандл роута).
+ */
+const isUniqueViolation = (e: unknown): boolean =>
+  typeof e === "object" &&
+  e !== null &&
+  (e as { code?: string }).code === "P2002";
+
+/**
  * POST /api/newsletter — subscribe an email with 152-ФЗ consent proof.
  * Stores consent timestamp + IP + User-Agent as legal proof of consent.
  *
@@ -37,6 +48,11 @@ const SourceSchema = z
  * «success (demo mode)» — тихая потеря подписки. Отвечаем честный 503
  * `{ ok: false, error }` — клиент показывает ошибку, пользователь знает,
  * что подписка не сохранилась.
+ *
+ * K4 (cycle-71, F3): TOCTOU-гонка findUnique→create закрыта ловушкой P2002
+ * → перезачитывание строки (идемпотентный ответ вместо 500).
+ * Публичный GET удалён: он отдавал наружу число активных подписчиков
+ * (метрика — не для анонимов) и маскировал сбой БД ответом active:0.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -74,6 +90,21 @@ export async function POST(req: NextRequest) {
       null;
     const userAgent = req.headers.get("user-agent") || null;
 
+    /** Реактивация отписанной строки — общая для основной ветки и
+     * P2002-ретрая (K4, F3). */
+    const reactivate = async (keepSource: string | null) =>
+      db.subscriber.update({
+        where: { email },
+        data: {
+          active: true,
+          unsubscribedAt: null,
+          consentDate: new Date(),
+          consentIp,
+          userAgent,
+          source: source ?? keepSource,
+        },
+      });
+
     try {
       // Upsert — if email exists and was unsubscribed, reactivate; if new, create.
       const existing = await db.subscriber.findUnique({ where: { email } });
@@ -90,39 +121,56 @@ export async function POST(req: NextRequest) {
           );
         }
         // Reactivate
-        const updated = await db.subscriber.update({
-          where: { email },
-          data: {
-            active: true,
-            unsubscribedAt: null,
-            consentDate: new Date(),
-            consentIp,
-            userAgent,
-            source: source ?? existing.source,
-          },
-        });
+        const updated = await reactivate(existing.source);
         return NextResponse.json(
           { ok: true, id: updated.id, code: "REACTIVATED" },
           { status: 200 },
         );
       }
 
-      const sub = await db.subscriber.create({
-        data: {
-          email,
-          source,
-          consentAccepted: true,
-          consentDate: new Date(),
-          consentIp,
-          userAgent,
-          active: true,
-        },
-      });
+      try {
+        const sub = await db.subscriber.create({
+          data: {
+            email,
+            source,
+            consentAccepted: true,
+            consentDate: new Date(),
+            consentIp,
+            userAgent,
+            active: true,
+          },
+        });
 
-      return NextResponse.json(
-        { ok: true, id: sub.id, code: "SUBSCRIBED" },
-        { status: 201 },
-      );
+        return NextResponse.json(
+          { ok: true, id: sub.id, code: "SUBSCRIBED" },
+          { status: 201 },
+        );
+      } catch (raceError) {
+        // K4 (cycle-71, F3): проиграли гонку findUnique→create — параллельный
+        // запрос вставил этот email между нашим чтением и записью (P2002).
+        // Перезачитываем строку и отвечаем по её ФАКТИЧЕСКОМУ состоянию —
+        // идемпотентно, без 500. Всё остальное (реальный сбой БД) — наружу
+        // во внешний catch → 503.
+        if (isUniqueViolation(raceError)) {
+          const winner = await db.subscriber.findUnique({ where: { email } });
+          if (winner) {
+            if (winner.active) {
+              return NextResponse.json(
+                { ok: true, id: winner.id, code: "ALREADY_SUBSCRIBED" },
+                { status: 200 },
+              );
+            }
+            const updated = await reactivate(winner.source);
+            return NextResponse.json(
+              { ok: true, id: updated.id, code: "REACTIVATED" },
+              { status: 200 },
+            );
+          }
+          // P2002, а строки нет (параллельный DELETE успел) — честный сбой
+          // следующего запроса, наружу → 503.
+        }
+        throw raceError;
+      }
     } catch (dbError) {
       // FIX-4 [F10]: БД недоступна — честный 503, никаких фейковых 201.
       console.error("[api/newsletter] DB write failed:", dbError);
@@ -143,15 +191,13 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/**
- * GET /api/newsletter — health check (counts active subscribers).
- * Useful for admin dashboards. No PII returned.
+/*
+ * GET /api/newsletter — УДАЛЁН (K4, cycle-71, F3).
+ *
+ * Прежний публичный GET отдавал `{ ok: true, active: N }` — число активных
+ * подписчиков наружу любому анониму (метрика не для публичного роута), а его
+ * catch маскировал недоступность БД ответом `active: 0`. rg по src/ показывает,
+ * что GET никто не вызывает (полоса подписки удалена из футера в C71) —
+ * health-check-ценности роут не нёс. Если появится админ-панель — её метрики
+ * должны жить за авторизацией, не в публичном route handler.
  */
-export async function GET() {
-  try {
-    const count = await db.subscriber.count({ where: { active: true } });
-    return NextResponse.json({ ok: true, active: count });
-  } catch {
-    return NextResponse.json({ ok: true, active: 0 });
-  }
-}

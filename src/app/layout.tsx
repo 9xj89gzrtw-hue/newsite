@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Oswald, Karla, Great_Vibes, Playfair_Display, Barlow_Semi_Condensed, Montserrat, Prata, Nothing_You_Could_Do, Lato, Marck_Script } from "next/font/google";
-import localFont from "next/font/local";
+import { Playfair_Display, Barlow_Semi_Condensed, Karla, Prata, Marck_Script } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { LenisProvider } from "@/components/catering/lenis-provider";
@@ -21,163 +20,77 @@ import {
 } from "@/lib/site-config";
 
 /*
- * W3-FIX (LCP): next/font по умолчанию ставит rel=preload на КАЖДЫЙ woff2
- * (39 файлов ≈ 1МБ) — все они конкурируют с hero-медиа за первые байты
- * соединения. Preload оставлен ТОЛЬКО шрифтам первого экрана (hero):
- *   - Prata                — wordmark hero (LCP-текст);
- *   - Nothing You Could Do — script «food as art» (hero-оверлей);
- *   - Lato                 — eyebrow/scroll подписи hero.
- * Все остальные — preload: false: шрифты НЕ удаляются и грузятся тем же
- * CSS-ом с display:swap (визуал не меняется), просто по мере надобности,
- * а не на старте. Oswald (wordmark футера — ниже fold) тоже без preload.
+ * F2 (cycle-71, K1-CRITICAL + K3-MAJOR): консолидация шрифтов 12 → 5 семейств.
+ * next/font-загрузка осталась ТОЛЬКО у пятёрки:
+ *   Prata, Playfair Display, Barlow Semi Condensed, Karla, Marck Script.
+ * Убраны из загрузки: Oswald, Montserrat, Lato, Great Vibes,
+ * Nothing You Could Do, Neutra2Display-Light, Neutra2Text_book
+ * (−90 @font-face из отдаваемого CSS, было 159 с учётом fallback-фейсов).
+ *
+ * Их CSS-переменные остаются живыми через АЛИАСЫ на <html> в globals.css
+ * (блок «F2 FONT CONSOLIDATION») — дюжины компонентов продолжают ссылаться
+ * на прежние переменные, не требуя правок в самих компонентах:
+ *   --font-display (Oswald)          → Barlow Semi Condensed (condensed caps)
+ *   --font-poppins (Montserrat)       → Barlow Semi Condensed
+ *   --font-lato (Lato)                → Karla (humanist body)
+ *   --font-script (Great Vibes)       → Marck Script (кириллический скрипт)
+ *   --font-nothing (Nothing You Could Do) → Marck Script
+ *   --font-neutra-display (Neutra2Display) → Playfair Display (крупные лейблы
+ *                                          «СЛЕДИТЕ ЗА НАМИ» и др.)
+ *   --font-neutra-text (Neutra2Text)  → Karla
+ * Скриптовые замены: «food as art» и «Сделано с любовью» — Marck Script.
+ *
+ * Preload остаётся ТОЛЬКО у Prata — wordmark hero (LCP-текст). Прежние
+ * preload-ы Nothing You Could Do и Lato ушли вместе с их загрузкой.
  */
 
-// Sopranos Catering typography — Oswald (display/condensed uppercase),
-// Karla (body, humanist sans), Great Vibes (script accent for "Welcome to").
-// All loaded via next/font/google — self-hosted at runtime, no external requests.
-const oswald = Oswald({
-  variable: "--font-display",
-  subsets: ["latin", "latin-ext"],
-  weight: ["200", "300", "400", "500", "600", "700"],
-  display: "swap",
-  /* W3-FIX: wordmark футера — ниже fold, preload не нужен. */
-  preload: false,
-});
-
-const karla = Karla({
-  variable: "--font-sans",
-  subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-  /* W3-FIX: body-фолбэк, не LCP-критичен. */
-  preload: false,
-});
-
-const greatVibes = Great_Vibes({
-  variable: "--font-script",
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
-  /* W3-FIX: акценты ниже fold. */
-  preload: false,
-});
-
+// — Playfair Display: editorial display-serif с полной кириллицей (H2/H3,
+//   «СЛЕДИТЕ ЗА НАМИ», ex-Neutra2Display-слоты).
 const playfair = Playfair_Display({
   variable: "--font-serif",
   subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  /* W3-FIX: не LCP-критичен. */
+  /* Не LCP-критичен. */
   preload: false,
 });
 
-// Concept-Catering.de aesthetic — Barlow Semi Condensed (ultra-bold condensed
-// all-caps for the dark "wow" layer: bold-statement, pink-marquee, rising-photos).
+// — Barlow Semi Condensed: ultra-bold condensed all-caps (eyebrow-система,
+//   ex-Oswald/ex-Montserrat-слоты).
 const barlow = Barlow_Semi_Condensed({
   variable: "--font-barlow",
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
-  /* W3-FIX: тёмный «wow»-слой ниже fold. */
   preload: false,
 });
 
-// Global Gourmet (ggcatering.com) — Montserrat as Poppins-replacement.
-// Poppins on Google Fonts does NOT ship a Cyrillic subset, so for the Russian
-// interfood site we substitute Montserrat — a geometric sans nearly identical
-// to Poppins in x-height/letterforms, but with full Cyrillic + italic coverage.
-// Variable name `--font-poppins` is kept for CSS compat with gg-* components.
-const poppins = Montserrat({
-  variable: "--font-poppins",
-  subsets: ["latin", "latin-ext", "cyrillic"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+// — Karla: humanist body-sans (латиница; кириллица — через metric-fallback
+//   в системный sans, как и было до консолидации).
+const karla = Karla({
+  variable: "--font-sans",
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
-  /* W3-FIX: gg-секции ниже fold. */
   preload: false,
 });
 
-// Cycle 27 — Creative Edge Parties (creativeedgeparties.com) self-hosted
-// Neutraface 2 fonts (downloaded from their Squarespace CDN). These carry the
-// brand identity: Neutra2Display-Light for ALL headings (uppercase, tight -2%
-// tracking, hero H1 at ~244px), Neutra2Text_Book for body copy. NOTE: these
-// are Latin-only faces (no Cyrillic) — used for the CEP English-language
-// signature headlines ("THE EGG", "SIMPLE & BRILLIANT", "WHY US?"). Russian
-// copy in the same sections falls back to Montserrat (geometric, matching
-// x-height) via the .cep-ru utility class.
-const neutraDisplay = localFont({
-  src: "../../public/fonts/Neutra2Display-Light.woff2",
-  variable: "--font-neutra-display",
-  display: "swap",
-  /* W3-FIX: CEP-заголовки ниже fold. */
-  preload: false,
-});
-
-const neutraText = localFont({
-  src: "../../public/fonts/Neutra2Text_book.woff2",
-  variable: "--font-neutra-text",
-  display: "swap",
-  /* W3-FIX: CEP-текст ниже fold. */
-  preload: false,
-});
-
-// ===== TALK OF THE TOWN (talkofthetownatlanta.com) FONTS — Cycle 30 =====
-// Reference site uses 3 Google Fonts (all weight 400):
-//   - Prata              → display serif (h1/h2, logo wordmark). Latin-only.
-//   - Nothing You Could Do → script accent (hero overlay tagline). Latin-only.
-//   - Lato               → body + nav menu. next/font Lato ships latin/latin-ext
-//                          only (no Cyrillic subset), so Russian glyphs fall back
-//                          through .tott-body's chain to Karla (full Cyrillic) —
-//                          Latin runs (logo, English accents) render in Lato.
-// Prata carries the editorial elegance of their burgundy+olive brand;
-// Nothing You Could Do delivers the handwritten script-accent wow (their
-// hero overlay "bacon & bluecheese tartlet"); Lato gives the clean nav/body.
-// Latin-only faces (Prata, Nothing You Could Do) are used for English accent
-// phrases; Russian copy falls back to Playfair (display) / Karla (body) which
-// both ship full Cyrillic coverage.
+// — Prata: display-serif hero-вордмарка (латиница).
 const prata = Prata({
   variable: "--font-prata",
   subsets: ["latin"],
   weight: ["400"],
   display: "swap",
-  /* W3-FIX: hero wordmark — preload ОСТАВЛЕН (LCP-критичный). */
+  /* hero wordmark — preload ОСТАВЛЕН (LCP-критичный). */
 });
 
-const nothingYouCouldDo = Nothing_You_Could_Do({
-  variable: "--font-nothing",
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
-  /* W3-FIX: script «food as art» на hero — preload ОСТАВЛЕН. */
-});
-
-const lato = Lato({
-  variable: "--font-lato",
-  subsets: ["latin", "latin-ext"],
-  /* W3-FIX: 300 исключён — НЕ ИСПОЛЬЗУЕТСЯ нигде (tott-body/site-header/
-     tott-cta-btn/tott-eyebrow/spiral — только 400 и 700; все прочие
-     font-weight:300 в проекте — Karla/Barlow/IBM Plex Mono/Montserrat,
-     не Lato). Без него preload-набор Lato = 4 файла (400/700 × latin/
-     latin-ext) вместо 6. Если 300 когда-нибудь понадобится — верни вес,
-     файл подтянется CSS-ом (просто без preload). */
-  weight: ["400", "700"],
-  display: "swap",
-  /* W3-FIX: eyebrow/scroll hero — preload ОСТАВЛЕН. */
-});
-
-// Marck Script — Cyrillic-capable handwritten script (task v5). Nothing You
-// Could Do (the reference site's script font) is Latin-only and CANNOT
-// render Cyrillic, so "Лучший кейтеринг Санкт-Петербурга" would fall back to
-// the browser's generic `cursive` (Comic-Sans-like) — which is why the user
-// saw "вообще никакого шрифта нету". Marck Script is a casual handwritten
-// brush script with FULL Cyrillic support, the closest visual analog to
-// Nothing You Could Do for Russian text. Used via `.tott-script-ru` helper.
+// — Marck Script: рукописный скрипт с ПОЛНОЙ кириллицей — единственный
+//   скрипт сайта (ex-Great Vibes / ex-Nothing You Could Do).
 const marck = Marck_Script({
   variable: "--font-marck",
   subsets: ["latin", "latin-ext", "cyrillic"],
   weight: ["400"],
   display: "swap",
-  /* W3-FIX: ru-скрипт акценты ниже fold. */
   preload: false,
 });
 
@@ -198,8 +111,11 @@ export const metadata: Metadata = {
     default: "nilov catering — Кейтеринг в Санкт-Петербурге от 650 ₽/чел",
     template: "%s | nilov catering",
   },
+  /* F2 (K3-MINOR): 192 → 152 симв. — ключи сохранены: «кейтеринг Санкт-Петербург",
+   * цены-ЦИ (2450/4470/900/650), телефон. Усечение хвоста «Рассчитайте стоимость
+   * онлайн за 30 секунд» — CTA-фраза дублирована в title. */
   description:
-    "«Еда как искусство» — выездной кейтеринг полного цикла в СПб. Фуршет от 2450₽, банкет от 4470₽, кофе-брейк от 900₽, обеды в офис от 650₽ за человека. Рассчитайте стоимость онлайн за 30 секунд.",
+    "Кейтеринг в Санкт-Петербурге: фуршет от 2450 ₽, банкет от 4470 ₽, кофе-брейк от 900 ₽, обед в офис от 650 ₽/чел. Смета за 30 секунд: +7 (911) 941-72-05.",
   keywords: [
     "кейтеринг",
     "кейтеринг СПб",
@@ -210,7 +126,10 @@ export const metadata: Metadata = {
     "nilov catering",
   ],
   authors: [{ name: "nilov catering" }],
-  alternates: { canonical: "/", languages: { "ru-RU": "/", "x-default": "/" } },
+  /* F2 (K3-NIT): hreflang убран — сайт одноязычный (ru), languages был
+   * объявлен только на главной (на /offer /privacy /terms его нет) —
+   * по гайдлайну одноязычному сайту hreflang не нужен. Canonical остаётся. */
+  alternates: { canonical: "/" },
   openGraph: {
     title: "nilov catering — Кейтеринг в Санкт-Петербурге",
     description:
@@ -242,6 +161,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  /* F2 (K2-MINOR): viewportFit: "cover" — оживляет уже написанные в CSS
+   * env(safe-area-inset-*) отступы (до этого без viewport-fit они были
+   * нулевыми/инертными). */
+  viewportFit: "cover",
   /* C71: унификация с manifest.json (#0A0908) и палитрой сайта —
    * light-хром = крем дизайн-системы #F7F5F5 (было #F9FAFB — чужой тон),
    * dark-хром = брендовый espresso #0A0908 (было #1F2937 — ink-серый). */
@@ -281,7 +204,10 @@ const jsonLd = {
     SOCIALS.whatsapp,
     SOCIALS.vk,
     SOCIALS.telegram,
-    SOCIALS.max,
+    /* F2 (K3-MINOR): max.ru/nilovcatering УДАЛЁН из sameAs — живой curl даёт
+     * 404, профиль не существует (мёртвая ссылка в разметке — анти-сигнал
+     * для валидаторов). Остальные 4 ссылки sameAs честные (vk/t.me/wa.me/ig
+     * отвечают 200/302). */
   ],
   /* Task 1-b: только форматы, реально представленные на сайте
    * (hacc-services: Фуршеты/Банкеты/Свадьбы/Корпоратив/Кофе-брейки/Барбекю/
@@ -320,18 +246,14 @@ const jsonLd = {
     streetAddress: "ул. Полевая-Сабировская, 45к1",
   },
   geo: { "@type": "GeoCoordinates", latitude: 59.994868, longitude: 30.275093 },
-  openingHoursSpecification: [
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-      opens: "09:00", closes: "19:00",
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Saturday"],
-      opens: "10:00", closes: "16:00",
-    },
-  ],
+  /* F2 (K3-MINOR): openingHoursSpecification УДАЛЁН — на сайте видимых
+   * часов нет («Отвечаем в любое время», заявки круглосуточно), контакт-часы
+   * удалены владельцем ещё в cycle 65. Оставалась 3-я версия правды
+   * (schema Пн–Пт 09–19 / страница / llms.txt «заявки круглосуточно)» —
+   * единственный честный источник: llms.txt. postalCode в PostalAddress
+   * НЕ добавлен: индекс 191186 в коде относится к юр-адресу (Б. Морская 18,
+   * LEGAL_INFO.legalAddress в lib/config.ts), а публичный офис —
+   * Полевая-Сабировская 45к1; подставлять чужой индекс = врать. */
   founder: { "@type": "Person", name: "Нилов Дмитрий Игоревич" },
   foundingDate: `${FOUNDED_YEAR}`,
   areaServed: [
@@ -352,12 +274,26 @@ export default function RootLayout({
     <html
       lang="ru"
       suppressHydrationWarning
-      className={`${oswald.variable} ${karla.variable} ${greatVibes.variable} ${playfair.variable} ${barlow.variable} ${poppins.variable} ${neutraDisplay.variable} ${neutraText.variable} ${prata.variable} ${nothingYouCouldDo.variable} ${lato.variable} ${marck.variable}`}
+      className={`${playfair.variable} ${barlow.variable} ${karla.variable} ${prata.variable} ${marck.variable}`}
     >
       <head>
-        {/* Preconnect hints for external domains */}
-        <link rel="preconnect" href="https://www.instagram.com" />
-        <link rel="preconnect" href="https://yandex.ru" />
+        {/* F2 (K4-MAJOR .js-gate): САМЫЙ РАННИЙ инлайн-скрипт — синхронно,
+            до отрисовки body, ставит класс `js` на <html>. Без JS класс не
+            ставится и CSS-правило `html:not(.js) [style*="opacity:0"]` в
+            globals.css раскрывает framer-инициализации (161 инлайн
+            opacity:0 в SSR-HTML — иначе no-JS посетитель видит пустую
+            страницу). С JS правило не срабатывает — ноль влияния на обычных
+            юзеров. CSP разрешает 'unsafe-inline'; расхождение className
+            при гидрации глушит suppressHydrationWarning на <html>. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
+        {/* F2 (K3-NIT): preconnect к instagram/yandex УДАЛЁН — страница не
+            тянет с них ресурсов на первом пейнте (фото/шрифты/видео —
+            self-hosted; яндекс-карта лениво грузится по скроллу уже после
+            handshake). Оставшийся preload — бейдж прелоадера. */}
         {/* Task 6-D: preloader badge must be pixel-ready within its 1.4s
             life on a cold first visit — start fetching the 41KB PNG at HTML
             parse time, before the hero media saturates the connection pool. */}
@@ -406,7 +342,10 @@ export default function RootLayout({
         <Toaster />
         <noscript>
           <div style={{ padding: '2rem', fontFamily: 'sans-serif', textAlign: 'center' }}>
-            <h1>nilov catering.</h1>
+            {/* F2 (K3-MAJOR): было <h1>nilov catering.</h1> — дубль H1 на
+                КАЖДОЙ странице (wordmark в hero — первый H1). <strong> даёт
+                тот же визуальный вес без второй H1 в семантике. */}
+            <strong>nilov catering.</strong>
             <p>Для работы сайта необходимо включить JavaScript.</p>
             <p style={{ marginTop: '1rem' }}>Позвоните: <a href={CONTACTS.phoneHref}>{CONTACTS.phone}</a></p>
           </div>

@@ -646,7 +646,12 @@ export function SiteFooter() {
 
       {/* ============ Section 5 — Копирайт ============ */}
       <div className="border-t border-cream/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-xs text-cream/50 md:flex-row md:px-8">
+        {/* F4 / K2 (контрасты): копирайт-строка была text-cream/50 на bg-ink
+            #1F2937 — 4.52:1 в srgb-миксе, но Tailwind-4 `/50` миксует в
+            oklab — на грани 4.5 (замер K2 ~4.5, риск FAIL при другом
+            смешивании). /60 = 5.83:1 — запас. Ссылки легала и так /60; ·
+            — декоративный (aria-hidden), не текст. */}
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-xs text-cream/60 md:flex-row md:px-8">
           <div className="flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-4">
             <p className="text-center md:text-left">
               {/* FIX-5 (W1-D NIT): SITE_CONFIG.brandName несёт фирменную

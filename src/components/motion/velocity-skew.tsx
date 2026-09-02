@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   motion,
   useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -54,13 +55,52 @@ const COARSE_MQ = "(pointer: coarse), (max-width: 767px)";
  * ±maxDeg / ±maxDegCoarse в движении. Экспортирован отдельно: тот же value
  * можно вплести в уже существующий style (tott-фото: y + skewY одним
  * transform-ом), не заводя лишнюю обёртку.
+ *
+ * K4 (cycle-71, F3): опция `enabled`. Потребитель (tott-parallax-band) зовёт
+ * хук безусловно (правило хуков), но на десктопе НЕ прикрепляет результат к
+ * стилям — раньше цепочка scrollY→velocity→spring всё равно молотила rAF
+ * впустую на каждый скролл. Решение — НЕ условные хуки (нельзя), а гейт
+ * ПОТОКА ДАННЫХ: скролл зеркалируется в liveScroll только при enabled=true.
+ * При enabled=false useVelocity видит покой — его собственный frame-цикл
+ * (framer useVelocity гоняет frame.update, пока velocity ≠ 0) завершается,
+ * spring не анимируется, DOM не пишется. Подписки дёшевы и живут всегда.
+ * Сигнатура ОБРАТНО СОВМЕСТИМА: вызов без опций = прежнее поведение.
+ *
+ * Пример (tott-parallax-band, десктоп-гейт — включит оркестратор):
+ *   const photoSkew = useVelocitySkewDeg(4, 3, { enabled: driftActive });
  */
+export interface VelocitySkewDegOptions {
+  /**
+   * false → цепочка «замирает»: ноль rAF-трафика, ноль DOM-записей,
+   * MotionValue остаётся валидным (вернётся к жизни при true).
+   * @default true
+   */
+  enabled?: boolean;
+}
+
 export function useVelocitySkewDeg(
   maxDeg = 4,
   maxDegCoarse = 3,
+  options?: VelocitySkewDegOptions,
 ): MotionValue<number> {
+  const enabled = options?.enabled !== false;
   const { scrollY } = useScroll();
-  const velocity = useVelocity(scrollY);
+
+  // K4-гейт: живое зеркало скролла. scrollY — синглтон страницы (useScroll
+  // без аргументов), его событие "change" синхронно отражается в liveScroll
+  // ТОЛЬКО при enabled — остальное время useVelocity питается покоем.
+  const liveScroll = useMotionValue(scrollY.get());
+  useMotionValueEvent(scrollY, "change", (latest: number) => {
+    if (enabled) liveScroll.set(latest);
+  });
+  // Реактивация после заморозки: выравниваем зеркало с реальным скроллом,
+  // иначе первый post-enable кадр посчитает ложный velocity-скачок
+  // (замороженное значение vs актуальная позиция).
+  React.useEffect(() => {
+    if (enabled) liveScroll.set(scrollY.get());
+  }, [enabled, liveScroll, scrollY]);
+
+  const velocity = useVelocity(liveScroll);
   const smooth = useSpring(velocity, SPRING);
 
   // Текущий кламп — тоже MotionValue: кламп живёт ВНУТРИ трансформера,
