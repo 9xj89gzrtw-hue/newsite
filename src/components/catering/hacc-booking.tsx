@@ -141,6 +141,24 @@
  *    по прямому запросу владельца («мало анимации»): 3 микроанимации,
  *    transform-only, ≤2% элементов, отключаются reduced-motion.
  *
+ * FIX-7 (Cycle 70, миноры волны-2 критика W2-B):
+ *  - M1: строка чека «Банкет → Полный банкет с обслуживанием» вылезала за
+ *    overflow:hidden-клип на +43px (390×844, value w 254 при строке 276) —
+ *    .hb-line__value больше не flex-shrink:0: коробка сжимается до
+ *    min-content, длинное название формата ПЕРЕНОСИТСЯ по словам и
+ *    выравнивается вправо (числа не страдают — пробелы в formatRUB
+ *    неразрывные). Шрифт не тронут.
+ *  - M2: датер калькулятора — нативный <input type="date"> заменён на
+ *    Popover + shadcn-Calendar (react-day-picker v9, ГОТОВАЯ русская локаль
+ *    из пакета «react-day-picker/locale»). Причина: Chromium раскрывает
+ *    внутренние сегменты нативного date-инпута в AX-дереве как англ.
+ *    задвоенные спин-кнопки «Month Month/Day Day/Year Year» (value 0) —
+ *    разметка сайта на них не влияет (probe на чистой странице: lang/label/
+ *    aria-label дают тот же дубль). Контракт даты НЕ меняется: value/onChange
+ *    — тот же ISO «YYYY-MM-DD», форма шлёт дату как прежде; гидратация
+ *    безопасна (контент поповера — только после открытия, триггер одинаков
+ *    на SSR/клиенте) — детали в докблоке HbDateField.
+ *
  * Контракты SPEC §2 — карта реализации:
  *  1. nuqs type/guests (parseAsString/parseAsInteger; Fix5: defaults
  *     banquet/30, guests — через локальное зеркало + debounced-коммит 500мс,
@@ -204,9 +222,12 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ru as ruDayPickerLocale } from "react-day-picker/locale";
 
 import { Magnetic } from "@/components/motion/magnetic";
 import { TiltedAccent } from "@/components/catering/tilted-accent";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useMounted } from "@/hooks/use-mounted";
 import { CONTACTS } from "@/lib/config";
 import { YANDEX_MAPS } from "@/lib/media";
@@ -358,6 +379,14 @@ function guestsLabel(n: number): string {
 /** ISO-дата «сегодня» для min у date-инпута (локальная, не UTC). */
 function todayIso(): string {
   const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+/** FIX-7: Date → «YYYY-MM-DD» (локальная, как todayIso) — язык обмена
+ *  между календарём и state `date` (контракт даты не меняется). */
+function toIsoDate(d: Date): string {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   return `${d.getFullYear()}-${mm}-${dd}`;
@@ -961,11 +990,16 @@ const LeadForm = memo(function LeadForm({
   }, []);
 
   /* --- draft save — ДЕБАУНС 300 мс (SPEC §2.6; в старом коде был каждый
-         keystroke — perf-баг). Пустая форма не пишется. --- */
+         keystroke — perf-баг). Пустая форма УДАЛЯЕТ черновик (W3-MINOR:
+         раньше пустая форма скипала запись — юзер, стёрший текст, после
+         reload получал его обратно из устаревшего draft). --- */
   useEffect(() => {
-    if (!name && !phone && !email && !preferredTime && !comment) return;
     const t = setTimeout(() => {
       try {
+        if (!name && !phone && !email && !preferredTime && !comment) {
+          window.localStorage.removeItem(DRAFT_KEY);
+          return;
+        }
         window.localStorage.setItem(
           DRAFT_KEY,
           JSON.stringify({ name, phone, email, preferredTime, comment }),
@@ -1854,6 +1888,118 @@ const UndecidedLines = memo(function UndecidedLines({
   );
 });
 
+/* ================================================== FIX-7 (W2-B M2): ДАТЕР */
+
+/**
+ * Поле даты калькулятора — Popover + shadcn-Calendar с ГОТОВОЙ русской
+ * локалью react-day-picker («react-day-picker/locale» → ru: дни «19 сентября
+ * 2026 г., суббота», стрелки «Перейти к следующему месяцу», неделя с ПН).
+ *
+ * ЗАЧЕМ ЗАМЕНА нативного <input type="date">: Chromium раскрывает ВНУТРЕННИЕ
+ * сегменты нативного поля в AX-дереве как англ. задвоенные спин-кнопки
+ * «Month Month / Day Day / Year Year» (value 0 до ввода) + кнопку
+ * «Show date picker» — на русском сайте это MINOR-дефект W2-B. Замер-проба
+ * на ЧИСТОЙ странице (tmp-fix7/date-test.html): дубль живёт в UA shadow DOM
+ * и НЕ управляется разметкой (lang="ru", <label>, aria-label — без эффекта),
+ * скрыть отдельные спин-кнопки aria-hidden невозможно. Единственный способ
+ * дать скринридеру внятные русские имена — свой пикер; react-day-picker v9
+ * уже в deps, датапикер-календарь (ui/calendar.tsx) добавлен во владение
+ * FIX-7 (используется как есть, без правок).
+ *
+ * ПОЛУЧАЕМ БОНУСОМ:
+ *  - клавиатурную навигацию сетки (стрелки/Home/End/PgUp/PgDn — RDP v9);
+ *  - фокус возвращается на триггер после выбора — SR перечитывает имя
+ *    кнопки с новой датой (петля обратной связи);
+ *  - iOS-зум-гейт снят: кнопка не триггерит авто-зум Safari (поле <16px
+ *    зумило; поле теперь 1rem, но это визуальная преемственность, не гейт).
+ *
+ * КОНТРАКТ ДАТЫ НЕ МЕНЯЕТСЯ (§34: датапикеры — источник гидрационных мин;
+ * все изменения даты проверяются сабмит-тестом):
+ *  - value/onChange — тот же ISO «YYYY-MM-DD» (state `date` родителя,
+ *    форма собирает дату из него как прежде — сообщение «Желаемая дата: …»);
+ *  - прошедшие дни disabled от minIso (minToday из эффекта: до маунта «» —
+ *    SSR/клиент идентичны, паттерн W3-FIX выше по файлу);
+ *  - дата необязательна; повторный клик по выбранному дню — сброс
+ *    (у нативного поля был крестик — семантика сохранена).
+ *
+ * ГИДРАТАЦИЯ: триггер рендерится одинаково на SSR/клиенте («Выберите дату»,
+ * min-атрибутов нет), контент поповера монтируется ТОЛЬКО при открытии
+ * (клиентское состояние open) — гидрационной поверхности нет вовсе.
+ * Имя кнопки — aria-labelledby «лейбл + значение»: видимый лейбл входит
+ * в accname (WCAG 2.5.3 Label in Name), значение даты озвучивается при
+ * каждом возврате фокуса.
+ */
+function HbDateField({
+  value,
+  minIso,
+  invalid,
+  onChange,
+}: {
+  /** ISO «YYYY-MM-DD» | "" (не выбрана). */
+  value: string;
+  /** Нижняя граница (сегодня, ISO) | "" до маунта — SSR-безопасно. */
+  minIso: string;
+  invalid?: boolean;
+  onChange: (iso: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = useMemo(
+    () => (value ? new Date(`${value}T00:00:00`) : undefined),
+    [value],
+  );
+  const minDate = useMemo(
+    () => (minIso ? new Date(`${minIso}T00:00:00`) : undefined),
+    [minIso],
+  );
+  const handleSelect = useCallback(
+    (d: Date | undefined) => {
+      onChange(d ? toIsoDate(d) : "");
+      setOpen(false);
+    },
+    [onChange],
+  );
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          id="hb-date"
+          className="hb-date__trigger"
+          aria-labelledby="hb-date-label hb-date-val"
+          /* aria-invalid НЕ вешаем: на role=button он не поддерживается
+             (jsx-a11y/role-supports-aria-props); ошибка озвучивается
+             подсказкой hb-date-err (aria-live=polite) через describedby. */
+          aria-describedby={invalid ? "hb-date-err" : undefined}
+        >
+          <CalendarDays className="hb-date__icon size-4" aria-hidden="true" />
+          <span
+            id="hb-date-val"
+            className="hb-date__val"
+            data-empty={value ? "false" : "true"}
+          >
+            {value ? formatHumanDate(value) : "Выберите дату"}
+          </span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="hb-date__pop"
+        align="start"
+        aria-label="Календарь даты события"
+      >
+        <Calendar
+          mode="single"
+          locale={ruDayPickerLocale}
+          selected={selected}
+          onSelect={handleSelect}
+          disabled={minDate ? { before: minDate } : undefined}
+          autoFocus
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 /* ============================================================ ГЛАВНЫЙ БЛОК */
 
 type Stage = "calc" | "form" | "success";
@@ -2385,20 +2531,23 @@ export function HaccBooking() {
 
             {/* 3 · Дата — необязательно */}
             <div className="hb-block" role="group" aria-label="Дата мероприятия (необязательно)">
-              <label htmlFor="hb-date" className="hb-label-caps">
+              {/* FIX-7: label остаётся настоящим <label> (клик по нему
+                  открывает пикер — htmlFor указывает на кнопку-поле),
+                  id добавлен для aria-labelledby триггера (имя кнопки =
+                  «лейбл + значение даты», WCAG 2.5.3 Label in Name). */}
+              <label htmlFor="hb-date" id="hb-date-label" className="hb-label-caps">
                 Дата события <span className="hb-label-caps__opt">— необязательно, уточним по звонку</span>
               </label>
               <div className="hb-date">
-                <CalendarDays className="hb-date__icon size-4" aria-hidden="true" />
-                <input
-                  id="hb-date"
-                  type="date"
-                  min={minToday || undefined}
+                {/* FIX-7: нативный date-инпут → HbDateField (Popover +
+                    react-day-picker, ru-локаль) — почему: докблок компонента.
+                    Контракт: value/minIso/onChange — те же ISO-строки, что
+                    были у инпута; invalid — прежняя aria-invalid-логика Q2. */}
+                <HbDateField
                   value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="hb-date__input"
-                  aria-invalid={dateInvalid ? "true" : undefined}
-                  aria-describedby={dateInvalid ? "hb-date-err" : undefined}
+                  minIso={minToday}
+                  invalid={dateInvalid}
+                  onChange={setDate}
                 />
               </div>
               {/* Q2 (task 9-fix2): прошедшая дата — инлайн-подсказка (polite). */}

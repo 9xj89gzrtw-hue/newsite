@@ -476,7 +476,15 @@
   color: var(--hb-red);
   pointer-events: none;
 }
-.hb-date__input {
+
+/* FIX-7 (W2-B M2): триггер-кнопка даты — визуальная преемственность с
+   прежним нативным инпутом (те же 48px/рамка/иконка/шрифт 1rem). Кнопка,
+   а не поле ввода: iOS Safari больше не авто-зумит при фокусе (старый
+   W2-FIX держал 16px ради этого — комментарий сохранён ниже для истории). */
+.hb-date__trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
   width: 100%;
   min-height: 48px;
   padding: 0 0.9rem 0 2.5rem;
@@ -484,13 +492,41 @@
   border-radius: 12px;
   background: #fff;
   font-family: var(--hb-body-font);
-  /* W2-FIX: 14.4 → 16px — iOS Safari не зумит страницу при фокусе
-     на поле даты (зум срабатывает при <16px на любом вьюпорте) */
+  /* преемственность W2-FIX (14.4 → 16px): полю ввода <16px iOS зумил
+     страницу; кнопке авто-зум не грозит, 1rem оставлен для визуала */
   font-size: 1rem;
+  text-align: left;
   color: var(--hb-ink);
+  cursor: pointer;
   color-scheme: light;
+  transition: border-color 0.2s ease;
 }
-.hb-date__input:hover { border-color: color-mix(in srgb, var(--hb-red) 50%, var(--hb-line)); }
+.hb-date__trigger:hover { border-color: color-mix(in srgb, var(--hb-red) 50%, var(--hb-line)); }
+.hb-date__val {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* дата не выбрана — плейсхолдер приглушён (data-empty вешает HbDateField);
+   выбранная дата красится чернилами поля */
+.hb-date__val[data-empty="true"] {
+  color: color-mix(in srgb, var(--hb-ink) 45%, transparent);
+}
+
+/* FIX-7: поповер календаря (Radix-портал). --cell-size перекрывает шадсн-овские
+   2rem → 2.5rem: тач-цели дней 40px (стандарт тач-зоны §39), ширина ~322px —
+   влезает в колонку слева на 390. На ≤360 клетка уже (35px → ширина ~296) —
+   влезает даже в 320-вьюпорт. */
+.hb-date__pop {
+  width: auto;
+  padding: 0.5rem;
+  --cell-size: 2.5rem;
+}
+@media (max-width: 374.98px) {
+  .hb-date__pop { --cell-size: 2.125rem; }
+}
 
 /* ============================================== ЗОНА ФОРМЫ (id="contact") */
 
@@ -628,7 +664,7 @@
 /* D3 (task 9-fix2): фокус полей — ink/золото (канон сайта), НЕ красный:
    красная рамка считывалась как ошибка. Красный — только для invalid (D1). */
 .hb-form .hb-input:focus,
-.hb-date__input:focus {
+.hb-date__trigger:focus {
   border-color: color-mix(in srgb, var(--hb-ink) 38%, transparent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold, #d4a373) 22%, transparent);
 }
@@ -636,12 +672,12 @@
 /* D1 (task 9-fix2): валидация перестаёт быть «немой» — поле с ошибкой
    видно и рамкой, и фоном; красный сохраняется и в фокусе. */
 .hb-form .hb-input[aria-invalid="true"],
-.hb-date__input[aria-invalid="true"] {
+.hb-date__trigger[aria-invalid="true"] {
   border-color: var(--hb-red-deep);
   background: #fff5f5;
 }
 .hb-form .hb-input[aria-invalid="true"]:focus,
-.hb-date__input[aria-invalid="true"]:focus {
+.hb-date__trigger[aria-invalid="true"]:focus {
   border-color: var(--hb-red-deep);
   background: #fff5f5;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--hb-red-deep) 16%, transparent);
@@ -901,7 +937,17 @@
 }
 .hb-line__label { color: color-mix(in srgb, var(--hb-ink) 78%, transparent); }
 .hb-line__value {
-  flex-shrink: 0;
+  /* FIX-7 (W2-B M1): значение строки больше НЕ «несжимаемое» — длинное
+     название формата («Полный банкет с обслуживанием»: w 254 при строке
+     276 на 390×844) вылезало за клип .hb-lines__clip на +43px. Коробка
+     сжимается до min-content, текст переносится ПО СЛОВАМ (обрезка
+     посреди названия формата хуже), двухстрочное значение выравнивается
+     ВПРАВО — колонка значений чека остаётся правой. Числа не страдают:
+     пробелы в formatRUB неразрывные — min-content = вся сумма, перенос
+     невозможен. Шрифт/вес не тронуты. */
+  flex-shrink: 1;
+  min-width: 0;
+  text-align: right;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -1635,7 +1681,7 @@
 
 /* ================================================== A11Y / MOTION */
 
-.hbooking :is(.hb-btn, .hb-type, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-consent__link, .hb-date__input, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input):focus-visible {
+.hbooking :is(.hb-btn, .hb-type, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-consent__link, .hb-date__trigger, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input):focus-visible {
   outline: 2px solid var(--gold, #d4a373);
   outline-offset: 2px;
 }
