@@ -2930,3 +2930,73 @@ C71-FIX (audit A1 MINOR): гейт `pointer:coarse || width<768 → IO не
 - Коммит: d4b133a (+ docs c74x ниже); PM2 interfood-catering-dev:3001.
 - Харнессы: research/c73-cursor-{verify,verify2,verify3,final}.mjs
   (локально, вне git по конвенции §Cycle-32).
+
+---
+Task ID: C74
+Agent: main
+Task: «посмотри в вебе какие еще классные эффекты анимации и интерактива можно добавить, актуальные на сентябрь 2026, добавь лучшие решения»
+
+## Web-ресёрч (источники решений)
+- Josh Comeau «Scroll-Driven Animations» (28.04.2026) — Animation Timeline API без JS
+- carmenansio.com/lab/variable-font-scroll (17.04.2026) — animation-timeline гонит wght
+- Orpetron «Cutting-Edge Microinteractions» (25.07.2026) — 10 призовых: Liquid,
+  variable weight previews (Casa di Solare), flashlight, Matter.js-физика
+- 3D/WebGL/геймификация отброшены: не премиальный кейтеринг (restraint)
+
+## Что добавлено (3 эффекта, все — нативные тренды 2026, без дублей)
+1. **E1 ScrollProgress** — полоса прогресса чтения, ЧИСТЫЙ CSS
+   `animation-timeline: scroll(root)`: ноль JS-кадров, работает и на touch.
+   Деградации: @supports not → display:none; reduced-motion; print.
+2. **E2 kinetic-h2** — кинетическая типографика: Playfair Display
+   `weight: "variable"` (VF 400 900) + `font-variation-settings:'wght'`
+   400→700 по `view()` (entry 10% → cover 32%). Входит лёгким — оседает
+   насыщенным. Применена к «Всё начинается с рук.» (#about) и «Что важно
+   знать.» (FAQ). Firefox (без animation-timeline) → статика 400.
+3. **E3 «фонарик»** — точечная сетка (26px) + курсорное свечение 600×600
+   (gold 15% → cream 7%, blend screen) в секции #about. transform-only
+   трекинг в pointermove (§44 — синхронно с курсором, ноль отставания),
+   точки красятся один раз. Fine pointer only: CSS + JS двойной гвард.
+
+## Ключевой замер (§43)
+- **Шрифты: сеть ИДЕНТИЧНА до/после** — 18 файлов, 331 856 Б. Google и для
+  статик-запросов next/font отдавал VF-файлы; переключение на "variable"
+  схлопывает 33 @font-face → 9 и объявляет ось 400 900 (чистая
+  интерполяция wght). Нулевая цена за kinetic-эффект.
+- E2 перф: перерастровка ОДНОЙ строки h2 только в entry-окне; вне окна
+  кадров нет (прогресс-таймлайн «стоит»).
+
+## Верификация (Playwright fine-pointer 1440×900 + iPhone 14)
+- E1: scaleX 0.000 → 0.528 → 1.000 по скроллу (десктоп), 0.524 (мобайл).
+- E2: efs-h2 wght 544.9 (промежуточный, entry) → 700 (cover); FAQ класс
+  активен, база 400. Мобайл: 570 → 700 (touch-скролл тоже гонит VF).
+- E3: display:block; transform x=685.0 y=548.9 СТРОГО = ожидание от rect;
+  opacity 1 при входе, 0 на pointerleave; мобайл: display:none.
+- Hero-tabu §42: `#hero a,button` = 0. Регресс-чек C73: body без
+  catering-cursor на таче.
+- Пиксельная проверка полосы: y=1 → rgb(211,163,115) на x=72…600 (gold),
+  за x=643 → фон. VLM проглядел 2px-линию (норма для VLM), пиксели её
+  подтверждают; VLM подтвердил фонарик («мягкое золотистое свечение +
+  точечная сетка») и насыщенный bold заголовок (wght 700 осел).
+- lint 0, tsc 0, консоль 0 ошибок (десктоп + мобайл).
+
+## Грабли, пойманные в этом цикле
+- **scroll-progress.tsx импортировал "./c74-kinetic.css"** из catering/
+  (файл лежит в motion/) → Module not found, 500. Лечится правильным
+  алиасом `@/components/motion/…`.
+- **next/font TS-тип Playfair_Display**: диапазонной строки "400..700"
+  в типе НЕТ — есть литерал "variable" (union в index.d.ts). weight
+  "variable" = VF со всей осью 400 900.
+- **VLM слеп к 2px-линиям**: полоса «не видна» по VLM при идеальных
+  computed-стилях. Тонкие элементы обязаны проверяться ПИКСЕЛЬНО
+  (screenshot → getImageData), VLM — только для крупных сцен.
+- **Прелоадер блокирует scrollTo**: скриншот «полоса невидима» был снят
+  в окне прелоадера (scroll заперт). Ждать завершения intro перед
+  программным скроллом (или поллить scrollY).
+- **Lenis НЕ перетаскивает программный скролл** (замер: scrollY стабилен
+  7114→7114 6 семплов) — но позицию для клика/ховера всё равно считать
+  от ФАКТИЧЕСКОГО getBoundingClientRect, не от запрошенного скролла.
+
+## Артефакты
+- Коммит: feat(c74) — 6 файлов (+274/−3); PM2 interfood-catering-dev:3001 online.
+- Харнессы: research/c74-{verify,mobile}.mjs, скрины c74-vlm-*.png
+  (локально, вне git по конвенции).
