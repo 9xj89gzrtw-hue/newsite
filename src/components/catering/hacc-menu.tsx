@@ -826,6 +826,9 @@ function MenuRack({
                 }}
                 id={spineId(k)}
                 data-spine-index={k}
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights);
+                    transition корешка — width (transform свободен). */
+                data-press
                 /* W2-FIX (ВАУ-фича курсора): на каждом корешке каталога —
                    превью-фото выбранного пакета (120px карточка у курсора,
                    cursor.tsx читает data-cursor-image с ближайшего

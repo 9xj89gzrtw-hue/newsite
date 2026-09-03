@@ -738,6 +738,10 @@ export function EaFounderStory() {
                   e.preventDefault();
                   scrollToMenu();
                 }}
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights).
+                    motion-обёртка анимирует РОДИТЕЛЯ (fadeUp) — сам <a>
+                    без inline-трансформа, конфликтов нет. */
+                data-press
                 className="ea-text-link"
               >
                 Смотреть меню

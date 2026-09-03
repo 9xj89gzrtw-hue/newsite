@@ -519,6 +519,8 @@ export function EventsVideoCarousel() {
               <button
                 type="button"
                 className="ea-evt-video__play"
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+                data-press
                 onClick={(e) => openModal(i, e.currentTarget)}
                 aria-label={`Открыть видео: ${tile.title}`}
               >
@@ -561,6 +563,8 @@ export function EventsVideoCarousel() {
           <button
             type="button"
             className="ea-evt-video__nav-btn"
+            /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+            data-press
             onClick={() => {
               const scroller = scrollerRef.current;
               if (!scroller) return;
@@ -577,6 +581,8 @@ export function EventsVideoCarousel() {
           <button
             type="button"
             className="ea-evt-video__nav-btn"
+            /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+            data-press
             onClick={() => {
               const scroller = scrollerRef.current;
               if (!scroller) return;
@@ -607,6 +613,8 @@ export function EventsVideoCarousel() {
             ref={closeRef}
             type="button"
             className="ea-evt-video__close"
+            /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+            data-press
             onClick={closeModal}
             aria-label="Закрыть видео"
           >

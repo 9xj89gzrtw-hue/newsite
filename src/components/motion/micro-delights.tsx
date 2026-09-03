@@ -31,10 +31,29 @@ import "./micro-delights.css";
  *   a[data-wiggle]      CSS-only (в micro-delights.css): wiggle-анимация
  *                       0.55s на hover — соцкнопки футера.
  *
+ * C79 «Mobile Motion» — touch-эквиваленты всего hover-выше (задача
+ * владельца: «в мобильной версии очень мало анимации»):
+ *
+ *   [data-press] и      touch-pointerdown → WAAPI-нажатие scale(0.94)
+ *   [data-spark]        за 150мс (fill forwards); pointerup → пружина
+ *                       0.94→1.03→1 (340мс, без fill — возврат к нативу).
+ *                       Скольжение пальца >12px (скролл/драг марке) —
+ *                       мгновенная отмена (возврат 200мс). Анимирует
+ *                       transform САМОГО элемента (WAAPI сильнее inline —
+ *                       конфликта с framer/Tailwind-transition нет, т.к.
+ *                       transition на transform не объявляем вовсе).
+ *   [data-spark]+
+ *   лонг-пресс 430мс    «золотой выдох»: усиленный всплеск искр ×1.6 +
+ *                       расширяющееся кольцо 56px + пульс фото
+ *                       scale 1→1.045→1 + navigator.vibrate(12) (Android).
+ *                       Клик ПОСЛЕ выдоха гасится (capture, once, 600мс
+ *                       страховка) — палец ушёл с ссылки без перехода.
+ *
  * ==========================================================================
  * PERF (§43, числа — по построению, проверено dev.log/agent-browser):
- *   - 2 пассивных document-слушателя (pointerdown + pointerover) ПОСТОЯННО;
- *     pointermove — ТОЛЬКО пока активен tilt (guard-выход первым кадром);
+ *   - 3 пассивных document-слушателя (pointerdown + pointerover +
+ *     pointerout) ПОСТОЯННО; pointermove/pointerup/pointercancel — ТОЛЬКО
+ *     пока активен tilt ИЛИ нажатие (снимаются первым же освобождением);
  *     ноль rAF-циклов в покое.
  *   - getBoundingClientRect: ≤1/кадр и только во время tilt (паттерн
  *     CustomCursor); на spark/egg — ≤1 на событие.
@@ -60,6 +79,20 @@ const EGG_WINDOW_MS = 1600;
 /** Максимальный наклон tilt, градусы. */
 const TILT_MAX_DEG = 5;
 
+/* ══ C79: touch-нажатие / лонг-пресс ═══════════════════════════════════ */
+/** Нажатие: время прижатия и масштаб. */
+const PRESS_DOWN_MS = 150;
+const PRESS_SCALE = 0.94;
+/** Освобождение: пружина возврата с лёгким overshoot. */
+const PRESS_UP_MS = 340;
+/** Отмена (скролл/драг): быстрый возврат. */
+const PRESS_CANCEL_MS = 200;
+/** Лонг-пресс: порог удержания и радиус срыва пальцем. */
+const HOLD_MS = 430;
+const HOLD_MOVE_PX = 12;
+/** Усиление искр лонг-пресса (×1.6 — частицы/радиус/длительность). */
+const HOLD_SPARK_BOOST = 1.6;
+
 export function MicroDelights() {
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -74,7 +107,7 @@ export function MicroDelights() {
     /* ── spark: двойной тап → всплеск искр ─────────────────────────── */
     let lastTap = { x: -999, y: -999, t: -Infinity };
 
-    const sparkBurst = (x: number, y: number) => {
+    const sparkBurst = (x: number, y: number, boost = 1) => {
       if (reduceMq.matches) return;
       const holder = document.createElement("div");
       holder.className = "micro-spark-holder";
@@ -82,16 +115,16 @@ export function MicroDelights() {
       holder.style.left = `${x}px`;
       holder.style.top = `${y}px`;
 
-      const count = window.innerWidth < 768 ? 9 : 13;
+      const count = Math.round((window.innerWidth < 768 ? 9 : 13) * boost);
       for (let i = 0; i < count; i++) {
         const s = document.createElement("span");
         s.className = i % 3 === 2 ? "micro-spark micro-spark--dot" : "micro-spark";
         const ang = (i / count) * Math.PI * 2 + Math.random() * 0.7;
-        const dist = 24 + Math.random() * 46;
+        const dist = (24 + Math.random() * 46) * boost;
         const dx = Math.cos(ang) * dist;
-        const dy = Math.sin(ang) * dist - 14; // лёгкий восходящий бейс
+        const dy = Math.sin(ang) * dist - 14 * boost; // лёгкий восходящий бейс
         const scale = 0.55 + Math.random() * 0.75;
-        const dur = 460 + Math.random() * 280;
+        const dur = (460 + Math.random() * 280) * Math.min(boost, 1.25);
         s.animate(
           [
             {
@@ -117,7 +150,7 @@ export function MicroDelights() {
         holder.appendChild(s);
       }
       document.body.appendChild(holder);
-      window.setTimeout(() => holder.remove(), 950);
+      window.setTimeout(() => holder.remove(), 950 * Math.min(boost, 1.25));
     };
 
     /* ── egg: счётчик тапов на элемент (WeakMap — не течёт) ────────── */
@@ -216,6 +249,142 @@ export function MicroDelights() {
       }, 620);
     };
 
+    /* ── C79: touch-нажатие + лонг-пресс ─────────────────────────────────
+     * Слушатели pointermove/up/cancel живут ТОЛЬКО пока палец прижат
+     * (паттерн tilt: снятие первым же освобождением). В покое — их нет.
+     * pressAnim без fill на возврате: после завершения элемент возвращается
+     * к нативному inline/каскадному transform — WAAPI-слой исчезает сам. */
+    let pressEl: HTMLElement | null = null;
+    let pressAnim: Animation | null = null;
+    let pressStartX = 0;
+    let pressStartY = 0;
+    let holdTimer = 0;
+    let holdFired = false;
+
+    const detachPressListeners = () => {
+      document.removeEventListener("pointermove", onPressMove);
+      document.removeEventListener("pointerup", onPressUp);
+      document.removeEventListener("pointercancel", onPressCancel);
+    };
+
+    const stopHoldTimer = () => {
+      if (holdTimer) {
+        window.clearTimeout(holdTimer);
+        holdTimer = 0;
+      }
+    };
+
+    /** Клик после выдоха: палец держали 430мс+ и отпустили на ссылке —
+     * переход был бы случайным. Гасим capture-фазой (once) + страховка
+     * 600мс на случай, когда клика вовсе не последовало. */
+    const suppressClickAfterHold = (el: HTMLElement) => {
+      const onClick = (ev: MouseEvent) => {
+        const t = ev.target as Node | null;
+        if (t && (t === el || el.contains(t))) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        }
+      };
+      document.addEventListener("click", onClick, { capture: true, once: true });
+      window.setTimeout(
+        () => document.removeEventListener("click", onClick, { capture: true }),
+        600,
+      );
+    };
+
+    /** Лонг-пресс по [data-spark] — «золотой выдох». */
+    const fireHoldBurst = (el: HTMLElement, x: number, y: number) => {
+      sparkBurst(x, y, HOLD_SPARK_BOOST);
+      const ring = document.createElement("div");
+      ring.className = "micro-press-ring";
+      ring.setAttribute("aria-hidden", "true");
+      ring.style.left = `${x}px`;
+      ring.style.top = `${y}px`;
+      ring.animate(
+        [
+          { transform: "translate(-50%, -50%) scale(0.35)", opacity: 0.95 },
+          { transform: "translate(-50%, -50%) scale(2.3)", opacity: 0 },
+        ],
+        { duration: 640, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" },
+      );
+      document.body.appendChild(ring);
+      window.setTimeout(() => ring.remove(), 700);
+      // Пульс самого фото — собственный transform (у [data-spark] его нет).
+      el.animate?.(
+        [
+          { transform: "scale(1)" },
+          { transform: "scale(1.045)", offset: 0.4 },
+          { transform: "scale(1)" },
+        ],
+        { duration: 620, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+      );
+      // Тактильный отклик — только Android (iOS Safari API не имеет).
+      try {
+        navigator.vibrate?.(12);
+      } catch {
+        /* noop */
+      }
+    };
+
+    const onPressMove = (e: PointerEvent) => {
+      if (!pressEl) return;
+      if (
+        Math.hypot(e.clientX - pressStartX, e.clientY - pressStartY) > HOLD_MOVE_PX
+      ) {
+        cancelPress();
+      }
+    };
+
+    const onPressUp = () => {
+      stopHoldTimer();
+      detachPressListeners();
+      if (!pressEl) return;
+      const el = pressEl;
+      pressEl = null;
+      pressAnim?.cancel();
+      pressAnim = el.animate(
+        [
+          { transform: `scale(${PRESS_SCALE})` },
+          { transform: "scale(1.032)", offset: 0.55 },
+          { transform: "scale(1)" },
+        ],
+        { duration: PRESS_UP_MS, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+      );
+      if (holdFired) {
+        holdFired = false;
+        suppressClickAfterHold(el);
+      }
+    };
+
+    const onPressCancel = () => cancelPress();
+
+    function cancelPress() {
+      stopHoldTimer();
+      detachPressListeners();
+      holdFired = false;
+      if (!pressEl) return;
+      const el = pressEl;
+      pressEl = null;
+      pressAnim?.cancel();
+      // Срыв (скролл/драг) — быстрый честный возврат без overshoot.
+      pressAnim = el.animate(
+        [
+          { transform: `scale(${PRESS_SCALE})` },
+          { transform: "scale(1)" },
+        ],
+        { duration: PRESS_CANCEL_MS, easing: "ease-out" },
+      );
+    }
+
+    const startHold = (el: HTMLElement, x: number, y: number) => {
+      holdFired = false;
+      holdTimer = window.setTimeout(() => {
+        holdTimer = 0;
+        holdFired = true;
+        fireHoldBurst(el, x, y);
+      }, HOLD_MS);
+    };
+
     /* ── делегирование: один pointerdown + один pointerover ────────── */
     const onPointerDown = (e: PointerEvent) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
@@ -233,6 +402,35 @@ export function MicroDelights() {
           Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) <= SPARK_RADIUS_PX;
         lastTap = { x: e.clientX, y: e.clientY, t: now };
         if (near) sparkBurst(e.clientX, e.clientY);
+      }
+
+      /* C79: touch-нажатие — [data-press] (кнопки/ссылки) и [data-spark]
+       * (фото: нажатие + кандидат на лонг-пресс-выдох). */
+      if (e.pointerType === "touch" && !reduceMq.matches) {
+        const pressTarget = target.closest<HTMLElement>("[data-press], [data-spark]");
+        if (pressTarget) {
+          pressEl = pressTarget;
+          pressStartX = e.clientX;
+          pressStartY = e.clientY;
+          pressAnim?.cancel();
+          pressAnim = pressTarget.animate(
+            [
+              { transform: "scale(1)" },
+              { transform: `scale(${PRESS_SCALE})` },
+            ],
+            {
+              duration: PRESS_DOWN_MS,
+              easing: "cubic-bezier(0.3, 0.9, 0.4, 1)",
+              fill: "forwards",
+            },
+          );
+          if (pressTarget.hasAttribute("data-spark")) {
+            startHold(pressTarget, e.clientX, e.clientY);
+          }
+          document.addEventListener("pointermove", onPressMove, { passive: true });
+          document.addEventListener("pointerup", onPressUp, { passive: true });
+          document.addEventListener("pointercancel", onPressCancel, { passive: true });
+        }
       }
     };
 
@@ -260,6 +458,9 @@ export function MicroDelights() {
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("pointerover", onPointerOver);
       document.removeEventListener("pointerout", onPointerOut);
+      stopHoldTimer();
+      detachPressListeners();
+      pressAnim?.cancel();
       endTilt();
     };
   }, []);

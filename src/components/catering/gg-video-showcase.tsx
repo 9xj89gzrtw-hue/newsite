@@ -293,6 +293,8 @@ export function GgVideoShowcase() {
               <a
                 key={cta.href}
                 href={cta.href}
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+                data-press
                 className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-white/80 px-6 py-3 text-center text-white transition-colors duration-300 hover:bg-white hover:text-black"
                 style={{
                   fontFamily: "var(--ea-font-eyebrow)",
@@ -318,6 +320,10 @@ export function GgVideoShowcase() {
         <button
           type="button"
           onClick={togglePlay}
+          /* C79: тач-нажатие — WAAPI-пружина (MicroDelights); Tailwind v4
+              центрует через свойство translate — с transform-scale
+              WAAPI композиционится без прыжка. */
+          data-press
           aria-pressed={expanded}
           aria-label={
             expanded

@@ -96,6 +96,49 @@ a[data-wiggle]:hover {
   transform: scale(1.05) rotate(-0.75deg);
 }
 
+/* ═════════════════════════════════════════════════════════════════════════
+   C79 «Mobile Motion» — touch-эквиваленты hover-эффектов (задача владельца:
+   «в мобильной версии очень мало анимации»).
+   JS-логика — micro-delights.tsx: [data-press]/[data-spark] WAAPI-нажим
+   (scale 0.94 за 150мс, пружина возврата 340мс) и лонг-пресс 430мс по
+   [data-spark] → «золотой выдох». CSS здесь — только не-transform-опора:
+   гашение iOS-каллаута (иначе системное меню съедает момент лонг-пресса)
+   и золотая вспышка тапа (Android честно красит -webkit-tap-highlight).
+   Никаких transition на transform — нажатие ведёт WAAPI из JS (нулевые
+   конфликты с framer/Tailwind-transition на тех же элементах). */
+@media (pointer: coarse) {
+  [data-spark] {
+    -webkit-touch-callout: none; /* iOS: превью-меню на ~500мс гасит сюрприз */
+    -webkit-user-select: none; /* декоративные фото — выделение не нужно */
+    user-select: none;
+  }
+  [data-press] {
+    -webkit-tap-highlight-color: rgba(201, 162, 39, 0.16);
+  }
+}
+
+/* Кольцо лонг-пресса — точка-холдер как у искр (частица ::before 56px);
+   расширение 0.35→2.3 и растворение анимируются WAAPI из JS. */
+.micro-press-ring {
+  position: fixed;
+  z-index: 9990; /* паритет канваса конфетти/искр */
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.micro-press-ring::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: -28px;
+  width: 56px;
+  height: 56px;
+  border: 2px solid rgba(201, 162, 39, 0.9);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(245, 230, 184, 0.25);
+}
+
 /* ── Гейты reduced-motion ─────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   a[data-wiggle]:hover {
@@ -110,4 +153,6 @@ a[data-wiggle]:hover {
   .micro-glare {
     transition: none;
   }
+  /* C79: каллаут/выделение фото — не движение, остаются (честные тапы);
+     нажатие/выдох гейтит JS. */
 }

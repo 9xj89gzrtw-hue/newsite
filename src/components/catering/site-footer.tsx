@@ -544,8 +544,10 @@ export function SiteFooter() {
                 rel="noopener noreferrer"
                 aria-label="nilov catering в ВКонтакте (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover (micro-delights.css, reduce → none). */
+                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
+                    (MicroDelights, reduce → none). */
                 data-wiggle
+                data-press
               >
                 <span className="font-display text-xs font-bold uppercase text-cream">VK</span>
               </a>
@@ -555,8 +557,10 @@ export function SiteFooter() {
                 rel="noopener noreferrer"
                 aria-label="nilov catering в MAX (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover (micro-delights.css, reduce → none). */
+                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
+                    (MicroDelights, reduce → none). */
                 data-wiggle
+                data-press
               >
                 <span className="font-display text-xs font-bold uppercase text-cream">MAX</span>
               </a>
@@ -566,8 +570,10 @@ export function SiteFooter() {
                 rel="noopener noreferrer"
                 aria-label="nilov catering в Instagram (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover (micro-delights.css, reduce → none). */
+                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
+                    (MicroDelights, reduce → none). */
                 data-wiggle
+                data-press
               >
                 <Instagram className="size-5 text-cream" aria-hidden="true" />
               </a>
@@ -577,8 +583,10 @@ export function SiteFooter() {
                 rel="noopener noreferrer"
                 aria-label="nilov catering в Telegram (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover (micro-delights.css, reduce → none). */
+                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
+                    (MicroDelights, reduce → none). */
                 data-wiggle
+                data-press
               >
                 <Send className="size-5 text-cream" aria-hidden="true" />
               </a>
@@ -588,8 +596,10 @@ export function SiteFooter() {
                 rel="noopener noreferrer"
                 aria-label="Написать в WhatsApp (открывается в новой вкладке)"
                 className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover (micro-delights.css, reduce → none). */
+                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
+                    (MicroDelights, reduce → none). */
                 data-wiggle
+                data-press
               >
                 <MessageCircle className="size-5 text-cream" aria-hidden="true" />
               </a>

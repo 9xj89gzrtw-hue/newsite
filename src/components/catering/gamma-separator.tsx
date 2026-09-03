@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 import { VelocitySkew } from "@/components/motion/velocity-skew";
+import { SdZoomFallback } from "@/components/motion/sd-zoom-fallback";
 
 /**
  * GammaSeparator — Cycle 31 (gammacatering.com signature full-bleed separator)
@@ -37,6 +38,10 @@ import { VelocitySkew } from "@/components/motion/velocity-skew";
  *    браузеры без поддержки и reduce-юзеры видят статичное фото). Фото —
  *    чистый CSS-слой (framer анимирует только предка-обёртку), конфликтов
  *    WAAPI/JS нет.
+ *  - C79: iOS Safari ≤18 / Firefox не умеют animation-timeline: view() —
+ *    для них zoom ведёт SdZoomFallback (клиентский остров вокруг <Image>,
+ *    те же 1.08→1.0 entry, rAF+IO; поддерживающие браузеры уходят на
+ *    CSS.supports-гейте — двойной анимации нет).
  *
  * Cycle 34 WOW graft (sondaven.com):
  *  - `data-theme-flip="espresso"` flips the html root `--background` to night
@@ -97,17 +102,22 @@ export function GammaSeparator() {
           className="relative w-full"
           style={{ height: SEPARATOR_HEIGHT }}
         >
-          <Image
-            src="/media/gamma/gamma-catering-separator.jpg"
-            alt=""
-            fill
-            sizes="100vw"
-            priority={false}
-            className="gamma-separator__img object-cover"
-            /* C71: CSS scroll-driven zoom (entry-диапазон), @supports-гейт в
-               globals.css; статика без поддержки/reduce */
-            data-sd-zoom
-          />
+          {/* C79: SdZoomFallback — размерная обёртка (absolute inset-0)
+              для fill-<Image> + JS-zoom для браузеров без view(). */}
+          <SdZoomFallback>
+            <Image
+              src="/media/gamma/gamma-catering-separator.jpg"
+              alt=""
+              fill
+              sizes="100vw"
+              priority={false}
+              className="gamma-separator__img object-cover"
+              /* C71: CSS scroll-driven zoom (entry-диапазон), @supports-гейт в
+                 globals.css; статика без поддержки/reduce. C79: без поддержки —
+                 JS-фоллбек в SdZoomFallback пишет тот же transform. */
+              data-sd-zoom
+            />
+          </SdZoomFallback>
           {/* Subtle left/right darkening — depth + legible accent backdrop. */}
           <div
             className="gamma-separator__overlay"

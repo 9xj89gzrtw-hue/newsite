@@ -292,6 +292,9 @@ export function EaFaqAccordion() {
                   initial="rest"
                   animate="rest"
                   whileHover={reduce ? undefined : "hover"}
+                  /* C79: тач-нажатие — whileTap (framer-натив, паритет
+                     hover-варианта; reduce → undefined). */
+                  whileTap={reduce ? undefined : { scale: 0.985 }}
                   style={{
                     display: "flex",
                     alignItems: "center",

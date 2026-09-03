@@ -1575,7 +1575,13 @@ function SuccessPanel({
 
         <div className="hb-success__meta">{metaLine}</div>
 
-        <button type="button" onClick={onReset} className="hb-btn hb-btn--ghost min-h-[44px]">
+        <button
+          type="button"
+          onClick={onReset}
+          /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+          data-press
+          className="hb-btn hb-btn--ghost min-h-[44px]"
+        >
           Отправить ещё одну заявку
         </button>
       </div>
@@ -1660,7 +1666,13 @@ function StickyBar({
           {guests} {guestsLabel(guests)}
         </span>
       </p>
-      <button type="button" onClick={onCta} className="hb-bar__cta">
+      <button
+        type="button"
+        onClick={onCta}
+        /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+        data-press
+        className="hb-bar__cta"
+      >
         Оставить заявку
       </button>
     </div>

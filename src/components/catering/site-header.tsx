@@ -112,6 +112,63 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // C79 «Mobile Motion»: hfx-rise (entrance контента шапки) — чистый CSS
+  // scroll-driven (animation-timeline: view(), site-header.css). Chromium и
+  // Safari 26+ его играют; iOS Safari ≤18 и Firefox — НЕТ: @supports не
+  // сработал → шапка появляется статично, на мобильной половине трафика
+  // входа шапки просто нет. JS-фоллбек для НЕ-поддерживающих: те же кейсы,
+  // что hfx-rise (opacity 0→1, y 14→0), WAAPI, один раз, когда шапка
+  // входит в верхние 65% вьюпорта (IO rootMargin -35%). Анимации создаются
+  // в паузе на 0-м кейфрейме (fill backwards) — стартового «мига» нет; по
+  // завершении cancel() (инлайн-слой снимается, элемент возвращается к
+  // каскаду). reduce-motion — статика, как и CSS-ветка.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Поддерживающие view() — CSS уже ведёт; не дублируем.
+    if (window.CSS?.supports?.("animation-timeline: view()")) return;
+    const header = headerRef.current;
+    if (!header) return;
+    const rows = Array.from(header.querySelectorAll<HTMLElement>(".hfx-row"));
+    if (rows.length === 0) return;
+    const anims = rows.map((row, i) =>
+      row.animate(
+        [
+          { opacity: 0, transform: "translateY(14px)" },
+          { opacity: 1, transform: "translateY(0)" },
+        ],
+        {
+          duration: 640,
+          delay: i * 90,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          fill: "backwards",
+        },
+      ),
+    );
+    anims.forEach((a) => a.pause());
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((en) => en.isIntersecting)) return;
+        io.disconnect();
+        for (const a of anims) {
+          a.play();
+          a.onfinish = () => a.cancel();
+          a.oncancel = null;
+          // страховка: фоновая вкладка (WAAPI стоит) — снимаем слой таймером
+          window.setTimeout(() => {
+            if (a.playState !== "finished") a.cancel();
+          }, 640 + 90 * anims.length + 200);
+        }
+      },
+      { rootMargin: "0px 0px -35% 0px" },
+    );
+    io.observe(header);
+    return () => {
+      io.disconnect();
+      anims.forEach((a) => a.cancel());
+    };
+  }, []);
+
   // FX5 v2 (CX4, wave C): dark-section watcher. Trigger = band-midpoint
   // coverage: dark iff a dark section's rect covers the header band's
   // vertical midpoint. rAF-throttled scroll handler; document offsets cached
@@ -463,6 +520,8 @@ export function SiteHeader() {
                 снизу + инверсия текста; схемы — через [data-header-scheme]). */}
             <a
               href="#contact"
+              /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+              data-press
               className={`hcta-btn tott-body hidden min-h-[44px] items-center justify-center border-2 bg-transparent px-5 text-[13px] font-700 uppercase tracking-[0.08em] sm:inline-flex ${
                 dark ? "border-[#F7F5F5]/80 text-[#F7F5F5]" : "border-black text-black"
               }`}
@@ -474,6 +533,8 @@ export function SiteHeader() {
             {/* Mobile: phone icon only */}
             <a
               href={CONTACTS.phoneHref}
+              /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+              data-press
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors sm:hidden ${
                 dark ? "text-[#F7F5F5]" : "text-tott-burgundy"
               }`}
@@ -485,6 +546,8 @@ export function SiteHeader() {
             <button
               ref={triggerRef}
               onClick={() => setOpen(true)}
+              /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+              data-press
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors lg:hidden ${
                 dark ? "text-[#F7F5F5]" : "text-ink"
               }`}
@@ -542,6 +605,8 @@ export function SiteHeader() {
               <button
                 ref={closeBtnRef}
                 onClick={() => setOpen(false)}
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+                data-press
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center p-3 text-ink"
                 aria-label="Закрыть меню"
               >
@@ -561,6 +626,10 @@ export function SiteHeader() {
                     closeAndNavigate(n.href);
                   }}
                   className="tott-body group py-4 min-h-[44px] flex items-center justify-between border-b border-border-line/50 text-2xl font-700 text-ink transition-colors hover:text-tott-burgundy"
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights).
+                    WAAPI-слой сильнее inline-трансформа framer, но живёт
+                    только 340мс — с x-слайдом входа не пересекается. */
+                data-press
                   style={{ fontWeight: 700 }}
                   initial={{ opacity: 0, x: -30 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -601,6 +670,8 @@ export function SiteHeader() {
                   e.preventDefault();
                   closeAndNavigate("#calculator");
                 }}
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+                data-press
                 className="tott-body flex min-h-[48px] w-full items-center justify-center border-2 border-black bg-transparent px-5 py-3 text-[15px] font-700 uppercase tracking-[0.08em] text-black transition-colors duration-300 hover:bg-black hover:text-white"
                 style={{ fontWeight: 700, borderRadius: 0 }}
                 aria-label="Оставить заявку — к калькулятору стоимости"
