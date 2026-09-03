@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
 import { CONTACTS } from "@/lib/media";
+import { HoverScramble } from "@/components/motion/hover-scramble";
 import "./site-header.css"; /* C77: kinetic-header эффекты (см. докблок css) */
 
 /**
@@ -387,6 +388,7 @@ export function SiteHeader() {
             aria-label="nilov catering — главная"
           >
             <motion.span
+              data-egg="confetti"
               className={`relative flex size-10 lg:size-9 shrink-0 items-center justify-center rounded-full transition-shadow duration-300 ${
                 dark ? "ring-1 ring-gold/60" : ""
               }`}
@@ -410,7 +412,10 @@ export function SiteHeader() {
             </span>
           </a>
 
-          {/* Nav CENTER — 5 items in Lato (hidden on mobile). */}
+          {/* Nav CENTER — 5 items in Lato (hidden on mobile).
+              C78: на pointerenter лейбл «декодируется» (HoverScramble,
+              кириллический шум, ширина локализуется). Итоговый текст живёт
+              в aria-label ссылки — скрамбл декоративен (§1 a11y). */}
           <nav
             className="hidden lg:flex items-center gap-8"
             aria-label="Основная навигация"
@@ -419,13 +424,14 @@ export function SiteHeader() {
               <a
                 key={n.label}
                 href={n.href}
+                aria-label={n.label}
                 className={`hnav-link tott-body min-h-[44px] flex items-center text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 ${
                   // FX5: burgundy hover dies on ink (≈1.6:1) — gold in dark.
                   dark ? "hover:text-[#D4A373]" : "hover:text-tott-burgundy"
                 }`}
                 style={{ fontWeight: 700 }}
               >
-                {n.label}
+                <HoverScramble text={n.label} />
               </a>
             ))}
           </nav>

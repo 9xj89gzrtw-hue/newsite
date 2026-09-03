@@ -500,6 +500,10 @@ export function EaFounderStory() {
               ref={portraitRef}
               className="efs__portrait-pos"
               style={settled ? { y: portraitY } : undefined}
+              /* C78: двойной тап по портрету — золотые искры
+                  (MicroDelights, декоративный data-атрибут — transform
+                  портрета не трогает). */
+              data-spark
             >
               {/* Вход портрета: clip inset(100%→0) снизу-вверх + inner zoom
                   1.12→1.0. §34 паттерн: initial + animate по useInView

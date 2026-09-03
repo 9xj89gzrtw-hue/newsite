@@ -4008,6 +4008,20 @@ header[data-scrolled="true"] [data-mega-panel] {
   }
 }
 
+/* C78 «скрытый вау»: наведение на полоску разгоняет перелив CATERING
+ * (5s → 1.3s). Специфичность (2 класса + :hover) выше базового правила
+ * @supports; при reduce выше animation:none уже снял имя — длительность
+ * инертна (нет скачка). Градиент 2-периодный (тайл A→B→A, замер c77) —
+ * перемап прогресса при смене duration визуально бесшовен. */
+.vertical-brand-label:hover .vertical-brand-label__word--accent {
+  animation-duration: 1.3s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vertical-brand-label:hover .vertical-brand-label__word--accent {
+    animation-duration: 5s; /* имя уже none — правило честно инертно */
+  }
+}
+
 /* Global body padding-left toggle. The sidebar occupies real space on
    the left ONLY AFTER the hero — at the top (hero screen) body has no
    padding (hero is full-width, no stripe). When the user scrolls past

@@ -8,6 +8,7 @@ import { Preloader } from "@/components/catering/preloader";
 import { EaCookieBanner } from "@/components/catering/ea-cookie-banner";
 import { GrainOverlay } from "@/components/catering/grain";
 import { ScrollProgress } from "@/components/catering/scroll-progress";
+import { MicroDelights } from "@/components/motion/micro-delights";
 import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
 import { NuqsAdapter } from "nuqs/adapters/next";
@@ -336,6 +337,10 @@ export default function RootLayout({
         {/* C74 E1: нативная CSS полоса прогресса чтения (scroll-driven,
             zero JS) — деградации в c74-kinetic.css. */}
         <ScrollProgress />
+        {/* C78: скрытые микровзаимодействия (двойной тап-искры [data-spark],
+            3-тап-яйцо [data-egg] с салютом+тостом, tilt [data-tilt]).
+            Рендерит null — только document-делегация, см. micro-delights.tsx. */}
+        <MicroDelights />
         <GrainOverlay />
         <VerticalBrandLabel />
         <EaCookieBanner />

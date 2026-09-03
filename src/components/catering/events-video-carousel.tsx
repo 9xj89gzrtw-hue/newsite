@@ -458,6 +458,10 @@ export function EventsVideoCarousel() {
               aria-label={`Видео ${i + 1} из ${TILES.length}: ${tile.title}`}
               onMouseEnter={() => playHoverVideo(i)}
               onMouseLeave={() => pauseHoverVideo(i)}
+              /* C78: 3D-tilt к курсору + глянец-блик (MicroDelights;
+                  у <li> своего transform нет — hover-масштаб живёт на
+                  __video-потомке, конфликт исключён; fine-pointer only). */
+              data-tilt
             >
               {/* Poster image — the visual base of the tile (alt text carries
                   the content description for AT).

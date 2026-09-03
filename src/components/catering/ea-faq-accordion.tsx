@@ -108,11 +108,14 @@ function PlusGlyph({
       height="14"
       viewBox="0 0 14 14"
       aria-hidden="true"
-      animate={{ rotate: isOpen ? 45 : 0 }}
+      /* C78: открытие — фехтовальный «взмах» [0→200°→45°] (пол-оборота
+          с перелётом и оседанием в ×), закрытие — прямой возврат в +.
+          reduce → мгновенная смена (transition duration 0 ниже). */
+      animate={{ rotate: isOpen ? [0, 200, 45] : 0 }}
       transition={
         reduce
           ? { duration: 0 }
-          : { duration: 0.32, ease: EASE }
+          : { duration: 0.55, ease: EASE }
       }
       style={{
         flex: "0 0 auto",

@@ -3181,3 +3181,58 @@ Stage Summary:
   документа — проценты range читаются по всей странице.
 - Коммиты: c77 (вместе с висевшими c76 261c377+7894e5a) — push origin
   main (diff проверен перед push).
+
+---
+Task ID: c78
+Agent: main (Z.ai Code)
+Task: «скрытые вау-сюрпризы» — микровзаимодействия по всему сайту,
+которых не видно при первом взгляде, но они раскрываются в контакте
+(двойной тап, 3 тапа, hover, наклон к курсору).
+
+Work Log:
+- Новый MicroDelights (motion/micro-delights.{tsx,css}, монтируется в
+  layout): document-делегация [data-spark] двойной тап ≤350мс/≤48px →
+  всплеск 9–13 золотых искр (WAAPI, transform/opacity, авто-удаление
+  ≤950мс, з-index 9990); [data-egg] 3 тапа ≤1600мс → fireGoldConfetti
+  + sonner-тост «Секретный ингредиент — любовь. С 2007 года.» (id
+  анти-стек); [data-tilt] 3D-наклон ≤5° + глянец-луч (--gx/--gy),
+  WAAPI-возврат 380мс; a[data-wiggle] CSS-wiggle. 2 пассивных
+  слушателя постоянно, pointermove только при tilt, ноль rAF в покое.
+- Аннотации (data-атрибуты, markup почти не тронут): 28 фото marquee +
+  9 плиток Instagram + портрет основателя → data-spark; бейдж логотипа
+  шапки → data-egg; 4 видео-тайла карусели → data-tilt; 5 соцкнопок
+  футера → data-wiggle; трек marquee → data-cursor «Тяните», плитки
+  IG → data-cursor «Смотреть» (лейблы линзы курсора).
+- HoverScramble (motion/hover-scramble.tsx): nav-ссылки «декодируются»
+  кириллическим шумом (42мс-тик, ~520мс, ширина локализуется на время
+  перебора); aria-label на <a> + aria-hidden спан (паттерн c71).
+- FAQ: PlusGlyph открытие — взмах [0→200°→45°] (было 45° плоско).
+- CATERING-полоска: hover разгоняет перелив 5s→1.3s (глобалc, после
+  reduce-блока; 2-периодный тайл = перемап бесшовен).
+- Marquee-фото: hover-выдох scale(1.05) rotate(−0.75°) (CSS, transform-
+  only). touch-action: manipulation на [data-spark] (убивает iOS
+  double-tap-zoom, тапы честные) + золотая подсветка тапа.
+- Гейты JS — НЕ-coarse, а не (pointer: fine): headless рапортует
+  (pointer: none) (грабли c43/worklog-2093) — инверсия даёт паритет
+  автотестам. reduce: spark/tilt/wiggle/scramble → noop, тост живёт.
+
+Stage Summary:
+- lint 0 / tsc 0 / pm2 :3001 online. Desktop 1440 + iPhone 14:
+  hero-табу 0 a/button + overflowX 0 (оба), консоль 0/0 ошибок, VLM
+  layout CLEAN/CLEAN (полные страницы).
+- Замеры: spark desktop DOM 13 частиц + пиксель-анализ 183 золотых
+  пикселя вокруг точки (VLM 12px-частицы НЕ видит — только пиксели);
+  spark mobile holder+9; egg canvas+toast (VLM YES/YES) на обоих;
+  tilt real-mouse rotateX(3.03°)/rotateY(2.03°) + чистка; scramble
+  mid «МеРЯ»→«Меню»; FAQ 152.9°→45°; shimmer 5s→1.3s computed;
+  wiggle animation-name micro-wiggle.
+- Грабли → §49: (1) Turbopack-смесь ПОВТОРНО — pm2 restart НЕ
+  обновил globals.css (правило в исходнике, в чанке нет) → стоп →
+  rm -rf .next → рестарт → прогрев 34с; после КАЖДОЙ правки globals
+  сверять сервируемый CSS curl-грепом. (2) elementFromPoint по
+  координатам против ДВИЖУЩЕГОСЯ marquee (105px/с) — флейк-тест:
+  диспетчить на найденный элемент, не на координаты; и preloader
+  (fixed inset-0 z-10000) перехватывает hit-тесты ~0.9с после
+  гидрации — ждать ≥2с. (3) Playwright locator.hover() на marquee
+  вечно ждёт stable — только raw mouse.move/синтетика.
+- Коммит c78: push origin main (diff проверен).

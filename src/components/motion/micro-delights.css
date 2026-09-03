@@ -1,0 +1,113 @@
+/* MicroDelights — CSS-часть скрытых микровзаимодействий (C78).
+ * JS-логика: src/components/motion/micro-delights.tsx.
+ * Все правила — transform/opacity (композитор) или ноль движения.
+ * prefers-reduced-motion гейтится ЗДЕСЬ для CSS-веток. */
+
+/* ── Искры двойного тапа [data-spark] ────────────────────────────────────
+ * Точка-холдер: fixed в месте тапа, частицы анимируются WAAPI из JS. */
+.micro-spark-holder {
+  position: fixed;
+  z-index: 9990; /* канвас конфетти = 9990, курсор = 9999 */
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.micro-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  background: #c9a227; /* базовое золото палитры конфетти */
+  /* четырёхлучевая «звёздочка» */
+  clip-path: polygon(
+    50% 0%, 63% 37%, 100% 50%, 63% 63%,
+    50% 100%, 37% 63%, 0% 50%, 37% 37%
+  );
+  filter: drop-shadow(0 1px 2px rgba(201, 162, 39, 0.45));
+}
+
+.micro-spark:nth-child(3n) {
+  background: #f5e6b8; /* кремовое сияние */
+}
+
+.micro-spark:nth-child(4n) {
+  background: #8a6d1f; /* тёмное золото */
+}
+
+.micro-spark--dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  clip-path: none;
+  background: #f5e6b8;
+}
+
+/* База [data-spark]: честные тапы без iOS double-tap-zoom + золотая
+ * вспышка подсветки тапа вместо системной серой (Android). */
+[data-spark] {
+  -webkit-tap-highlight-color: rgba(201, 162, 39, 0.18);
+  touch-action: manipulation;
+}
+
+/* ── Tilt: глянец-блик [data-tilt] ───────────────────────────────────────
+ * Блик — радиальный луч, следует за указателем через --gx/--gy (JS). */
+.micro-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    120px circle at var(--gx, 50%) var(--gy, 50%),
+    rgba(245, 230, 184, 0.26),
+    rgba(245, 230, 184, 0) 62%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.micro-tilt--on .micro-glare {
+  opacity: 1;
+}
+
+/* ── Соцкнопки футера a[data-wiggle] ──────────────────────────────────── */
+@keyframes micro-wiggle {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-7deg) scale(1.1); }
+  55% { transform: rotate(5deg) scale(1.1); }
+  80% { transform: rotate(-2deg) scale(1.03); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+a[data-wiggle]:hover {
+  animation: micro-wiggle 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Marquee-фото: hover-выдох (масштаб + микронаклон) ──────────────────
+ * Фото и так едут (трек — комппозитор); hover добавляет transform-only
+ * зум на самой картинке — новый слой только у hovered-фото. */
+.gamma-marquee__img {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gamma-marquee__item:hover .gamma-marquee__img {
+  transform: scale(1.05) rotate(-0.75deg);
+}
+
+/* ── Гейты reduced-motion ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  a[data-wiggle]:hover {
+    animation: none;
+  }
+  .gamma-marquee__img {
+    transition: none;
+  }
+  .gamma-marquee__item:hover .gamma-marquee__img {
+    transform: none;
+  }
+  .micro-glare {
+    transition: none;
+  }
+}

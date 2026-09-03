@@ -167,6 +167,8 @@ function PhotoTile({
     <span
       className="gamma-marquee__item relative mr-8 inline-block aspect-[3/4] w-[280px] shrink-0 snap-start overflow-hidden md:w-[300px]"
       aria-hidden={ariaHidden || undefined}
+      /* C78: двойной тап по фото — золотой всплеск искр (MicroDelights). */
+      data-spark
     >
       <Image
         src={src}
@@ -513,6 +515,9 @@ export function GammaMarquee() {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
+        /* C78: лейбл кастомного курсора над лентой — аффорданс «можно
+            тянуть» (CustomCursor: [data-cursor] входит в INTERACTIVE). */
+        data-cursor="Тяните"
         className={
           reducedMotion
             ? "gamma-marquee__track gamma-marquee__track--static flex w-max snap-x snap-mandatory overflow-x-auto pb-3"

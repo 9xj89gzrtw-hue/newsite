@@ -166,6 +166,10 @@ export function CepInstagramGrid() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Instagram nilov catering — фото ${i + 1} из ленты (открывает профиль)`}
+              /* C78: двойной тап — золотые искры (MicroDelights);
+                  лейбл линзы курсора — аффорданс перехода. */
+              data-spark
+              data-cursor="Смотреть"
               className="group relative block aspect-square overflow-hidden bg-black/5"
               variants={itemVariants}
               custom={i}
