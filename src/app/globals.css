@@ -467,15 +467,34 @@ html.lenis body {
   overflow: hidden;
 }
 
-/* Custom cursor — hide native on fine pointers ONLY while the gold cursor
-   is enabled (Task 5-C: the class is toggled by cursor.tsx in sync with
-   `(pointer: fine) and (min-width: 768px)`, so a narrow desktop window
-   always keeps its system cursor). Universal `*` rule: the dot+ring IS the
-   cursor everywhere, not just on the old interactive-element list. */
+/* Custom cursor — hide native on fine pointers ONLY while the liquid-lens
+   cursor is enabled (Cycle-73: the class is toggled by cursor.tsx in sync
+   with `(pointer: fine) and (min-width: 768px)`, so a narrow desktop window
+   always keeps its system cursor). Universal `*` rule: the lens IS the
+   cursor everywhere. */
 @media (pointer: fine) {
   body.catering-cursor,
   body.catering-cursor * {
     cursor: none !important;
+  }
+  /* Cycle-73 юзабилити: над текстовыми полями системный I-beam честнее
+     кастомной линзы — линза растворяется (cursor.tsx nativeZone), здесь
+     возвращаем системный курсор. Слайдеры/чекбоксы/radio остаются под
+     линзой (drag/click UI — кастомный указатель уместен). */
+  body.catering-cursor
+    input:is(
+      [type="text"],
+      [type="tel"],
+      [type="email"],
+      [type="date"],
+      [type="number"],
+      [type="time"],
+      [type="url"],
+      [type="password"]
+    ),
+  body.catering-cursor textarea,
+  body.catering-cursor select {
+    cursor: auto !important;
   }
 }
 
