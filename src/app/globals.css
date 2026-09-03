@@ -4335,35 +4335,43 @@ header[data-scrolled="true"] [data-mega-panel] {
    72 65 66 5e 3d = a + [href^=) и через CSSOM вживую — правило валидно
    и матчит phone-FAB (fixed bottom-6 right-6, lg:hidden). «Сломанный»
    селектор из аудита W1 — артефакт отображения терминала, съедающего
-   последовательность [h. Высота баннера на мобиле — 96px (замер FIX-5
-   agent-browser, 390×844, после поднятия кнопок до 44px),
-   translateY(-92px) поднимает FAB (низ был на 24px + 56px роста →
-   116px от низа) с запасом 20px над баннером. ── */
+   последовательность [h.
+   C75 (§43): хардкод-высоты Cycle-70 (96px) протухли — контент баннера
+   вырос до 150px на 390×844 (замер agent-browser), лифт −92 оставлял
+   нижние 34px FAB под панелью. Теперь лифт считается от ЖИВОГО замера
+   --cookie-banner-h (ea-cookie-banner.tsx, ResizeObserver): низ FAB
+   (24px от низа) + лифт = bannerH + 20px запаса → лифт = bannerH − 4.
+   Фолбэк 150px — актуальный замер 390×844 на случай отсутствия переменной
+   (класс и переменная ставятся одним коммитом — окно равно нулю). ── */
 @media (max-width: 1023px) {
   body.cookie-banner-open a[href^="tel:"][class*="fixed"] {
-    /* FAB: bottom-6 (24px) + size-14 (56px) → верх на 80px от низа;
-       баннер 96px → лифт -92px даёт запас 20px над баннером */
-    transform: translateY(-92px);
+    transform: translateY(
+      calc((var(--cookie-banner-h, 150px) - 4px) * -1)
+    );
   }
 }
 
-/* FIX-5 (Cycle 70, W1-A MINOR): пока cookie-баннер открыт (fixed снизу,
-   z-80), он перекрывал нижнюю строку копирайта футера. Резервируем место
-   паддингом на body: высоты баннера измерены agent-browser'ом ПОСЛЕ
-   поднятия кнопок до 44px — десктоп 1920 — 69px (одна строка, sm+),
-   мобайл 390 — 96px (<640px, две строки); паддинг с запасом 7/12px.
+/* FIX-5 (Cycle 70, W1-A MINOR) → C75 (§43): пока cookie-баннер открыт
+   (fixed снизу, z-80), он перекрывал нижнюю строку футера — телефон
+   накрывался на 42px (хардкод 108px против реальных 150px на 390×844,
+   контент баннера вырос после Cycle 70). Теперь паддинг = ЖИВОЙ замер
+   --cookie-banner-h (ea-cookie-banner.tsx, ResizeObserver, border-box
+   включая внутренний env(safe-area-inset-bottom)) — цифры в коде, а не
+   в комментарии. Фолбэки — последний замер (1440: 69px, 390: 150px) на
+   случай, когда класс есть, а переменная ещё не установлена.
    Без transition: padding на body — layout-свойство, анимация дёргает
    скролл (плавность не нужна — класс появляется вместе с баннером до
-   первого скролла вниз). env(safe-area-inset-bottom) повторяет
-   safe-area-инсет самого баннера. Класс ставится ea-cookie-banner.tsx
-   СТРОГО по visible и снимается после выбора (раньше — только при
-   unmount корневого компонента, т.е. никогда; см. FIX-5 в компоненте). */
+   первого скролла вниз). Класс ставится ea-cookie-banner.tsx СТРОГО
+   по visible и снимается после выбора. */
 body.cookie-banner-open {
-  padding-bottom: 76px;
+  padding-bottom: var(--cookie-banner-h, 76px);
 }
 @media (max-width: 639px) {
   body.cookie-banner-open {
-    padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(
+      --cookie-banner-h,
+      calc(150px + env(safe-area-inset-bottom, 0px))
+    );
   }
 }
 

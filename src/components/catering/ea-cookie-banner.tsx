@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { CSSProperties } from "react";
 import { loadMetrika } from "@/lib/analytics";
@@ -171,6 +171,8 @@ function hasActiveAnalyticsConsent(): boolean {
 export function EaCookieBanner() {
   const [visible, setVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  /* C75: ref на панель баннера — источник замера --cookie-banner-h. */
+  const bannerRef = useRef<HTMLDivElement>(null);
 
   // Mount: clear stale (>14 days) choices, then decide whether to show.
   // W3 / K6-CRITICAL: консент на аналитику выдан ранее (не просрочен) →
@@ -194,6 +196,39 @@ export function EaCookieBanner() {
   useEffect(() => {
     document.body.classList.toggle("cookie-banner-open", visible);
     return () => document.body.classList.remove("cookie-banner-open");
+  }, [visible]);
+
+  /* C75 (§43, "числа-замеры живут в коде, а не в комментариях"): высота
+   * баннера ИЗМЕРЯЕТСЯ, а не хардкодится. Причина: хардкод Cycle-70
+   * «мобайл 96px» протух после роста контента — реальный баннер 390×844
+   * стал 150px, body padding 108px накрывал телефон футера и FAB
+   * (−42px/−34px, замер agent-browser + VLM: номер телефона под панелью).
+   * --cookie-banner-h питает body padding и лифт phone-FAB в globals.css.
+   * rect.height (border-box) уже включает внутренний env(safe-area-
+   * inset-bottom) баннера — отдельный env() не нужен. ResizeObserver
+   * перемеряет при пере-переносе строк (поворот, resize, свап шрифта).
+   * Класс cookie-banner-open и эта переменная ставятся в ОДНОМ коммите
+   * эффектов — прыгающего кадра между классом и числом нет. */
+  useEffect(() => {
+    /* Гвард visible: AnimatePresence держит панель живой ~0.4s ВЫХОДНОЙ
+     * анимации после setVisible(false) — ref ещё не пуст, и без гварда
+     * эффект пере-поставил бы переменную ПОСЛЕ cleanup, оставляя её
+     * висеть навсегда (замер C75: varGone=false после «Отклонить»). */
+    if (!visible) return;
+    const el = bannerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const root = document.documentElement;
+    const apply = () => {
+      const h = el.getBoundingClientRect().height;
+      if (h > 0) root.style.setProperty("--cookie-banner-h", `${Math.ceil(h)}px`);
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty("--cookie-banner-h");
+    };
   }, [visible]);
 
   // Cycle 40 fix: NO programmatic focus on the first link — it painted a
@@ -239,6 +274,7 @@ export function EaCookieBanner() {
     <AnimatePresence>
       {visible && (
         <motion.div
+          ref={bannerRef}
           role="region"
           aria-label="Уведомление об использовании cookies"
           data-component="ea-cookie-banner"
