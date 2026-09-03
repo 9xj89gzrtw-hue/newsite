@@ -40,8 +40,16 @@ import { EVENTS_DONE, FOUNDED_YEAR } from "@/lib/site-config";
  *
  * @see docs/talkofthetown-MINED-EXTRACTION.md (hero section)
  */
-const HERO_VIDEO = "/media/mculinary/mculinary-hero.mp4";
+const HERO_VIDEO = "/media/mculinary/mculinary-hero-720.mp4";
 const HERO_POSTER = "/media/hero-premium/hero-premium-6.jpg";
+/* C71-P1 / K8-CRITICAL (Task 2): poster-атрибут видео тянул RAW jpg 595KB
+   рядом с next/image-копией (~77KB webp) — двойная загрузка одного визуала.
+   Новый постер — заранее оптимизированный sharp-webp 828px q82 (67KB,
+   public/media/hero-premium/hero-premium-6-828.webp): виден долю секунды
+   до старта видео на десктопе и остаётся статичным hero на mobile
+   (видео там не играет — coarse-гейт эффекта выше). LCP-<Image> (z-0,
+   next/image-оптимизация) НЕ тронут — он остаётся приоритетным кадром. */
+const HERO_VIDEO_POSTER = "/media/hero-premium/hero-premium-6-828.webp";
 
 /* ════════════ Cycle-71 / F4 — CTA-пара в hero (K1 MAJOR: «hero без единого
    тапабельного действия», elementFromPoint(720,40) = декоративный div) ════════════
@@ -237,7 +245,12 @@ export function TottHero() {
           FIX-4 [F2]: preload="none" + IO-гейт (см. эффект выше) — 5.16MB
           уходит из критического пути; poster = HERO_POSTER (дедуп с
           gg-video-showcase). autoPlay-атрибут убран — старт выдаёт IO,
-          hero в вьюпорте с первой секунды, визуал не меняется. */}
+          hero в вьюпорте с первой секунды, визуал не меняется.
+          C71-P1 (Task 2+5): poster → HERO_VIDEO_POSTER (готовый 828w webp
+          67KB вместо RAW jpg 595KB — двойная загрузка hero-кадра устранена,
+          K8-CRITICAL); источник видео → re-encode 720p/440kbps crf31
+          faststart (1.49MB вместо 5.16MB, новое имя = cache-bust; старый
+          файл не удаляем — конвенция §28). */}
       <video
         ref={videoRef}
         className="absolute inset-0 z-[1] size-full object-cover"
@@ -245,7 +258,7 @@ export function TottHero() {
         loop
         playsInline
         preload="none"
-        poster={HERO_POSTER}
+        poster={HERO_VIDEO_POSTER}
         aria-hidden="true"
       >
         <source src={HERO_VIDEO} type="video/mp4" />

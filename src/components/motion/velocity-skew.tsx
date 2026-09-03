@@ -11,7 +11,10 @@ import {
   useTransform,
   useVelocity,
   type MotionValue,
-} from "motion/react";
+} from "framer-motion"; /* C71-P1 (K8 MAJOR, Task 6): было "motion/react" —
+  двойной рантайм анимации (framer-motion 63 файла + motion 4 файла);
+  framer-motion — тот же re-export API (motion v12 = framer-motion v12),
+  импорт унифицирован в единый пакет. */
 import { useMounted } from "@/hooks/use-mounted";
 import { cn } from "@/lib/utils";
 

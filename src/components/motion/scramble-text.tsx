@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useInView, useReducedMotion } from "motion/react";
+import { useInView, useReducedMotion } from "framer-motion"; /* C71-P1 (K8, Task 6): было "motion/react" — унификация на единый пакет. */
 import { cn } from "@/lib/utils";
 
 /* ═══════════════════════════════════════════════════════════════════════════

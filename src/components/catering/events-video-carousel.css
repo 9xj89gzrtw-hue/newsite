@@ -60,7 +60,9 @@
 }
 
 .ea-evt-video__scroller:focus-visible {
-  outline: 2px solid var(--ea-red);
+  /* K7-FIX (P2 / 2.4.11): --ea-red #E71D3A = 4.17:1 на креме — проходил, но
+     без запаса; новый канон --ea-red-text #B91431 = 6.03:1 (как globals). */
+  outline: 2px solid var(--ea-red-text, #B91431);
   outline-offset: 6px;
   border-radius: 2px;
 }
@@ -373,11 +375,21 @@
   stroke-linejoin: round;
 }
 
-.ea-evt-video__nav-btn:hover,
+.ea-evt-video__nav-btn:hover {
+  border-color: var(--ea-red);
+  color: var(--ea-red);
+  transform: scale(1.06);
+}
+/* K7-FIX (P2 / 2.4.11, MINOR): единственным индикатором была смена
+   border-color на 1px — слишком тонко (толщина <2px). Добавлен явный
+   контур 2px --ea-red-text: 6.03:1 на креме ✓ (border-CHANGE оставлен
+   как вторичный отклик). Правило отделено от :hover — контур только
+   на клавиатурном фокусе, мышь его не видит. */
 .ea-evt-video__nav-btn:focus-visible {
   border-color: var(--ea-red);
   color: var(--ea-red);
-  outline: none;
+  outline: 2px solid var(--ea-red-text, #B91431);
+  outline-offset: 2px;
   transform: scale(1.06);
 }
 

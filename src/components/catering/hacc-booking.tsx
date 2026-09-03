@@ -83,7 +83,8 @@
  *    «слайдер → цена» на обоих вьюпортах; БЕЗ aria-live (итог чека уже
  *    анонсируется, дубль спамил бы SR);
  *  - M3: карта — tap-to-activate: iframe pointer-events:none до активации,
- *    обёртка role="button" (клик/Enter/Space/фокус активирует), чип-аффорданс
+ *    обёртка role="button" (клик/Enter/Space активируют, фокус — НЕТ:
+ *    K7-FIX), после активации фокус уходит в iframe; чип-аффорданс
  *    по центру; деактивации при blur/уходе курсора НЕТ (не мигать);
  *  - M4: ±5-кнопки ≥44px; мобильный кегль «от N ₽/чел» 13.5px;
  *  - M5: шаг 2 различим (подложка+рамка, узел «2»), шаг 1 после перехода
@@ -769,12 +770,20 @@ function ContactTicker({ items }: { items: ContactItem[] }) {
  * M3 (task 11-fix3): стандартный tap-to-activate — до активации iframe
  * pointer-events:none (свайп над картой скроллит страницу, а не панорамирует
  * карту), поверх — чип «Нажмите, чтобы активировать карту». Активация: клик
- * по обёртке / Enter / Space / фокус обёртки (tabIndex=0, role="button" до
- * активации). src НЕ перезагружается — меняется только pointer-events.
+ * по обёртке / Enter / Space (tabIndex=0, role="button" до активации).
+ * src НЕ перезагружается — меняется только pointer-events.
  * Деактивации при blur/уходе курсора НЕТ (не мигать).
+ * K7-FIX (P2 / 2.4.3): УБРАНА onFocus-активация — Tab на обёртку мгновенно
+ * снимал tabIndex у сфокусированного div → браузер ронял фокус в <body>
+ * (замер K7: activeElement=BODY, Enter/Space-хендлер недостижим). Теперь
+ * фокус спокойно стоит на обёртке, активация — только явным действием
+ * (клик/Enter/Space), и сразу после неё фокус передаётся ВНУТРЬ iframe —
+ * клавиатурный пользователь может панорамировать карту стрелками;
+ * снятие tabIndex обёртки больше не выбивает фокус (он уже в iframe).
  */
 function LazyMap() {
   const ref = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
   const [near, setNear] = useState(false);
   const [active, setActive] = useState(false);
 
@@ -795,11 +804,20 @@ function LazyMap() {
     return () => io.disconnect();
   }, [near]);
 
-  const activate = useCallback(() => setActive(true), []);
+  /* K7-FIX (P2): активация с передачей фокуса в iframe. rAF — после
+   * коммита React (снятие role/tabIndex с обёртки): без этого браузер
+   * сбрасывал фокус на <body>. preventScroll — карту только что привели
+   * во вьюпорт (клик/Tab), автоскролла не нужно. */
+  const activate = useCallback(() => {
+    setActive(true);
+    requestAnimationFrame(() => {
+      frameRef.current?.focus({ preventScroll: true });
+    });
+  }, []);
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!active && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
-      setActive(true);
+      activate();
     }
   };
 
@@ -817,11 +835,11 @@ function LazyMap() {
         : {})}
       onClick={activate}
       onKeyDown={onKeyDown}
-      onFocus={activate}
     >
       {near ? (
         <>
           <iframe
+            ref={frameRef}
             src={YANDEX_MAPS.embedSrc}
             title="Nilov Catering на карте — Санкт-Петербург, ул. Полевая-Сабировская, 45к1"
             className="hb-map__iframe"

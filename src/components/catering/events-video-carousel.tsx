@@ -369,21 +369,33 @@ export function EventsVideoCarousel() {
   // Cycle 40 a11y: remember which tile opened the modal so focus returns
   // there on close (previously focus fell to <body> — keyboard users lost
   // their place on the page).
+  // K7-FIX (P2 / 2.4.3): замер критика — Esc закрывает, но фокус всё равно
+  // в BODY. Причина №1: openerRef брался из document.activeElement — а это
+  // не работает для JS-кликов (element.click() не фокусирует) и в Safari
+  // (кнопки не получают фокус от мыши) → ref пуст → возврат молча пропадал.
+  // Лечение: открывашка передаётся ЯВНО из onClick (event.currentTarget).
   const openerRef = useRef<HTMLButtonElement | null>(null);
   const openModal = useCallback(
-    (i: number) => {
+    (i: number, opener?: HTMLButtonElement | null) => {
       pauseHoverVideos();
-      openerRef.current =
-        document.activeElement instanceof HTMLButtonElement
-          ? document.activeElement
-          : null;
+      openerRef.current = opener ?? null;
       setActiveIndex(i);
     },
     [pauseHoverVideos],
   );
+  // K7-FIX (P2): возврат фокуса — двойной rAF. Первый rAF в React 18 может
+  // успеть ДО коммита снятия модалки (concurrent-планировщик): фокус ставился
+  // ещё при живой модалке, а затем фокусный узел размонтировался → браузер
+  // снова ронял фокус в BODY. Второй rAF всегда ПОСЛЕ коммита — модалки в
+  // DOM нет, фокус падает на живую кнопку-открывашку. Анимация закрытия —
+  // чистая fade-размонтировка (240ms), фокус не конкурирует с ней.
   const closeModal = useCallback(() => {
     setActiveIndex(null);
-    requestAnimationFrame(() => openerRef.current?.focus());
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        openerRef.current?.focus({ preventScroll: false });
+      });
+    });
   }, []);
   useEffect(() => {
     closeModalRef.current = closeModal;
@@ -497,7 +509,7 @@ export function EventsVideoCarousel() {
               <button
                 type="button"
                 className="ea-evt-video__play"
-                onClick={() => openModal(i)}
+                onClick={(e) => openModal(i, e.currentTarget)}
                 aria-label={`Открыть видео: ${tile.title}`}
               >
                 <svg

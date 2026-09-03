@@ -81,6 +81,10 @@ import {
  */
 
 const BAND_BG = "/media/c62/nilov-olive-trees-1920.webp";
+/* C71-P1 / K8-MAJOR (Task 3): 828w-вариант для coarse/narrow — 114KB
+   (sharp q80, public/media/c62/nilov-olive-trees-828.webp) вместо
+   513KB 1920w, который мобильные экраны (390px) скачивали целиком. */
+const BAND_BG_COARSE = "/media/c62/nilov-olive-trees-828.webp";
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function TottParallaxBand() {
@@ -103,6 +107,40 @@ export function TottParallaxBand() {
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, []);
+
+  /* ═══ C71-P1 (K8 MAJOR, Task 3): выбор разрешения фонового webp ═══
+   *
+   * Трейдофф (задокументирован по ТЗ): сервер не знает ни pointer, ни ширину
+   * экрана. Замер ДО-фикса подтвердил: Chromium скачивает inline CSS-фон
+   * В МОМЕНТ РАЗБОРА HTML, а не «при подходе к вьюпорту» (nilov-olive-trees-
+   * 1920.webp 513KB стартовал на t=1415ms при скролле 0px — секция на
+   * ~8500px). Поэтому «SSR-1920 + подмена на 828 при монте» НЕ сработала бы:
+   * к моменту гидрации 513KB уже в полёте. Решение — инверсия дефолта:
+   *
+   *   SSR рендерит 828w (BAND_BG_COARSE) — худший кейс трансфера закрыт
+   *   по умолчанию (телефоны = главный K8-сценарий, −399KB на мобиле);
+   *   fine-pointer + широкий экран поднимает до 1920w ПРЯМО НА МОНТЕ
+   *   (эффект ниже) — секция ниже фолда на ~8500px, гидрация на 0px,
+   *   запас до первого просмотра огромен, подмена без заметного моргания.
+   *
+   * Цена компромисса: десктоп скачивает ОБА файла (828 при разборе + 1920
+   * после монт-апгрейда, ~+114KB к прежнему одиночному 513KB) — сознательный
+   * размен «мобильный −399KB / десктоп +114KB». Альтернатива «пустой SSR-фон
+   * + URL только с монта» дешевле на десктопе, но оставляет no-JS без фона
+   * вовсе — отвергнута. isCoarse-гейт трансформа (drift) не тронут — фон
+   * выбирается независимо от reduce (статичному фото тоже нужен правильный
+   * вес). */
+  const [bgHiRes, setBgHiRes] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(
+      "(hover: hover) and (pointer: fine) and (min-width: 828px)",
+    );
+    const update = () => setBgHiRes(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  const bandBg = bgHiRes ? BAND_BG : BAND_BG_COARSE;
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -145,13 +183,14 @@ export function TottParallaxBand() {
           }
           style={
             driftActive
-              ? { backgroundImage: `url('${BAND_BG}')`, y: drift, skewY: photoSkew }
-              : { backgroundImage: `url('${BAND_BG}')` }
+              ? { backgroundImage: `url('${bandBg}')`, y: drift, skewY: photoSkew }
+              : { backgroundImage: `url('${bandBg}')` }
           }
           aria-hidden="true"
         >
           {/* No next/image here — the CSS layer IS the visual (single
-              optimized webp download, C62). The parallax motion comes from
+              optimized webp download, C62; 828w/1920w-выбор — C71-P1 Task 3,
+              см. комментарий к bandBg выше). The parallax motion comes from
               background-attachment: fixed on .tott-parallax (desktop) or
               the drift transform (touch only). */}
         </motion.div>

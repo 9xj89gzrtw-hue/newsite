@@ -102,9 +102,10 @@ export function GgVideoShowcase() {
 
   /** W4-FIX «видео-вау»: the clip plays as a muted loop as soon as the
    *  section is near the viewport (muted autoplay is always permitted) and
-   *  pauses when it scrolls away — the 1.5MB catering-clip-2.mp4 is a
+   *  pauses when it scrolls away — the C71-P1 re-encoded 813KB
+   *  catering-clip-2-720.mp4 is a
    *  DIFFERENT url from the hero's mculinary-hero.mp4 and preload="none"
-   *  keeps it out of the critical path above the fold. IO rootMargin 100px
+   *  keeps it out of the critical path. IO rootMargin -15%/-25% (V4-find: было 100px — секция на 917px попадала в margin при scroll=0 на mobile и 788KB тизер качался на СТАРТЕ, съедая экономию P1; теперь play() только когда секция реально в кадре)
    *  starts playback just before the section is revealed. Cleanup pauses
    *  on unmount. prefers-reduced-motion: no IO at all — the poster stays
    *  and the clip plays only after a user click. */
@@ -127,7 +128,7 @@ export function GgVideoShowcase() {
           video.pause();
         }
       },
-      { rootMargin: "100px" },
+      { rootMargin: "-15% 0px -25% 0px" },
     );
     io.observe(section);
     return () => {
@@ -194,7 +195,7 @@ export function GgVideoShowcase() {
             preload="none": the browser downloads nothing until play(); the
             poster attribute covers the pre-play frame (the old static
             <img> is gone — the video poster replaces it 1:1). The clip
-            (1.5MB catering-clip-2.mp4) differs from the hero video url, so
+            (788KB catering-clip-2-720.mp4, C71-P1) differs from the hero video url, so
             nothing is fetched in parallel with the hero. */}
         <video
           ref={videoRef}
@@ -202,11 +203,11 @@ export function GgVideoShowcase() {
           loop
           playsInline
           preload="none"
-          poster="/media/hero-premium/hero-premium-6.jpg"
+          poster="/media/hero-premium/hero-premium-6-828.webp"
           aria-label="Видео: кейтеринг как искусство — приготовление и подача блюд"
           className="absolute inset-0 h-full w-full object-cover"
         >
-          <source src="/media/clips/catering-clip-2.mp4" type="video/mp4" />
+          <source src="/media/clips/catering-clip-2-720.mp4" type="video/mp4" />
         </video>
 
         {/* Dark scrim — Task 4-B readability hardening. Two stacked

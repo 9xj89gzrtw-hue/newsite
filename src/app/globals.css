@@ -425,10 +425,23 @@ html {
     color: #FFFFFF;
   }
 
-  /* Smooth focus outlines for accessibility */
+  /* Smooth focus outlines for accessibility.
+     K7-FIX (P2 / wave 4 cycle-71, 2.4.11): был var(--gold) #D4A373 =
+     2.08:1 на креме / 2.26:1 на белом (FAIL <3:1). Новый канон —
+     --ea-red-text #B91431: 6.03:1 на креме, 6.55:1 на белом, 6.38:1 на
+     бумаге #FDFCF9 ✓. Тёмные секции инвертируются ниже (кремовый контур). */
   :focus-visible {
-    outline: 2px solid var(--gold);
+    outline: 2px solid var(--ea-red-text, #B91431);
     outline-offset: 2px;
+  }
+  /* K7-FIX (P2): инверсный контур на тёмных секциях — [data-header-theme=
+     "dark"] вешают все тёмные секции сайта (hero, parallax, видео, манифест,
+     футер…), это же читает site-header для флипа шапки. #B91431 на тёмном
+     фоне ≈1.1–2.2:1 (невидим) → крем: 13.5:1 на night, 18.3:1 на #0A0908.
+     outline-offset 2px держит кольцо НАД фоном секции, не над самим
+     элементом — контраст считается против фона секции. */
+  [data-header-theme="dark"] :focus-visible {
+    outline-color: var(--cream, #F7F5F5);
   }
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -1074,9 +1087,12 @@ html.lenis body {
   /* Invisible expansion area for magnetic effect */
 }
 
-/* Premium focus visible states (Accessibility + Luxury) */
+/* Premium focus visible states (Accessibility + Luxury)
+   K7-FIX (P2): gold → --ea-red-text (2.08:1 → 6.03:1 на креме, 2.4.11).
+   Правило не используется ни одним компонентом (rg premium-focus — только
+   здесь), цвет приведён к новому канону на будущее. */
 :focus-visible.premium-focus {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--ea-red-text, #B91431);
   outline-offset: 4px;
   border-radius: inherit;
   box-shadow: 0 0 20px rgba(196, 149, 106, 0.2);

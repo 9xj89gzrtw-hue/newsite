@@ -807,7 +807,18 @@ function HaccRack({
                       fill
                       blurDataURL={BLUR_DATA_URL}
                       sizes="(max-width: 1023px) 100vw, 64vw"
-                      loading={isOpen ? "eager" : "lazy"}
+                      /* C71-P1 (K8 MAJOR, Task 4): было loading={isOpen ?
+                         "eager" : "lazy"} — дефолт-раскрытая строка
+                         сериализовала loading="eager" в SSR, и три
+                         ниже-фолдных фото (c49-furshet 87KB + furshet-1
+                         26KB + c57-bar 78KB) качались на t≈512ms, конкурируя
+                         с hero-LCP (замер K8/DO). Теперь всегда lazy —
+                         фото панели грузится по мере входа аккордеона во
+                         вьюпорт/раскрытия (приемлемый трейдофф ТЗ), а
+                         fetchPriority="low" дополнительно опускает их
+                         в приоритетной очереди. */
+                      loading="lazy"
+                      fetchPriority="low"
                       className="hacc__img"
                     />
                   </motion.div>

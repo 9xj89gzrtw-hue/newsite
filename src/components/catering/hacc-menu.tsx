@@ -930,7 +930,15 @@ function MenuRack({
                           fill
                           blurDataURL={BLUR_DATA_URL}
                           sizes="(max-width: 1023px) 100vw, 38vw"
-                          loading={isOpen ? "eager" : "lazy"}
+                          /* C71-P1 (K8 MAJOR, Task 4): было
+                             loading={isOpen ? "eager" : "lazy"} —
+                             default-open категория сериализовала
+                             loading="eager" в SSR и тянула ниже-фолдное
+                             фото в первых ~500ms (конкуренция с LCP, K8).
+                             Теперь всегда lazy + fetchPriority="low"
+                             (тот же паттерн, что hacc-services Task 4). */
+                          loading="lazy"
+                          fetchPriority="low"
                           className="hmenu__img"
                         />
                       </motion.div>

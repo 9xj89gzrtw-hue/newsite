@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import SplitType from "split-type";
-import { animate, useInView, useReducedMotion } from "motion/react";
+import { animate, useInView, useReducedMotion } from "framer-motion"; /* C71-P1 (K8, Task 6): было "motion/react" — унификация на единый пакет. */
 import { cn } from "@/lib/utils";
 
 type As = "h1" | "h2" | "h3" | "h4" | "p" | "span";
@@ -45,7 +45,7 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
  * masked stagger animation.
  *
  * - `split-type` (4kb MIT) does the DOM split; reverted on unmount.
- * - motion/react imperative `animate()` drives each split child
+ * - framer-motion imperative `animate()` drives each split child
  *   (transform/opacity only — RULES §5).
  * - Container starts at `opacity: 0` and flips to `1` once split completes,
  *   avoiding any FOUC of the un-split text.

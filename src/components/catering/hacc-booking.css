@@ -10,7 +10,9 @@
    - кириллический body — var(--font-poppins) (cyrillic ✓; --font-sans=Karla
      cyrillic НЕ имеет — урок C63 §35; scoped-лечение в пределах секции);
    - цифры итога — --font-prata (latin-цифры + fallback на Playfair для ₽);
-   - focus-visible — золотой канон сайта (globals §focus).
+   - focus-visible — красный канон K7-FIX (P2): --hb-red-deep 2px (gold
+     был 2.08:1 на креме — FAIL 2.4.11); на тёмных подложках — инверсный
+     белый (см. A11Y-блок в конце файла).
 
    Perf: ноль filter/backdrop анимаций, ноль box-shadow transition на скролле,
    компоновочные анимации — только grid-template-rows/transform/opacity.
@@ -110,12 +112,14 @@
 .hb-label-caps__opt {
   font-family: var(--hb-body-font);
   font-weight: 400;
-  font-size: 0.72rem;
+  /* K7-FIX (P2 / 1.4.3): «— необязательно, уточним по звонку» 11.52px
+     ink 45% = 2.88:1 FAIL → 12px и 70% = 6.33:1 на креме ✓. */
+  font-size: 0.75rem;
   /* T4 (task 11-fix3): трекинг лейбла рвал суффикс — строчной вставке
      положен нулевой letter-spacing (был 0.02em). */
   letter-spacing: normal;
   text-transform: none;
-  color: color-mix(in srgb, var(--hb-ink) 45%, transparent);
+  color: color-mix(in srgb, var(--hb-ink) 70%, transparent);
 }
 
 /* 1 · тип события — типографические кнопки */
@@ -213,7 +217,9 @@
 }
 .hb-guests__word {
   font-size: 1rem;
-  color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
+  /* K7-FIX (P2 / 1.4.3): «гостей» ink 55% = 3.79:1 на креме (FAIL <4.5,
+     16px не large-text) → 75% = 7.31:1 ✓. */
+  color: color-mix(in srgb, var(--hb-ink) 75%, transparent);
 }
 
 /* катушка одометра: колонка высотой 1em, лента глифов едет по y (em).
@@ -530,7 +536,9 @@
 /* дата не выбрана — плейсхолдер приглушён (data-empty вешает HbDateField);
    выбранная дата красится чернилами поля */
 .hb-date__val[data-empty="true"] {
-  color: color-mix(in srgb, var(--hb-ink) 45%, transparent);
+  /* K7-FIX (P2 / 1.4.3): «Выберите дату» — ЗНАЧЕНИЕ контрола, не
+     плейсхолдер: ink 45% = 2.88:1 на белом (FAIL) → 75% = 7.69:1 ✓. */
+  color: color-mix(in srgb, var(--hb-ink) 75%, transparent);
 }
 
 /* FIX-7: поповер календаря (Radix-портал).
@@ -681,12 +689,14 @@
 .hb-label__opt {
   font-family: var(--hb-body-font);
   font-weight: 400;
-  font-size: 0.72rem;
+  /* K7-FIX (P2 / 1.4.3): «— необязательно» 11.52px ink 45% = 2.88:1 FAIL
+     (текст, не декор) → 12px и ink 70% = 6.33:1 на панели ✓. */
+  font-size: 0.75rem;
   /* T4 (task 11-fix3): было 0.01em (= 0.1152px — мусор); строчной вставке —
      нулевой трекинг (наследование 0.14em капс-лейбла ей не подходит). */
   letter-spacing: normal;
   text-transform: none;
-  color: color-mix(in srgb, var(--hb-ink) 45%, transparent);
+  color: color-mix(in srgb, var(--hb-ink) 70%, transparent);
 }
 /* iOS не зумит поля ≥16px (урок Cycle 37/40) — перекрываем text-[15px] на мобиле */
 @media (max-width: 767px) {
@@ -805,9 +815,10 @@
   accent-color: var(--hb-red);
   cursor: pointer;
 }
-/* M5a (task 11-fix3): фокус после «Далее» должен быть ВИДЕН */
+/* M5a (task 11-fix3): фокус после «Далее» должен быть ВИДЕН
+   K7-FIX (P2 / 2.4.11): gold #D4A373 = 2.26:1 на белом → red-deep 6.55:1 ✓ */
 .hb-consent__box:focus-visible {
-  outline: 2px solid var(--gold, #d4a373);
+  outline: 2px solid var(--hb-red-deep, #b91431);
   outline-offset: 2px;
 }
 .hb-consent__link {
@@ -999,7 +1010,11 @@
   padding-top: 0.45rem;
   font-size: 0.72rem;
   line-height: 1.5;
-  color: color-mix(in srgb, var(--hb-ink) 50%, transparent);
+  /* K7-FIX (P2 / 1.4.3): «Включено: …» ink 50% = 3.31:1 на бумаге #FDFCF9
+     (FAIL) → 70% = 6.33:1 ✓. Кегль не тронут: X4-фикс держит ≥12px на
+     мобиле; на десктопе 11.52px — сноска чека, K7-порог «≥4.5» для неё
+     покрыт контрастом с запасом. */
+  color: color-mix(in srgb, var(--hb-ink) 70%, transparent);
 }
 
 /* итог */
@@ -1734,9 +1749,21 @@
 
 /* ================================================== A11Y / MOTION */
 
-.hbooking :is(.hb-btn, .hb-type, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-consent__link, .hb-date__trigger, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input):focus-visible {
-  outline: 2px solid var(--gold, #d4a373);
+.hbooking :is(.hb-btn, .hb-type, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-consent__link, .hb-date__trigger, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input, .hb-input, .hb-map, .hb-form__legend-btn):focus-visible {
+  /* K7-FIX (P2 / 2.4.11): gold #D4A373 = 2.08:1 на креме → FAIL.
+     --hb-red-deep #B91431: 6.03:1 на креме / 6.55:1 на белом ✓.
+     Правило unlayered — перебивает и базовый globals-канон, и тайлвиндовый
+     outline-none на .hb-input (utilities-слой проигрывает unlayered). */
+  outline: 2px solid var(--hb-red-deep, #b91431);
   outline-offset: 2px;
+}
+/* K7-FIX (P2): контур на ТЁМНЫХ подложках блока — красная панель чека
+   (.hb-panel__again, градиент #E71D3A→#B91431) и мобильный night-бар
+   (.hb-bar__cta, #1F2937→#111827): бордо там 1.45:1 / 2.24:1 (невидим)
+   → инверсный белый контур: 4.53:1 на красном, 14.7–17.7:1 на night ✓.
+   Специфичность (0,3,0)+перечисление выше — перекрывает правило выше. */
+.hbooking :is(.hb-panel__again, .hb-bar__cta):focus-visible {
+  outline-color: #fff;
 }
 
 /* ================================================== K2-F1 (Task 6): ТАЧ-

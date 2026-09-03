@@ -284,7 +284,7 @@ export function EaFaqAccordion() {
                   id={triggerId}
                   onClick={() => toggle(i)}
                   onKeyDown={onKey(i)}
-                  className="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full focus-visible:after:w-full"
+                  className="relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full focus-visible:after:w-full"
                   initial="rest"
                   animate="rest"
                   whileHover={reduce ? undefined : "hover"}
@@ -303,7 +303,12 @@ export function EaFaqAccordion() {
                     background: "transparent",
                     width: "100%",
                     textAlign: "left",
-                    outline: "none",
+                    /* K7-FIX (P2 / 2.4.11, MINOR): инлайн outline:none убивал
+                       глобальный контур (инлайн-стиль бьёт любую специфичность)
+                       — индикатором оставался ::after-андерлайн 1px (<2px).
+                       Убран: теперь триггер получает глобальный контур 2px
+                       --ea-red-text (6.03:1 на креме) + андерлайн поднят
+                       до 2px (after:h-0.5) — двойной запас. */
                   }}
                 >
                   {/* Thin gold hairline left of the question (brand gold),
