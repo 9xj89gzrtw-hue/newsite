@@ -74,7 +74,6 @@ import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
 import { ScrambleText } from "@/components/motion/scramble-text";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
-import { BrandBadge } from "@/components/brand/brand-badge";
 import { MENU_TYPES, formatRUB, type MenuType } from "@/lib/pricing";
 import "./hacc-menu.css";
 
@@ -1214,7 +1213,7 @@ export function HaccMenu() {
           <div className="hmenu__head-text">
             {/* C71: eyebrow собирается перебором символов (ScrambleText):
                 тот же класс/шрифт/цвет, a11y — aria-label + aria-hidden узел. */}
-            <ScrambleText className="ea-eyebrow" delayMs={150}>
+            <ScrambleText className="ea-eyebrow--script" delayMs={150}>
               Каталог меню
             </ScrambleText>
             {/* C71: H2 — слова поднимаются каскадом (SplitTextReveal, дефолты
@@ -1264,12 +1263,21 @@ export function HaccMenu() {
         </motion.div>
       </div>
 
-      {/* метка рэка + печать кухни (C76: BrandBadge-монограмма в конце
-          волосяной линейки — как сургучная печать на краю каталога) */}
+      {/* метка рэка + печать кухни (C77: НАСТОЯЩИЙ логотип компании —
+          растр emblem-black-480 на прозрачном: золотые кольца + чёрные
+          буквы, как сургучная печать на краю каталога) */}
       <div className="ea-container ea-container--wide">
         <p className="hmenu__rack-label">
           <span>От канапе до мангала — семь каталогов</span>
-          <BrandBadge className="hmenu__seal" badgeStrokeWidth={0.5} />
+          <img
+            src="/brand/emblem-black-480.png"
+            alt=""
+            width={480}
+            height={558}
+            loading="lazy"
+            decoding="async"
+            className="hmenu__seal"
+          />
         </p>
       </div>
 

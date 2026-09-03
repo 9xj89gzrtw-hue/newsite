@@ -246,7 +246,10 @@ export function GgVideoShowcase() {
               unlayered `.ea-section-h2` rule (color: var(--ea-ink)) beats
               the layered Tailwind `text-white` utility — an inline
               `color: "#fff"` (inline beats both) keeps the H2 white over
-              the dark video. */}
+              the dark video.
+              C77 (владелец): слово «искусство» — ниже на строку: <br/>
+              между частями, вторая строка читается как акцентный
+              «выдох» курсивом. */}
           <motion.h2
             {...reveal(0)}
             className="ea-section-h2 mb-8 mt-2 max-w-4xl text-white"
@@ -255,7 +258,9 @@ export function GgVideoShowcase() {
               textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)",
             }}
           >
-            Кейтеринг как <i>искусство</i>
+            Кейтеринг как
+            <br />
+            <i>искусство</i>
           </motion.h2>
 
           {/* Subtitle — white @ 85%, max-w-2xl editorial column.

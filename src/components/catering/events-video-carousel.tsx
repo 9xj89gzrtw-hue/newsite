@@ -412,7 +412,12 @@ export function EventsVideoCarousel() {
     >
       <div className="ea-container ea-container--wide">
         {/* Header — eyebrow + H2 (italic-as-fragment) + subtitle.
-            (Task 4-B: TiltedAccent «кухня» removed; wording updated.) */}
+            (Task 4-B: TiltedAccent «кухня» removed; wording updated.)
+            C77 (владелец): здесь будет ~10 видео с мероприятий — и не
+            только еда. Копия переписана под это: афоризм «Не только
+            блюда. Всё событие.» + подзаголовок без счётчика (работает и
+            на текущих роликах, и на будущих десяти), охватывает кухню,
+            зал, команду и гостей. */}
         <motion.div
           className="ea-evt-video__top"
           initial={reduceSettled ? false : { opacity: 0, y: 24 }}
@@ -421,14 +426,15 @@ export function EventsVideoCarousel() {
           transition={{ duration: 0.7, ease: EASE }}
         >
           <div className="ea-evt-video__heading-block">
-            <span className="ea-eyebrow">Видео с наших мероприятий</span>
+            <span className="ea-eyebrow--script">Видео с наших мероприятий</span>
             <h2 className="ea-section-h2 ea-evt-video__h2">
-              {"Блюда, которые мы "}
-              <i className="ea-italic-fragment">создаём</i>
+              {"Не только блюда. "}
+              <i className="ea-italic-fragment">Всё событие</i>
               {"."}
             </h2>
             <p className="ea-evt-video__subtitle">
-              Четыре фрагмента нашей работы — от первых закусок до десертов.
+              Живые кадры с наших мероприятий — кухня и подача, зал и свет,
+              команда и гости в движении.
             </p>
           </div>
         </motion.div>

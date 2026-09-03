@@ -190,7 +190,7 @@ export function EaFaqAccordion() {
             крупно — дивайдеры/карусельные точки), затемняю ТОЛЬКО здесь:
             #7A6362 = 5.10:1 ✓ AA. */}
         <motion.p
-          className="ea-eyebrow text-center"
+          className="ea-eyebrow--script text-center"
           style={{ color: "#7A6362" }}
           {...reveal(0)}
         >

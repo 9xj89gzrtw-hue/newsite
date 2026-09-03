@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
 import { CONTACTS } from "@/lib/media";
+import "./site-header.css"; /* C77: kinetic-header эффекты (см. докблок css) */
 
 /**
  * SiteHeader — Talk of the Town (talkofthetownatlanta.com) header graft
@@ -368,7 +369,7 @@ export function SiteHeader() {
         }`}
       >
         <div
-          className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 transition-all duration-500 md:px-8"
+          className="hfx-row mx-auto flex max-w-7xl items-center justify-between px-5 py-3 transition-all duration-500 md:px-8"
         >
           {/* Logo LEFT — NILOV round badge (Task 6-D, nilov rebrand).
               Cycle 31.3 history: the Prata wordmark used to be hidden on
@@ -418,7 +419,7 @@ export function SiteHeader() {
               <a
                 key={n.label}
                 href={n.href}
-                className={`tott-body min-h-[44px] flex items-center text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 ${
+                className={`hnav-link tott-body min-h-[44px] flex items-center text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 ${
                   // FX5: burgundy hover dies on ink (≈1.6:1) — gold in dark.
                   dark ? "hover:text-[#D4A373]" : "hover:text-tott-burgundy"
                 }`}
@@ -440,7 +441,7 @@ export function SiteHeader() {
           <div className="flex items-center gap-3">
             <a
               href={CONTACTS.phoneHref}
-              className={`tott-body hidden min-h-[44px] items-center gap-2 text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 sm:inline-flex ${
+              className={`hnav-link tott-body hidden min-h-[44px] items-center gap-2 text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 sm:inline-flex ${
                 dark ? "text-[#F7F5F5] hover:text-[#D4A373]" : "text-ink hover:text-tott-burgundy"
               }`}
               style={{ fontWeight: 700 }}
@@ -451,13 +452,13 @@ export function SiteHeader() {
             </a>
             {/* Заказать — BLACK OUTLINE button (task v7: "кнопка заказать в
                 черной рамке а не черном квадрате"). Transparent bg, black
-                border, black text, square corners, hover fills black. → #contact */}
+                border, black text, square corners, hover fills black. → #contact
+                C77: hover-инверсию ведёт .hcta-btn (slide-fill панелью
+                снизу + инверсия текста; схемы — через [data-header-scheme]). */}
             <a
               href="#contact"
-              className={`tott-body hidden min-h-[44px] items-center justify-center border-2 bg-transparent px-5 text-[13px] font-700 uppercase tracking-[0.08em] transition-colors duration-300 sm:inline-flex ${
-                dark
-                  ? "border-[#F7F5F5]/80 text-[#F7F5F5] hover:bg-[#F7F5F5] hover:text-[#161312]"
-                  : "border-black text-black hover:bg-black hover:text-white"
+              className={`hcta-btn tott-body hidden min-h-[44px] items-center justify-center border-2 bg-transparent px-5 text-[13px] font-700 uppercase tracking-[0.08em] sm:inline-flex ${
+                dark ? "border-[#F7F5F5]/80 text-[#F7F5F5]" : "border-black text-black"
               }`}
               style={{ fontWeight: 700, borderRadius: 0 }}
               aria-label="Заказать кейтеринг"
@@ -557,7 +558,15 @@ export function SiteHeader() {
                   style={{ fontWeight: 700 }}
                   initial={{ opacity: 0, x: -30 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + i * 0.06 }}
+                  transition={{
+                    delay: 0.1 + i * 0.06,
+                    /* C77: пружина вместо линейного слайда — лёгкий overshoot,
+                       transform-only (дровер сам гейтится AnimatePresence;
+                       reduce-юзер открывает меню редко, движение короткое) */
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 24,
+                  }}
                 >
                   {n.label}
                 </motion.a>

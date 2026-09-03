@@ -236,7 +236,6 @@ import { ru as ruDayPickerLocale } from "react-day-picker/locale";
 
 import { Magnetic } from "@/components/motion/magnetic";
 import { TiltedAccent } from "@/components/catering/tilted-accent";
-import { BrandBadge } from "@/components/brand/brand-badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useMounted } from "@/hooks/use-mounted";
@@ -882,7 +881,7 @@ const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTM
     <div ref={hideRef} data-hb-hide="contacts" className="hb-contacts mt-16 md:mt-24">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <span className="ea-eyebrow">Контакты</span>
+          <span className="ea-eyebrow--script">Контакты</span>
           <h3 className="hb-contacts__title">Быстрее всего — позвонить.</h3>
         </div>
         <AnytimeBadge />
@@ -1543,10 +1542,20 @@ function SuccessPanel({
     <div className="hb-success">
       {settled && <ConfettiBurst />}
       <div className="hb-success__paper">
-        {/* C76: водяной знак монограммы на квитанции — бренд-момент в
-            точке конверсии. Ink ≈10%, наклон −12° (рифма со штампом
-            «Заявка принята»), z:-1 под текстом (isolate на paper). */}
-        <BrandBadge className="hb-success__wm" badgeStrokeWidth={0.4} />
+        {/* C77: водяной знак НАСТОЯЩЕГО логотипа компании на квитанции —
+            бренд-момент в точке конверсии. Растр emblem-black-480
+            (прозрачный фон, чёрные буквы) на бумаге через opacity 10%,
+            наклон −12° (рифма со штампом «Заявка принята»), z:-1 под
+            текстом (isolate на paper). */}
+        <img
+          src="/brand/emblem-black-480.png"
+          alt=""
+          width={480}
+          height={558}
+          loading="lazy"
+          decoding="async"
+          className="hb-success__wm"
+        />
         {/* D2 (task 9-fix2): единственный штамп блока — здесь, на квитанции.
             Компонент маунтится ТОЛЬКО после interact-сабмита (settled уже
             устойчив) — §35 «initial не перевооружается» неприменим. */}

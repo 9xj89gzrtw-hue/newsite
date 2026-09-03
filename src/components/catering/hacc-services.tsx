@@ -978,7 +978,7 @@ export function HaccServices() {
           <div className="hacc__head-text">
             {/* C71: eyebrow собирается перебором символов (ScrambleText):
                 тот же класс/шрифт/цвет, a11y — aria-label + aria-hidden узел. */}
-            <ScrambleText className="ea-eyebrow" delayMs={150}>
+            <ScrambleText className="ea-eyebrow--script" delayMs={150}>
               Форматы и сервисы
             </ScrambleText>
             {/* C71: H2 — слова поднимаются каскадом (SplitTextReveal, дефолты
@@ -989,7 +989,11 @@ export function HaccServices() {
             <h2 id="hacc-heading" className="ea-section-h2">
               <SplitTextReveal as="span" mode="words">
                 Сначала формат.
-              </SplitTextReveal>{" "}
+              </SplitTextReveal>
+              {/* C77 (владелец): «Потом меню.» — на строку ниже — вторая
+                  половина афоризма читается как курсивный ответ. <br/>
+                  вместо прежнего пробела между спанами. */}
+              <br />
               <i className="ea-italic-fragment">
                 <SplitTextReveal as="span" mode="words" delay={0.12}>
                   Потом меню.

@@ -13,7 +13,6 @@ import {
 } from "framer-motion";
 import "./ea-founder-story.css";
 import "@/components/motion/c74-kinetic.css";
-import { BrandBadge } from "@/components/brand/brand-badge";
 
 /**
  * EaFounderStory — Cycle 66 redesign: «Хроника одних рук».
@@ -685,12 +684,22 @@ export function EaFounderStory() {
             {/* Подпись «чернильным письмом»: clip слева→направо 900ms после
                 глав; под ней caps-роль. */}
             <div ref={signRef} className="efs__sign-block">
-              {/* C76: личная печать шефа — BrandBadge над подписью, золотом,
+              {/* C77: личная печать шефа — НАСТОЯЩИЙ логотип компании над
+                  подписью (растр emblem-white-480: белые буквы + золотые
+                  кольца на прозрачном — вариант лого для тёмного фона),
                   наклон +4° (в противоход рукописному −2°): как hanko-печать
                   под росчерком. fadeUp — framer (transform на обёртке),
-                  CSS-наклон — на внутреннем svg (не конфликтуют). */}
+                  CSS-наклон — на внутреннем img (не конфликтуют). */}
               <motion.div className="efs__seal" {...fadeUp(0.48)}>
-                <BrandBadge className="efs__seal-badge" badgeStrokeWidth={0.5} />
+                <img
+                  src="/brand/emblem-white-480.png"
+                  alt=""
+                  width={480}
+                  height={558}
+                  loading="lazy"
+                  decoding="async"
+                  className="efs__seal-badge"
+                />
               </motion.div>
               <motion.div
                 key={`sign-${on}`}

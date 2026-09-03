@@ -23,7 +23,6 @@ import {
 } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
-import { BrandBadge } from "@/components/brand/brand-badge";
 
 /**
  * Stable current year — computed once on mount to avoid SSR/CSR
@@ -270,25 +269,38 @@ function KineticWordmark({
 
 /**
  * FooterWatermark — ГИГАНТСКИЙ фоновый логотип-водяной знак «во весь
- * футер» (задача владельца, C76). Inline-SVG BrandBadge (вектор-двойник
- * public/logo.svg) масштабом ~min(115vmin, 1060px), крем ≈4.5% на bg-ink.
+ * футер» (задача владельца, C76; C77 — замена на НАСТОЯЩИЙ логотип
+ * компании по указанию владельца: растр /brand/logo-round-1024.png —
+ * тот же кругляж, что в шапке/фавиконе; «векторный двойник» C76
+ * монограммой НЕ был логотипом компании). Масштаб
+ * ~min(115vmin, 1060px), ghost ~5.5% opacity на bg-ink: белые буквы
+ * дают крем-призрак, золотые кольца — тёплый ореол.
  *
  * Слои: z-index:-1 внутри isolate-футера (как .fw-spotlight) — над
  * фоном, ПОД контентом; в DOM стоит РАНЬШЕ spotlight → свечение
  * курсора красится ПОВЕРХ водяного знака (золотая подсветка мягко
- * «проявляет» монограмму при движении).
+ * «проявляет» эмблему при движении).
  *
  * Кинетика (тренд 09.2026, продолжение C74): нативный CSS scroll-driven
  * дрейф — translateY ±4% + rotate ∓2.5° по animation-timeline: view()
- * (badge въезжает с лёгким наклоном и оседает по мере проскролла
+ * (эмблема въезжает с лёгким наклоном и оседает по мере проскролла
  * футера). Ноль JS-кадров. Деградации: @supports not → статика по
  * центру; prefers-reduced-motion → статика; печать — не печатается
  * (print-медиа). SSR-статичен (чистый CSS, §34 — не гейтится).
+ * loading="lazy": футер — самый низ страницы, грузим по мере надобности.
  */
 function FooterWatermark() {
   return (
     <div className="fw-watermark" aria-hidden="true">
-      <BrandBadge className="fw-watermark__badge" badgeStrokeWidth={0.18} />
+      <img
+        src="/brand/logo-round-1024.png"
+        alt=""
+        width={1024}
+        height={1033}
+        loading="lazy"
+        decoding="async"
+        className="fw-watermark__badge"
+      />
     </div>
   );
 }

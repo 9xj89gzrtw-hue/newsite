@@ -1162,8 +1162,10 @@
   border-radius: 12px;
   box-shadow: 0 30px 60px -34px color-mix(in srgb, var(--hb-ink) 55%, transparent);
 }
-/* C76: водяной знак «nilov» в правом нижнем углу квитанции — призрачная
-   печать бренда в момент успеха. Ink 10% на бумаге, наклон −12° —
+/* C77: водяной знак НАСТОЯЩЕГО логотипа компании в правом нижнем углу
+   квитанции — призрачная печать бренда в момент успеха. Растр
+   emblem-black-480 (прозрачный фон, чёрные буквы) красится через
+   opacity 10% (color/currentColor растр не красит), наклон −12° —
    рифма со штампом «Заявка принята» (у того rotate −12°). */
 .hb-success__wm {
   position: absolute;
@@ -1171,8 +1173,9 @@
   bottom: 0.85rem;
   z-index: -1;
   width: 88px;
-  height: 88px;
-  color: color-mix(in srgb, var(--hb-ink) 10%, transparent);
+  aspect-ratio: 480 / 558; /* растр 480×558 — без искажения эмблемы */
+  height: auto;
+  opacity: 0.1;
   transform: rotate(-12deg);
   pointer-events: none;
 }

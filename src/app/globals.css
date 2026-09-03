@@ -3465,6 +3465,35 @@ header[data-scrolled="true"] [data-mega-panel] {
   display: inline-block;
 }
 
+/* C77 (владелец): рукописный наклонный kicker секций — «Форматы и
+   сервисы», «Каталог меню», «Видео с наших мероприятий», «Контакты»,
+   «Вопросы · Ответы». Тот же шрифт и приём, что у наклонённых названий
+   блоков сайта (заголовки корешков рэка .hacc__title —6°, Marck Script;
+   «Не нашли нужное?» tott-script-ru rotate-3): Marck Script, наклон
+   −5° от левого низа (правый край поднимается — «записка редактора»
+   над заголовком). Цвет наследует контекст вызова: красный акцент —
+   как у прежнего eyebrow (--ea-red-text), FAQ держит свой mauve.
+   Контраст: 24px+ regular = large text → 3:1 достаточно; красный
+   6.01:1 и в малом кегле проходит AA. */
+.ea-eyebrow--script {
+  font-family: var(--font-marck), var(--font-script), cursive;
+  font-weight: 400;
+  font-size: clamp(1.3rem, 2.1vw, 1.8rem);
+  line-height: 1.1;
+  letter-spacing: 0.02em; /* тот же tracking, что .tilted-accent */
+  text-transform: none;
+  display: inline-block;
+  /* цвет прежнего eyebrow — красный акцент; инлайн-переопределение
+     (FAQ mauve) побеждает каскад */
+  color: var(--ea-red-text);
+  transform: rotate(-5deg);
+  transform-origin: 0 100%;
+  /* оптика: наклон уводит базу вправо-вниз — компенсируем врезкой
+     слева, и даём воздух до H2 (прежде глаз мерил Barlow-caps) */
+  margin-left: -0.35rem;
+  margin-bottom: 0.55rem;
+}
+
 .ea-section-h2 {
   font-family: var(--ea-font-display);
   font-weight: 400;
@@ -3894,6 +3923,7 @@ header[data-scrolled="true"] [data-mega-panel] {
   color: var(--gold, #c9a063);
 }
 
+
 /* R1 (C67 wave D): dark-section variant. Over [data-header-theme="dark"]
    sections (founder story #about, video showcase, parallax band, footer)
    the sticky header flips to its dark glass — but this rail stayed bright
@@ -3919,6 +3949,63 @@ header[data-scrolled="true"] [data-mega-panel] {
 }
 .vertical-brand-label[data-scheme="dark"] .vertical-brand-label__tick {
   background: rgba(247, 245, 245, 0.25);
+}
+
+/* C77 (владелец): «CATERING» на левой полоске ПЕРЕЛИВАЕТСЯ —
+   золотой градиент с бегущим бликом (background-clip: text).
+   Периодичный тайл (2 периода: A→B→A→B→A, background-size 200%)
+   + панорамирование позиции ровно на период = бесшовный луп.
+   180deg — ВДОЛЬ вертикальной строки (текст writing-mode vertical).
+   Краска background-position — не compositor, но зона ~50×160px на
+   декоративной полоске: замеренно-дешёвая (§43: число-основание —
+   repaint-прямоугольник слова, не вьюпорт).
+   Деградации: @supports not (background-clip: text) → сплошное золото
+   (базовое правило выше); prefers-reduced-motion → статичный градиент
+   (блик стоит, движения нет). Тёмная схема — свой набор стопов. */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .vertical-brand-label__word--accent {
+    background-image: linear-gradient(
+      180deg,
+      #c9a063 0%,
+      #f3e2bd 25%,
+      #c9a063 50%,
+      #f3e2bd 75%,
+      #c9a063 100%
+    );
+    background-size: 100% 200%;
+    background-repeat: repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: vbl-shimmer 5s linear infinite;
+  }
+  .vertical-brand-label[data-scheme="dark"] .vertical-brand-label__word--accent {
+    background-image: linear-gradient(
+      180deg,
+      #d4a373 0%,
+      #f7e7c8 25%,
+      #d4a373 50%,
+      #f7e7c8 75%,
+      #d4a373 100%
+    );
+    /* дублируем transparent: выше по файлу dark-правило красит слово
+       в #d4a373 — без этого градиент клипается, но текст рисуется
+       сплошным золотом поверх (наш блок НИЖЕ — побеждает) */
+    color: transparent;
+  }
+}
+@keyframes vbl-shimmer {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vertical-brand-label__word--accent {
+    animation: none; /* блик замирает, двухтоновое золото остаётся */
+  }
 }
 
 /* Global body padding-left toggle. The sidebar occupies real space on
@@ -4516,7 +4603,8 @@ body.cookie-banner-open {
      маркой городов, силуэт читается «дыханием», не «наклейкой»). */
   padding-bottom: 9%;
   pointer-events: none;
-  color: color-mix(in srgb, var(--cream) 4.5%, transparent);
+  /* C77: тинт переехал на opacity растрового логотипа (см. __badge) —
+     color-mix/currentColor красил только inline-SVG. */
   mask-image: radial-gradient(
     ellipse 94% 88% at 50% 46%,
     #000 48%,
@@ -4536,14 +4624,21 @@ body.cookie-banner-open {
      симметрично кровлится за края (overflow-x:clip держит скролл). */
   flex: none;
   width: min(115vmin, 1060px);
-  height: min(115vmin, 1060px);
+  aspect-ratio: 1024 / 1033; /* растр логотипа — без искажения круга */
+  height: auto;
+  /* C77-фикс: tailwind-preflight даёт img max-width:100% — 150vw-кровь
+     на мобиле сжималась до 390 (замер). Отключаем: слой bleed-заранее
+     за краями, overflow-x:clip на футере держит скролл. */
+  max-width: none;
   max-height: 100%;
-  opacity: 1; /* сила тинта управляется color-mix цвета выше */
+  object-fit: contain;
+  /* C77: ghost-сила ~5.5% — белые буквы дают крем-призрак, золотые
+     кольца тёплый ореол (было 4.5% color-mix на монохромном SVG). */
+  opacity: 0.055;
 }
 @media (max-width: 767px) {
   .fw-watermark__badge {
     width: 150vw;
-    height: 150vw;
     max-height: none; /* моб-футер всегда выше 150vw — центра достаточно */
   }
 }
