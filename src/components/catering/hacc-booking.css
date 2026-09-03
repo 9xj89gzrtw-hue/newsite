@@ -1154,10 +1154,27 @@
 .hb-success { position: relative; }
 .hb-success__paper {
   position: relative;
+  /* C76: stacking-контекст для водяного знака монограммы (z:-1 — над
+     фоном бумаги, под текстом квитанции) */
+  isolation: isolate;
   padding: 1.4rem 1.3rem 1.5rem;
   background: var(--hb-paper);
   border-radius: 12px;
   box-shadow: 0 30px 60px -34px color-mix(in srgb, var(--hb-ink) 55%, transparent);
+}
+/* C76: водяной знак «nilov» в правом нижнем углу квитанции — призрачная
+   печать бренда в момент успеха. Ink 10% на бумаге, наклон −12° —
+   рифма со штампом «Заявка принята» (у того rotate −12°). */
+.hb-success__wm {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  z-index: -1;
+  width: 88px;
+  height: 88px;
+  color: color-mix(in srgb, var(--hb-ink) 10%, transparent);
+  transform: rotate(-12deg);
+  pointer-events: none;
 }
 .hb-stamp { margin-bottom: 0.9rem; }
 .hb-success__no { font-size: 0.86rem; color: color-mix(in srgb, var(--hb-ink) 70%, transparent); }

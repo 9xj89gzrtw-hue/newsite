@@ -236,6 +236,7 @@ import { ru as ruDayPickerLocale } from "react-day-picker/locale";
 
 import { Magnetic } from "@/components/motion/magnetic";
 import { TiltedAccent } from "@/components/catering/tilted-accent";
+import { BrandBadge } from "@/components/brand/brand-badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useMounted } from "@/hooks/use-mounted";
@@ -1542,6 +1543,10 @@ function SuccessPanel({
     <div className="hb-success">
       {settled && <ConfettiBurst />}
       <div className="hb-success__paper">
+        {/* C76: водяной знак монограммы на квитанции — бренд-момент в
+            точке конверсии. Ink ≈10%, наклон −12° (рифма со штампом
+            «Заявка принята»), z:-1 под текстом (isolate на paper). */}
+        <BrandBadge className="hb-success__wm" badgeStrokeWidth={0.4} />
         {/* D2 (task 9-fix2): единственный штамп блока — здесь, на квитанции.
             Компонент маунтится ТОЛЬКО после interact-сабмита (settled уже
             устойчив) — §35 «initial не перевооружается» неприменим. */}

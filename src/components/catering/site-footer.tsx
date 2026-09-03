@@ -23,6 +23,7 @@ import {
 } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
+import { BrandBadge } from "@/components/brand/brand-badge";
 
 /**
  * Stable current year — computed once on mount to avoid SSR/CSR
@@ -268,6 +269,31 @@ function KineticWordmark({
 }
 
 /**
+ * FooterWatermark — ГИГАНТСКИЙ фоновый логотип-водяной знак «во весь
+ * футер» (задача владельца, C76). Inline-SVG BrandBadge (вектор-двойник
+ * public/logo.svg) масштабом ~min(115vmin, 1060px), крем ≈4.5% на bg-ink.
+ *
+ * Слои: z-index:-1 внутри isolate-футера (как .fw-spotlight) — над
+ * фоном, ПОД контентом; в DOM стоит РАНЬШЕ spotlight → свечение
+ * курсора красится ПОВЕРХ водяного знака (золотая подсветка мягко
+ * «проявляет» монограмму при движении).
+ *
+ * Кинетика (тренд 09.2026, продолжение C74): нативный CSS scroll-driven
+ * дрейф — translateY ±4% + rotate ∓2.5° по animation-timeline: view()
+ * (badge въезжает с лёгким наклоном и оседает по мере проскролла
+ * футера). Ноль JS-кадров. Деградации: @supports not → статика по
+ * центру; prefers-reduced-motion → статика; печать — не печатается
+ * (print-медиа). SSR-статичен (чистый CSS, §34 — не гейтится).
+ */
+function FooterWatermark() {
+  return (
+    <div className="fw-watermark" aria-hidden="true">
+      <BrandBadge className="fw-watermark__badge" badgeStrokeWidth={0.18} />
+    </div>
+  );
+}
+
+/**
  * FooterSpotlight — мягкое золотое свечение, следующее за курсором.
  * Монтируется только после mount на fine-pointer вне reduce (гейт в
  * SiteFooter) — SSR-разметка не содержит этот слой. Позиция —
@@ -376,6 +402,10 @@ export function SiteFooter() {
          над фоном футера и под контентом; overflow-x: clip (не hidden, §2). */
       className="grain relative isolate mt-auto overflow-x-clip bg-ink text-cream"
     >
+      {/* Гигантский фоновый логотип-водяной знак (z:-1, под контентом;
+          в DOM РАНЬШЕ spotlight — свечение красится поверх монограммы) */}
+      <FooterWatermark />
+
       {/* Курсорный gold-spotlight — fine-pointer + не-reduce, post-mount */}
       {mounted && !reduce && finePointer ? <FooterSpotlight /> : null}
 

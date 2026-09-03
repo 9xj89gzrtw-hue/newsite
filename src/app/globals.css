@@ -4487,6 +4487,89 @@ body.cookie-banner-open {
   pointer-events: none;
 }
 
+/* ── C76: гигантский фоновый логотип-водяной знак «во весь футер» ──
+   BrandBadge (inline-SVG, currentColor) в слое z:-1 — ДО spotlight в
+   DOM, поэтому золотое свечение курсора красится ПОВЕРХ монограммы и
+   мягко «проявляет» её. Крем 4.5% на bg-ink: текст футера сохраняет
+   контраст (замер: bg #0A0908 → микс с 4.5% cream ≈ #1D1A16 — ΔL
+   пренебрежим, AA/AAA-запас колонок не тронут).
+   Размер: min(115vmin, 1060px); на мобиле — 150vw (футер длинный,
+   «во весь футер» сохраняет драматизм). Вертикальный перепас:
+   absolute inset-0 + flex-центр; badge ограничен max-height:100% —
+   при гипотетически низком футере просто уменьшается, не вылезает.
+   Кинетика — нативный CSS (тренд 09.2026, та же школа что C74):
+   view()-таймлайн самого бейджа: entry 8% → cover 55% дрейф
+   translateY 4%→−4% + rotate −2.5°→2°. Ноль JS-кадров, работает и
+   при touch-скролле. Деградации: @supports not (animation-timeline)
+   → статика по центру; prefers-reduced-motion → статика; print —
+   водяной знак не печатается (декоративный слой). */
+.fw-watermark {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* VLM-ревью C76: оптический центр чуть выше геометрического (низ
+     футера — города/копирайт — дышит чистым фоном) + радиальная маска
+     растворяет силуэт бейджа к краям (снимает шум пересечения с
+     маркой городов, силуэт читается «дыханием», не «наклейкой»). */
+  padding-bottom: 9%;
+  pointer-events: none;
+  color: color-mix(in srgb, var(--cream) 4.5%, transparent);
+  mask-image: radial-gradient(
+    ellipse 94% 88% at 50% 46%,
+    #000 48%,
+    transparent 76%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 94% 88% at 50% 46%,
+    #000 48%,
+    transparent 76%
+  );
+}
+.fw-watermark__badge {
+  display: block;
+  /* flex:none — контейнер уже вьюпорта: без гварда flex-shrink сжимал
+     ширину бейджа до ширины футера (замер: 585→390 на iPhone 14, квадрат
+     становился прямоугольником). С none — бейдж честно 150vw и
+     симметрично кровлится за края (overflow-x:clip держит скролл). */
+  flex: none;
+  width: min(115vmin, 1060px);
+  height: min(115vmin, 1060px);
+  max-height: 100%;
+  opacity: 1; /* сила тинта управляется color-mix цвета выше */
+}
+@media (max-width: 767px) {
+  .fw-watermark__badge {
+    width: 150vw;
+    height: 150vw;
+    max-height: none; /* моб-футер всегда выше 150vw — центра достаточно */
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .fw-watermark__badge {
+      animation: fw-watermark-drift both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 55%;
+    }
+  }
+}
+@keyframes fw-watermark-drift {
+  from {
+    transform: translateY(4%) rotate(-2.5deg);
+  }
+  to {
+    transform: translateY(-4%) rotate(2deg);
+  }
+}
+@media print {
+  .fw-watermark {
+    display: none;
+  }
+}
+
 
 /* ══════════════════════════════════════════════════════════════════════
    Task 5-C (курсор + вау-эффекты): новые утилиты — ВСЕ анимации только

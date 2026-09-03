@@ -74,6 +74,7 @@ import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
 import { ScrambleText } from "@/components/motion/scramble-text";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
+import { BrandBadge } from "@/components/brand/brand-badge";
 import { MENU_TYPES, formatRUB, type MenuType } from "@/lib/pricing";
 import "./hacc-menu.css";
 
@@ -1263,9 +1264,13 @@ export function HaccMenu() {
         </motion.div>
       </div>
 
-      {/* метка рэка + сам рэк (full-bleed, как в услугах) */}
+      {/* метка рэка + печать кухни (C76: BrandBadge-монограмма в конце
+          волосяной линейки — как сургучная печать на краю каталога) */}
       <div className="ea-container ea-container--wide">
-        <p className="hmenu__rack-label">От канапе до мангала — семь каталогов</p>
+        <p className="hmenu__rack-label">
+          <span>От канапе до мангала — семь каталогов</span>
+          <BrandBadge className="hmenu__seal" badgeStrokeWidth={0.5} />
+        </p>
       </div>
 
       <MenuRack

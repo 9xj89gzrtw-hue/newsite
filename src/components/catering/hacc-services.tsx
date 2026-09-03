@@ -998,7 +998,7 @@ export function HaccServices() {
             </h2>
             <p className="hacc__lede">
               От кофе-брейка на двадцать персон до свадьбы на пятьсот гостей:
-              раскройте формат — увидите меню, команду и цену за гостя.
+              формат определяет меню, команду и цену за гостя.
             </p>
           </div>
           {/* cycle-54: the big 01/12 counter is GONE — it ticked far from

@@ -146,6 +146,34 @@
   background: rgba(26, 26, 26, 0.15);
 }
 
+/* ── C76: печать кухни — монограмма BrandBadge в конце линейки ──
+   Сургучная печать на краю каталога: бургунди (фирменный акцент
+   логотипа), наклон −8°, при наведении «выпрямляется» (fine-pointer).
+   order:1 — в конец flex-строки ЗА волосяной линией (::after).
+   Декоративная — aria-hidden внутри BrandBadge. */
+.hmenu__seal {
+  order: 1;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  color: var(--tott-burgundy, #8b1f1c);
+  transform: rotate(-8deg);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .hmenu__seal:hover {
+    transform: rotate(-1.5deg) scale(1.08);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hmenu__seal {
+    transition: none;
+  }
+  .hmenu__seal:hover {
+    transform: rotate(-8deg);
+  }
+}
+
 /* честная приписка под рэком */
 .hmenu__note {
   margin-top: 1.15rem;
