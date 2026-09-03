@@ -4,9 +4,6 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
-import type { CSSProperties } from "react";
-import { MENU_TYPES, formatRUB } from "@/lib/pricing";
-import { EVENTS_DONE, FOUNDED_YEAR } from "@/lib/site-config";
 
 /**
  * TottHero — Talk of the Town (talkofthetownatlanta.com) hero graft (Cycle 30).
@@ -51,79 +48,18 @@ const HERO_POSTER = "/media/hero-premium/hero-premium-6.jpg";
    next/image-оптимизация) НЕ тронут — он остаётся приоритетным кадром. */
 const HERO_VIDEO_POSTER = "/media/hero-premium/hero-premium-6-828.webp";
 
-/* ════════════ Cycle-71 / F4 — CTA-пара в hero (K1 MAJOR: «hero без единого
-   тапабельного действия», elementFromPoint(720,40) = декоративный div) ════════════
+/* ════════════ Cycle-72 — hero «чистый как картина» (прямое указание
+   владельца, §1.3 «пользователь — лучший критик» + §1.6 «вкусовая правка
+   юзера отменяет улучшения агента») ════════════
 
-   Две кнопки в существующем языке сайта (максимальная консистентность):
-   - pill-геометрия rounded-full + Barlow Semi Condensed Bold uppercase с
-     трекингом — тот же рецепт, что CTA-пилюли gg-video-showcase и кнопки
-     hacc-booking (--hb-caps = var(--ea-font-eyebrow) = Barlow Semi Condensed);
-   - ЗАЛИВКА: брендовое золото #C9A227 + espresso-текст #0A0908 — 8.22:1
-     (белый на золоте = 2.42:1 FAIL, поэтому текст тёмный; белый на #E71D3A
-     = 4.53:1 — впритык, забраковано);
-   - ОУТЛАЙН: рамка золото #C9A227 (8.22:1 против тёмного hero как UI-контроль
-     ≥3:1) + кремовый текст #F7F5F5 (≥11:1 на скриме) + лёгкая text-shadow
-     как у gg-пилюль на видео;
-   - тач-таргет ≥48px (K2/F5-стандарт), на мобиле — колонкой, на sm+ — в ряд;
-   - глобальные правила сайта работают сами: :focus-visible → золотой outline
-     (globals.css), button/a :active → scale(0.96) (тап-фидбек K2).
-   Палитра — cycle-71 (оркестратор): espresso #0A0908, золото #C9A227,
-   cream #F7F5F5. НИКАКИХ синих/indigo. */
-const CTA_BASE_CLASS =
-  "inline-flex min-h-[48px] items-center justify-center rounded-full px-6 text-center transition-colors duration-300 sm:px-8";
-const CTA_PRIMARY_CLASS = `${CTA_BASE_CLASS} bg-[#C9A227] text-[#0A0908] hover:bg-[#B08D22]`;
-const CTA_OUTLINE_CLASS = `${CTA_BASE_CLASS} border border-[#C9A227] text-cream hover:border-[#E5C76B] hover:bg-[#C9A227]/15`;
-const CTA_TEXT_STYLE: CSSProperties = {
-  fontFamily: "var(--ea-font-eyebrow)",
-  fontWeight: 700,
-  fontSize: "0.8rem",
-  lineHeight: 1.2,
-  letterSpacing: "0.1em",
-  textTransform: "uppercase",
-};
-const CTA_OUTLINE_TEXT_STYLE: CSSProperties = {
-  ...CTA_TEXT_STYLE,
-  textShadow: "0 1px 16px rgba(0, 0, 0, 0.5)",
-};
-
-/* ════════════ Cycle-71 / W3 — ценовой якорь в hero (K5+K6 MAJOR:
-   «hero = 0 цен / 0 пруфов, первый ценник на 2.6 экрана скролла») ════════════
-
-   Одна сдержанная строка под eyebrow: цены «от» двух флагманских форматов
-   + стаж. Числа — ТОЛЬКО из источников правды (заповедь «декорация дешевле
-   истины» / AGENTS.md §1.6), ноль выдумки:
-   - buffet/banquet perGuest — src/lib/pricing.ts (MENU_TYPES, те же
-     данные, что читает калькулятор: 2450 и 4470 ₽);
-   - 2400+ и 2007 — src/lib/site-config.ts (EVENTS_DONE / FOUNDED_YEAR,
-     те же константы, что в JSON-LD/llms.txt/футере «2 400+ мероприятий
-     с 2007 года»).
-   Типографика: tott-body, clamp(13–15px) — text-sm/base по ТЗ, НЕ
-   конкурирует с вордмарком (Prata clamp(3.5–10rem)); золото #E5C76B
-   (12.27:1 на hero-фоне #0A0908 — D6-конвенция computed, тот же тинт,
-   что CTA-пилюли F4), текст — чистый white (замер по пикселям видео:
-   /90 падало до 4.31 на ярких кадрах, /100 ≥5.07 даже на самом ярком
-   кадре); тень-гало из двух слоёв (плотная 1px-подложка + мягкая) —
-   субтитровый приём: цифры читаются и на ярких кадрах видео, где
-   попиксельный контраст золота проседает до ~3.7; перенос по словам
-   (390px — 2 строки, text-balance). Секция = 100svh — высота hero НЕ
-   растёт, композиция (CTA/«ЛИСТАЙТЕ») не тронута (замер ниже). */
-const ANCHOR_TEXT_STYLE: CSSProperties = {
-  ...CTA_TEXT_STYLE,
-  fontSize: "clamp(13px, 1.2vw, 15px)",
-  fontWeight: 600,
-  letterSpacing: "0.02em",
-  lineHeight: 1.6,
-  textTransform: "none",
-  textShadow:
-    "0 0 1px rgba(0,0,0,0.9), 0 1px 3px rgba(0,0,0,0.75), 0 2px 22px rgba(0,0,0,0.55)",
-};
-
-/** Источники чисел якоря — pricing.ts/site-config.ts (см. блок выше). */
-const ANCHOR_BUFFET = MENU_TYPES.find((m) => m.id === "buffet");
-const ANCHOR_BANQUET = MENU_TYPES.find((m) => m.id === "banquet");
-const ANCHOR_BUFFET_PRICE = ANCHOR_BUFFET ? formatRUB(ANCHOR_BUFFET.perGuest) : "";
-const ANCHOR_BANQUET_PRICE = ANCHOR_BANQUET ? formatRUB(ANCHOR_BANQUET.perGuest) : "";
-const ANCHOR_EVENTS = `${new Intl.NumberFormat("ru-RU").format(EVENTS_DONE)}+`;
+   Удалены ЦЕЛИКОМ (наследие Cycle-71 W3/F4):
+   - ценовой якорь «фуршеты от … · банкеты от … · 2 400+ мероприятий…»;
+   - CTA-пара «Смотреть меню» / «Рассчитать стоимость».
+   Hero остаётся чистой кинематографичной «картиной»: вордмарк +
+   script-подпись + eyebrow + scroll-cue. Цены по-прежнему на первом
+   экране скролла НЕ ниже (первые ценники — сервис-секция/калькулятор),
+   CTA живут в бургер-меню, хедере (после докинга) и теле страницы.
+   Возврат eyebrow marginTop 2.5rem (F4 сжимал до 2rem под CTA-пару). */
 
 export function TottHero() {
   const reduce = useReducedMotion();
@@ -391,9 +327,9 @@ export function TottHero() {
             letterSpacing: "0.35em",
             fontWeight: 700,
             textTransform: "uppercase",
-            /* F4: 2.5rem → 2rem — вертикальный бюджет под CTA-пару ниже
-               (замер: зазор до scroll-cue «ЛИСТАЙТЕ» ≥8px, W1-стандарт). */
-            marginTop: "2rem",
+            /* Cycle-72: 2rem (F4-бюджет под CTA-пару) → 2.5rem — исходные
+               «щедрые» редакционные отступы, CTA-пары больше нет. */
+            marginTop: "2.5rem",
             paddingLeft: "0.35em",
             textShadow: "0 2px 20px rgba(0,0,0,0.4)",
           }}
@@ -402,54 +338,6 @@ export function TottHero() {
           <br className="sm:hidden" />
           {" "}Санкт-Петербурга
         </motion.p>
-
-        {/* W3 (K5+K6 MAJOR): ценовой якорь — сдержанная строка под eyebrow,
-            до CTA-пары. Числа из pricing.ts/site-config.ts (константы выше,
-            комментарий-источник в блоке ANCHOR_*). mt-3 (12px) — «висит»
-            под eyebrow плотной подписью, не расталкивает стек; CTA ниже
-            с прежним mt-6. Перенос по словам: на 390px строка складывается
-            в 2 строки (text-balance), десктоп — одна. */}
-        <motion.p
-          variants={fade}
-          data-hero-anchor="prices"
-          className="tott-body mt-3 text-balance text-white"
-          style={ANCHOR_TEXT_STYLE}
-        >
-          {"Фуршеты от "}
-          <span className="text-[#E5C76B]">{ANCHOR_BUFFET_PRICE}</span>
-          {" · банкеты от "}
-          <span className="text-[#E5C76B]">{ANCHOR_BANQUET_PRICE}</span>
-          {" · "}
-          <span className="text-[#E5C76B]">{ANCHOR_EVENTS}</span>
-          {` мероприятий с ${FOUNDED_YEAR} года`}
-        </motion.p>
-
-        {/* F4 (K1 MAJOR): CTA-пара — раньше в hero было 0 тапабельных
-            действий (хедер докается только после 900px скролла). Обе —
-            якорные ссылки на СУЩЕСТВУЮЩИЕ секции (#menu — menu.tsx:402 /
-            hacc-menu.tsx:1175, #calculator — hacc-booking.tsx:2366):
-            мгновенный отклик без перезагрузки, Lenis-скролл по якорю
-            работает (проверено замером ниже). Вариант rise — общий
-            стаггер-каскад hero (reduce-motion → без анимации). */}
-        <motion.div
-          variants={rise}
-          className="mt-6 flex flex-col items-center gap-3 sm:mt-7 sm:flex-row sm:justify-center sm:gap-4"
-        >
-          <a
-            href="#menu"
-            className={CTA_PRIMARY_CLASS}
-            style={CTA_TEXT_STYLE}
-          >
-            Смотреть меню
-          </a>
-          <a
-            href="#calculator"
-            className={CTA_OUTLINE_CLASS}
-            style={CTA_OUTLINE_TEXT_STYLE}
-          >
-            Рассчитать стоимость
-          </a>
-        </motion.div>
       </motion.div>
 
       {/* Scroll cue bottom-center (sits above the docked nav). W1-FIX:
