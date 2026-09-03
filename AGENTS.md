@@ -952,3 +952,42 @@ document-делегатор: annotated-элементов может быть с
 (headless = pointer:none, §43-цикл 43): (pointer: fine) минует
 автотесты. WAAPI-частицы: fill forwards + remove() контейнера по
 таймауту-страховке (rAF в фоновой вкладке стоит).
+
+## §50. Cycle 79 — touch-анимации: как не отравиться инструментарием замера
+
+**Латентность CLI ломает субсекундные тайминги.** agent-browser-команда
+живёт 0.2–1.4с (запуск, CDP-круг): цепочка «dispatch → CLI wait 220 → CLI
+eval читает computed» гарантирует, что read УЖЕ после 430мс-лонг-пресса
+(пульс стартует с scale(1) → identity «провал», хотя всё работает).
+Лечение: ВСЕ timing-зависимые проверки — одним async-eval с внутренними
+setTimeout и одним return-объектом; CLI только вызывает и печатает.
+
+**Самотаймированный eval — канон:**
+```js
+(async () => { el.dispatchEvent(new PointerEvent("pointerdown",
+ {pointerType:"touch", …}));
+ await new Promise(r=>setTimeout(r,200)); const mid=…;
+ await new Promise(r=>setTimeout(r,420)); …
+ return JSON.stringify({mid, ring, sparks}); })()
+```
+
+**--full скриншот на тяжёлой странице = CDP-timeout + возможный вис**
+(видео+марке+ленис). Он же совпал с рестартом dev-сервера (19с
+recompile) — у СВЕЖЕЙ сессии картинки зависали в pending (7/75 loaded)
+после «Ready»: reload сессии лечит, паника — нет. Полные страницы —
+кнопкой склейки вьюпорт-скриншотов, не одним --full.
+
+**Живой rect в момент диспетча.** Марке едет 105px/с: rect, прочитанный
+в одном eval, к dispatch в СЛЕДУЮЩЕМ уже протух на сотни px —
+элемент-цель выбирать по свежему getBoundingClientRect (или делать
+dispatch в том же eval). Пиксель-анализ «золотости» на движущихся
+тёплых фото врет (контроль без всплеска дал те же 7к пикселей) —
+доказательства DOM-уровня (holder/children/anim keyframes) честнее.
+
+**WAAPI-нажатие vs CSS-транзишены.** transition: transform на
+[data-press] в @media (pointer: coarse) ДРАЛСЯ бы с Tailwind
+transition-* и framer inline-transform. Вместо этого нажатие ведёт
+WAAPI из JS (fill: forwards 150мс → пружина 340мс без fill) — ноль
+объявленных transition, WAAPI-слой сильнее inline и снимается сам.
+Tailwind v4 translate-* — standalone-свойство translate (не transform):
+с scale-WAAPI компононируется, прыжка центра нет.

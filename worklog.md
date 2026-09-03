@@ -3236,3 +3236,69 @@ Stage Summary:
   гидрации — ждать ≥2с. (3) Playwright locator.hover() на marquee
   вечно ждёт stable — только raw mouse.move/синтетика.
 - Коммит c78: push origin main (diff проверен).
+
+---
+Task ID: c79
+Agent: main (Z.ai Code)
+Task: «в мобильной версии очень мало анимации» — паритет анимаций для
+тача: десктопные hover/scroll-CSS-эффекты на мобильном либо невидимы,
+либо не работают в iOS Safari.
+
+Work Log:
+- Аудит мобильных дыр: (1) у ~26 интерактивных элементов НЕТ отклика на
+  нажатие (hover-эквивалент отсутствует); (2) hfx-rise шапки и
+  data-sd-zoom — чистый CSS animation-timeline: view() → Chromium/Safari
+  26+, iOS Safari ≤18 и Firefox видят СТАТИКУ; (3) c78-сюрпризы в
+  основном hover-гейты. Hero (§42) не тронут.
+- MicroDelights C79: touch-pointerdown на [data-press]/[data-spark] →
+  WAAPI-нажатие scale(0.94) 150мс (fill forwards); pointerup → пружина
+  0.94→1.032→1 340мс; сдвиг пальца >12px (скролл/драг марке) → отмена
+  200мс. Слушатели move/up/cancel живут ТОЛЬКО во время нажатия (паттерн
+  tilt). CSS не объявляет transition на transform — конфликтов с
+  framer/Tailwind ноль (WAAPI сильнее inline, живёт ≤340мс).
+- Лонг-пресс 430мс по [data-spark] — «золотой выдох»: искры ×1.6 (14
+  частиц на мобиле) + расширяющееся кольцо 56px + пульс фото 1→1.045→1
+  + navigator.vibrate(12) (Android). Клик после выдоха гасится capture
+  once + страховка 600мс. iOS: -webkit-touch-callout/user-select:none
+  на [data-spark] под (pointer: coarse) — системный каллаут не съедает
+  момент.
+- Аннотации [data-press] (26 эл-в): шапка (CTA/бургер/телефон/пункты
+  мобильного меню/CTA дровера/крестик), gg-video (2 CTA + Play-пилюля),
+  events-карусель (play/стрелки/крестик модалки), hacc-menu корешки,
+  hacc-booking (reset + hb-bar__cta), founder CTA, 5 соцкнопок футера.
+  FAQ-триггеры — framer whileTap 0.985 (reduce-гейт как у hover).
+  hacc-services корешки уже имели whileTap 0.98 — не тронуты.
+- site-header.tsx: JS-фоллбек hfx-rise для НЕ-поддерживающих view() —
+  WAAPI opacity/y, IO rootMargin -35% (вход в верхние 65%), пауза на
+  0-м кейфрейме (fill backwards, без мига), cancel по завершению +
+  таймер-страховка для фоновой вкладки.
+- SdZoomFallback (новый motion/sd-zoom-fallback.tsx): JS-зум 1.08→1.0
+  entry-прогресс для [data-spark]-фото GammaSeparator — IO ±20% + rAF,
+  ≤1 rect/кадр, слушатель scroll только в зоне; CSS.supports-гейт
+  исключает двойную анимацию с CSS-веткой.
+
+Stage Summary:
+- lint 0 / tsc 0 / pm2 :3001 online. Замеры (iPhone 14 эмуляция,
+  синтетические PointerEvent pointerType=touch, самотайминг внутри
+  одного eval): нажатие mid-press computed matrix(0.94); лонг-пресс →
+  ring:true + sparks:14 + пульс; клик после выдоха defaultPrevented,
+  URL не изменился; сдвиг пальца → transform:none (чистая отмена);
+  мышь (desktop 1440) → transform:none (тач-only гейт работает);
+  FAQ whileTap matrix(0.985); hfx-row animName hfx-rise (CSS-ветка
+  Chromium); разделитель animName sd-zoom-in, обёртка 390px — layout
+  VLM CLEAN (полоса + вордмарк целы); шапка+марке VLM CLEAN.
+- Регресс: hero a/button = 0 в обоих вьюпортах, overflowX = 0 в обоих,
+  ошибок консоли 0 (обе сессии), PM2-лог чист после правок.
+- Фоллбек-ветки (iOS Safari ≤18) в Chromium непроверяемы напрямую
+  (CSS.supports view()=true) — ветка уходит на гейте; механика WAAPI+IO
+  подтверждена теми же API в press-системе. Честно зафиксировано.
+- Грабли: (1) латентность CLI agent-browser (0.2–1.4с на команду)
+  ломает субсекундные тайминги — «mid-press» читался уже ПОСЛЕ
+  лонг-пресса (пульс стартует с scale(1) → identity). Лечится
+  самотаймированным async-eval (setTimeout внутри одного вызова).
+  (2) полный --full скриншот на тяжёлой странице → CDP-timeout,
+  способный подвесить сессию; параллельно рестартнул dev-сервер
+  (19с recompile) — картинки свежей сессии зависли в pending → после
+  «Ready» reload лечит. (3) фото марке едут 105px/с — rect читается в
+  момент диспетча, элемент выбирать по живому rect.
+- Коммит c79 2b4cf22: push origin main (diff проверен).
