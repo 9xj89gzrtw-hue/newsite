@@ -7,6 +7,7 @@ import { CustomCursor } from "@/components/catering/cursor";
 import { Preloader } from "@/components/catering/preloader";
 import { EaCookieBanner } from "@/components/catering/ea-cookie-banner";
 import { GrainOverlay } from "@/components/catering/grain";
+import { ScrollProgress } from "@/components/catering/scroll-progress";
 import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
 import { NuqsAdapter } from "nuqs/adapters/next";
@@ -46,10 +47,18 @@ import {
 
 // — Playfair Display: editorial display-serif с полной кириллицей (H2/H3,
 //   «СЛЕДИТЕ ЗА НАМИ», ex-Neutra2Display-слоты).
+//   C74 (E2, kinetic typography): weight "variable" вместо массива статиков.
+//   ЗАМЕР (research/c74-mobile.mjs, §43): Google и для статик-запросов
+//   отдавал VF-файлы — сеть до/после ИДЕНТИЧНА (18 файлов, 331 856 Б);
+//   переключение схлопывает 33 @font-face-декларации в 9 (8 VF-сабсетов
+//   roman+italic + fallback) и объявляет ось weight 400 900 → чистая
+//   интерполяция font-variation-settings 'wght' (.kinetic-h2,
+//   c74-kinetic.css). Вид по умолчанию не меняется: VF wght 400 ==
+//   прежняя статика 400.
 const playfair = Playfair_Display({
   variable: "--font-serif",
   subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600", "700"],
+  weight: "variable",
   style: ["normal", "italic"],
   /* Не LCP-критичен. */
   preload: false,
@@ -324,6 +333,9 @@ export default function RootLayout({
           />
         </noscript>
         <CustomCursor />
+        {/* C74 E1: нативная CSS полоса прогресса чтения (scroll-driven,
+            zero JS) — деградации в c74-kinetic.css. */}
+        <ScrollProgress />
         <GrainOverlay />
         <VerticalBrandLabel />
         <EaCookieBanner />

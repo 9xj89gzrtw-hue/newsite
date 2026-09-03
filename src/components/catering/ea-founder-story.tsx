@@ -12,6 +12,7 @@ import {
   useTransform,
 } from "framer-motion";
 import "./ea-founder-story.css";
+import "@/components/motion/c74-kinetic.css";
 
 /**
  * EaFounderStory — Cycle 66 redesign: «Хроника одних рук».
@@ -333,6 +334,58 @@ export function EaFounderStory() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const signRef = useRef<HTMLDivElement>(null);
 
+  /* C74 (E3) «фонарик»: ref подвижного свечения. Слой и стили —
+     efs__spot / efs__spot-glow (ea-founder-story.css), гварды —
+     (hover:hover)+(pointer:fine) и в CSS, и в JS (двойная защита
+     мобайла). */
+  const spotGlowRef = useRef<HTMLDivElement>(null);
+
+  /* ── C74 (E3) «фонарик» — курсорный светильник над точечной сеткой ──
+     Тренд 2026: joshwcomeau.com «flashlight», wearedevelopers «Spotlight
+     Text Effect» (10.2025), webflow «Spotlight Hover» — радиальное свечение
+     следует за мышью, проявляя точечную текстуру секции («музейный
+     фонарик» над призрачным «НИЛОВ»).
+     Перф-модель: точки — статичный фон обёртки (репейнт один раз);
+     свечение 600×600 — ЕДИНСТВЕННЫЙ подвижный слой, движение ТОЛЬКО
+     transform (композитор). Трекинг — синхронная запись transform прямо
+     в pointermove (§44/C73: без rAF-батчинга, без React-state — свечение
+     в том же кадре, что и системный курсор, отставание исключено).
+     Один gBCR на событие — браузер батчит, паттерн TiltCard.
+     Fine pointer only: touch-скролл сечение не трогает. */
+  useEffect(() => {
+    const section = sectionRef.current;
+    const glow = spotGlowRef.current;
+    if (!section || !glow) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    let visible = false;
+    const show = () => {
+      if (!visible) {
+        visible = true;
+        glow.style.opacity = "1";
+      }
+    };
+    const hide = () => {
+      if (visible) {
+        visible = false;
+        glow.style.opacity = "0";
+      }
+    };
+    const move = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      const r = section.getBoundingClientRect();
+      glow.style.transform = `translate3d(${e.clientX - r.left - 300}px, ${
+        e.clientY - r.top - 300
+      }px, 0)`;
+      show();
+    };
+    section.addEventListener("pointermove", move);
+    section.addEventListener("pointerleave", hide);
+    return () => {
+      section.removeEventListener("pointermove", move);
+      section.removeEventListener("pointerleave", hide);
+    };
+  }, []);
+
   // useInView — на ВСЕГДА присутствующих обёртках (refs не ремоунтятся,
   // булевы стабильны при key-флипе внутренних слоёв).
   // margin -60px (не -80px): запас против anchor-jump на #about — замер
@@ -420,6 +473,13 @@ export function EaFounderStory() {
     >
       {/* Тёплый bloom — статичный, один слой, не отвлекает (EA restraint). */}
       <div className="efs__bloom" aria-hidden="true" />
+
+      {/* C74 (E3) «фонарик»: точечная сетка + курсорное свечение.
+          z-2 — НАД призрачным «НИЛОВ» (z-1), ПОД контентом (z-10).
+          overflow:hidden — свечение не выходит за границы секции. */}
+      <div className="efs__spot" aria-hidden="true">
+        <div className="efs__spot-glow" ref={spotGlowRef} />
+      </div>
 
       {/* Гигантское outlined «НИЛОВ» — signature-typography на всю ширину
           низа. Декор: aria-hidden, pointer-events none. Дрейф — только
@@ -575,7 +635,7 @@ export function EaFounderStory() {
             <motion.h2
               key={`h2-${on}`}
               id="ea-founder-story-headline"
-              className="efs__h2"
+              className="efs__h2 kinetic-h2"
               {...fadeUp(0.08)}
             >
               Всё начинается с <i>рук.</i>

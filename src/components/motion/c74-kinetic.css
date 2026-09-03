@@ -1,0 +1,109 @@
+/* ==========================================================================
+   c74-kinetic.css — Cycle 74 «Kinetic September 2026».
+   Источники (web-ресёрч 2026-09, worklog C74):
+   - CSS Scroll-Driven Animations: Josh Comeau (28.04.2026), MDN (05.2026),
+     drafts.csswg.org scroll-animations-1. Chrome 115+, Edge, Safari 26+.
+     Firefox — флаг → деградация в статику через @supports.
+   - Kinetic variable-font typography: carmenansio.com/lab/variable-font-scroll
+     (17.04.2026 — «font axes animatable → animation-timeline drives wght»),
+     Casa di Solare by Unseen Studio (Orpetron #10, variable weight previews).
+   Конвенция файла — как у wow.css (волна 1): эффекты одной волны живут
+   в одном css, globals.css не трогаем. Импорт: scroll-progress.tsx +
+   ea-founder-story.tsx + ea-faq-accordion.tsx (Next дедуплицирует).
+   Палитра: gold/cream/ink. Никаких синих/indigo.
+   ========================================================================== */
+
+/* ── E1: ScrollProgress — нативная полоса прогресса чтения ─────────────
+   Чистый CSS: НОЛЬ JS-кадров, работает и на touch-скролле (мобайл).
+   transform: scaleX — свойство композитора, стоимость ≈ 0/кадр.
+   Высота 2px — тоньше рамочных линий PageBorders (1px, ink 16%):
+   полоса — «измеритель», не декор; gold-градиент по канону сайта.
+   Скрыта: reduced-motion (прогресс-бар = чистая декорация движения),
+   браузеры без animation-timeline (@supports), печать. */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  z-index: 90; /* над sticky-хедером (z-50) — стандарт полос прогресса */
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--gold) 10%,
+    var(--gold) 90%,
+    transparent 100%
+  );
+  transform-origin: 0 50%;
+  transform: scaleX(0); /* SSR-старт: нулевой прогресс */
+  animation-name: scroll-progress-grow;
+  animation-duration: auto; /* прогресс-таймлайн: длительность = диапазон */
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root);
+}
+
+@keyframes scroll-progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media print {
+  .scroll-progress {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress {
+    display: none;
+  }
+}
+
+@supports not (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: none;
+  }
+}
+
+/* ── E2: kinetic-h2 — кинетическая типографика (variable font wght) ────
+   Playfair Display теперь ГИБКИЙ VF (layout.tsx: weight "400..700" вместо
+   4 статик-инстансов × 2 стиля = 8 файлов → 2 VF-файла; замер байтов
+   в worklog C74). 'wght' 400→700 растёт, пока заголовок входит в экран
+   (entry 10% → cover 32%): входит лёгким, оседает насыщенным.
+   Стоимость: перерастровка ОДНОЙ строки h2 (~25 символов) только внутри
+   entry-окна; вне окна кадр не тратится (прогресс-таймлайн стоит).
+   Рефлоу: ширина строки меняется — заголовки блочные/центрированные,
+   соседей не сдвигают (замер overflow — см. верификацию C74).
+   Деградация: нет animation-timeline → статический 400 (штатный вид);
+   reduced-motion → статический 400. font-variation-settings наследуется
+   в <i>-фрагменты (курсивный VF тоже оживает). */
+.kinetic-h2 {
+  /* база = старый вид: VF wght 400 идентичен статике 400 */
+  font-weight: 400;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .kinetic-h2 {
+      animation-name: kinetic-wght;
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 32%;
+    }
+  }
+}
+
+@keyframes kinetic-wght {
+  from {
+    font-variation-settings: "wght" 400;
+  }
+  to {
+    font-variation-settings: "wght" 700;
+  }
+}

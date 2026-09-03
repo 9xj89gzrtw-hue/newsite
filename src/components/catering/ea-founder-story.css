@@ -607,3 +607,69 @@
     transform: none !important;
   }
 }
+
+/* ==========================================================================
+   C74 (E3) — «фонарик»: точечная сетка + курсорный светильник.
+   Тренд 2026: joshwcomeau.com «flashlight», wearedevelopers «Spotlight
+   Text Effect» (10.2025), webflow «Spotlight Hover».
+   Слои:
+   - .efs__spot — обёртка inset:0, z-2 (НАД призрачным «НИЛОВ» z-1, ПОД
+     контентом z-10: сетка проявляется над ghost-словом, читаемость текста
+     не тронута). overflow:hidden — свечение никогда не выходит за секцию.
+     Точечная сетка — фон обёртки (репейнт ОДИН раз, дальше кэш).
+     Виньет-маска — точки тают у краёв, нет резкой границы паттерна.
+   - .efs__spot-glow — 600×600 радиальное свечение (gold 15% → cream 7% →
+     transparent), mix-blend-mode: screen над ink #161312. Подвижный слой
+     ровно один; движение — ТОЛЬКО transform (композитор, will-change),
+     opacity-переход входа/ухода 450ms. Трекинг — JS в компоненте.
+   Активация: (hover:hover) and (pointer:fine) — CSS-гвард + дубль в JS;
+   мобайл/тач: слой не рендерится (display:none), эффект не существует.
+   ========================================================================== */
+.efs__spot {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+  display: none;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--efs-cream) 10%, transparent) 1px,
+    transparent 1.6px
+  );
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 96% 96% at 50% 48%,
+    black 62%,
+    transparent 99%
+  );
+  mask-image: radial-gradient(
+    ellipse 96% 96% at 50% 48%,
+    black 62%,
+    transparent 99%
+  );
+}
+
+.efs__spot-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 600px;
+  height: 600px;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  will-change: transform;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--gold) 15%, transparent) 0%,
+    color-mix(in oklab, var(--efs-cream) 7%, transparent) 38%,
+    transparent 68%
+  );
+  mix-blend-mode: screen;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .efs__spot {
+    display: block;
+  }
+}

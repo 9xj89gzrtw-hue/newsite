@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { ComponentProps, KeyboardEvent } from "react";
 import { ScrambleText } from "@/components/motion/scramble-text";
+import "@/components/motion/c74-kinetic.css";
 
 /**
  * EaFaqAccordion — Elegant Affairs minimalist single-column FAQ accordion.
@@ -199,7 +200,7 @@ export function EaFaqAccordion() {
         {/* H2 with italic-as-fragment trailing phrase ("знать" in red). */}
         <motion.h2
           id={`${reactId}-headline`}
-          className="ea-section-h2 mt-5 text-center"
+          className="ea-section-h2 kinetic-h2 mt-5 text-center"
           style={{ fontSize: "clamp(2.5rem, 5.5vw, 4rem)" }}
           {...reveal(0.05)}
         >
