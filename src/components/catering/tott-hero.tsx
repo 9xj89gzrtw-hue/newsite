@@ -86,46 +86,78 @@ export function TottHero() {
       };
 
   /* FIX-4 [F2, W1-D] §39 «живое видео без фриза: IO + preload="none"» —
-   * тот же паттерн, что gg-video-showcase.tsx:192-203. Раньше <video
-   * autoPlay> качал 5.16MB mculinary-hero.mp4 в критическом пути парсинга
-   * HTML (~6.1MB начального трафика, замер W1-D). Теперь: preload="none" —
-   * байты не запрашиваются, пока play() не вызван IO-гейтом; IO
-   * (rootMargin 100px) мгновенно стартует play при появлении секции в
-   * вьюпорте — hero виден с первой секунды, поэтому визуально НИЧЕГО не
-   * меняется (тот же autoplay-эффект, только запрос видео уходит после
-   * гидрации, а не блокирует начальный HTML); при уходе из вьюпорта —
-   * pause (экономия трафика на фоне ниже фолда). poster — существующее
-   * hero-фото (HERO_POSTER), дедуплицируется с poster-атрибутом
-   * gg-video-showcase (тот же URL).
+   * preload="none": байты видео не запрашиваются, пока play() не вызван
+   * IO-гейтом (rootMargin 100px — старт при появлении секции, pause при
+   * уходе из вьюпорта — экономия трафика ниже фолда). poster-кадр
+   * дедуплицирован с LCP-<Image> и gg-video-showcase.
    *
-   * C71-FIX (Task 3, audit A1 MINOR — 5.16MB видео качалось и на mobile
-   * 390×844: 5.5MB из ~7MB трансфера): mobile-first гейт — на coarse
-   * pointer ИЛИ ширине <768px IO не создаётся ВООБЩЕ, play() нечем
-   * звать → при preload="none" браузер не запрашивает ни байта видео,
-   * hero живёт на постере (HERO_POSTER уже LCP-priority <Image> — тот
-   * же кадр, дедуп с poster-атрибутом; в hero нет контрола
-   * воспроизведения — §39: «если нет — просто постер без видео на
-   * мобиле»). Десктоп без изменений: видео = LCP-стратегия как раньше.
-   * Решение принимается один раз на монте (device-характеристика;
-   * расширение окна после монт-решения видео не включает — осознанно).
-   *
-   * prefers-reduced-motion: IO не создаём — видео не играет, остаётся
-   * статичный постер (next/image z-0) — эталонный паттерн §39.
+   * C72-FIX-2 (прямая просьба владельца: «на мобильном hero перестало
+   * проигрываться видео, исправь»): C71-гейт «coarse-указатель ИЛИ
+   * <768px → IO не создаётся, видео выкл навсегда» СНЯТ. Основание:
+   * видео уже не 5.16MB, а 1.49MB (C71-P1 re-encode 720p/440kbps crf31
+   * faststart), muted + playsInline допускают autoplay на iOS без жеста
+   * юзера. Защиты, которые остались:
+   * - saveData / соединение 2g (Network Information API) → постер:
+   *   трафик владельца устройства дороже вау-эффекта;
+   * - мобильный старт ждёт декода LCP-<img> (кап 2.5s) — видео не
+   *   конкурирует с первым кадром страницы за канал;
+   * - ретрай play() на первом касании — iOS Low Power Mode отклоняет
+   *   autoplay, касание легализует старт;
+   * - prefers-reduced-motion: IO не создаём — статичный постер (§39).
    */
   useEffect(() => {
     if (reduce) return;
-    if (window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768) return;
     const section = sectionRef.current;
     const video = videoRef.current;
     if (!section || !video) return;
+
+    /* saveData/2g-гейт: «мобайл-ноль» теперь только для плохих сетей и
+       режимов экономии, НЕ для всех мобильных (§41-правило переопределено
+       владельцем — см. AGENTS.md §43). */
+    type ConnInfo = { saveData?: boolean; effectiveType?: string };
+    const conn = (navigator as Navigator & { connection?: ConnInfo }).connection;
+    if (conn && (conn.saveData === true || /2g/.test(conn.effectiveType ?? ""))) return;
+
+    const isMobile =
+      window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
+
+    let cancelled = false;
+    const tryPlay = () => {
+      if (cancelled) return;
+      // Muted-луп — разрешён всегда; отказ просто оставляет постер.
+      void video.play().catch(() => {
+        /* autoplay rejected (iOS Low Power Mode и т.п.) — постер
+           остаётся, ретрай на первом касании ниже. */
+      });
+    };
+
+    const playWhenReady = () => {
+      if (!isMobile) {
+        tryPlay();
+        return;
+      }
+      const img = section.querySelector("img") as HTMLImageElement | null;
+      if (!img || img.complete) {
+        tryPlay();
+        return;
+      }
+      /* Ждём LCP-кадр: видео не встаёт в очередь раньше первого экрана. */
+      img.addEventListener("load", tryPlay, { once: true });
+      window.setTimeout(tryPlay, 2500); /* кап: load может не прийти. */
+    };
+
+    /* iOS Low Power Mode: первый тап легализует muted-play. */
+    const retryOnTouch = () => {
+      tryPlay();
+      window.removeEventListener("touchend", retryOnTouch);
+      window.removeEventListener("touchstart", retryOnTouch);
+    };
+
     const io = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
         if (entry.isIntersecting) {
-          // Muted-луп — разрешён всегда; отказ просто оставляет постер.
-          void video.play().catch(() => {
-            /* autoplay rejected — poster image stays */
-          });
+          playWhenReady();
         } else {
           video.pause();
         }
@@ -133,9 +165,16 @@ export function TottHero() {
       { rootMargin: "100px" },
     );
     io.observe(section);
+    if (isMobile) {
+      window.addEventListener("touchstart", retryOnTouch, { passive: true });
+      window.addEventListener("touchend", retryOnTouch, { passive: true });
+    }
     return () => {
+      cancelled = true;
       io.disconnect();
       video.pause();
+      window.removeEventListener("touchend", retryOnTouch);
+      window.removeEventListener("touchstart", retryOnTouch);
     };
   }, [reduce]);
 
