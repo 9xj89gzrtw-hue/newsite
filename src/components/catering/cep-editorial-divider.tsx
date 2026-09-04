@@ -24,7 +24,7 @@ import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
  *    the band is the focus.
  *
  * Server Component — no hooks, no client JS at the section level. The
- * ClipPathReveal wrapper is a client island (motion/react useInView); the
+ * ClipPathReveal wrapper is a client island (framer-motion useInView); the
  * Ken-Burns animation is pure CSS (`.cep-bg-zoom` keyframes already defined in
  * globals.css), and `prefers-reduced-motion` is handled at the CSS layer
  * (globals.css disables `.cep-bg-zoom` animation under reduced motion) plus

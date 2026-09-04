@@ -50,8 +50,11 @@
  *  - Each step slices the shared progress (SPEC windows [i/N·0.75, +0.25])
  *    with per-step useTransform overlays: red ink-fill opacity on the
  *    numeral (two stacked spans: -webkit-text-stroke outline under a filled
- *    cep-red copy), verb/body opacity 0.8→1 (wave-1 H: the old 0.45 floor
- *    failed WCAG contrast on cream), dot 0→1 with a subtle scale pulse.
+ *    cep-red copy; 81-F3: контур — СПЛОШНОЙ cep-black, не полупрозрачный —
+ *    Lighthouse color-contrast 2.4:1 → ≥4.5:1, дизайн «контурных цифр»
+ *    сохранён: заливка прозрачная, только stroke), verb/body opacity
+ *    0.8→1 (wave-1 H: the old 0.45 floor failed WCAG contrast on cream),
+ *    dot 0→1 with a subtle scale pulse.
  *
  * Type hierarchy (wave-1 A/B): H2 is the page-wide Cyrillic canon —
  * .ea-section-h2 (Playfair Display, sentence case, ≤64px, lh 1.08), the same
@@ -345,12 +348,16 @@ function ProcessStep({
 
       {/* Numeral — -webkit-text-stroke outline under a red ink-fill overlay.
           Fixed md:h-14 box keeps every column's dot on the same 3.875rem
-          line; the w-[2ch] box (via NUMERAL) keeps mobile indents aligned. */}
+          line; the w-[2ch] box (via NUMERAL) keeps mobile indents aligned.
+          81-F3 (Lighthouse color-contrast): контур был rgba(0,0,0,0.35) —
+          2.4:1 на креме (#F7F5F5); сплошной var(--cep-black) даёт ≈19:1 —
+          AA ≥4.5:1 при любом состоянии скролла, «контурные цифры»
+          (stroke-only, заливка прозрачная) остаются контурными. */}
       <span className="relative block md:flex md:h-14 md:items-end md:pb-2">
         <span
           aria-hidden="true"
           className={`${NUMERAL} block text-transparent`}
-          style={{ WebkitTextStroke: "1.5px rgba(0,0,0,0.35)" }}
+          style={{ WebkitTextStroke: "1.5px var(--cep-black)" }}
         >
           {step.num}
         </span>

@@ -8,17 +8,30 @@ import { CONTACTS } from "@/lib/config";
  * переходе по битой ссылке). Next 16: not-found.tsx поддерживает export
  * metadata (title/description уже работали) — openGraph/twitter тоже
  * рендерятся, проверено curl-ом /nonexistent в верификации Task 1-b.
- * canonical = "/" (консолидация веса на главную; сама 404 — noindex). */
+ *
+ * 81-F2 (критик A, дубль robots + canonical на 404) + 81-F2b (доделка):
+ *   - robots: null — ГАСИТ унаследованный из layout.tsx robots
+ *     («index, follow, max-*»). Next.js на 404-статусе сам ставит
+ *     <meta name="robots" content="noindex"> (app-render.js: NonIndex —
+ *     безусловно для statusCode>400) — с живым layout-robots на 404
+ *     рендерились ДВА противоречащих robots-мета (замер curl: «noindex» +
+ *     «index, follow»). null (официальный способ сброса поля в Next,
+ *     metadata-interface.d.ts: robots?: null | string | Robots) оставляет
+ *     РОВНО ОДНУ директиву — авто-noindex; follow — дефолт по спецификации
+ *     robots-meta, ссылки не страдают.
+ *   - alternates: null — canonical «/» из layout.tsx НЕ консолидирует вес
+ *     на главную (дубль канонического сигнала на noindex-странице
+ *     бессмысленен), og:url убран по той же причине — og:title/description/
+ *     images остаются для корректного соцпревью по битой ссылке. */
 export const metadata: Metadata = {
   title: "Страница не найдена",
   description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с nilov catering.",
-  robots: { index: false, follow: true },
-  alternates: { canonical: "/" },
+  robots: null,
+  alternates: null,
   openGraph: {
     title: "Страница не найдена | nilov catering",
     description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с nilov catering.",
     type: "website",
-    url: "/",
     locale: "ru_RU",
     siteName: "nilov catering",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — кейтеринг Санкт-Петербурга" }],
@@ -38,12 +51,25 @@ export default function NotFound() {
    * cream = 18.32:1, cream/75 = 10.29:1 — всё ≥4.5 AA), ghost-404 —
    * золотой контур (декоративный, aria-hidden). Кнопки: «На главную» —
    * золотая заливка с espresso-текстом (8.22:1), «Смотреть меню»/телефон —
-   * outline-gold с кремовым текстом. Metadata-экспорт НЕ тронут (Task 1-b,
-   * свежие OG/noindex/canonical — см. докстринг выше). */
+   * outline-gold с кремовым текстом.
+   *
+   * 81-F2 (критик A CRITICAL — 3 CTA сплющены в 2 строки внутри max-w-md):
+   * текст-блок остаётся в max-w-md, а ряд кнопок вынесен в СОБСТВЕННЫЙ
+   * контейнер: <lg — вертикальный стек на полную ширину трека (max-w-sm,
+   * каждая кнопка однострочная, min-h 48px), lg+ — горизонтальный ряд
+   * в max-w-2xl (3 кнопки ≈ 640px — без сжатия).
+   * skip-link цель: id="main-content" + tabIndex -1 (WCAG 2.4.1 A —
+   * W1-D MAJOR: у 404 не было цели для перехода из скип-линка). */
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#0A0908] px-5 py-20 text-center">
-      <div className="mx-auto max-w-md">
-        <span className="font-mono text-xs uppercase tracking-[0.3em] text-[#C9A227]">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="flex min-h-screen flex-col items-center justify-center bg-[#0A0908] px-5 py-20 text-center"
+    >
+      <div className="mx-auto w-full max-w-md">
+        {/* 81-F2: tracking 0.3em → 0.14em — при 0.3em «О Ш И Б К А 404»
+            читалось как разряжённые отдельные буквы (замер критика A). */}
+        <span className="font-mono text-xs uppercase tracking-[0.14em] text-[#C9A227]">
           Ошибка 404
         </span>
         <p
@@ -63,30 +89,31 @@ export default function NotFound() {
           Возможно, страница была перемещена или удалена. Вернитесь на главную
           или свяжитесь с нами — поможем организовать ваше мероприятие.
         </p>
+      </div>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Link
-            href="/"
-            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#C9A227] px-7 py-3 text-sm font-medium text-[#0A0908] transition-colors hover:bg-[#B08D22] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
-          >
-            <Home className="size-4" />
-            На главную
-          </Link>
-          <Link
-            href="/#menu"
-            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#C9A227] bg-transparent px-7 py-3 text-sm font-medium text-cream transition-colors hover:border-[#E5C76B] hover:bg-[#C9A227]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
-          >
-            <UtensilsCrossed className="size-4" />
-            Смотреть меню
-          </Link>
-          <a
-            href={CONTACTS.phoneHref}
-            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#C9A227] bg-transparent px-7 py-3 text-sm font-medium text-cream transition-colors hover:border-[#E5C76B] hover:bg-[#C9A227]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
-          >
-            <Phone className="size-4" />
-            {CONTACTS.phone}
-          </a>
-        </div>
+      {/* 81-F2: кнопки — отдельный контейнер (не сжимаются max-w-md). */}
+      <div className="mx-auto mt-8 flex w-full max-w-sm flex-col gap-3 lg:max-w-2xl lg:flex-row lg:justify-center">
+        <Link
+          href="/"
+          className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#C9A227] px-7 py-3 text-sm font-medium text-[#0A0908] transition-colors hover:bg-[#B08D22] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
+        >
+          <Home className="size-4" aria-hidden="true" />
+          На главную
+        </Link>
+        <Link
+          href="/#menu"
+          className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#C9A227] bg-transparent px-7 py-3 text-sm font-medium text-cream transition-colors hover:border-[#E5C76B] hover:bg-[#C9A227]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
+        >
+          <UtensilsCrossed className="size-4" aria-hidden="true" />
+          Смотреть меню
+        </Link>
+        <a
+          href={CONTACTS.phoneHref}
+          className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#C9A227] bg-transparent px-7 py-3 text-sm font-medium text-cream transition-colors hover:border-[#E5C76B] hover:bg-[#C9A227]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
+        >
+          <Phone className="size-4" aria-hidden="true" />
+          {CONTACTS.phone}
+        </a>
       </div>
     </main>
   );

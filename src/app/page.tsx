@@ -9,11 +9,17 @@ import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
 import { CepProcess } from "@/components/catering/cep-process";
 import { HaccBooking } from "@/components/catering/hacc-booking";
+import { TiltedAccent } from "@/components/catering/tilted-accent";
 import { EaFounderStory } from "@/components/catering/ea-founder-story";
 import { GammaSeparator } from "@/components/catering/gamma-separator";
 import { EaFaqAccordion } from "@/components/catering/ea-faq-accordion";
 import { CepInstagramGrid } from "@/components/catering/cep-instagram-grid";
 import { SiteFooter } from "@/components/catering/site-footer";
+/* 81-F2b: vanity-URL /menu /events /contacts /calculator приезжают на
+   главную через next.config-rewritы с scrollY=0 (hash до браузера не
+   доходит) — клиентский скроллер ведёт к целевой секции (см. докстринг
+   компонента). Рендерит null, ноль DOM, ноль layout-влияния. */
+import { VanityUrlScroll } from "@/components/vanity-scroll";
 
 // Cycle 32 — Simplified 17-section catering site restructure.
 //
@@ -163,6 +169,81 @@ const faqJsonLd = {
   ],
 };
 
+/* 81-F3 (S1, критик C — MAJOR): SSR-shell конверс-блока. HaccBooking обязан
+ * жить в Suspense (nuqs useQueryState) — при СТАТИЧЕСКОМ пререндере проде
+ * fallback={null} оставлял в SSR-HTML пустоту: якоря #calculator/#contact
+ * (шапка/футер/privacy/offer/llms.txt) и H2 секции отсутствовали в сыром
+ * HTML. Фикс — паттерн Next.js Streaming-гайда (81-R1/P4): серверный
+ * статичный фоллбэк-шелл с НОСИТЕЛЯМИ ЯКОРЕЙ + реальным заголовком (1:1
+ * разметка живого виджета — TiltedAccent + H2 + лид) + скелет-плашки
+ * размерами ≈ виджет (замеры :3001: hb-grid 926px @1280, contacts ~750px;
+ * десктоп-стрейч правой колонки — грид-стрейч).
+ *
+ * Ключевое решение (координация с 81-F2, хозяином hacc-booking.tsx):
+ * якоря живут В ФОЛЛБЭКЕ, а не в постоянной обёртке ВНЕ Suspense —
+ * hacc-booking.tsx рендерит СОБСТВЕННУЮ <section id="calculator"> (не мой
+ * файл, «рендерится как раньше»); постоянная внешняя обёртка с id давала бы
+ * ДУБЛЬ id после гидрации. React заменяет фоллбэк на виджет одним коммитом
+ * — якорь #calculator/#contact существует и в SSR-HTML (фоллбэк), и после
+ * гидрации (живой виджет), ни в один момент двух экземпляров нет. Нюанс
+ * верификации: dev :3001 рендерит динамически (Suspense не срабатывает,
+ * виджет в SSR-HTML всегда); фоллбэк проверялся временным прямым рендером
+ * (research/f3/) — прод-проверка сырого HTML за оркестратором (ребилд :3002
+ * в этой сессии запрещён).
+ */
+function HaccBookingShell() {
+  return (
+    <section
+      id="calculator"
+      data-header-theme="light"
+      aria-labelledby="hbooking-heading"
+      data-stage="calc"
+      className="hbooking ea-section ea-section--cream section-light relative"
+    >
+      <div className="ea-container ea-container--wide">
+        {/* Шапка — 1:1 с живым виджетом (hacc-booking.tsx: hb-head):
+            одинаковая разметка/классы => свап фоллбэка не двигает
+            заголовок (зона текста — CLS=0), SSR-HTML получает H2+лид. */}
+        <div className="hb-head">
+          <TiltedAccent text="смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
+          <h2 id="hbooking-heading" className="ea-section-h2">
+            {"Соберите банкет. "}
+            <i className="ea-italic-fragment hb-h2-line">Чек напечатается сразу.</i>
+          </h2>
+          <p className="hb-lede">
+            Выберите формат и гостей — смета-чек напечатается рядом.
+            Ещё выбираете формат? Оставьте заявку — подберём и посчитаем вместе.
+          </p>
+        </div>
+
+        {/* Сцена-скелет: серо-кремовые плашки (декоративны — aria-hidden).
+            Левая колонка — контроловые блоки (тип/гости/дата), правая —
+            панель смета-чека (на xl растягивается грид-стрейчем, как живой
+            sticky-чек). Высоты подобраны под замеры живого грида. */}
+        <div className="hb-grid" aria-hidden="true">
+          <div className="flex flex-col gap-8">
+            <div className="h-64 md:h-[320px] rounded-2xl bg-cep-cream-warm ring-1 ring-ink/10" />
+            <div className="h-48 md:h-[230px] rounded-2xl bg-cep-cream-warm ring-1 ring-ink/10" />
+            <div className="h-32 md:h-[150px] rounded-2xl bg-cep-cream-warm ring-1 ring-ink/10" />
+          </div>
+          <div className="h-[480px] rounded-3xl bg-cep-cream-warm ring-1 ring-ink/10 md:h-[620px] xl:h-auto" />
+        </div>
+
+        {/* Якорь зоны формы: пустой div.hb-zone (scroll-margin-top: 96px —
+            как у живого #contact). После гидрации заменяется живым
+            div#contact виджета — дубля id нет (фоллбэк уходит целиком). */}
+        <div id="contact" className="hb-zone" />
+
+        {/* Низ секции — контакты/карта: грубые плашки ≈ 750px живой зоны. */}
+        <div className="mt-16 md:mt-24" aria-hidden="true">
+          <div className="h-40 rounded-2xl bg-cep-cream-warm ring-1 ring-ink/10 md:h-48" />
+          <div className="mt-6 h-[320px] rounded-3xl bg-cep-cream-warm ring-1 ring-ink/10 md:h-[380px]" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   return (
     <main
@@ -277,15 +358,18 @@ export default function Home() {
               Хендофф: чек сжимается в карточку-шапку, под контролами раскрывается
               2-шаговая форма (контакты → отправка) с prefill из nuqs-стейта →
               POST /api/lead → штамп + tear-off + конфетти. Низ секции —
-              контакты-зона: live-бейдж Открыто/Закрыто (Europe/Moscow), быстрые
-              ссылки, ленивая Яндекс-карта. Якоря: id="calculator" (секция) и
-              id="contact" (зона формы) — на них смотрят шапка, футер, hacc-services,
-              hacc-menu, delivery-block, privacy/offer, gg-video-showcase.
-              Спека: research/c64/SPEC.md; дизайн: research/c64/RESEARCH-DESIGN.md.
-              Компонент обязан жить в Suspense (требование nuqs useQueryState).
+              контакты-зона: бейдж «Отвечаем в любое время», быстрые ссылки,
+              ленивая Яндекс-карта. Якоря: id="calculator" (секция) и
+              id="contact" (зона формы) — на них смотрят шапка, футер,
+              hacc-services, hacc-menu, delivery-block, privacy/offer,
+              gg-video-showcase. Спека: research/c64/SPEC.md; дизайн:
+              research/c64/RESEARCH-DESIGN.md. Компонент обязан жить в
+              Suspense (требование nuqs useQueryState). 81-F3 (S1): fallback —
+              серверный SSR-shell (HaccBookingShell выше): якоря + H2 + скелет
+              в статичном HTML пререндера, виджет гидрируется как раньше.
               Старые Calculator/Contact остаются на диске (конвенция репо),
               НЕ рендерятся. */}
-      <Suspense fallback={null}>
+      <Suspense fallback={<HaccBookingShell />}>
         <HaccBooking />
       </Suspense>
 
@@ -319,6 +403,11 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
+
+      {/* 81-F2b: vanity-URL-скроллер (см. импорт выше) — самый конец
+          страницы: событие монтируется после всех секций, к моменту
+          effect-тактов DOM-дерево готово, getElementById находит цель. */}
+      <VanityUrlScroll />
     </main>
   );
 }

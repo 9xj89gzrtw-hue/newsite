@@ -62,6 +62,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
@@ -144,6 +145,9 @@ export function EventsVideoCarousel() {
   const scrollerRef = useRef<HTMLUListElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [progress, setProgress] = useState(0);
+  /* 81-F2: края трека — гашение стрелок (см. скролл-эффект ниже). */
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
 
   /** activeIndex !== null → fullscreen modal open with that tile's video. */
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -295,23 +299,37 @@ export function EventsVideoCarousel() {
   }, [reduce, activeIndex, startAuto, stopAuto]);
 
   // Scroll-progress bar — rAF-throttled to keep scroll perf clean.
+  // 81-F2 (критик B, стрелки на краях): тот же скролл-поток считает
+  // atStart/atEnd — стрелки гаснут (opacity 40% + pointer-events none),
+  // когда скроллить в эту сторону больше нечего (трек упирается в край:
+  // scrollLeft ≤ 4 / scrollLeft+clientWidth ≥ scrollWidth-4). Автопрокрутка
+  // с wrap-around обновляет состояния через те же события. ResizeObserver
+  // пересчитывает после ресайза/поворота.
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
     let ticking = false;
+    const measure = () => {
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      setAtStart(scroller.scrollLeft <= 4);
+      setAtEnd(max <= 0 || scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 4);
+      const pct = max > 0 ? scroller.scrollLeft / max : 0;
+      setProgress(pct);
+      ticking = false;
+    };
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
-      requestAnimationFrame(() => {
-        const max = scroller.scrollWidth - scroller.clientWidth;
-        const pct = max > 0 ? scroller.scrollLeft / max : 0;
-        setProgress(pct);
-        ticking = false;
-      });
+      requestAnimationFrame(measure);
     };
     scroller.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => scroller.removeEventListener("scroll", onScroll);
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    ro?.observe(scroller);
+    measure();
+    return () => {
+      scroller.removeEventListener("scroll", onScroll);
+      ro?.disconnect();
+    };
   }, []);
 
   /* Latest closeModal for the ESC listener — assigned in an effect that
@@ -400,6 +418,40 @@ export function EventsVideoCarousel() {
   useEffect(() => {
     closeModalRef.current = closeModal;
   }, [closeModal]);
+
+  /* 81-F2 (критик B, a11y модалки): фон под диалогом глохнет. Паттерн
+   * site-header.tsx:419 (inert={open} aria-hidden={open} на хедере при
+   * открытом бургере) — но шапка владеет СВОИМ элементом, а модалка здесь
+   * должна заглушить ЧУЖИЕ корневые слои: <main> и <header>. Отсюда два
+   * решения:
+   *  (1) модалка рендерится ЧЕРЕЗ createPortal(document.body) — иначе
+   *      inert на <main> погасил бы и её саму (она живёт внутри секции
+   *      внутри main); fixed-позиция от портала не меняется (предки без
+   *      transform);
+   *  (2) атрибуты ставятся императивно с cleanup: React не перепишет
+   *      их, пока его собственные пропсы не меняются (inert у хедера
+   *      React-управляемый только из состояния бургера).
+   * Заодно гасится и cookie-баннер (живёт в layout ВНЕ main — фокус-лапа
+   * модалки его иначе достигала бы поверх бэкдропа). Escape/фокус-трап/
+   * возврат фокуса на открывашку — как было (K7-FIX двойной rAF). */
+  useEffect(() => {
+    if (activeIndex === null) return;
+    const roots = [
+      document.querySelector("main"),
+      document.querySelector("header"),
+      document.querySelector('[data-component="ea-cookie-banner"]'),
+    ].filter((el): el is HTMLElement => el !== null);
+    roots.forEach((el) => {
+      el.setAttribute("inert", "");
+      el.setAttribute("aria-hidden", "true");
+    });
+    return () => {
+      roots.forEach((el) => {
+        el.removeAttribute("inert");
+        el.removeAttribute("aria-hidden");
+      });
+    };
+  }, [activeIndex]);
 
   const activeTile = activeIndex === null ? null : TILES[activeIndex];
 
@@ -558,14 +610,21 @@ export function EventsVideoCarousel() {
         </div>
 
         {/* Cycle 39 fix: desktop prev/next arrows — the 4th card was
-            partially cut with no affordance. Arrows scroll one card. */}
+            partially cut with no affordance. Arrows scroll one card.
+            81-F2: на краю трека стрелка гаснет (opacity 40% +
+            pointer-events: none — CSS-правило [data-edge="true"];
+            критик B: стрелка «дальше» при упоре в конец читалась как
+            сломанная — это кламп трека, не баг скролла). */}
         <div className="ea-evt-video__nav">
           <button
             type="button"
             className="ea-evt-video__nav-btn"
+            data-edge={atStart ? "true" : undefined}
+            aria-disabled={atStart || undefined}
             /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
             data-press
             onClick={() => {
+              if (atStart) return;
               const scroller = scrollerRef.current;
               if (!scroller) return;
               const card = scroller.querySelector<HTMLElement>(".ea-evt-video__card");
@@ -581,9 +640,12 @@ export function EventsVideoCarousel() {
           <button
             type="button"
             className="ea-evt-video__nav-btn"
+            data-edge={atEnd ? "true" : undefined}
+            aria-disabled={atEnd || undefined}
             /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
             data-press
             onClick={() => {
+              if (atEnd) return;
               const scroller = scrollerRef.current;
               if (!scroller) return;
               const card = scroller.querySelector<HTMLElement>(".ea-evt-video__card");
@@ -599,54 +661,61 @@ export function EventsVideoCarousel() {
         </div>
       </div>
 
-      {/* Fullscreen modal — full video unmuted + native controls + close. */}
-      {activeTile && (
-        <div
-          className="ea-evt-video__modal"
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Видео: ${activeTile.title}`}
-          onClick={closeModal}
-          onKeyDown={trapFocus}
-        >
-          <button
-            ref={closeRef}
-            type="button"
-            className="ea-evt-video__close"
-            /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
-            data-press
-            onClick={closeModal}
-            aria-label="Закрыть видео"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M6 6l12 12M18 6l-12 12" />
-            </svg>
-          </button>
+      {/* Fullscreen modal — full video unmuted + native controls + close.
+          81-F2: createPortal(document.body) — фон (main/header/cookie)
+          гасится inert'ом (см. эффект выше), а сама модалка обязана жить
+          ВНЕ погашенного поддерева; fixed-инсет от портала не зависит от
+          предков (ни у кого из них нет transform — иначе fixed прилипал бы
+          к секции). */}
+      {activeTile &&
+        createPortal(
           <div
-            ref={videoWrapRef}
-            className="ea-evt-video__modal-frame"
-            onClick={(e) => e.stopPropagation()}
+            className="ea-evt-video__modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Видео: ${activeTile.title}`}
+            onClick={closeModal}
+            onKeyDown={trapFocus}
           >
-            <video
-              className="ea-evt-video__modal-video"
-              src={activeTile.video}
-              poster={activeTile.poster}
-              autoPlay
-              controls
-              playsInline
-              preload="metadata"
-              aria-label={activeTile.videoAlt}
-            />
-            <div className="ea-evt-video__modal-caption">
-              <span className="ea-evt-video__category">
-                {activeTile.category}
-              </span>
-              <h3 className="ea-evt-video__modal-title">{activeTile.title}</h3>
-              <p className="ea-evt-video__meta">{activeTile.meta}</p>
+            <button
+              ref={closeRef}
+              type="button"
+              className="ea-evt-video__close"
+              /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+              data-press
+              onClick={closeModal}
+              aria-label="Закрыть видео"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 6l12 12M18 6l-12 12" />
+              </svg>
+            </button>
+            <div
+              ref={videoWrapRef}
+              className="ea-evt-video__modal-frame"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <video
+                className="ea-evt-video__modal-video"
+                src={activeTile.video}
+                poster={activeTile.poster}
+                autoPlay
+                controls
+                playsInline
+                preload="metadata"
+                aria-label={activeTile.videoAlt}
+              />
+              <div className="ea-evt-video__modal-caption">
+                <span className="ea-evt-video__category">
+                  {activeTile.category}
+                </span>
+                <h3 className="ea-evt-video__modal-title">{activeTile.title}</h3>
+                <p className="ea-evt-video__meta">{activeTile.meta}</p>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </section>
   );
 }

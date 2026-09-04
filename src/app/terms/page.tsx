@@ -26,8 +26,11 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   const updated = "1 сентября 2025 г.";
+  // 81-F3 (A1): skip-link target — layout.tsx «К содержанию» ведёт на
+  // #main-content; на юридических страницах цели не было (MAJOR A1).
+  // tabIndex={-1} — фокус-приёмник для программного фокуса.
   return (
-    <main className="min-h-screen bg-cream pt-32 pb-20">
+    <main id="main-content" role="main" tabIndex={-1} className="min-h-screen bg-cream pt-32 pb-20 outline-none">
       <article className="mx-auto max-w-3xl px-5 md:px-8">
         <header className="mb-12">
           <span className="font-mono text-xs uppercase tracking-[0.3em] text-bordeaux">

@@ -934,6 +934,14 @@ const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTM
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
+/** 81-F2 (критик B MINOR): человекочитаемый номер квитанции из времени
+ *  приёма заявки — «ДДММ-ЧЧММ» (№ 0409-1532). CUID из API больше НЕ
+ *  рендерится (остаётся внутренним leadId — аналитика/дедуп на бэкенде). */
+function formatLeadNo(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(d.getDate())}${pad(d.getMonth() + 1)}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+}
+
 /**
  * Изолированная форма заявки (React.memo): keystroke перерисовывает ТОЛЬКО
  * форму — чек и контролы не трогаются (SPEC §4.4).
@@ -1053,9 +1061,30 @@ const LeadForm = memo(function LeadForm({
       /* C71-FIX (Task 2, audit A1 MINOR): без этого пользователь видел
        * красную рамку/текст ошибки, но фокус оставался на кнопке «Далее»
        * — невалидное поле приходилось искать глазами. Переносим фокус на
-       * ПЕРВОЕ невалидное (имя → телефон); focus() подскроллит поле в
-       * кадр, role="alert" у .hb-err озвучит причину. */
-      (nextErrors.name ? nameRef.current : phoneRef.current)?.focus();
+       * ПЕРВОЕ невалидное (имя → телефон); role="alert" у .hb-err
+       * озвучит причину.
+       *
+       * 81-F2 (критик B, замер живьём): перенос фокуса НЕ срабатывал на
+       * мыши — mousedown на кнопке фокусирует её, blur поля вставляет
+       * <p class="hb-err"> (~28px), кнопка УЕЗЖАЕТ из-под курсора ДО
+       * mouseup → click-событие уходит в контейнер, onClick «Далее» не
+       * срабатывает ВООБЩЕ (замер: фокус-лог пуст, шаг не меняется). Тот
+       * же эффект на повторном клике с валидными данными (ошибка
+       * УДАЛЯЕТСЯ на blur → сдвиг вверх). Лечение см. onMouseDown у
+       * кнопки ниже — mousedown не отбирает фокус у поля → нет blur →
+       * нет сдвига → click доходит до кнопки.
+       *
+       * scrollIntoView: focus() скролляет поле в кадр нативно, но при
+       * Lenis/раскрытии зоны поле может остаться за краем — дожимаем
+       * явным scrollIntoView, если rect вне вьюпорта. */
+      const el = nextErrors.name ? nameRef.current : phoneRef.current;
+      if (el) {
+        el.focus();
+        const r = el.getBoundingClientRect();
+        if (r.top < 0 || r.bottom > window.innerHeight) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
       return;
     }
     setStep(1);
@@ -1350,11 +1379,17 @@ const LeadForm = memo(function LeadForm({
               </div>
 
               {/* Кнопка «Далее» живёт только на шаге 1 (после перехода
-                  шаг 1 приглушён, возврат — по легенде, M5). */}
+                  шаг 1 приглушён, возврат — по легенде, M5).
+                  81-F2: onMouseDown preventDefault — mousedown не отбирает
+                  фокус у поля → blur НЕ вставляет/не удаляет .hb-err ДО
+                  mouseup → кнопка не уезжает из-под курсора → click
+                  доходит (подробнее — комментарий в goNext). Фокус после
+                  клика и так переносится (невалидное поле / hb-consent). */}
               {step === 0 && (
                 <button
                   type="button"
                   onClick={goNext}
+                  onMouseDown={(e) => e.preventDefault()}
                   className="hb-btn hb-btn--red mt-1 min-h-[48px] w-full"
                 >
                   Далее — к отправке
@@ -1461,10 +1496,15 @@ const LeadForm = memo(function LeadForm({
                 </Magnetic>
               </div>
 
-              {/* Подсказка, почему кнопка ещё не активна (канон C38) */}
+              {/* Подсказка, почему кнопка ещё не активна (канон C38).
+                  81-F2 (критик B MINOR): постоянно видима, пока consent=false
+                  и статус idle — toast недостижим на disabled-кнопке (Enter
+                  на форме блокируется тем же disabled), видимый хинт —
+                  честный канал. aria-live нет: текст статичен, меняется
+                  только появление/исчезание — роль status достаточно. */}
               {!consent && status === "idle" && (
                 <p className="hb-hint" role="status">
-                  Подтвердите согласие — и кнопка оживёт
+                  Поставьте согласие, чтобы отправить заявку
                 </p>
               )}
 
@@ -1518,21 +1558,23 @@ function ConfettiBurst() {
 /* ============================================================ УСПЕХ (201) */
 
 /**
- * Квитанция успеха: № заявки из API, ЕДИНСТВЕННЫЙ штамп «Заявка принята»
+ * Квитанция успеха: № заявки + ЕДИНСТВЕННЫЙ штамп «Заявка принята»
  * (D2, task 9-fix2: печать ставится на ДОКУМЕНТ о приёме заявки; на
  * смете-чеке вместо штампа — текстовая строка .hb-panel__next рядом),
  * Marck Script-строка (динамическое обещание C6), дата события
  * по-человечески (C2), однократное конфетти.
  * Fix5 V6: мета — готовая строка metaLine (у undecided — без цены).
- */
+ * 81-F2: № — человекочитаемый «ДДММ-ЧЧММ» из времени приёма (см.
+ * formatLeadNo); CUID из API не показываем. */
 function SuccessPanel({
-  leadId,
+  leadNo,
   metaLine,
   promiseLine,
   onReset,
   settled,
 }: {
-  leadId: string | number | undefined;
+  /** Отображаемый номер (ДДММ-ЧЧММ) — всегда есть на этапе success. */
+  leadNo: string;
   metaLine: string;
   promiseLine: string;
   onReset: () => void;
@@ -1568,7 +1610,7 @@ function SuccessPanel({
           Заявка принята
         </motion.span>
         <p className="hb-success__no">
-          Номер заявки: <b>{leadId != null ? `№ ${leadId}` : "принята"}</b>
+          Номер заявки: <b>№ {leadNo}</b>
         </p>
         {/* C6+C7 (task 9-fix2): динамическое обещание, с заглавной. */}
         <p className="hb-success__script">{promiseLine}</p>
@@ -2144,6 +2186,9 @@ export function HaccBooking() {
   const [date, setDate] = useState("");
   const [stage, setStage] = useState<Stage>("calc");
   const [leadId, setLeadId] = useState<string | number | undefined>(undefined);
+  /* 81-F2: отображаемый номер квитанции (ДДММ-ЧЧММ, из времени приёма) —
+   * CUID-подобный id из API не рендерим (критик B). */
+  const [leadNo, setLeadNo] = useState("");
   /** X2 (task 13-fix4): чек вошёл во вьюпорт — с этого момента строки
    *  «печатаются» (PrintLine); до того — статика (SSR/no-JS/reduce §34). */
   const [paperInView, setPaperInView] = useState(false);
@@ -2269,10 +2314,13 @@ export function HaccBooking() {
   }, [guestsLocal, setGuestsParam]);
 
   /* Task 7-E: обещание перезвона — без привязки к часам офиса (бейдж
-     «Отвечаем в любое время»); один тон на CTA-нот, тост и квитанцию. */
+     «Отвечаем в любое время»); один тон на CTA-нот и тост.
+     81-F2: квитанция обещает конкретику «в течение часа» (критик B/
+     оркестратор: подпись успеха), тост/CTA остаются на живом тоне «сразу
+     как увидим» — не противоречат, уточняют одна другую. */
   const ctaPromise = "Перезвоним сразу, как увидим заявку";
   const toastPromise = "Перезвоним сразу, как увидим заявку";
-  const scriptPromise = "Мы перезвоним сразу, как увидим заявку";
+  const scriptPromise = "Мы перезвоним в течение часа";
 
   /* КОНТРАКТ 7 (слушатель): catering:menu-select. menu.tsx шлёт detail=string
      (typeId); спящие компоненты могут прислать {typeId, guests} — понимаем оба. */
@@ -2355,7 +2403,16 @@ export function HaccBooking() {
   useEffect(() => {
     const timers: number[] = [];
     const openFromHash = () => {
-      if (window.location.hash !== "#contact") return;
+      /* 81-F2 (критик B, vanity-URL): /contacts и /contact — rewrite на
+       * /#contact, но фрагмент до браузера НЕ доходит (hash пуст) — это
+       * контактное намерение кампании: открываем форму тем же путём, что
+       * и якорь. Проверка живёт в openFromHash (маунт-вызов); hashchange
+       * всегда несёт hash и проходит по первой ветке. */
+      const vanityContact =
+        !window.location.hash &&
+        (window.location.pathname === "/contacts" ||
+          window.location.pathname === "/contact");
+      if (window.location.hash !== "#contact" && !vanityContact) return;
       setStage((s) => {
         if (s !== "calc") return s;
         return "form";
@@ -2400,7 +2457,10 @@ export function HaccBooking() {
       id: string | number | undefined,
       detail: { typeId: string; guests: number; dateIso: string; total: number },
     ) => {
+      /* CUID остаётся внутренним id (не рендерится), квитанция получает
+       * человекочитаемый № из времени приёма (81-F2). */
       setLeadId(id);
+      setLeadNo(formatLeadNo(new Date()));
       setStage("success");
       window.dispatchEvent(
         new CustomEvent("catering:calc-lead", {
@@ -2431,12 +2491,13 @@ export function HaccBooking() {
        пустые поля — draft удалён при 201, подтягиваться нечему;
      - дата сбрасывается к дефолту (NIT: имя/телефон чистились, дата
        переживала ресет — дата живёт в родителе, вне формы);
-     - leadId затирается — квитанция прошлого цикла не подтекает;
+     - leadId/leadNo затираются — квитанция прошлого цикла не подтекает;
      - фокус — в первое поле (кнопка ресета только что размонтировалась,
        иначе фокус падает на body; mounted-гейт §34 не нужен — фокус
        ставится только по пользовательскому клику). */
   const resetToForm = useCallback(() => {
     setLeadId(undefined);
+    setLeadNo("");
     setDate("");
     setStage("form");
     /* LeadForm монтируется следующим коммитом — таймер 120 мс даёт
@@ -2741,7 +2802,7 @@ export function HaccBooking() {
                 <div className="hb-zone__body" inert={stage === "calc"}>
                   {stage === "success" ? (
                     <SuccessPanel
-                      leadId={leadId}
+                      leadNo={leadNo}
                       metaLine={successMeta}
                       promiseLine={scriptPromise}
                       onReset={resetToForm}
@@ -2808,10 +2869,11 @@ export function HaccBooking() {
 
               <p className="hb-panel__caps">
                 {/* X1 (task 13-fix4): после успеха шапка панели гасится —
-                    «ЗАЯВКА ПРИНЯТА · № id». Штамп остаётся ОДИН — на квитанции
-                    (урок волны-1 D2: не дублировать печать). */}
+                    «ЗАЯВКА ПРИНЯТА · № …». Штамп остаётся ОДИН — на квитанции
+                    (урок волны-1 D2: не дублировать печать).
+                    81-F2: № — человекочитаемый leadNo (ДДММ-ЧЧММ), не CUID. */}
                 {stage === "success" ? (
-                  leadId != null ? `Заявка принята · № ${leadId}` : "Заявка принята"
+                  leadNo ? `Заявка принята · № ${leadNo}` : "Заявка принята"
                 ) : (
                   <>
                     Предварительная смета

@@ -127,6 +127,16 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  /* 81-F1b (критик B CRITICAL, добивка): translate(-50%,-50%) приводит ЦЕНТР
+     бокса в его же левый-верхний угол → origin «0 0» = визуальный центр.
+     Любая scale-композиция (CSS hover scale(1.04) и WAAPI-нажатие
+     [data-press] из micro-delights — свойство `scale`, S·T) теперь
+     инвариантна по центру: замер playwright 390×844 — сдвиг центра при
+     нажатии 3.75px → 0px, hover-рост тоже идеально центрирован (прежде
+     уезжал на ~3px). Без этого origin масштаб давит вокруг ЛЕВОГО-ВЕРХНЕГО
+     угла layout-бокса (top:50%/left:50%), который на 75px правее/ниже
+     видимой кнопки. */
+  transform-origin: 0 0;
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
@@ -395,6 +405,16 @@
 
 .ea-evt-video__nav-btn:active {
   transform: scale(0.94);
+}
+
+/* 81-F2 (критик B): край трека — стрелка гаснет (40% + некликабельна).
+   Кламп трека (1352px контента при 1272px вьюпорта на 1440) — не баг
+   скролла; живая стрелка на краю читалась как «сломанная». Атрибут
+   ставит events-video-carousel.tsx по scrollLeft-замерам (scroll ≤ 4 /
+   scrollLeft+clientWidth ≥ scrollWidth-4). */
+.ea-evt-video__nav-btn[data-edge="true"] {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

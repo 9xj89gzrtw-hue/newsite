@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { preload as reactDomPreload } from "react-dom";
 import { Playfair_Display, Barlow_Semi_Condensed, Karla, Prata, Marck_Script } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -275,6 +276,15 @@ const jsonLd = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  /* 81-F1 (критик D + код-критик W1-c: «дубль preload логотипа»): preload
+     бейджа прелоадера через Float API ReactDOM.preload — в HTML остаётся
+     РОВНО ОДИН <link> (поднимается в самое начало <head>). Ручной <link>
+     в head-JSX давал ДВЕ ссылки (Float-копия + in-place-копия — проверено
+     curl'ом на :3001); дедуп Float-ресурсов здесь же схлопывает и preload
+     из <Image priority> прелоадера в ту же единственную ссылку (в dev-SSR
+     он не эмитится вовсе, в prod — дедупится в этот же хинт). 41KB PNG
+     нужен в первые 0.45с (CSS-таймлайн дверей) — грузим до медиа-hero. */
+  reactDomPreload("/brand/logo-256.png", { as: "image" });
   // Cycle 49 (font-fix): next/font variable classes live on <html> (= :root)
   // so that :root-level custom properties in globals.css (e.g.
   // --ea-font-display: var(--font-serif)) can resolve them. Declared on
@@ -303,13 +313,45 @@ export default function RootLayout({
         {/* F2 (K3-NIT): preconnect к instagram/yandex УДАЛЁН — страница не
             тянет с них ресурсов на первом пейнте (фото/шрифты/видео —
             self-hosted; яндекс-карта лениво грузится по скроллу уже после
-            handshake). Оставшийся preload — бейдж прелоадера. */}
-        {/* Task 6-D: preloader badge must be pixel-ready within its 1.4s
-            life on a cold first visit — start fetching the 41KB PNG at HTML
-            parse time, before the hero media saturates the connection pool. */}
-        <link rel="preload" as="image" href="/brand/logo-256.png" />
+            handshake). */}
+        {/* 81-F1 (критик D: Barlow приходит на 7-9s, застревая за видео):
+            preload двух самых нужных woff2 тела — Barlow Semi Condensed
+            400 + 700, latin (кириллицы у Barlow нет — ру-текст и так в
+            системном фоллбэке; latin покрывает «nilov/catering/NILOV
+            CATERING» и англ. копирайт). Имена файлов = контент-хэши
+            next/font — идентичны dev и prod-сборкам (сверено по CSS :3001
+            и :3002). crossorigin обязателен для шрифтов (иначе двойной
+            запрос). Prata-latin уже preloaded next/font'ом — не дублируем. */}
+        <link
+          rel="preload"
+          href="/_next/static/media/4b23c5ee480ee380-s.046c0c63.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/_next/static/media/490cbca7f386131e-s.116c03d8.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="antialiased bg-background text-foreground">
+        {/* 81-F1: СЕССИОННЫЙ ГЕЙТ ПРЕЛОАДЕРА — самый ранний инлайн-скрипт
+            в <body> (до контента): при повторном визите за сессию ставит
+            [data-no-preloader] на <html> ДО парсинга SSR-дверей → CSS-правило
+            [data-no-preloader] [data-preloader-root]{display:none} гасит их
+            первым же стайл-резолвом (двери не красятся вовсе, гидрация не
+            нужна). try/catch — Safari private mode бросает на sessionStorage.
+            Ключ «catering-preloaded» согласован с preloader.tsx; расхождение
+            атрибута глушит suppressHydrationWarning на <html> (как у js-гейта). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(sessionStorage.getItem('catering-preloaded'))document.documentElement.dataset.noPreloader='1'}catch(e){}",
+          }}
+        />
         <a href="#main-content" className="skip-link">
           Перейти к содержанию
         </a>

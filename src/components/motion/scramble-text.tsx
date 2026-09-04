@@ -19,8 +19,12 @@ import { cn } from "@/lib/utils";
    (каркас строки стабилен, длина строки не меняется — ноль layout-джиттера
    по количеству символов).
 
-   A11y: элемент-носитель несёт aria-label с финальным текстом, видимый
-   (перебираемый) узел — aria-hidden (модель split-text-reveal.tsx).
+   A11y (81-F3, критик A2 / Lighthouse aria-prohibited-attr): доступный
+   текст — sr-only-твин ВНУТРИ носителя; видимый (перебираемый) узел —
+   aria-hidden. Прежний aria-label на <span>/<p> (generic/paragraph —
+   роли без naming) был запрещённым атрибутом WAI-ARIA; теперь имя
+   элемента/семантического родителя (напр. h2) вычисляется из реального
+   текст-содержимого (та же модель, что split-text-reveal.tsx).
 
    SSR/reduce: серверный HTML = финальный текст (перебор — только
    пост-гидрационная мутация в effect); prefers-reduced-motion → эффект
@@ -137,7 +141,11 @@ export function ScrambleText({
 
   const Tag = as as React.ElementType;
   return (
-    <Tag className={cn(className)} aria-label={children}>
+    <Tag className={cn(className)}>
+      {/* 81-F3 (A2): sr-only-твин — доступный текст живёт в содержимом
+          (aria-label на generic/paragraph запрещён); визуальный
+          скрамбл-узел — aria-hidden, как раньше. */}
+      <span className="sr-only">{children}</span>
       <span ref={textRef} aria-hidden="true">
         {children}
       </span>

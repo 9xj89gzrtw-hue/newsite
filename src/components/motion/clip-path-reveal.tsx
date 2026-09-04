@@ -56,8 +56,8 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
  * - внутренний `motion.div`: `whileInView` масштаб 1.15 → 1 тем же
  *   transition (duration/delay/EASE [0.22, 1, 0.36, 1]).
  * - `framer-motion` (единая моушн-библиотека сайта — как magnetic.tsx,
- *   cursor.tsx, delivery-block.tsx; motion/react × framer-motion
- *   микса нет — контексты не конфликтуют).
+ *   cursor.tsx, delivery-block.tsx; микса двух библиотек нет —
+ *   контексты не конфликтуют).
  * - transform / opacity only — GPU-композит, никогда не трогает layout
  *   (RULES §5).
  * - `prefers-reduced-motion`: дети в простом `<div>`, без зума и сдвига.

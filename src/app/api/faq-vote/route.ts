@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import crypto from "node:crypto";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,8 +11,10 @@ export const dynamic = "force-dynamic";
  * FIX-4 [F8, W1-D]: простые длины-лимиты ДО записи в БД (zod уже в deps):
  *   - question: trim, 1..500 символов;
  *   - vote: строго "up" | "down".
- * Rate-limit НЕ добавляем (отдельная задача, W1-D F8 частично).
+ * Rate-limit: добавлен 81-F4 [SEC2, W1-c] — см. RATE_LIMIT ниже.
  */
+const RATE_LIMIT = { capacity: 10, refillPerMin: 6 } as const;
+
 const QuestionSchema = z
   .string()
   .trim()
@@ -42,6 +45,14 @@ const isUniqueViolation = (e: unknown): boolean =>
  * update-ветка (last-write-wins — та же семантика, что в основном пути).
  */
 export async function POST(req: NextRequest) {
+  // SEC2: лимит до валидации тела и до записи в БД.
+  const rl = rateLimit(`faq-vote:${getClientIp(req)}`, RATE_LIMIT);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Слишком много запросов. Попробуйте позже." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } },
+    );
+  }
   try {
     const body = await req.json().catch(() => ({}));
 
@@ -157,6 +168,9 @@ export async function POST(req: NextRequest) {
       );
     }
   } catch (e) {
+    // 81-F4 [SEC3]: внешний catch больше не глотает исключение молча —
+    // лог обязателен (иначе сбой БД/рантайма в POST-пути не виден в логах).
+    console.error("[api/faq-vote] unhandled error:", e);
     return NextResponse.json(
       { ok: false, error: "Внутренняя ошибка сервера" },
       { status: 500 },
@@ -164,60 +178,24 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/**
- * GET /api/faq-vote — fetch aggregate vote counts (for admin dashboard).
- * Returns up/down counts per question.
+/*
+ * GET /api/faq-vote — АДМИН-ЭНДПОИНТ УДАЛЁН (81-F4, SEC3, W1-c).
  *
- * Query params:
- *  - question: filter to a specific question (returns {up: N, down: N})
- *  - (no params): return top 20 questions by activity
+ * Прежний неавторизованный GET отдавал наружу пользовательские вопросы
+ * (top-20 с текстами, IP-контекст, время голосов) любому анониму —
+ * «админ»-дашборд без авторизации. rg по src/components + src/app
+ * показал: фронтенд НЕ вызывает GET (и POST тоже — UI голосования
+ * удалён из FAQ ранее; роут остался для будущих интеграций). Поэтому
+ * эндпоинт удалён целиком, а не закрыт admin_key.
+ *
+ * Остался явный 404-стаб вместо автоматического Next-405: по 405 злоумышленник
+ * видит, что POST существует; 404-ответ читается как «такого роута нет».
+ * Если появится настоящая админ-панель — её метрики должны жить за
+ * авторизацией (ADMIN_KEY/session), не в публичном route handler.
  */
-export async function GET(req: NextRequest) {
-  try {
-    const url = new URL(req.url);
-    const question = url.searchParams.get("question");
-
-    if (question) {
-      const questionHash = crypto
-        .createHash("sha256")
-        .update(question.trim())
-        .digest("hex")
-        .slice(0, 64);
-
-      const vote = await db.faqVote.findUnique({
-        where: { questionHash },
-      });
-      if (!vote) {
-        return NextResponse.json({ ok: true, up: 0, down: 0 });
-      }
-      return NextResponse.json({
-        ok: true,
-        up: vote.vote === "up" ? 1 : 0,
-        down: vote.vote === "down" ? 1 : 0,
-        latestVote: vote.vote,
-        updatedAt: vote.updatedAt,
-      });
-    }
-
-    // Top 20 by createdAt desc — admin dashboard view
-    const recent = await db.faqVote.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    });
-    const up = recent.filter((v) => v.vote === "up").length;
-    const down = recent.filter((v) => v.vote === "down").length;
-    return NextResponse.json({
-      ok: true,
-      total: recent.length,
-      up,
-      down,
-      recent: recent.map((v) => ({
-        question: v.questionText.slice(0, 80),
-        vote: v.vote,
-        createdAt: v.createdAt,
-      })),
-    });
-  } catch {
-    return NextResponse.json({ ok: true, total: 0, up: 0, down: 0 });
-  }
+export async function GET() {
+  return NextResponse.json(
+    { ok: false, error: "Not Found" },
+    { status: 404 },
+  );
 }

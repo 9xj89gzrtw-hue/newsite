@@ -61,7 +61,7 @@ import { SdZoomFallback } from "@/components/motion/sd-zoom-fallback";
  *    span, which now wraps the SplitTextReveal instance).
  *
  * Server Component — no hooks, no client JS at the section level. ClipPathReveal
- * and SplitTextReveal are client islands (motion/react + split-type); the
+ * and SplitTextReveal are client islands (framer-motion + split-type); the
  * `.gamma-separator` CSS class still controls the section's height/overflow/
  * bg-color, and `prefers-reduced-motion` is handled inside both motion
  * primitives (they render static markup under reduced motion).

@@ -30,8 +30,8 @@ import { loadMetrika } from "@/lib/analytics";
  *   - 3 localStorage keys, each suffixed `:YYYY-MM-DD`. On mount, sweep all
  *     3 — if any value's timestamp is older than 14 days, clear it (banner
  *     re-shows). Otherwise hide if ANY active choice exists.
- *   - AnimatePresence + motion.div slide-in from top (y: -100 → 0, 400ms
- *     ease-out); slide-out on dismiss. prefers-reduced-motion → opacity only.
+ *   - AnimatePresence + motion.div rises from below (y: 24 → 0, 400ms
+ *     ease-out); fade-out on dismiss. prefers-reduced-motion → opacity only.
  *   - role="region" + aria-label="Cookie consent". NOT a dialog and NOT
  *     modal: NO focus trap — Tab moves through the links/buttons and
  *     continues into the page naturally (FIX-5, WCAG 2.1.2 / W1-D F5).
@@ -40,6 +40,17 @@ import { loadMetrika } from "@/lib/analytics";
  *     actually loads via lib/analytics.ts loadMetrika() (env-gated, noop
  *     without NEXT_PUBLIC_YANDEX_METRIKA_ID; the Cycle-28 console.log stub
  *     is retired). Reload with a live accepted-choice also loads it on mount.
+ *
+ * 81-F2 (критики A+B CRITICAL, редизайн компакта): полноширинная полоса
+ *   внизу перекрывала нижние ~25% hero-CTA и строку футера до accept — и на
+ *   автоскролле формы могла накрыть CTA «Далее». Теперь — компактная
+ *   карточка (≤340px) внизу-слева, на мобиле — по центру с меньшей высотой
+ *   (замер 390×844: ≤140px, отступ от низа 16px + safe-area). Дизайн — в
+ *   стилистике системы: espresso-панель, золотая рамка, скруглённые углы,
+ *   мягкая тень. Логика консента, ключи, 14-дневный re-prompt, loadMetrika,
+ *   класс cookie-banner-open и замер --cookie-banner-h НЕ тронуты
+ *   (globals.css-хуки body padding/FAB-лифта продолжают работать на живой
+ *   высоте карточки — замер C75 идёт по этому же элементу).
  *
  * z-[80] (Cycle 39 bottom-dock keeps the sticky header visible; above
  * site-header z-50 + announcement-bar z-55, below the mobile-menu overlay
@@ -69,6 +80,8 @@ const LINK_TERMS_HREF = "/terms";
 const LINK_CLASS =
   "no-underline text-[#C9A227] transition-colors hover:text-[#E5C76B] hover:underline focus-visible:underline py-4 -my-4";
 // Outline-кнопки — крем на тёмной панели (18.65:1) — уже в бренде.
+// 81-F2: компакт-карточка — px-2 (340px-трек вмещает все 3 кнопки в один
+// ряд даже на 320px-вьюпорте с wrap-страховкой на самый узкий случай).
 const BTN_OUTLINE_CLASS =
   "border border-[var(--ea-cream)] bg-transparent text-[var(--ea-cream)] hover:bg-white/10 focus-visible:bg-white/10";
 // F4: solid-кнопка — золотая заливка + espresso-текст (8.22:1; белый на
@@ -80,18 +93,19 @@ const BTN_SOLID_CLASS =
 const BTN_BASE_STYLE: CSSProperties = {
   fontFamily: "var(--ea-font-eyebrow)",
   fontWeight: 700,
-  /* размер/паддинги — классами: на мобильном баннер сжимается в одну
-     компактную строку (3 независимых слепых критика C59: на iPhone
-     баннер закрывал зону CTA панели меню) */
-  letterSpacing: "0.1em",
+  /* 81-F2: карточка ≤340px ⇒ один ряд из 3 кнопок только при 11px +
+     трекинге 0.03em и px-1 (замер: 0.08em+px-2 = 336px > 306px контента;
+     0.03em+px-1 = ~295px ✓; высота карточки тогда ≈110px ≤ 140px).
+     Тач-таргеты не страдают: высота 44px, ширина кнопок ~95px. */
+  letterSpacing: "0.03em",
   textTransform: "uppercase",
   lineHeight: 1,
-  borderRadius: 0,
+  borderRadius: 10,
   cursor: "pointer",
   transition:
     "background-color 200ms ease, border-color 200ms ease, color 200ms ease",
   /* FIX-5 (W1-D NIT): тач-таргет 40 → 44px (WCAG 2.5.5 / Apple HIG);
-     на 390px все три кнопки остаются в один ряд (замер в worklog). */
+     81-F2-замер: на 390px все три кнопки остаются в один ряд. */
   minHeight: 44,
   minWidth: 44,
 };
@@ -259,13 +273,13 @@ export function EaCookieBanner() {
 
   const initial = prefersReducedMotion
     ? { opacity: 0 }
-    : { opacity: 0, y: 100 };
+    : { opacity: 0, y: 24 };
   const animate = prefersReducedMotion
     ? { opacity: 1 }
     : { opacity: 1, y: 0 };
   const exit = prefersReducedMotion
     ? { opacity: 0 }
-    : { opacity: 0, y: 100 };
+    : { opacity: 0, y: 24 };
   const transition = prefersReducedMotion
     ? { duration: 0.3 }
     : { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const };
@@ -278,26 +292,35 @@ export function EaCookieBanner() {
           role="region"
           aria-label="Уведомление об использовании cookies"
           data-component="ea-cookie-banner"
-          /* Cycle 39 fix: docked to the BOTTOM — previously top-0 z-60 exactly
-             covered the sticky header (nav/phone/CTA invisible until consent).
-             F4: тёмная espresso-панель бренда + золотая рамка (была чёрная с
-             красной рамкой — K1 «вне бренда»); backdrop-контент под ней
-             просвечивает на 3% — безопасно, панель остаётся ~непрозрачной. */
-          className="fixed inset-x-0 bottom-0 z-[80] w-full"
-          style={{
-            background: "rgba(10, 9, 8, 0.97)",
-            borderTop: "1px solid #C9A227",
-            color: "var(--ea-cream)",
-            paddingBottom: "env(safe-area-inset-bottom, 0px)",
-          }}
+          /* 81-F2: компактная карточка вместо полноширинной полосы.
+             Внешний fixed-контейнер = трек позиционирования (мобайл:
+             inset-x-4 → карточка ≤340px центрирована; sm+: левый нижний
+             угол). Отступ снизу 16px + safe-area — зона CTA «Далее»
+             калькулятора при автоскролле остаётся свободной (высота
+             карточки на мобиле ≤140px, замер в верификации). Cycle-39
+             фикс (низ, не верх) сохранён: раньше top-0 z-60 накрывал
+             sticky-хедер. */
+          className="fixed z-[80] inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom,0px))] sm:inset-x-auto sm:bottom-6 sm:left-6"
           initial={initial}
           animate={animate}
           exit={exit}
           transition={transition}
         >
-          <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-1.5 px-3 py-2 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-3 md:px-12">
+          <div
+            className="mx-auto flex max-w-[340px] flex-col gap-2 rounded-2xl px-4 py-3"
+            style={{
+              /* F4: тёмная espresso-панель бренда + золотая рамка (была
+                 чёрная с красной рамкой — K1 «вне бренда»); 81-F2:
+                 скруглённая карточка + мягкая тень (стилистика системы). */
+              background: "rgba(10, 9, 8, 0.97)",
+              border: "1px solid #C9A227",
+              color: "var(--ea-cream)",
+              boxShadow:
+                "0 18px 44px -14px rgba(0, 0, 0, 0.55), 0 4px 14px -8px rgba(0, 0, 0, 0.4)",
+            }}
+          >
             <p
-              className="m-0 max-w-[68ch] text-[12px] leading-snug sm:text-[13px]"
+              className="m-0 text-[12px] leading-snug"
               style={{
                 fontFamily: "var(--ea-font-body)",
                 color: "color-mix(in srgb, var(--ea-cream) 85%, transparent)",
@@ -322,7 +345,7 @@ export function EaCookieBanner() {
                 Условия
               </a>.
             </p>
-            <div className="flex w-full shrink-0 flex-row flex-wrap items-center justify-end gap-1.5 sm:w-auto sm:gap-2 md:gap-3">
+            <div className="flex flex-row flex-wrap items-center justify-end gap-1.5">
               {/* F4: применяю осиротевшие (C59) BTN_*_CLASS — дизайн-интент
                   докстринга «один акцент: filled Accept + outline остальные»
                   не рендерился вовсе (замер: все 3 кнопки прозрачные без рамок).
@@ -331,7 +354,7 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("rejected")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_OUTLINE_CLASS} px-2.5 py-2 text-[12px] sm:px-4 sm:text-[13px]`}
+                className={`${BTN_OUTLINE_CLASS} px-1 py-2 text-[11px]`}
               >
                 Отклонить
               </button>
@@ -339,16 +362,15 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("essential")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_OUTLINE_CLASS} px-2.5 py-2 text-[12px] sm:px-4 sm:text-[13px]`}
+                className={`${BTN_OUTLINE_CLASS} px-1 py-2 text-[11px]`}
               >
-                <span className="sm:hidden">Необходимые</span>
-                <span className="hidden sm:inline">Только необходимые</span>
+                Необходимые
               </button>
               <button
                 type="button"
                 onClick={() => decide("accepted")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_SOLID_CLASS} px-2.5 py-2 text-[12px] sm:px-4 sm:text-[13px]`}
+                className={`${BTN_SOLID_CLASS} px-1 py-2 text-[11px]`}
               >
                 Принять все
               </button>

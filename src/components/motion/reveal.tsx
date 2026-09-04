@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "framer-motion"; /* 81-F4 [P7,
+  бандл-дедуп]: раньше импорт шёл из второго пакета motion (re-export
+  того же API при установленном framer-motion@12) — это второй экземпляр
+  того же рантайма анимации в бандле (дубль чанков). Экспорты,
+  используемые здесь (motion, useReducedMotion), идентичны в обоих. */
 import * as React from "react";
 
 type RevealProps = {
@@ -19,7 +23,8 @@ type RevealProps = {
  * Fade + rise on scroll-into-view. The workhorse micro-interaction for the
  * whole site. Respects `prefers-reduced-motion` (renders children static).
  *
- * Uses `motion/react` (the new package name for Framer Motion v12+).
+ * Uses `framer-motion` — единая моушн-библиотека сайта (81-F4: дедуп,
+ * раньше этот файл единственный тянул второй пакет-двойник).
  */
 export function Reveal({
   children,

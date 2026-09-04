@@ -2,8 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
-import { useMounted } from "@/hooks/use-mounted";
+import { useReducedMotion } from "framer-motion";
 
 /**
  * TottHero — Talk of the Town (talkofthetownatlanta.com) hero graft (Cycle 30).
@@ -29,8 +28,21 @@ import { useMounted } from "@/hooks/use-mounted";
  *   - NO cities strip, NO long subhead (per task v2: лишняя информация
  *     и города там не нужны).
  *
- * Animation: framer-motion staggered reveal (opacity + 40px rise, 0.8s ease),
- * respecting `useReducedMotion()` + SSR mount gate (no hydration mismatch).
+ * Animation — 81-F1 (performance fixer, критик 81-W1-D): вход текста
+ *   ЧИСТЫМ CSS (.hero-stagger / .hero-cue — keyframes hero-rise /
+ *   hero-fade-in в globals.css), БЕЗ framer-вариантов и БЕЗ useMounted-гейта:
+ *   прежде initial="hidden" шипил в SSR инлайн `opacity:0` на h1 (LCP-элемент)
+ *   и красился только после полной гидрации (mobile LCP 10.5s → цель ~3s).
+ *   Паттерн Shopify/DebugBear (ресёрч 81-R1/P1): LCP-текст виден в
+ *   SSR-разметке, анимируется только transform (opacity вордмарка НЕ
+ *   трогаем). Тайминги 1:1 с прежней хореографией: стаггер 0.14с от
+ *   delayChildren 0.15 (nth-child 0.15/0.29/0.43), rise 0.85s easeOut,
+ *   eyebrow fade 0.7s, scroll-cue fade 0.8s delay 1.3s. ВАЖНО: scroll-cue
+ *   — обёртка (позиционирование -translate-x-1/2) + внутренний
+ *   анимируемый узел: CSS-transform в keyframes ЗАМЕНЯЕТ computed transform
+ *   (грабля §44 — позиционирующий translate живёт на обёртке).
+ *   useReducedMotion остался ТОЛЬКО для видео-гейта (IO-эффект ниже);
+ *   reduced-motion для hero-входа гейтится в CSS (animation: none).
  * The SiteHeader docks at the BOTTOM of this hero (100vh) via its own scroll
  * logic — see site-header.tsx. Hence `min-h-screen` so the bottom-docked nav
  * aligns to the hero's bottom edge.
@@ -63,27 +75,8 @@ const HERO_VIDEO_POSTER = "/media/hero-premium/hero-premium-6-828.webp";
 
 export function TottHero() {
   const reduce = useReducedMotion();
-  const mounted = useMounted();
-  const showStatic = mounted && Boolean(reduce);
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  const container = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.14, delayChildren: 0.15 } },
-  };
-  const rise = showStatic
-    ? { hidden: {}, visible: {} }
-    : {
-        hidden: { opacity: 0, y: 36 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.85, ease: "easeOut" as const } },
-      };
-  const fade = showStatic
-    ? { hidden: {}, visible: {} }
-    : {
-        hidden: { opacity: 0 },
-        visible: { opacity: 1, transition: { duration: 0.7, ease: "easeOut" as const } },
-      };
 
   /* FIX-4 [F2, W1-D] §39 «живое видео без фриза: IO + preload="none"» —
    * preload="none": байты видео не запрашиваются, пока play() не вызван
@@ -273,12 +266,7 @@ export function TottHero() {
                line on sm+ screens. Generous editorial whitespace below the
                script pair.
           Text-shadow on white text for video-bg legibility. */}
-      <motion.div
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center [transform:translateY(40px)]"
-        initial={showStatic ? false : "hidden"}
-        animate={showStatic ? undefined : "visible"}
-        variants={container}
-      >
+      <div className="hero-stagger absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center [transform:translateY(40px)]">
         {/* Wordmark — Prata (high-contrast serif). Two stacked lines
             "nilov" / "catering." — вау-композиция: широкая строка
             "catering." (~4.1em) при 15vw занимает ~62vw — влезает и на
@@ -288,8 +276,7 @@ export function TottHero() {
             держит иерархию над script-флор 2.25rem (task v11) и
             гарантирует, что "catering." не упирается в px-6-поля на
             320px-экранах. */}
-        <motion.h1
-          variants={rise}
+        <h1
           /* Cycle 40 SEO fix: the visible wordmark alone carries no keywords;
              aria-label gives search engines «лучший кейтеринг
              Санкт-Петербурга» without changing the visual design. */
@@ -312,7 +299,7 @@ export function TottHero() {
               aria-label H1 уже несёт «лучший кейтеринг Санкт-Петербурга» —
               видимая часть «nilov catering» вложена в него (WCAG 2.5.3). */}
           <span className="sr-only"> — кейтеринг в Санкт-Петербурге</span>
-        </motion.h1>
+        </h1>
 
         {/* Script tagline — Nothing You Could Do (Latin script font). Nestles tight
             under the wordmark (negative mt) for a signature/underline feel.
@@ -320,13 +307,12 @@ export function TottHero() {
             над латинским вордмарком «nilov catering» (food ↔ catering),
             фонетика и семантика читаются одинаково в обеих локáлях.
             Tilted -6° (rotate) for a handwritten signature gesture — mirrors
-            gamma's tilted-accent device. The rotation is applied to an inner
-            <span> so framer-motion's `rise` variant (opacity + y) on the
-            outer <motion.p> doesn't clobber the transform.
+            gamma's tilted-accent device. The rotation lives on an inner
+            <span> so the hero-rise CSS entry (translateY) on the outer <p>
+            never touches it.
             Size kept smaller than the wordmark (floor 2.25rem vs 4rem) so the
             visual hierarchy holds on narrow screens. */}
-        <motion.p
-          variants={rise}
+        <p
           className="tott-script text-white/95"
           style={{
             fontSize: "clamp(2.25rem, 6vw, 4.5rem)",
@@ -347,7 +333,7 @@ export function TottHero() {
           >
             food as art
           </span>
-        </motion.p>
+        </p>
 
         {/* Eyebrow label — Lato (sans-serif, .tott-body) ALL CAPS, small,
             wide letter-spacing. Per task v10: "сделай чтобы на мобильных
@@ -357,8 +343,7 @@ export function TottHero() {
             so the label renders as one line. Generous editorial whitespace
             below the script pair (mt-10). padding-left optically centers
             the tracked label. */}
-        <motion.p
-          variants={fade}
+        <p
           className="tott-body text-white/85"
           style={{
             fontSize: "clamp(11px, 1.2vw, 14px)",
@@ -376,32 +361,32 @@ export function TottHero() {
           Лучший кейтеринг
           <br className="sm:hidden" />
           {" "}Санкт-Петербурга
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
 
       {/* Scroll cue bottom-center (sits above the docked nav). W1-FIX:
           bottom-12 (was bottom-28) — at 1440×900 the cue overlapped the
-          eyebrow label; measured gap after the fix ≥8px. */}
-      <motion.div
-        className="absolute bottom-12 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2"
-        initial={showStatic ? false : { opacity: 0 }}
-        animate={showStatic ? undefined : { opacity: 1, transition: { delay: 1.3, duration: 0.8 } }}
+          eyebrow label; measured gap after the fix ≥8px.
+          81-F1: обёртка владеет ПОЗИЦИОНИРОВАНИЕМ (left-1/2
+          -translate-x-1/2), внутренний .hero-cue узел — входом (opacity):
+          CSS-transform в keyframes заменяет computed transform, поэтому
+          позиционирующий translate обязан жить на РОДИТЕЛЕ (грабля §44).
+          Линия — .hero-cue-line: пульс scaleY на собственном узле без
+          других transform; reduced-motion → animation:none (CSS-гейт). */}
+      <div
+        className="absolute bottom-12 left-1/2 z-10 -translate-x-1/2"
         aria-hidden="true"
       >
-        <span className="tott-body text-[13px] font-bold uppercase tracking-[0.35em] text-white/85">
-          Листайте
-        </span>
-        {showStatic ? (
-          <span className="block h-[54px] w-px bg-white/40" />
-        ) : (
-          <motion.span
-            className="block w-px bg-white/40"
-            style={{ height: 54, transformOrigin: "top" }}
-            animate={{ scaleY: [0.4, 1, 0.4] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
+        <div className="hero-cue flex flex-col items-center gap-2">
+          <span className="tott-body text-[13px] font-bold uppercase tracking-[0.35em] text-white/85">
+            Листайте
+          </span>
+          <span
+            className="hero-cue-line block w-px bg-white/40"
+            style={{ height: 54 }}
           />
-        )}
-      </motion.div>
+        </div>
+      </div>
     </section>
   );
 }

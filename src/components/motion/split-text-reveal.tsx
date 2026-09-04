@@ -38,11 +38,16 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
  * SplitTextReveal — line/word/char staggered text reveal with optional
  * gradient mask. The Sondaven `split-line` / Lando `split-type` signature.
  *
- * **Accessibility model (critical):** the wrapper element carries
- * `aria-label={full text}` + `role="heading"` + `aria-level` (when `as` is a
- * heading tag). The visible (split) text node is `aria-hidden="true"`. Screen
- * readers therefore read the heading normally while sighted users see the
- * masked stagger animation.
+ * **Accessibility model (81-F3, критик A2 / Lighthouse
+ * aria-prohibited-attr):** the accessible text lives in an sr-only twin
+ * span INSIDE the wrapper; the visible (split) text node is
+ * `aria-hidden="true"`. The old `aria-label` on non-heading wrappers
+ * (`span`/`p` — generic/paragraph roles, author-naming prohibited by
+ * WAI-ARIA) was a Lighthouse violation; headings and containers now
+ * compute their accessible name from the real text content. When `as`
+ * is a heading tag the wrapper also carries `role="heading"` +
+ * `aria-level`. Screen readers therefore read the heading normally while
+ * sighted users see the masked stagger animation.
  *
  * - `split-type` (4kb MIT) does the DOM split; reverted on unmount.
  * - framer-motion imperative `animate()` drives each split child
@@ -205,11 +210,11 @@ export function SplitTextReveal({
   const reduceConfirmed = mountedRef && !!reduce;
 
   if (reduceConfirmed) {
-    // Reduced motion: plain element with the full text as accessible name.
-    // aria-label overrides visible text for AT, so the heading is announced
-    // correctly without the animation scaffolding.
+    // Reduced motion: plain element — the visible text IS the accessible
+    // content (no splitting, no aria-hidden twin, no prohibited attrs —
+    // 81-F3: aria-label удалён и здесь).
     return (
-      <Tag className={className} aria-label={children} {...headingAttrs}>
+      <Tag className={className} {...headingAttrs}>
         {children}
       </Tag>
     );
@@ -220,9 +225,12 @@ export function SplitTextReveal({
       ref={containerRef as React.Ref<HTMLElement>}
       className={cn(className)}
       style={{ opacity: ready ? 1 : 0 }}
-      aria-label={children}
       {...headingAttrs}
     >
+      {/* 81-F3 (A2): sr-only-твин — доступное имя вычисляется из
+          текст-содержимого (aria-label на generic/paragraph-обёртках
+          запрещён WAI-ARIA); видимый сплит-узел — aria-hidden, как был. */}
+      <span className="sr-only">{children}</span>
       <span ref={splitRef} aria-hidden="true">
         {children}
       </span>

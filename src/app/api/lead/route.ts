@@ -1,163 +1,237 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { PHONE_PRETTY } from "@/lib/site-config";
+import { normalizePhone } from "@/lib/phone";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Russian phone regex: +7/7/8 prefix + 10 digits, or bare 10 digits
- * (Cycle 40: bare 10-digit input previously 400'd — the client normalizes
- * to +7XXXXXXXXXX, the API accepts every common shape as defense in depth).
+ * 81-F4 [SEC2, W1-c]: rate-limit ДО парсинга тела и ДО записи в БД.
+ * lead:${ip} — token-bucket 5 burst / 3 в минуту (lib/rate-limit.ts).
+ * 6-й POST подряд → 429 + Retry-After.
  */
-const PHONE_REGEX = /^(\+7|7|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+const RATE_LIMIT = { capacity: 5, refillPerMin: 3 } as const;
+
+/**
+ * 81-F4 [SEC5, W1-c]: ручная валидация (String() + if) переведена на
+ * zod-схему — как в newsletter/faq-vote. Что изменилось против старого
+ * кода (осознанно, по ТЗ 81-F4):
+ *   - name: 2–80 символов (было: непусто и ≤100);
+ *   - email: опционально, но СТРОГО валидный формат ≤254 (было: любая
+ *     строка ≤254 писалась в БД — «email без формата»);
+ *   - phone: 10–15 цифр после выкидывания не-цифр (было: жёсткий
+ *     RU-regex; теперь международные номера проходят, а RU-шейпы
+ *     нормализуются сервером через lib/phone.ts);
+ *   - consentAccepted: строго literal true (Boolean() принимал "yes").
+ * Правила eventType/guests/budget/message перенесены как есть: мягкие
+ * (мусор → null, message/eventType усекаются, guests округляется).
+ */
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const NameSchema = z
+  .string()
+  .trim()
+  .min(2, "Имя слишком короткое (минимум 2 символа)")
+  .max(80, "Имя слишком длинное (максимум 80 символов)");
+
+const PhoneSchema = z
+  .string()
+  .trim()
+  .max(32, "Телефон слишком длинный")
+  .refine((v) => {
+    const digits = v.replace(/\D/g, "");
+    return digits.length >= 10 && digits.length <= 15;
+  }, "Укажите телефон в формате +7 XXX XXX-XX-XX");
+
+/** Email: опционален — "", null, undefined → null; иначе валидный ≤254.
+ * (regex, а не z.email(): тот режет кириллические домены (почта.рф) —
+ * тот же паттерн и то же сообщение, что в newsletter, для консистентности.) */
+const EmailSchema = z
+  .union([
+    z.literal(""),
+    z
+      .string()
+      .trim()
+      .max(254, "Email слишком длинный (макс. 254 символа)")
+      .regex(EMAIL_REGEX, "Некорректный формат email"),
+  ])
+  .nullish()
+  .transform((v) => (v ? v : null));
+
+const ConsentSchema = z.literal(true, {
+  error: "Требуется согласие на обработку персональных данных",
+});
+
+/** eventType: строка ≤100; мусор/отсутствие → null (как в старом коде). */
+const EventTypeSchema = z
+  .string()
+  .trim()
+  .max(100, "Поле eventType слишком длинное (макс. 100 символов)")
+  .nullish()
+  .catch(null)
+  .transform((v) => (v && v.length > 0 ? v : null));
+
+/** guests: число 0–100000, округление; мусор/вне диапазона → null (как было). */
+const GuestsSchema = z
+  .number()
+  .finite()
+  .min(0)
+  .max(100000)
+  .transform((v) => Math.round(v))
+  .nullish()
+  .catch(null)
+  .transform((v) => v ?? null);
+
+/** budget: число 0–100000000, округление; мусор/вне диапазона → null (как было). */
+const BudgetSchema = z
+  .number()
+  .finite()
+  .min(0)
+  .max(100000000)
+  .transform((v) => Math.round(v))
+  .nullish()
+  .catch(null)
+  .transform((v) => v ?? null);
+
+/** message: усечение до 2000 (не 400 — как в старом коде), пустое → null. */
+const MessageSchema = z
+  .string()
+  .nullish()
+  .catch(null)
+  .transform((v) => {
+    const s = typeof v === "string" ? v.trim().slice(0, 2000) : "";
+    return s.length > 0 ? s : null;
+  });
+
+const LeadSchema = z.object({
+  name: NameSchema,
+  phone: PhoneSchema,
+  email: EmailSchema,
+  consentAccepted: ConsentSchema,
+  eventType: EventTypeSchema,
+  guests: GuestsSchema,
+  budget: BudgetSchema,
+  message: MessageSchema,
+});
 
 /**
  * POST /api/lead — create a lead with 152-ФЗ consent proof.
  * Stores consent timestamp + IP + User-Agent as legal proof of consent.
  *
- * K4 (cycle-71, F3): фейкового успеха при падении БД больше НЕТ. Раньше
- * лид писался в module-local массив (который никто никогда не читал) и
- * клиенту отдавался 201 «Заявка принята» → пользователь видел успех и
- * конфетти, а лид терялся бесследно. Теперь: честный 503 + структурный
- * console.error со ВСЕМИ полями лида (восстановление из логов сервера).
- * Клиент hacc-booking показывает toast с текстом из тела ответа и НЕ
- * запускает конфетти на не-2xx — см. его обработку `!res.ok`.
+ * K4 (cycle-71, F3): фейкового успеха при падении БД больше НЕТ — честный
+ * 503 + структурный console.error со ВСЕМИ полями лида (восстановление из
+ * логов сервера). Клиент hacc-booking показывает toast с текстом из тела
+ * ответа и НЕ запускает конфетти на не-2xx — см. его обработку `!res.ok`.
  */
 export async function POST(req: NextRequest) {
-  let body: Record<string, unknown> | null;
+  // SEC2: лимит ДО валидации тела и ДО записи в БД — даже мусорный спам
+  // не должен доходить до parse/БД.
+  const rl = rateLimit(`lead:${getClientIp(req)}`, RATE_LIMIT);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Слишком много запросов. Попробуйте позже." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } },
+    );
+  }
+
+  let body: unknown;
   try {
-    body = (await req.json()) as Record<string, unknown> | null;
+    body = await req.json();
   } catch {
-    // Cycle 70 (W2-B): пустое/битое тело — это ошибка КЛИЕНТА (4xx),
-    // а не «внутренняя ошибка» 500. Раньше parse-исключение падало в
-    // внешний catch → 500 без деталей.
+    // Cycle 70 (W2-B): пустое/битое тело — ошибка КЛИЕНТА (4xx), не 500.
     return NextResponse.json(
       { ok: false, error: "Некорректный формат запроса — ожидается JSON" },
       { status: 400 },
     );
   }
-  try {
-    const name = String(body?.name ?? "").trim();
-    const phone = String(body?.phone ?? "").trim();
-    const consentAccepted = Boolean(body?.consentAccepted);
 
-    // 152-ФЗ: consent is REQUIRED to process personal data
-    if (!name || !phone) {
-      return NextResponse.json(
-        { ok: false, error: "Имя и телефон обязательны" },
-        { status: 400 },
-      );
-    }
-    if (!consentAccepted) {
-      return NextResponse.json(
-        { ok: false, error: "Требуется согласие на обработку персональных данных" },
-        { status: 400 },
-      );
-    }
-
-    // Phone validation: must match +7 XXX XXX-XX-XX format
-    if (!PHONE_REGEX.test(phone.replace(/[^+0-9]/g, ""))) {
-      return NextResponse.json(
-        { ok: false, error: "Укажите телефон в формате +7 XXX XXX-XX-XX" },
-        { status: 400 },
-      );
-    }
-
-    /* Cycle 70 (W2-B): лимиты длин — без них 10КБ-строка писалась в БД
-     * (замер: name 10000 симв. → 201). Спам-щит + защита sqlite-полей.
-     * Границы согласованы с формой (hacc-booking): имя — human-scale,
-     * message — развёрнутый комментарий, eventType — выбор из списка. */
-    if (name.length > 100) {
-      return NextResponse.json(
-        { ok: false, error: "Имя слишком длинное (максимум 100 символов)" },
-        { status: 400 },
-      );
-    }
-    if (phone.length > 32) {
-      return NextResponse.json(
-        { ok: false, error: "Телефон слишком длинный" },
-        { status: 400 },
-      );
-    }
-
-    const eventType = body?.eventType ? String(body.eventType).slice(0, 100) : null;
-    const guests = typeof body?.guests === "number" && Number.isFinite(body.guests) && body.guests >= 0 && body.guests <= 100000 ? Math.round(body.guests) : null;
-    const budget = typeof body?.budget === "number" && Number.isFinite(body.budget) && body.budget >= 0 && body.budget <= 100000000 ? Math.round(body.budget) : null;
-    const email = body?.email ? String(body.email).trim().slice(0, 254) || null : null;
-    const message = body?.message ? String(body.message).trim().slice(0, 2000) || null : null;
-
-    // 152-ФЗ compliance: capture consent proof metadata
-    const consentIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || null;
-    const userAgent = req.headers.get("user-agent") || null;
-
-    // K4 (cycle-71, F3): единственная честная стратегия при сбое записи.
-    // Module-local фоллбэк (lead-store.ts) удалён — он давал ложное чувство
-    // безопасности: в проде его никто не читал, лид терялся молча.
-    try {
-      const lead = await db.lead.create({
-        data: {
-          name,
-          phone,
-          email,
-          eventType,
-          guests,
-          budget,
-          message,
-          consentAccepted: true,
-          consentDate: new Date(),
-          consentIp,
-          userAgent,
-        },
-      });
-
-      return NextResponse.json({ ok: true, id: String(lead.id) }, { status: 201 });
-    } catch (dbError) {
-      // Лид не сохранён — это потерянный бизнес. Двухступенчатая страховка:
-      //  1) структурный лог со ВСЕМИ полями (timestamp + payload + ошибка) —
-      //     из него лид восстанавливается руками по логам сервера;
-      //  2) 503 + человекочитаемая ошибка — клиент показывает toast,
-      //     конфетти (только на 2xx) не срабатывает, пользователь знает,
-      //     что заявка НЕ прошла, и может позвонить.
-      console.error(
-        "[api/lead] DB write FAILED — lead NOT saved, recover manually from payload:",
-        JSON.stringify(
-          {
-            at: new Date().toISOString(),
-            lead: {
-              name,
-              phone,
-              email,
-              eventType,
-              guests,
-              budget,
-              message,
-              consentAccepted: true,
-              consentDate: new Date().toISOString(),
-              consentIp,
-              userAgent,
-            },
-            error:
-              dbError instanceof Error
-                ? { name: dbError.name, message: dbError.message }
-                : String(dbError),
-          },
-          null,
-          2,
-        ),
-      );
-      return NextResponse.json(
-        {
-          ok: false,
-          error: `Сервис заявок временно недоступен — заявка не сохранилась. Позвоните нам: ${PHONE_PRETTY}, примем заказ по телефону.`,
-        },
-        { status: 503 },
-      );
-    }
-  } catch (e) {
+  const parsed = LeadSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
-      { ok: false, error: "Внутренняя ошибка сервера" },
-      { status: 500 },
+      {
+        ok: false,
+        error: parsed.error.issues[0]?.message ?? "Некорректные данные заявки",
+      },
+      { status: 400 },
+    );
+  }
+  const data = parsed.data;
+
+  // SEC5: серверная нормализация телефона — единый источник (lib/phone.ts).
+  // Клиент шлёт уже нормализованный +7XXXXXXXXXX (hacc-booking), но прямой
+  // POST (curl/bot) с «9991234567»/«8-999-…» теперь тоже ляжет в БД
+  // канонически.
+  const phone = normalizePhone(data.phone);
+
+  // 152-ФЗ compliance: capture consent proof metadata
+  const consentIp =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    null;
+  const userAgent = req.headers.get("user-agent") || null;
+
+  // K4 (cycle-71, F3): единственная честная стратегия при сбое записи.
+  try {
+    const lead = await db.lead.create({
+      data: {
+        name: data.name,
+        phone,
+        email: data.email,
+        eventType: data.eventType,
+        guests: data.guests,
+        budget: data.budget,
+        message: data.message,
+        consentAccepted: true,
+        consentDate: new Date(),
+        consentIp,
+        userAgent,
+      },
+    });
+
+    return NextResponse.json({ ok: true, id: String(lead.id) }, { status: 201 });
+  } catch (dbError) {
+    // Лид не сохранён — это потерянный бизнес. Двухступенчатая страховка:
+    //  1) структурный лог со ВСЕМИ полями (timestamp + payload + ошибка) —
+    //     из него лид восстанавливается руками по логам сервера;
+    //  2) 503 + человекочитаемая ошибка — клиент показывает toast,
+    //     конфетти (только на 2xx) не срабатывает, пользователь знает,
+    //     что заявка НЕ прошла, и может позвонить.
+    console.error(
+      "[api/lead] DB write FAILED — lead NOT saved, recover manually from payload:",
+      JSON.stringify(
+        {
+          at: new Date().toISOString(),
+          lead: {
+            name: data.name,
+            phone,
+            email: data.email,
+            eventType: data.eventType,
+            guests: data.guests,
+            budget: data.budget,
+            message: data.message,
+            consentAccepted: true,
+            consentDate: new Date().toISOString(),
+            consentIp,
+            userAgent,
+          },
+          error:
+            dbError instanceof Error
+              ? { name: dbError.name, message: dbError.message }
+              : String(dbError),
+        },
+        null,
+        2,
+      ),
+    );
+    return NextResponse.json(
+      {
+        ok: false,
+        error: `Сервис заявок временно недоступен — заявка не сохранилась. Позвоните нам: ${PHONE_PRETTY}, примем заказ по телефону.`,
+      },
+      { status: 503 },
     );
   }
 }

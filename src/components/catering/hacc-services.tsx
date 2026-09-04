@@ -977,7 +977,9 @@ export function HaccServices() {
         >
           <div className="hacc__head-text">
             {/* C71: eyebrow собирается перебором символов (ScrambleText):
-                тот же класс/шрифт/цвет, a11y — aria-label + aria-hidden узел. */}
+                тот же класс/шрифт/цвет. A11y (81-F3): sr-only-твин внутри
+                носителя + aria-hidden скрамбл-узел — aria-label на generic-
+                ролях запрещён (Lighthouse aria-prohibited-attr). */}
             <ScrambleText className="ea-eyebrow--script" delayMs={150}>
               Форматы и сервисы
             </ScrambleText>

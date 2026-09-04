@@ -3140,6 +3140,13 @@ header[data-scrolled="true"] [data-mega-panel] {
    ===================================================================== */
 
 /* --- Neutra2 font helpers ------------------------------------------------ */
+/* 81-F3 (Lighthouse color-contrast, контурные цифры cep-process): контурные
+   применения .cep-display (outline-цифры 01–04, stroke-only) обязаны держать
+   stroke-цвет ПОЛНОЙ непрозрачности и ≥4.5:1 на креме #F7F5F5 — полупрозрачный
+   контур (rgba(0,0,0,0.35) ≈ 2.4:1) ловился color-contrast-аудитом. Контракт:
+   cep-process.tsx пишет инлайн `-webkit-text-stroke: 1.5px var(--cep-black)`
+   (≈19:1); сплошная заливка остаётся акцентной (--cep-red), у неё отдельный
+   large-text-бюджет (≥24px → 3:1 достаточно). */
 .cep-display {
   font-family: var(--font-neutra-display), var(--font-poppins), Arial, sans-serif;
   font-weight: 400;
@@ -4809,4 +4816,138 @@ html:not(.js) [style*="opacity:0;"],
 html:not(.js) [style$="opacity:0"] {
   opacity: 1 !important;
   transform: none !important;
+}
+
+/* ============================================================================
+   81-F1 (Task 81, performance fixer) — HERO LCP: вход чистым CSS, без
+   JS-гейта (паттерн Shopify/DebugBear, ресёрч 81-R1/P1).
+
+   Прежний механизм: framer-варианты (initial="hidden" → инлайн
+   `opacity:0;transform:translateY(36px)` в SSR-HTML) + гейт useMounted —
+   вордмарк красился только ПОСЛЕ полной гидрации (критик 81-W1-D:
+   mobile LCP 10.5s, «FCP→LCP ≈ 8-9s = чистый JS-бутнек»). Новый:
+   SSR-разметка hero-текста видима (opacity НЕ анимируется у LCP-элемента),
+   вход — CSS-композитор.
+
+   ГРАБЛИ (§44-рода): кейфреймы hero-rise анимируют ТОЛЬКО translateY —
+   (а) не красят opacity вордмарка (h1 = LCP, обязан краситься в первом
+   кадре); (б) НЕ вешаются на элементы с позиционирующим transform —
+   scroll-cue: обёртка (позиционирование left-1/2 -translate-x-1/2) и
+   анимируемый внутренний узел РАЗДЕЛЕНЫ (.hero-cue / .hero-cue-line),
+   CSS-анимация transform в keyframes заменяет computed transform целиком.
+
+   Тайминги — 1:1 с прежней framer-хореографией (механизм менялся, НЕ
+   дизайн): стаггер 0.14с от delayChildren 0.15 → nth-child delays
+   0.15/0.29/0.43; rise 0.85s easeOut (cubic-bezier(0,0,.58,1) — точный
+   framer-easeOut); eyebrow — fade 0.7s easeOut (opacity-only, как был
+   вариант fade); scroll-cue fade 0.8s delay 1.3s; cue-линия — scaleY
+   0.4→1→0.4, 2.2s easeInOut infinite, delay 1.6s (до delay — статична,
+   как у framer без fill backwards).
+   ============================================================================ */
+@keyframes hero-rise {
+  from { transform: translateY(36px); }
+  to { transform: translateY(0); }
+}
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+}
+@keyframes hero-cue-pulse {
+  0% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+  100% { transform: scaleY(0.4); }
+}
+
+/* Центральный бренд-стек hero (h1 + script + eyebrow). `both`: до
+   задержки элемент держит from-состояние (36px сдвиг) — как framer
+   initial; после — конечное. */
+.hero-stagger > * {
+  animation: hero-rise 0.85s cubic-bezier(0, 0, 0.58, 1) both;
+  animation-delay: calc(0.15s + (var(--hero-stagger-i, 0) * 0.14s));
+}
+/* Fallback nth-child (когда --hero-stagger-i не проставлен): те же
+   задержки стаггера 0.15/0.29/0.43. */
+.hero-stagger > *:nth-child(1) { animation-delay: 0.15s; }
+.hero-stagger > *:nth-child(2) { animation-delay: 0.29s; }
+.hero-stagger > *:nth-child(3) {
+  animation-delay: 0.43s;
+  /* Eyebrow (3-й элемент) — прежний fade-вариант: только opacity. */
+  animation-name: hero-fade-in;
+  animation-duration: 0.7s;
+}
+
+/* Scroll-cue: внутренний узел (обёртка владеет позиционированием). */
+.hero-cue {
+  animation: hero-fade-in 0.8s cubic-bezier(0, 0, 0.58, 1) 1.3s both;
+}
+.hero-cue-line {
+  transform-origin: top;
+  animation: hero-cue-pulse 2.2s cubic-bezier(0.42, 0, 0.58, 1) 1.6s
+    infinite;
+}
+
+/* ============================================================================
+   81-F1 — PRELOADER: двери уходят CSS-таймлайном от первого кадра, БЕЗ
+   ожидания гидратации (критик 81-W1-D: opaque-двери на медленном мобиле
+   держали LCP 8-9с: dwell 450ms + exit 345ms отсчитывались ПОСЛЕ гидрации).
+
+   Таймлайн от загрузки стилей (= первый пейнт):
+     0s     — двери opaque (SSR-разметка), бейдж/кольца/caption — framer
+              (декор, не блокирует LCP: при поздней гидрации просто не
+              успевают — кластер уже растворён CSS);
+     0.45s  — начало выхода: кластер fade-out 0.18s (pre-cluster-out),
+              панели — шторка вверх 0.3s с микро-стаггером var(--i)*0.015s
+              (последняя панель стартует 0.495s, завершается ≤0.795s);
+     0.82s  — корень [data-preloader-root] уходит из потока событий
+              (visibility:hidden + pointer-events:none, fill both) —
+              оверлей больше не перехватывает тапы ДО JS-чистки DOM;
+     ~1.2s  — гидрация: preloader.tsx только ЧИСТИТ DOM (страховка).
+
+   Повторный визит за сессию: инлайн-скрипт в <body> (layout.tsx) ставит
+   data-no-preloader на <html> ДО парсинга разметки дверей → display:none
+   первым же стайл-резолвом (двери не красятся вовсе).
+   Reduced-motion / no-JS: display:none немедленно (noscript-стиль
+   layout.tsx + правило ниже).
+   ============================================================================ */
+@keyframes pre-panel-exit {
+  to { transform: translateY(-100%); }
+}
+@keyframes pre-cluster-out {
+  to { opacity: 0; }
+}
+@keyframes pre-root-release {
+  to {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.pre-panel {
+  animation: pre-panel-exit 0.3s cubic-bezier(0.83, 0, 0.17, 1) both;
+  animation-delay: calc(0.45s + (var(--i, 0) * 0.015s));
+}
+.pre-cluster {
+  animation: pre-cluster-out 0.18s ease-out 0.45s both;
+}
+[data-preloader-root] {
+  animation: pre-root-release 0.01s linear 0.82s both;
+}
+
+[data-no-preloader] [data-preloader-root] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-stagger > *,
+  .hero-cue,
+  .hero-cue-line,
+  .pre-panel,
+  .pre-cluster,
+  [data-preloader-root] {
+    animation: none;
+  }
+  /* Двери — чистое движение: reduced-motion не показывает их вовсе
+     (раньше убирались на гидрации — теперь мгновенно, из CSS). */
+  [data-preloader-root] {
+    display: none;
+  }
 }

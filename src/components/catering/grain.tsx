@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-
 /**
  * GrainOverlay — fixed full-viewport SVG film-grain noise at low opacity.
  *
@@ -17,16 +13,13 @@ import { useEffect, useRef } from "react";
  * compositing at 4.5% opacity). Visually near-identical, ~0 runtime cost.
  *
  * Pointer-events: none — never blocks interaction.
+ *
+ * 81-F1: "use client" СНЯТ. Хуков/слушателей/условного рендера здесь нет
+ * (бывший no-op useRef/useEffect «для API stability» — мёртвый код,
+ * удалён): оверлей — чисто презентационный инлайн-SVG-слой, рендерится
+ * сервером, ноль клиентского JS на компонент.
  */
 export function GrainOverlay() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  // No-op mount effect kept for API stability (component may be referenced
-  // by tests / future effects). The overlay is fully CSS-static now.
-  useEffect(() => {
-    void ref;
-  }, []);
-
   // Inline SVG turbulence noise as data URI (no external asset)
   const noise =
     "data:image/svg+xml;utf8," +
@@ -36,7 +29,6 @@ export function GrainOverlay() {
 
   return (
     <div
-      ref={ref}
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 z-[100] opacity-[0.045]"
       style={{

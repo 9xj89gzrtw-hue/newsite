@@ -45,19 +45,50 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
+            // 81-F4 [SEC1, W1-c]: Метрика (analytics.ts инжектит
+            // https://mc.yandex.ru/metrika/tag.js + бьёт beacon'ы в mc
+            // — без этих хостов CSP блокировала счётчик):
+            //   a) script-src += https://mc.yandex.ru;
+            //   b) connect-src += https://mc.yandex.ru.
+            // 81-F4 [SEC4]: жёсткий каркас:
+            //   c) frame-ancestors 'none' — запрет фрейминга (XFO
+            //      SAMEORIGIN остаётся для старых браузеров, но
+            //      frame-ancestors — современный стандарт);
+            //   d) upgrade-insecure-requests — http-сабресурсы
+            //      апгрейдятся до https (localhost — potentially
+            //      trustworthy, dev не задет).
+            // 'unsafe-inline'/'unsafe-eval' в script-src ОСТАВЛЕНЫ
+            // (dev-нужды React Refresh; полный nonce-CSP через proxy.ts +
+            // strict-dynamic — будущий цикл, см. worklog 81-F4).
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.instagram.com https://instagram.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://mc.yandex.ru https://www.instagram.com https://instagram.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com data:",
-              "img-src 'self' data: blob: https://sfile.chatglm.cn https://images.unsplash.com https://z-cdn.chatglm.cn https://*.cdninstagram.com https://*.fbcdn.net https://www.instagram.com",
+              "img-src 'self' data: blob: https://sfile.chatglm.cn https://images.unsplash.com https://z-cdn.chatglm.cn https://*.cdninstagram.com https://*.fbcdn.net https://www.instagram.com https://mc.yandex.ru",
               "frame-src 'self' https://yandex.ru https://www.yandex.ru https://www.instagram.com https://instagram.com",
-              "connect-src 'self' https://api.telegram.org https://wa.me https://wa.me/*",
+              "connect-src 'self' https://mc.yandex.ru https://api.telegram.org https://wa.me https://wa.me/*",
               "media-src 'self' https://*.cdninstagram.com https://*.fbcdn.net https://www.instagram.com data: blob:",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
+              "frame-ancestors 'none'",
+              "upgrade-insecure-requests",
             ].join("; "),
+          },
+          {
+            // 81-F4 [SEC4]: HSTS — 2 года + сабдомены. Браузер применяет
+            // только поверх https (http-ответы игнорируют заголовок —
+            // dev на :3001 не задет).
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains",
+          },
+          {
+            // 81-F4 [SEC6-минимум]: COOP — окно изолировано от
+            // cross-origin opener'а (обратные ссылки window.opener
+            // с чужих окон обрезаются; popup'ы соцсетей не ломаются).
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin",
           },
           {
             key: "X-Frame-Options",

@@ -25,6 +25,15 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      // 81-F4 [P7, дедуп]: страховочный алиас — пакеты framer-motion@12 и
+      // motion@12 (тот же API, re-export) дублем лежат в node_modules.
+      // Все импорты унифицированы на framer-motion; этот маппинг гарантирует,
+      // что случайно вернувшийся import "motion/react" (не в бандл-дубль, а
+      // в тот же framer-motion) не раздаст второй рантайм анимации в чанки.
+      // Удалить вместе с зависимостью "motion" из package.json (будущий цикл).
+      "motion/react": [
+        "./node_modules/framer-motion"
       ]
     }
   },

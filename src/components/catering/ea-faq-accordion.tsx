@@ -36,6 +36,12 @@ import "@/components/motion/c74-kinetic.css";
  *   - Panel `role="region"` + `aria-labelledby`.
  *   - +/− SVG is `aria-hidden` (decorative — the open state is already
  *     announced via aria-expanded).
+ *   - 81-F2 (критик B MINOR): закрытая панель была видима скринридеру
+ *     (height:0 + overflow:hidden не убирает контент из a11y-дерева) →
+ *     добавлен inert-паттерн hacc-services.tsx (React 19 boolean inert):
+ *     закрытая панель исключается из a11y-дерева и таб-цепочки целиком,
+ *     открытие снимает inert. Панель остаётся в DOM (SSR для краулеров +
+ *     анимация высоты).
  *   - Honors `prefers-reduced-motion` (AnimatePresence collapses instantly,
  *     +/− rotation becomes a 2-frame swap, scroll-reveal returns empty props).
  *
@@ -350,11 +356,14 @@ export function EaFaqAccordion() {
                     explicit recipe). The answer is ALWAYS in the DOM
                     (server-rendered for crawlers + no-JS users): height 0 +
                     overflow hidden clips it while closed. Reduced-motion →
-                    instant swap (duration 0). */}
+                    instant swap (duration 0).
+                    81-F2: закрытая панель — inert (паттерн hacc-services:
+                    контент недоступен AT и табу, пока isOpen=false). */}
                 <motion.div
                   id={panelId}
                   role="region"
                   aria-labelledby={triggerId}
+                  inert={!isOpen}
                   initial={false}
                   animate={
                     reduce

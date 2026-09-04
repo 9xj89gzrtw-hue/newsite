@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,10 +9,17 @@ export const dynamic = "force-dynamic";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
+ * 81-F4 [SEC2, W1-c]: rate-limit ДО парсинга тела и ДО записи в БД.
+ * newsletter:${ip} — token-bucket 3 burst / 1 в минуту (lib/rate-limit.ts).
+ * 4-й POST подряд → 429 + Retry-After.
+ */
+const RATE_LIMIT = { capacity: 3, refillPerMin: 1 } as const;
+
+/**
  * FIX-4 [F8, W1-D]: простые длины-лимиты ДО записи в БД (zod уже в deps):
  *   - email: trim + lowercase, ≤254 (RFC max), формат по EMAIL_REGEX;
  *   - source: trim, ≤100, optional.
- * Rate-limit НЕ добавляем (отдельная задача, W1-D F8 частично).
+ * Rate-limit: добавлен 81-F4 [SEC2] — см. RATE_LIMIT выше.
  */
 const EmailSchema = z
   .string()
@@ -55,6 +63,15 @@ const isUniqueViolation = (e: unknown): boolean =>
  * (метрика — не для анонимов) и маскировал сбой БД ответом active:0.
  */
 export async function POST(req: NextRequest) {
+  // SEC2: лимит до валидации тела и до записи в БД — спам подписками
+  // (один IP массово перебирает адреса) не доходит до БД вообще.
+  const rl = rateLimit(`newsletter:${getClientIp(req)}`, RATE_LIMIT);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Слишком много запросов. Попробуйте позже." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } },
+    );
+  }
   try {
     const body = await req.json().catch(() => ({}));
 

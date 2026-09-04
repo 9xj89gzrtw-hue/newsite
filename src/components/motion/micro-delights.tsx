@@ -38,10 +38,11 @@ import "./micro-delights.css";
  *   [data-spark]        за 150мс (fill forwards); pointerup → пружина
  *                       0.94→1.03→1 (340мс, без fill — возврат к нативу).
  *                       Скольжение пальца >12px (скролл/драг марке) —
- *                       мгновенная отмена (возврат 200мс). Анимирует
- *                       transform САМОГО элемента (WAAPI сильнее inline —
- *                       конфликта с framer/Tailwind-transition нет, т.к.
- *                       transition на transform не объявляем вовсе).
+ *                       мгновенная отмена (возврат 200мс). Анимируется
+ *                       ИНДИВИДУАЛЬНОЕ свойство `scale`, НЕ transform
+ *                       (81-F1: transform-кейфреймы — даже composite:'add'
+ *                       — конфликтуют с позиционирующим translate кнопок,
+ *                       критик B CRITICAL; см. animateScale ниже).
  *   [data-spark]+
  *   лонг-пресс 430мс    «золотой выдох»: усиленный всплеск искр ×1.6 +
  *                       расширяющееся кольцо 56px + пульс фото
@@ -92,6 +93,77 @@ const HOLD_MS = 430;
 const HOLD_MOVE_PX = 12;
 /** Усиление искр лонг-пресса (×1.6 — частицы/радиус/длительность). */
 const HOLD_SPARK_BOOST = 1.6;
+
+/** 81-F1 (критик B, CRITICAL): все press/возврат/пульс-анимации — кейфреймы
+ *  через ИНДИВИДУАЛЬНОЕ CSS-свойство `scale`, НЕ через `transform`.
+ *  Причина: WAAPI-слой с transform-кейфреймами (даже с composite:'add' —
+ *  см. 81-F1b ниже) конфликтует с позиционирующим translate(-50%,-50%)
+ *  кнопок (.ea-evt-video__play в карусели): replace-кейфреймы сносили
+ *  transform на ~80px и тап уходил мимо модалки (критик B CRITICAL).
+ *  Свойство `scale` не трогает transform ВООБЩЕ — ноль интеракции с
+ *  CSS-transition на transform у тех же кнопок.
+ *  81-F1b ЗАМЕРЫ (390×844, playwright, research/f81-f1b/): scale-ветка
+ *  держит кнопку под пальцем (клик доходит, модалка открывается ✓);
+ *  центро-сдвиг S·T-композиции у кнопок с translate-центрированием
+ *  ≈3.75px лечится НЕ здесь, а transform-origin на самой кнопке
+ *  (events-video-carousel.css: origin 0 0 = визуальный центр —
+ *  т.к. translate(-50%,-50%) приводит центр бокса в его же левый-верхний
+ *  угол; с таким origin ЛЮБАЯ scale-композиция центро-инвариантна).
+ *  Побочный замер 81-F1b: transform+composite:'add' в Chromium 1234
+ *  при одновременном CSS-transition на transform (hover 0.1s) ТЕРЯЕТ
+ *  translate в computed matrix на ~340мс пружины → кнопка телепортируется
+ *  на +75px и клик после тапа уходит в video — РЕГРЕССИЯ критика B.
+ *  Поэтому composite-ветка — только фоллбек для старых WebKit без
+ *  индивидуальных свойств (Safari <14.1), где нет и нашего transition-
+ *  бага (движок другой).
+ *  Фиче-детект: старый WebKit молча выкидывает незнакомое свойство из
+ *  кейфреймов — ловим по getKeyframes(); для composite-фоллбека
+ *  дополнительно проверяем effect.composite === 'add' (браузер без
+ *  поддержки молча сводит к 'replace' = тот самый ~80px-снос). */
+const animateScale = (
+  el: HTMLElement,
+  frames: Array<{ scale: number; offset?: number }>,
+  options: KeyframeAnimationOptions,
+): Animation | null => {
+  if (typeof el.animate !== "function") return null;
+  /* Первичная ветка: индивидуальное CSS-свойство `scale` — не трогает
+     transform, ноль конфликтов с CSS-transition на transform. */
+  const scaleFrames: Keyframe[] = frames.map((f) =>
+    f.offset === undefined ? { scale: f.scale } : { scale: f.scale, offset: f.offset },
+  );
+  try {
+    const anim = el.animate(scaleFrames, options);
+    const effect = anim.effect as KeyframeEffect | null;
+    const survived = (effect?.getKeyframes?.() ?? []).some(
+      (k) => k.scale !== undefined,
+    );
+    if (survived) return anim;
+    anim.cancel();
+  } catch {
+    /* TypeError — невалидные кейфреймы для старого Safari: фоллбек. */
+  }
+  /* Фоллбек (старый WebKit без индивидуальных свойств): аддитивный
+     transform. Фиче-детект effect.composite обязателен: браузер без
+     composite молча сводит к 'replace' — это ~80px-снос критика B. */
+  const transformFrames: Keyframe[] = frames.map((f) => {
+    const frame: Keyframe = { transform: `scale(${f.scale})` };
+    if (f.offset !== undefined) frame.offset = f.offset;
+    return frame;
+  });
+  try {
+    const anim = el.animate(transformFrames, { ...options, composite: "add" });
+    const effect = anim.effect as KeyframeEffect | null;
+    const additive = effect?.composite === "add";
+    const survived = (effect?.getKeyframes?.() ?? []).some(
+      (k) => k.transform !== undefined,
+    );
+    if (additive && survived) return anim;
+    anim.cancel();
+  } catch {
+    /* Оба механизма мертвы (очень старый WebKit) — без нажатия. */
+  }
+  return null;
+};
 
 export function MicroDelights() {
   useEffect(() => {
@@ -309,15 +381,13 @@ export function MicroDelights() {
       );
       document.body.appendChild(ring);
       window.setTimeout(() => ring.remove(), 700);
-      // Пульс самого фото — собственный transform (у [data-spark] его нет).
-      el.animate?.(
-        [
-          { transform: "scale(1)" },
-          { transform: "scale(1.045)", offset: 0.4 },
-          { transform: "scale(1)" },
-        ],
-        { duration: 620, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
-      );
+      // Пульс самого фото — свойство `scale` (не transform): даже если у
+      // [data-spark]-элемента окажется позиционирующий CSS-transform,
+      // WAAPI его не снесёт (81-F1, см. animateScale).
+      animateScale(el, [{ scale: 1 }, { scale: 1.045, offset: 0.4 }, { scale: 1 }], {
+        duration: 620,
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      });
       // Тактильный отклик — только Android (iOS Safari API не имеет).
       try {
         navigator.vibrate?.(12);
@@ -342,11 +412,14 @@ export function MicroDelights() {
       const el = pressEl;
       pressEl = null;
       pressAnim?.cancel();
-      pressAnim = el.animate(
+      // Пружина возврата 0.94→1.032→1 — свойство `scale`, позиционирующий
+      // CSS-transform кнопки не трогаем (81-F1, критик B CRITICAL).
+      pressAnim = animateScale(
+        el,
         [
-          { transform: `scale(${PRESS_SCALE})` },
-          { transform: "scale(1.032)", offset: 0.55 },
-          { transform: "scale(1)" },
+          { scale: PRESS_SCALE },
+          { scale: 1.032, offset: 0.55 },
+          { scale: 1 },
         ],
         { duration: PRESS_UP_MS, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
       );
@@ -367,11 +440,9 @@ export function MicroDelights() {
       pressEl = null;
       pressAnim?.cancel();
       // Срыв (скролл/драг) — быстрый честный возврат без overshoot.
-      pressAnim = el.animate(
-        [
-          { transform: `scale(${PRESS_SCALE})` },
-          { transform: "scale(1)" },
-        ],
+      pressAnim = animateScale(
+        el,
+        [{ scale: PRESS_SCALE }, { scale: 1 }],
         { duration: PRESS_CANCEL_MS, easing: "ease-out" },
       );
     }
@@ -413,11 +484,12 @@ export function MicroDelights() {
           pressStartX = e.clientX;
           pressStartY = e.clientY;
           pressAnim?.cancel();
-          pressAnim = pressTarget.animate(
-            [
-              { transform: "scale(1)" },
-              { transform: `scale(${PRESS_SCALE})` },
-            ],
+          // Нажатие scale(1)→0.94 за 150мс (fill forwards — держится до
+          // pointerup). Свойство `scale` — НЕ transform: кнопка с
+          // translate(-50%,-50%) остаётся на месте (81-F1, критик B).
+          pressAnim = animateScale(
+            pressTarget,
+            [{ scale: 1 }, { scale: PRESS_SCALE }],
             {
               duration: PRESS_DOWN_MS,
               easing: "cubic-bezier(0.3, 0.9, 0.4, 1)",
