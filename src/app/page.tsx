@@ -21,70 +21,73 @@ import { SiteFooter } from "@/components/catering/site-footer";
    компонента). Рендерит null, ноль DOM, ноль layout-влияния. */
 import { VanityUrlScroll } from "@/components/vanity-scroll";
 
-// Cycle 32 — Simplified 17-section catering site restructure.
+// Cycle 32 — Simplified 15-section catering site restructure.
 //
 // STRATEGY: The user explicitly requested a streamlined, conversion-focused
 // structure inspired by gammacatering.com, joels.com, mculinary.com and
 // ggcatering.com. All editorial experiments (CEP/Salt Block/Ridgewells/MCulinary/
 // EA/TOTT/Gamma cycles 21-31) are condensed into a single coherent narrative:
-// hero → header → video → photo carousel → services → events → where-we-work →
-// menu → events video carousel → algorithm → delivery → calculator → about →
-// FAQ → instagram → form → footer. Two parallax photo bands (GammaSeparator,
+// hero → header → video → photo marquee → parallax band → services → menu →
+// parallax band → events video carousel → process → calculator+form → about →
+// FAQ → instagram → footer. Two parallax photo bands (GammaSeparator,
 // TottParallaxBand) bridge the major acts for cinematic pacing.
 //
-// SECTION ORDER (per task spec, "остальное убрать с сайта"):
+// SECTION ORDER (c83-D: приведён к ФАКТИЧЕСКОМУ рендеру — прежний список
+// упоминал DeliveryBlock (№13) и компоненты ранних итераций Task, которых
+// в рендере нет):
 //
-//   ── ACT I: BRAND PROMISE (hero → header → video → carousel) ──
+//   ── ACT I: BRAND PROMISE (hero → header → video → marquee) ──
 //    1. TottHero              — full-viewport bg video + "Interfood." wordmark
 //    2. SiteHeader            — sticky nav, scrolls up with hero, sticks at top:0
-//    3. GgVideoShowcase       — NEW. ggcatering.com-style 16:9 video block:
+//    3. GgVideoShowcase       — ggcatering.com-style 16:9 video block:
 //                               looping muted autoplay mp4 + "Кейтеринг как
 //                               *искусство*" overlay + Play pill + 2 CTAs.
-//    4. GammaMarquee          — infinite horizontal photo marquee (14 portrait photos).
-//    5. GammaSeparator        — PARALLAX BAND. Full-bleed separator photo + tilted
-//                               "interfood" Marck Script watermark. Task 2-a: moved
-//                               here from the founder→FAQ gap — user swapped the
-//                               photo band below the carousel for this one.
+//    4. GammaMarquee          — infinite horizontal photo marquee (14 portrait
+//                               photos, CSS-keyframes -50% seam loop).
+//    5. GammaSeparator        — PARALLAX BAND. Full-bleed separator photo +
+//                               tilted "interfood" Marck Script watermark.
+//                               Task 2-a: moved here from the founder→FAQ gap.
 //
-//   ── ACT II: WHAT WE OFFER (services → events → venues → menu) ──
-//    6. EaServiceTabs        — 5-tab premium services (Свадьбы · Корпоратив ·
-//                               Банкеты · Фуршеты · Выездной Шеф) with contextual CTAs.
-//    7. EaEventsPortfolio    — magazine horizontal-scroll event gallery (8 cards).
-//    8. EaVenuesSpotlight    — 3-up full-bleed venue cards "Где мы *работаем*."
-//    9. Menu                  — 7 menu types interactive list + PDF export.
-//   10. TottParallaxBand      — PARALLAX BAND. CSS-parallax bg + char-split headline
-//                               + "bon appétit" script. Cinematic pause before the
-//                               events video carousel.
+//   ── ACT II: WHAT WE OFFER (services → menu) ──
+//    6. HaccServices          — gamma-style horizontal accordion «Каталог
+//                               услуг» (12 panels + prices + Ken Burns exhale).
+//    7. HaccMenu              — меню-каталог в той же hacc-идиоме (корешки,
+//                               тинты, Marck Script, табы пакетов).
+//    8. TottParallaxBand      — PARALLAX BAND. CSS-parallax bg + char-split
+//                               headline + "bon appétit" script. Cinematic
+//                               pause before the events video carousel.
 //
-//   ── ACT III: PROCESS & LOGISTICS (video carousel → algorithm → delivery) ──
-//   11. EventsVideoCarousel  — NEW. Carousel of 4 event-type video tiles with
-//                               looping muted autoplay teasers + fullscreen click-to-play
-//                               modal. Magazine scroll-snap pattern, 5s auto-advance.
-//   12. CepProcess           — Cycle 63. «КАК МЫ РАБОТАЕМ» compact 4-step strip:
-//                               scroll-drawn red progress rail, sequential step
-//                               activation, ink-fill outline numerals.
-//   13. DeliveryBlock        — NEW. 2-col split: delivery photo + 5 USPs + 2 CTAs.
-//                               "Кейтеринг, который *доставляют*." bridges logistics
-//                               into the conversion flow.
+//   ── ACT III: PROCESS (video carousel → process) ──
+//    9. EventsVideoCarousel   — carousel of 4 event-type video tiles with
+//                               looping muted autoplay teasers + fullscreen
+//                               click-to-play modal. Magazine scroll-snap
+//                               pattern, 5s auto-advance.
+//   10. CepProcess            — «КАК МЫ РАБОТАЕМ» compact 4-step strip:
+//                               scroll-drawn red progress rail, sequential
+//                               step activation, ink-fill outline numerals.
 //
 //   ── ACT IV: CONVERSION (booking → about → FAQ → instagram → footer) ──
-//   14. HaccBooking          — Cycle 64 «СМЕТА-ЧЕК INTERFOOD»: merged calculator
-//                              + lead form + contacts in one receipt scene (nuqs state,
-//                              POST /api/lead). Anchors: #calculator (section top),
-//                              #contact (form zone).
-//   15. EaFounderStory       — founder-forward 2-col About + 3 count-up stats + CTA.
-//                              Task 2-a: followed directly by FAQ (the separator
-//                              band between them moved up to section 5).
-//   16. EaFaqAccordion       — minimalist 6-item accordion (resolves objections).
-//   17. CepInstagramGrid     — 3×3 IG grid with Reel play icons (social proof).
-//   18. SiteFooter           — dark navy footer with newsletter + 3-col + cities marquee.
+//   11. HaccBooking           — Cycle 64 «СМЕТА-ЧЕК INTERFOOD»: merged
+//                              calculator + lead form + contacts in one
+//                              receipt scene (nuqs state, POST /api/lead).
+//                              Anchors: #calculator (section top), #contact
+//                              (form zone).
+//   12. EaFounderStory        — founder-forward 2-col About + 3 count-up
+//                              stats + CTA.
+//   13. EaFaqAccordion        — minimalist 6-item accordion (resolves
+//                              objections).
+//   14. CepInstagramGrid      — 3×3 IG grid with Reel play icons (social
+//                              proof).
+//   15. SiteFooter            — dark navy footer with newsletter + 3-col +
+//                              cities marquee.
 //
 // PARALLAX BAND PLACEMENT (per user: "между некоторыми блоками можно оставить
 // классные фотки с параллакс эффектом, которые уже есть"):
-//   - GammaSeparator       between #4 photo marquee and #5 services — visual
+//   - GammaSeparator       between #4 photo marquee and #6 services — visual
 //                          breather (Task 2-a: moved from the founder→FAQ gap,
 //                          replacing CepEditorialDivider in this slot)
-//   - TottParallaxBand    between #8 menu and #9 events video carousel — cinematic pause
+//   - TottParallaxBand    between #7 menu and #9 events video carousel —
+//                          cinematic pause
 //
 // REMOVED (per user: "остальное убрать с сайта") — these 30+ components remain
 // on disk for reference but are no longer rendered:
@@ -94,7 +97,9 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //   EaTastingCta, SustainabilityStrip, EaServicesGrid, ServicesOverview,
 //   GammaAccordion, GammaHaccordion, EaVenueNetwork, EaNamedTestimonials,
 //   EaCapabilityStrip, CepLocationsStrip (subsumed by EaVenuesSpotlight),
-//   EaPressStrip, EaCareersBlock, EaPhilosophyQuote, EaFinalCta, TottBestCatering.
+//   EaPressStrip, EaCareersBlock, EaPhilosophyQuote, EaFinalCta,
+//   TottBestCatering, DeliveryBlock (компонент и якорные ссылки — на диске,
+//   в рендере его нет; конверсию ведут HaccBooking и хедер/футер CTAs).
 //
 // REMOVED in Task 2-a (user cleanup, files stay on disk per repo convention):
 //   CepEditorialDivider — the parallax band below the photo carousel was
@@ -281,10 +286,10 @@ export default function Home() {
       <GgVideoShowcase />
 
       {/* 4. GammaMarquee — Cycle 31. gammacatering.com signature infinite
-             horizontal photo marquee (GSAP xPercent:-50, repeat:-1, children
-             duplicated for seamless loop). 14 portrait food/event photos. Pure
-             photo scroll — no text overlay, per gamma. The first wow photo moment
-             after the video block. */}
+             horizontal photo marquee (CSS-keyframes -50% seam loop + WAAPI
+             playbackRate, children duplicated for seamless loop). 14 portrait
+             food/event photos. Pure photo scroll — no text overlay, per
+             gamma. The first wow photo moment after the video block. */}
       <GammaMarquee />
 
       {/* 5. GammaSeparator — PARALLAX BAND. Cycle 31 gammacatering.com signature

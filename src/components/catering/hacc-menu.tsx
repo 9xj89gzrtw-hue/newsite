@@ -750,11 +750,18 @@ function MenuRack({
   const spineId = (i: number) => `${baseId}-spine-${cats[i].id}`;
 
   /* entrance-каскад корешков (как в услугах) -------------------------------- */
+  /* c83-F2 (V1b RM): под reduce варианты остаются ОПРЕДЕЛЁННЫМИ (нулевая
+     длительность) + рэк получает animate="show" — прежде снятие
+     whileInView оставляло залитый в SSR initial opacity:0 навсегда
+     (замер: каталоги/корешки невидимы под prefers-reduced-motion). */
   const rackVariants = reduceSettled
-    ? undefined
+    ? { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0 } } }
     : { hidden: { opacity: 0 }, show: { opacity: 1 } };
   const itemVariants = reduceSettled
-    ? undefined
+    ? {
+        hidden: { opacity: 0, y: 44 },
+        show: { opacity: 1, y: 0, transition: { duration: 0 } },
+      }
     : {
         hidden: { opacity: 0, y: 44 },
         show: (i: number) => ({
@@ -776,6 +783,9 @@ function MenuRack({
       aria-label="Каталоги меню — семь направлений кейтеринга"
       initial={reduceSettled ? false : "hidden"}
       whileInView={reduceSettled ? undefined : "show"}
+      /* c83-F2: под reduce финал через animate (duration 0), а не через
+         снятие whileInView — иначе залипание SSR-initial. */
+      animate={reduceSettled ? "show" : undefined}
       viewport={{ once: true, margin: "-60px" }}
       variants={rackVariants}
       onMouseMove={onRackMouseMove}
@@ -1059,6 +1069,27 @@ function MenuRack({
                                   transition: { duration: 0.3, ease: EASE },
                                 },
                               }}
+                              /* c83-C: hover-глисс — строка блюда при hover
+                                 мягко съезжает вправо на 6px (паттерн
+                                 ea-faq-accordion, transform-only,
+                                 [0.22,1,0.36,1], снимается на leave).
+                                 Гейты: reduced-motion и coarse-pointer
+                                 (desktopFine = ≥1024px + fine) — на таче
+                                 и скролле жеста нет. Золотая hairline снизу
+                                 — чистый CSS ::after в hacc-menu.css.
+                                 Кроссфейд-remount списка и стаггер
+                                 вариантов не затронуты. */
+                              whileHover={
+                                reduced || !desktopFine
+                                  ? undefined
+                                  : {
+                                      x: 6,
+                                      transition: {
+                                        duration: 0.35,
+                                        ease: EASE,
+                                      },
+                                    }
+                              }
                             >
                               <span className="hmenu__dish-name">{dish.name}</span>
                               {dish.weight ? (
@@ -1222,8 +1253,12 @@ export function HaccMenu() {
           className="hmenu__head"
           initial={headReduceSettled ? false : { opacity: 0, y: 26 }}
           whileInView={headReduceSettled ? undefined : { opacity: 1, y: 0 }}
+          /* c83-F2 (V1b RM): под reduce финал мгновенно через animate
+             (duration 0) — снятие whileInView без animate оставляло
+             SSR-стиль opacity:0 навсегда (шапка невидима под RM). */
+          animate={headReduceSettled ? { opacity: 1, y: 0 } : undefined}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7, ease: EASE }}
+          transition={headReduceSettled ? { duration: 0 } : { duration: 0.7, ease: EASE }}
         >
           <div className="hmenu__head-text">
             {/* C71: eyebrow собирается перебором символов (ScrambleText):
@@ -1332,8 +1367,10 @@ export function HaccMenu() {
           className="mt-10 md:mt-14"
           initial={headReduceSettled ? false : { opacity: 0, y: 26 }}
           whileInView={headReduceSettled ? undefined : { opacity: 1, y: 0 }}
+          /* c83-F2 (V1b RM): финал мгновенно через animate (duration 0). */
+          animate={headReduceSettled ? { opacity: 1, y: 0 } : undefined}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, ease: EASE }}
+          transition={headReduceSettled ? { duration: 0 } : { duration: 0.7, ease: EASE }}
         >
           <p className="hmenu__rack-label">Своё меню</p>
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">

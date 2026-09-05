@@ -352,6 +352,33 @@
   width: 44px;
   transform: none;
 }
+/* c83-F2 (V1b LOW): крайние тики не вылезают за рельс/вьюпорт.
+   44px-бокс кнопки (min-width из 81-W2F1) с translateX(-50%) центрируется
+   на позиции тика: у крайних (min на 0%, 500 на 100%) полбокса вылезает
+   за рельс — на 390px это за край вьюпорта (замер V1b: x=−2 / right=392).
+   Тап-таргет крайних тиков — ::after-полоса (≥44px, не тронута; сама
+   кнопка pointer-events:none — драг-фикс Cycle 65), поэтому у крайних
+   бокс прижимаем к лейблу (min-width: 0): translateX(-50%) держит ЛЕЙБЛ
+   на точной позиции тика, бокс = лейбл + паддинги; фокус-подсветка
+   обнимает лейбл. Средние тики — без изменений. */
+.hb-slider__tick:first-of-type,
+.hb-slider__tick:last-of-type {
+  min-width: 0;
+}
+/* c83-F4b (критик-V2 MINOR): на узких вьюпортах нелинейная шкала ставит
+   «100» (80%) и «200» (90%) в ~35px друг от друга (рельс ~350px на 390) —
+   44px-минимальные боксы перекрывались на 9px. МИНИМАЛЬНЫЙ фикс — паттерн
+   крайних тиков c83-F2: бокс прижимаем к лейблу (min-width: 0 + паддинг
+   чуть уже; 3-значный лейбл ≈ 26–31px → зазор между соседями ≥ 4px).
+   Тап-таргет ≥44×44 НЕ тронут — он в ::after (48×44, coarse-контракт
+   W2/Cycle-65: кнопка pointer-events:none, полоса снизу). Фокус-
+   подсветка обнимает лейбл — как у крайних тиков. ≥640px — без изменений. */
+@media (max-width: 639.98px) {
+  .hb-slider__tick {
+    min-width: 0;
+    padding: 6px 0.2rem 0;
+  }
+}
 .hb-slider__tick:focus-visible {
   color: var(--hb-red-deep);
   background: color-mix(in srgb, var(--hb-red) 7%, transparent);
@@ -762,6 +789,53 @@
   border-color: var(--hb-red-deep);
   background: #fff5f5;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--hb-red-deep) 16%, transparent);
+}
+
+/* ─── c83-C: focus-underline — градиентная нить под полем при фокусе ───
+   ДОБАВКА к существующим focus-стилям D3/D1 (border + gold-shadow НЕ
+   заменяются — линия живёт отдельно, под нижней кромкой поля). При
+   :focus-within из левого края прорастает 2px нить
+   linear-gradient(90deg, gold → бордо), scaleX 0→1, 0.45s
+   [0.22,1,0.36,1], transform-origin 0 50%. Чистый CSS: работает в
+   SSR-шелле (#contact) без JS/гидрации. Обёртка .hb-field__ctl — хук
+   вокруг input/textarea формы (см. tsx); кастомное поле даты
+   (селект-подобный триггер) использует уже существующую обёртку .hb-date
+   (position: relative). reduced-motion → transition: none (нить
+   появляется мгновенно). Инлайн-числовой ввод гостей (hb-guests-input)
+   сознательно не тронут: компактный степпер в калькуляторе, нить = шум. */
+.hb-field__ctl {
+  position: relative;
+}
+
+.hb-field__ctl::after,
+.hb-date::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--gold, #d4a373),
+    var(--hb-red-deep, #b91431)
+  );
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hb-field__ctl:focus-within::after,
+.hb-date:focus-within::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hb-field__ctl::after,
+  .hb-date::after {
+    transition: none;
+  }
 }
 
 /* кнопки блока */

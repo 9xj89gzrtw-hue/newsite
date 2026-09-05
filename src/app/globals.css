@@ -668,35 +668,6 @@ html.lenis body {
 
 /* ===== LIGHT THEME ANIMATIONS ===== */
 
-/* Gentle floating animation for decorative elements */
-@keyframes float-gentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-.float-gentle {
-  animation: float-gentle 6s ease-in-out infinite;
-}
-
-/* Shimmer effect for loading states */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-.shimmer {
-  background: linear-gradient(90deg, var(--cream-2) 25%, var(--parchment) 50%, var(--cream-2) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 2s ease-in-out infinite;
-}
-
-/* Pulse glow for CTAs */
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 149, 106, 0.4); }
-  50% { box-shadow: 0 0 20px 10px rgba(196, 149, 106, 0.1); }
-}
-.pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
 /* Gradient text utility */
 .gradient-text {
   background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
@@ -757,110 +728,6 @@ html.lenis body {
 
 /* ===== ENHANCED ANIMATIONS FOR LIGHT THEME REDESIGN ===== */
 
-/* Smooth reveal from bottom */
-@keyframes reveal-up {
-  from { 
-    opacity: 0; 
-    transform: translateY(40px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-.reveal-up {
-  animation: reveal-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* Staggered children animation */
-.stagger-children > * {
-  opacity: 0;
-  animation: reveal-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
-.stagger-children > *:nth-child(7) { animation-delay: 0.7s; }
-.stagger-children > *:nth-child(8) { animation-delay: 0.8s; }
-
-/* Glow pulse for special elements */
-@keyframes glow-pulse {
-  0%, 100% { 
-    box-shadow: 0 0 20px rgba(196, 149, 106, 0.2),
-                0 0 40px rgba(196, 149, 106, 0.1);
-  }
-  50% { 
-    box-shadow: 0 0 30px rgba(196, 149, 106, 0.35),
-                0 0 60px rgba(196, 149, 106, 0.15);
-  }
-}
-.glow-pulse {
-  animation: glow-pulse 3s ease-in-out infinite;
-}
-
-/* Shimmer text effect */
-@keyframes shimmer-text {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-.shimmer-text {
-  background: linear-gradient(
-    90deg,
-    var(--ink) 0%,
-    var(--gold) 25%,
-    var(--terracotta) 50%,
-    var(--gold) 75%,
-    var(--ink) 100%
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shimmer-text 4s linear infinite;
-}
-
-/* Floating animation variant */
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-15px) rotate(1deg); }
-  75% { transform: translateY(10px) rotate(-1deg); }
-}
-.float-slow {
-  animation: float-slow 8s ease-in-out infinite;
-}
-
-/* Border draw animation */
-@keyframes border-draw {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0 0 0 0); }
-}
-.border-draw {
-  position: relative;
-}
-.border-draw::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 2px solid var(--gold);
-  border-radius: inherit;
-  animation: border-draw 1s ease-out forwards;
-  pointer-events: none;
-}
-
-/* Magnetic hover lift */
-.magnetic-lift {
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.magnetic-lift:hover {
-  transform: translateY(-12px) scale(1.02);
-  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.15),
-              0 0 30px rgba(196, 149, 106, 0.1);
-}
-
 /* Text highlight on scroll into view */
 .highlight-on-scroll {
   position: relative;
@@ -878,31 +745,6 @@ html.lenis body {
 }
 .highlight-on-scroll.highlighted::before {
   transform: scaleX(1);
-}
-
-/* Rotating gradient border */
-@keyframes rotate-gradient {
-  0% { --angle: 0deg; }
-  100% { --angle: 360deg; }
-}
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-.rotating-border {
-  position: relative;
-  background: white;
-  border-radius: inherit;
-}
-.rotating-border::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  background: conic-gradient(from var(--angle), var(--gold), var(--terracotta), var(--peach), var(--gold));
-  z-index: -1;
-  animation: rotate-gradient 4s linear infinite;
 }
 
 /* Parallax depth layers */
@@ -945,162 +787,7 @@ html.lenis body {
   transition: 0s;
 }
 
-/* Background gradient shift animation */
-@keyframes background-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-.animate-background-shift {
-  animation: background-shift 4s ease-in-out infinite;
-}
-
 /* ===== GLOBAL ANIMATION ENHANCEMENTS (Reference-inspired) ===== */
-
-/* Smooth page entrance - fade up */
-@keyframes page-enter {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Gold shimmer sweep for cards (Cut & Taste / Vegas pattern) */
-@keyframes gold-shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-.gold-shimmer {
-  position: relative;
-  overflow: hidden;
-}
-.gold-shimmer::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(196, 149, 106, 0.15) 45%,
-    rgba(196, 112, 74, 0.2) 50%,
-    rgba(196, 149, 106, 0.15) 55%,
-    transparent 70%
-  );
-  background-size: 200% 100%;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-}
-.gold-shimmer:hover::after {
-  opacity: 1;
-  animation: gold-shimmer 1s ease-out forwards;
-}
-
-/* Text gradient animation for special headings */
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% center;
-  }
-  50% {
-    background-position: 100% center;
-  }
-}
-.animate-gradient-text {
-  background-size: 200% auto;
-  animation: gradient-shift 4s ease-in-out infinite;
-}
-
-/* Pulse ring for CTAs (Salza pattern) */
-@keyframes pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-}
-.pulse-ring::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: inherit;
-  animation: pulse-ring 2s ease-out infinite;
-  z-index: -1;
-}
-
-/* Floating animation for decorative elements ( Ridgewells pattern) */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-10px) rotate(1deg);
-  }
-  75% {
-    transform: translateY(5px) rotate(-1deg);
-  }
-}
-.float-animation {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Scale pulse for attention elements */
-@keyframes scale-pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-.scale-pulse {
-  animation: scale-pulse 3s ease-in-out infinite;
-}
-
-/* Draw line animation for borders and dividers.
-   NOTE: uses transform: scaleX (GPU-friendly, RULES §5 compliant) —
-   not width: 0→100% (which would force layout/paint every frame). */
-@keyframes draw-line {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
-.draw-line {
-  transform-origin: left;
-}
-.draw-line::after {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, var(--gold), var(--terracotta));
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: draw-line 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* Stagger children entrance helper */
-.stagger-entrance > * {
-  opacity: 0;
-  animation: var(--entrance-animation, reveal-up) 0.6s ease-out forwards;
-}
-.stagger-entrance > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger-entrance > *:nth-child(2) { animation-delay: 0.1s; }
-.stagger-entrance > *:nth-child(3) { animation-delay: 0.15s; }
-.stagger-entrance > *:nth-child(4) { animation-delay: 0.2s; }
-.stagger-entrance > *:nth-child(5) { animation-delay: 0.25s; }
-.stagger-entrance > *:nth-child(6) { animation-delay: 0.3s; }
-.stagger-entrance > *:nth-child(7) { animation-delay: 0.35s; }
-.stagger-entrance > *:nth-child(8) { animation-delay: 0.4s; }
 
 /* Magnetic hover zone indicator */
 .magnetic-zone {
@@ -1221,42 +908,6 @@ html.lenis body {
     font-size: 0.8em;
     color: #666;
   }
-}
-
-/* ===== PREMIUM ANIMATION & UTILITY ENHANCEMENTS (Task 2-b) ===== */
-
-/* Gold shimmer text — premium accent for marquee items and headlines.
-   Uses transform: translateX (GPU-friendly, RULES §5 compliant —
-   background-position shifts are visually equivalent but force paint). */
-@keyframes text-shimmer-gold-anim {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-.text-shimmer-gold {
-  position: relative;
-  display: inline-block;
-  color: var(--ink);
-  -webkit-background-clip: initial;
-  background-clip: initial;
-  -webkit-text-fill-color: initial;
-}
-.text-shimmer-gold::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    100deg,
-    transparent 30%,
-    rgba(196, 149, 106, 0.45) 50%,
-    transparent 70%
-  );
-  background-size: 200% 100%;
-  transform: translateX(-100%);
-  pointer-events: none;
-  mix-blend-mode: overlay;
-}
-.text-shimmer-gold:hover::after {
-  animation: text-shimmer-gold-anim 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Cursor-following preview text — utility hook (used later for cursor-follow
@@ -1549,23 +1200,6 @@ header[data-scrolled="true"] [data-mega-panel] {
   font-size: clamp(5rem, 10vw, 8rem);
 }
 
-/* --- True infinite marquee (Ridgewells marquee band wow #2) ---
-   Track duplicated → translate -50% loops seamlessly. */
-@keyframes ridge-marquee {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-50%, 0, 0); }
-}
-.ridge-marquee-track {
-  display: flex;
-  width: max-content;
-  animation: ridge-marquee 32s linear infinite;
-  will-change: transform;
-}
-.ridge-marquee-pause:hover .ridge-marquee-track,
-.ridge-marquee-pause:focus-within .ridge-marquee-track {
-  animation-play-state: paused;
-}
-
 /* --- Slow image hover-zoom for two-up service cards (Ridgewells 0.4s ease) --- */
 .ridge-img-zoom {
   transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1605,19 +1239,6 @@ header[data-scrolled="true"] [data-mega-panel] {
   opacity: 0.3;
 }
 
-/* --- Star sparkle pulse (marquee-band decorative stars) ---
-   Subtle opacity + scale pulse so the stars feel "alive" as they scroll.
-   Staggered via inline animation-delay on each star (set in marquee-band.tsx). */
-@keyframes ridge-star-pulse {
-  0%, 100% { opacity: 0.55; transform: scale(0.92); }
-  50% { opacity: 1; transform: scale(1.12); }
-}
-.ridge-star {
-  animation: ridge-star-pulse 2.4s ease-in-out infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-
 /* --- Reduce painterly bg motion (subtle drift on the blooms) --- */
 @keyframes painterly-drift {
   0%, 100% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
@@ -1628,26 +1249,14 @@ header[data-scrolled="true"] [data-mega-panel] {
   background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
 }
 
-/* ── Concept-Catering style: rising photos + marquee ──
+/* ── Concept-Catering style: rising photos ──
    Reverse-engineered from concept-catering.de (.works / .project pattern).
    Each .cc-project is sticky at top:0 with height 100vh, so the next photo
    scrolls UP and COVERS the previous — the "rising photos" effect.
-   Pure CSS sticky stacking (no JS for the rise itself). */
-@keyframes cc-marquee-x {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.cc-marquee-track {
-  display: inline-flex;
-  white-space: nowrap;
-  animation: cc-marquee-x var(--cc-marquee-duration, 24s) linear infinite;
-  will-change: transform;
-}
-.cc-marquee-track.cc-reverse { animation-direction: reverse; }
+   Pure CSS sticky stacking (no JS for the rise itself).
+   c83-D: @keyframes cc-marquee-x + .cc-marquee-track — удалены (нуль
+   ссылок по всему src). */
 .cc-project { position: sticky; top: 0; height: 100vh; overflow: hidden; }
-@media (prefers-reduced-motion: reduce) {
-  .cc-marquee-track { animation: none; }
-}
 
 /* Barlow Semi Condensed font-family helper (concept-catering all-caps). */
 .font-barlow {
@@ -1949,26 +1558,6 @@ header[data-scrolled="true"] [data-mega-panel] {
   color: #FFFFFF;
   text-align: center;
   text-wrap: balance;
-}
-
-/* Joel's-style scroll cue keyframe.
-   Line retracts from bottom (origin 100%), then re-extends from top (origin 0)
-   over 2s — the signature "scroll" indicator at the bottom of the hero. */
-@keyframes joel-scroll-cue {
-  0%   { transform: scaleY(1); transform-origin: 0 100%; }
-  40%  { transform: scaleY(0); transform-origin: 0 100%; }
-  60%  { transform: scaleY(0); transform-origin: 0 0; }
-  100% { transform: scaleY(1); transform-origin: 0 0; }
-}
-.joel-scroll-cue-line {
-  width: 1px;
-  height: 94px;
-  background-color: var(--sage);
-  animation: joel-scroll-cue 2s infinite ease-in-out;
-  transform-origin: 0 0;
-}
-@media (prefers-reduced-motion: reduce) {
-  .joel-scroll-cue-line { animation: none; }
 }
 
 /* Joel's-style content frame (max-width 1070px between page borders).
@@ -2716,21 +2305,8 @@ header[data-scrolled="true"] [data-mega-panel] {
   transform: translateY(0);
 }
 
-/* Marquee — slow continuous auto-scroll (wow band) */
-.mcu-marquee {
-  display: flex;
-  width: max-content;
-  animation: mcu-marquee-scroll 40s linear infinite;
-}
-.mcu-marquee:hover { animation-play-state: paused; }
-@keyframes mcu-marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .mcu-marquee { animation: none; }
   .mcu-reveal { opacity: 1; transform: none; transition: none; }
   .mcu-photo-filmstrip .mcu-photo-slide-inner img,
   .mcu-service-card-img img,
@@ -2760,7 +2336,6 @@ header[data-scrolled="true"] [data-mega-panel] {
    Pure-new in this block (no prior conflict):
      - .sb-petal-btn + __icon + size variants  (Task 6-A — primary deliverable)
      - .sb-hero-title + data-tone              (Task 6-A)
-     - .sb-marquee-repeating + track/phrase/sep + @keyframes  (Task 6-A)
      - .sb-press-strip (BASE — flex layout — complements existing [data-variant])
      - .sb-tasting-row + __num/__dish/__ingredients/__pairing  (Task 6-A)
      - .sb-sustainability-cell                  (Task 6-A) */
@@ -2900,53 +2475,6 @@ header[data-scrolled="true"] [data-mega-panel] {
 }
 .sb-hero-title[data-tone="cream"] {
   color: var(--cream);
-}
-
-/* --- 3. sb-marquee-repeating — Salt Block brand-phrase insistence -------
-   Single phrase repeated 7× inline; track animates translateX(0 → -50%) over
-   32s. Pause-on-hover. Gold ✦ separator between phrases.
-   Task 7-B restyle: deep ink-black bg (var(--espresso)) + clamp height
-   (80–144px, 11vh) + Barlow Semi Condensed Bold cream phrases + honey ✦. */
-.sb-marquee-repeating {
-  overflow: hidden;
-  width: 100%;
-  height: clamp(80px, 11vh, 144px);
-  display: flex;
-  align-items: center;
-  background: linear-gradient(180deg, #0a0908 0%, #12100e 50%, #0a0908 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
-}
-.sb-marquee-repeating .sb-marquee-track {
-  display: flex;
-  width: max-content;
-  animation: sb-marquee-scroll 32s linear infinite;
-}
-.sb-marquee-repeating:hover .sb-marquee-track {
-  animation-play-state: paused;
-}
-.sb-marquee-repeating .sb-marquee-phrase {
-  display: inline-flex;
-  align-items: center;
-  padding: 0 1.5rem;
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--cream);
-  white-space: nowrap;
-}
-.sb-marquee-repeating .sb-marquee-sep {
-  display: inline-block;
-  margin-left: 1.5rem;
-  color: var(--honey);
-  font-size: 1.25em;
-  line-height: 1;
-}
-@keyframes sb-marquee-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
 }
 
 /* --- 4. sb-press-strip — "as featured in" logo row ---------------------
@@ -3118,9 +2646,8 @@ header[data-scrolled="true"] [data-mega-panel] {
   }
 }
 
-/* --- Salt Block reduced-motion: stop marquee, drop transforms ---------- */
+/* --- Salt Block reduced-motion: drop transforms ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .sb-marquee-repeating .sb-marquee-track { animation: none; }
   .sb-petal-btn,
   .sb-petal-btn:hover,
   .sb-petal-btn:focus-visible,
@@ -3690,6 +3217,130 @@ header[data-scrolled="true"] [data-mega-panel] {
   background: var(--ea-red-deep);
   transform: translateY(-1px);
   outline: none;
+}
+
+/* ============================================================================
+   c83-D — COOKIE-БАННЕР: slide-fill кнопок (механика .hcta-btn,
+   site-header.css §3, скопирована 1:1).
+
+   Solid-кнопка «Принять все» (ea-cookie-banner.tsx, BTN_SOLID_CLASS):
+   ::after-заливка espresso #0A0908 въезжает СНИЗУ (translateY(101%) → 0,
+   360ms EASE [0.22,1,0.36,1]), текст инвертируется в золото #C9A227
+   (8.22:1 на espresso — фактический расчёт c83-F1, синхронизировано с
+   ea-cookie-banner.tsx: раньше «8.38:1» расходилось с «8.22:1» там —
+   F4-канон cookie-карточки), рамка — в espresso.
+   Псевдоэлемент absolute (inset:0) ⇒ layout НЕ меняется: высота 44px,
+   358px-карточка и flex-wrap ряд кнопок целы.
+
+   Специфичность: globals.css (unlayered) бьёт Tailwind-утилиты (layer
+   utilities) — hover:bg-[#B08D22]/hover:border-[#B08D22] на кнопке
+   остаются фолбэком ПОД непрозрачной ::after-заливкой; transition
+   цвета/рамки самого элемента задаёт инлайн BTN_BASE_STYLE (200ms ease
+   — не тронут). Гейты: :hover — только внутри (hover:hover) (тач-контекст
+   без sticky-hover); :focus-visible — без гейта (клавиатура);
+   prefers-reduced-motion → ::after transition:none — заливка появляется
+   мгновенно (состояние, не анимация).
+
+   Outline-кнопки («Отклонить»/«Необходимые», .cookie-cta-outline):
+   лёгкий ховер-бордер в золото — чистое цвет-состояние, transform-free.
+   ============================================================================ */
+.cookie-cta-solid {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate; /* ::after (z:-1) над фоном кнопки, ПОД текстом */
+  --cookie-cta-fill: #0a0908; /* espresso */
+  --cookie-cta-ink: #c9a227; /* золото на espresso = 8.22:1 (F4, c83-F4b) */
+}
+
+.cookie-cta-solid::after {
+  content: "";
+  position: absolute;
+  inset: 0; /* паддинг-бокс: 1px-рамка остаётся видимой «штампом» */
+  z-index: -1; /* внутри isolate: над золотым фоном, под текстом */
+  background: var(--cookie-cta-fill);
+  transform: translateY(101%);
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+/* Заливка едет только для устройств с честным :hover. */
+@media (hover: hover) {
+  .cookie-cta-solid:hover::after {
+    transform: translateY(0);
+  }
+  .cookie-cta-solid:hover {
+    color: var(--cookie-cta-ink);
+    border-color: var(--cookie-cta-fill);
+  }
+}
+
+/* Клавиатура: тот же slide-fill без hover-гейта (паритет .hcta-btn). */
+.cookie-cta-solid:focus-visible::after {
+  transform: translateY(0);
+}
+.cookie-cta-solid:focus-visible {
+  color: var(--cookie-cta-ink);
+  border-color: var(--cookie-cta-fill);
+}
+
+/* Outline-кнопки: бордер в золото на hover — цвет, ноль transform. */
+@media (hover: hover) {
+  .cookie-cta-outline:hover {
+    border-color: #c9a227;
+  }
+}
+
+/* c83-F4b (критик-V2 NIT): инлайн-ссылки-слова текста карточки («Условия»
+   42×46) — тач-таргет уже по ширине. min-width не работает на чистом
+   inline → inline-block + центр; высоту (46px) держит их py-4 (W2-FIX в
+   tsx). Unlayered-специфичность globals.css бьёт Tailwind-utilities.
+   «Политика» уже >44px — правило визуально меняет только «Условия». */
+[data-component="ea-cookie-banner"] p a {
+  display: inline-block;
+  min-width: 44px;
+  text-align: center;
+}
+
+/* Reduced-motion: заливка мгновенна (состояние), без перехода. */
+@media (prefers-reduced-motion: reduce) {
+  .cookie-cta-solid::after {
+    transition: none;
+  }
+}
+
+/* ============================================================================
+   c83-F2 (U1a D1): gg play-pill — тонкий hover-тактил (масштаб).
+   Критик U1a: на hover менялась только opacity 1→0.90 (Tailwind), масштаба
+   не было. Класс на САМОЙ кнопке: обёртка Magnetic владеет СВОИМ
+   transform-переносом (другой элемент — свойства не пересекаются), а
+   data-press WAAPI анимирует свойство scale (не transform) — CSS-transform
+   и WAAPI-scale композиционируются по Transforms L2 без прыжка (§52/c81).
+   Переходы: opacity 500ms (прежде — Tailwind transition-opacity
+   duration-500, перенесён сюда ради общего списка свойств) + transform
+   300ms EASE [0.22,1,0.36,1]. Гейты: (hover: hover) — честный :hover
+   (тач не залипает), prefers-reduced-motion — без масштаба и без
+   transform-перехода (состояние opacity остаётся).
+   ============================================================================ */
+.gg-play-pill {
+  transition-property: opacity, transform;
+  transition-duration: 500ms, 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1),
+    cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) {
+  .gg-play-pill:hover {
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gg-play-pill {
+    transition-property: opacity;
+  }
+  .gg-play-pill:hover {
+    transform: none;
+  }
 }
 
 /* EA section wrapper */
@@ -4447,6 +4098,8 @@ header[data-scrolled="true"] [data-mega-panel] {
 
 .gamma-marquee__track--anim {
   animation: gamma-marquee-scroll 40s linear infinite;
+  /* will-change живёт ТОЛЬКО здесь — c83-F1: дубль с Tailwind
+     will-change-transform на треке (gamma-marquee.tsx) убран. */
   will-change: transform;
 }
 
@@ -4903,6 +4556,69 @@ html:not(.js) [style$="opacity:0"] {
   transform-origin: top;
   animation: hero-cue-pulse 2.2s cubic-bezier(0.42, 0, 0.58, 1) 1.6s
     infinite;
+}
+
+/* ============================================================================
+   c83-D — HERO SCROLL-EXIT: «hero уезжает» по мере прокрутки.
+
+   Нативные view()-таймлайны (C74-паттерн, композитор, 0 JS):
+     - медиа-слой (постер-<img> z-0 + <video> z-1, прямые дети #hero):
+       translate3d(0,-8%,0) + scale(1.05) — TRANSFORM-ONLY, range
+       exit 0% → exit 100%;
+     - текстовый блок (.hero-stagger): translateY(40px → -25%) +
+       opacity 1 → 0.2, range exit 0% → exit 80% (текст «уезжает» быстрее).
+
+   LCP-БЕЗОПАСНОСТЬ (§52: LCP-текст не гейтится JS):
+     - в покое exit-прогресс = 0% → оба таймлайна держат from-кадр:
+       медиа = identity, текст = его базовый translateY(40px). Первый кадр
+       НЕ отличается от вёрстки без анимации; стартовых opacity:0 НЕТ;
+     - ГРАБЛЯ §44: CSS-анимация transform в keyframes ЗАМЕНЯЕТ computed
+       transform целиком — from-кадр текста обязан повторять базовый
+       Tailwind-класс [transform:translateY(40px)] контейнера, иначе
+       resting-состояние прыгнуло бы на 40px;
+     - exit ≠ entry: hero-rise/hero-fade-in (81-F1) живут на ДЕТЯХ
+       (.hero-stagger > *, .hero-cue), scroll-exit — на РОДИТЕЛЬСКИХ слоях
+       (сам контейнер текста, медиа-элементы) — две анимации на одном
+       элементе не встречаются (грабля «stuck-снап» C77);
+     - деградация: @supports (animation-timeline: view()) → браузеры без
+       поддержки видят статичный hero; prefers-reduced-motion: reduce →
+       правило не применяется вовсе (гейт no-preference). Ноль filter/
+       brightness/blur, ноль новых DOM-элементов.
+   ============================================================================ */
+@keyframes hero-exit-media {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(0, -8%, 0) scale(1.05); }
+}
+@keyframes hero-exit-copy {
+  from { transform: translateY(40px); opacity: 1; }
+  to { transform: translateY(-25%); opacity: 0.2; }
+}
+
+/* Именованный view-таймлайн на САМОЙ секции. ГРАБЛЯ (поймана живым замером
+   c83-D): view() у потомков #hero резолвится в БЛИЖАЙШИЙ scroll-container,
+   а это сам #hero (Tailwind overflow-hidden = scroll container с нулевым
+   диапазоном прокрутки) → прогресс навечно 0. Именованный таймлайн
+   (view-timeline-name) считает субъектом сам #hero относительно ДОКУМЕНТА
+   — overflow секции больше не перехватывает; имя видно всем потомкам
+   секции. Замер: exit 0% = scrollY 0, exit 100% = 900px (100svh). */
+#hero {
+  view-timeline-name: --hero-exit;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    #hero > img,
+    #hero > video {
+      animation: hero-exit-media linear both;
+      animation-timeline: --hero-exit;
+      animation-range: exit 0% exit 100%;
+    }
+    .hero-stagger {
+      animation: hero-exit-copy linear both;
+      animation-timeline: --hero-exit;
+      animation-range: exit 0% exit 80%;
+    }
+  }
 }
 
 /* ============================================================================

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { ComponentProps, KeyboardEvent } from "react";
 import { ScrambleText } from "@/components/motion/scramble-text";
@@ -43,7 +43,21 @@ import "@/components/motion/c74-kinetic.css";
  *     открытие снимает inert. Панель остаётся в DOM (SSR для краулеров +
  *     анимация высоты).
  *   - Honors `prefers-reduced-motion` (AnimatePresence collapses instantly,
- *     +/− rotation becomes a 2-frame swap, scroll-reveal returns empty props).
+ *     +/− rotation becomes a 2-frame swap, scroll-reveal renders static tags
+ *     post-mount — c83-F2).
+ *
+ * c83-F2 (V1b HIGH): под prefers-reduced-motion секция была НЕВИДИМА —
+ * root cause: useReducedMotion() на СЕРВЕРЕ возвращает null → SSR-рендер
+ * берёт анимационную ветку reveal() и сериализует initial {opacity:0,
+ * y:18} в style-атрибут; на первом КЛИЕНТСКОМ рендере хук уже true →
+ * reveal() возвращает {} → у motion-элементов нет ни initial, ни
+ * whileInView, ни animate → НИКТО не пишет opacity:1, а залитый в SSR
+ * style="opacity:0" гидрация не перезатирает → контент зависает невидимым
+ * навсегда (замер V1b: h2 op=0, translateY(18px)). Фикс = проектный
+ * settled-гейт (reveal.tsx/§34/§52): rmSettled = mounted && reduce — до
+ * маунта всегда motion-ветка (паритет SSR/гидрация), после маунта под
+ * reduce рендерим ТЕ ЖЕ семантические теги без motion-обёртки (смена типа
+ * = ремонт узла с чистым style). Normal-режим не задет (гейт false).
  *
  * CONTENT: 6 realistic RU catering questions per the Cycle 28 brief.
  */
@@ -156,6 +170,20 @@ export function EaFaqAccordion() {
   const reduce = useReducedMotion();
   const [open, setOpen] = useState<number | null>(0);
   const reactId = useId();
+  /* c83-C hydration-safety (C62 §34): squash-масштаб появляется в animate
+     ТОЛЬКО после маунта и только без reduced-motion. SSR и первый
+     клиентский рендер пишут одинаковый style (height/opacity из
+     style-prop) — ноль гидрационных минусов; под reduce «scale» вообще
+     не сериализуется в SSR-стиль (иначе залипший transform:scale(.985)
+     оставался бы на раскрытой панели) — scale фикс 1. */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const squashSettled = mounted && !reduce;
+  /* c83-F2 (V1b HIGH): RM-settled гейт — см. докблок вверху. До маунта
+     (SSR + первый клиентский рендер) ВСЕГДА motion-ветка reveal-пропсов
+     (паритет с SSR, reduce на сервере = null), после маунта под reduce —
+     статичные теги. Boolean(...) — тип boolean, не boolean|null. */
+  const rmSettled = Boolean(mounted && reduce);
 
   const toggle = (i: number) => setOpen((cur) => (cur === i ? null : i));
 
@@ -167,11 +195,14 @@ export function EaFaqAccordion() {
   };
 
   // Shared Motion reveal preset — fade-up 18px → 0 over 550ms. Empty when
-  // reduced-motion is requested (the element renders statically + visible).
+  // rmSettled (post-mount reduced-motion): элементы рендерятся СТАТИЧНЫМИ
+  // тегами (RevealP/RevealH2/RevealItem ниже) — финальное состояние без
+  // анимационных пропсов. НЕ ветвиться на «сырой» reduce — это и было
+  // причиной невидимости (c83-F2, докблок вверху).
   const reveal = (
     delay: number,
   ): Partial<MotionDivProps & MotionH2Props & MotionPProps> =>
-    reduce
+    rmSettled
       ? {}
       : {
           initial: { opacity: 0, y: 18 },
@@ -179,6 +210,16 @@ export function EaFaqAccordion() {
           viewport: { once: true, margin: "-60px" },
           transition: { duration: 0.55, delay, ease: EASE },
         };
+
+  /* c83-F2: теги reveal-элементов. Под rmSettled — семантические теги
+     (смена типа = ремонт узла с чистым style-атрибутом; финал
+     «opacity:1; transform:none» — стили по умолчанию), иначе — motion-
+     версии с reveal-пропсами. Приведение типа безопасно: под rmSettled
+     reveal()/triggerReveal = {} — на тег попадают только
+     className/style/children. */
+  const RevealP = (rmSettled ? "p" : motion.p) as unknown as typeof motion.p;
+  const RevealH2 = (rmSettled ? "h2" : motion.h2) as unknown as typeof motion.h2;
+  const RevealItem = (rmSettled ? "div" : motion.div) as unknown as typeof motion.div;
 
   return (
     <section
@@ -198,26 +239,26 @@ export function EaFaqAccordion() {
             bold). Глобальную переменную НЕ трогаю (она используется и
             крупно — дивайдеры/карусельные точки), затемняю ТОЛЬКО здесь:
             #7A6362 = 5.10:1 ✓ AA. */}
-        <motion.p
+        <RevealP
           className="ea-eyebrow--script text-center"
           style={{ color: "#7A6362" }}
           {...reveal(0)}
         >
           <ScrambleText delayMs={150}>Вопросы · Ответы</ScrambleText>
-        </motion.p>
+        </RevealP>
 
         {/* H2 with italic-as-fragment trailing phrase ("знать" in red). */}
-        <motion.h2
+        <RevealH2
           id={`${reactId}-headline`}
           className="ea-section-h2 kinetic-h2 mt-5 text-center"
           style={{ fontSize: "clamp(2.5rem, 5.5vw, 4rem)" }}
           {...reveal(0.05)}
         >
           Что важно <i className="ea-italic-fragment">знать</i>.
-        </motion.h2>
+        </RevealH2>
 
         {/* Body line + ea-text-link → #contact. */}
-        <motion.p
+        <RevealP
           className="mt-6 text-center"
           style={{
             fontFamily: "var(--ea-font-body)",
@@ -245,7 +286,7 @@ export function EaFaqAccordion() {
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </a>
-        </motion.p>
+        </RevealP>
 
         {/* Accordion list — hairline-divided, single column. */}
         <div className="mt-12" style={{ marginTop: "clamp(2rem, 4vw, 3rem)" }}>
@@ -254,7 +295,7 @@ export function EaFaqAccordion() {
             const panelId = `${reactId}-panel-${i}`;
             const triggerId = `${reactId}-trigger-${i}`;
             const isLast = i === FAQ_ITEMS.length - 1;
-            const triggerReveal: Partial<MotionDivProps> = reduce
+            const triggerReveal: Partial<MotionDivProps> = rmSettled
               ? {}
               : {
                   initial: { opacity: 0, y: 18 },
@@ -267,7 +308,7 @@ export function EaFaqAccordion() {
                   },
                 };
             return (
-              <motion.div
+              <RevealItem
                 key={item.q}
                 className="ea-faq-accordion__item"
                 style={{
@@ -365,12 +406,34 @@ export function EaFaqAccordion() {
                   aria-labelledby={triggerId}
                   inert={!isOpen}
                   initial={false}
+                  /* c83-C: origin топ-центр для squash-масштаба — ТАЙЛВИНД-
+                     класс, не inline style: класс рендерится одинаково на
+                     SSR/клиенте и не даёт вклада в гидрационный диф
+                     (framer сериализует inline transformOrigin как
+                     «center top» ≠ клиентское «top center»).
+                     c83-F2: overflow тоже перенесён из inline style в класс
+                     — framer-SSR сериализует overflow как overflow-x/y, а
+                     клиентский рендер под reduce (без animate) — как
+                     overflow: это был последний гидрационный диф секции
+                     (безвредный по значениям, шумный в консоли под RM). */
+                  className="[transform-origin:top_center] overflow-hidden"
                   animate={
                     reduce
                       ? undefined
                       : {
                           height: isOpen ? "auto" : 0,
                           opacity: isOpen ? 1 : 0,
+                          /* c83-C: squash-stretch — при открытии тело ответа
+                             слегка пружинит (scale 0.985→1) в добавок к
+                             height-пружине. Дельта ≤1.5% — растеризация
+                             текста не страдает; origin top center (класс
+                             выше) — контент «оседает» из-под верхней кромки.
+                             Включается после маунта (squashSettled) —
+                             reduced-motion → scale не анимируется вовсе
+                             (фикс 1). */
+                          ...(squashSettled
+                            ? { scale: isOpen ? 1 : 0.985 }
+                            : null),
                         }
                   }
                   transition={
@@ -383,12 +446,23 @@ export function EaFaqAccordion() {
                             damping: 30,
                           },
                           opacity: { duration: 0.25 },
+                          /* c83-C: пружина масштаба чуть более
+                             недампфирована, чем у высоты — лёгкий
+                             overshoot >1 и оседание ровно в 1 */
+                          scale: {
+                            type: "spring",
+                            stiffness: 260,
+                            damping: 24,
+                          },
                         }
                   }
                   style={{
-                    height: isOpen ? "auto" : 0,
-                    opacity: isOpen ? 1 : 0,
-                    overflow: "hidden",
+                    /* c83-F2: значения закрытой панели — СТРОКИ («0px»/«0»):
+                       CSSOM при гидрации читает style-атрибут строками,
+                       числовые 0/1 в пропе ≠ «0px»/«0» из SSR → шумный
+                       hydration-diff под reduce. Открытая — «auto»/«1». */
+                    height: isOpen ? "auto" : "0px",
+                    opacity: isOpen ? "1" : "0",
                   }}
                 >
                   <div>
@@ -407,7 +481,7 @@ export function EaFaqAccordion() {
                       </p>
                     </div>
                   </motion.div>
-              </motion.div>
+              </RevealItem>
             );
           })}
         </div>

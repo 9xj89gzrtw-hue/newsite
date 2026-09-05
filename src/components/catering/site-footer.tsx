@@ -23,6 +23,10 @@ import {
 } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
+/* c83-B (Impl-B): VelocitySkew на вордмарке (§3a) + анимационный
+   слой соц-иконок y-hop (§3b, site-footer-anim.css). */
+import { VelocitySkew } from "@/components/motion/velocity-skew";
+import "./site-footer-anim.css";
 
 /**
  * Stable current year — computed once on mount to avoid SSR/CSR
@@ -545,72 +549,74 @@ export function SiteFooter() {
 
             {/* Соцсети — VK / MAX / Instagram / Telegram / WhatsApp.
                 MAX (max.ru/nilovcatering) — российский мессенджер, бейдж
-                в том же стиле, что VK (font-display-спан, не иконка). */}
+                в том же стиле, что VK (font-display-спан, не иконка).
+                c83-B (Impl-B, задача 3b): y-hop глифа — подъём -4px +
+                заливка золотом на hover/focus-visible (CSS в
+                site-footer-anim.css; гейты fine-pointer + no-preference).
+                data-wiggle ЗАМЕНЁН на hop (разрешение задачи при конфликте:
+                wiggle — CSS-анимация transform rotate+scale на ТОЙ ЖЕ
+                кнопке по ТОМУ ЖЕ hover — два жеста конкурировали бы на
+                одном триггере); data-press сохранён. */}
             <div className="mt-2 flex items-center gap-3">
               <a
                 href={CONTACTS.vkHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="nilov catering в ВКонтакте (открывается в новой вкладке)"
-                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
-                    (MicroDelights, reduce → none). */
-                data-wiggle
+                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
+                    reduce → none). */
                 data-press
               >
-                <span className="font-display text-xs font-bold uppercase text-cream">VK</span>
+                <span className="fw-soc__glyph font-display text-xs font-bold uppercase text-cream">VK</span>
               </a>
               <a
                 href={CONTACTS.maxHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="nilov catering в MAX (открывается в новой вкладке)"
-                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
-                    (MicroDelights, reduce → none). */
-                data-wiggle
+                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
+                    reduce → none). c83-B: wiggle → y-hop (см. VK выше). */
                 data-press
               >
-                <span className="font-display text-xs font-bold uppercase text-cream">MAX</span>
+                <span className="fw-soc__glyph font-display text-xs font-bold uppercase text-cream">MAX</span>
               </a>
               <a
                 href={CONTACTS.instagramHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="nilov catering в Instagram (открывается в новой вкладке)"
-                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
-                    (MicroDelights, reduce → none). */
-                data-wiggle
+                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
+                    reduce → none). c83-B: wiggle → y-hop (см. VK выше). */
                 data-press
               >
-                <Instagram className="size-5 text-cream" aria-hidden="true" />
+                <Instagram className="fw-soc__glyph size-5 text-cream" aria-hidden="true" />
               </a>
               <a
                 href={CONTACTS.telegramHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="nilov catering в Telegram (открывается в новой вкладке)"
-                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
-                    (MicroDelights, reduce → none). */
-                data-wiggle
+                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
+                    reduce → none). c83-B: wiggle → y-hop (см. VK выше). */
                 data-press
               >
-                <Send className="size-5 text-cream" aria-hidden="true" />
+                <Send className="fw-soc__glyph size-5 text-cream" aria-hidden="true" />
               </a>
               <a
                 href={CONTACTS.whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Написать в WhatsApp (открывается в новой вкладке)"
-                className="flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C78: wiggle на hover; C79: тач-нажатие — WAAPI-пружина
-                    (MicroDelights, reduce → none). */
-                data-wiggle
+                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
+                    reduce → none). c83-B: wiggle → y-hop (см. VK выше). */
                 data-press
               >
-                <MessageCircle className="size-5 text-cream" aria-hidden="true" />
+                <MessageCircle className="fw-soc__glyph size-5 text-cream" aria-hidden="true" />
               </a>
             </div>
 
@@ -667,8 +673,18 @@ export function SiteFooter() {
           не heading. overflow-x: clip — гвард от горизонтального скролла.
           3-A: ДВЕ строки «NILOV» / «CATERING.» — два экземпляра
           KineticWordmark; каждая .fw-line — width:100% + flex-центрировка,
-          блоки складываются в столбец без обёртки. */}
-      <div className="relative overflow-x-clip px-2 pb-8 pt-2 md:pb-12">
+          блоки складываются в столбец без обёртки.
+          c83-B (Impl-B): контейнер обёрнут VelocitySkew — «живой материал»:
+          при быстрой прокрутке вордмарк чуть «запинается» (skewY, кламп
+          ±4° fine / ±3° coarse — MotionValue-цепочка scroll-velocity →
+          spring, transform-only, ноль ререндеров; работает и на тач-скролле
+          — velocity считается от scrollY, не от указателя). В покое — 0°
+          (тождественный transform, SSR-идентично). reduce-гейт внутри
+          утилиты (обёртка без skewY). IO-триггер .fw-line (whileInView)
+          и shimmer-измерения (offsetLeft/getBoundingClientRect — по ширине
+          skewY не меняет) не затронуты; SplitTextReveal ниже (§4) — вне
+          обёртки, работает как раньше. */}
+      <VelocitySkew className="relative overflow-x-clip px-2 pb-8 pt-2 md:pb-12">
         {WORDMARK_LINES.map((glyphs, lineIndex) => (
           <KineticWordmark
             key={`fw-row-${lineIndex}`}
@@ -677,7 +693,7 @@ export function SiteFooter() {
             lineIndex={lineIndex}
           />
         ))}
-      </div>
+      </VelocitySkew>
 
       {/* ============ Section 4 — «С гордостью обслуживаем» маркие ============ */}
       <div className="border-t border-cream/10 bg-[#161312]/60">

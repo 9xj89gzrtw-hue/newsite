@@ -32,7 +32,8 @@
  * /media/event-0[1-4].{png,jpg} assets.
  *
  * Motion:
- *  - Auto-advances every 5000ms by one card-width + 24px gap.
+ *  - Auto-advances every 5000ms — c83-F3: на следующую snap-точку трека
+ *    (не cardWidth+gap), wrap на 0 только с последней точки.
  *  - Pauses on mouseenter, resumes on mouseleave.
  *  - Respects `useReducedMotion` — when reduced, no auto-advance.
  *  - Subtle motion.div fade-up on header (respects reduced-motion).
@@ -74,9 +75,6 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Auto-advance interval in milliseconds. */
 const AUTOPLAY_MS = 5000;
-
-/** Card gap in pixels — must match `gap: 1.5rem` in events-video-carousel.css. */
-const CARD_GAP_PX = 24;
 
 type EventTile = {
   /** Background teaser video — looping muted autoplay. */
@@ -247,27 +245,49 @@ export function EventsVideoCarousel() {
     });
   }, []);
 
-  /**
-   * Advance the scroller by one card-width + gap. When at the end, wrap
-   * back to the start (continuous-loop illusion). Forked verbatim (modulo
-   * the class hook) from ea-events-portfolio.tsx.
-   */
+  /* ── c83-F3 (MAJOR, «клик стрелки сбрасывается») ────────────────────────
+   *
+   * Root cause: обе прокрутки — стрелки и 5s-auto-advance — целились в
+   * арифметику `scrollLeft ± (cardWidth + gap)`, а wrap-эвристика
+   * `scrollLeft + delta >= max - 4` считала «конец» из ЛЮБОЙ позиции,
+   * когда остаток трека меньше ширины карты (десктоп: 4×320+3×24=1352
+   * при clientWidth 1272 → max=80; 0+344 ≥ 76 → «конец»). Каждый тик
+   * таймер заворачивал scrollTo(0) поверх позиции пользователя, а клик
+   * стрелки отсчёт НЕ сбрасывал — тик попадал в середину smooth-полёта
+   * (rAF-лог критика: 0→80→0, возврат за 0.7–2с).
+   *
+   * Фикс: обе прокрутки идут ТОЛЬКО на реальные snap-точки — старты
+   * карточек, клампнутые в [0..max] (клампнутый старт последней карты
+   * == max; Chromium держит его валидной snap-позицией, замер
+   * research/c83-f3/carousel-isolate.js). Wrap — только когда следующей
+   * точки нет. Клик стрелки перезапускает 5s-отсчёт (таймер больше не
+   * стреляет в полёт). Геометрия читается по факту — работает при любом
+   * вьюпорте/ресайзе, IO-edge-состояния стрелок не тронуты. */
+  const snapPoints = useCallback((): number[] => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return [];
+    const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+    const base = scroller.getBoundingClientRect().left;
+    const pts = new Set<number>();
+    scroller
+      .querySelectorAll<HTMLElement>(".ea-evt-video__card")
+      .forEach((card) => {
+        const p = Math.round(
+          card.getBoundingClientRect().left - base + scroller.scrollLeft,
+        );
+        pts.add(Math.min(Math.max(p, 0), max));
+      });
+    return [...pts].sort((a, b) => a - b);
+  }, []);
+
   const advance = useCallback(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
-    const card = scroller.querySelector<HTMLElement>(
-      ".ea-evt-video__card",
-    );
-    const cardWidth = card ? card.offsetWidth : 320;
-    const delta = cardWidth + CARD_GAP_PX;
-    const max = scroller.scrollWidth - scroller.clientWidth;
-    if (max <= 0) return;
-    const atEnd = scroller.scrollLeft + delta >= max - 4;
-    scroller.scrollTo({
-      left: atEnd ? 0 : scroller.scrollLeft + delta,
-      behavior: "smooth",
-    });
-  }, []);
+    if (scroller.scrollWidth - scroller.clientWidth <= 0) return;
+    const next = snapPoints().find((p) => p > scroller.scrollLeft + 4);
+    // At the last snap point → wrap to the start (continuous-loop illusion).
+    scroller.scrollTo({ left: next ?? 0, behavior: reduce ? "instant" : "smooth" });
+  }, [snapPoints, reduce]);
 
   const startAuto = useCallback(() => {
     // No autoplay under reduced-motion OR while modal is open.
@@ -283,6 +303,37 @@ export function EventsVideoCarousel() {
       intervalRef.current = null;
     }
   }, []);
+
+  /* c83-F4b (критик-P2): свежий startAuto для скролл-листенера ниже — его
+     эффект подписки живёт с deps [] (переподписка на каждый флип
+     activeIndex не нужна), поэтому берём через ref (паттерн closeModalRef).
+     Без него замыкание застяло бы на старом activeIndex. */
+  const startAutoRef = useRef(startAuto);
+  useEffect(() => {
+    startAutoRef.current = startAuto;
+  }, [startAuto]);
+
+  /* c83-F3: snap-aware arrow navigation — prev/next на соседнюю snap-точку
+   * (не scrollBy ± cardWidth). Перезапускает 5s-отсчёт (только если
+   * авто-прокрутка сейчас активна — паузы IO/mouseEnter не нарушаем). */
+  const goTo = useCallback(
+    (dir: 1 | -1) => {
+      const scroller = scrollerRef.current;
+      if (!scroller) return;
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      if (max <= 0) return;
+      const pts = snapPoints();
+      const cur = scroller.scrollLeft;
+      const target =
+        dir === 1
+          ? pts.find((p) => p > cur + 4)
+          : [...pts].reverse().find((p) => p < cur - 4) ?? 0;
+      if (target === undefined) return; // edge clamp — no further snap point
+      scroller.scrollTo({ left: target, behavior: reduce ? "instant" : "smooth" });
+      if (intervalRef.current) startAuto();
+    },
+    [snapPoints, reduce, startAuto],
+  );
 
   // Start autoplay + pause when offscreen (perf). Re-runs when modal state
   // changes so opening/closing the modal cleanly pauses/resumes autoplay.
@@ -323,15 +374,39 @@ export function EventsVideoCarousel() {
   // scrollLeft ≤ 4 / scrollLeft+clientWidth ≥ scrollWidth-4). Автопрокрутка
   // с wrap-around обновляет состояния через те же события. ResizeObserver
   // пересчитывает после ресайза/поворота.
+  // c83-F4b (критик-P2): ручной свайп сбрасывает 5s-отсчёт — как клик
+  // стрелки (goTo). Порог 30px за rAF-тик отличает жест пользователя
+  // (колесо/флик дают ≥50px за кадр) от хвостовых дрейфов инерции (<10px);
+  // перезапуск ТОЛЬКО при живом intervalRef — паузы IO/hover/модалки не
+  // трогаем (там interval=null и стартовать нельзя). Отсчёт 5с пойдёт от
+  // последнего крупного кадра свайпа — тик не попадёт в разгар инерции.
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
     let ticking = false;
+    let lastLeft = scroller.scrollLeft;
+    /* c83-F5b (критик волна-3, LOW): timestamp-гейт перезапуска авто-тика.
+       Быстрый скролл даёт крупные Δ на КАЖДОМ rAF-кадре (~60/с) — без
+       гейта startAuto (clearInterval+setInterval) дёргался бы ~60 раз/с
+       (чаттер таймеров). 150мс-троттлинг: перезапуск максимум раз в 150мс;
+       суть c83-F4b сохранена — последний перезапуск случится ≤150мс после
+       последнего крупного кадра свайпа, 5с-отсчёт не тикнет в моментум. */
+    let lastSwipeRestartAt = 0;
     const measure = () => {
       const max = scroller.scrollWidth - scroller.clientWidth;
-      setAtStart(scroller.scrollLeft <= 4);
-      setAtEnd(max <= 0 || scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 4);
-      const pct = max > 0 ? scroller.scrollLeft / max : 0;
+      const left = scroller.scrollLeft;
+      const delta = left - lastLeft;
+      lastLeft = left;
+      if (Math.abs(delta) > 30 && intervalRef.current) {
+        const now = performance.now();
+        if (now - lastSwipeRestartAt > 150) {
+          lastSwipeRestartAt = now;
+          startAutoRef.current();
+        }
+      }
+      setAtStart(left <= 4);
+      setAtEnd(max <= 0 || left + scroller.clientWidth >= scroller.scrollWidth - 4);
+      const pct = max > 0 ? left / max : 0;
       setProgress(pct);
       ticking = false;
     };
@@ -492,8 +567,12 @@ export function EventsVideoCarousel() {
           className="ea-evt-video__top"
           initial={reduceSettled ? false : { opacity: 0, y: 24 }}
           whileInView={reduceSettled ? undefined : { opacity: 1, y: 0 }}
+          /* c83-F2 (V1b RM): под reduce финал мгновенно через animate
+             (duration 0) — снятие whileInView без animate оставляло
+             SSR-стиль opacity:0 навсегда (шапка секции невидима под RM). */
+          animate={reduceSettled ? { opacity: 1, y: 0 } : undefined}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, ease: EASE }}
+          transition={reduceSettled ? { duration: 0 } : { duration: 0.7, ease: EASE }}
         >
           <div className="ea-evt-video__heading-block">
             <span className="ea-eyebrow--script">Видео с наших мероприятий</span>
@@ -585,7 +664,12 @@ export function EventsVideoCarousel() {
               {/* Bottom gradient overlay — rgba(0,0,0,0.78) → transparent. */}
               <div className="ea-evt-video__overlay" aria-hidden="true" />
 
-              {/* Center play-pill CTA — ggcatering signature. */}
+              {/* Center play-pill CTA — ggcatering signature.
+                  c83-B (Impl-B): внутренний слой .ea-evt-video__play-sheen —
+                  клип-обёртка shimmer-sweep (блик проезжает при hover).
+                  Бордер/фон/тень остаются на внешней кнопке — грабля
+                  «клип режет тень» (§2/c66); слой растянут на весь
+                  интерьер пила (margin −padding — контент неподвижен). */}
               <button
                 type="button"
                 className="ea-evt-video__play"
@@ -597,15 +681,17 @@ export function EventsVideoCarousel() {
                    (было «Открыть видео: …» — не совпадало с надписью). */
                 aria-label={`Смотреть видео: ${tile.title}`}
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="ea-evt-video__play-icon"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                <span>Смотреть видео</span>
+                <span className="ea-evt-video__play-sheen">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="ea-evt-video__play-icon"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  <span>Смотреть видео</span>
+                </span>
               </button>
 
               {/* Bottom caption panel. */}
@@ -646,11 +732,7 @@ export function EventsVideoCarousel() {
             data-press
             onClick={() => {
               if (atStart) return;
-              const scroller = scrollerRef.current;
-              if (!scroller) return;
-              const card = scroller.querySelector<HTMLElement>(".ea-evt-video__card");
-              const w = (card?.offsetWidth ?? 320) + CARD_GAP_PX;
-              scroller.scrollBy({ left: -w, behavior: "smooth" });
+              goTo(-1);
             }}
             aria-label="Предыдущее видео"
           >
@@ -667,11 +749,7 @@ export function EventsVideoCarousel() {
             data-press
             onClick={() => {
               if (atEnd) return;
-              const scroller = scrollerRef.current;
-              if (!scroller) return;
-              const card = scroller.querySelector<HTMLElement>(".ea-evt-video__card");
-              const w = (card?.offsetWidth ?? 320) + CARD_GAP_PX;
-              scroller.scrollBy({ left: w, behavior: "smooth" });
+              goTo(1);
             }}
             aria-label="Следующее видео"
           >

@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
     // в 2.25×). Webp поддерживается 100% браузеров в 2026 (аргумент C49),
     // Vercel-оптимизатор в проде отдаёт webp без потерь качества.
     formats: ["image/webp"],
+    // c83-F2 (U1a D2): cep-instagram-grid рендерит ig-real-*.jpg с
+    // quality={82} — не было в списке → 9 dev-варнингов next/image
+    // «quality 82 ∉ images.qualities» на каждый рендер сетки. 82 добавлен
+    // к дефолтному 75 (в src quality=82 — единственное использование).
+    qualities: [75, 82],
     remotePatterns: [
       { protocol: "https", hostname: "sfile.chatglm.cn" },
       { protocol: "https", hostname: "images.unsplash.com" },

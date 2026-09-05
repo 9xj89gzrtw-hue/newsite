@@ -1,0 +1,58 @@
+/* ==========================================================================
+   site-footer-anim.css — Cycle c83-B (Impl-B, задача 3b).
+   Анимационный слой футера. globals.css — владение другого агента
+   (§39), поэтому всё новое живёт здесь, скоуп .fw-* (расширяет
+   существующее семейство футера). Импорт: site-footer.tsx.
+   ========================================================================== */
+
+/* ── Соц-иконки: y-hop (подъём −4px + заливка золотом) ──────────────────
+   Ховер-жест: глиф (иконка/текст-бейдж) поднимается на 4px и красится
+   золотом; бордер/фон остаются на самом <a> (hover:border-gold/
+   hover:bg-gold/10 — Tailwind, transition-colors). transform живёт на
+   ГЛИФЕ, а не на кнопке — с data-press (WAAPI-свойство scale) и любыми
+   будущими transform кнопки нулевая интеракция.
+   Замена data-wiggle: wiggle — CSS-анимация transform (rotate+scale) на
+   ТОЙ ЖЕ кнопке по ТОМУ ЖЕ hover; два жеста на одном триггере
+   конкурировали (задача c83-B разрешала замену при конфликте —
+   «замени wiggle на hop, сохрани data-press»).
+   Гейты: transform — только fine-pointer (тачу hover-жест не нужен) и
+   только prefers-reduced-motion: no-preference; заливка золотом (color)
+   — не движение, под reduce остаётся. EASE — канон сайта
+   cubic-bezier(0.22, 1, 0.36, 1). :focus-visible — клавиатурный паритет
+   ховера БЕЗ hover-гейта (c83-F4b: гибрид тач+клавиатура = (hover:none),
+   а Tab-жест обязан быть виден). */
+
+/* Переход — без гейта: на устройствах без hover просто не срабатывает,
+   на гибриде даёт плавность focus-жесту. reduce-блок ниже гасит его. */
+.fw-soc__glyph {
+  transition:
+    color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Клавиатура: паритет ховера без hover-медиа (гейт — только движение). */
+@media (prefers-reduced-motion: no-preference) {
+  .fw-soc:focus-visible .fw-soc__glyph {
+    transform: translateY(-4px);
+    color: var(--gold);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fw-soc:hover .fw-soc__glyph {
+    transform: translateY(-4px);
+    color: var(--gold);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fw-soc__glyph {
+    transition: none;
+  }
+  .fw-soc:hover .fw-soc__glyph,
+  .fw-soc:focus-visible .fw-soc__glyph {
+    /* движения нет; заливка золотом остаётся (не движение) */
+    transform: none;
+    color: var(--gold);
+  }
+}

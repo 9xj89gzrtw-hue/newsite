@@ -27,9 +27,9 @@ import "./micro-delights.css";
  *                       блик-глянец, следующий за указателем (луч 120px,
  *                       opacity-only). fine-pointer И не reduce-motion.
  *                       Плитки карусели видео. Уход — WAAPI-возврат 380мс.
- *
- *   a[data-wiggle]      CSS-only (в micro-delights.css): wiggle-анимация
- *                       0.55s на hover — соцкнопки футера.
+ *                       (c83-F1: a[data-wiggle] — удалён: соцкнопки
+ *                       футера перешли на y-hop в site-footer-anim.css,
+ *                       CSS осиротел — см. micro-delights.css.)
  *
  * C79 «Mobile Motion» — touch-эквиваленты всего hover-выше (задача
  * владельца: «в мобильной версии очень мало анимации»):
@@ -65,7 +65,7 @@ import "./micro-delights.css";
  *
  * A11Y:
  *   - Всё декоративное — pointer-events:none, aria-hidden.
- *   - prefers-reduced-motion: spark/tilt/wiggle → noop (CSS-гейт отдельно),
+ *   - prefers-reduced-motion: spark/tilt → noop (CSS-гейт отдельно),
  *     тост — информативный UI, остаётся; конфетти сам-noop.
  *   - touch-action: manipulation на [data-spark] (в CSS) — убирает
  *     iOS double-tap-zoom, тапы остаются честными.

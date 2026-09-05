@@ -39,6 +39,11 @@
  * Burns drift + unifying color grade, autoplay progress line (desktop,
  * focused rack only, stops after the first manual engagement — WCAG 2.2.2),
  * full prefers-reduced-motion, print styles, forced-colors.
+ *
+ * C83 (Impl-E): панельный «индекс-поп» — spine-номера удалены владельцем
+ * (cycle-55: «зачем?» ×2), счётчик 01/12 — cycle-54, поэтому поп получает
+ * слот индекса gamma-раскладки: eyebrow-тег head-row (scale 0.88→1 spring
+ * 300/22 + лёгкий y 3px→0, при закрытии — назад; reduce — статика).
  */
 
 import {
@@ -635,15 +640,22 @@ function HaccRack({
 
   const autoplayOn = focused && playing && !reduced && isDesktop && openIndex !== null;
 
-  /* choreographed entrance — this rack's spines cascade (40ms stagger) -- */
+  /* choreographed entrance — this rack's spines cascade (40ms stagger) --
+     c83-F2 (V1b RM): под reduce варианты остаются ОПРЕДЕЛЁННЫМИ (нулевая
+     длительность) + рэк получает animate="show" — прежде снятие
+     whileInView оставляло залитый в SSR initial opacity:0 навсегда
+     (замер: рэк/корешки невидимы под prefers-reduced-motion). */
   const rackVariants = reduceSettled
-    ? undefined
+    ? { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0 } } }
     : {
         hidden: { opacity: 0 },
         show: { opacity: 1 },
       };
   const itemVariants = reduceSettled
-    ? undefined
+    ? {
+        hidden: { opacity: 0, y: 36 },
+        show: { opacity: 1, y: 0, transition: { duration: 0 } },
+      }
     : {
         hidden: { opacity: 0, y: 36 },
         show: (i: number) => ({
@@ -665,6 +677,9 @@ function HaccRack({
       data-paused={paused ? "true" : "false"}
       initial={reduceSettled ? false : "hidden"}
       whileInView={reduceSettled ? undefined : "show"}
+      /* c83-F2: под reduce финал приходит через animate (duration 0),
+         а не через снятие whileInView — иначе залипание SSR-initial. */
+      animate={reduceSettled ? "show" : undefined}
       viewport={{ once: true, margin: "-60px" }}
       variants={rackVariants}
       onMouseMove={onRackMouseMove}
@@ -768,7 +783,40 @@ function HaccRack({
               <div className="hacc__body">
                 {/* head row: tag · handwritten title · price */}
                 <div className="hacc__row-head">
-                  <span className="hacc__tag">{s.tag}</span>
+                  {/* C83 (Impl-E, Task 1) — «индекс-поп» панели: spine-номера
+                      удалены владельцем (cycle-55), счётчик — cycle-54, поэтому
+                      поп получает ближайший живой слот индекса — eyebrow-тег
+                      head-row. Открытие: scale 0.88→1 spring (stiffness 300 /
+                      damping 22) + лёгкий y 3px→0; закрытие — назад. Delay
+                      0.16s подсаживается в существующий staggered entrance
+                      .hacc__body>* (140/220/300ms) — поп виден ровно с
+                      появлением head-row. initial={false}: ничего не
+                      сериализуется в SSR-анимацией (C62); reduceSettled —
+                      identity-таргет с duration 0 (статика, без transform-
+                      остатка на открытой панели). Transform-only: flex-grow /
+                      autoplay / progress-line / Ken Burns / параллакс не
+                      затронуты. */}
+                  <motion.span
+                    className="hacc__tag"
+                    initial={false}
+                    animate={
+                      reduceSettled
+                        ? { scale: 1, y: 0 }
+                        : { scale: isOpen ? 1 : 0.88, y: isOpen ? 0 : 3 }
+                    }
+                    transition={
+                      reduceSettled
+                        ? { duration: 0 }
+                        : {
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 22,
+                            delay: isOpen ? 0.16 : 0,
+                          }
+                    }
+                  >
+                    {s.tag}
+                  </motion.span>
                   <p className="hacc__title">{s.title}</p>
                   <span className="hacc__price">
                     {s.price}
@@ -990,8 +1038,12 @@ export function HaccServices() {
           className="hacc__head"
           initial={reduceSettled ? false : { opacity: 0, y: 26 }}
           whileInView={reduceSettled ? undefined : { opacity: 1, y: 0 }}
+          /* c83-F2 (V1b RM): под reduce финал мгновенно через animate
+             (duration 0) — снятие whileInView без animate оставляло
+             SSR-стиль opacity:0 навсегда (шапка невидима под RM). */
+          animate={reduceSettled ? { opacity: 1, y: 0 } : undefined}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7, ease: EASE }}
+          transition={reduceSettled ? { duration: 0 } : { duration: 0.7, ease: EASE }}
         >
           <div className="hacc__head-text">
             {/* C71: eyebrow собирается перебором символов (ScrambleText):

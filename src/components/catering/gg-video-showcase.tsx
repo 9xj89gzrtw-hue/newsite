@@ -5,6 +5,16 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
 import { GoldDust } from "@/components/motion/gold-dust";
 import { useHapticFeedback } from "@/components/motion/tap-feedback";
+/* c83-B (Impl-B, задача 1): Magnetic на Play-pill и kinetic-h2
+   (scroll-driven wght) на H2. Гейты fine-pointer/reduce — внутри утилиты
+   (c83-F1: до фикса утилита гейтила только reduce — тап на iOS эмулировал
+   mousemove и дёргал pill пружиной; см. magnetic.tsx). */
+import { Magnetic } from "@/components/motion/magnetic";
+/* c83-B: kinetic-h2 — утилита c74-kinetic.css (animation-timeline: view(),
+   entry 10% → cover 32%, wght 400→700; reduce/@supports-гейты внутри).
+   Паттерн импорта — как ea-faq-accordion.tsx:7 (side-effect; Next
+   дедуплицирует повторные импорты того же файла). */
+import "@/components/motion/c74-kinetic.css";
 
 /**
  * GgVideoShowcase — Cycle 31, Task 4-C.
@@ -252,7 +262,12 @@ export function GgVideoShowcase() {
               «выдох» курсивом. */}
           <motion.h2
             {...reveal(0)}
-            className="ea-section-h2 mb-8 mt-2 max-w-4xl text-white"
+            /* c83-B: kinetic-h2 — вес строки растёт со скроллом
+                (view-таймлайн, wght 400→700) — утилита c74-kinetic.css,
+                reduce/нет-timeline → статический 400 (штатный вид).
+                База ea-section-h2 = font-weight 400 — в покое вид
+                идентичен прежнему. */
+            className="ea-section-h2 kinetic-h2 mb-8 mt-2 max-w-4xl text-white"
             style={{
               color: "#fff",
               textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)",
@@ -317,6 +332,23 @@ export function GgVideoShowcase() {
             so we toggle `muted` + `controls` on the same element.
             K2-F1 (Task 3): тач-таргет — min-height 44px + flex-центровка
             (замер критика: 119×41 < 44). */}
+        {/* c83-B (Impl-B): pill обёрнут в Magnetic — тянется к курсору
+            (spring; гейты fine-pointer/reduce внутри утилиты — с c83-F1:
+            тач/reduce рендерят ту же div-обёртку без магнита и без
+            обработчиков). Центровка ПЕРЕЕХАЛА на
+            обёртку: Tailwind v4 центрует ПОД-свойством translate, framer
+            пишет transform — свойства композиционируются (CSS Transforms
+            L2: translate → rotate → scale → transform), прыжка нет;
+            data-press (WAAPI-свойство scale) на кнопке по-прежнему не
+            пересекается ни с translate, ни с transform (§52).
+            Хендлер/aria/data-press кнопки не тронуты.
+            c83-F2 (U1a D1): + .gg-play-pill — тонкий hover-scale 1.04
+            (transform 300ms EASE, гейты hover/reduce — globals.css);
+            Tailwind transition-opacity duration-500 перенесён туда же
+            (общий transition-property: opacity, transform). */}
+        <Magnetic
+          className="absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2"
+        >
         <button
           type="button"
           onClick={togglePlay}
@@ -334,7 +366,10 @@ export function GgVideoShowcase() {
               ? "Выключить звук — скрыть элементы управления видео"
               : "Смотреть — включить звук и показать управление видео"
           }
-          className="group absolute left-1/2 top-1/2 z-20 inline-flex min-h-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center transition-opacity duration-500 hover:opacity-90"
+          /* c83-F2 (U1a D1): .gg-play-pill — hover-scale 1.04 + переходы
+              opacity/transform (гейты hover/reduce в globals.css);
+              data-press (WAAPI-свойство scale) не конфликтует. */
+          className="gg-play-pill group inline-flex min-h-[44px] items-center justify-center hover:opacity-90"
           style={{
             background: "transparent",
             color: "#fff",
@@ -370,6 +405,7 @@ export function GgVideoShowcase() {
             {expanded ? "Выключить звук" : "Смотреть"}
           </span>
         </button>
+        </Magnetic>
       </div>
     </section>
   );

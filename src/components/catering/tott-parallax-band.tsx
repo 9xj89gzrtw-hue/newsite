@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   motion,
   useInView,
@@ -8,6 +8,7 @@ import {
   useScroll,
   useSpring,
   useTransform,
+  type MotionValue,
 } from "framer-motion";
 import { TottReveal } from "./tott-reveal";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
@@ -15,6 +16,7 @@ import {
   VelocitySkew,
   useVelocitySkewDeg,
 } from "@/components/motion/velocity-skew";
+import { useMounted } from "@/hooks/use-mounted";
 
 /**
  * TottParallaxBand — Talk of the Town (talkofthetownatlanta.com) parallax
@@ -87,6 +89,32 @@ const BAND_BG = "/media/c62/nilov-olive-trees-1920.webp";
 const BAND_BG_COARSE = "/media/c62/nilov-olive-trees-828.webp";
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
+/* C83 (Impl-E, Task 4) — reading-highlight лейда: слова подписи полосы
+   подсвечиваются по мере прокрутки (opacity 0.25→1 scrub, stagger по
+   словам — паттерн «reading highlight» GSAP Vault). H2 уже занят
+   SplitTextReveal (chars, once) — highlight уходит на лейд, как
+   предписывает план. Текст — один источник: из него сплит и sr-only-твин. */
+const BAND_LEDE =
+  "Не меню, не список калорий, не логистика. Ритуал, в котором каждая деталь — от первого ножа до последнего бокала — служит одному: моменту, который гости запомнят на всю жизнь.";
+const BAND_LEDE_WORDS = BAND_LEDE.split(" ");
+/** Полоса чтения на прогрессе прохождения секции: первое слово
+ *  загорается на 0.10, последнее — на 0.60 (рамп 0.12 на слово —
+ *  слова завершают подсветку к ~0.72, пока центрированный текст ещё
+ *  уверенно на экране). ManifestoWord-подобные окна (manifesto.tsx). */
+const WORD_START = 0.1;
+const WORD_SPAN = 0.5;
+const WORD_RAMP = 0.12;
+
+/* c83-F1 (критик-P1 NIT): изоморфный layout-effect. Прямой useLayoutEffect
+   в SSR-рендере клиента ругается ворнингом React («does nothing on the
+   server» — сыпался в серверную консоль). На сервере берём useEffect
+   (SSR-строгий no-op), на клиенте — useLayoutEffect: прыжок спринга к
+   текущему прогрессу обязан случиться до первой краски (см. эффект ниже,
+   паттерн cep-process.tsx wave-1 D). Порядок эффектов не критичен — это
+   разовый замер после layout, не хореография. */
+const useIsoLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 export function TottParallaxBand() {
   const sectionRef = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
@@ -148,6 +176,58 @@ export function TottParallaxBand() {
   });
   const driftRaw = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
   const drift = useSpring(driftRaw, { stiffness: 90, damping: 26, mass: 0.4 });
+
+  /* C83 (Impl-E, Task 4): reading-highlight — тот же прогресс прохождения
+   * секции, отдельный спринг (drift — строковый MV, не переиспользуется).
+   * Слова — useTransform-срезы (ManifestoWord-паттерн: чистые MotionValue,
+   * ноль ре-рендеров при скролле). iOS-безопасно: MotionValue, фото-слой и
+   * его fixed-attachment не затронуты (слова — в контентном стеке z-10). */
+  const readProgress = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 26,
+    mass: 0.4,
+  });
+  const wordsMounted = useMounted();
+  /* C62 hydration-safety: MotionValue-стили слов цепляются только после
+   * монта — SSR и reduce рендерят слова с полной opacity (статика), первая
+   * клиент-отрисовка совпадает с SSR; пост-мон-флип — легален. */
+  const wordsActive = wordsMounted && !reduce;
+
+  const interactedRef = useRef(false);
+  /* SSR-flash fix (cep-process wave-1 D): на перезагрузке, уже заскролленной
+   * в полосу, спринг не должен разгоняться с 0 — прыжок к текущему прогрессу
+   * в layout-effect, после коммита стилей, до первой анимированной краски.
+   * c83-F1: useIsoLayoutEffect (см. выше) — без SSR-ворнинга. */
+  useIsoLayoutEffect(() => {
+    if (wordsActive) readProgress.jump(scrollYProgress.get());
+  }, [wordsActive, readProgress, scrollYProgress]);
+
+  /* Passive-restoration re-anchor (cep-process wave-2 A): браузер может
+   * восстановить позицию скролла ПОСЛЕ гидрации — до первого реального
+   * взаимодействия каждый window-scroll считается пассивным восстановлением,
+   * и спринг прыгает к живому прогрессу (иначе слова «прочерчиваются» на
+   * стоячей странице). После первого взаимодействия — обычный плавный scrub. */
+  useEffect(() => {
+    const mark = () => {
+      interactedRef.current = true;
+    };
+    const reanchor = () => {
+      if (!interactedRef.current) readProgress.jump(scrollYProgress.get());
+    };
+    const opts = { passive: true } as const;
+    window.addEventListener("pointerdown", mark, opts);
+    window.addEventListener("wheel", mark, opts);
+    window.addEventListener("touchstart", mark, opts);
+    window.addEventListener("keydown", mark, opts);
+    window.addEventListener("scroll", reanchor, opts);
+    return () => {
+      window.removeEventListener("pointerdown", mark);
+      window.removeEventListener("wheel", mark);
+      window.removeEventListener("touchstart", mark);
+      window.removeEventListener("keydown", mark);
+      window.removeEventListener("scroll", reanchor);
+    };
+  }, [readProgress, scrollYProgress]);
 
   const driftActive = isCoarse && !reduce;
 
@@ -278,9 +358,25 @@ export function TottParallaxBand() {
           className="tott-body mt-6 mx-auto max-w-xl text-base leading-relaxed text-white/80 sm:text-lg"
           text={undefined}
         >
-          Не меню, не список калорий, не логистика. Ритуал, в котором каждая
-          деталь — от первого ножа до последнего бокала — служит одному: моменту,
-          который гости запомнят на всю жизнь.
+          {/* C83 (Impl-E, Task 4): reading-highlight — доступный текст в
+              sr-only-твине (81-F3 SplitTextReveal-паттерн), видимые слова —
+              aria-hidden; каждое слово — срез прогресса прохождения секции
+              (scrub-подсветка 0.25→1, stagger). TottReveal fade-right входа
+              НЕ тронут (композитится по opacity). Reduce/pre-mount — слова
+              со статичной полной opacity. */}
+          <span className="sr-only">{BAND_LEDE}</span>
+          <span aria-hidden="true">
+            {BAND_LEDE_WORDS.map((word, i) => (
+              <BandWord
+                key={i}
+                word={word}
+                index={i}
+                total={BAND_LEDE_WORDS.length}
+                progress={readProgress}
+                active={wordsActive}
+              />
+            ))}
+          </span>
         </TottReveal>
 
         <TottReveal
@@ -293,6 +389,40 @@ export function TottParallaxBand() {
         </TottReveal>
       </VelocitySkew>
     </section>
+  );
+}
+
+/**
+ * BandWord — одно слово лейды: подсвечивается 0.25→1 на собственном срезе
+ * прогресса прохождения полосы (ManifestoWord-паттерн: per-word
+ * useTransform → чистые MotionValue, ноль ре-рендеров при scrub).
+ * active=false (SSR / pre-mount / reduced-motion) — статичная полная
+ * opacity (reveal.tsx:32-35 swap-паттерн). Инлайн-слова со «внутренним»
+ * пробелом — перенос строк работает нативно, без inline-block-обёрток.
+ */
+function BandWord({
+  word,
+  index,
+  total,
+  progress,
+  active,
+}: {
+  word: string;
+  index: number;
+  total: number;
+  progress: MotionValue<number>;
+  active: boolean;
+}) {
+  const start = WORD_START + (index / (total - 1)) * WORD_SPAN;
+  const opacity = useTransform(
+    progress,
+    [start, start + WORD_RAMP],
+    [0.25, 1],
+  );
+  return (
+    <motion.span style={active ? { opacity } : { opacity: 1 }}>
+      {word}{" "}
+    </motion.span>
   );
 }
 

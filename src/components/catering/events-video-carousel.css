@@ -176,6 +176,80 @@
   fill: currentColor;
 }
 
+/* — — — — — c83-B (Impl-B): shimmer-sweep на play-pill — — — — —
+   Диагональный золотой блик проезжает по кнопке при hover.
+   Архитектура — грабля «клип режет тень» (§2/c66): overflow:hidden
+   живёт на ВНУТРЕННЕМ слое .ea-evt-video__play-sheen, а бордер/фон
+   (и любая будущая тень) остаются на внешней кнопке
+   .ea-evt-video__play — клип их не касается. Внутренний слой
+   растянут на весь интерьер пила (margin -8px -16px + компенсирующий
+   padding 8px 16px — контент неподвижен, layout не сдвинут ни на
+   пиксель), поэтому блик проезжает всю кнопку до скруглённых краёв,
+   а не только текстовую зону.
+   Механика: ::before с linear-gradient(115deg) + translateX(-70%)→(70%),
+   0.8s cubic-bezier(.16,1,.3,1) — transform-only (композитор), событие —
+   исключительно :hover/:focus-visible (никакого автовоспроизведения).
+   Гейты: :hover — только (hover: hover) (тач-залипания нет);
+   :focus-visible — БЕЗ hover-гейта (c83-F4b: клавиатура на гибридах
+   (тач-экран + клавиатура, (hover:none)) видит фокус-жест);
+   prefers-reduced-motion: reduce → ::before display:none (общий гейт). */
+.ea-evt-video__play-sheen {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  /* растяжка на весь интерьер пила (padding пила = 8px 16px) */
+  margin: -8px -16px;
+  padding: 8px 16px;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.ea-evt-video__play-sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 60%
+  );
+  /* старт вне кадра: блик невидим до первого hover */
+  transform: translateX(-70%);
+  pointer-events: none;
+}
+
+/* c83-F4b (NIT): :focus-visible-жест выведен ИЗ (hover: hover) — на
+   гибридах (тач + клавиатура) hover-медиа не матчится, а клавиатурный
+   Tab обязан давать блик. Гейт остаётся только reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .ea-evt-video__play:focus-visible .ea-evt-video__play-sheen::before {
+    animation: ea-evt-video-sweep 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .ea-evt-video__play:hover .ea-evt-video__play-sheen::before {
+    animation: ea-evt-video-sweep 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes ea-evt-video-sweep {
+  from {
+    transform: translateX(-70%);
+  }
+  to {
+    transform: translateX(70%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ea-evt-video__play-sheen::before {
+    display: none;
+  }
+}
+
 /* — — — — — Bottom caption panel — — — — — */
 
 .ea-evt-video__caption {

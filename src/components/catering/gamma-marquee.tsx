@@ -12,28 +12,43 @@ import { useMounted } from "@/hooks/use-mounted";
  * Source: docs/advanced-technical/site_21_gamma.html §4567-4603
  *   .marquee-slider > .marquee-track > .marquee-item[] (14 portrait
  *   food/event photos). Gamma uses Splide (loop + AutoScroll + free drag)
- *   — we reproduce the same VISUAL result with GSAP
- *   `gsap.to(track, { xPercent: -50, ease: 'none', duration: 40,
- *   repeat: -1 })` (the same -50% seam trick gamma uses for their TEXT
- *   marquee in §4611-4619). Children rendered TWICE for the seamless
- *   -50% loop — when the first set has fully scrolled out of view, the
- *   duplicate set is in the exact position the first started, so the
- *   animation loops without a visible jump.
+ *   — we reproduce the same VISUAL result with a pure CSS keyframes loop
+ *   (`@keyframes gamma-marquee-scroll` in globals.css: translate3d 0 →
+ *   -50%, 40s linear infinite — the same -50% seam trick gamma uses for
+ *   their TEXT marquee in §4611-4619). Children rendered TWICE for the
+ *   seamless -50% loop — when the first set has fully scrolled out of
+ *   view, the duplicate set is in the exact position the first started,
+ *   so the animation loops without a visible jump.
+ *
+ * ANIMATION PIPELINE (Cycle 41 PERF FIX + Task 5-C; GSAP удалён —
+ * stale-докблок пойман аудитом c83-2, фикс c83-D):
+ *   1. Loop — CSS keyframes `.gamma-marquee__track--anim` (transform-only
+ *      → композитор; прежний GSAP-твин писал inline transform каждый кадр
+ *      из JS и вместе с grain-репейнтом валил main thread в фризы).
+ *   2. Drag (Cycle 31.1) — pointer-обработчики ставят animation:none и
+ *      ведут track инлайн-transform'ом; на release кейфреймы
+ *      перезапускаются с отрицательным animation-delay (-resumeAt) —
+ *      бесшовно с места броска.
+ *   3. Scroll-velocity (Task 5-C) — Web Animations API: playbackRate
+ *      (0.6…2.2) на существующей CSSAnimation (track.getAnimations()),
+ *      rate никогда не возвращает анимацию в main thread.
  *
  * Photos: 14 portrait (~3:4) food/event photos from /media/gamma/ — the
  * same 14 images gamma uses in their homepage .marquee-slider. Each
- * rendered in a uniform `aspect-[3/4]` portrait frame (`w-[280px]` mobile,
- * `w-[300px]` md+) with `next/image fill + object-cover` so every photo
+ * rendered in a uniform 3:4 portrait frame (280px mobile, 300px md+)
+ * with `next/image fill + object-cover` so every photo
  * occupies an identical box — top/bottom edges align pixel-perfectly
  * regardless of source aspect (VLM critique fix). 32px (mr-8) right
  * margin for editorial breathing room.
+ * (c83: НЕ писать утилити-подобные токены «aspect + [N:N]» в комментариях —
+ * Tailwind v4 сканирует комментарии как кандидаты классов и генерит
+ * невалидный aspect-ratio N:N, от которого падает next build.)
  *
  * Section: full-bleed (NO horizontal padding), `overflow: hidden`,
  * `bg-cream` — sits in the natural page flow, default z-index. Edge-fade
- * mask on both sides (`mask-image: linear-gradient(to right, transparent,
- * black 5%, black 95%, transparent)`) so photos dissolve softly at the
- * edges — the same trick gamma uses on their marquee (and the same trick
- * the existing `.cep-marquee-mask` uses in globals.css). Pure photo
+ * mask REMOVED (Cycle 31.1, по прямому запросу владельца «убери плавное
+ * затухание») — фото входят/выходят с чёткими краями (см. JSX-комментарий
+ * секции ниже). Pure photo
  * scroll: NO text overlay, NO eyebrow — per gamma's lead, the marquee is
  * just photos. A 1px hairline top + bottom border in
  * `color-mix(in oklch, var(--ink) 8%, transparent)` frames the band as a
@@ -44,8 +59,9 @@ import { useMounted } from "@/hooks/use-mounted";
  * via `py-5`; +2px for the two 1px hairlines). Photos fit within the
  * section so there is no harsh cut.
  *
- * Reduced-motion: if the user prefers reduced motion, the GSAP tween is
- * NOT created and the track falls back to a native horizontal
+ * Reduced-motion: if the user prefers reduced motion, the keyframes
+ * animation is NOT created (класс --anim не вешается) and the track falls
+ * back to a native horizontal
  * `overflow-x-auto` scroll with `scroll-snap-x mandatory` so users can
  * still browse the photos by scrolling, just without auto-motion. This
  * matches the gamma site's reduced-motion behaviour (Splide AutoScroll
@@ -53,26 +69,18 @@ import { useMounted } from "@/hooks/use-mounted";
  *
  * Mount gate: `useMounted()` returns false during SSR + first client
  * render, true after mount. Until mounted, we render a STATIC track
- * (the duplicate-set markup, no GSAP), so the server and client agree
- * on initial HTML and there is no hydration mismatch. After mount, GSAP
- * takes over the track's transform and animates it. This is the same
- * pattern used by `ScrollScene` (`src/components/motion/scroll-scene.tsx`)
- * and recommended in `use-mounted.ts` §14 грабли #8.
+ * (the duplicate-set markup, БЕЗ анимации), so the server and client
+ * agree on initial HTML and there is no hydration mismatch. After mount,
+ * эффект добавляет треку класс `.gamma-marquee__track--anim` —
+ * CSS-кейфреймы берут transform (тот же SSR-гейт-паттерн, что
+ * рекомендует `use-mounted.ts` §14 грабли #8).
  *
- * GSAP is dynamically imported (`await import("gsap")`) so it stays out
- * of the server bundle — same convention as `ScrollScene`. This keeps
- * the client bundle smaller and avoids loading GSAP for users with
- * reduced-motion enabled (the import is gated behind the reduced-motion
- * check).
- *
- * First wow moment after hero: this section is placed immediately after
- * `<SiteHeader />` and before `<CepSimpleBrilliant />` in page.tsx —
- * mirroring gamma's structure (hero → marquee → content). The marquee is
- * the first "wow" photo scroll moment a visitor sees after the hero
- * scroll-up animation completes.
+ * First wow photo moment after the hero: в page.tsx лента идёт за
+ * GgVideoShowcase (hero → header → video → marquee), mirroring gamma's
+ * structure (hero → marquee → content).
  *
  * @see /home/z/my-project/newsite/docs/advanced-technical/site_21_gamma.html
- *      §4567-4603 (image marquee), §4611-4619 (text marquee — GSAP -50%)
+ *      §4567-4603 (image marquee), §4611-4619 (text marquee — -50% seam)
  */
 
 /** 14 portrait food/event photos from /media/gamma/ — the exact set gamma
@@ -204,16 +212,16 @@ function PhotoTile({
         // (горизонтальный скролл ленты подводит их в зону IO сам).
         // draggable=false so the user can't accidentally trigger the
         // browser's native image-drag gesture over the marquee (which
-        // would otherwise interfere with the GSAP-driven motion).
+        // would otherwise interfere with the keyframes-driven motion).
         draggable={false}
       />
     </span>
   );
 }
 
-/** One full set of 14 photos — rendered TWICE inside the track so GSAP
- *  can `xPercent: -50` for a seamless loop (when set 1 has fully exited
- *  left, set 2 is exactly where set 1 started). */
+/** One full set of 14 photos — rendered TWICE inside the track so the CSS
+ *  keyframes loop translate3d(-50%) is seamless (when set 1 has fully
+ *  exited left, set 2 is exactly where set 1 started). */
 function PhotoSet({ ariaHidden = false }: { ariaHidden?: boolean }) {
   return (
     <span className="gamma-marquee__set flex shrink-0 items-center">
@@ -243,15 +251,17 @@ export function GammaMarquee() {
   // ── Drag state ──────────────────────────────────────────────────────
   // Cycle 31.1: the user requested the marquee be draggable by cursor
   // (like gammacatering.com, which uses Splide `drag: 'free'`). We
-  // implement manual pointer drag on top of the GSAP auto-scroll:
-  //   - pointerdown  → kill the GSAP tween, record startX + current baseX
+  // implement manual pointer drag on top of the CSS-keyframes auto-scroll:
+  //   - pointerdown  → freeze the keyframes (animation:none), record
+  //                    startX + current baseX (computed matrix)
   //   - pointermove  → set track x = baseX + (clientX - startX)
   //   - pointerup    → normalize x into the [-trackWidth/2, 0] loop range,
-  //                    then resume the GSAP auto-scroll from there.
-  // The track's x is driven by GSAP's transform, so during drag we use
-  // gsap.set() to override it. cursor: grab/grabbing + touch-action: none
-  // (via the .gamma-marquee__track--draggable class) so touch devices
-  // don't fight vertical scroll while dragging horizontally.
+  //                    then resume the keyframes from there via a
+  //                    matching negative animation-delay.
+  // During drag the track's x is an inline transform (keyframes paused).
+  // cursor: grab/grabbing + touch-action: pan-y (inline style)
+  // so touch devices don't fight vertical scroll while we own the
+  // horizontal gesture.
   const dragState = React.useRef({
     active: false,
     startX: 0,
@@ -359,7 +369,7 @@ export function GammaMarquee() {
 
   // Read prefers-reduced-motion AFTER mount (server has no window) so we
   // don't risk a hydration mismatch. The animation effect below reads
-  // this state and skips the GSAP tween when true.
+  // this state and skips the CSS keyframes loop when true.
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -389,15 +399,24 @@ export function GammaMarquee() {
   // transform every frame from JS — combined with the grain overlay's
   // repaint loop this contributed to full main-thread freezes on
   // software-rendered browsers. The drag interaction still works: pointer
-  // handlers temporarily pause the animation (`.gamma-marquee__track--drag`
-  // sets animation-play-state: paused) and translate the track inline,
-  // then resume the keyframes from a matched offset.
+  // handlers kill the keyframes with an INLINE `animation: none`
+  // (c83-F1: никакого `.gamma-marquee__track--drag`-класса /
+  // animation-play-state не существует) and translate the track inline;
+  // on release the animation is dropped and restarted from a matched
+  // offset via a negative animation-delay.
   React.useEffect(() => {
     if (!mounted || reducedMotion || !trackRef.current) return;
     const track = trackRef.current;
     track.classList.add("gamma-marquee__track--anim");
     return () => {
       track.classList.remove("gamma-marquee__track--anim");
+      // c83-F5b (критик волна-3, LOW): drag-обработчики оставляют на треке
+      // inline `animation: none` (pointerdown) и `animationDelay`
+      // (release-resume). Если RM флипается true→false СРАЗУ после драга,
+      // класс --anim вернётся, а выживший inline `animation: none` задушит
+      // кейфреймы — лента замрёт. Сбрасываем оба, вместе с transform.
+      track.style.animation = "";
+      track.style.animationDelay = "";
       gsapSetTransformIdentity(track);
     };
   }, [mounted, reducedMotion]);
@@ -512,19 +531,20 @@ export function GammaMarquee() {
           "1px solid color-mix(in oklch, var(--ink) 8%, transparent)",
       }}
     >
-      {/* Track: two identical PhotoSets side by side. When GSAP moves the
-          track to xPercent:-50, set 1 has fully exited left and set 2 is
-          exactly where set 1 started → the loop is seamless.
+      {/* Track: two identical PhotoSets side by side. The CSS keyframes
+          loop drives the track to translate3d(-50%): set 1 has fully
+          exited left and set 2 is exactly where set 1 started → the loop
+          is seamless.
 
           Cycle 31.1: the track is now DRAGGABLE by cursor (pointer
-          events). On drag, we kill the GSAP auto-scroll and take over
-          the transform; on release, we resume auto-scroll from the
-          dropped position. cursor: grab / grabbing signals the
-          affordance. touch-action: none on the track prevents the
-          browser from hijacking the gesture for horizontal swipe-back.
+          events). On drag, we pause the keyframes auto-scroll and take
+          over with an inline transform; on release, we resume the
+          auto-scroll from the dropped position. cursor: grab / grabbing
+          signals the affordance. touch-action: pan-y keeps vertical page
+          scroll native while we own the horizontal gesture.
 
           Under reduced-motion the track keeps the same markup, but no
-          tween runs. Instead we let the wrapper scroll horizontally
+          animation runs. Instead we let the wrapper scroll horizontally
           natively (overflow-x-auto + scroll-snap) so users can browse
           the photos by hand — the same end-result as gamma's Splide
           AutoScroll being disabled under reduced-motion. */}
@@ -540,7 +560,7 @@ export function GammaMarquee() {
         className={
           reducedMotion
             ? "gamma-marquee__track gamma-marquee__track--static flex w-max snap-x snap-mandatory overflow-x-auto pb-3"
-            : "gamma-marquee__track gamma-marquee__track--draggable flex w-max will-change-transform cursor-grab select-none"
+            : "gamma-marquee__track gamma-marquee__track--draggable flex w-max cursor-grab select-none"
         }
         style={
           reducedMotion
@@ -562,15 +582,14 @@ export function GammaMarquee() {
 }
 
 /**
- * Defensive identity-transform reset for the track element. Uses
- * `gsap.set(el, { xPercent: 0, clearProps: 'transform' })` when GSAP is
- * available, else falls back to clearing the inline `transform` style
- * directly. Keeps the cleanup branch SSR-safe (gsap is only imported
- * lazily inside the effect).
+ * Defensive identity-transform reset for the track element. Clears the
+ * inline `transform` style directly (drag/release handlers may have left
+ * a stale translate3d on it). Имя — реликвия GSAP-эпохи Cycle 31, оставлено
+ * чтобы не менять код вызова (функция — только el.style.transform = "").
+ * Keeps the cleanup branch SSR-safe (никаких внешних импортов).
  */
 function gsapSetTransformIdentity(el: HTMLElement) {
-  // Don't import gsap just to clear an inline style — direct DOM reset
-  // is enough and works whether or not GSAP has loaded.
+  // Direct DOM reset is enough — no animation library is loaded here.
   el.style.transform = "";
 }
 

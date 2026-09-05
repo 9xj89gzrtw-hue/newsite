@@ -87,20 +87,28 @@ const LINK_TERMS_HREF = "/terms";
 // W2-FIX: py-2.5 → py-4 (компенсация -my-4) — тач-таргет ссылки
 // ~43px → 44px при 12px-тексте (инлайн-бокс 12px + 2×16px паддинг);
 // визуальный размер строки не меняется (-my-4 компенсирует).
-// F4: ссылки — золото на тёмной панели (#C9A227 = 8.38:1, hover #E5C76B
-// = 12.27:1); было var(--ea-red) #E71D3A на чёрном ≈ 3.9:1 FAIL.
+// F4: ссылки — золото на тёмной панели (#C9A227 = 8.22:1, hover #E5C76B
+// = 12.04:1 — фактический расчёт c83-F1, синхронизировано с globals.css);
+// было var(--ea-red) #E71D3A на чёрном ≈ 3.9:1 FAIL.
 const LINK_CLASS =
   "no-underline text-[#C9A227] transition-colors hover:text-[#E5C76B] hover:underline focus-visible:underline py-4 -my-4";
 // Outline-кнопки — крем на тёмной панели (18.65:1) — уже в бренде.
 // 81-F2: компакт-карточка — px-2 (340px-трек вмещает все 3 кнопки в один
 // ряд даже на 320px-вьюпорте с wrap-страховкой на самый узкий случай).
+// c83-D: .cookie-cta-outline (globals.css) — лёгкий ховер-бордер в золото
+// (цвет-состояние, transform-free, гейт (hover:hover)).
 const BTN_OUTLINE_CLASS =
-  "border border-[var(--ea-cream)] bg-transparent text-[var(--ea-cream)] hover:bg-white/10 focus-visible:bg-white/10";
+  "cookie-cta-outline border border-[var(--ea-cream)] bg-transparent text-[var(--ea-cream)] hover:bg-white/10 focus-visible:bg-white/10";
 // F4: solid-кнопка — золотая заливка + espresso-текст (8.22:1; белый на
 // золоте = 2.42:1 FAIL, поэтому текст тёмный); hover — плотнее-золото
 // #B08D22 (6.33:1). Была красная заливка с крем-текстом.
+// c83-D: .cookie-cta-solid (globals.css) — slide-fill по механике
+// .hcta-btn (site-header.css): ::after espresso-заливка едет снизу
+// 360ms EASE [0.22,1,0.36,1], текст → золото #C9A227, рамка → espresso;
+// absolute ::after — layout/44px/wrap не меняются. Tailwind hover:bg/border
+// остаются фолбэком под заливкой; фокус — :focus-visible-ветка класса.
 const BTN_SOLID_CLASS =
-  "border border-[#C9A227] bg-[#C9A227] text-[#0A0908] hover:border-[#B08D22] hover:bg-[#B08D22] focus-visible:border-[#B08D22] focus-visible:bg-[#B08D22]";
+  "cookie-cta-solid border border-[#C9A227] bg-[#C9A227] text-[#0A0908] hover:border-[#B08D22] hover:bg-[#B08D22] focus-visible:border-[#B08D22] focus-visible:bg-[#B08D22]";
 
 const BTN_BASE_STYLE: CSSProperties = {
   fontFamily: "var(--ea-font-eyebrow)",

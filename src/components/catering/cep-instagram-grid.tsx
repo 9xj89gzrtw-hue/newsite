@@ -239,6 +239,21 @@ export function CepInstagramGrid() {
                 className="pointer-events-none absolute inset-0 border-2 border-gold opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               />
 
+              {/* C83 (Impl-E, Task 3): caption slide-up fallback — captions
+                  в разметке нет → тонкий золотой hairline по низу тайла
+                  «прорисовывается» (scaleX 0→1, origin-left), ложась ровно
+                  на нижнюю кромку золотой рамки: свип идёт в такт её
+                  fade-in, конечное состояние бесшовно сливается с рамкой.
+                  Fine-pointer гейт — Tailwind media-вариант (hover:hover +
+                  pointer:fine), touch-тайлы линию не получают; reduce —
+                  transition-none (мгновенное состояние, без анимации).
+                  Transform-only, pointer-events-none — ImageTrail /
+                  data-spark / data-tilt / ClipPathReveal не затронуты. */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute bottom-0 left-0 right-0 h-[2px] origin-left scale-x-0 bg-gold transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none [@media(hover:hover)_and_(pointer:fine)]:group-hover:scale-x-100"
+              />
+
               {/* Reel Play icon — always visible but subtle (CEP shows it always) */}
               {isReel && (
                 <span

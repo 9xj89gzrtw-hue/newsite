@@ -23,6 +23,10 @@
       остаётся видимой «штампом»), текст инвертируется. Схемы —
       через [data-header-scheme] на <header> (тот же сигнал, что
       красит текст кнопки в JSX).
+   4. .hnav-link::before + .is-active — c83-A scroll-spy: постоянная
+      золотая метка (16px) активного пункта nav (цвет — по схеме хедера:
+      c83-F1 контраст-фикс, см. докблок §4); класс + aria-current
+      вешает IntersectionObserver-эффект в site-header.tsx.
    ══════════════════════════════════════════════════════════════════════ */
 
 /* ── 1. Entrance строки шапки (scroll-driven) ─────────────────────────── */
@@ -133,11 +137,59 @@ header[data-header-scheme="dark"] .hcta-btn {
   border-color: var(--hcta-fill);
 }
 
+/* ── 4. c83-A Scroll-spy: метка активного пункта nav ──────────────────── */
+
+/* Постоянная метка «ты здесь» на рельсе hover-underline (bottom 7px / 2px):
+   короткий золотой штрих 16px по центру пункта (scaleX из центра, 180ms,
+   EASE — появление состояния, не анимация контента). Hover-underline
+   (::after, currentColor, та же геометрия рельса) накрывает метку сверху —
+   конфликта нет: hover = полная линия, покой = золотая метка. HoverScramble
+   не задет (метка на <a>, не на тексте). Цвет метки — по схеме хедера
+   (механизм [data-header-scheme], как у .hcta-btn §3): светлая (bg-white /
+   white-60+blur над cream-страницей) — углублённое золото #AA8440: 3.45:1
+   на white, 3.18:1 на cream, 3.34:1 на склейке white/60+cream — WCAG
+   1.4.11 ≥3:1 (c83-F1, критик-P1 MAJOR: бренд #C89B5A давал 2.33–2.53:1);
+   тёмная (ink-glass #161312/85) — бренд-золото #C89B5A, 7.3:1. Класс и
+   aria-current="location" вешает/снимает scroll-spy-эффект в
+   site-header.tsx (IntersectionObserver). */
+.hnav-link::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 7px; /* тот же рельс, что ::after-подчёркивание */
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+  background: #aa8440;
+  transform: translateX(-50%) scaleX(0);
+  opacity: 0;
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.hnav-link.is-active::before {
+  transform: translateX(-50%) scaleX(1);
+  opacity: 1;
+}
+
+/* тёмная схема шапки — тот же сигнал, что JSX-условие dark (и .hcta-btn):
+   бренд-золото возвращается на ink-glass (7.3:1 — контраста с запасом). */
+header[data-header-scheme="dark"] .hnav-link::before {
+  background: #c89b5a;
+}
+
 /* ── reduced-motion: всё мгновенно/статично ────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
   .hnav-link::after,
   .hcta-btn::after {
+    transition: none;
+  }
+  /* c83-A: метка активного пункта — состояние, не анимация: появляется/
+     исчезает мгновенно (без перехода). */
+  .hnav-link::before {
     transition: none;
   }
   .hcta-btn:hover::after,

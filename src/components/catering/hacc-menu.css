@@ -972,6 +972,45 @@
   font-feature-settings: "tnum";
 }
 
+/* ─── c83-C: hover-глисс строк каталога ────────────────────────────────
+   Fine-pointer hover: строка съезжает вправо на 6px (framer whileHover на
+   motion.li — см. tsx) + снизу из ЛЕВОГО края прорастает тонкая золотая
+   нить (scaleX 0→1). Тоньше паттерна ea-faq-accordion: 1px / opacity .5 —
+   строки блюд плотнее, нить не должна кричать. Transform-only, поверх
+   существующей волосяной линейки (bottom: -1px — точно на border-bottom).
+   reduced-motion → transition: none (нить появляется мгновенно; сдвиг
+   строки выключен гейтом в tsx). Мобильные оверрайды не затронуты. */
+.hmenu__dish {
+  position: relative;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hmenu__dish::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: var(--gold, #d4a373);
+    opacity: 0.5;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .hmenu__dish:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hmenu__dish::after {
+    transition: none;
+  }
+}
+
 /* «включено» — 2×2 сетка с галочками от руки (gamma service-grid) */
 .hmenu__incl {
   flex: none;

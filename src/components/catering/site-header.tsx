@@ -1,13 +1,26 @@
 "use client";
 
-import { useState, useEffect, useRef, type ReactNode } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  type ReactNode,
+} from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
 import { CONTACTS } from "@/lib/media";
 import { HoverScramble } from "@/components/motion/hover-scramble";
+import { Magnetic } from "@/components/motion/magnetic";
 import "./site-header.css"; /* C77: kinetic-header эффекты (см. докблок css) */
+
+/* c83-F4b: изоморфный layout-effect (паттерн tott-parallax-band.tsx) —
+   прямой useLayoutEffect ругается ворнингом в SSR-рендере клиента
+   («does nothing on the server»), на сервере берём useEffect (no-op). */
+const useIsoLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
  * SiteHeader — Talk of the Town (talkofthetownatlanta.com) header graft
@@ -91,6 +104,10 @@ export function SiteHeader() {
   // FX5 (C67 wave B): a [data-header-theme="dark"] section occupies the
   // header band right now. Starts false → SSR/first render = light.
   const [themeDark, setThemeDark] = useState(false);
+  // c83-A: магнит CTA «Заказать» — утилита Magnetic (motion/magnetic.tsx)
+  // гейтит fine-pointer и reduce-motion ВНУТРИ себя (c83-F1): тач/coarse и
+  // reduce получают ту же plain-обёртку div без обработчиков, десктоп —
+  // spring-магнит. Локальный matchMedia-гейт удалён (дубль листенера+state).
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -278,6 +295,104 @@ export function SiteHeader() {
     };
   }, []);
 
+  // c83-A (Impl-A, задача 2): scroll-spy подсветка активного пункта nav.
+  // IntersectionObserver (rootMargin -40%/-55% = «полоса» 40–45% vh) на
+  // секциях, на которые указывают пункты NAV (фактические href: #menu,
+  // #services, #about, #contact — их секции в page.tsx). IO — только
+  // триггер (вход/выход секции из полосы); в колбэке пересчитываем актив
+  // по живым rect'ам: активна ПОСЛЕДНЯЯ в документном порядке секция с
+  // top ≤ нижней кромки полосы (45% vh). Двунаправленно честно: вниз в
+  // «дырах» между nav-секциями (showcase/marquee/faq/instagram…) светится
+  // последняя пройденная; вверх — следующая гаснет, как только её верх
+  // вышел из полосы. #contact — сворачиваемая зона формы (grid 0fr внутри
+  // #calculator): для пункта наблюдаем секцию-носитель, иначе схлопнутый
+  // 0-высотой div никогда не пересечёт полосу. Состояние (не анимация):
+  // класс .is-active + aria-current="location" на desktop-ссылке (c83-F1);
+  // появление метки — CSS transition
+  // transform/opacity 180ms с гейтом reduce (css, п.4). Дровер и мобильный
+  // nav не затронуты (селектор — только <nav> внутри шапки).
+  const activeHrefRef = useRef("");
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header || typeof IntersectionObserver === "undefined") return;
+    // href → наблюдаемый элемент (#contact → секция-носитель #calculator).
+    const targets: Array<{ href: string; el: Element }> = [];
+    for (const n of NAV) {
+      const anchor = document.querySelector(n.href);
+      if (!anchor) continue;
+      const el =
+        n.href === "#contact" ? (anchor.closest("section") ?? anchor) : anchor;
+      targets.push({ href: n.href, el });
+    }
+    if (targets.length === 0) return;
+    const links = Array.from(
+      header.querySelectorAll<HTMLAnchorElement>("nav a.hnav-link"),
+    );
+    if (links.length === 0) return;
+
+    const apply = (href: string) => {
+      if (href === activeHrefRef.current) return;
+      activeHrefRef.current = href;
+      for (const l of links) {
+        // c83-F1 (критик-P1 MAJOR): «ты здесь» — не только глазу: активная
+        // ссылка дополнительно к .is-active получает aria-current="location"
+        // (скрин-ридеры объявляют текущий раздел; снимаю с бывшей активной).
+        const active = l.getAttribute("href") === href;
+        l.classList.toggle("is-active", active);
+        if (active) l.setAttribute("aria-current", "location");
+        else l.removeAttribute("aria-current");
+      }
+    };
+
+    const recompute = () => {
+      // документный порядок = порядок текущих rect.top; линия отсчёта —
+      // нижняя кромка IO-полосы (45% vh): top ≤ неё → секция «дошла».
+      const line = window.innerHeight * 0.45;
+      let best = "";
+      const tops = targets.map((t) => ({
+        href: t.href,
+        top: t.el.getBoundingClientRect().top,
+      }));
+      tops.sort((a, b) => a.top - b.top);
+      for (const t of tops) if (t.top <= line) best = t.href;
+      apply(best);
+    };
+
+    const io = new IntersectionObserver(() => recompute(), {
+      rootMargin: "-40% 0px -55% 0px",
+    });
+    for (const t of targets) io.observe(t.el);
+    recompute(); // стартовое состояние (напр., reload с restore-scroll)
+    return () => {
+      io.disconnect();
+      apply(""); // снять метки при unmount
+    };
+  }, []);
+
+  // c83-A: React перезаписывает className ссылок nav при смене схемы шапки
+  // (dark-вариант hover-цвета живёт в JSX-шаблоне) — императивный .is-active
+  // при этом может затереться. Восстанавливаем метку после каждого рендера,
+  // меняющего className (dark-флип FX5, stuck, дровер).
+  // c83-F1: вместе с классом восстанавливаем и aria-current="location"
+  // (не трекает — JSX не задаёт, — но синхронизируем оба атрибута
+  // одним проходом, состояние обязано совпадать с .is-active).
+  // c83-F4b: useLayoutEffect (изоморфный) — метка восстанавливается до
+  // краски, иначе dark-флип давал 1-кадровый флик снятой .is-active.
+  useIsoLayoutEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const href = activeHrefRef.current;
+    const links = header.querySelectorAll<HTMLAnchorElement>(
+      "nav a.hnav-link",
+    );
+    links.forEach((l) => {
+      const active = l.getAttribute("href") === href;
+      l.classList.toggle("is-active", active);
+      if (active) l.setAttribute("aria-current", "location");
+      else l.removeAttribute("aria-current");
+    });
+  }, [stuck, themeDark, open]);
+
   // Lock body scroll when mobile menu open.
   // W3-FIX (edge case): при resize через lg-брейкпоинт с открытым меню
   // (390→1440, поворот/девтулзы) кнопка-бургер исчезает, меню остаётся
@@ -443,6 +558,27 @@ export function SiteHeader() {
   // bottom, the top band is the hero itself — nothing to flip for).
   const dark = stuck && themeDark;
 
+  /* c83-A: CTA «Заказать» — единственная нода <a>; Magnetic сам решает,
+     магнит или plain-обёртка (fine-pointer/reduce внутри утилиты, c83-F1).
+     Магнит тянет к курсору только обёртку (spring, transform-only):
+     data-press (WAAPI scale на самом <a>, §52 — разные элементы, не
+     конфликтует), slide-fill ::after, focus-visible, таб-порядок (обёртка
+     div не фокусируема) и aria не меняются. */
+  const ctaNode = (
+    <a
+      href="#contact"
+      /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
+      data-press
+      className={`hcta-btn tott-body hidden min-h-[44px] items-center justify-center border-2 bg-transparent px-5 text-[13px] font-700 uppercase tracking-[0.08em] sm:inline-flex ${
+        dark ? "border-[#F7F5F5]/80 text-[#F7F5F5]" : "border-black text-black"
+      }`}
+      style={{ fontWeight: 700, borderRadius: 0 }}
+      aria-label="Заказать кейтеринг"
+    >
+      Заказать
+    </a>
+  );
+
   return (
     <>
       <header
@@ -551,19 +687,12 @@ export function SiteHeader() {
                 черной рамке а не черном квадрате"). Transparent bg, black
                 border, black text, square corners, hover fills black. → #contact
                 C77: hover-инверсию ведёт .hcta-btn (slide-fill панелью
-                снизу + инверсия текста; схемы — через [data-header-scheme]). */}
-            <a
-              href="#contact"
-              /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
-              data-press
-              className={`hcta-btn tott-body hidden min-h-[44px] items-center justify-center border-2 bg-transparent px-5 text-[13px] font-700 uppercase tracking-[0.08em] sm:inline-flex ${
-                dark ? "border-[#F7F5F5]/80 text-[#F7F5F5]" : "border-black text-black"
-              }`}
-              style={{ fontWeight: 700, borderRadius: 0 }}
-              aria-label="Заказать кейтеринг"
-            >
-              Заказать
-            </a>
+                снизу + инверсия текста; схемы — через [data-header-scheme]).
+                c83-A: магнит — утилита Magnetic (fine-pointer и reduce
+                гейтит сама утилита, c83-F1). */}
+            <Magnetic strength={0.3} className="hidden sm:inline-flex">
+              {ctaNode}
+            </Magnetic>
             {/* Mobile: phone icon only */}
             <a
               href={CONTACTS.phoneHref}
@@ -585,7 +714,14 @@ export function SiteHeader() {
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center p-3 transition-colors lg:hidden ${
                 dark ? "text-[#F7F5F5]" : "text-ink"
               }`}
-              aria-label={open ? "Закрыть меню" : "Открыть меню"}
+              /* c83-F3 (a11y-nit): постоянный уникальный лейбл. При open
+                 шапка целиком inert+aria-hidden — страничный бургер
+                 недоступен, но его лейбл дублировал крестик панели
+                 («Закрыть меню» ×2 в querySelectorAll-запросах критика).
+                 Кнопка интерактивна ТОЛЬКО при закрытом меню — лейбл
+                 описывает это состояние (иконка-гамбургер постоянна);
+                 состояние open несёт aria-expanded, панель — свой крестик. */
+              aria-label="Открыть меню"
               aria-expanded={open ? "true" : "false"}
               aria-controls="mobile-menu"
             >

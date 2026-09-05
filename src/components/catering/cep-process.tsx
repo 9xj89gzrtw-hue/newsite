@@ -62,6 +62,11 @@
  * step verbs only. Numerals are capped at 32px so the read is H2 ≫ numeral >
  * verb > body.
  *
+ * C83 (Impl-E, Task 2): first-reveal cascade — на первом входе секции
+ * бокс цифры шага (контур + красная заливка) падает каскадом
+ * rotate -6°→0 + y 12→0 + opacity, stagger 0.06, 0.5s, once — добавка
+ * К scrub-рейлу (окна fill/ink/dot НЕ тронуты: это только первый вход).
+ *
  * Semantics/a11y: <ol>/<li> with sr-only «Шаг N из 4» per item (wave-1 I),
  * section aria-label, rails + numerals aria-hidden. No sticky/pin, no extra
  * scroll height. Reduced-motion OR pre-mount: static fully-activated state —
@@ -353,7 +358,24 @@ function ProcessStep({
           2.4:1 на креме (#F7F5F5); сплошной var(--cep-black) даёт ≈19:1 —
           AA ≥4.5:1 при любом состоянии скролла, «контурные цифры»
           (stroke-only, заливка прозрачная) остаются контурными. */}
-      <span className="relative block md:flex md:h-14 md:items-end md:pb-2">
+      {/* C83 (Impl-E, Task 2) — first-reveal cascade: бокс цифры шага
+          (контурная + заливная копии) появляется каскадом — rotate -6°→0,
+          y 12→0, opacity 0→1, stagger 0.06 по индексу шага, 0.5s EASE,
+          once:true. Scrub-слои не затронуты: заливка/чернила/точки —
+          по-прежнему окна общего прогресса (style ниже), вход лишь
+          множится поверх (opacity композитится). key flips с animate
+          (C62-паттерн, как у хедера выше): SSR красит статику, каскад —
+          только пост-монт; reduce — initial=false/whileInView=undefined,
+          полная статика. Transform-only: rail-выравнивание md:h-14 —
+          layout-бокс не двигается, transform не влияет на грид/флоу. */}
+      <motion.span
+        key={animate ? "cascade" : "static"}
+        className="relative block md:flex md:h-14 md:items-end md:pb-2"
+        initial={animate ? { opacity: 0, y: 12, rotate: -6 } : false}
+        whileInView={animate ? { opacity: 1, y: 0, rotate: 0 } : undefined}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.5, ease: EASE, delay: index * 0.06 }}
+      >
         <span
           aria-hidden="true"
           className={`${NUMERAL} block text-transparent`}
@@ -368,7 +390,7 @@ function ProcessStep({
         >
           {step.num}
         </motion.span>
-      </span>
+      </motion.span>
 
       {/* Dot node on the rail: mobile absolute at the li's left edge (on the
           vertical rail); hidden in the md–xl 2-col band (no rail there);

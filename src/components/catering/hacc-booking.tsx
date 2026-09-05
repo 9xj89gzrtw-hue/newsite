@@ -1278,19 +1278,24 @@ const LeadForm = memo(function LeadForm({
                 <label htmlFor="hb-name" className="hb-label">
                   Имя <span aria-hidden="true" className="text-[var(--ea-red)]">*</span>
                 </label>
-                <input
-                  id="hb-name"
-                  ref={nameRef}
-                  className={field}
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  autoComplete="name"
-                  placeholder="Как к вам обращаться"
-                  aria-invalid={errors.name ? "true" : undefined}
-                  aria-describedby={errors.name ? "hb-name-err" : undefined}
-                  required
-                />
+                {/* c83-C: .hb-field__ctl — обёртка-хук для focus-underline
+                    (градиентная нить под полем, чистый CSS — см. блок в
+                    hacc-booking.css; на layout не влияет). */}
+                <div className="hb-field__ctl">
+                  <input
+                    id="hb-name"
+                    ref={nameRef}
+                    className={field}
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    autoComplete="name"
+                    placeholder="Как к вам обращаться"
+                    aria-invalid={errors.name ? "true" : undefined}
+                    aria-describedby={errors.name ? "hb-name-err" : undefined}
+                    required
+                  />
+                </div>
                 {errors.name && (
                   <p id="hb-name-err" className="hb-err" role="alert">
                     <AlertCircle className="size-3.5" aria-hidden="true" />
@@ -1303,27 +1308,29 @@ const LeadForm = memo(function LeadForm({
                 <label htmlFor="hb-phone" className="hb-label">
                   Телефон <span aria-hidden="true" className="text-[var(--ea-red)]">*</span>
                 </label>
-                <input
-                  id="hb-phone"
-                  ref={phoneRef}
-                  className={field}
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  onBlur={() => {
-                    setErrors((er) => ({ ...er, phone: phone ? !phoneValid : false }));
-                    /* Wave-4 (product-critic MINOR): маска при blur — display-only
-                       формат «+7 (999) 123-45-67» для валидного ввода. normalizePhone
-                       на сабмите работает с любым форматом, драфт не ломаем. */
-                    if (phoneValid) setPhone((p) => formatPhoneDisplay(p));
-                  }}
-                  autoComplete="tel"
-                  inputMode="tel"
-                  placeholder="+7 (999) 123-45-67"
-                  aria-invalid={errors.phone ? "true" : undefined}
-                  aria-describedby={errors.phone ? "hb-phone-err" : undefined}
-                  required
-                />
+                <div className="hb-field__ctl">
+                  <input
+                    id="hb-phone"
+                    ref={phoneRef}
+                    className={field}
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    onBlur={() => {
+                      setErrors((er) => ({ ...er, phone: phone ? !phoneValid : false }));
+                      /* Wave-4 (product-critic MINOR): маска при blur — display-only
+                         формат «+7 (999) 123-45-67» для валидного ввода. normalizePhone
+                         на сабмите работает с любым форматом, драфт не ломаем. */
+                      if (phoneValid) setPhone((p) => formatPhoneDisplay(p));
+                    }}
+                    autoComplete="tel"
+                    inputMode="tel"
+                    placeholder="+7 (999) 123-45-67"
+                    aria-invalid={errors.phone ? "true" : undefined}
+                    aria-describedby={errors.phone ? "hb-phone-err" : undefined}
+                    required
+                  />
+                </div>
                 {errors.phone && (
                   <p id="hb-phone-err" className="hb-err" role="alert">
                     <AlertCircle className="size-3.5" aria-hidden="true" />
@@ -1336,15 +1343,17 @@ const LeadForm = memo(function LeadForm({
                 <label htmlFor="hb-email" className="hb-label">
                   Email <span className="hb-label__opt">— необязательно</span>
                 </label>
-                <input
-                  id="hb-email"
-                  className={field}
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  placeholder="Пришлём смету письмом"
-                />
+                <div className="hb-field__ctl">
+                  <input
+                    id="hb-email"
+                    className={field}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    placeholder="Пришлём смету письмом"
+                  />
+                </div>
               </div>
 
               {/* Fix5 V6: комментарий виден ТОЛЬКО в режиме «Ещё решаю» —
@@ -1354,14 +1363,16 @@ const LeadForm = memo(function LeadForm({
                   <label htmlFor="hb-comment" className="hb-label">
                     О событии <span className="hb-label__opt">— необязательно</span>
                   </label>
-                  <textarea
-                    id="hb-comment"
-                    className={`${field} resize-y min-h-[72px]`}
-                    rows={2}
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Пара слов — что за событие и что уже знаете"
-                  />
+                  <div className="hb-field__ctl">
+                    <textarea
+                      id="hb-comment"
+                      className={`${field} resize-y min-h-[72px]`}
+                      rows={2}
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder="Пара слов — что за событие и что уже знаете"
+                    />
+                  </div>
                 </div>
               )}
 
@@ -1369,14 +1380,16 @@ const LeadForm = memo(function LeadForm({
                 <label htmlFor="hb-time" className="hb-label">
                   Желаемое время звонка <span className="hb-label__opt">— необязательно</span>
                 </label>
-                <input
-                  id="hb-time"
-                  className={field}
-                  type="text"
-                  value={preferredTime}
-                  onChange={(e) => setPreferredTime(e.target.value)}
-                  placeholder="Например: вечером после 18:00"
-                />
+                <div className="hb-field__ctl">
+                  <input
+                    id="hb-time"
+                    className={field}
+                    type="text"
+                    value={preferredTime}
+                    onChange={(e) => setPreferredTime(e.target.value)}
+                    placeholder="Например: вечером после 18:00"
+                  />
+                </div>
               </div>
 
               {/* Кнопка «Далее» живёт только на шаге 1 (после перехода
