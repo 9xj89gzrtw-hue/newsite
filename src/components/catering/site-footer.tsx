@@ -273,7 +273,7 @@ function KineticWordmark({
  * компании по указанию владельца: растр /brand/logo-round-1024.png —
  * тот же кругляж, что в шапке/фавиконе; «векторный двойник» C76
  * монограммой НЕ был логотипом компании). Масштаб
- * ~min(115vmin, 1060px), ghost ~5.5% opacity на bg-ink: белые буквы
+ * ~min(115vmin, 1060px), ghost ~5.5% opacity на тёплом espresso #161312: белые буквы
  * дают крем-призрак, золотые кольца — тёплый ореол.
  *
  * Слои: z-index:-1 внутри isolate-футера (как .fw-spotlight) — над
@@ -369,7 +369,14 @@ function FooterSpotlight() {
 }
 
 /**
- * SiteFooter — тёмный navy футер nilov catering.
+ * SiteFooter — тёмный тёплый espresso-футер nilov catering.
+ *
+ * 81-W2F2 (критик E MAJOR): было bg-ink #1F2937 — холодный slate/Tailwind
+ * gray-800, диссонанс с тёплыми тёмными секциями сайта (#161312 — фон
+ * ea-founder-story, gg-конвейер; шапка в тёмном варианте — #161312/85).
+ * Фон переведён на тот же тёплый эспрессо #161312; производные
+ * (bg-ink/60 банд, from-ink фейды) — следом. Текст остаётся светлым
+ * (cream/gold — контрасты только выросли, см. K2-комментарий ниже).
  *
  * Layout (Task 2-c):
  * 1. «Сделано с любовью» (intro band, Great Vibes script + подзаголовок)
@@ -410,9 +417,11 @@ export function SiteFooter() {
       role="contentinfo"
       data-header-theme="dark"
       aria-label="Подвал сайта"
-      /* isolate: stacking-context корень — spotlight с z-index:-1 живёт
-         над фоном футера и под контентом; overflow-x: clip (не hidden, §2). */
-      className="grain relative isolate mt-auto overflow-x-clip bg-ink text-cream"
+      /* 81-W2F2: isolate: stacking-context корень — spotlight с z-index:-1 живёт
+         над фоном футера и под контентом; overflow-x: clip (не hidden, §2).
+         bg-[#161312] — тёплый эспрессо тёмных секций (было bg-ink #1F2937 —
+         холодный slate, критик E MAJOR волна-2). */
+      className="grain relative isolate mt-auto overflow-x-clip bg-[#161312] text-cream"
     >
       {/* Гигантский фоновый логотип-водяной знак (z:-1, под контентом;
           в DOM РАНЬШЕ spotlight — свечение красится поверх монограммы) */}
@@ -671,7 +680,7 @@ export function SiteFooter() {
       </div>
 
       {/* ============ Section 4 — «С гордостью обслуживаем» маркие ============ */}
-      <div className="border-t border-cream/10 bg-ink/60">
+      <div className="border-t border-cream/10 bg-[#161312]/60">
         <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
           <div className="mb-4 flex flex-col items-center text-center">
             <SplitTextReveal as="h2" className="eyebrow-wide text-sm text-gold">
@@ -710,11 +719,11 @@ export function SiteFooter() {
             >
               {/* Edge fade masks */}
               <div
-                className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-ink to-transparent md:w-24"
+                className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#161312] to-transparent md:w-24"
                 aria-hidden="true"
               />
               <div
-                className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-ink to-transparent md:w-24"
+                className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#161312] to-transparent md:w-24"
                 aria-hidden="true"
               />
               {/* Duplicated track — translateX(-50%) loops seamlessly */}
@@ -732,8 +741,10 @@ export function SiteFooter() {
         {/* F4 / K2 (контрасты): копирайт-строка была text-cream/50 на bg-ink
             #1F2937 — 4.52:1 в srgb-миксе, но Tailwind-4 `/50` миксует в
             oklab — на грани 4.5 (замер K2 ~4.5, риск FAIL при другом
-            смешивании). /60 = 5.83:1 — запас. Ссылки легала и так /60; ·
-            — декоративный (aria-hidden), не текст. */}
+            смешивании). /60 = 5.83:1 — запас. 81-W2F2: фон теперь тёплый
+            эспрессо #161312 (темнее прежнего slate) — контрасты /60 и
+            gold только выросли (cream/60 ≈6.6:1, gold ≈8.2:1). Ссылки
+            легала и так /60; · — декоративный (aria-hidden), не текст. */}
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-xs text-cream/60 md:flex-row md:px-8">
           <div className="flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-4">
             <p className="text-center md:text-left">

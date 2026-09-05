@@ -50,6 +50,11 @@ import { useReducedMotion } from "framer-motion";
  * @see docs/talkofthetown-MINED-EXTRACTION.md (hero section)
  */
 const HERO_VIDEO = "/media/mculinary/mculinary-hero-720.mp4";
+/* 81-W2F3 [критик H #3: hero-видео 1.5MB на мобиле + decode-таск 1410мс]:
+   мобильная копия — 480×270, h264 Main, crf30, faststart, без звука,
+   315KB (десктоп-720 = 1.49MB; источник 720→480 re-encode ffmpeg).
+   Подмена источника — в IO-эффекте ДО первого play() (см. там). */
+const HERO_VIDEO_MOBILE = "/media/mculinary/mculinary-hero-480.mp4";
 const HERO_POSTER = "/media/hero-premium/hero-premium-6.jpg";
 /* C71-P1 / K8-CRITICAL (Task 2): poster-атрибут видео тянул RAW jpg 595KB
    рядом с next/image-копией (~77KB webp) — двойная загрузка одного визуала.
@@ -113,6 +118,21 @@ export function TottHero() {
 
     const isMobile =
       window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
+
+    /* 81-W2F3 [H #3]: мобильный источник видео. Ставим video.src ПРЯМО на
+     * <video> (НЕ <source>.src): по HTML-спецификации установка/изменение
+     * src-атрибута самого media-элемента ГАРАНТИРОВАННО перезапускает
+     * алгоритм загрузки (load), а подмена дочернего <source>.src
+     * пере-выбирается только пока networkState === NETWORK_EMPTY —
+     * ненадёжно. При src-атрибуте на <video> дочерний <source> (720,
+     * SSR-разметка не меняется) игнорируется — грузится только -480.
+     * preload="none" держит байты обоих файлов до первого play(), а play()
+     * вызывается только ниже по этому же эффекту (IO/тап) — то есть
+     * ПОДМЕНА ВСЕГДА РАНЬШЕ play: сетевой перехват на мобиле видит ровно
+     * один mp4 (-480), -720 не запрашивается вовсе. Десктоп — <source> 720. */
+    if (isMobile) {
+      video.src = HERO_VIDEO_MOBILE;
+    }
 
     let cancelled = false;
     const tryPlay = () => {

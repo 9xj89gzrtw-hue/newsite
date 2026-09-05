@@ -6,13 +6,16 @@
    outlined «НИЛОВ» (Playfair, кириллица ✓) на scrub-дрейфе, 3 главы-хроники,
    count-up строка, подпись Marck Script с «чернильным» clip-reveal.
 
-   Контраст (замер, на --efs-bg #161312, L≈0.0095; research/c67/fix):
-     --ea-cream #F7F5F5  ≈ 17:1   ✓ AAA
+   Контраст (замер, на --efs-bg #161312, L≈0.0068):
+     --ea-cream #F7F5F5  ≈ 16.9:1 ✓ AAA
      cream-86            ≈ 14:1   ✓ body
      --efs-muted (62%)   ≈ 6.3:1  ✓ мелкий caps
-     --efs-red-text #FF6B77 ≈ 6.4:1 ✓ мелкий красный (--ea-red #E71D3A даёт
-       лишь 3.9:1 — оставлен только для КРУПНОГО h2 i; подпись переведена
-       на cream — F16, красная подпись была самым громким голосом)
+     --efs-accent-text #C9A227 ≈ 7.6:1 ✓ мелкий акцент (81-W2F2: лосось
+       #FF6B77 ≈6.4:1 был ВНЕ палитры сайта — фрагментация акцентов,
+       критик E/G MAJOR. Канон тёмных поверхностей — золото #C9A227
+       (cookie-banner 8.38:1, not-found 8.22:1, конфетти). Бордо #B91431
+       — канон КРЕМА (6.01:1), на ink #161312 даёт лишь 2.8:1 — отвергнуто
+       замером; h2 i остался на --ea-red 4.1:1 large-text AA)
    Self-contained scope: `.efs__*` + три scoped-оверрайда общих .ea-* классов.
    globals.css НЕ трогает. Вся декоративная геометрия — rem/% (§35).
    ============================================================================ */
@@ -23,8 +26,10 @@
   --efs-cream-86: color-mix(in oklab, var(--ea-cream) 86%, transparent);
   --efs-muted: color-mix(in oklab, var(--ea-cream) 62%, transparent);
   --efs-rule: color-mix(in oklab, var(--ea-cream) 18%, transparent);
-  /* Осветлённый красный для мелкого текста на ink (≥4.5:1). */
-  --efs-red-text: #ff6b77;
+  /* 81-W2F2: мелкий акцентный текст на ink — золото палитры тёмных
+     поверхностей (критик E: лосось #FF6B77 вне палитры; на #161312
+     #C9A227 = 7.64:1 AA, как у ea-cookie-banner/not-found). */
+  --efs-accent-text: #c9a227;
 
   position: relative;
   /* `clip`, НЕ `hidden` — hidden создаёт scroll-container и убивает
@@ -340,9 +345,9 @@
 }
 
 /* Scoped-оверрайд: .ea-eyebrow канонично красный #E71D3A — на ink это 3.9:1;
-   для 13–15px caps поднимаем до --efs-red-text (6.4:1 ✓ AA). */
+   для 13–15px caps переводим на золото тёмных секций (7.64:1 ✓ AA). */
 .efs .efs__eyebrow {
-  color: var(--efs-red-text);
+  color: var(--efs-accent-text);
 }
 
 .efs__h2 {
@@ -411,7 +416,7 @@
   font-size: 0.8125rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--efs-red-text);
+  color: var(--efs-accent-text);
 }
 
 .efs__chapter-text {
@@ -595,7 +600,7 @@
 
 .efs .ea-text-link:hover,
 .efs .ea-text-link:focus-visible {
-  color: var(--efs-red-text);
+  color: var(--efs-accent-text);
 }
 
 /* Глобальный .ea-text-link гасит outline — возвращаем видимый focus-ring

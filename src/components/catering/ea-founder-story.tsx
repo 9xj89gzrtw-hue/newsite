@@ -61,9 +61,11 @@ import "@/components/motion/c74-kinetic.css";
  *
  * Доступность: landmark + aria-labelledby; декор (слово/bloom/зерно/делители)
  * aria-hidden; честные alt (VLM-сверка фактического содержимого кадров);
- * контраст (замер research/c67/fix): cream ≈17:1 (AAA), muted 6.3:1,
- * мелкий красный #FF6B77 6.4:1; красный --ea-red остался только в h2 i и
- * hairline (подпись переведена на cream, F16); focus-ring CTA 2px ≥3:1.
+ * контраст (замер research/c67/fix + 81-W2F2): cream ≈17:1 (AAA), muted 6.3:1,
+ * мелкий акцент #C9A227 7.64:1 (81-W2F2: лосось #FF6B77 выведен из палитры —
+ * золото тёмных секций, как cookie-banner/not-found); красный --ea-red
+ * остался только в h2 i и hairline (подпись переведена на cream — F16);
+ * focus-ring CTA 2px ≥3:1.
  */
 
 const EASE = [0.22, 1, 0.36, 1] as const;

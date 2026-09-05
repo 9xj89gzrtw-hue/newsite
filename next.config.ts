@@ -33,7 +33,12 @@ const nextConfig: NextConfig = {
     return [
       { source: "/calculator", destination: "/#calculator" },
       { source: "/menu", destination: "/#menu" },
-      { source: "/events", destination: "/#events" },
+      /* 81-W2F1 (критик G NIT): якоря #events на главной НЕТ — реальный id
+         секции видео-карусели. Хэш до сервера не доходит (rewrite
+         прозрачен), фактический скролл ведёт vanity-scroll.tsx по
+         VANITY_TARGETS["/events"] = "events-video-carousel" — строка здесь
+         держит конфиг и цель синхронно. */
+      { source: "/events", destination: "/#events-video-carousel" },
       { source: "/contacts", destination: "/#contact" },
       { source: "/contact", destination: "/#contact" },
     ];

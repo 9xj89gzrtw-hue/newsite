@@ -325,10 +325,14 @@ export function GgVideoShowcase() {
               WAAPI композиционится без прыжка. */
           data-press
           aria-pressed={expanded}
+          /* 81-W2F1 (критик G MAJOR, WCAG 2.5.3 Label in Name): aria-label
+             НАЧИНАЕТСЯ с видимого текста кнопки («Смотреть» / «Выключить
+             звук») — раньше accname «Включить звук и показать элементы
+             управления видео» не содержал видимой надписи вовсе. */
           aria-label={
             expanded
-              ? "Выключить звук и скрыть элементы управления видео"
-              : "Включить звук и показать элементы управления видео"
+              ? "Выключить звук — скрыть элементы управления видео"
+              : "Смотреть — включить звук и показать управление видео"
           }
           className="group absolute left-1/2 top-1/2 z-20 inline-flex min-h-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center transition-opacity duration-500 hover:opacity-90"
           style={{

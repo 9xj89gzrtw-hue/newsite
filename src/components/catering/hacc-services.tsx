@@ -806,7 +806,25 @@ function HaccRack({
                       alt={s.mediaAlt}
                       fill
                       blurDataURL={BLUR_DATA_URL}
-                      sizes="(max-width: 1023px) 100vw, 64vw"
+                      /* 81-W2F2b: было 64vw (=921.6px @1440) — занижало
+                         реальный бокс фото панели. Замеры (1440 DPR1,
+                         research/w2f2b): видимый figure .hacc__media =
+                         920px, но layout-бокс img = figure+24px bleed =
+                         944px, в макс. Ken-Burns-дрейфе (scale 1.09) —
+                         до 1057px. Ширина панели растёт БЫСТРЕЕ vw
+                         (корешки фикс-пиксельные): img-бокс 68.6vw@1280,
+                         69.5vw@1440, 71.6vw@1600, 77.3vw@1920. 75vw по
+                         лестнице кандидатов (828→1080→1200→1920) даёт
+                         828@1024-1279 (как и раньше), 1080@1280-1439
+                         (было 828@1280 = 0.94 на дрейф), 1200@1440-1600
+                         (было 1080@1600 = 0.89), 1920@≥1698 (без изм.).
+                         Retina-десктоп — тот же выбор ×2. Примечание:
+                         img.naturalWidth в Chromium для srcset+w-дескрипторов
+                         возвращает density-corrected размер (intrinsic×
+                         sizes/candidate) — «natural 921» критика E =
+                         артефакт, реальный файл 1080 (замер
+                         createImageBitmap, research/w2f2b/measure2.json). */
+                      sizes="(max-width: 1023px) 100vw, 75vw"
                       /* C71-P1 (K8 MAJOR, Task 4): было loading={isOpen ?
                          "eager" : "lazy"} — дефолт-раскрытая строка
                          сериализовала loading="eager" в SSR, и три

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { createHash } from "node:crypto";
 import { db } from "@/lib/db";
 import { PHONE_PRETTY } from "@/lib/site-config";
 import { normalizePhone } from "@/lib/phone";
@@ -167,13 +168,23 @@ export async function POST(req: NextRequest) {
   const phone = normalizePhone(data.phone);
 
   // 152-ФЗ compliance: capture consent proof metadata
-  const consentIp =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    null;
+  // 81-W2F3 [G MAJOR #2 «XFF-спуфинг»]: consentIp теперь через getClientIp
+  // (lib/rate-limit) — единая модель XFF-доверия с rate-limiter'ом
+  // (прод за Caddy-шлюзом: шлюз ПЕРЕЗАПИСЫВАЕТ XFF → одиночная запись;
+  // Vercel: платформа ДОБАВЛЯЕТ реальный IP к клиентскому XFF → последняя
+  // запись). Прежняя локальная копия брала первый элемент XFF безусловно —
+  // на платформах с append-моделью это спуфаемое значение в юридическом
+  // proof-поле (согласие 152-ФЗ, consentIp). "local" = прямой запрос без
+  // прокси-заголовков (dev/health) → null, как раньше при отсутствии XFF.
+  const clientIp = getClientIp(req);
+  const consentIp = clientIp === "local" ? null : clientIp;
   const userAgent = req.headers.get("user-agent") || null;
 
-  // K4 (cycle-71, F3): единственная честная стратегия при сбое записи.
+  // K4 (cycle-71, F3): единственная честная стратегия при сбое записи —
+  // 503 + человекочитаемая ошибка: клиент показывает toast, конфетти (только
+  // на 2xx) не срабатывает, пользователь знает, что заявка НЕ прошла, и
+  // может позвонить. Лог при сбое — БЕЗ PII (81-W2F3, см. catch ниже):
+  // имя/телефон/email/сообщение больше не покидают процесс.
   try {
     const lead = await db.lead.create({
       data: {
@@ -193,38 +204,29 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, id: String(lead.id) }, { status: 201 });
   } catch (dbError) {
-    // Лид не сохранён — это потерянный бизнес. Двухступенчатая страховка:
-    //  1) структурный лог со ВСЕМИ полями (timestamp + payload + ошибка) —
-    //     из него лид восстанавливается руками по логам сервера;
-    //  2) 503 + человекочитаемая ошибка — клиент показывает toast,
-    //     конфетти (только на 2xx) не срабатывает, пользователь знает,
-    //     что заявка НЕ прошла, и может позвонить.
+    /* 81-W2F3 [G MAJOR #6 «PII в логах»]: прежде console.error
+       сериализовал ПОЛНЫЙ пейлоад лида (имя/телефон/email/message/
+       consentIp/UA) — персональные данные утекали в pm2/логи хостинга
+       (152-ФЗ + GDPR-практика: логи — не место для PII). Теперь — только
+       безопасная сводка для корреляции инцидента: leadIdHint = первые
+       8 hex sha256(нормализованный телефон) — однонаправленный хэш,
+       персона не восстанавливается, но когда клиент позвонит (503-текст
+       просит позвонить), оператор по времени инцидента + номеру связывает
+       обращение с записью в логе. */
+    const leadIdHint = createHash("sha256")
+      .update(phone)
+      .digest("hex")
+      .slice(0, 8);
     console.error(
-      "[api/lead] DB write FAILED — lead NOT saved, recover manually from payload:",
-      JSON.stringify(
-        {
-          at: new Date().toISOString(),
-          lead: {
-            name: data.name,
-            phone,
-            email: data.email,
-            eventType: data.eventType,
-            guests: data.guests,
-            budget: data.budget,
-            message: data.message,
-            consentAccepted: true,
-            consentDate: new Date().toISOString(),
-            consentIp,
-            userAgent,
-          },
-          error:
-            dbError instanceof Error
-              ? { name: dbError.name, message: dbError.message }
-              : String(dbError),
-        },
-        null,
-        2,
-      ),
+      JSON.stringify({
+        event: "lead_db_error",
+        at: new Date().toISOString(),
+        leadIdHint,
+        error:
+          dbError instanceof Error
+            ? `${dbError.name}: ${dbError.message}`
+            : String(dbError),
+      }),
     );
     return NextResponse.json(
       {

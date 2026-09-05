@@ -285,6 +285,25 @@ export default function RootLayout({
      он не эмитится вовсе, в prod — дедупится в этот же хинт). 41KB PNG
      нужен в первые 0.45с (CSS-таймлайн дверей) — грузим до медиа-hero. */
   reactDomPreload("/brand/logo-256.png", { as: "image" });
+  /* 81-W2F3 [G MINOR #8 «дубли preload шрифтов»]: preload Barlow Semi
+     Condensed 400 + 700 latin (LCP-критичные woff2 тела — 81-F1) переведён
+     с ручных <link> в head-JSX на Float API ReactDOM.preload. Ручные теги
+     НЕ участвуют в Float-дедупликации и в прод-HTML дублировались с
+     авто-preload'ами (по 2 <link> на файл — критик G: 4b23c5ee@546+@3356,
+     490cbca7@680+@3490). Float-ресурс с тем же href/attrs дедупится в
+     РОВНО ОДИН <link> в начале <head> — тот же механизм, что у логотипа
+     выше. crossorigin обязателен для шрифтов (CORS-mode fetch, иначе
+     двойной запрос). Prata-latin уже preloaded next/font'ом — не дублируем. */
+  reactDomPreload("/_next/static/media/4b23c5ee480ee380-s.046c0c63.woff2", {
+    as: "font",
+    type: "font/woff2",
+    crossOrigin: "anonymous",
+  });
+  reactDomPreload("/_next/static/media/490cbca7f386131e-s.116c03d8.woff2", {
+    as: "font",
+    type: "font/woff2",
+    crossOrigin: "anonymous",
+  });
   // Cycle 49 (font-fix): next/font variable classes live on <html> (= :root)
   // so that :root-level custom properties in globals.css (e.g.
   // --ea-font-display: var(--font-serif)) can resolve them. Declared on
@@ -320,22 +339,9 @@ export default function RootLayout({
             системном фоллбэке; latin покрывает «nilov/catering/NILOV
             CATERING» и англ. копирайт). Имена файлов = контент-хэши
             next/font — идентичны dev и prod-сборкам (сверено по CSS :3001
-            и :3002). crossorigin обязателен для шрифтов (иначе двойной
-            запрос). Prata-latin уже preloaded next/font'ом — не дублируем. */}
-        <link
-          rel="preload"
-          href="/_next/static/media/4b23c5ee480ee380-s.046c0c63.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/_next/static/media/490cbca7f386131e-s.116c03d8.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
+            и :3002). Сами <link> — 81-W2F3 см. reactDomPreload в начале
+            RootLayout (дубль с авто-preload'ами Next устранён через
+            Float-дедуп). */}
       </head>
       <body className="antialiased bg-background text-foreground">
         {/* 81-F1: СЕССИОННЫЙ ГЕЙТ ПРЕЛОАДЕРА — самый ранний инлайн-скрипт

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone } from "lucide-react";
 import { CONTACTS } from "@/lib/media";
@@ -70,6 +71,19 @@ const NAV: NavItem[] = [
    280 мс гарантированно ПОСЛЕ него, но ещё до конца exit-анимации
    оверлея (0.5 с) — прыжок под скрывающимся меню незаметен. */
 const DRAWER_NAV_DELAY_MS = 280;
+
+/** 81-W2F1: портал мобильного дровера в <body>. SiteHeader рендерится
+ *  ВНУТРИ <main> (page.tsx) — а при открытом меню main получает inert
+ *  (эффект ниже, паттерн видео-модалки events-video-carousel.tsx):
+ *  дровер обязан жить ВНЕ погашенного поддерева, иначе инертная петля
+ *  гасит и его самого (замер research/w2f1/debug-burger.js: клик по
+ *  «Закрыть меню» попадал в BODY, кнопка не отвечала). AnimatePresence
+ *  прокидывает PresenceContext СКВОЗЬ портал — exit-анимация
+ *  (y: "-100%", 0.5с) сохраняется. */
+function MobileMenuPortal({ children }: { children: ReactNode }) {
+  if (typeof document === "undefined") return null;
+  return createPortal(children, document.body);
+}
 
 export function SiteHeader() {
   const [stuck, setStuck] = useState(false);
@@ -358,6 +372,26 @@ export function SiteHeader() {
     };
   }, [open]);
 
+  /* 81-W2F1 (критик F MINOR): при открытом бургере <main> обязан глохнуть —
+   * фокус-хвост модального дровера (role=dialog aria-modal) иначе Tab'ом
+   * проваливался в фоновый контент (замер критика F: main не inert). Паттерн
+   * — тот же, что у видео-модалки events-video-carousel.tsx: императивные
+   * атрибуты с cleanup (React не владеет этими узлами: main живёт в layout,
+   * дровер здесь; mutual-exclusion с модалкой гарантирован — при inert main
+   * клики по её плиткам недостижимы, а при открытой модалке header сам
+   * inert и бургер не нажимается). */
+  useEffect(() => {
+    if (!open) return;
+    const main = document.querySelector("main");
+    if (!main) return;
+    main.setAttribute("inert", "");
+    main.setAttribute("aria-hidden", "true");
+    return () => {
+      main.removeAttribute("inert");
+      main.removeAttribute("aria-hidden");
+    };
+  }, [open]);
+
   /* W3 (K5 MAJOR, задача 3) — закрыть меню и уйти по якорю.
    *
    * ПРОБЛЕМА (замер W3, research/c71/w3-probe-menu.mjs): у пунктов
@@ -565,10 +599,14 @@ export function SiteHeader() {
           W2-FIX: z-[60] → z-[90] — оверлей меню ВЫШЕ cookie-баннера
           (fixed z-[80]): раньше баннер перекрывал нижний ряд меню
           (телефон, mt-auto). Теперь открытое меню полностью над
-          баннером, телефон кликабелен. */}
+          баннером, телефон кликабелен.
+          81-W2F1: рендер через MobileMenuPortal (createPortal,
+          document.body) — вне <main>, который глохнет inert'ом при
+          открытом меню (см. эффект выше и докблок портала). */}
       <AnimatePresence>
         {open && (
-          <motion.div
+          <MobileMenuPortal>
+            <motion.div
             className="fixed inset-0 z-[90] flex flex-col bg-white px-6 py-6 lg:hidden"
             id="mobile-menu"
             role="dialog"
@@ -679,7 +717,8 @@ export function SiteHeader() {
                 Оставить заявку
               </a>
             </div>
-          </motion.div>
+            </motion.div>
+          </MobileMenuPortal>
         )}
       </AnimatePresence>
 

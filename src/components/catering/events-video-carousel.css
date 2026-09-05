@@ -189,22 +189,27 @@
   pointer-events: none;
 }
 
+/* 81-W2F1 (критик E MAJOR «палитра-фрагментация» + задача оркестратора):
+   лососевый капс-лейбл #FF7A85 (12px bold) заменён на бордо #B91431 из
+   базовой палитры. КРИТИЧНО: лейбл живёт на ТЁМНОМ градиенте плитки —
+   бордо-ТЕКСТ на тёмном дал бы ~2.6:1 (регресс WCAG), поэтому бордо
+   кладётся на КРЕМ-чип (background var(--ea-cream)): текст #B91431 на
+   #F7F5F5 = 5.9:1 ✓ AA — контраст теперь независим от постера под
+   градиентом. Текст-тень больше не нужна (чип непрозрачный).
+   Класс используется и в модалке (.ea-evt-video__modal-caption на тёмном
+   фоне) — чип одинаково читаем на обоих. */
 .ea-evt-video__category {
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  /* F4 / K2 MAJOR (контраст): было var(--ea-red) #E71D3A на тёмной плитке
-     #1A1A1A = 3.84:1 при 12px bold (FAIL AA <4.5). Глобальную --ea-red не
-     трогаю (крем-секции её держат) — локально для ТЁМНОГО фона плитки
-     осветляю фирменный красный до #FF7A85 = 6.94:1 ✓ AA (тот же hue,
-     светлая версия для dark-bg; текст-тень сохранена). Используется и в
-     модалке (тёмный фон rgba(0,0,0,0.92) — контраст ещё выше). */
-  color: #ff7a85;
+  color: var(--ea-red-text, #B91431);
+  background: var(--ea-cream, #F7F5F5);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  width: fit-content;
   margin: 0;
-  /* Lift the red tag above the dark overlay so it pops — EA signature. */
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .ea-evt-video__title {
@@ -279,6 +284,63 @@
   border-radius: var(--ea-radius-soft);
   background: #000;
   box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.5);
+}
+
+/* 81-W2F1 (критик F MEDIUM): трек видео в модалке — контейнер для
+   Play-оверлея. */
+.ea-evt-video__modal-video-wrap {
+  position: relative;
+}
+
+/* Центр-оверлей Play: ≥44px тач-таргет (64px), полупрозрачный тёмный
+   диск + белая иконка Lucide Play. Клик = video.play() (видео со звуком:
+   клик — жест пользователя, autoplay-политика пропускает). onPlay в tsx
+   прячет кнопку; если видео уже играет — оверлея нет вовсе. */
+.ea-evt-video__modal-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+  transition: background 220ms ease, transform 220ms ease;
+}
+
+.ea-evt-video__modal-play:hover,
+.ea-evt-video__modal-play:focus-visible {
+  background: rgba(0, 0, 0, 0.75);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.ea-evt-video__modal-play:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.ea-evt-video__modal-play-icon {
+  width: 28px;
+  height: 28px;
+  /* Оптическая центровка треугольника (визуальный центр левее
+     геометрического). */
+  margin-left: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ea-evt-video__modal-play {
+    transition: none;
+  }
+  .ea-evt-video__modal-play:hover,
+  .ea-evt-video__modal-play:focus-visible {
+    transform: translate(-50%, -50%);
+  }
 }
 
 .ea-evt-video__modal-caption {

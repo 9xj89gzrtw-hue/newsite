@@ -174,7 +174,26 @@ function PhotoTile({
         src={src}
         alt={ariaHidden ? "" : alt}
         fill
-        sizes="(max-width: 768px) 280px, 300px"
+        /* 81-W2F2 (критик E волна-2, проверено измерением): 280px/300px —
+           ТОЧНЫЕ слоты тайла (замер: 280×373 @390 / 300×400 @1440),
+           апскейла нет на DPR1 (файл 384/484 = 1.28–1.73×). На retina
+           браузер просит w=640, НО оптимизатор капает до ширины
+           ИСХОДНИКОВ 482–484px (gammacatering.com оригиналы) = 0.81–0.86×
+           retina — это предел источников, sizes больше не выжать.
+           Найденные в репо hires (media/gamma/c49-*) — ДРУГИЕ кадры
+           (пиксель-корреляция ≤0.66 + VLM: не совпадают), подмена = смена
+           контента по конвейеру §4 — отдельный цикл.
+           81-W2F2b: sizes подняты до слот×1.15 (322/345) — запас 15%
+           из ТЗ (файл ≥ client×dpr×1.15): retina-мобайл теперь просит
+           w=750 (было 640): 13 файлов с капом источника получают тот же
+           484-пиксельный файл (байты не меняются), karriere (960 исх.)
+           получает 750 ≥ 644 ✓ — единственный тайл, где ТЗ-формула
+           выполнима; десктоп-выбор не меняется (345 → 384). Примечание:
+           naturalWidth критика (210×317 «апскейл 1.33×») был артефактом
+           Chromium: для srcset+w naturalWidth = intrinsic×sizes/candidate
+           (density-corrected), реальный файл = 484 (createImageBitmap,
+           research/w2f2b/measure2.json) — DPR1-апскейла в марки НЕТ. */
+        sizes="(max-width: 768px) 322px, 345px"
         className="gamma-marquee__img absolute inset-0 h-full w-full object-cover"
         // FIX-4 [F3, W1-D]: было loading="eager" — React 19 SSR
         // автоэмитит <link rel=preload as=image> для каждого <img> без

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 
 /**
  * VerticalBrandLabel — gamma-style LEFT sidebar with the brand name.
@@ -48,6 +49,13 @@ import * as React from "react";
  * @see .vertical-brand-label in src/app/globals.css
  */
 export function VerticalBrandLabel() {
+  /* 81-W2F1 (критик G MINOR, мёртвый href на субстраницах): на /offer
+   * /privacy /terms /404 якоря #hero НЕ СУЩЕСТВУЕТ (нет hero-секции) —
+   * клик по рейлу ничего не делал. На субстраницах href="/" (ведёт на
+   * главную), на главной — прежний #hero. usePathname рендерится на SSR
+   * одинаково с клиентом — гидрационного рассинхрона нет. */
+  const pathname = usePathname();
+  const railHref = pathname === "/" ? "#hero" : "/";
   const [visible, setVisible] = React.useState(false);
   // R1 (C67 wave D): mirrors the header's data-header-scheme. Starts
   // "light" → SSR markup and the first client render are identical.
@@ -120,8 +128,12 @@ export function VerticalBrandLabel() {
     // intercept this for smooth scroll — either way the user lands on
     // the hero.
     <a
-      href="#hero"
-      aria-label="Вернуться в начало — главный экран"
+      href={railHref}
+      aria-label={
+        pathname === "/"
+          ? "Вернуться в начало — главный экран"
+          : "На главную — nilov catering"
+      }
       className={`vertical-brand-label${visible ? " is-visible" : ""}`}
       data-scheme={scheme}
     >

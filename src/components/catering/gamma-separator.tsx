@@ -109,7 +109,14 @@ export function GammaSeparator() {
               src="/media/gamma/gamma-catering-separator.jpg"
               alt=""
               fill
-              sizes="100vw"
+              /* 81-W2F2 (критик E волна-2): было 100vw — фото в момент
+                 data-sd-zoom-дрейфа занимает до 1.15× ширины секции
+                 (замер бокса img: 1656px @1440), т.е. sizes недо-декларировал
+                 зону фактического рендера. 115vw: мобайл DPR2 теперь берёт
+                 w=1080 (было 828 — 0.92× retina), десктоп DPR1 — 1920
+                 (без изменений). Верх упирается в ИСХОДНИК 2560×900 —
+                 больше пикселей в репо нет, оптимизатор честно капает. */
+              sizes="115vw"
               priority={false}
               className="gamma-separator__img object-cover"
               /* C71: CSS scroll-driven zoom (entry-диапазон), @supports-гейт в

@@ -231,13 +231,14 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
+import dynamic from "next/dynamic";
 import { fireGoldConfetti } from "@/components/motion/gold-confetti";
-import { ru as ruDayPickerLocale } from "react-day-picker/locale";
 
 import { Magnetic } from "@/components/motion/magnetic";
 import { TiltedAccent } from "@/components/catering/tilted-accent";
-import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import type { ComponentProps } from "react";
+import type { Calendar as CalendarType } from "@/components/ui/calendar";
 import { useMounted } from "@/hooks/use-mounted";
 import { CONTACTS } from "@/lib/config";
 import { anchorClickGoal, GOALS, trackGoal } from "@/lib/analytics";
@@ -1581,7 +1582,7 @@ function SuccessPanel({
   settled: boolean;
 }) {
   return (
-    <div className="hb-success">
+    <div className="hb-success" id="hb-success">
       {settled && <ConfettiBurst />}
       <div className="hb-success__paper">
         {/* C77: водяной знак НАСТОЯЩЕГО логотипа компании на квитанции —
@@ -1668,9 +1669,21 @@ function StickyBar({
     };
     const measure = () => {
       const banner = document.querySelector('[data-component="ea-cookie-banner"]');
-      const h = banner ? banner.getBoundingClientRect().height : 0;
+      /* 81-W2F1b (замер research/w2f1b/01-mobile.js): баннер на мобиле
+       * ПОДНЯТ над нижней док-зоной (bottom: 140px + safe-area — фикс
+       * перекрытия hero-CTA критика F), а этот лифт считался от ВЫСОТЫ
+       * карточки: бар (z-40) ставился на y 649..721 и накрывался
+       * карточкой (y 593..704) с пересечением 19690px² — CTA «Оставить
+       * заявку» бара был некликабелен до решения по cookies. Теперь лифт =
+       * ЭФФЕКТИВНЫЙ НИЖНИЙ СЛЕД (innerHeight − rect.top), ровно как
+       * --cookie-banner-h самого баннера (его докстринг это и обещал):
+       * бар поднимается НАД ВЕРХОМ карточки. На sm+ (bottom-6) след =
+       * высота + отступ — прежняя математика сохраняется. */
+      const h = banner
+        ? Math.max(0, Math.round(window.innerHeight - banner.getBoundingClientRect().top))
+        : 0;
       if (banner) seenBanner = true;
-      root.style.setProperty("--hbooking-cookie-h", `${Math.round(h)}px`);
+      root.style.setProperty("--hbooking-cookie-h", `${h}px`);
       /* M1 (task 11-fix3): баннер исчез (accept/unmount) — лифт больше не
          нужен, снимаем слушатели (паттерн §33: MutationObserver живёт ровно
          столько, сколько нужен; застывшие lift-переменные = живой баг C61). */
@@ -1681,11 +1694,15 @@ function StickyBar({
       }
     };
     measure();
+    /* 81-W2F1b: вход баннера — transform-анимация y 24→0 (0.4с), MutationObserver
+     * её не видит (childList) — перемер после оседания, паттерн ea-cookie-banner. */
+    const settle = window.setTimeout(measure, 550);
     mo = new MutationObserver(schedule);
     mo.observe(document.body, { childList: true, subtree: true });
     window.addEventListener("resize", schedule, { passive: true });
     return () => {
       mo?.disconnect();
+      window.clearTimeout(settle);
       window.removeEventListener("resize", schedule);
       if (raf) cancelAnimationFrame(raf);
       root.style.setProperty("--hbooking-cookie-h", "0px");
@@ -2029,6 +2046,40 @@ const UndecidedLines = memo(function UndecidedLines({
 /* ================================================== FIX-7 (W2-B M2): ДАТЕР */
 
 /**
+ * 81-W2F1 (критик H, TBT): Calendar (react-day-picker + date-fns-локали)
+ * выведен из стартового бандла — next/dynamic. Раньше ui/calendar был
+ * статическим импортом hacc-booking (секция главной страницы), и ~100KB
+ * JS (критик H: unused-JS 96KB, «140d322c 41% — lucide+react-day-picker+…»)
+ * грузились/парсились на каждой загрузке, хотя пикер нужен только при
+ * открытии Popover. Теперь:
+ *  - chunk calendar+react-day-picker+ru-локаль подгружается ЕДИНОВРЕМЕННО
+ *    (Promise.all) при ПЕРВОМ рендере HbCalendar внутри открытого поповера;
+ *  - до готовности — скелетон .hb-date__cal-skeleton (замер: локально
+ *    холодное открытие < 300мс, тёплое — мгновенное, чанк в кэше);
+ *  - ssr:false безопасен: контент поповера и так клиентский (open-state),
+ *    SSR-разметка не меняется (гидрационной поверхности нет — FIX-7);
+ *  - ru-локаль инжектится дефолтом в обёртке (проп locale у коллбека
+ *    по-прежнему перекрывает, если передать явно).
+ * Тип ComponentProps берётся type-only импортом — в рантайме нулевой вес.
+ */
+const HbCalendar = dynamic<ComponentProps<typeof CalendarType>>(
+  async () => {
+    const [{ Calendar }, { ru }] = await Promise.all([
+      import("@/components/ui/calendar"),
+      import("react-day-picker/locale"),
+    ]);
+    function CalendarWithRu(props: ComponentProps<typeof CalendarType>) {
+      return <Calendar locale={ru} {...props} />;
+    }
+    return CalendarWithRu;
+  },
+  {
+    ssr: false,
+    loading: () => <div className="hb-date__cal-skeleton" aria-hidden="true" />,
+  },
+);
+
+/**
  * Поле даты калькулятора — Popover + shadcn-Calendar с ГОТОВОЙ русской
  * локалью react-day-picker («react-day-picker/locale» → ru: дни «19 сентября
  * 2026 г., суббота», стрелки «Перейти к следующему месяцу», неделя с ПН).
@@ -2125,9 +2176,8 @@ function HbDateField({
         align="start"
         aria-label="Календарь даты события"
       >
-        <Calendar
+        <HbCalendar
           mode="single"
-          locale={ruDayPickerLocale}
           selected={selected}
           onSelect={handleSelect}
           disabled={minDate ? { before: minDate } : undefined}
@@ -2462,6 +2512,34 @@ export function HaccBooking() {
       setLeadId(id);
       setLeadNo(formatLeadNo(new Date()));
       setStage("success");
+      /* 81-W2F1 (критик F MINOR + № заявки): квитанция после сабмита
+       * оказывалась НАД вьюпортом (замер: top −230) — юзер видел только
+       * тост и № ДДММ-ЧЧММ терялся. Автоскролл к квитанции через 500 мс
+       * (после конфетти-салютА + коммита разметки): позиция — верх
+       * квитанции на ~30% высоты вьюпорта. Через window.__lenis (грабля
+       * §33 — Lenis перебивает нативные smooth-скроллы), фоллбек —
+       * window.scrollTo; prefers-reduced-motion — без анимации.
+       * Таймер без cleanup безопасен: элемент ищется по id ПОСЛЕ коммита,
+       * при навигации getElementById вернёт null. */
+      window.setTimeout(() => {
+        const el = document.getElementById("hb-success");
+        if (!el) return;
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const docTop = el.getBoundingClientRect().top + window.scrollY;
+        const target = Math.max(0, docTop - window.innerHeight * 0.3);
+        const lenis = (
+          window as unknown as {
+            __lenis?: {
+              scrollTo?: (t: number, o?: { duration?: number }) => void;
+            };
+          }
+        ).__lenis;
+        if (typeof lenis?.scrollTo === "function") {
+          lenis.scrollTo(target, { duration: reduce ? 0 : 0.8 });
+        } else {
+          window.scrollTo({ top: target, behavior: reduce ? "auto" : "smooth" });
+        }
+      }, 500);
       window.dispatchEvent(
         new CustomEvent("catering:calc-lead", {
           detail: {

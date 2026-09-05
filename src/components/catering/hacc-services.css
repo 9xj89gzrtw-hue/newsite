@@ -417,7 +417,10 @@
   display: block;
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 600;
-  font-size: 0.62rem;
+  /* 81-W2F2b (E MINOR): 0.62rem = 9.92px — микрокегль капс-лейбла
+     («за гостя» под ценой) ниже порога 11px (та же претензия критика E,
+     что и rack-labels 10.56px → 11px в 81-W2F2). Поднят до 11px. */
+  font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--hacc-soft);
@@ -526,7 +529,10 @@
   /* label aligns with the rack's side padding below */
   .hacc__rack-label {
     margin-inline: clamp(1rem, 4vw, 2rem);
-    font-size: 0.66rem;
+    /* 81-W2F2 (E MINOR, критик E): 0.66rem = 10.56px — микро-кегль
+       («Форматы события» / «К любому формату» на мобиле); поднят до 11px.
+       Десктоп 0.72rem (11.52px) не тронут. */
+    font-size: 11px;
   }
 
   .hacc__rack {

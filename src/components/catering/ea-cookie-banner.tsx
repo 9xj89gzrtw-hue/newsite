@@ -52,6 +52,18 @@ import { loadMetrika } from "@/lib/analytics";
  *   (globals.css-хуки body padding/FAB-лифта продолжают работать на живой
  *   высоте карточки — замер C75 идёт по этому же элементу).
  *
+ * 81-W2F1 (критик F HIGH, перекрытие hero-CTA): карточка на bottom-16
+ *   накрывала CTA «Оставить заявку» (y 763-807) и «Листайте» до решения
+ *   юзера. На мобиле карточка ПОДНИМАЕТСЯ над нижней док-зоной (bottom =
+ *   100px + safe-area): CTA, scroll-cue, phone-FAB и sticky-bar
+ *   калькулятора остаются достижимыми. --cookie-banner-h теперь пишется
+ *   как ЭФФЕКТИВНЫЙ нижний след (innerHeight − rect.top): лифты FAB
+ *   (globals.css) и sticky-bar продолжают работать корректно — они
+ *   поднимают элементы НАД реальной геометрией карточки. Кнопки 11 → 12px
+ *   (критик E K2, читаемость); на 340px-карточке ряд из 3 кнопок при 12px
+ *   переносится (flex-wrap, «Принять все» — на своей строке) — высота
+ *   карточки ~156px, CTA по-прежнему вне пересечения. sm+ — без изменений.
+ *
  * z-[80] (Cycle 39 bottom-dock keeps the sticky header visible; above
  * site-header z-50 + announcement-bar z-55, below the mobile-menu overlay
  * which renders later in the DOM so stacks above naturally).
@@ -96,7 +108,11 @@ const BTN_BASE_STYLE: CSSProperties = {
   /* 81-F2: карточка ≤340px ⇒ один ряд из 3 кнопок только при 11px +
      трекинге 0.03em и px-1 (замер: 0.08em+px-2 = 336px > 306px контента;
      0.03em+px-1 = ~295px ✓; высота карточки тогда ≈110px ≤ 140px).
-     Тач-таргеты не страдают: высота 44px, ширина кнопок ~95px. */
+     81-W2F1 (критик E K2): 11 → 12px — читаемость. При 12px ряд из трёх
+     (~332px) НЕ влезает в 306px контента — flex-wrap переносит «Принять
+     все» на вторую строку (ряд 94px, карточка ~156px; hero-CTA по-прежнему
+     свободен — замер research/w2f1). Тач-таргеты не страдают: высота 44px,
+     ширина кнопок ~95px. */
   letterSpacing: "0.03em",
   textTransform: "uppercase",
   lineHeight: 1,
@@ -232,14 +248,29 @@ export function EaCookieBanner() {
     const el = bannerRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
     const root = document.documentElement;
+    /* 81-W2F1: переменная — ЭФФЕКТИВНЫЙ нижний след карточки (не голая
+     * высота): на мобиле карточка поднята на 100px от низа (hero-CTA
+     * fix), и нижние док-системы (FAB-лифт globals.css, sticky-bar
+     * --hbooking-cookie-h) должны поднимать элементы НАД РЕАЛЬНОЙ
+     * геометрией — то есть до ВЕРХА карточки. innerHeight − rect.top
+     * даёт ровно это и остаётся корректным для десктопа (bottom-6:
+     * след = высота + 24px отступа). */
     const apply = () => {
-      const h = el.getBoundingClientRect().height;
-      if (h > 0) root.style.setProperty("--cookie-banner-h", `${Math.ceil(h)}px`);
+      const rect = el.getBoundingClientRect();
+      if (rect.height > 0) {
+        const footprint = Math.max(0, Math.ceil(window.innerHeight - rect.top));
+        root.style.setProperty("--cookie-banner-h", `${footprint}px`);
+      }
     };
     apply();
+    /* Входная анимация (y: 24 → 0, transform) НЕ триггерит ResizeObserver
+     * (border-box не меняется) — перемеряем после её завершения, иначе
+     * след зависает на 24px выше реального. Однократный таймер. */
+    const settle = window.setTimeout(apply, 500);
     const ro = new ResizeObserver(apply);
     ro.observe(el);
     return () => {
+      window.clearTimeout(settle);
       ro.disconnect();
       root.style.removeProperty("--cookie-banner-h");
     };
@@ -294,20 +325,25 @@ export function EaCookieBanner() {
           data-component="ea-cookie-banner"
           /* 81-F2: компактная карточка вместо полноширинной полосы.
              Внешний fixed-контейнер = трек позиционирования (мобайл:
-             inset-x-4 → карточка ≤340px центрирована; sm+: левый нижний
-             угол). Отступ снизу 16px + safe-area — зона CTA «Далее»
-             калькулятора при автоскролле остаётся свободной (высота
-             карточки на мобиле ≤140px, замер в верификации). Cycle-39
-             фикс (низ, не верх) сохранён: раньше top-0 z-60 накрывал
-             sticky-хедер. */
-          className="fixed z-[80] inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom,0px))] sm:inset-x-auto sm:bottom-6 sm:left-6"
+             inset-x-4 → карточка ≤358px центрирована; sm+: левый нижний
+             угол). 81-W2F1 (критик F HIGH): отступ снизу на мобиле —
+             140px + safe-area, НАД нижней зоной hero: декоративный
+             scroll-cue «Листайте» (y 715-796 на 390×844, замер
+             research/w2f1/probe-hero-390.js) и весь нижний клик-слой
+             свободны; телефон-FAB лифтится следов (глобальный лифт по
+             --cookie-banner-h = эффективному нижнему следу) и не
+             пересекается. Задача предлагала bottom ~100px, но 100 =
+             баннер до 744 — текст кия «Листайте» (715-735) оставался
+             под панелью; 140 clears всё с запасом 11px. sm+ — без
+             изменений (bottom-6). */
+          className="fixed z-[80] inset-x-4 bottom-[calc(140px+env(safe-area-inset-bottom,0px))] sm:inset-x-auto sm:bottom-6 sm:left-6"
           initial={initial}
           animate={animate}
           exit={exit}
           transition={transition}
         >
           <div
-            className="mx-auto flex max-w-[340px] flex-col gap-2 rounded-2xl px-4 py-3"
+            className="mx-auto flex max-w-[358px] sm:max-w-[368px] flex-col gap-2 rounded-2xl px-3 sm:px-4 py-3"
             style={{
               /* F4: тёмная espresso-панель бренда + золотая рамка (была
                  чёрная с красной рамкой — K1 «вне бренда»); 81-F2:
@@ -354,7 +390,7 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("rejected")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_OUTLINE_CLASS} px-1 py-2 text-[11px]`}
+                className={`${BTN_OUTLINE_CLASS} px-1 py-2 text-[12px]`}
               >
                 Отклонить
               </button>
@@ -362,7 +398,7 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("essential")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_OUTLINE_CLASS} px-1 py-2 text-[11px]`}
+                className={`${BTN_OUTLINE_CLASS} px-1 py-2 text-[12px]`}
               >
                 Необходимые
               </button>
@@ -370,7 +406,7 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("accepted")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_SOLID_CLASS} px-1 py-2 text-[11px]`}
+                className={`${BTN_SOLID_CLASS} px-1 py-2 text-[12px]`}
               >
                 Принять все
               </button>

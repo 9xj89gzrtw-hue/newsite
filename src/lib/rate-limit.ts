@@ -106,16 +106,36 @@ function evictIfNeeded() {
 }
 
 /**
- * IP клиента для ключа лимита: первый элемент x-forwarded-for (за
- * прокси может стоять цепочка «client, proxy1, proxy2» — нужен первый),
+ * IP клиента для ключа лимита (и consentIp в 152-ФЗ-proof — см. роуты).
+ *
+ * 81-W2F3 [G MAJOR #2 «XFF-спуфинг»]: доверие к x-forwarded-for зависит
+ * от модели шлюза деплоя, слепо брать первый элемент небезопасно:
+ *  - ЭТОТ прод (self-hosted за Caddy-шлюзом): reverse_proxy настроен
+ *    `header_up X-Forwarded-For {remote_host}` — шлюз ПЕРЕЗАПИСЫВАЕТ
+ *    клиентский XFF значением TCP remote host; спуф стирается, в заголовке
+ *    ровно ОДНА доверительная запись → берём ПЕРВУЮ (= единственную).
+ *    (Прямые запросы к Next без шлюза — dev/localhost: заголовков нет,
+ *    см. fallback "local" ниже.)
+ *  - Vercel (process.env.VERCEL === "1" — ставит сама платформа):
+ *    платформа ДОБАВЛЯЕТ реальный IP подключившегося к СУЩЕСТВУЮЩЕМУ
+ *    (клиент-контролируемому) XFF — все записи, кроме последней,
+ *    спуфаемы клиентом → берём ПОСЛЕДНЮЮ запись (ближайший прокси).
+ * С одиночным XFF обе ветки дают один и тот же результат.
  * fallback x-real-ip, затем константа "local" (прямые запросы без
  * прокси — dev/localhost; все они делят один бакет, что корректно).
  */
 export function getClientIp(req: NextRequest): string {
   const forwarded = req.headers.get("x-forwarded-for");
   if (forwarded) {
-    const first = forwarded.split(",")[0]?.trim();
-    if (first) return first;
+    const entries = forwarded
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+    const entry =
+      process.env.VERCEL === "1"
+        ? entries[entries.length - 1]
+        : entries[0];
+    if (entry) return entry;
   }
   const real = req.headers.get("x-real-ip")?.trim();
   if (real) return real;

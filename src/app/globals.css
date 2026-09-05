@@ -637,11 +637,19 @@ html.lenis body {
 }
 
 /* Skip to content link (WCAG 2.4.1) — high contrast for accessibility */
+/* 81-W2F1 (критик F MINOR): skip-link был НЕВИДИМ при фокусе — rect.top
+   −836px. Причина: position:absolute + top:-100% отсчитывается от высоты
+   содержащего блока (весь документ) → ссылка улетала за -800px, а :focus
+   { top: 1rem } анимировалась через transition от -800px. Стандартный
+   паттерн: fixed + left:-9999px до фокуса, мгновенный флип на
+   left:8px/top:8px по :focus/:focus-visible (программный focus() не
+   всегда матчит :focus-visible — берём оба селектора). transform-центровка
+   и анимация топа убраны: появление мгновенное, позиция — верхний-левый
+   угол (не перекрывает контент по центру). */
 .skip-link {
-  position: absolute;
-  top: -100%;
-  left: 50%;
-  transform: translateX(-50%);
+  position: fixed;
+  top: 8px;
+  left: -9999px;
   z-index: 9999;
   padding: 0.75rem 1.5rem;
   background: var(--ink);
@@ -651,11 +659,11 @@ html.lenis body {
   font-weight: 600;
   text-decoration: none;
   border-radius: 0.5rem;
-  transition: top 0.2s ease;
   border: 2px solid var(--gold);
 }
-.skip-link:focus {
-  top: 1rem;
+.skip-link:focus,
+.skip-link:focus-visible {
+  left: 8px;
 }
 
 /* ===== LIGHT THEME ANIMATIONS ===== */
@@ -3642,6 +3650,18 @@ header[data-scrolled="true"] [data-mega-panel] {
 .ea-outline-btn:hover::before,
 .ea-outline-btn:focus-visible::before {
   transform: translateY(0);
+}
+
+/* 81-W2F1 (критик F MEDIUM): у .ea-outline-btn («Рассчитать фуршет» в
+   hacc-services/hacc-menu) фокус-обводка была погашена (outline:none в
+   правиле выше) — единственный таб-стоп сайта без индикатора фокуса.
+   Кольцо как у остальных таб-стопов: бордо --ea-red-text (6.03:1 на
+   креме), 2px, offset 2px. Селектор стоит ПОСЛЕ hover/focus-правила
+   (равная специфичность → source order) — outline:none побеждён;
+   заливка-ховер из правила выше сохранена (кольцо читается поверх). */
+.ea-outline-btn:focus-visible {
+  outline: 2px solid var(--ea-red-text, #B91431);
+  outline-offset: 2px;
 }
 
 /* EA solid red CTA (used in forms, cookie banner, final CTA) */

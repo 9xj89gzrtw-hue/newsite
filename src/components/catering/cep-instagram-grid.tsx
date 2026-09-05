@@ -212,7 +212,21 @@ export function CepInstagramGrid() {
                     src={tile.src}
                     alt={tile.alt}
                     fill
-                    sizes="(max-width: 768px) 33vw, 22vw"
+                    /* 81-W2F2 (E MAJOR, критик E волна-2): было 33vw/22vw —
+                       сетка 3×3 реально рендерит тайл (100vw − паддинги −
+                       гэпы)/3 = 434.7px @1440 (замер), а sizes декларировал
+                       316.8px → браузер брал вариант 384 → апскейл 0.88×
+                       даже на DPR1 и 0.74× на retina. calc() из реального
+                       лэйаута: <768 — px-8(32×2)+gap-2(8×2); ≥768 —
+                       px-14(56×2)+md:gap-3(12×2). Теперь: DPR1 1440 →
+                       кандидат 640 (1.47×), DPR2 → 1080 (файл 1024 =
+                       1.18× retina), мобайл DPR2 → 256 (1.24×). Источники
+                       1024×1024 — лимит натурального разрешения соблюдён. */
+                    sizes="(max-width: 767px) calc((100vw - 80px) / 3), calc((100vw - 136px) / 3)"
+                    /* food-крупняки: +q82 против webp-«каши» на деталях
+                       текстуры (байтовая дельта ~40% от q75, приемлемо
+                       для витринной сетки) */
+                    quality={82}
                     className="object-cover transition-[filter,transform] duration-500 ease-out group-hover:scale-[1.06] group-hover:saturate-150 group-hover:brightness-105 motion-reduce:transform-none motion-reduce:transition-[filter]"
                   />
                 </div>

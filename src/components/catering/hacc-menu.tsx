@@ -932,7 +932,19 @@ function MenuRack({
                           alt={`«${pkg.name}» — ${cat.label}: ${pkg.description}`}
                           fill
                           blurDataURL={BLUR_DATA_URL}
-                          sizes="(max-width: 1023px) 100vw, 38vw"
+                          /* 81-W2F2 (E MAJOR, критик E волна-2): было
+                             100vw/38vw — реальный слот фото ~92vw мобайл
+                             (323px фигура + 24px parallax-bleed @390) и
+                             ~32vw десктоп (427px + bleed @1440); 38vw
+                             пере-декларировал → лишние байты, а на узких
+                             десктопах 100vw-мобайл недобирал. Теперь
+                             браузер на DPR2 просит w=750 (как в ТЗ) /
+                             w=1080; лимит — ширина ИСХОДНИКА (у c60/c61
+                             1200–1920px всё покрыто; furshet-1.jpg
+                             524×700 — оптимизатор честно капает до 524,
+                             retina-запас 0.81× — ограничение источника,
+                             не sizes). */
+                          sizes="(max-width: 1023px) 92vw, 32vw"
                           /* C71-P1 (K8 MAJOR, Task 4): было
                              loading={isOpen ? "eager" : "lazy"} —
                              default-open категория сериализовала

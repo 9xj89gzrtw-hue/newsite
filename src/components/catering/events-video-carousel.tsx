@@ -64,6 +64,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
+import { Play } from "lucide-react";
 
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
 import "./events-video-carousel.css";
@@ -151,6 +152,23 @@ export function EventsVideoCarousel() {
 
   /** activeIndex !== null → fullscreen modal open with that tile's video. */
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  /* ── 81-W2F1 (критик F MEDIUM, модалка без Play-аффорданса) ────────
+   *
+   * Модальное видео открывается со звуком (unmuted autoplay) — браузеры
+   * без жеста пользователя отвергают его: видео стоит НА ПАУЗЕ, а
+   * единственным намёком оставался крестик (замер критика F). Теперь
+   * поверх видео — центр-оверлей Play-кнопка (lucide Play, 64px ≥ 44px
+   * тач-таргет, aria-label «Смотреть видео»): клик = video.play()
+   * (клик — жест, звук разрешён). onPlay прячет оверлей навсегда — и
+   * если autoplay всё же сработал (жест клика по плитке), и если юзер
+   * нажал нативный Play в controls. Повторной паузе оверлей НЕ
+   * возвращается — нативные controls уже дают resume. */
+  const modalVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [modalPlayed, setModalPlayed] = useState(false);
+  useEffect(() => {
+    if (activeIndex !== null) setModalPlayed(false);
+  }, [activeIndex]);
 
   /* ── W4-FIX: hover-видео-тизеры (десктоп, fine pointer) ─────────────────
    *
@@ -574,7 +592,10 @@ export function EventsVideoCarousel() {
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
                 data-press
                 onClick={(e) => openModal(i, e.currentTarget)}
-                aria-label={`Открыть видео: ${tile.title}`}
+                /* 81-W2F1 (критик G MAJOR, WCAG 2.5.3 Label in Name):
+                   aria-label начинается с ВИДИМОГО текста «Смотреть видео»
+                   (было «Открыть видео: …» — не совпадало с надписью). */
+                aria-label={`Смотреть видео: ${tile.title}`}
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -695,16 +716,40 @@ export function EventsVideoCarousel() {
               className="ea-evt-video__modal-frame"
               onClick={(e) => e.stopPropagation()}
             >
-              <video
-                className="ea-evt-video__modal-video"
-                src={activeTile.video}
-                poster={activeTile.poster}
-                autoPlay
-                controls
-                playsInline
-                preload="metadata"
-                aria-label={activeTile.videoAlt}
-              />
+              {/* 81-W2F1: обёртка видео — трек для Play-оверлея (центр
+                  кадра, НЕ поверх нативных controls внизу). */}
+              <div className="ea-evt-video__modal-video-wrap">
+                <video
+                  ref={modalVideoRef}
+                  className="ea-evt-video__modal-video"
+                  src={activeTile.video}
+                  poster={activeTile.poster}
+                  autoPlay
+                  controls
+                  playsInline
+                  preload="metadata"
+                  aria-label={activeTile.videoAlt}
+                  onPlay={() => setModalPlayed(true)}
+                />
+                {!modalPlayed && (
+                  <button
+                    type="button"
+                    className="ea-evt-video__modal-play"
+                    onClick={() => {
+                      modalVideoRef.current
+                        ?.play()
+                        .then(() => setModalPlayed(true))
+                        .catch(() => {
+                          /* отказ браузера — нативные controls остаются,
+                             оверлей не снимаем (видео всё ещё на паузе) */
+                        });
+                    }}
+                    aria-label="Смотреть видео"
+                  >
+                    <Play className="ea-evt-video__modal-play-icon" aria-hidden="true" />
+                  </button>
+                )}
+              </div>
               <div className="ea-evt-video__modal-caption">
                 <span className="ea-evt-video__category">
                   {activeTile.category}
