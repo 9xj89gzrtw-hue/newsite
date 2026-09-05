@@ -64,6 +64,9 @@
 | **c81:** `naturalWidth` в Playwright-эмуляции | показывает 390 при теле ответа 828×553 | мерить сеть/тело ответа, не naturalWidth |
 | **c81:** Lighthouse mobile дисперсия | TBT 1140–7570ms между прогонами, score ±8 | гейт по ≥3 прогонам + реальной пробе (Playwright + CPU throttle) |
 | **c81:** строки с кавычками через Bash-транспорт | «порча» селекторов | проверка только Read-инструментом (§51) |
+| **c83:** утилити-токены в КОММЕНТАРИЯХ кода (aspect + N:N в скобках) | Tailwind v4 сканирует комментарии как кандидаты → невалидный aspect-ratio N:N → **next build падает**, dev молчит | не писать bracket-токены в докблоках; гейт прод-сборкой |
+| **c83:** window.scrollTo в e2e | Lenis rAF возвращает свою позицию → «телепорты» | только __lenis.scrollTo(immediate) или wheel |
+| **c83:** headless agent-browser | отдаёт hover:false и reduce:true → «мёртвые» ховеры/анимации = ложные клеймы критиков | fine-pointer/RM-чеки — только Playwright |
 
 ## 3. Инфраструктура
 
@@ -102,16 +105,23 @@ bun run lint && bun run typecheck          # оба зелёные перед к
 8. **c81-дополнение:** rendered×2 ≤ natural запрошенного варианта — мерить
    через тело ответа (не naturalWidth, см. §2).
 
-## 5. Текущее состояние витрины (c81)
+## 5. Текущее состояние витрины (c83)
 
-- Секции: tott-hero (CSS-анимации, видео 720/480 по платформе), services-
-  аккордеон, menu-каталог, events-карусель, founder, FAQ, hacc-booking
-  (калькулятор+форма, SSR-shell с якорями), footer (espresso).
-- Анимации: hero/preloader — чистый CSS (LCP-безопасно); ниже фолда —
-  framer-motion/gsap; press-тактилы — WAAPI scale-свойство.
-- API: 3 POST с token-bucket rate-limit, zod, серверная нормализация
-  телефона; заголовки: CSP(+Metrika/frame-ancestors/UIR), HSTS, COOP.
-- Прод-метрики c81: desktop Perf 0.95, mobile 0.60, A11y 0.97, BP/SEO 1.0.
+- Секции: tott-hero, gg-video, gamma-marquee, separator, services-аккордеон,
+  menu-каталог, parallax-band, events-карусель, process, hacc-booking,
+  founder, FAQ, instagram, footer (espresso) + preloader/cursor/cookie.
+- Анимации: hero/preloader — чистый CSS (LCP-безопасно) + hero scroll-exit
+  (view()-таймлайн, именованный); ниже фолда — framer-motion (MotionValue,
+  springs, whileInView) + CSS scroll-driven (kinetic-h2, hb-rise);
+  press — WAAPI scale-свойство; c83-слой: scroll-spy, Magnetic (гейт в
+  утилите), kinetic-h2 gg, shimmer play-pill, hover-глисс меню, squash FAQ,
+  focus-underline формы, reading-highlight band, VelocitySkew футер,
+  cookie slide-fill, каскад process, индекс-поп аккордеона.
+- API: 3 POST с token-bucket rate-limit, zod, нормализация телефона;
+  CSP(+Metrika/frame-ancestors/UIR), HSTS, COOP.
+- Прод-метрики c83: desktop-preset Perf 89-92 (LCP 1.2s, TBT 68-175, CLS 0),
+  mobile real LCP 0.35s / LH-devtools 2.7s, A11y 0.97. Мёртвый CSS globals
+  вычищен (−611 строк, 24 keyframes).
 
 ## 6. Тон бренда
 
@@ -171,8 +181,20 @@ bun run lint && bun run typecheck          # оба зелёные перед к
   MUX-токены в git-истории ВАЛИДНЫ — ротация у владельца; nonce-CSP;
   полный SSR формы; hires-исходники gamma/furshet; шрифтовая диета;
   hero-CTA в первый экран (решение владельца).
+- **c83 §53:** анимации в каждый блок (15 секций, ~12 новых эффектов) +
+  4 волны слепых критиков + прод-гейт. Грабли: Tailwind v4 сканирует
+  КОММЕНТАРИИ кода как классы-кандидаты (токен «aspect + 3:4 в скобках»
+  в докблоке gamma-marquee → next build падал, dev молчал — ловится
+  ТОЛЬКО прод-сборкой); view() у потомков
+  overflow-секции резолвится в контейнер — нужен view-timeline-name на
+  секции; FAQ под RM зависал в opacity:0 (SSR initial + RM-ветка без
+  финала — settled type-swap p/motion.p); карусель: wrap-эвристика
+  advance() при max<шага считала конец из любой позиции + таймер не
+  сбрасывался ручным скроллом; критики в headless врут про ховеры/RM
+  (hover:false, reduce:true — только Playwright); LH-Lantern mobile на
+  общем боксе инфлирует LCP ×2 — верить real-пробе (0.35s).
 
 ---
 
-*Файл сжат c81 (994→~190 строк) по §7. Полные истории циклов:
+*Файл обновлён c83 (~205 строк, §7). Полные истории циклов:
 `docs/AGENTS-HISTORY.md`, `git log worklog.md`.*

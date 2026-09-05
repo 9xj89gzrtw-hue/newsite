@@ -189,3 +189,69 @@ Stage Summary:
   против десктоп-720. Цена: 315KB → 2.67MB видео-байт на мобиле (вне
   критического пути: preload=none + IO + старт после LCP-кадра).
 - Коммит c82: 13d24d0 (1 tsx + новый mp4), push без force, дифф проверен.
+
+---
+Task ID: c83
+Agent: main (Z.ai Code) + ~30 субагентов (аудит, ресёрч, 5 реализаторов
+A/B/C/D/E, фиксеры F1-F5, 4 волны слепых критиков V/U/P ×2-4 сегмента)
+
+Task: «добавь побольше анимации в каждый из блоков» — усиление анимаций
+всех блоков с сохранением перф-бюджетов, вкуса бренда и верифицируемости.
+
+Work Log:
+- Разведка: аудит-агент (инвентаризация анимаций 15 секций, живые/мёртвые
+  keyframes, «дыры») + web-ресёрч (Awwwards/GSAP Vault/motion.dev 2025-26,
+  20+ рецептур). План: 4 параллельных реализатора непересекающимися файлами
+  (§39) + globals-агент последовательно.
+- Реализация: hero scroll-exit (CSS view(), именованный таймлайн — грабля:
+  view() у потомков #hero резолвится в overflow-контейнер, нужен
+  view-timeline-name на секции); Magnetic CTA хедера + scroll-spy
+  (aria-current, метка #AA8440 ≥3:1 на light); kinetic-h2 gg + Magnetic
+  play-pill; shimmer-sweep пила карусели; hover-глисс строк меню +hairline;
+  squash FAQ; focus-underline полей booking; индекс-поп аккордеона;
+  каскад цифр process; hairline тайлов IG; reading-highlight слов band
+  (useScroll→per-word useTransform, sr-only-твин); VelocitySkew wordmark
+  футера + соц y-hop; cookie slide-fill.
+- Волна-1 критиков: FAQ НЕВИДИМ под RM (SSR initial opacity:0 + RM-ветка
+  без финала; F2a: settled type-swap rmSettled? p : motion.p, гидро-паритет);
+  Magnetic без fine-pointer гейта (тап=mousemove; фикс в УТИЛИТЕ — закрыл все
+  вызовы); a11y-пакет.
+- Волна-2: карусель — СТРЕЛКА ОТКАТЫВАЛА scrollLeft (root-cause: wrap-эвристика
+  advance() считала конец из любой позиции при max=80 + 5s-таймер не
+  сбрасывался кликом; F3: snapPoints по rect карточек + restart отсчёта);
+  миноры P2/V2 (дубль-гейт хедера, свайп-сброс таймера, 8.22:1, мёртвый
+  .magnetic-lift, тики <640px, focus-visible вне hover-медиа).
+- Волны-2/3 ЛОЖНЫЕ клеймы разобраны пруфами (§1.2): «телепорты скролла»
+  и «зависание» = OOM-убийцы chrome (4ГБ/0-swap, критики оставляли ~1.8ГБ
+  процессов) + программный scrollTo-vs-Lenis дрейф agent-browser; «cookie
+  auto-consent» = персистентный localStorage профиля критика (Storage.setItem
+  перехват со стеком: 0 записей в 5/5 пассивных сессий).
+- Прод-гейт поймал КРИТИЧЕСКИЙ баг: next build падал — Tailwind v4 сканирует
+  КОММЕНТАРИИ как кандидаты классов; докблок gamma-marquee содержал
+  «aspect-[3:4]» → невалидный aspect-ratio: 3:4 в выходе → PostCSS-парсинг
+  падал (dev-сервер молчал, браузер дропал декларацию). Фикс: комментарий
+  без утилити-токенов + предупреждение в докблоке. Урок в §2.
+- Перф (c81-методика: LH + реальная проба): desktop-preset 89/92 (LCP
+  1.16-1.4s, TBT 68-175ms, CLS 0); mobile REAL LCP 348-392ms (лучше c81
+  0.94s), LH-devtools 2.7s (c81: 3.3s); LH-Lantern mobile ~6.9s/46-53 —
+  инфляция render-delay на общем боксе при 4x-CPU симуляции (§52: гейтить
+  реальной пробой). A11y LH 97.
+- Хозяйство: −611 строк мёртвых keyframes/классов (24 удалено, 5 оставлено
+  с нерындеримыми владельцами), stale-докблоки gamma-marquee/page.tsx,
+  images.qualities [75,82] (−9 dev-варнингов).
+
+Stage Summary:
+- Коммит 678a6ae, push без force. Все 15 секций получили новые анимации
+  (кроме уже-максимальных founder/gamma-separator/gamma-marquee — §1.4).
+- 4 волны слепых критиков: волна-4 U4a APPROVE (9/10, единственный «фейл» —
+  методологический: framer-спринги в JS, не WAAPI); финальная прямая
+  верификация карусели/модалки/бургера/FAQ-тапа — PASS.
+- ГРАБЛИ цикла → §2: (1) Tailwind-комментарий-кандидат; (2) window.scrollTo
+  vs Lenis для e2e-позиционирования — только __lenis.scrollTo или wheel;
+  (3) критикам-субагентам: headless agent-browser отдаёт hover:false и
+  reduce:true — их «мёртвые ховеры/анимации» = слепота инструмента, валид
+  только Playwright; (4) контекст-лимит субагентов: all-in-one скрипт одним
+  запуском вместо интерактива (максимум фактов за минимум раунд-трипов).
+- ОТКРЫТО (c84): lazy-hydration (перенос c81); LH-mobile Lantern на общем
+  боксе — прогонять на чистой машине для честного score; EASE-константа
+  lib/motion-ease (45 файлов дублируют [0.22,1,0.36,1]).
