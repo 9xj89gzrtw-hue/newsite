@@ -50,11 +50,23 @@ import { useReducedMotion } from "framer-motion";
  * @see docs/talkofthetown-MINED-EXTRACTION.md (hero section)
  */
 const HERO_VIDEO = "/media/mculinary/mculinary-hero-720.mp4";
-/* 81-W2F3 [критик H #3: hero-видео 1.5MB на мобиле + decode-таск 1410мс]:
-   мобильная копия — 480×270, h264 Main, crf30, faststart, без звука,
-   315KB (десктоп-720 = 1.49MB; источник 720→480 re-encode ffmpeg).
+/* 81-W2F3 → c82 [владелец: «качество видео на hero на мобильной версии
+   стало прям очень плохим» — правка владельца отменяет byte-оптимизацию
+   волны-2, §1.6]: мобильная копия была 480×270 / 88kbps / 315KB — на
+   390×844 (DPR 2-3) object-cover апскейлит её ×3.5, виден центр ~26%
+   полосы → фактическая резкость ~125px на ширину экрана + макроблоки.
+   Замена: mculinary-hero-portrait-720.mp4 — вертикальный кроп 480×720
+   ЦЕНТРА исходника (x=400..880), закодирован из ОРИГИНАЛА 1.45Mbps
+   (не из пережатой -720) в h264 High, crf21/preset-fast, 751kbps,
+   2.67MB, faststart, без звука. Кроп = ровно та полоса, которую
+   object-cover и так показывает на смартфонах (видимая доля 26-32%
+   ширины при aspect 0.39-0.56) — композиция 1:1 с текущей, но весь
+   битрейт сконцентрирован в видимой зоне: ~4.5× битов на видимый
+   пиксель против десктоп-720, ×30 против старого -480. Планшет
+   (aspect ≥0.67) — cover скейлит по ширине, режет высоту: без боксов.
    Подмена источника — в IO-эффекте ДО первого play() (см. там). */
-const HERO_VIDEO_MOBILE = "/media/mculinary/mculinary-hero-480.mp4";
+const HERO_VIDEO_MOBILE =
+  "/media/mculinary/mculinary-hero-portrait-720.mp4";
 const HERO_POSTER = "/media/hero-premium/hero-premium-6.jpg";
 /* C71-P1 / K8-CRITICAL (Task 2): poster-атрибут видео тянул RAW jpg 595KB
    рядом с next/image-копией (~77KB webp) — двойная загрузка одного визуала.
@@ -119,7 +131,7 @@ export function TottHero() {
     const isMobile =
       window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
 
-    /* 81-W2F3 [H #3]: мобильный источник видео. Ставим video.src ПРЯМО на
+    /* 81-W2F3 [H #3] / c82: мобильный источник видео (портрет-кроп 480×720). Ставим video.src ПРЯМО на
      * <video> (НЕ <source>.src): по HTML-спецификации установка/изменение
      * src-атрибута самого media-элемента ГАРАНТИРОВАННО перезапускает
      * алгоритм загрузки (load), а подмена дочернего <source>.src
