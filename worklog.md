@@ -255,3 +255,54 @@ Stage Summary:
 - ОТКРЫТО (c84): lazy-hydration (перенос c81); LH-mobile Lantern на общем
   боксе — прогонять на чистой машине для честного score; EASE-константа
   lib/motion-ease (45 файлов дублируют [0.22,1,0.36,1]).
+
+---
+Task ID: c84-research
+Agent: web-research subagent (Z.ai Code)
+Task: веб-ресёрч мобильного UX — 7 проблем (scroll-hints, морфинг слов,
+калькулятор, Data Saver, слабые девайсы, мобильная типографика, PDF
+per-tariff). Паттерны 2024-2026, только проверенные живые источники.
+
+Work Log:
+- ~50 web_search запросов + ~35 page_reader чтений (все URL
+  прогнаны curl/page_reader, битые ссылки отброшены; в т.ч. вычислены
+  актуальные слаги web.dev/css-tricks/MDN после миграций).
+- Полный отчёт с код-рецептами: docs/C84-MOBILE-UX-RESEARCH.md.
+- Ключевые находки: NN/G illusion-of-completeness (6/8 юзеров не
+  скроллили full-screen hero) + scrolling-and-attention (80% времени
+  выше фолда); cssanimation.rocks scroll-cue (fade-slide-up + pulse
+  keyframes); WebKit/MDN scroll-driven animations (прогресс-бар без JS,
+  Safari 26+); Magic UI ScrollProgress/WordRotate + react-bits
+  RotatingText — исходники с GitHub (spring damping 25/stiffness 300,
+  Intl.Segmenter grapheme-сплит, AnimatePresence wait); GSAP SplitText
+  (autoSplit + mask lines); NN/G 12 рекомендаций калькуляторов (live
+  пересчёт, embed, без попапов) + progressive disclosure (staged);
+  web.dev Save-Data (детект-код) + Chromium-блог «Data Saver → Lite
+  mode» (прокси-сжатие, Save-Data: On, HTTPS не ломается) + AOSP
+  Data Saver (нельзя: autoplay/prefetch); addyosmani adaptive-loading
+  (react-adaptive-hooks: saveData/deviceMemory/hardwareConcurrency,
+  продакшн Facebook/eBay/Tinder); letsbuildui IO-mount lazy-load
+  (React.lazy+Suspense+IntersectionObserver, rootMargin 200px) =
+  искомый «reffine IO-mount»; react.dev Labs (React 19.2 Activity
+  shipped, ViewTransition canary); motion.dev perf-guide (только
+  transform/opacity, 60fps=16.7ms); css-tricks 16px-инпуты (iOS zoom);
+  aleksandrhovhannisyan clamp-формула (m=(maxF−minF)/(maxBP−minBP));
+  pdf4.dev (route handler, «no PDF lib in browser bundle», таблица
+  методов) — детали+URL в доке.
+- Грабли ресёрча: z-ai web_search возвращает только host_name в url —
+  точные слаги добирались уточняющими запросами и curl-проверкой;
+  Wix-статья про lazy-hydration удалена (404), заменена react.dev Labs
+  + letsbuildui; старые web.dev/css-tricks URL дают 404 без миграции
+  на /articles и без слэша.
+
+Stage Summary:
+- Все 7 проблем закрыты паттернами с проверенными источниками и
+  код-рецептами (готовы к передаче реализаторам c84): топ-5 в доке.
+- Прямые ответы нашему бэклогу: lazy-hydration = IO-mount
+  (letsbuildui-рецепт); мобильный перф = гейтинг по
+  saveData/deviceMemory/cores + framer→CSS; LCP-морфинг хиро =
+  SSR-статика до гидратации; калькулятор = одна страница + sticky
+  live-сводка + scrollIntoView; PDF = серверный route handler с
+  immutable-кэшем или прегенерация в /public.
+- Коммит: только доки (worklog + docs/C84-MOBILE-UX-RESEARCH.md),
+  код не менялся.
