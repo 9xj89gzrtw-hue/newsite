@@ -225,6 +225,9 @@ export function CepProcess() {
         transition={{ duration: 0.6, ease: EASE }}
         className="mb-3 md:mb-8"
       >
+        {/* c85 (понятность): глава 04 — единая нумерация главных глав
+            страницы (см. .ea-chapter в globals.css). Decorative. */}
+        <span className="ea-chapter" aria-hidden="true">Глава 04</span>
         {/* wave-2 G.1: «от и до» duplicated the counter line's «от … до»
             figure; the accent is decorative marginalia → «как это будет».
             Size floor 1.1→0.95rem: the 1.1rem floor bound below ~1100px, so

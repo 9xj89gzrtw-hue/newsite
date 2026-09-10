@@ -79,6 +79,30 @@ import { loadMetrika } from "@/lib/analytics";
  *   Десктоп: карточка переезжает в ПРАВЫЙ нижний угол — контент секций
  *   выровнен слева, первый визит больше не срезает CTA (замер M2 d1440:
  *   −15px/31% высоты «Смотреть меню»). --cookie-banner-h не меняется.
+ *
+ * c85-A (жалоба владельца: «файлы куки вообще в другой стилистике,
+ *   исправь, сделай в стилистике сайта»): визуал переведён со тёмной
+ *   espresso-панели на «бумажную редакционную карточку» светлых секций
+ *   сайта — крем --ea-cream, espresso-чернила, золото:
+ *   - карточка: крем-фон, рамка espresso/12% + золотая кромка 2px сверху,
+ *     радиус 10px, мягкая тень (никакого глассморфизма);
+ *   - заголовок-мини: Marck Script «cookies» 20px, наклон −6° — тот же
+ *     рукописный акцент, что «food as art» на hero (Prata-заголовок в
+ *     карточке 340-370px читался бы тяжелее скрипта);
+ *   - текст 13px/espresso-80 (≈10.8:1 на креме), leading-snug;
+ *   - кнопки: outline espresso (рамка espresso/35, ховер — инверсия:
+ *     заливка espresso + крем-текст), «Принять все» — золотая заливка
+ *     #C9A227 с espresso-текстом 8.22:1, приподнята мягкой золотой тенью;
+ *     капс 12px, трекинг 0.04em, высота 44px; ≥390px — один ряд из трёх
+ *     (flex-1), <390px — перенос (≤2 ряда, карта ≤190px);
+ *   - ссылки «Политика»/«Условия»: espresso-текст (18.32:1) с золотой
+ *     нитью-подчёркиванием (чистое золото текстом на креме = 2.22:1 FAIL —
+ *     поэтому золото только в декоративной нити, hover углубляет её).
+ *   Логика НЕ тронута: KEYS/localStorage, loadMetrika, ResizeObserver +
+ *   --cookie-banner-h, body.cookie-banner-open, safe-area, role/aria,
+ *   decide(). Классы .cookie-cta-solid/.cookie-cta-outline (globals.css)
+ *   сохранены: slide-fill espresso + золотой текст на ховере (8.22:1) —
+ *   та же инверсия, что у hcta-btn шапки, поверх золотой заливки кнопки.
  */
 
 const DISMISS_DAYS = 14;
@@ -96,27 +120,28 @@ const LINK_PRIVACY_HREF = "/privacy";
 const LINK_TERMS_HREF = "/terms";
 
 // Tailwind classnames hoisted so AnimatePresence child JSX stays readable.
-// W2-FIX: py-2.5 → py-4 (компенсация -my-4) — тач-таргет ссылки
-// ~43px → 44px при 12px-тексте (инлайн-бокс 12px + 2×16px паддинг);
-// визуальный размер строки не меняется (-my-4 компенсирует).
-// F4: ссылки — золото на тёмной панели (#C9A227 = 8.22:1, hover #E5C76B
-// = 12.04:1 — фактический расчёт c83-F1, синхронизировано с globals.css);
-// было var(--ea-red) #E71D3A на чёрном ≈ 3.9:1 FAIL.
+// W2-FIX: py-4 (компенсация -my-4) — тач-таргет ссылки ~44px при 12px-тексте.
+// c85-A: ссылки на КРЕМОВОЙ карточке — espresso-текст (18.32:1 на креме #F7F5F5 (замер c85-A))
+// + золотая нить-подчёркивание (декоративная: золото текстом на креме =
+// 2.22:1 FAIL 1.4.3 — поэтому цвет текста espresso, золото только в нити);
+// hover углубляет нить в #8A6D1F и утолщает до 2px. Прежний вариант —
+// золотой текст на тёмной панели — был корректен для espresso-фона.
 const LINK_CLASS =
-  "no-underline text-[#C9A227] transition-colors hover:text-[#E5C76B] hover:underline focus-visible:underline py-4 -my-4";
-// Outline-кнопки — крем на тёмной панели (18.65:1) — уже в бренде.
-// 81-F2: компакт-карточка — px-2 (340px-трек вмещает все 3 кнопки в один
-// ряд даже на 320px-вьюпорте с wrap-страховкой на самый узкий случай).
-// c83-D: .cookie-cta-outline (globals.css) — лёгкий ховер-бордер в золото
-// (цвет-состояние, transform-free, гейт (hover:hover)).
+  "text-[#0A0908] underline decoration-[#C9A227] decoration-1 underline-offset-[3px] transition-colors hover:decoration-[#8A6D1F] hover:decoration-2 focus-visible:decoration-[#8A6D1F] focus-visible:decoration-2 py-4 -my-4";
+// c85-A: outline-кнопки — канон светлых секций: текст espresso на креме
+// (18.27:1), рамка espresso/35, ховер — ИНВЕРСИЯ (заливка espresso +
+// крем-текст 18.32:1), как у hcta-btn шапки. .cookie-cta-outline
+// (globals.css) докрашивает рамку в золото на ховере — цвет-состояние,
+// transform-free, гейт (hover:hover).
 const BTN_OUTLINE_CLASS =
-  "cookie-cta-outline border border-[var(--ea-cream)] bg-transparent text-[var(--ea-cream)] hover:bg-white/10 focus-visible:bg-white/10";
-// F4: solid-кнопка — золотая заливка + espresso-текст (8.22:1; белый на
-// золоте = 2.42:1 FAIL, поэтому текст тёмный); hover — плотнее-золото
-// #B08D22 (6.33:1). Была красная заливка с крем-текстом.
+  "cookie-cta-outline border border-[rgba(10,9,8,0.35)] bg-transparent text-[#0A0908] hover:bg-[#0A0908] hover:text-cream hover:border-[#C9A227] focus-visible:bg-[#0A0908] focus-visible:text-cream focus-visible:border-[#C9A227]";
+// c85-A: solid-кнопка — акцент сайта: золотая заливка #C9A227 +
+// espresso-текст (8.22:1; белый на золоте = 2.42:1 FAIL, поэтому текст
+// тёмный), приподнята мягкой золотой тенью (BTN_SOLID_STYLE ниже).
 // c83-D: .cookie-cta-solid (globals.css) — slide-fill по механике
 // .hcta-btn (site-header.css): ::after espresso-заливка едет снизу
-// 360ms EASE [0.22,1,0.36,1], текст → золото #C9A227, рамка → espresso;
+// 360ms EASE [0.22,1,0.36,1], текст → золото #C9A227 (8.22:1 на espresso),
+// рамка → espresso — ТА ЖЕ ховер-инверсия, что у кнопок сайта.
 // absolute ::after — layout/44px/wrap не меняются. Tailwind hover:bg/border
 // остаются фолбэком под заливкой; фокус — :focus-visible-ветка класса.
 const BTN_SOLID_CLASS =
@@ -125,14 +150,11 @@ const BTN_SOLID_CLASS =
 const BTN_BASE_STYLE: CSSProperties = {
   fontFamily: "var(--ea-font-eyebrow)",
   fontWeight: 700,
-  /* 81-F2: карточка ≤340px ⇒ один ряд из 3 кнопок только при 11px +
-     трекинге 0.03em и px-1 (замер: 0.08em+px-2 = 336px > 306px контента;
-     0.03em+px-1 = ~295px ✓; высота карточки тогда ≈110px ≤ 140px).
-     81-W2F1 (критик E K2): 11 → 12px — читаемость. При 12px ряд из трёх
-     (~332px) НЕ влезает в 306px контента — flex-wrap переносит «Принять
-     все» на вторую строку (ряд 94px, карточка ~156px; hero-CTA по-прежнему
-     свободен — замер research/w2f1). Тач-таргеты не страдают: высота 44px,
-     ширина кнопок ~95px. */
+  /* c85-A: капс 12px + трекинг 0.03em (шкала задачи 12-13px / 0.03-0.06em;
+     бюджет ряда на ≥390px: max-content кнопок 97+119+106 (замер dbg.cjs,
+     px-1.5) → px-1 + 0.03em ≈ 92+114+101 + 2×8 gap = 323 ≤ 332 контента
+     (карта px-3) — один ряд; на <390px — перенос flex-wrap, «Принять все»
+     полной строкой. Тач-таргет 44px (WCAG 2.5.5 / Apple HIG). */
   letterSpacing: "0.03em",
   textTransform: "uppercase",
   lineHeight: 1,
@@ -140,10 +162,21 @@ const BTN_BASE_STYLE: CSSProperties = {
   cursor: "pointer",
   transition:
     "background-color 200ms ease, border-color 200ms ease, color 200ms ease",
-  /* FIX-5 (W1-D NIT): тач-таргет 40 → 44px (WCAG 2.5.5 / Apple HIG);
-     81-F2-замер: на 390px все три кнопки остаются в один ряд. */
+  /* FIX-5 (W1-D NIT): тач-таргет 40 → 44px (WCAG 2.5.5 / Apple HIG).
+     c85-A: minWidth = max-content (inline-стиль сильнее Tailwind-класса —
+     min-w-max не мог его перебить, flex-1 сжимал «Необходимые» до 77px
+     при min-content 111px → текст-оверфлоу, замер btnfit.cjs): кнопка
+     никогда не уже своего текста (подписи 92-114px, замер) — тач-таргет
+     44px выполняется автоматически; нехватка ряда → перенос, не скважок. */
   minHeight: 44,
-  minWidth: 44,
+  minWidth: "max-content",
+};
+
+// c85-A: «Принять все» чуть приподнята над рядом — мягкая золотая тень
+// (только тень, transform-free — канон ховеров сайта).
+const BTN_SOLID_STYLE: CSSProperties = {
+  ...BTN_BASE_STYLE,
+  boxShadow: "0 6px 16px -8px rgba(201, 162, 39, 0.65)",
 };
 
 /** Format today's date as YYYY-MM-DD for the localStorage timestamp suffix. */
@@ -357,24 +390,52 @@ export function EaCookieBanner() {
           exit={exit}
           transition={transition}
         >
+          {/* c85-A: «бумажная редакционная карточка» светлых секций сайта —
+              кремовая бумага, espresso-чернила, тонкая рамка espresso/12%
+              + золотая кромка 2px сверху, радиус 10px, мягкая тень.
+              Было: тёмная espresso-панель с золотой рамкой (глассморфная
+              тяжесть на hero). Максимальная ширина ≤370px; на мобиле —
+              inset-x-4 (позиционирование — на внешнем motion.div, см.
+              докстринг контракта док-зоны). */}
           <div
-            className="mx-auto flex max-w-[358px] sm:max-w-[368px] flex-col gap-2 rounded-2xl px-3 sm:px-4 py-3"
+            className="mx-auto flex max-w-[358px] sm:max-w-[370px] flex-col rounded-[10px] px-3 pt-3 pb-3 sm:px-4 sm:pt-3.5 sm:pb-4"
             style={{
-              /* F4: тёмная espresso-панель бренда + золотая рамка (была
-                 чёрная с красной рамкой — K1 «вне бренда»); 81-F2:
-                 скруглённая карточка + мягкая тень (стилистика системы). */
-              background: "rgba(10, 9, 8, 0.97)",
-              border: "1px solid #C9A227",
-              color: "var(--ea-cream)",
+              background: "var(--ea-cream, #F7F5F1)",
+              border: "1px solid rgba(10, 9, 8, 0.12)",
+              borderTop: "2px solid #C9A227",
+              color: "#0A0908",
               boxShadow:
-                "0 18px 44px -14px rgba(0, 0, 0, 0.55), 0 4px 14px -8px rgba(0, 0, 0, 0.4)",
+                "0 16px 40px -16px rgba(10, 9, 8, 0.3), 0 4px 12px -8px rgba(10, 9, 8, 0.18)",
             }}
           >
+            {/* Заголовок-мини — рукописный акцент бренда: Marck Script
+                «cookies» с наклоном −6° (приём «food as art» на hero);
+                наклон на внутреннем span, чтобы не конфликтовать с
+                line-box'ом. Не заголовок-элемент: регион уже несёт
+                aria-label, структуру документа не загрязняем. */}
             <p
-              className="m-0 text-[12px] leading-snug"
+              className="m-0 mb-0.5 text-[20px] leading-none"
+              style={{
+                fontFamily: "var(--font-marck), var(--font-script), cursive",
+                fontWeight: 400,
+                color: "#0A0908",
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  transform: "rotate(-6deg)",
+                  transformOrigin: "center",
+                }}
+              >
+                cookies
+              </span>
+            </p>
+            <p
+              className="m-0 text-[13px] leading-snug"
               style={{
                 fontFamily: "var(--ea-font-body)",
-                color: "color-mix(in srgb, var(--ea-cream) 85%, transparent)",
+                color: "rgba(10, 9, 8, 0.8)",
               }}
             >
               Мы используем cookies для аналитики. Подробнее:{" "}
@@ -396,16 +457,20 @@ export function EaCookieBanner() {
                 Условия
               </a>.
             </p>
-            <div className="flex flex-row flex-wrap items-center justify-end gap-1.5">
-              {/* F4: применяю осиротевшие (C59) BTN_*_CLASS — дизайн-интент
-                  докстринга «один акцент: filled Accept + outline остальные»
-                  не рендерился вовсе (замер: все 3 кнопки прозрачные без рамок).
-                  Теперь: outline-крем × 2 + золотая заливка у «Принять все». */}
+            {/* Кнопки: ≥390px — один ряд из трёх (flex-1 + inline
+                min-width:max-content — равные доли, но не уже текста;
+                замер c85-A: чистый flex-1 сжимал «Необходимые» до 77px при
+                min-content 111px → overflow), <390px — аккуратный перенос
+                flex-wrap («Принять все» приезжает полной строкой).
+                whitespace-nowrap — «ПРИНЯТЬ ВСЕ» не рвётся в 2 строки
+                внутри кнопки. Один акцент: золотая заливка только у
+                «Принять все» — restraint-принцип докстринга. */}
+            <div className="mt-2 flex flex-row flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => decide("rejected")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_OUTLINE_CLASS} px-1 py-2 text-[12px]`}
+                className={`${BTN_OUTLINE_CLASS} flex-1 whitespace-nowrap px-1 py-2 text-[12px]`}
               >
                 Отклонить
               </button>
@@ -413,15 +478,15 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("essential")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_OUTLINE_CLASS} px-1 py-2 text-[12px]`}
+                className={`${BTN_OUTLINE_CLASS} flex-1 whitespace-nowrap px-1 py-2 text-[12px]`}
               >
                 Необходимые
               </button>
               <button
                 type="button"
                 onClick={() => decide("accepted")}
-                style={BTN_BASE_STYLE}
-                className={`${BTN_SOLID_CLASS} px-1 py-2 text-[12px]`}
+                style={BTN_SOLID_STYLE}
+                className={`${BTN_SOLID_CLASS} flex-1 whitespace-nowrap px-1 py-2 text-[12px]`}
               >
                 Принять все
               </button>

@@ -630,6 +630,9 @@ export function EaFounderStory() {
 
           {/* — — ПРАВАЯ: хроника одних рук — — */}
           <div className="efs__body">
+            {/* c85 (понятность): глава 06 — единая нумерация главных глав
+                страницы (см. .ea-chapter в globals.css). Decorative. */}
+            <span className="ea-chapter" aria-hidden="true">Глава 06</span>
             <motion.span
               key={`eyebrow-${on}`}
               className="ea-eyebrow efs__eyebrow"

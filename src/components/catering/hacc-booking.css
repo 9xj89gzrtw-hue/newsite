@@ -1676,6 +1676,21 @@
   white-space: nowrap;
 }
 .hb-badge__dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+/* c85-PERF: пульс золотой точки — ЧИСТЫЕ CSS-keyframes (был бесконечный
+   framer-motion луп: 259 inline-style записей на прокрутку, каждый кадр
+   на main thread). transform+opacity → композитор; паузы нет — анимация
+   бесконечная, но бесплатная вне кадров браузер сам не тикает.
+   prefers-reduced-motion — статичная точка (гейт ниже). */
+@keyframes hb-badge-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.75; }
+}
+.hb-badge__dot[aria-hidden="true"] {
+  animation: hb-badge-pulse 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-badge__dot[aria-hidden="true"] { animation: none; }
+}
 .hb-badge--open .hb-badge__dot { background: #2f9e44; box-shadow: 0 0 0 3px rgba(47, 158, 68, 0.16); }
 .hb-badge--closed .hb-badge__dot { background: var(--hb-red-deep); box-shadow: 0 0 0 3px rgba(185, 20, 49, 0.12); }
 .hb-badge__next { font-weight: 400; color: color-mix(in srgb, var(--hb-ink) 52%, transparent); }

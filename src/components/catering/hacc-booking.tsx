@@ -587,26 +587,25 @@ function TotalDelta({ total, animate }: { total: number; animate: boolean }) {
  * и график офиса удалены по требованию владельца: заявки читаем круглосуточно,
  * обещание перезвона — «сразу, как увидим заявку», без привязки к часам.
  * Точка — золотая (var(--gold)), мягко пульсирует: scale 1↔1.25 + opacity,
- * 2.4s, transform-only, framer-motion. Отступление от «ноль бесконечных
- * анимаций в TSX» (SPEC §4.5) — сознательное, по прямому запросу владельца;
- * prefers-reduced-motion — статичная точка. SSR/первый рендер — статика
- * (§34: анимационные ветки свапаются после монта).
+ * 2.4s.
+ * c85-PERF (замер CPU-профиля: 259 inline-style записей на .hb-badge__dot
+ * за одну прокрутку — бесконечный framer-луп тикал на main thread КАЖДЫЙ
+ * кадр, пока секция в кадре): пульс переведён на ЧИСТЫЕ CSS-keyframes
+ * (globals.css, @keyframes hb-badge-pulse — композитор, 0 JS-кадров).
+ * prefers-reduced-motion гейтится в CSS. Компонент стал серверо-рендеримым
+ * (ни хуков, ни motion) — «ноль бесконечных анимаций в TSX» (SPEC §4.5)
+ * восстановлен без потери движения.
  */
 function AnytimeBadge() {
-  const mounted = useMounted();
-  const reduce = useReducedMotion();
-  const pulse = mounted && !reduce;
   return (
     <span className="hb-badge">
-      <motion.span
+      <span
         className="hb-badge__dot"
         style={{
           background: "var(--gold)",
           boxShadow: "0 0 0 3px color-mix(in srgb, var(--gold) 24%, transparent)",
         }}
         aria-hidden="true"
-        animate={pulse ? { scale: [1, 1.25, 1], opacity: [1, 0.75, 1] } : undefined}
-        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
       />
       <span>Отвечаем в любое время</span>
     </span>
@@ -3093,6 +3092,9 @@ export function HaccBooking() {
                устранён — остаётся ТОЛЬКО наклонный TiltedAccent; вторая строка
                H2 — с новой строки (блок-строка .hb-h2-line). ── */}
         <div className="hb-head">
+          {/* c85 (понятность): глава 05 — единая нумерация главных глав
+              страницы (см. .ea-chapter в globals.css). Decorative. */}
+          <span className="ea-chapter" aria-hidden="true">Глава 05</span>
           <TiltedAccent text="смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
           <h2 id="hbooking-heading" className="ea-section-h2">
             {"Соберите банкет. "}

@@ -3,7 +3,7 @@
 import Lenis from "lenis";
 import { useEffect } from "react";
 import { useLiteDevice } from "@/hooks/use-lite-device";
-import { isLiteDevice, subscribeLiteDevice } from "@/lib/lite-device";
+import { isLiteDevice, startFpsProbeOnce, subscribeLiteDevice } from "@/lib/lite-device";
 
 /**
  * Smooth-scroll provider (Lenis) with GSAP ScrollTrigger bridge.
@@ -43,8 +43,16 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
   /* c84-F1: html.lite-device — CSS-гейт растровых анимаций (см. докстринг).
      Эффект без deps: класс живёт пока живёт провайдер (layout) — при
-     lite-даунгрейде по ходу сессии (connection.change) useLiteDevice
-     перезапускает init-эффект, а класс уже стоит. */
+     lite-даунгрейде по ходу сессии (connection.change / FPS-зонд c85)
+     useLiteDevice перезапускает init-эффект, а класс уже стоит. */
+  /* c85: живой FPS-зонд — спит до первого скролла, затем 2.2с мерит
+     кадры; p80 > 26ms → честный даунгрейд в lite (слабый ПК ловится
+     измерением, не эвристикой cores, которая на WebKit клампится —
+     см. lib/lite-device.ts). Идемпотентен, гонок нет: зонд пассивен. */
+  useEffect(() => {
+    startFpsProbeOnce();
+  }, []);
+
   useEffect(() => {
     const root = document.documentElement;
     if (isLiteDevice()) root.classList.add("lite-device");

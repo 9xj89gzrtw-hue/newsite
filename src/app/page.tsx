@@ -216,8 +216,10 @@ function HaccBookingShell() {
       <div className="ea-container ea-container--wide">
         {/* Шапка — 1:1 с живым виджетом (hacc-booking.tsx: hb-head):
             одинаковая разметка/классы => свап фоллбэка не двигает
-            заголовок (зона текста — CLS=0), SSR-HTML получает H2+лид. */}
+            заголовок (зона текста — CLS=0), SSR-HTML получает H2+лид.
+            c85: глава 05 — зеркалит живой виджет (единая нумерация). */}
         <div className="hb-head">
+          <span className="ea-chapter" aria-hidden="true">Глава 05</span>
           <TiltedAccent text="смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
           <h2 id="hbooking-heading" className="ea-section-h2">
             {"Соберите банкет. "}

@@ -83,6 +83,12 @@ export function VerticalBrandLabel() {
     if (typeof window === "undefined") return;
 
     let rafId = 0;
+    /* c85-PERF (замер CPU-профиля: update 267ms self на прокрутку):
+       setVisible вызывался на КАЖДОМ скролл-кадре — React bail-out на
+       том же булеве всё равно гоняет рендер-попытку (в DEV — jsxDEV).
+       Гвард: стейт и body-класс меняются ТОЛЬКО при реальной смене
+       isPast (2 перехода за сессию вместо ~400 рендер-попыток). */
+    let lastIsPast: boolean | null = null;
     const update = () => {
       rafId = 0;
       // Fade in when the user has scrolled past ~85% of the hero. The
@@ -92,6 +98,8 @@ export function VerticalBrandLabel() {
       // the hero fully exits — feels more responsive.
       const threshold = window.innerHeight * 0.85;
       const isPast = window.scrollY > threshold;
+      if (isPast === lastIsPast) return;
+      lastIsPast = isPast;
       setVisible(isPast);
       // Toggle body.has-sidebar so the global body padding-left
       // animates 0 → 72px (synchronized with the sidebar's opacity

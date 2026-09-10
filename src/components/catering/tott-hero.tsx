@@ -46,8 +46,9 @@ import { useLiteDevice } from "@/hooks/use-lite-device";
  *   useReducedMotion остался ТОЛЬКО для видео-гейта (IO-эффект ниже);
  *   reduced-motion для hero-входа гейтится в CSS (animation: none).
  * The SiteHeader sits in normal flow AFTER this hero and is sticky top-0 —
- * see site-header.tsx. Hero height lives in globals.css (#hero, c84-A:
- * 92svh + hero-peek) — не в утилите-классе здесь.
+ * see site-header.tsx. Hero height lives in globals.css (#hero, c85: полный
+ * экран 100dvh/100svh/100vh — прямое указание владельца «во весь экран»)
+ * — не в утилите-классе здесь.
  *
  * @see docs/talkofthetown-MINED-EXTRACTION.md (hero section)
  */
@@ -233,21 +234,15 @@ export function TottHero() {
       id="hero"
       data-header-theme="transparent"
       aria-label="nilov catering — лучший кейтеринг Санкт-Петербурга"
-      /* c84-A (задача 4b, hero-peek): высота 100svh → 92svh — следующий
-         контент (SiteHeader в потоке после hero) выглядывает ~8% над
-         фолдом (NN/G «illusion of completeness»: 6 из 8 юзеров не
-         листали full-screen хиро). Высота живёт в globals.css (#hero,
-         id-специфичность бьёт утилиту) с vh-фоллбеком для браузеров
-         без svh.
-         РЕШЕНИЕ по снапшоту (замер+VLM, подробности в worklog c84-A):
-         peek ОСТАВЛЕН (67px @390 = лого+навигация, VLM «осознанная
-         подсказка» в чистом состоянии) + добавлен .hero-bottom-fade —
-         градиент-фэйд низа, чтобы белый срез читался как граница, а не
-         случайный обрез. Известная интеракция: на ПЕРВОМ визите
-         cookie-баннер (fixed, bottom 140px — контракт c81 под 100svh)
-         перекрывает метку «Листайте» (cue привязан к низу 92svh-героя,
-         поднялся на 8svh). Повторные визиты — чисто. Файл баннера не
-         мой — координация задокументирована в worklog. */
+      /* c85 (указание владельца: «херо надо чтобы было во весь экран»):
+         высота живёт в globals.css (#hero — id-специфичность бьёт
+         утилиту): 100vh → 100svh → 100dvh (динамический вьюпорт —
+         ровно видимая высота при любом состоянии адресной строки
+         iOS/Android). Прежний 92svh-peek снят; сигнал «можно листать» —
+         scroll-cue «Листайте» + .hero-bottom-fade (тёмный пьедестал
+         низа). Cookie-баннер первого визита прячет cue правилом
+         body.cookie-banner-open .hero-cue-wrap { visibility: hidden }
+         (globals.css). */
       className="relative w-full overflow-hidden bg-black"
       /* F4 / задача 2 (K1 MAJOR «first-paint крем-вспышка»): инлайновый
          SSR-гейт — тёмный espresso-фон секции сериализуется прямо в HTML,

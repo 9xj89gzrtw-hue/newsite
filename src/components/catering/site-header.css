@@ -201,3 +201,37 @@ header[data-header-scheme="dark"] .hnav-link::before {
     transition: none;
   }
 }
+
+/* ── 5. c85-B: дровер — точка «на связи» ──────────────────────────────── */
+
+/* Паттерн золотой точки бейджа калькулятора (hb-badge__dot,
+   hacc-booking.css): var(--gold) + мягкое гало, пульс scale 1↔1.25 +
+   opacity, 2.4с — чистые CSS-keyframes (композитор, ноль JS-кадров),
+   prefers-reduced-motion — статичная точка. Живёт в подписи-строке
+   «Отвечаем в любое время» рядом с плитками Telegram/WhatsApp. */
+.hnav-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  background: var(--gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 24%, transparent);
+  animation: hnav-live-dot-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes hnav-live-dot-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hnav-live-dot {
+    animation: none;
+  }
+}

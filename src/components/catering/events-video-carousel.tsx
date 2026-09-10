@@ -587,6 +587,9 @@ export function EventsVideoCarousel() {
           transition={reduceSettled ? { duration: 0 } : { duration: 0.7, ease: EASE }}
         >
           <div className="ea-evt-video__heading-block">
+            {/* c85 (понятность): глава 03 — единая нумерация главных глав
+                страницы (см. .ea-chapter в globals.css). Decorative. */}
+            <span className="ea-chapter" aria-hidden="true">Глава 03</span>
             <span className="ea-eyebrow--script">Видео с наших мероприятий</span>
             <h2 className="ea-section-h2 ea-evt-video__h2">
               {"Не только блюда. "}

@@ -124,6 +124,13 @@ export function CepInstagramGrid() {
     >
       {/* Header row — H2 + IG handle link */}
       <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-full">
+          {/* c85 (понятность): глава 08 — единая нумерация главных глав
+              страницы (см. .ea-chapter в globals.css). Decorative.
+              min-w-full — занимает строку целиком (flex-wrap), H2 и ссылка
+              продолжают прежнюю items-end-строку ниже. */}
+          <span className="ea-chapter" aria-hidden="true">Глава 08</span>
+        </div>
         {/*
           Cycle 34 WOW graft — sondaven.com split-line word stagger. The H2
           "СЛЕДИТЕ ЗА НАМИ" reveals word-by-word (mask + translateY 110%→0%

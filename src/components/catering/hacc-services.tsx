@@ -1046,6 +1046,9 @@ export function HaccServices() {
           transition={reduceSettled ? { duration: 0 } : { duration: 0.7, ease: EASE }}
         >
           <div className="hacc__head-text">
+            {/* c85 (понятность): глава 01 — единая нумерация главных глав
+                страницы (см. .ea-chapter в globals.css). Decorative. */}
+            <span className="ea-chapter" aria-hidden="true">Глава 01</span>
             {/* C71: eyebrow собирается перебором символов (ScrambleText):
                 тот же класс/шрифт/цвет. A11y (81-F3): sr-only-твин внутри
                 носителя + aria-hidden скрамбл-узел — aria-label на generic-

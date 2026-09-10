@@ -429,14 +429,22 @@ export function GammaMarquee() {
   // changes never drag the animation back onto the main thread (a GSAP
   // timeScale tween would reintroduce the Cycle 41 freeze).
   //
-  // Perf: no always-on rAF. The loop wakes on scroll events (passive) and
-  // self-terminates ~0.2s after the last one, once the rate settles at 1.
-  // During pointer-drag the keyframes are `animation: none` (inline), so
-  // getAnimations() is empty and the loop is a no-op.
+  // PERF (§43): слушатель scroll (passive) существует ТОЛЬКО пока секция в
+  // зоне видимости ±20% (IntersectionObserver снимает его вне зоны);
+  // внутри — ≤1 rAF на событие скролла. В покое — ноль слушателей, ноль rAF.
+  //
+  // c85-PERF (замер CPU-профиля: GammaMarquee.loop 1471ms self на прокрутку
+  // страницы — 6.6% всего CPU): (1) track.getAnimations() вызывался КАЖДЫЙ
+  // кадр лупа — аллокация+обход всех анимаций поддерева; теперь CSSAnimation
+  // КЭШИРУЕТСЯ при первом apply и пере-резолвится только если кэш умер
+  // (drag-режим ставит animation:none inline). (2) Луп + scroll-слушатель
+  // живут ТОЛЬКО пока секция в кадре ±20% — вне экрана velocity-эффект
+  // всё равно не виден; IO снимает всё хозяйство (паттерн SdZoomFallback).
   React.useEffect(() => {
     if (!mounted || reducedMotion) return;
     const track = trackRef.current;
-    if (!track) return;
+    const section = sectionRef.current;
+    if (!track || !section) return;
 
     const MAX_RATE = 2.2;
     const MIN_RATE = 0.6;
@@ -455,14 +463,32 @@ export function GammaMarquee() {
     let vel = 0; // smoothed signed px/ms
     let rate = 1;
     let lastScrollAt = 0;
+    /* c85: кэш CSSAnimation — getAnimations() ДОРОГОЙ (замер: 202ms на
+       прокрутку при вызове каждый кадр). Живёт пока жива keyframes-анимация
+       (class --anim не снимается; drag ставит animation:none inline —
+       тогда кэш пуст и apply() молча no-op до конца drag). */
+    let cachedAnim: CSSAnimation | null = null;
 
-    const apply = () => {
+    const resolveAnim = (): CSSAnimation | null => {
+      if (cachedAnim && cachedAnim.playState !== "finished") {
+        // animation:none (drag) останавливает CSSAnimation → playState
+        // отменён/finished; лёгкая проверка живости перед возвратом кэша.
+        return cachedAnim;
+      }
       const anims = track.getAnimations();
       for (const a of anims) {
         if ((a as CSSAnimation).animationName === "gamma-marquee-scroll") {
-          a.playbackRate = rate;
+          cachedAnim = a as CSSAnimation;
+          return cachedAnim;
         }
       }
+      cachedAnim = null;
+      return null;
+    };
+
+    const apply = () => {
+      const a = resolveAnim();
+      if (a) a.playbackRate = rate;
     };
 
     const loop = (now: number) => {
@@ -498,13 +524,42 @@ export function GammaMarquee() {
       }
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
+    /* c85-PERF: всё хозяйство (scroll-слушатель + луп) монтируется ТОЛЬКО
+       когда секция в кадре ±20% — вне экрана эффект невидим, слушателей
+       ноль (грабля §52: анимация вне экрана бесплатно не бывает). */
+    let listenersOn = false;
+    const setListeners = (on: boolean) => {
+      if (on === listenersOn) return;
+      listenersOn = on;
+      if (on) {
+        window.addEventListener("scroll", onScroll, { passive: true });
+      } else {
+        window.removeEventListener("scroll", onScroll);
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = 0;
+        }
+        running = false;
+        rate = 1;
+        vel = 0;
+        apply(); // вернуть естественную скорость на выходе из кадра
+      }
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        setListeners(entries.some((en) => en.isIntersecting));
+      },
+      { rootMargin: "20% 0px" },
+    );
+    io.observe(section);
+
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = 0;
+      io.disconnect();
+      setListeners(false);
       // Leave the animation at natural speed for whoever mounts next.
-      for (const a of track.getAnimations()) {
+      const anims = track.getAnimations();
+      for (const a of anims) {
         if ((a as CSSAnimation).animationName === "gamma-marquee-scroll") {
           a.playbackRate = 1;
         }

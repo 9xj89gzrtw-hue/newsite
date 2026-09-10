@@ -239,6 +239,15 @@ export function EaFaqAccordion() {
             bold). Глобальную переменную НЕ трогаю (она используется и
             крупно — дивайдеры/карусельные точки), затемняю ТОЛЬКО здесь:
             #7A6362 = 5.10:1 ✓ AA. */}
+        {/* c85 (понятность): глава 07 — единая нумерация главных глав
+            страницы (см. .ea-chapter в globals.css). Decorative. */}
+        <RevealP
+          className="text-center"
+          style={{ color: "#7A6362" }}
+          {...reveal(0)}
+        >
+          <span className="ea-chapter" aria-hidden="true">Глава 07</span>
+        </RevealP>
         <RevealP
           className="ea-eyebrow--script text-center"
           style={{ color: "#7A6362" }}
