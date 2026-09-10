@@ -16,8 +16,10 @@
  *  - odometer гостей: ОДИН useSpring + per-digit useTransform (строки-em),
  *    ноль setState на кадр; итог — MotionValue<string> как child текста
  *    (textContent обновляется мимо React);
- *  - calcTotal — useMemo([typeId, guests, date]), addons = [] (юзер просил
- *    убрать секцию «Дополнительно»);
+ *  - calcTotal — useMemo([typeId, guests, pkgIdx, addonIds, date]): цена
+ *    за гостя — из ВЫБРАННОГО пакета, допуслуги входят в итог (c84-B: новая
+ *    инструкция владельца «пакеты + допуслуги» перекрыла старый контракт
+ *    «секцию Дополнительно убрать» — возвращены в hacc-эстетике);
  *  - форма — изолированный React.memo-компонент: keystroke перерисовывает
  *    только форму, чек/контролы не трогает;
  *  - draft localStorage — дебаунс 300 мс (в contact.tsx был на каждый
@@ -174,7 +176,8 @@
  *     внешние replaceState из hacc-menu подхватываются эффектом синхронизации);
  *  2. presetCalculator-совместимость — те же хуки nuqs читают
  *     history.replaceState из hacc-menu;
- *  3. pricing.ts не тронут; calcTotal(..., [], date); formatRUB везде;
+ *  3. pricing.ts: calcTotal(typeId, guests, addonIds, date, pkgIdx?) — 5-й
+ *     аргумент опционален, прежние 4-арг вызовы не ломаются; formatRUB везде;
  *  4. POST /api/lead + чтение error из 400-ответа в toast;
  *  5. PHONE_REGEX + normalizePhone — единый источник для поля и сабмита;
  *  6. draft «catering-lead-draft»: EMPTY ← draft ← URL (URL живёт в nuqs,
@@ -214,6 +217,7 @@ import {
 } from "framer-motion";
 import {
   AlertCircle,
+  ArrowDown,
   ArrowRight,
   CalendarDays,
   Check,
@@ -240,13 +244,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import type { ComponentProps } from "react";
 import type { Calendar as CalendarType } from "@/components/ui/calendar";
 import { useMounted } from "@/hooks/use-mounted";
+import { useLiteDevice } from "@/hooks/use-lite-device";
 import { CONTACTS } from "@/lib/config";
 import { anchorClickGoal, GOALS, trackGoal } from "@/lib/analytics";
 import { YANDEX_MAPS } from "@/lib/media";
 import {
+  ADDONS,
   MENU_TYPES,
   calcTotal,
   formatRUB,
+  type Addon,
   type MenuType,
 } from "@/lib/pricing";
 
@@ -787,10 +794,16 @@ function LazyMap() {
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const [near, setNear] = useState(false);
   const [active, setActive] = useState(false);
+  /* c84-F1 (критик P1-D3, MINOR): в эконом-режиме/на слабых устройствах
+     живой iframe Яндекс-карты (172KB JS + cross-origin longtask 337ms на
+     3g-эмуляции) не грузится ВООБЩЕ — плейсхолдер-карточка с адресом;
+     тап ведёт на внешнюю карту (YANDEX_MAPS.href) в новой вкладке.
+     Функция «посмотреть где мы» сохранена, трафика ноль. */
+  const lite = useLiteDevice();
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || near) return;
+    if (!el || near || lite) return;
     const io = new IntersectionObserver(
       (entries) => {
         const e = entries[0];
@@ -803,7 +816,7 @@ function LazyMap() {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [near]);
+  }, [near, lite]);
 
   /* K7-FIX (P2): активация с передачей фокуса в iframe. rAF — после
    * коммита React (снятие role/tabIndex с обёртки): без этого браузер
@@ -821,23 +834,40 @@ function LazyMap() {
       activate();
     }
   };
+  /* c84-F3 (критик C, MAJOR a11y): lite-ветка обязана оставаться
+     клавиатурно-доступной (WCAG 2.1.1 Level A) — раньше lite-див
+     терял role/tabIndex/onKeyDown, сохраняя onClick: users экономного
+     режима (та же аудитория lite) не могли открыть карту ни Enter'ом,
+     ни скринридером. Тап/Enter = window.open внешней карты. */
+  const onLiteKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      window.open(YANDEX_MAPS.href, "_blank", "noopener");
+    }
+  };
 
   return (
     <div
       ref={ref}
       className="hb-map"
-      data-active={active ? "true" : "false"}
-      {...(!active
+      data-active={active && !lite ? "true" : "false"}
+      {...(!active && !lite
         ? {
             role: "button" as const,
             tabIndex: 0 as const,
             "aria-label": "Нажмите, чтобы активировать интерактивную карту",
           }
-        : {})}
-      onClick={activate}
-      onKeyDown={onKeyDown}
+        : lite
+          ? {
+              role: "button" as const,
+              tabIndex: 0 as const,
+              "aria-label": "Открыть карту проезда в новой вкладке",
+            }
+          : {})}
+      onClick={lite ? () => window.open(YANDEX_MAPS.href, "_blank", "noopener") : activate}
+      onKeyDown={lite ? onLiteKeyDown : onKeyDown}
     >
-      {near ? (
+      {near && !lite ? (
         <>
           <iframe
             ref={frameRef}
@@ -863,6 +893,16 @@ function LazyMap() {
         <div className="hb-map__ph" aria-hidden="true">
           <MapPin className="size-6" />
           <span>{YANDEX_MAPS.address}</span>
+          {/* c84-F1: lite-подпись — честный аффорданс внешней карты.
+              c84-F3: в lite обёртка теперь role=button c aria-label —
+              внутренности всегда декоративны для SR (адрес дублируется
+              в контактах), было aria-hidden={lite?undefined:true}. */}
+          {lite && (
+            <span className="hb-map__hint">
+              <MapPin className="size-4" />
+              Открыть карту в новой вкладке
+            </span>
+          )}
         </div>
       )}
     </div>
@@ -959,6 +999,8 @@ const LeadForm = memo(function LeadForm({
   dateIso,
   total,
   undecided,
+  pkgIdx,
+  addonIds,
   toastPromise,
   onSuccess,
 }: {
@@ -972,11 +1014,24 @@ const LeadForm = memo(function LeadForm({
   total: number;
   /** Fix5 V6: формат ещё не выбран — без цены, с необязательным комментарием. */
   undecided: boolean;
+  /** c84-B (задача 4): 0-based индекс пакета — в message «Пакет: …» и в
+   *  событие catering:calc-lead (клампится по packages текущего типа). */
+  pkgIdx: number;
+  /** c84-B (задача 4): выбранные допуслуги (id из ADDONS) — в message
+   *  «Допуслуги: …» и в событие (метки берём из ADDONS — один источник). */
+  addonIds: string[];
   /** Обещание перезвона для тоста — без привязки к часам (task 7-E). */
   toastPromise: string;
   onSuccess: (
     id: string | number | undefined,
-    detail: { typeId: string; guests: number; dateIso: string; total: number },
+    detail: {
+      typeId: string;
+      guests: number;
+      dateIso: string;
+      total: number;
+      pkgIdx: number;
+      addonIds: string[];
+    },
   ) => void;
 }) {
   const [step, setStep] = useState<0 | 1>(0);
@@ -1152,6 +1207,13 @@ const LeadForm = memo(function LeadForm({
             [
               undecided && "Формат ещё не выбран — нужна помощь с подбором",
               dateHuman && `Желаемая дата: ${dateHuman}`,
+              /* c84-B (задача 4): выбор пакета и допуслуг едет в лид текстом
+                 message (поля БД не меняем — schema.prisma неприкосновенна,
+                 zod-схема /api/lead уже принимает message ≤2000 и так). */
+              !undecided && pkgName && `Пакет: ${pkgName}`,
+              !undecided &&
+                selectedAddons.length > 0 &&
+                `Допуслуги: ${selectedAddons.map((a) => a.label).join(", ")}`,
               preferredTime && `Желаемое время звонка: ${preferredTime}`,
               !undecided && total > 0 && `Расчёт с сайта: ~${formatRUB(total)}`,
               comment && `Комментарий: ${comment}`,
@@ -1203,6 +1265,9 @@ const LeadForm = memo(function LeadForm({
         guests,
         dateIso,
         total,
+        /* c84-B: снимок выбора (пакет + допуслуги) — в событие лида. */
+        pkgIdx,
+        addonIds,
       });
     } catch (err) {
       /* K4-F1 (Task 5): прерванный по таймауту fetch — отдельная причина
@@ -1221,8 +1286,17 @@ const LeadForm = memo(function LeadForm({
   };
 
   const menuType = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
+  /* c84-B: производные выбора для сводки шага 2 и текста лида. */
+  const pkgName = undecided
+    ? null
+    : (menuType.packages[
+        Math.max(0, Math.min(pkgIdx, menuType.packages.length - 1))
+      ]?.name ?? null);
+  const selectedAddons = ADDONS.filter((a) => addonIds.includes(a.id));
   /* Fix5 V6: формат в сводке — для undecided показываем честное «Подберём вместе». */
-  const formatLabel = undecided ? "Подберём вместе" : menuType.label;
+  const formatLabel = undecided
+    ? "Подберём вместе"
+    : `${menuType.label}${pkgName ? ` · ${pkgName}` : ""}`;
 
   /* D3 (task 9-fix2): focus-хвосты (красные утилиты Tailwind) сняты —
      фокус поля теперь ink/золото из CSS; красный — ТОЛЬКО aria-invalid. */
@@ -1443,6 +1517,14 @@ const LeadForm = memo(function LeadForm({
                     <dd>{dateHuman}</dd>
                   </div>
                 )}
+                {/* c84-B: выбранные допуслуги в мини-сводке шага 2 — юзер
+                    видит, что именно уедет в заявку (до кнопки Отправить). */}
+                {selectedAddons.length > 0 && (
+                  <div className="hb-summary__row">
+                    <dt>Допуслуги</dt>
+                    <dd>{selectedAddons.map((a) => a.label).join(", ")}</dd>
+                  </div>
+                )}
                 <div className="hb-summary__row">
                   <dt>Имя</dt>
                   <dd>{name}</dd>
@@ -1659,14 +1741,20 @@ function SuccessPanel({
 function StickyBar({
   total,
   guests,
+  addonsCount,
   visible,
   onCta,
+  onTotal,
 }: {
   /** null для «Ещё решаю» (Fix5 V6) — вместо цены показываем «после подбора». */
   total: number | null;
   guests: number;
+  /** c84-B: N выбранных допуслуг — краткая метка «· +N доп.» в строке гостей. */
+  addonsCount: number;
   visible: boolean;
   onCta: () => void;
+  /** c84-B: тап по блоку суммы — скролл к чек-панели (детализация цены). */
+  onTotal: () => void;
 }) {
   useEffect(() => {
     const root = document.documentElement;
@@ -1730,14 +1818,23 @@ function StickyBar({
       data-visible={visible}
       inert={!visible}
     >
-      <p className="hb-bar__total">
+      {/* c84-B: блок суммы — КНОПКА: тап ведёт к смета-чеку (итог уже
+          включает допуслуги — calcTotal родителя). Активных аддонов > 0 —
+          краткая метка в строке гостей: «30 гостей · +2 доп.». */}
+      <button
+        type="button"
+        className="hb-bar__total"
+        onClick={onTotal}
+        aria-label={`Показать смету-чек: примерно ${total != null ? formatRUB(total) : "после подбора"}`}
+      >
         <span className="hb-bar__total-label">Итого</span>
         {/* Fix5 V6: у undecided цены нет — честный текст вместо «~0 ₽». */}
         <b>{total != null ? `~${formatRUB(total)}` : "после подбора"}</b>
         <span className="hb-bar__guests">
           {guests} {guestsLabel(guests)}
+          {addonsCount > 0 ? ` · +${addonsCount} доп.` : ""}
         </span>
-      </p>
+      </button>
       <button
         type="button"
         onClick={onCta}
@@ -1884,6 +1981,104 @@ function PrintLine({
   );
 }
 
+/* ================================================== ПАКЕТЫ МЕНЮ (c84-B, t.1) */
+
+/**
+ * Сегмент-контрол пакетов выбранного типа — React.memo в духе TypeGrid:
+ * перерисовывается только при смене типа/пакета (props: type + pkgIdx +
+ * stable onSelect). Данные — MENU_TYPES[i].packages (у банкета
+ * Базовый/Стандарт/Премиум, у snack-box — именованные наборы: рендерим как
+ * есть, 2–4 кнопки).
+ *
+ * Доступность — ЧЕСТНЫЙ radiogroup (WAI-ARIA): контейнер role="radiogroup",
+ * кнопки role="radio" + aria-checked, roving tabindex (tab останавливается
+ * только на выбранном), стрелки ←→↑↓ двигают выбор И фокус (rAF — после
+ * коммита React), Enter/Space — нативный click у <button>. Это кнопки-типы
+ * соседней сетки (та же hb-эстетика), но ARIA-семантика — радио, потому что
+ * выбор ровно один из группы.
+ *
+ * Кнопки ≥44px (контент выше), на мобиле — full-width (grid 1col).
+ * Цена — «от N ₽/чел» по канону карточек типов (N — база до сезона ×1,15).
+ */
+const PackageGrid = memo(function PackageGrid({
+  type,
+  pkgIdx,
+  onSelect,
+  settled,
+}: {
+  type: MenuType;
+  pkgIdx: number;
+  onSelect: (idx: number) => void;
+  settled: boolean;
+}) {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    /* Стрелки: +1/−1 с зацикливанием — паттерн ARIA radio group. */
+    const dir =
+      e.key === "ArrowRight" || e.key === "ArrowDown"
+        ? 1
+        : e.key === "ArrowLeft" || e.key === "ArrowUp"
+          ? -1
+          : 0;
+    if (!dir) return;
+    e.preventDefault();
+    const n = type.packages.length;
+    const next = (pkgIdx + dir + n) % n;
+    onSelect(next);
+    /* Roving tabindex: фокус едет за выбором ПОСЛЕ коммита React
+       (rAF) — querySelector по data-атрибуту, refs-массив не нужен. */
+    requestAnimationFrame(() => {
+      rootRef.current
+        ?.querySelector<HTMLButtonElement>(`[data-hb-pkg="${next}"]`)
+        ?.focus();
+    });
+  };
+
+  return (
+    <div
+      ref={rootRef}
+      className="hb-pkgs"
+      role="radiogroup"
+      aria-label={`Пакет меню — ${type.label}`}
+      onKeyDown={handleKeyDown}
+    >
+      {type.packages.map((p, i) => {
+        const selected = i === pkgIdx;
+        return (
+          <motion.button
+            key={p.name}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            data-hb-pkg={i}
+            tabIndex={selected ? 0 : -1}
+            onClick={() => onSelect(i)}
+            whileTap={settled ? { scale: 0.985 } : undefined}
+            className={`hb-pkg ${selected ? "hb-pkg--on" : ""}`}
+          >
+            <span className="hb-pkg__name">{p.name}</span>
+            <span className="hb-pkg__price">
+              от {formatRUB(p.pricePerGuest)}
+              {type.priceUnit ?? "/чел"}
+            </span>
+            <span className="hb-pkg__desc">{p.description}</span>
+            {selected && (
+              <motion.span
+                layoutId="hb-pkg-underline"
+                className="hb-pkg__underline"
+                initial={false}
+                transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                aria-hidden="true"
+              />
+            )}
+          </motion.button>
+        );
+      })}
+    </div>
+  );
+});
+
 /**
  * Itemized-строки чека — React.memo (task 7-fix1 D5): перерисовываются
  * только при смене типа/гостей/сезона (все производные typeId+guests+date).
@@ -1895,6 +2090,8 @@ function PrintLine({
  */
 const ReceiptLines = memo(function ReceiptLines({
   type,
+  pkgName,
+  addons,
   guests,
   perGuest,
   subtotal,
@@ -1903,6 +2100,10 @@ const ReceiptLines = memo(function ReceiptLines({
   active,
 }: {
   type: MenuType;
+  /** c84-B: имя выбранного пакета — строка типа печатает «Банкет · Стандарт». */
+  pkgName: string;
+  /** c84-B: ВЫБРАННЫЕ допуслуги (уже отфильтрованы) — по строке на каждую. */
+  addons: Addon[];
   guests: number;
   perGuest: number;
   subtotal: number;
@@ -1923,17 +2124,22 @@ const ReceiptLines = memo(function ReceiptLines({
     <>
       {/* Строка типа: смена типа = мгновенная замена + печать новой (X2).
           Бывший x-shift-морф (P3) заменён печатью — он и читался критиком
-          как «fade-перерисовка». */}
+          как «fade-перерисовка».
+          c84-B: «Банкет · Стандарт — цена/чел» — пакет в лейбл, цену за
+          гостя выбранного пакета — в значение (та же цифра едет строкой
+          ниже как множитель подытога — чеки повторяют юнит-цену). */}
       <PrintLine
-        sig={type.id}
+        sig={`${type.id}|${pkgName}`}
         index={0}
         active={active}
         settled={settled}
         delayBase={delayBase}
         className="hb-line"
       >
-        <span className="hb-line__label">{type.label}</span>
-        <span className="hb-line__value">{type.short}</span>
+        <span className="hb-line__label">
+          {type.label} · {pkgName}
+        </span>
+        <span className="hb-line__value">{formatRUB(perGuest)}/чел</span>
       </PrintLine>
 
       {/* Строка гостей × цена → подытог: печатается на каждом изменении
@@ -1951,6 +2157,26 @@ const ReceiptLines = memo(function ReceiptLines({
         </span>
         <span className="hb-line__value">{formatRUB(subtotal)}</span>
       </PrintLine>
+
+      {/* c84-B (задача 2): КАЖДАЯ выбранная допуслуга — отдельной строкой
+          «label слева / +N ₽ справа» (стиль строк чека, value — red-deep,
+          как сезонная строка: доплаты читаются одним акцентом).
+          0 выбранных — не рисуем ничего. Максимум 6 строк (ADDONS.length)
+          — чек растёт естественно, клип .hb-lines__clip растёт вместе. */}
+      {addons.map((a, i) => (
+        <PrintLine
+          key={a.id}
+          sig={`addon|${a.id}`}
+          index={2 + i}
+          active={active}
+          settled={settled}
+          delayBase={delayBase}
+          className="hb-line hb-line--addon"
+        >
+          <span className="hb-line__label">{a.label}</span>
+          <span className="hb-line__value">+{formatRUB(a.price)}</span>
+        </PrintLine>
+      ))}
 
       {/* ЧЕСТНАЯ строка сезона — только когда множитель > 1.
           C1 (task 9-fix2): формулировка — единый канон SEASON_LABEL.
@@ -1980,10 +2206,11 @@ const ReceiptLines = memo(function ReceiptLines({
       </AnimatePresence>
 
       {/* C4 (task 9-fix2): ПОЛНЫЙ список «Включено» — без slice(0,3),
-          «Доставка в пределах КАД» больше не теряется; высота естественная. */}
+          «Доставка в пределах КАД» больше не теряется; высота естественная.
+          c84-B: индекс стаггера едет за аддонами (печать не склеивается). */}
       <PrintLine
         sig={type.included.join("·")}
-        index={3}
+        index={3 + addons.length}
         active={active}
         settled={settled}
         delayBase={delayBase}
@@ -2247,6 +2474,19 @@ export function HaccBooking() {
     [],
   );
   const [date, setDate] = useState("");
+  /* c84-B (задача 1): пакет меню — nuqs `pkg` (0-based индекс в packages
+     выбранного типа). Дип-линк-контракт с hacc-menu/presetCalculator:
+     URL `?pkg=0|1|2` — агент C допишет &pkg= к пресету, мы просто читаем
+     (гости так же живут в nuqs — Контракт 2). URL-мусор клампится
+     ЭФФЕКТОМ ниже, ядро расчёта дополнительно защищено внутри calcTotal. */
+  const [pkgParam, setPkgParam] = useQueryState("pkg", parseAsInteger.withDefault(0));
+  /* c84-B (задача 2): выбранные допуслуги (id из ADDONS) — локальный стейт:
+     в URL не пишем (6 флагов — шум в шэр-ссылке), пересчёт мгновенный. */
+  const [addonIds, setAddonIds] = useState<string[]>([]);
+  /* c84-B (задача 3): моб-навигация — микроподсказка после первого выбора
+     формата + доскролл к следующему контроловому блоку (см. IO/эффекты). */
+  const [typeHintShown, setTypeHintShown] = useState(false);
+  const [pkgInView, setPkgInView] = useState(false);
   const [stage, setStage] = useState<Stage>("calc");
   const [leadId, setLeadId] = useState<string | number | undefined>(undefined);
   /* 81-F2: отображаемый номер квитанции (ДДММ-ЧЧММ, из времени приёма) —
@@ -2263,6 +2503,11 @@ export function HaccBooking() {
   const typesZoneRef = useRef<HTMLFieldSetElement>(null);
   const ctaZoneRef = useRef<HTMLDivElement>(null);
   const contactsZoneRef = useRef<HTMLDivElement>(null);
+  /* c84-B: блоки пакетов/гостей/допуслуг — зоны sticky-bar (как D3) и
+     цели моб-доскролла после выбора формата (задача 3). */
+  const pkgZoneRef = useRef<HTMLFieldSetElement>(null);
+  const guestsZoneRef = useRef<HTMLDivElement>(null);
+  const addonsZoneRef = useRef<HTMLFieldSetElement>(null);
 
   /* ══ W3 / K6-CRITICAL (задача 1c–1d): цели Метрики ═════════════════════
      Единственный монтаж document-level listener'а кликов по контактам
@@ -2303,6 +2548,23 @@ export function HaccBooking() {
   }, [stage]);
 
   const current = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
+  /* c84-B (задача 1): валидный индекс пакета ДЛЯ ТЕКУЩЕГО типа — при смене
+     typeId клампится в диапазон нового (deep-link-контракт: ?pkg=2 у
+     банкета при переходе на vegetarian оседает на последнем валидном).
+     URL синхронизируется эффектом (чтение всегда безопасно, расчёт — тем
+     более: у calcTotal собственный кламп). */
+  const pkgMaxIdx = Math.max(0, current.packages.length - 1);
+  const pkgIdx = Math.min(pkgMaxIdx, Math.max(0, pkgParam));
+  useEffect(() => {
+    if (pkgParam !== pkgIdx) void setPkgParam(pkgIdx);
+  }, [pkgParam, pkgIdx, setPkgParam]);
+  /** Выбранный пакет — шапка чека, сводка формы, лид. */
+  const pkg = current.packages[pkgIdx] ?? current.packages[0];
+  /** c84-B: выбранные аддоны (объекты, для строк чека/summary/лида). */
+  const selectedAddons = useMemo(
+    () => ADDONS.filter((a) => addonIds.includes(a.id)),
+    [addonIds],
+  );
   /** Fix5 V6: «Ещё решаю» — псевдо-тип без цены/формата. */
   const isUndecided = typeId === UNDECIDED_ID;
   /** Эффективный минимум: у undecided — общий минимум 10 (не 30 банкета). */
@@ -2331,11 +2593,12 @@ export function HaccBooking() {
   const dateValid = dateInvalid ? "" : date;
   const humanDate = useMemo(() => formatHumanDate(dateValid), [dateValid]);
 
-  /* КОНТРАКТ 3: addons = [] — секцию «Дополнительно» юзер просил убрать.
+  /* c84-B: расчёт от ВЫБРАННОГО пакета + выбранных допуслуг (итог =
+     (perGuest×guests + addons) × сезон — существующая формула calcTotal).
      Fix5 V6: у undecided расчёта НЕТ (result = null) — цены нигде не рендерятся. */
   const result = useMemo(
-    () => (isUndecided ? null : calcTotal(typeId, guestsClamped, [], dateValid)),
-    [isUndecided, typeId, guestsClamped, dateValid],
+    () => (isUndecided ? null : calcTotal(typeId, guestsClamped, addonIds, dateValid, pkgIdx)),
+    [isUndecided, typeId, guestsClamped, addonIds, dateValid, pkgIdx],
   );
 
   /* Fix5 V4: itemized-строки чека печатаются от ДЕБАУНС-значения гостей
@@ -2343,8 +2606,8 @@ export function HaccBooking() {
      Живой итог (MotionTotal) и мини-сумма считаются от МГНОВЕННОГО значения. */
   const receiptGuests = useDebouncedValue(guestsClamped, 160);
   const receiptResult = useMemo(
-    () => (isUndecided ? null : calcTotal(typeId, receiptGuests, [], dateValid)),
-    [isUndecided, typeId, receiptGuests, dateValid],
+    () => (isUndecided ? null : calcTotal(typeId, receiptGuests, addonIds, dateValid, pkgIdx)),
+    [isUndecided, typeId, receiptGuests, addonIds, dateValid, pkgIdx],
   );
 
   /* Fix5 V4 (перф): три эффекта вместо старого кламп-эффекта с записью в URL.
@@ -2386,22 +2649,28 @@ export function HaccBooking() {
   const scriptPromise = "Мы перезвоним в течение часа";
 
   /* КОНТРАКТ 7 (слушатель): catering:menu-select. menu.tsx шлёт detail=string
-     (typeId); спящие компоненты могут прислать {typeId, guests} — понимаем оба. */
+     (typeId); спящие компоненты могут прислать {typeId, guests} — понимаем оба.
+     c84-B: {…, pkg} — если агент C зашлёт индекс пакета событием, примем
+     и его (число ≥0, дробная часть отбрасывается). */
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       const id = typeof detail === "string" ? detail : detail?.typeId;
       const g = typeof detail === "object" && detail ? detail.guests : undefined;
+      const p = typeof detail === "object" && detail ? detail.pkg : undefined;
       if (typeof id === "string" && MENU_TYPES.some((m) => m.id === id)) setTypeId(id);
       if (typeof g === "number" && Number.isFinite(g) && g >= 1) {
         // Q1 (task 9-fix2): кламп сверху; Fix5 V4 — пишем в зеркало,
         // URL догонит debounced-коммитом (не гнать nuqs на каждый кадр).
         setGuestsLocal(Math.min(GUESTS_MAX, g));
       }
+      if (typeof p === "number" && Number.isFinite(p) && p >= 0) {
+        void setPkgParam(Math.floor(p));
+      }
     };
     window.addEventListener("catering:menu-select", handler);
     return () => window.removeEventListener("catering:menu-select", handler);
-  }, [setTypeId]);
+  }, [setTypeId, setPkgParam]);
 
   /* Sticky-bar виден только у секции (один IO, без scroll-listener'ов). */
   useEffect(() => {
@@ -2418,17 +2687,23 @@ export function HaccBooking() {
     return () => io.disconnect();
   }, []);
 
-  /* D3 (task 7-fix1): ОДИН IO на три зоны (типы / CTA чека / контакты).
-     Fix5 (critic MAJOR-2, cycle 65): раньше rootMargin «-140px снизу» давал
-     ОБРАТНУЮ семантику — бар прятался, когда зона была ГДЕ УГОДНО выше
-     нижней полосы (виден в 1 из 9 позиций), и мигал над заголовком контактов
-     при входе зоны. Теперь root — сама НИЖНЯЯ ПОЛОСА (~17% вьюпорта через
-     процентный rootMargin — переживает resize без пересчёта в px): бар виден
-     ВСЮду, кроме момента, когда интерактив реально входит в полосу под баром. */
+  /* D3 (task 7-fix1): ОДИН IO на зоны (типы / пакеты / гости / допуслуги /
+     CTA чека / контакты). c84-B: deps [isUndecided] — блоки пакетов/допуслуг
+     монтируются/размонтируются при переключении «Ещё решаю» → IO
+     пересобирается на живые элементы (застывший isIntersecting от
+     отсоединённого узла больше не держит бар скрытым).
+     Fix5 (critic MAJOR-2, cycle 65): root — сама НИЖНЯЯ ПОЛОСА (~17%
+     вьюпорта) — бар виден ВСЮду, кроме момента, когда интерактив
+     реально входит в полосу под баром. */
   useEffect(() => {
-    const els = [typesZoneRef.current, ctaZoneRef.current, contactsZoneRef.current].filter(
-      (el): el is NonNullable<(typeof els)[number]> => !!el,
-    );
+    const els = [
+      typesZoneRef.current,
+      pkgZoneRef.current,
+      guestsZoneRef.current,
+      addonsZoneRef.current,
+      ctaZoneRef.current,
+      contactsZoneRef.current,
+    ].filter((el): el is NonNullable<(typeof els)[number]> => !!el);
     if (!els.length) return;
     const state = new Map<HTMLElement, boolean>();
     const io = new IntersectionObserver(
@@ -2440,7 +2715,22 @@ export function HaccBooking() {
     );
     for (const el of els) io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [isUndecided]);
+
+  /* c84-B (задача 3): IO на блок «Пакет меню» — гейт микроподсказки
+     «Пакет и гости — ниже ↓» (гаснет, когда блок в кадре). Пересборка по
+     isUndecided — как у зон выше (блок монтируется/размонтируется). */
+  useEffect(() => {
+    if (isUndecided) return;
+    const el = pkgZoneRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => setPkgInView(entries[0]?.isIntersecting ?? false),
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [isUndecided]);
 
   /** Плавный скролл к зоне формы через window.__lenis (грабля §2/§33:
       bare smooth-scroll Lenis перебивает; if/else — не ?? с side-effect). */
@@ -2510,6 +2800,108 @@ export function HaccBooking() {
     }, delay);
   }, [scrollToZone, settled]);
 
+  /** c84-B (задача 2): тап по блоку суммы мобильного sticky-бара — к
+      смета-чеку (разбор итога). Паттерн §33: window.__lenis, фоллбек —
+      scrollIntoView smooth (его оффсет — CSS scroll-margin-top: 96px на
+      #hb-check, норма якорей D2: панель приезжает ПОД 73-84px шапкой,
+      а не под ней; замер probe c84-B — было -32px/под шапкой).
+      c84-F3 (критик C, MINOR): offset: 0 — Lenis сам читает
+      scroll-margin-top цели (см. lenis.mjs scrollTo), ручной −96
+      считал бы отступ дважды. */
+  const scrollToCheck = useCallback(() => {
+    const el = document.getElementById("hb-check");
+    if (!el) return;
+    const lenis = (
+      window as unknown as { __lenis?: { scrollTo?: (t: Element, o?: object) => void } }
+    ).__lenis;
+    if (typeof lenis?.scrollTo === "function") {
+      lenis.scrollTo(el, { offset: 0, duration: 0.9 });
+    } else {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
+  /* c84-B (задача 3): после ПОЛЬЗОВАТЕЛЬСКОГО клика по карточке типа
+     (stage=calc, вьюпорт <1280 ИЛИ coarse pointer) — плавный доскролл к
+     следующему контроловому блоку («Пакет меню»; для «Ещё решаю» — «Гости»):
+     юзер не понимал, что продолжение ниже. 420мс — коммит React (блок
+     пакетов пересобирается под новый тип: карточки другого типа = другая
+     высота → лэйаут оседает ~400мс, замер probe c84-B) + оседание
+     layoutId-подчёркиваний.
+     ГЕЙТЫ: блок уже полностью во вьюпорте (rect) — не скроллим; клики по
+     ТЕКУЩЕМУ типу — тоже скроллим (подсказка не должна зависеть от смены);
+     программные установки типа (URL при монтировании / presetCalculator /
+     catering:menu-select) сюда НЕ попадают — только onClick карточек.
+     Скролл — ТОЛЬКО window.__lenis (грабля §52/c83: голый scrollTo
+     конфликтует с Lenis). Фоллбек — window.scrollTo smooth с ручным
+     оффсетом -100 (НЕ scrollIntoView block:start: без оффсета sticky-шапка
+     накрывает легенду блока; в lite-режиме c84-D Lenis-инстанса нет —
+     грабля §52 не применима, нативный smooth безопасен; мобильный путь
+     как раз идёт сюда — lite-детект включен на мобиле).
+     РЕТАРГЕТ (+1030мс): карточки пакетов могут дрейфовать и ПОСЛЕ старта
+     скролла (§2/§66 — «scrollIntoView во время layout-сдвига: цель
+     устаревает»). Защита от борьбы с юзером: коррекция ТОЛЬКО если скролл
+     ДОШЁЛ до командованной позиции (|scrollY − цель| < 140) — если юзер
+     уже уехал сам, не дёргаем его обратно. */
+  const typeScrollTimerRef = useRef(0);
+  const typeRetargetTimerRef = useRef(0);
+  const typeCommandedYRef = useRef(-1);
+  /* Гейт стадии — ref, а не deps: колбек остаётся стабильным для
+     memo-детей (TypeGrid), а таймер читает актуальную стадию ПОСЛЕ
+     коммита (эффект ниже обновляет её на каждом переходе). */
+  const stageRef = useRef<Stage>("calc");
+  useEffect(() => {
+    stageRef.current = stage;
+  }, [stage]);
+  const scrollBlockIntoView = useCallback((el: HTMLElement, duration = 0.9) => {
+    const lenis = (
+      window as unknown as { __lenis?: { scrollTo?: (t: Element, o?: object) => void } }
+    ).__lenis;
+    if (typeof lenis?.scrollTo === "function") {
+      typeCommandedYRef.current = Math.max(0, el.getBoundingClientRect().top + window.scrollY - 100);
+      lenis.scrollTo(el, { offset: -100, duration });
+    } else {
+      const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - 100);
+      typeCommandedYRef.current = top;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
+  }, []);
+  const scheduleScrollAfterType = useCallback(
+    (selectedId: string) => {
+      /* Спека задачи 3: только stage=calc — клик по типу при ОТКРЫТОЙ
+         форме не должен уводить юзера из полей ввода. */
+      if (stageRef.current !== "calc") return;
+      const coarse = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+      if (!(window.innerWidth < 1280 || coarse)) return;
+      window.clearTimeout(typeScrollTimerRef.current);
+      window.clearTimeout(typeRetargetTimerRef.current);
+      typeScrollTimerRef.current = window.setTimeout(() => {
+        const el = selectedId === UNDECIDED_ID ? guestsZoneRef.current : pkgZoneRef.current;
+        if (!el || !el.isConnected) return;
+        const r = el.getBoundingClientRect();
+        if (r.top >= 0 && r.bottom <= window.innerHeight) return;
+        scrollBlockIntoView(el);
+        /* Ретаргет после оседания скролла — короткая коррекция 0.45с. */
+        typeRetargetTimerRef.current = window.setTimeout(() => {
+          const el2 = selectedId === UNDECIDED_ID ? guestsZoneRef.current : pkgZoneRef.current;
+          const commanded = typeCommandedYRef.current;
+          if (!el2 || !el2.isConnected || commanded < 0) return;
+          if (Math.abs(window.scrollY - commanded) > 140) return; // юзер уехал сам
+          const r2 = el2.getBoundingClientRect();
+          if (r2.top < 40 || r2.top > 460) scrollBlockIntoView(el2, 0.45);
+        }, 1030);
+      }, 420);
+    },
+    [scrollBlockIntoView],
+  );
+  useEffect(
+    () => () => {
+      window.clearTimeout(typeScrollTimerRef.current);
+      window.clearTimeout(typeRetargetTimerRef.current);
+    },
+    [],
+  );
+
   /** КОНТРАКТ 7 (диспетчер): catering:calc-lead при УСПЕШНОМ сабмите.
       Fix5 V4 (перф) + React Compiler: колбек ПОЛНОСТЬЮ стабильный — снимок
       расчёта строит сама форма из СВОИХ пропсов (LeadForm onSuccess-вызов;
@@ -2518,7 +2910,14 @@ export function HaccBooking() {
   const handleSuccess = useCallback(
     (
       id: string | number | undefined,
-      detail: { typeId: string; guests: number; dateIso: string; total: number },
+      detail: {
+        typeId: string;
+        guests: number;
+        dateIso: string;
+        total: number;
+        pkgIdx: number;
+        addonIds: string[];
+      },
     ) => {
       /* CUID остаётся внутренним id (не рендерится), квитанция получает
        * человекочитаемый № из времени приёма (81-F2). */
@@ -2560,7 +2959,9 @@ export function HaccBooking() {
             guests: detail.guests,
             date: detail.dateIso,
             total: detail.total,
-            addons: [] as string[],
+            /* c84-B: реальные выборы (Контракт 7: раньше addons всегда []). */
+            pkgIdx: detail.pkgIdx,
+            addons: detail.addonIds,
           },
         }),
       );
@@ -2600,13 +3001,41 @@ export function HaccBooking() {
 
   /** D5 (task 7-fix1): stable-колбек для memo-сетке типов (TypeGrid).
    *  W3: заодно CALC_START — первое касание контролов (once per page view,
-   *  ref-гейт в fireCalcStart). */
+   *  ref-гейт в fireCalcStart).
+   *  c84-B (задача 3): ПЕРВЫЙ выбор формата зажигает микроподсказку «Пакет
+   *  и гости — ниже ↓» (гаснет по IO — блок пакетов в кадре), каждый клик
+   *  на мобиле доскролливает к следующему блоку (scheduleScrollAfterType). */
   const handleTypeSelect = useCallback(
     (id: string) => {
       fireCalcStart();
       setTypeId(id);
+      setTypeHintShown(true);
+      scheduleScrollAfterType(id);
     },
-    [setTypeId, fireCalcStart],
+    [setTypeId, fireCalcStart, scheduleScrollAfterType],
+  );
+
+  /** c84-B (задача 1): выбор пакета (клик/стрелки radiogroup) — прямой
+   *  коммит в nuqs (клик, не драг — дебаунс не нужен, URL всегда валиден).
+   *  Стабильная ссылка — PackageGrid.memo не ломается. */
+  const handlePkgSelect = useCallback(
+    (idx: number) => {
+      fireCalcStart();
+      void setPkgParam(idx);
+    },
+    [setPkgParam, fireCalcStart],
+  );
+
+  /** c84-B (задача 2): тумблер допуслуги — живой пересчёт чека/бара/лида
+   *  (useMemo result пересчитывается по addonIds). Стабилен для детей. */
+  const toggleAddon = useCallback(
+    (id: string) => {
+      fireCalcStart();
+      setAddonIds((prev) =>
+        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+      );
+    },
+    [fireCalcStart],
   );
 
   /* W3: дата — выбор дня в пикере = взаимодействие с калькулятором
@@ -2634,10 +3063,16 @@ export function HaccBooking() {
     return () => clearTimeout(t);
   }, [isUndecided, result, guestsClamped]);
 
-  /** Fix5 V6: мета квитанции успеха — одна строка (у undecided — без цены). */
+  /** Fix5 V6: мета квитанции успеха — одна строка (у undecided — без цены).
+   *  c84-B: пакет — в мету (владелец видит выбор лида без раскрытия). */
   const successMeta = isUndecided
     ? `Формат обсудим · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""}`
-    : `${current.label} · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""} · ~${formatRUB(result!.total)}`;
+    : `${current.label} · ${pkg.name} · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""} · ~${formatRUB(result!.total)}`;
+
+  /* c84-B (задача 3): микроподсказка — после первого ПОЛЬЗОВАТЕЛЬСКОГО выбора
+     формата, пока «Пакет меню» вне вьюпорта и формат реальный (у undecided
+     пакета нет — текст бы врал). Чисто навигационная: aria-hidden. */
+  const typeHintVisible = typeHintShown && !pkgInView && !isUndecided && stage === "calc";
 
   /* D3 (task 7-fix1): бар показан ТОЛЬКО между блоками — у секции,
      при закрытой форме и когда нижняя полоса вьюпорта свободна от зон
@@ -2688,10 +3123,38 @@ export function HaccBooking() {
               />
             </fieldset>
 
+            {/* c84-B (задача 3): микроподсказка после первого выбора формата —
+                «продолжение ниже». Гаснет по IO (блок «Пакет меню» в кадре),
+                живёт только <1280px (десктопу не нужна). Чисто навигационная:
+                aria-hidden, отдельный класс — НЕ конфликтует с .hb-panel__next. */}
+            {typeHintVisible && (
+              <p className="hb-types-hint" aria-hidden="true">
+                Пакет и гости — ниже
+                <ArrowDown className="size-3.5" aria-hidden="true" />
+              </p>
+            )}
+
+            {/* 1b · Пакет меню (c84-B, задача 1) — сегмент-контрол МЕЖДУ
+                «Тип события» и «Гости» в идиоме карточек-типов: имя пакета,
+                цена/чел и короткое описание из pricing.ts. У undecided блока
+                нет — формат подбираем по звонку. D3: fieldset — зона бара. */}
+            {!isUndecided && (
+              <fieldset className="hb-block" ref={pkgZoneRef} data-hb-hide="pkg">
+                <legend className="hb-label-caps">Пакет меню</legend>
+                <PackageGrid
+                  type={current}
+                  pkgIdx={pkgIdx}
+                  onSelect={handlePkgSelect}
+                  settled={settled}
+                />
+              </fieldset>
+            )}
+
             {/* 2 · Гости — odometer + слайдер. Fix5 V1/V2/V4: нелинейная шкала
                 (10–50 = 62% трека), шаг 1, ввод числа с клавиатуры, ±1,
-                заливка scaleX (compositor), URL — дебаунсом. */}
-            <div className="hb-block">
+                заливка scaleX (compositor), URL — дебаунсом.
+                c84-B: ref — цель доскролла при «Ещё решаю» (задача 3). */}
+            <div className="hb-block" ref={guestsZoneRef}>
               <span className="hb-label-caps">Гости</span>
               <div className="hb-guests">
                 <OdometerGuests value={guestsClamped} animate={settled} />
@@ -2849,6 +3312,38 @@ export function HaccBooking() {
               )}
             </div>
 
+            {/* 2b · Дополнительно (c84-B, задача 2) — ПОСЛЕ «Гости», ДО даты
+                (по вертикали мобайла это правильная ступень: цена уже
+                посчитана — сразу предлагаем усилить). 6 позиций из ADDONS:
+                нативный чекбокс (accent-color — канон hb-consent) + кликабельный
+                label-ряд + цена «+N ₽»; тумблер — живой пересчёт чека/бара.
+                У undecided блока нет — расчёта нет. */}
+            {!isUndecided && (
+              <fieldset className="hb-block" ref={addonsZoneRef} data-hb-hide="addons">
+                <legend className="hb-label-caps">
+                  Дополнительно{" "}
+                  <span className="hb-label-caps__opt">— к любому пакету</span>
+                </legend>
+                <div className="hb-addons">
+                  {ADDONS.map((a) => {
+                    const on = addonIds.includes(a.id);
+                    return (
+                      <label key={a.id} className={`hb-addon ${on ? "hb-addon--on" : ""}`}>
+                        <input
+                          type="checkbox"
+                          className="hb-addon__box"
+                          checked={on}
+                          onChange={() => toggleAddon(a.id)}
+                        />
+                        <span className="hb-addon__label">{a.label}</span>
+                        <span className="hb-addon__price">+{formatRUB(a.price)}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            )}
+
             {/* 3 · Дата — необязательно */}
             <div className="hb-block" role="group" aria-label="Дата мероприятия (необязательно)">
               {/* FIX-7: label остаётся настоящим <label> (клик по нему
@@ -2909,6 +3404,9 @@ export function HaccBooking() {
                       dateHuman={humanDate}
                       dateIso={dateValid}
                       total={receiptResult?.total ?? 0}
+                      /* c84-B: снимок выбора — в текст лида и событие. */
+                      pkgIdx={pkgIdx}
+                      addonIds={addonIds}
                       undecided={isUndecided}
                       toastPromise={toastPromise}
                       onSuccess={handleSuccess}
@@ -2927,6 +3425,7 @@ export function HaccBooking() {
                 срабатывает рано и на высокой панели тоже. */}
             <motion.div
               key={settled ? "panel-a" : "panel-s"}
+              id="hb-check"
               className="hb-panel lg:sticky lg:top-24"
               initial={settled ? "hb-hidden" : false}
               whileInView={settled ? "hb-show" : undefined}
@@ -2978,13 +3477,14 @@ export function HaccBooking() {
                   квитанции успеха), поэтому и «удар штампа»-шейк снят —
                   бумагу трясло под печать, которой здесь больше нет. */}
               <motion.div className="hb-paper" variants={HB_PAPER_VARIANTS} data-stage={stage}>
-                {/* Шапка чека (Fix5 V6: у undecided — без формата) */}
+                {/* Шапка чека (Fix5 V6: у undecided — без формата; c84-B:
+                    пакет — в шапку: «Банкет · Стандарт · 30 гостей»). */}
                 <div className="hb-paper__head">
                   <span className="hb-paper__brand">Смета-чек</span>
                   <span className="hb-paper__type">
                     {isUndecided
                       ? `Формат обсудим · ${guestsClamped} ${guestsLabel(guestsClamped)}`
-                      : `${current.label} · ${guestsClamped} ${guestsLabel(guestsClamped)}`}
+                      : `${current.label} · ${pkg.name} · ${guestsClamped} ${guestsLabel(guestsClamped)}`}
                   </span>
                 </div>
 
@@ -3005,6 +3505,8 @@ export function HaccBooking() {
                     ) : (
                       <ReceiptLines
                         type={current}
+                        pkgName={pkg.name}
+                        addons={selectedAddons}
                         guests={receiptGuests}
                         perGuest={receiptResult!.perGuest}
                         subtotal={receiptResult!.subtotal}
@@ -3197,8 +3699,10 @@ export function HaccBooking() {
         <StickyBar
           total={result?.total ?? null}
           guests={guestsClamped}
+          addonsCount={addonIds.length}
           visible={barVisible}
           onCta={openForm}
+          onTotal={scrollToCheck}
         />
       )}
     </section>

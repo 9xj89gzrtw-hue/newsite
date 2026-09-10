@@ -25,6 +25,13 @@ import { CONTACTS } from "@/lib/config";
  * проверяем бюджет страницы; не влезает — новая страница с «продолжением»-
  * колонтитулом. Ничего не режется молча (дефект C60-PDF: блюда терялись).
  *
+ * c84-C — per-tariff PDF: generateMenuPdf(typeId, pkgIdx) при заданном
+ * pkgIdx (валиден ТОЛЬКО для одиночного typeId, не "all") собирает документ
+ * одного тарифа: фирменная обложка (тип события + имя пакета + цена/гостя) →
+ * пакет с описанием и ВСЕМИ блюдами (тот же flow-engine) → «включено» →
+ * задняя обложка с контактами. Рисование переиспользует drawMenu/drawDish
+ * (параметр-фильтр onlyPkg — минимальный diff, дублей кода нет).
+ *
  * Шрифты: Roboto (текст) + Marck Script (рукописные заголовки) +
  * Prata (имена пакетов) — все с кириллицей, лежат в /public/fonts.
  */
@@ -56,10 +63,19 @@ const C = {
   coverMuted: [172, 167, 156] as [number, number, number],
 };
 
-let fontsLoaded = false;
+/* c84-C (баг, пойманный bun-верификацией): addFileToVFS пишет в ГЛОБАЛЬНЫЙ
+   VFS jsPDF, но addFont регистрирует шрифт В ЭКЗЕМПЛЯРЕ документа. Прежний
+   флаг fontsLoaded кэшировал «шрифты загружены» на модуль — второй документ
+   того же процесса (повторный клик по «Каталог в PDF», per-tariff PDF после
+   каталога) оставался БЕЗ кириллических шрифтов (замер: 8KB без шрифтов
+   против 139KB). Теперь кэшируется ТОЛЬКО fetch (модульный Promise), а
+   регистрация addFont выполняется на каждый doc. Ошибка сети сбрасывает
+   кэш — повторный клик retry'ит честно. */
+let fontsFetch: Promise<
+  [ArrayBuffer, ArrayBuffer, ArrayBuffer, ArrayBuffer, ArrayBuffer]
+> | null = null;
 
 async function loadFonts(doc: jsPDF): Promise<void> {
-  if (fontsLoaded) return;
   const toBase64 = (buf: ArrayBuffer) => {
     const bytes = new Uint8Array(buf);
     let binary = "";
@@ -67,16 +83,19 @@ async function loadFonts(doc: jsPDF): Promise<void> {
       binary += String.fromCharCode(bytes[i]);
     return btoa(binary);
   };
-  const [robotoR, robotoB, robotoI, marck, prata] = await Promise.all([
-    fetch("/fonts/Roboto-Regular.ttf").then((r) => r.arrayBuffer()),
-    fetch("/fonts/Roboto-Bold.ttf").then((r) => r.arrayBuffer()),
-    fetch("/fonts/Roboto-Italic.ttf").then((r) => r.arrayBuffer()),
-    fetch("/fonts/MarckScript-Regular.ttf").then((r) => r.arrayBuffer()),
-    fetch("/fonts/Prata-Regular.ttf").then((r) => r.arrayBuffer()),
-  ]).catch((err) => {
-    fontsLoaded = false; // allow retry on next click
-    throw err;
-  });
+  if (!fontsFetch) {
+    fontsFetch = Promise.all([
+      fetch("/fonts/Roboto-Regular.ttf").then((r) => r.arrayBuffer()),
+      fetch("/fonts/Roboto-Bold.ttf").then((r) => r.arrayBuffer()),
+      fetch("/fonts/Roboto-Italic.ttf").then((r) => r.arrayBuffer()),
+      fetch("/fonts/MarckScript-Regular.ttf").then((r) => r.arrayBuffer()),
+      fetch("/fonts/Prata-Regular.ttf").then((r) => r.arrayBuffer()),
+    ]).catch((err) => {
+      fontsFetch = null; // allow retry on next click
+      throw err;
+    });
+  }
+  const [robotoR, robotoB, robotoI, marck, prata] = await fontsFetch;
   doc.addFileToVFS("Roboto-Regular.ttf", toBase64(robotoR));
   doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
   doc.addFileToVFS("Roboto-Bold.ttf", toBase64(robotoB));
@@ -87,7 +106,6 @@ async function loadFonts(doc: jsPDF): Promise<void> {
   doc.addFont("MarckScript-Regular.ttf", "Marck", "normal");
   doc.addFileToVFS("Prata-Regular.ttf", toBase64(prata));
   doc.addFont("Prata-Regular.ttf", "Prata", "normal");
-  fontsLoaded = true;
 }
 
 /* ────────────────────────────────────────────────────────── shared utils */
@@ -132,12 +150,84 @@ function unitFor(m: MenuType): string {
   return m.id === "office-lunch" ? "за порцию" : "за гостя";
 }
 
-/* ─────────────────────────────────────────────────────────────── entry */
+/* ── c84-C: латинские слаги для имён файлов per-tariff PDF ────────────────
+   Menu-Banquet-Premium-nilov-catering.pdf. Основа — карты известных имён;
+   нестандартные («Канапе (6 шт)») идут через транслит-фоллбэк. */
 
-export async function buildMenuCatalogDoc(typeId = "all"): Promise<jsPDF> {
+const TYPE_SLUGS: Record<string, string> = {
+  buffet: "Buffet",
+  banquet: "Banquet",
+  "snack-box": "Snack-Box",
+  "coffee-break": "Coffee-Break",
+  vegetarian: "Vegetarian",
+  bbq: "BBQ",
+  "office-lunch": "Office-Lunch",
+};
+
+const PKG_SLUGS: Record<string, string> = {
+  "Базовый": "Basic",
+  "Стандарт": "Standard",
+  "Премиум": "Premium",
+  "Расширенный": "Extended",
+};
+
+const CYR_SLUG: Record<string, string> = {
+  а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh",
+  з: "z", и: "i", й: "y", к: "k", л: "l", м: "m", н: "n", о: "o",
+  п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "ts",
+  ч: "ch", ш: "sh", щ: "sch", ъ: "", ы: "y", ь: "", э: "e",
+  ю: "yu", я: "ya",
+};
+
+function typeSlug(m: MenuType): string {
+  const known = TYPE_SLUGS[m.id];
+  if (known) return known;
+  return m.id
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join("-");
+}
+
+function pkgSlug(pkg: MenuPackage): string {
+  const known = PKG_SLUGS[pkg.name];
+  if (known) return known;
+  let out = "";
+  for (const ch of pkg.name.toLowerCase()) {
+    const c = CYR_SLUG[ch];
+    if (c !== undefined) out += c;
+    else if (/[a-z0-9]/.test(ch)) out += ch;
+    else out += "-";
+  }
+  const slug = out.replace(/-+/g, "-").replace(/^-+|-+$/g, "");
+  return slug.charAt(0).toUpperCase() + slug.slice(1);
+}
+
+
+/* ─────────────────────────────────────────────────────── entry */
+
+export async function buildMenuCatalogDoc(
+  typeId = "all",
+  pkgIdx?: number,
+): Promise<jsPDF> {
   const types =
     typeId === "all" ? MENU_TYPES : MENU_TYPES.filter((m) => m.id === typeId);
   if (types.length === 0) throw new Error("no menus for typeId=" + typeId);
+
+  /* c84-C: один тариф — pkgIdx осмыслен только для одиночного типа
+     ("all" + pkgIdx игнорируется: у каталогов разные наборы пакетов) */
+  const single = types.length === 1 ? types[0] : undefined;
+  const pkg =
+    single !== undefined &&
+    pkgIdx !== undefined &&
+    pkgIdx >= 0 &&
+    pkgIdx < single.packages.length
+      ? single.packages[pkgIdx]
+      : undefined;
+  if (single !== undefined && pkgIdx !== undefined && pkg === undefined) {
+    throw new Error(
+      `no package #${pkgIdx} in menu "${single.id}" (of ${single.packages.length})`,
+    );
+  }
 
   const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
   await loadFonts(doc);
@@ -146,13 +236,23 @@ export async function buildMenuCatalogDoc(typeId = "all"): Promise<jsPDF> {
   doc.setLineCap("round");
 
   doc.setProperties({
-    title: "Каталог меню — nilov catering",
+    title:
+      pkg && single
+        ? `Меню «${single.label}» — пакет «${pkg.name}» — nilov catering`
+        : "Каталог меню — nilov catering",
     subject: "Кейтеринг полного цикла · Санкт-Петербург",
     author: "nilov catering",
     creator: "nilov catering",
   });
 
-  if (types.length > 1) {
+  if (pkg && single) {
+    /* c84-C: документ одного тарифа — обложка тарифа → пакет → контакты */
+    drawPkgCover(doc, single, pkg);
+    doc.addPage();
+    drawMenu(doc, single, pkgIdx);
+    doc.addPage();
+    drawBackCover(doc);
+  } else if (types.length > 1) {
     drawCover(doc);
     for (const menu of types) {
       doc.addPage();
@@ -164,21 +264,44 @@ export async function buildMenuCatalogDoc(typeId = "all"): Promise<jsPDF> {
     drawMenu(doc, types[0]);
   }
 
-  drawPageFooters(doc, types.length > 1);
+  drawPageFooters(doc, pkg !== undefined || types.length > 1);
   return doc;
 }
 
-export async function generateMenuPdf(typeId: string): Promise<void> {
+export async function generateMenuPdf(
+  typeId: string,
+  pkgIdx?: number,
+): Promise<void> {
   const types =
     typeId === "all" ? MENU_TYPES : MENU_TYPES.filter((m) => m.id === typeId);
   if (types.length === 0) return;
 
-  const doc = await buildMenuCatalogDoc(typeId);
+  /* c84-C: битый индекс — молча не генерируем «не то» (UI клампит,
+     сюда попадаем только при рассинхроне данных) */
+  if (
+    types.length === 1 &&
+    pkgIdx !== undefined &&
+    (pkgIdx < 0 || pkgIdx >= types[0].packages.length)
+  ) {
+    return;
+  }
+
+  const doc = await buildMenuCatalogDoc(typeId, pkgIdx);
+
+  const pkg =
+    types.length === 1 &&
+    pkgIdx !== undefined &&
+    pkgIdx >= 0 &&
+    pkgIdx < types[0].packages.length
+      ? types[0].packages[pkgIdx]
+      : undefined;
 
   const filename =
-    types.length > 1
-      ? "Catalog-nilov-catering.pdf"
-      : `Menu-${types[0].label}-nilov.pdf`;
+    pkg && types.length === 1
+      ? `Menu-${typeSlug(types[0])}-${pkgSlug(pkg)}-nilov-catering.pdf`
+      : types.length > 1
+        ? "Catalog-nilov-catering.pdf"
+        : `Menu-${types[0].label}-nilov.pdf`;
   doc.save(filename);
 }
 
@@ -270,6 +393,105 @@ function drawCover(doc: jsPDF) {
   );
 }
 
+/* ── c84-C: обложка одного тарифа — тот же мх/персик/красная линейка,
+   что у обложки каталога, но герой — не список каталогов, а пакет:
+   тип события (надзаголовок) + имя пакета (Marck) + цена/гостя. */
+function drawPkgCover(doc: jsPDF, menu: MenuType, pkg: MenuPackage) {
+  doc.setFillColor(...C.moss);
+  doc.rect(0, 0, PAGE.w, PAGE.h, "F");
+
+  // красная линейка + надзаголовок: тип события + год
+  doc.setDrawColor(...C.red);
+  doc.setLineWidth(0.8);
+  doc.line(PAGE.mL, 52, PAGE.mL + 34, 52);
+
+  doc.setTextColor(...C.peach);
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(9);
+  doc.text(
+    `МЕНЮ · ${menu.label.toUpperCase()} · ${new Date().getFullYear()}`,
+    PAGE.mL,
+    61,
+  );
+
+  // рукописный бренд (шрифт сайта) + красная точка по фактической ширине
+  doc.setTextColor(...C.cream);
+  doc.setFont("Marck", "normal");
+  doc.setFontSize(54);
+  doc.text("nilov catering", PAGE.mL, 96);
+  const brandW = doc.getTextWidth("nilov catering");
+  doc.setFillColor(...C.red);
+  doc.circle(PAGE.mL + brandW + 4.5, 92.5, 1.7, "F");
+
+  doc.setTextColor(...C.coverMuted);
+  doc.setFont("Roboto", "italic");
+  doc.setFontSize(11.5);
+  doc.text("Кейтеринг полного цикла · Санкт-Петербург", PAGE.mL, 110);
+
+  // герой тарифа: имя пакета рукописно + описание
+  doc.setTextColor(...C.peach);
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(9);
+  doc.text("ПАКЕТ МЕНЮ", PAGE.mL, 146);
+
+  doc.setTextColor(...C.cream);
+  doc.setFont("Marck", "normal");
+  doc.setFontSize(40);
+  doc.text(pkg.name, PAGE.mL, 168);
+  const pkgW = doc.getTextWidth(pkg.name);
+  doc.setFillColor(...C.red);
+  doc.circle(PAGE.mL + pkgW + 3.6, 164.5, 1.3, "F");
+
+  doc.setTextColor(...C.coverMuted);
+  doc.setFont("Roboto", "italic");
+  doc.setFontSize(10.5);
+  const descLines: string[] = doc.splitTextToSize(
+    pkg.description,
+    PAGE.contentW - 24,
+  );
+  doc.text(descLines, PAGE.mL, 180);
+
+  // цена/гостя — крупно персиковым (красный по мху не читается)
+  doc.setTextColor(...C.peach);
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(16);
+  doc.text(`${formatRUB(pkg.pricePerGuest)} ${unitFor(menu)}`, PAGE.mL, 212);
+  doc.setTextColor(...C.coverMuted);
+  doc.setFont("Roboto", "normal");
+  doc.setFontSize(9);
+  doc.text(
+    `от ${menu.minGuests} ${guestsWord(menu.minGuests)} · состав согласуем под событие · все пакеты — в полном каталоге`,
+    PAGE.mL,
+    220,
+  );
+
+  // честная приписка о сезонности (как на сайте)
+  doc.setFont("Roboto", "italic");
+  doc.setFontSize(8);
+  doc.text(
+    "Цены — за одного гостя. В высокий сезон (май–сентябрь, декабрь) действует коэффициент ×1,15.",
+    PAGE.mL,
+    230,
+  );
+
+  // контакты — тот же блок, что на обложке каталога
+  doc.setDrawColor(...C.peach);
+  doc.setLineWidth(0.4);
+  doc.line(PAGE.mL, 254, PAGE.mL + 58, 254);
+  doc.setTextColor(...C.peach);
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(10);
+  doc.text(CONTACTS.phone, PAGE.mL, 262);
+  doc.setTextColor(...C.coverMuted);
+  doc.setFont("Roboto", "normal");
+  doc.setFontSize(8.5);
+  doc.text(
+    `${CONTACTS.email}  ·  ${CONTACTS.city}  ·  ${CONTACTS.phone}`,
+    PAGE.mL,
+    269,
+  );
+}
+
 /* ───────────────────────────────────────────────────── category header */
 
 const BAND_H = 47;
@@ -285,7 +507,12 @@ const TINTS: Record<string, [number, number, number]> = {
   "office-lunch": [245, 238, 226],
 };
 
-function drawCategoryHeader(doc: jsPDF, menu: MenuType, index: number) {
+function drawCategoryHeader(
+  doc: jsPDF,
+  menu: MenuType,
+  index: number,
+  pkg?: MenuPackage,
+) {
   const tint = TINTS[menu.id] ?? [245, 238, 226];
 
   // тинт-полоса во всю ширину листа — как панель категории на сайте
@@ -296,7 +523,11 @@ function drawCategoryHeader(doc: jsPDF, menu: MenuType, index: number) {
   doc.setFont("Roboto", "bold");
   doc.setFontSize(7.5);
   doc.text(
-    `КАТАЛОГ ${String(index + 1).padStart(2, "0")} / ${String(MENU_TYPES.length).padStart(2, "0")}`,
+    /* c84-C: в документе одного тарифа нумерация каталогов не нужна —
+       надзаголовок называет пакет */
+    pkg
+      ? `ПАКЕТ МЕНЮ · ${pkg.name.toUpperCase()}`
+      : `КАТАЛОГ ${String(index + 1).padStart(2, "0")} / ${String(MENU_TYPES.length).padStart(2, "0")}`,
     PAGE.mL,
     16.5,
   );
@@ -307,13 +538,21 @@ function drawCategoryHeader(doc: jsPDF, menu: MenuType, index: number) {
   doc.setFontSize(30);
   doc.text(menu.label, PAGE.mL, 35.5);
 
-  // цена — по правому краю, на базовой линии заголовка (единица — как на сайте)
+  // цена — по правому краю, на базовой линии заголовка (единица — как на
+  // сайте). c84-C: для одного тарифа — ТОЧНАЯ цена пакета, не «от» каталога
   doc.setFont("Roboto", "bold");
   doc.setFontSize(12);
   doc.setTextColor(...C.red);
-  doc.text(`от ${formatRUB(menu.perGuest)} ${unitFor(menu)}`, PAGE.w - PAGE.mR, 30, {
-    align: "right",
-  });
+  doc.text(
+    pkg
+      ? `${formatRUB(pkg.pricePerGuest)} ${unitFor(menu)}`
+      : `от ${formatRUB(menu.perGuest)} ${unitFor(menu)}`,
+    PAGE.w - PAGE.mR,
+    30,
+    {
+      align: "right",
+    },
+  );
   doc.setFont("Roboto", "normal");
   doc.setFontSize(7.5);
   doc.setTextColor(...C.soft);
@@ -356,9 +595,13 @@ function packageHeaderH(doc: jsPDF, pkg: MenuPackage): number {
   return 8.5 + descLines.length * 3.4 + 2.5 + 5;
 }
 
-function drawMenu(doc: jsPDF, menu: MenuType) {
+function drawMenu(doc: jsPDF, menu: MenuType, onlyPkg?: number) {
   const index = MENU_TYPES.indexOf(menu);
-  let y = drawCategoryHeader(doc, menu, index);
+  /* c84-C: фильтр пакета — рисуем ТОЛЬКО выбранный тариф (per-tariff PDF);
+     всё остальное (flow-engine, «включено», колонтитулы) — без изменений */
+  const selPkg =
+    onlyPkg !== undefined ? menu.packages[onlyPkg] : undefined;
+  let y = drawCategoryHeader(doc, menu, index, selPkg);
 
   const ensure = (h: number) => {
     if (y + h <= PAGE.bottom) return;
@@ -376,13 +619,16 @@ function drawMenu(doc: jsPDF, menu: MenuType) {
     }, 0);
 
   menu.packages.forEach((pkg, pkgIdx) => {
+    if (onlyPkg !== undefined && pkgIdx !== onlyPkg) return;
     const headerH = packageHeaderH(doc, pkg);
 
-    // «Включено» идёт сразу за ПОСЛЕДНИМ пакетом: если последний пакет +
-    // «включено» не помещаются вместе на остатке страницы, но помещаются
-    // на свежей — переносим их ВМЕСТЕ (страница не рвётся на 3 строки +
-    // включено, дефект «почти пустой страницы»)
-    if (pkgIdx === menu.packages.length - 1) {
+    // «Включено» идёт сразу за ПОСЛЕДНИМ РИСУЕМЫМ пакетом (c84-C: при
+    // фильтре рисуемый пакет — последний): если он + «включено» не
+    // помещаются вместе на остатке страницы, но помещаются на свежей —
+    // переносим их ВМЕСТЕ (страница не рвётся на 3 строки + включено)
+    const isLastDrawn =
+      onlyPkg !== undefined || pkgIdx === menu.packages.length - 1;
+    if (isLastDrawn) {
       const inclH = 8 + menu.included.length * 5 + 6;
       const needed = headerH + dishesH(pkg) + 4.5 + inclH;
       const freshBudget = PAGE.bottom - 26;

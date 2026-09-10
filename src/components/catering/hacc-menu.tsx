@@ -178,10 +178,18 @@ function hookNoteFor(cat: MenuCat): string | undefined {
   return `Меньше ${cat.minGuests} гостей? Посчитаем индивидуально — позвоните или оставьте заявку.`;
 }
 
-/** Калькулятор читает ?type=… через nuqs (подхватывает history.replaceState). */
-function presetCalculator(typeId: string, guests: number) {
+/** Калькулятор читает ?type=… через nuqs (подхватывает history.replaceState).
+ *  c84-C: pkg — активная ступень открытой категории (контракт с блоком
+ *  расчёта: nuqs-параметр pkg, как type/guests). */
+function presetCalculator(typeId: string, guests: number, pkgIdx?: number) {
   if (typeof window === "undefined") return;
-  window.history.replaceState(null, "", `/?type=${typeId}&guests=${guests}#calculator`);
+  const pkg =
+    pkgIdx !== undefined && pkgIdx >= 0 ? `&pkg=${pkgIdx}` : "";
+  window.history.replaceState(
+    null,
+    "",
+    `/?type=${typeId}&guests=${guests}${pkg}#calculator`,
+  );
 }
 
 const MENUS: MenuCat[] = MENU_TYPES.map((m) => {
@@ -356,6 +364,36 @@ function MenuRack({
      700ms тишины после открытия гасят перехват на переверстке */
   const suppressHoverUntil = useRef(0);
 
+  /* c84-C: тариф из навигации — дровер шапки шлёт ?pkg=N (pushState + событие
+     "menu:pkg-preset", без перезагрузки) и прямая загрузка /?pkg=N#menu
+     (читаем search на монте). Пресет применяется к ОТКРЫТОЙ категории
+     (рэк стартует с первой) — с клампом под её набор пакетов; если рэк
+     закрыт — сохраняется и применяется при первом открытии категории.
+     Ручной клик по табу снимает пресет: юзер взял управление.
+     (объявлен ДО open(): open применяет пресет к свежераскрытой категории) */
+  const presetPkgRef = useRef<number | null>(null);
+
+  /** force=true — явное указание уровня (чип дровера / ?pkg в URL):
+   *  перекрывает и ручной выбор таба в ОТКРЫТОЙ категории — это более
+   *  свежий интент юзера. force=false (переключение категории в open()):
+   *  пресет применяется только если юзер ещё не выбирал таб руками —
+   *  ручной выбор в той категории сохраняется. */
+  const applyPresetPkg = useCallback(
+    (idx: number | null, force = false) => {
+      const n = presetPkgRef.current;
+      if (n === null || idx === null) return;
+      const cat = cats[idx];
+      if (!cat || cat.packages.length === 0) return;
+      const clamped = Math.max(0, Math.min(n, cat.packages.length - 1));
+      setPkgs((prev) =>
+        force || prev[cat.id] === undefined
+          ? { ...prev, [cat.id]: clamped }
+          : prev,
+      );
+    },
+    [cats],
+  );
+
   const open = useCallback(
     (i: number, manual: boolean) => {
       if (i < 0 || i >= N) return;
@@ -380,6 +418,10 @@ function MenuRack({
         return;
       }
       setOpenIndex(i);
+      /* c84-C: пресет тарифа (из дровера шапки) применяется и к категории,
+         открытой ПОСЛЕ клика по чипу, — пока юзер не выбрал таб руками
+         (селект в applyPresetPkg не перетирает ручной выбор) */
+      applyPresetPkg(i);
       // Мобильный: скроллим к свежераскрытой панели ПОСЛЕ конца анимации.
       if (
         typeof window !== "undefined" &&
@@ -395,7 +437,7 @@ function MenuRack({
         }, 600);
       }
     },
-    [N, reduced, expandedId],
+    [N, reduced, expandedId, applyPresetPkg],
   );
 
   /* hover-intent (desktop, fine pointer) ----------------------------------- */
@@ -484,6 +526,118 @@ function MenuRack({
   const selectPkg = useCallback((catId: string, i: number) => {
     setPkgs((prev) => (prev[catId] === i ? prev : { ...prev, [catId]: i }));
   }, []);
+
+  /* c84-C: слушатели пресета тарифа (см. applyPresetPkg выше).
+     c84-F1 (критик M1-D4, MINOR): чипы вели на ШАПКУ #menu — табы
+     оставались на 270–300px ниже фолда («выбор не видно»). Теперь
+     скролл ведёт к ПАНЕЛИ открытой категории (табы в её верхней части);
+     если ни одна не открыта — открываем первую (open() сам проскроллит
+     на мобиле к свежераскрытой панели). */
+  useEffect(() => {
+    const onPreset = (e: Event) => {
+      const n = (e as CustomEvent<number>).detail;
+      if (typeof n !== "number" || !Number.isFinite(n) || n < 0) return;
+      presetPkgRef.current = n;
+      const idx = openIndexRef.current;
+      if (idx === null) {
+        open(0, false);
+        return;
+      }
+      applyPresetPkg(idx, true);
+      window.clearTimeout(scrollTimer.current);
+      scrollTimer.current = window.setTimeout(() => {
+        const item = itemRefs.current[idx];
+        if (!item) return;
+        /* c84-F2 (дефект оркестратора, замер 390×844 lite-ветка): цель —
+           блок деталей с табами (.hmenu__details: label «Выберите уровень
+           меню:» + табы + PDF-кнопка), а НЕ весь item. Весь item высок
+           (корешок + фото ~200px + список блюд): block:"center" клал
+           табы на ~300px ВЫШЕ вьюпорта (scrollY 5974, tabs top −311 —
+           юзер не видел применённый пресет — цель чипа убита). Ветка
+           срабатывает на ВСЕХ lite-устройствах (нативный скролл без
+           Lenis) — ровно та аудитория «экономного режима».
+           Двухтактная коррекция (паттерн «пере-якорь» КОНТРАКТ 8 в
+           hacc-booking): свежая загрузка → глубокий прыжок → ленивые
+           фото/шрифты выше оседают на ~40px ПОСЛЕ вычисления цели —
+           первый такт промахивается (замер: 52 вместо 96). Второй такт
+           через 720мс: дельта >24px — доводка, иначе ничего (идемпотентно). */
+        const target =
+          item.querySelector<HTMLElement>(".hmenu__details") ?? item;
+        const scrollToDetails = () => {
+          const lenis = (
+            window as unknown as {
+              __lenis?: {
+                scrollTo?: (t: Element, o?: object) => void;
+                resize?: () => void;
+              };
+            }
+          ).__lenis;
+          if (typeof lenis?.scrollTo === "function") {
+            /* c84-F2 (замер fresh-load 390×844, Lenis-ветка): после
+               дровер-лока (body fixed → документ схлопнут) внутренний
+               limit Lenis устаревает до 0 — scrollTo МОЛЧА клампит
+               таргет 5584 → 0 === targetScroll → early-return без
+               анимации (замер: call был, кадры wST — нет). Тот же фикс,
+               что у unlock-restore site-header.tsx: ПЕРЕД scrollTo —
+               публичный lenis.resize() (пересчёт геометрии).
+               offset: 0 — Lenis сам читает scroll-margin-top цели
+               (96px, см. lenis.mjs scrollTo), ручной offset = −96
+               считал бы отступ дважды (замер: посадка 148 вместо 96). */
+            lenis.resize?.();
+            lenis.scrollTo(target, { offset: 0, duration: 0.9 });
+          } else {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        };
+        scrollToDetails();
+        /* Такт 2: коррекция после оседания layout (грабля c80-подобная:
+           цель устаревает — таймер после завершения). c84-F3 (критик C,
+           MINOR): гвард «юзер уехал сам» — если за 720мс юзер начал
+           скроллить руками (позиция вне ±140px от нашей посадки), доводка
+           НЕ дёргает его обратно (паттерн гварда — hacc-booking такт-2). */
+        window.setTimeout(() => {
+          const delta = target.getBoundingClientRect().top - 96;
+          if (Math.abs(delta) > 24 && Math.abs(delta) < 140) scrollToDetails();
+        }, 720);
+      }, 120);
+    };
+    window.addEventListener("menu:pkg-preset", onPreset as EventListener);
+    return () =>
+      window.removeEventListener("menu:pkg-preset", onPreset as EventListener);
+  }, [applyPresetPkg, open]);
+
+  useEffect(() => {
+    const raw = new URLSearchParams(window.location.search).get("pkg");
+    if (raw === null) return;
+    const n = Number.parseInt(raw, 10);
+    if (!Number.isFinite(n) || n < 0) return;
+    presetPkgRef.current = n;
+    applyPresetPkg(openIndexRef.current, true);
+  }, [applyPresetPkg]);
+
+  /* c84-C: per-tariff PDF — кнопка в панели категории (активный пакет).
+     Паттерн FIX-4/W1-D: dynamic import по клику (jspdf+pako не в бандле),
+     busy «Готовим PDF…» и честный статус ошибки — как у «Каталог в PDF». */
+  const [pkgPdfBusy, setPkgPdfBusy] = useState<string | null>(null);
+  const [pkgPdfError, setPkgPdfError] = useState<string | null>(null);
+
+  const downloadPkgPdf = useCallback(
+    async (catId: string, pi: number) => {
+      const key = `${catId}#${pi}`;
+      if (pkgPdfBusy !== null) return;
+      setPkgPdfBusy(key);
+      setPkgPdfError(null);
+      try {
+        const { generateMenuPdf } = await import("@/lib/pdf-client");
+        await generateMenuPdf(catId, pi);
+      } catch {
+        setPkgPdfError(catId);
+      } finally {
+        setPkgPdfBusy(null);
+      }
+    },
+    [pkgPdfBusy],
+  );
 
   /* M1: fade-индикатор «список продолжается» — живой замер скролла открытой
      панели (перепроверяется при смене пакета/категории и на resize).
@@ -738,6 +892,7 @@ function MenuRack({
       else if (e.key === "End") next = pkgCount - 1;
       if (next < 0) return;
       e.preventDefault();
+      presetPkgRef.current = null; // c84-C: ручная навигация табом снимает пресет
       selectPkg(catId, next);
       document
         .getElementById(`${baseId}-pkg-${catId}-${next}`)
@@ -981,6 +1136,12 @@ function MenuRack({
                   </figure>
 
                   <div className="hmenu__details">
+                    {/* c84-C: явная инструкция над табами (мобайл: непонятно,
+                        что ступени — кнопки, жалоба владельца) */}
+                    <p className="hmenu__tabs-label">
+                      Выберите уровень меню:
+                    </p>
+
                     {/* табы пакетов */}
                     <div
                       className="hmenu__tabs"
@@ -999,10 +1160,14 @@ function MenuRack({
                           data-cursor={p.name.split(" (")[0].toUpperCase()}
                           data-cursor-image={p.photo ?? undefined}
                           className="hmenu__tab"
+                          data-testid={`hmenu-tab-${cat.id}-${pi}`}
                           aria-selected={pi === pkgIdx}
                           aria-controls={`${baseId}-dishlist-${cat.id}`}
                           tabIndex={pi === pkgIdx ? 0 : -1}
-                          onClick={() => selectPkg(cat.id, pi)}
+                          onClick={() => {
+                            presetPkgRef.current = null; // c84-C: ручной выбор снимает пресет
+                            selectPkg(cat.id, pi);
+                          }}
                           onKeyDown={(e) =>
                             onTabKeyDown(e, cat.id, cat.packages.length, pi)
                           }
@@ -1015,6 +1180,37 @@ function MenuRack({
                           </span>
                         </button>
                       ))}
+                    </div>
+
+                    {/* c84-C: панель активного пакета — описание (мобайл)
+                        + кнопка per-tariff PDF (одна на активную ступень) */}
+                    <div className="hmenu__pkgbar">
+                      <p className="hmenu__pkg-desc">{pkg.description}</p>
+                      <button
+                        type="button"
+                        className="hmenu__pkgpdf"
+                        data-press
+                        data-testid={`hmenu-pkgpdf-${cat.id}`}
+                        onClick={() => downloadPkgPdf(cat.id, pkgIdx)}
+                        disabled={pkgPdfBusy !== null}
+                        aria-label={`Скачать PDF пакета «${pkg.name}» — ${cat.label}`}
+                      >
+                        <Download aria-hidden="true" />
+                        <span className="hmenu__pkgpdf-label">
+                          {pkgPdfBusy === `${cat.id}#${pkgIdx}`
+                            ? "Готовим PDF…"
+                            : `Скачать PDF — ${pkg.name}`}
+                        </span>
+                      </button>
+                      {pkgPdfError === cat.id ? (
+                        <span
+                          className="hmenu__pkgpdf-status"
+                          role="status"
+                          aria-live="polite"
+                        >
+                          Не удалось собрать PDF — попробуйте ещё раз.
+                        </span>
+                      ) : null}
                     </div>
 
                     {/* блюда выбранного пакета. tabIndex=0 — панель со
@@ -1169,7 +1365,7 @@ function MenuRack({
                       aria-label={`${cat.ctaLabel} — ${cat.label}`}
                       onClick={
                         cat.ctaHref === "#calculator"
-                          ? () => presetCalculator(cat.id, cat.minGuests)
+                          ? () => presetCalculator(cat.id, cat.minGuests, pkgIdx)
                           : undefined
                       }
                     >
@@ -1338,6 +1534,17 @@ export function HaccMenu() {
         reduced={prefersReduced}
         onOpenChange={handleOpenChange}
       />
+
+      {/* c84-C: скролл-подсказка (мобайл) — «сайт продолжается». Владелец:
+          читатели останавливаются на середине и не понимают, что ниже
+          есть ещё. eyebrow-идиома секции, шеврон — bob из hmenu-cue-bob;
+          десктоп не показывает (там рэк виден целиком). */}
+      <div className="ea-container ea-container--wide">
+        <p className="hmenu__morecue" data-testid="hmenu-morecue">
+          <ChevronDown aria-hidden="true" />
+          <span>Ниже — ещё форматы и смета-калькулятор</span>
+        </p>
+      </div>
 
       {/* честная приписка под рэком: условия до заявки + ориентир бюджета
           (CFO/невеста C59/W5: коэффициент сезона публикуем, «не входит»

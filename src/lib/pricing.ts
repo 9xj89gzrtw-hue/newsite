@@ -492,15 +492,35 @@ export function seasonMultiplier(dateStr: string): number {
   return 1;
 }
 
+/**
+ * c84-B (задача 1): pkgIdx — 0-based индекс пакета в packages выбранного
+ * типа. Опционален: без него (все прежние вызовы) = min-пакет (packages[0]
+ * == t.perGuest во всех данных). Индекс клампится в валидный диапазон —
+ * URL-мусор (?pkg=-3, ?pkg=99) не роняет расчёт. perGuest в ответе — цена
+ * ВЫБРАННОГО пакета (чек/строка «N гостей × X ₽» печатает её же);
+ * pkgName — для чека и текста лида (null быть не может — packages всегда
+ * непустые, но тип поля честный optional для будущих типов без пакетов).
+ */
 export function calcTotal(
   typeId: string,
   guests: number,
   addonIds: string[],
   dateStr: string,
-): { perGuest: number; subtotal: number; addonsTotal: number; season: number; total: number } {
+  pkgIdx = 0,
+): {
+  perGuest: number;
+  subtotal: number;
+  addonsTotal: number;
+  season: number;
+  total: number;
+  pkgName?: string;
+} {
   const t = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
   const g = Math.max(guests, t.minGuests);
-  const subtotal = t.perGuest * g;
+  const clampedIdx = Math.max(0, Math.min(Math.trunc(pkgIdx), t.packages.length - 1));
+  const pkg = t.packages[clampedIdx];
+  const perGuest = pkg ? pkg.pricePerGuest : t.perGuest;
+  const subtotal = perGuest * g;
   const addonsTotal = ADDONS.filter((a) => addonIds.includes(a.id)).reduce(
     (s, a) => s + a.price,
     0,
@@ -508,11 +528,12 @@ export function calcTotal(
   const season = seasonMultiplier(dateStr);
   const total = Math.round((subtotal + addonsTotal) * season);
   return {
-    perGuest: t.perGuest,
+    perGuest,
     subtotal,
     addonsTotal,
     season,
     total,
+    pkgName: pkg?.name,
   };
 }
 

@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
+import { isLiteDevice } from "@/lib/lite-device";
+import { useLiteDevice } from "@/hooks/use-lite-device";
 
 /**
  * TottHero — Talk of the Town (talkofthetownatlanta.com) hero graft (Cycle 30).
@@ -43,9 +45,9 @@ import { useReducedMotion } from "framer-motion";
  *   (грабля §44 — позиционирующий translate живёт на обёртке).
  *   useReducedMotion остался ТОЛЬКО для видео-гейта (IO-эффект ниже);
  *   reduced-motion для hero-входа гейтится в CSS (animation: none).
- * The SiteHeader docks at the BOTTOM of this hero (100vh) via its own scroll
- * logic — see site-header.tsx. Hence `min-h-screen` so the bottom-docked nav
- * aligns to the hero's bottom edge.
+ * The SiteHeader sits in normal flow AFTER this hero and is sticky top-0 —
+ * see site-header.tsx. Hero height lives in globals.css (#hero, c84-A:
+ * 92svh + hero-peek) — не в утилите-классе здесь.
  *
  * @see docs/talkofthetown-MINED-EXTRACTION.md (hero section)
  */
@@ -92,6 +94,11 @@ const HERO_VIDEO_POSTER = "/media/hero-premium/hero-premium-6-828.webp";
 
 export function TottHero() {
   const reduce = useReducedMotion();
+  /* c84-A (задача 5): единый lite-детектор оркестратора (saveData || 2g ||
+     deviceMemory ≤ 2 || cores ≤ 4, контракт src/lib/lite-device.ts)
+     заменяет локальный saveData/2g-гейт ниже: lite → постер без видео
+     (как прежде при saveData), IO/LCP-гейты не переписаны. */
+  const lite = useLiteDevice();
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -116,17 +123,16 @@ export function TottHero() {
    * - prefers-reduced-motion: IO не создаём — статичный постер (§39).
    */
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || lite) return;
     const section = sectionRef.current;
     const video = videoRef.current;
     if (!section || !video) return;
 
-    /* saveData/2g-гейт: «мобайл-ноль» теперь только для плохих сетей и
-       режимов экономии, НЕ для всех мобильных (§41-правило переопределено
-       владельцем — см. AGENTS.md §43). */
-    type ConnInfo = { saveData?: boolean; effectiveType?: string };
-    const conn = (navigator as Navigator & { connection?: ConnInfo }).connection;
-    if (conn && (conn.saveData === true || /2g/.test(conn.effectiveType ?? ""))) return;
+    /* c84-A (задача 5): saveData/2g-гейт (Network Information API,
+       локальная проверка) ЗАМЕНЁН на единый useLiteDevice() выше —
+       порог расширен до deviceMemory/cores (adaptive loading, Osmani;
+       docs/C84-MOBILE-UX-RESEARCH.md §4.3+§5.1). Поведение то же:
+       lite → IO не создаётся, видео не стартует, постер остаётся. */
 
     const isMobile =
       window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
@@ -149,6 +155,16 @@ export function TottHero() {
     let cancelled = false;
     const tryPlay = () => {
       if (cancelled) return;
+      /* c84-A (задача 5, mount-race — находка Impl-D): первый коммит
+         эффектов стартует с lite=false (useLiteDevice поднимает стейт
+         тем же коммитом ПОСЛЕ этого эффекта) — гонка успевала скачать
+         hero-mp4 на lite-девайсах ДО flip-ререндера. Лечится синхронной
+         проверкой МОДУЛЬ-КЭША в момент play: вызванный выше useLiteDevice
+         (тот же компонент) уже вычислил кэш, а IO-коллбэк/тап приходят
+         асинхронно позже — гейт гарантированно видит lite без гонки.
+         Даунгрейд post-play (connection.change) остаётся на ререндер-ветку
+         эффекта (deps reduce/lite) → cleanup pause(). */
+      if (isLiteDevice()) return;
       // Muted-луп — разрешён всегда; отказ просто оставляет постер.
       void video.play().catch(() => {
         /* autoplay rejected (iOS Low Power Mode и т.п.) — постер
@@ -201,7 +217,7 @@ export function TottHero() {
       window.removeEventListener("touchend", retryOnTouch);
       window.removeEventListener("touchstart", retryOnTouch);
     };
-  }, [reduce]);
+  }, [reduce, lite]);
 
   /** FIX-4: React не сериализует атрибут `muted` в SSR-HTML (known
    *  React #10389) — пиним DOM-свойство на монте, чтобы muted-autoplay
@@ -217,7 +233,22 @@ export function TottHero() {
       id="hero"
       data-header-theme="transparent"
       aria-label="nilov catering — лучший кейтеринг Санкт-Петербурга"
-      className="relative min-h-[100svh] w-full overflow-hidden bg-black"
+      /* c84-A (задача 4b, hero-peek): высота 100svh → 92svh — следующий
+         контент (SiteHeader в потоке после hero) выглядывает ~8% над
+         фолдом (NN/G «illusion of completeness»: 6 из 8 юзеров не
+         листали full-screen хиро). Высота живёт в globals.css (#hero,
+         id-специфичность бьёт утилиту) с vh-фоллбеком для браузеров
+         без svh.
+         РЕШЕНИЕ по снапшоту (замер+VLM, подробности в worklog c84-A):
+         peek ОСТАВЛЕН (67px @390 = лого+навигация, VLM «осознанная
+         подсказка» в чистом состоянии) + добавлен .hero-bottom-fade —
+         градиент-фэйд низа, чтобы белый срез читался как граница, а не
+         случайный обрез. Известная интеракция: на ПЕРВОМ визите
+         cookie-баннер (fixed, bottom 140px — контракт c81 под 100svh)
+         перекрывает метку «Листайте» (cue привязан к низу 92svh-героя,
+         поднялся на 8svh). Повторные визиты — чисто. Файл баннера не
+         мой — координация задокументирована в worklog. */
+      className="relative w-full overflow-hidden bg-black"
       /* F4 / задача 2 (K1 MAJOR «first-paint крем-вспышка»): инлайновый
          SSR-гейт — тёмный espresso-фон секции сериализуется прямо в HTML,
          первый кадр под (ещё не загрузившимся) постером гарантированно
@@ -275,6 +306,11 @@ export function TottHero() {
         className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0)_0%,rgba(0,0,0,0.35)_70%,rgba(0,0,0,0.6)_100%)]"
         aria-hidden="true"
       />
+
+      {/* c84-A (задача 4b): мягкий фэйд низа hero (см. .hero-bottom-fade в
+          globals.css) — белый срез выглядывающей шапки под 92svh-героем
+          читается как осознанная граница, cue получает тёмный пьедестал. */}
+      <div className="hero-bottom-fade z-[2]" aria-hidden="true" />
 
       {/* 5px white border decorative frame — talkofthetown SR7 signature. */}
       <span className="tott-border-frame z-[3]" aria-hidden="true" />
@@ -374,11 +410,14 @@ export function TottHero() {
             forces the wrap on mobile only; on sm+ screens the <br> is hidden
             so the label renders as one line. Generous editorial whitespace
             below the script pair (mt-10). padding-left optically centers
-            the tracked label. */}
+            the tracked label.
+            c84-A (задача 3, читаемость): clamp 11px → 12.5px на мобиле —
+            владелец: «некоторым слишком мелко, но должно остаться
+            красиво» (капс-лидер, трекинг/кегель-пропорции сохранены). */}
         <p
           className="tott-body text-white/85"
           style={{
-            fontSize: "clamp(11px, 1.2vw, 14px)",
+            fontSize: "clamp(12.5px, 1.4vw, 14px)",
             lineHeight: 1.4,
             letterSpacing: "0.35em",
             fontWeight: 700,
@@ -403,14 +442,20 @@ export function TottHero() {
           -translate-x-1/2), внутренний .hero-cue узел — входом (opacity):
           CSS-transform в keyframes заменяет computed transform, поэтому
           позиционирующий translate обязан жить на РОДИТЕЛЕ (грабля §44).
-          Линия — .hero-cue-line: пульс scaleY на собственном узле без
-          других transform; reduced-motion → animation:none (CSS-гейт). */}
+          c84-A (задача 4c): + .hero-cue-wrap на обёртке — уход cue при
+          прокрутке привязан к именованному #hero view-таймлайну
+          (--hero-exit, globals.css): opacity 1→0 на первых ~25% exit.
+          Анимируется ТОЛЬКО opacity обёртки (никакого transform —
+          позиционирующий перевод не трогаем). Линия — .hero-cue-line:
+          пульс scaleY на собственном узле без других transform;
+          reduced-motion → animation:none (CSS-гейт). */}
       <div
-        className="absolute bottom-12 left-1/2 z-10 -translate-x-1/2"
+        className="hero-cue-wrap absolute bottom-12 left-1/2 z-10 -translate-x-1/2"
         aria-hidden="true"
       >
         <div className="hero-cue flex flex-col items-center gap-2">
-          <span className="tott-body text-[13px] font-bold uppercase tracking-[0.35em] text-white/85">
+          {/* c84-A (задача 3, читаемость): 13px → 14px. */}
+          <span className="tott-body text-[14px] font-bold uppercase tracking-[0.35em] text-white/85">
             Листайте
           </span>
           <span

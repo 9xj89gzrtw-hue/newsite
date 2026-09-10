@@ -46,9 +46,16 @@
 .hbooking a { text-decoration: none; }
 
 /* X4 (task 13-fix4, seal-жюри): мобильный пол кегля 12px — на <768px
-   label-уровень капс-шкалы поднимается с 11.5 до 12px (desktop не тронут). */
+   label-уровень капс-шкалы поднимается с 11.5 до 12px (desktop не тронут).
+   c84-B (задача 5): пол поднят до 13.5px (label) / 14px (eyebrow) —
+   владелец: «слишком мелко». Двухуровневая шкала T4 сохранена: eyebrow
+   (заголовки групп «Тип события»/«Пакет меню»/«Гости») остаётся ВЫШЕ
+   label-уровня. */
 @media (max-width: 767px) {
-  .hbooking { --hb-caps-label-fs: 0.75rem; }
+  .hbooking {
+    --hb-caps-label-fs: 0.84375rem;   /* 12 → 13.5px */
+    --hb-caps-eyebrow-fs: 0.875rem;   /* 12.5 → 14px */
+  }
 }
 
 /* ------------------------------------------------------------------ шапка */
@@ -75,9 +82,13 @@
 
 /* D2 (task 7-fix1): нативный якорный прыжок (#calculator из футера,
    #contact из шапки/privacy/offer) обязан оставлять место под sticky-шапку
-   (84px) — иначе якорь уезжает за верх вьюпорта. */
+   (84px) — иначе якорь уезжает за верх вьюпорта.
+   c84-B (задача 2): #hb-check — та же норма для нативного фоллбека тапа
+   по сумме мобильного бара (scrollIntoView уважает scroll-margin: панель
+   чека приезжает ПОД шапкой, а не под ней; замер: header 73px на 390px). */
 .hbooking,
-.hb-zone { scroll-margin-top: 96px; }
+.hb-zone,
+#hb-check { scroll-margin-top: 96px; }
 
 .hb-grid {
   display: grid;
@@ -199,6 +210,170 @@
   background: var(--hb-red);
 }
 
+/* =============================================== ПАКЕТЫ МЕНЮ (c84-B, t.1) */
+
+/* Сегмент-контрол пакетов в идиоме карточек-типов (hb-type): те же рамка/
+   радиус/красный тинт активного. auto-fit — 2–4 пакета ложатся в ряд на
+   десктопе (snack-box — 4 набора), на мобиле — 1 колонка full-width.
+   Тач-таргет ≥44px обеспечен контентом (карточка всегда выше 44px). */
+.hb-pkgs {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.25rem), 1fr));
+  gap: 0.6rem;
+}
+.hb-pkg {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 44px;
+  text-align: left;
+  padding: 0.8rem 0.95rem 0.95rem;
+  background: #fff;
+  border: 1px solid var(--hb-line);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.hb-pkg:hover {
+  border-color: color-mix(in srgb, var(--hb-red) 55%, var(--hb-line));
+  box-shadow: 0 10px 26px -18px color-mix(in srgb, var(--hb-red) 65%, transparent);
+}
+/* T5-канон: ОДИН красный на активную карточку — red-deep (AA), как у типов. */
+.hb-pkg--on {
+  border-color: var(--hb-red);
+  background: color-mix(in srgb, var(--hb-red) 4%, #fff);
+  box-shadow: 0 14px 30px -20px color-mix(in srgb, var(--hb-red) 70%, transparent);
+}
+.hb-pkg__name {
+  font-family: var(--hb-serif);
+  font-size: 1.06rem;
+  line-height: 1.25;
+  color: var(--hb-ink);
+}
+.hb-pkg--on .hb-pkg__name { color: var(--hb-red-deep); }
+.hb-pkg__price {
+  margin-top: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
+}
+.hb-pkg--on .hb-pkg__price { color: var(--hb-red-deep); }
+.hb-pkg__desc {
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--hb-ink) 65%, transparent);
+}
+.hb-pkg__underline {
+  position: absolute;
+  left: 0.95rem;
+  right: 0.95rem;
+  bottom: 0.55rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hb-red);
+}
+
+/* ======================================== ДОПУСЛУГИ (c84-B, t.2) */
+
+/* Чекбокс-ряды в духе hb-consent (нативный бокс + accent-color) на карточке
+   hb-type: клик по всему label, тач ≥44px (min-height), 2 колонки ≥640. */
+.hb-addons {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+@media (min-width: 640px) {
+  .hb-addons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.hb-addon {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 48px;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--hb-line);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+.hb-addon:hover {
+  border-color: color-mix(in srgb, var(--hb-red) 55%, var(--hb-line));
+}
+.hb-addon--on {
+  border-color: var(--hb-red);
+  background: color-mix(in srgb, var(--hb-red) 4%, #fff);
+  box-shadow: 0 12px 26px -20px color-mix(in srgb, var(--hb-red) 70%, transparent);
+}
+.hb-addon__box {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin: 0;
+  accent-color: var(--hb-red);
+  cursor: pointer;
+}
+.hb-addon__box:focus-visible {
+  outline: 2px solid var(--hb-red-deep, #b91431);
+  outline-offset: 2px;
+}
+.hb-addon__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--hb-ink) 80%, transparent);
+}
+.hb-addon__price {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
+}
+.hb-addon--on .hb-addon__price { color: var(--hb-red-deep); }
+
+/* ==================== ПОДСКАЗКА «ПАКЕТ И ГОСТИ — НИЖЕ» (c84-B, t.3) */
+
+/* Микроподсказка после первого выбора формата: только <1280 (десктоп не
+   нужен), гаснет по IO. aria-hidden — чисто навигационная. Класс — СВОЙ
+   (не .hb-panel__next: тот живёт на панели в стадии form/success). */
+.hb-types-hint {
+  display: none;
+}
+@media (max-width: 1279.98px) {
+  .hb-types-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.65rem 0 0;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--hb-red-deep);
+    animation: hb-hint-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) 1;
+  }
+  .hb-types-hint svg {
+    animation: hb-hint-bob 1.6s ease-in-out infinite;
+  }
+}
+@keyframes hb-hint-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes hb-hint-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hb-types-hint { animation: none; }
+  .hb-types-hint svg { animation: none; }
+}
+
 /* 2 · гости — odometer + слайдер */
 
 .hb-minwarn {
@@ -315,7 +490,10 @@
   background: transparent;
   font-family: var(--hb-caps);
   font-weight: 600;
-  font-size: 0.68rem;
+  /* c84-F3 (критик A, задача владельца «мелко»): 0.68rem (10.88px) →
+     0.75rem (12px) — тики-пресеты КЛИКАБЕЛЬНЫ, кегль им положен как
+     тексту. */
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   /* W3-FIX (a11y/контраст): неактивные тики — 12px КЛИКАБЕЛЬНЫЕ кнопки,
      38% ink на #F7F5F5 давало 2.27:1. 62% ≈ 4.5:1. Активный тик
@@ -503,7 +681,7 @@
   background: #fff;
   font-family: var(--hb-caps);
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.875rem; /* c84-F1 (M2-№4): 12.5 → 14px — кнопки ±1 читаемы */
   letter-spacing: 0.08em;
   color: var(--hb-ink);
   transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
@@ -520,7 +698,7 @@
   padding: 0.32rem 0.75rem;
   border-radius: 10px;
   background: color-mix(in srgb, var(--hb-ink) 5%, transparent);
-  font-size: 0.78rem;
+  font-size: 0.84375rem; /* c84-F1 (M2-№4): 12.5 → 13.5px — сноска без щурила */
   line-height: 1.45;
   color: color-mix(in srgb, var(--hb-ink) 65%, transparent);
 }
@@ -594,6 +772,9 @@
 .hb-date__pop {
   width: auto;
   padding: 0.5rem;
+  /* c84-F1 (критик M1-D2, MAJOR): календарь обязан жить НАД cookie-баннером
+     (z-80) — до фикса 21 из 35 кнопок дней были перекрыты на первом визите. */
+  z-index: 90;
 }
 /* 81-W2F1: скелетон календаря на время загрузки async-чанка
    (next/dynamic, критик H TBT): габарит под реальный календарь
@@ -942,7 +1123,8 @@
   align-items: center;
   gap: 0.4rem;
   margin-top: 0.9rem;
-  font-size: 0.72rem;
+  /* c84-F3 (критик A): 0.72rem → 0.75rem (12px). */
+  font-size: 0.75rem;
   color: color-mix(in srgb, var(--hb-ink) 48%, transparent);
 }
 
@@ -1113,7 +1295,8 @@
   display: block;
   border-bottom: 0;
   padding-top: 0.45rem;
-  font-size: 0.72rem;
+  /* c84-F3 (критик A): 0.72rem → 0.75rem (12px) — сноска чека. */
+  font-size: 0.75rem;
   line-height: 1.5;
   /* K7-FIX (P2 / 1.4.3): «Включено: …» ink 50% = 3.31:1 на бумаге #FDFCF9
      (FAIL) → 70% = 6.33:1 ✓. Кегль не тронут: X4-фикс держит ≥12px на
@@ -1121,6 +1304,9 @@
      покрыт контрастом с запасом. */
   color: color-mix(in srgb, var(--hb-ink) 70%, transparent);
 }
+/* c84-B: строка допуслуги в чеке — value red-deep (доплата читается тем же
+   акцентом, что сезонная строка; лейбл остаётся нейтральным). */
+.hb-line--addon .hb-line__value { color: var(--hb-red-deep); }
 
 /* итог */
 
@@ -1334,7 +1520,11 @@
   bottom: calc(12px + var(--hbooking-cookie-h, 0px) + env(safe-area-inset-bottom, 0px));
   z-index: 40;
   display: none; /* >=768 — скрыт всегда; иначе .hb-bar перебивает md:hidden (порядок чанков) */
-  max-height: 72px;
+  /* c84-B (задача 5): 72 → 84px — кегли бара выросли до 13.5px (метка
+     «+N доп.» в строке гостей): label 13.5 + сумма 1.3rem + guests 13.5
+     + паддинги 0.6×2 = ~76px; 84px — с запасом, FAB-лифт ниже поднят
+     соответственно (92 → 100px). */
+  max-height: 84px;
   padding: 0.6rem 0.7rem 0.6rem 1rem;
   border-radius: 16px;
   background: linear-gradient(165deg, var(--night, #1f2937), var(--night-2, #111827));
@@ -1379,6 +1569,15 @@
   min-width: 0;
   margin: 0;
   line-height: 1.2;
+  /* c84-B (задача 2): сумма — КНОПКА (тап → скролл к смета-чеку);
+     сброс браузерных стилей кнопки — визуал прежний (p-подобный столбец). */
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 .hb-bar__total-label {
   font-family: var(--hb-caps);
@@ -1411,7 +1610,7 @@
   color: #fff;
   font-family: var(--hb-caps);
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.875rem; /* c84-F1 (M2-№4): лип-бар CTA 12.8 → 14px — конверсионная кнопка читается мгновенно */
   letter-spacing: 0.07em;
   text-transform: uppercase;
   cursor: pointer;
@@ -1429,7 +1628,7 @@
    CTA бара «Оставить заявку» (замер 390px). */
 @media (max-width: 767px) {
   body:has(.hb-bar[data-visible="true"]) :is(.fixed.bottom-6.left-6, .fixed.bottom-6.right-6) {
-    bottom: calc(92px + var(--hbooking-cookie-h, 0px) + env(safe-area-inset-bottom, 0px));
+    bottom: calc(100px + var(--hbooking-cookie-h, 0px) + env(safe-area-inset-bottom, 0px));
     transition: bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
@@ -1687,16 +1886,20 @@
 /* ================================================== T2 (task 11-fix3):
    МОБИЛЬНЫЙ МИКРОКЕГЛЬ ЧЕКА — только <768, desktop не тронут.
    Пороги критика: строки позиций ≥14px; сноски/cta-note/type ≥12.5px;
-   «Итого за гостя» ≥13.5px. */
+   «Итого за гостя» ≥13.5px.
+   c84-B (задача 5): «слишком мелко» — строки чека 14 → 15px, сноски
+   12.5 → 13.5px, «/чел» 13.5 → 15px. Линк-хайты кратны кеглю — переносятся
+   вместе с текстом, layout чека растёт естественно (клип .hb-lines__clip
+   без фикс. высоты). */
 @media (max-width: 767.98px) {
-  .hb-line { font-size: 0.875rem; }            /* 13.6 → 14px */
+  .hb-line { font-size: 0.9375rem; }             /* 14 → 15px */
   .hb-line--included,
   .hb-note,
   .hb-note--season,
   .hb-cta-note,
-  .hb-paper__type { font-size: 0.78125rem; }   /* 11.84 → 12.5px */
-  .hb-total__per { font-size: 0.84375rem; }    /* 12.48 → 13.5px */
-  .hb-note--tasting { font-size: 0.78125rem; } /* W3: 13 → 12.5px (12–13 капс) */
+  .hb-paper__type { font-size: 0.84375rem; }    /* 12.5 → 13.5px */
+  .hb-total__per { font-size: 0.9375rem; }      /* 13.5 → 15px */
+  .hb-note--tasting { font-size: 0.84375rem; }  /* 12.5 → 13.5px */
 }
 
 /* ================================================== X4 (task 13-fix4):
@@ -1705,19 +1908,28 @@
    шаг-цифры нити 9.92, .hb-label / .hb-label-caps__opt / .hb-label__opt /
    .hb-panel__caps / .hb-total__label / .hb-ccard__sub / .hb-bar__total-label
    11.5, .hb-safe 11.52, .hb-bar__guests 11.2. Полный замер до/после —
-   research/c64/verify-fix4.json (x4_before / x4_after). */
+   research/c64/verify-fix4.json (x4_before / x4_after).
+   c84-B (задача 5): пол 12 → 13.5px (замена X4-уровня, пороги media
+   сохранены — только значения). .hb-form__node — цифра в круге 22px,
+   13.5px влезает (place-items center, line-height 1); тики слайдера —
+   бокс 44px с паддинг-топ 6px, лейбл остаётся на месте. Инпуты формы
+   и без того 16px (iOS-зум-гейт, правило .hb-form input.hb-input выше).
+   Новые узлы c84-B (пакеты/допуслуги) — тем же полом. */
 @media (max-width: 767.98px) {
-  .hb-slider__tick { font-size: 0.75rem; }   /* 10.88 → 12px */
-  .hb-form__node { font-size: 0.75rem; }     /* 9.92 → 12px */
+  .hb-slider__tick { font-size: 0.84375rem; }  /* 12 → 13.5px */
+  .hb-form__node { font-size: 0.84375rem; }    /* 12 → 13.5px */
   .hb-label-caps__opt,
-  .hb-label__opt { font-size: 0.75rem; }     /* 11.52 → 12px */
+  .hb-label__opt { font-size: 0.84375rem; }    /* 12 → 13.5px */
   .hb-label,
   .hb-panel__caps,
   .hb-total__label,
   .hb-bar__total-label,
-  .hb-ccard__sub { font-size: 0.75rem; }     /* 11.5 → 12px */
-  .hb-safe { font-size: 0.75rem; }           /* 11.52 → 12px */
-  .hb-bar__guests { font-size: 0.75rem; }    /* 11.2 → 12px */
+  .hb-ccard__sub { font-size: 0.84375rem; }    /* 12 → 13.5px */
+  .hb-safe { font-size: 0.84375rem; }          /* 12 → 13.5px */
+  .hb-bar__guests { font-size: 0.84375rem; }   /* 12 → 13.5px */
+  .hb-pkg__price,
+  .hb-pkg__desc { font-size: 0.84375rem; }     /* 12.5 → 13.5px */
+  .hb-addon__price { font-size: 0.84375rem; }  /* 12.8 → 13.5px */
 }
 
 /* ================================================== Fix5 V8: H2 — вторая
@@ -1874,7 +2086,7 @@
 
 /* ================================================== A11Y / MOTION */
 
-.hbooking :is(.hb-btn, .hb-type, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-consent__link, .hb-date__trigger, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input, .hb-input, .hb-map, .hb-form__legend-btn):focus-visible {
+.hbooking :is(.hb-btn, .hb-type, .hb-pkg, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-bar__total, .hb-consent__link, .hb-date__trigger, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input, .hb-input, .hb-map, .hb-form__legend-btn):focus-visible {
   /* K7-FIX (P2 / 2.4.11): gold #D4A373 = 2.08:1 на креме → FAIL.
      --hb-red-deep #B91431: 6.03:1 на креме / 6.55:1 на белом ✓.
      Правило unlayered — перебивает и базовый globals-канон, и тайлвиндовый
@@ -1887,7 +2099,7 @@
    (.hb-bar__cta, #1F2937→#111827): бордо там 1.45:1 / 2.24:1 (невидим)
    → инверсный белый контур: 4.53:1 на красном, 14.7–17.7:1 на night ✓.
    Специфичность (0,3,0)+перечисление выше — перекрывает правило выше. */
-.hbooking :is(.hb-panel__again, .hb-bar__cta):focus-visible {
+.hbooking :is(.hb-panel__again, .hb-bar__cta, .hb-bar__total):focus-visible {
   outline-color: #fff;
 }
 
@@ -1923,12 +2135,15 @@
   .hb-lines,
   .hb-cta-zone { transition: none; }
   .hb-type,
+  .hb-pkg,
+  .hb-addon,
   .hb-clink,
   .hb-ccard,
   .hb-btn,
   .hb-step-btn,
   .hb-bar,
   .hb-bar__cta,
+  .hb-bar__total,
   .hb-clink__arrow,
   .hb-label,
   .hb-form__legend-btn,

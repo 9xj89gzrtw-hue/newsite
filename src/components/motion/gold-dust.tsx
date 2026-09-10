@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLiteDevice } from "@/hooks/use-lite-device";
 import "./wow.css";
 
 /**
@@ -19,6 +20,11 @@ import "./wow.css";
  * - DPR cap 1.5; rAF-цикл С ПАУЗАМИ: document.hidden → стоп,
  *   IntersectionObserver секции → вне вьюпорта стоп.
  * - prefers-reduced-motion → canvas вообще не рендерится.
+ * - c84 (Impl-D, lite-режим): useLiteDevice() → canvas не рендерится ВООБЩЕ
+ *   (как под reduce): rAF-цикл + canvas 2d = постоянная GPU/CPU-нагрузка на
+ *   слабых девайсах/экономном режиме. Даунгрейд односторонний: если lite
+ *   поднялся ПОСЛЕ включения (connection.change), канвас разбирается
+ *   (cleanup эффекта гасит rAF/IO/RO) и больше не возвращается.
  * - resize через ResizeObserver с debounce 150ms, частицы
  *   пересчитываются пропорционально (без визуального «попа»).
  * - SSR-safe: канвас появляется только после mount-эффекта (первый
@@ -99,14 +105,22 @@ const makeDust = (x: number, y: number): Dust => {
 
 export function GoldDust() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  // Канвас рендерится только после mount и без reduce-motion:
-  // сервер и первый клиентский рендер дают null → гидрация стабильна
+  // Канвас рендерится только после mount, без reduce-motion и НЕ в
+  // lite-режиме: сервер и первый клиентский рендер дают null →
+  // гидрация стабильна (lite поднимается post-mount — как и reduce)
   const [enabled, setEnabled] = useState(false);
+  const lite = useLiteDevice();
 
   useEffect(() => {
+    if (lite) {
+      // c84-D lite: пыль — чисто декоративный rAF-канвас; на слабом
+      // устройстве/экономном режиме его не должно быть в DOM вовсе.
+      setEnabled(false);
+      return;
+    }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     setEnabled(true);
-  }, []);
+  }, [lite]);
 
   useEffect(() => {
     if (!enabled) return;

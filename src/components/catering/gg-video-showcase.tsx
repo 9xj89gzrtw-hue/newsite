@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMounted } from "@/hooks/use-mounted";
+import { isLiteDevice } from "@/lib/lite-device";
+import { useLiteDevice } from "@/hooks/use-lite-device";
 import { GoldDust } from "@/components/motion/gold-dust";
 import { useHapticFeedback } from "@/components/motion/tap-feedback";
 /* c83-B (Impl-B, задача 1): Magnetic на Play-pill и kinetic-h2
@@ -76,6 +78,15 @@ import "@/components/motion/c74-kinetic.css";
 /** Editorial easing — Ridgewell/CEP/EA shared curve. */
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/* c84-A (задача 2, прямая просьба владельца): цикл слов второй строки H2.
+   «кино» замыкает список на субтитл («мы создаём кино, которое можно
+   попробовать»). Порядок фиксирован — SEO/SSR всегда видит первое слово. */
+const ROTATE_WORDS = ["искусство", "ритуал", "спектакль", "кино"] as const;
+/** Интервал смены слова, мс (WordRotate-паттерн ~2500-3000). */
+const ROTATE_INTERVAL_MS = 2600;
+/** Длительность exit/enter-флипа слова, с (mode="wait": полный цикл 2×). */
+const MORPH_DURATION_S = 0.45;
+
 type Cta = {
   /** Visible label (Russian). */
   label: string;
@@ -92,6 +103,10 @@ export function GgVideoShowcase() {
   const mounted = useMounted();
   const reduce = useReducedMotion();
   const animate = mounted && !reduce;
+  /* c84-A (задача 5): единый lite-детектор оркестратора (saveData || 2g ||
+     deviceMemory ≤ 2 || cores ≤ 4, контракт src/lib/lite-device.ts).
+     Гидро-паритет: SSR/первый рендер — false, даунгрейд после монта. */
+  const lite = useLiteDevice();
 
   // Волна 1 / Task 1-c2: единый document-level тап-хаптик (вибрация 8ms
   // на тапах по button/a/[role=button]; iOS молча скипает — нет API).
@@ -102,6 +117,14 @@ export function GgVideoShowcase() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [expanded, setExpanded] = useState(false);
 
+  /* c84-A (задача 2): индекс текущего слова морфинга. SSR/до монта — 0
+     («искусство»), меняется ТОЛЬКО интервалом ниже (клиент). */
+  const [wordIndex, setWordIndex] = useState(0);
+  /* c84-A (задача 2): секция в вьюпорте? Отдельный маленький IO — пауза
+     таймера морфинга вне кадра (грабля §52: анимация вне экрана —
+     бесплатно не бывает). Начальное false — до первого колбэка IO. */
+  const [sectionInView, setSectionInView] = useState(false);
+
   /** W4-FIX: React doesn't serialize the `muted` attribute into SSR HTML
    *  (known #10389) — pin the DOM property on mount so the muted autoplay
    *  below is never rejected. togglePlay owns `muted` afterwards. */
@@ -109,6 +132,36 @@ export function GgVideoShowcase() {
     const video = videoRef.current;
     if (video) video.muted = true;
   }, []);
+
+  /* c84-A (задача 2): видимость секции для паузы морфинга. IO без
+   *  rootMargin/threshold: isIntersecting = «хоть пиксель в кадре»;
+   *  колбэк приходит сразу на observe — стейт синхронизируется с
+   *  фактическим положением секции (в т.ч. при приземлении по #якорю). */
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const io = new IntersectionObserver((entries) => {
+      setSectionInView(entries[0].isIntersecting);
+    });
+    io.observe(section);
+    return () => io.disconnect();
+  }, []);
+
+  /* c84-A (задача 2): интервал ротации слова. Стартует ТОЛЬКО после
+   *  монта (SSR-текст статичен — LCP/SEO не трогаем), стоит при
+   *  reduce-motion (a11y: слепой/вестибулярный пользователь не должен
+   *  ловить смену слова периферией) и вне вьюпорта (IO-пауза). Все
+   *  читаемые значения — в deps (грабля React Compiler).
+   *  c84-F3 (критик C, NIT): + lite-гейт — декоративное движение гасим
+   *  на слабых/экономных девайсах (идеология c84), слово остаётся
+   *  статичным «искусство» (SSR-дефолт). */
+  useEffect(() => {
+    if (!mounted || reduce || lite || !sectionInView) return;
+    const id = window.setInterval(() => {
+      setWordIndex((i) => (i + 1) % ROTATE_WORDS.length);
+    }, ROTATE_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [mounted, reduce, lite, sectionInView]);
 
   /** W4-FIX «видео-вау»: the clip plays as a muted loop as soon as the
    *  section is near the viewport (muted autoplay is always permitted) and
@@ -120,7 +173,7 @@ export function GgVideoShowcase() {
    *  on unmount. prefers-reduced-motion: no IO at all — the poster stays
    *  and the clip plays only after a user click. */
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || lite) return;
     const section = sectionRef.current;
     const video = videoRef.current;
     if (!section || !video) return;
@@ -128,6 +181,15 @@ export function GgVideoShowcase() {
       (entries) => {
         const entry = entries[0];
         if (entry.isIntersecting) {
+          /* c84-A (задача 5, mount-race — тот же фикс, что в tott-hero):
+             IO-эффект первого коммита стартует с lite=false (стейт
+             useLiteDevice поднимается тем же коммитом позже) — при
+             приземлении по якорю на lite-девайсе коллбэк успевал
+             video.play() до flip-ререндера. Синхронный модуль-кэш
+             isLiteDevice() в момент play закрывает окно гонки. Тап по
+             пиллу (togglePlay) НЕ гейчен: юзер-жест = осознанный
+             запрос байтов, видео включается по нажатию. */
+          if (isLiteDevice()) return;
           // Muted in teaser state; when expanded (sound on) the prior
           // click counts as user activation, so unmuted play() is allowed
           // too — a rejection just leaves the native controls in charge.
@@ -145,7 +207,7 @@ export function GgVideoShowcase() {
       io.disconnect();
       video.pause();
     };
-  }, [reduce]);
+  }, [reduce, lite]);
 
   /** Toggle the play-pill: expanded → unmuted + native controls (user
    *  gesture, so play-with-sound is guaranteed); collapsed → back to the
@@ -266,8 +328,11 @@ export function GgVideoShowcase() {
                 (view-таймлайн, wght 400→700) — утилита c74-kinetic.css,
                 reduce/нет-timeline → статический 400 (штатный вид).
                 База ea-section-h2 = font-weight 400 — в покое вид
-                идентичен прежнему. */
-            className="ea-section-h2 kinetic-h2 mb-8 mt-2 max-w-4xl text-white"
+                идентичен прежнему.
+                c84-A (задача 1): mb-8 → mb-5 на мобиле — компактнее
+                вертикальный стек оверлея, чтобы Play-pill не наезжал
+                (pill на мобиле поднят выше, см. Magnetic ниже). */
+            className="ea-section-h2 kinetic-h2 mb-5 mt-2 max-w-4xl text-white md:mb-8"
             style={{
               color: "#fff",
               textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)",
@@ -275,14 +340,56 @@ export function GgVideoShowcase() {
           >
             Кейтеринг как
             <br />
-            <i>искусство</i>
+            {/* c84-A (задача 2, WordRotate): вторая строка — морфинг слов
+                искусство → ритуал → спектакль → кино. Требования §52:
+                - SSR-HTML несёт статичное «искусство» (sr-only для
+                  скринридера + видимый спан); морфинг стартует после
+                  монта (интервал выше);
+                - AnimatePresence mode="wait" + initial={false} — первый
+                  рендер БЕЗ входной анимации (framer не шипит в SSR
+                  инлайн-стили начального состояния), смена слова:
+                  exit вверх / enter снизу (y ±60%, ТОЛЬКО
+                  transform/opacity, motion.dev-гайд);
+                - контейнер фикс. высоты (border-box 1.28em = line-height
+                  H2 1.08em + 0.2em запас на десцендеры кириллицы —
+                  у/р Playfair выходят за line-box при lh 1.08; строка
+                  контейнера стоит на месте ритма H2) +
+                  overflow-hidden — смена слова не прыгает по вертикали;
+                - a11y: морф-спан aria-hidden (синонимы не орут при
+                  каждой смене), скринридер читает «Кейтеринг как
+                  искусство» из sr-only;
+                - курсив/красный — наследование .ea-section-h2 i;
+                  kinetic-h2 wght-анимация H2 не тронута. */}
+            <i>
+              <span className="sr-only">искусство</span>
+              <span
+                aria-hidden="true"
+                className="block overflow-hidden"
+                style={{ height: "1.28em", paddingBottom: "0.2em" }}
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={ROTATE_WORDS[wordIndex]}
+                    className="block"
+                    initial={{ opacity: 0, y: "60%" }}
+                    animate={{ opacity: 1, y: "0%" }}
+                    exit={{ opacity: 0, y: "-60%" }}
+                    transition={{ duration: MORPH_DURATION_S, ease: EASE }}
+                  >
+                    {ROTATE_WORDS[wordIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </i>
           </motion.h2>
 
           {/* Subtitle — white @ 85%, max-w-2xl editorial column.
-              Task 4-B: text-shadow for contrast in motion. */}
+              Task 4-B: text-shadow for contrast in motion.
+              c84-A (задача 1): mb-8 → mb-5 на мобиле (компактный стек
+              под пилл), md+ — как было. */}
           <motion.p
             {...reveal(0.08)}
-            className="mb-8 max-w-2xl text-white/85"
+            className="mb-5 max-w-2xl text-white/85 md:mb-8"
             style={{
               fontFamily: "var(--ea-font-body)",
               fontSize: "clamp(1rem, 1.1vw, 1.1rem)",
@@ -346,8 +453,14 @@ export function GgVideoShowcase() {
             (transform 300ms EASE, гейты hover/reduce — globals.css);
             Tailwind transition-opacity duration-500 перенесён туда же
             (общий transition-property: opacity, transform). */}
+        {/* c84-A (задача 1, FIX перекрытия на мобиле): контент-стек
+            оверлея (H2 + субтитл + 2 CTA ≈ 350px от низа) наезжал на
+            центр-пилл. На мобиле пилл поднят выше зоны контента: центр
+            на 26% высоты секции (перевод по вертикали сохранён);
+            md+ — прежний центр секции, десктопный вид не меняется.
+            Magnetic/центровка/data-press не тронуты (см. докблок ниже). */}
         <Magnetic
-          className="absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2"
+          className="absolute left-1/2 top-[26%] z-20 flex -translate-x-1/2 -translate-y-1/2 md:top-1/2"
         >
         <button
           type="button"

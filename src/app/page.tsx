@@ -15,6 +15,14 @@ import { GammaSeparator } from "@/components/catering/gamma-separator";
 import { EaFaqAccordion } from "@/components/catering/ea-faq-accordion";
 import { CepInstagramGrid } from "@/components/catering/cep-instagram-grid";
 import { SiteFooter } from "@/components/catering/site-footer";
+/* c84-A (задача 4a): ScrollProgress — полоса прогресса чтения, ЧИСТЫЙ
+   CSS scroll-driven (animation-timeline: scroll(root), c74-kinetic.css),
+   ноль JS-кадров; гварды reduced-motion/@supports/print — в CSS. Рендер
+   ОДИН раз, первым ребёнком <main>: fixed-полоса z-90 над sticky-хедером
+   (DOM-порядок не влияет на позицию; первый ребёнок = в потоке разметки
+   полоса читается раньше секций). Server Component — попадает в SSR-HTML
+   без гидрации. */
+import { ScrollProgress } from "@/components/catering/scroll-progress";
 /* 81-F2b: vanity-URL /menu /events /contacts /calculator приезжают на
    главную через next.config-rewritы с scrollY=0 (hash до браузера не
    доходит) — клиентский скроллер ведёт к целевой секции (см. докстринг
@@ -257,6 +265,10 @@ export default function Home() {
       tabIndex={-1}
       className="flex min-h-screen flex-col bg-cream outline-none"
     >
+      {/* c84-A (задача 4a): полоса прогресса чтения — первый ребёнок
+          <main> (см. импорт-блок). */}
+      <ScrollProgress />
+
       {/* W4-AUDIT NOTE: espresso theme-flip (GammaSeparator) остаётся скрытым
           под bg-cream — секции сидят на захардкоженном --ea-cream с тёмным
           текстом, раскрытие флипа = отдельная дизайн-задача (риск контраста).

@@ -85,6 +85,17 @@ const NAV: NavItem[] = [
    оверлея (0.5 с) — прыжок под скрывающимся меню незаметен. */
 const DRAWER_NAV_DELAY_MS = 280;
 
+/* c84-C: чипы тарифов в дровере — «Выбрать тариф меню» (жалоба владельца:
+   выбор уровня меню был неочевиден). Клик = /?pkg=N#menu: каталог
+   применяет пресет к открытой категории (hacc-menu слушает событие
+   "menu:pkg-preset" и читает ?pkg на монте). Индексы — ступени пакетов
+   каталога (Базовый/Стандарт/Премиум), каталог клампит под категорию. */
+const MENU_PKG_CHIPS = [
+  { label: "Базовый", idx: 0 },
+  { label: "Стандарт", idx: 1 },
+  { label: "Премиум", idx: 2 },
+] as const;
+
 /** 81-W2F1: портал мобильного дровера в <body>. SiteHeader рендерится
  *  ВНУТРИ <main> (page.tsx) — а при открытом меню main получает inert
  *  (эффект ниже, паттерн видео-модалки events-video-carousel.tsx):
@@ -545,6 +556,35 @@ export function SiteHeader() {
     }, DRAWER_NAV_DELAY_MS);
   };
 
+  /* c84-C: закрыть дровер и выбрать тариф меню. Тот же паттерн, что
+   * closeAndNavigate (preventDefault-клик + задержка после unlock-restore),
+   * но цель — /?pkg=N#menu: pushState не порождает ни hashchange, ни
+   * popstate (нативный прыжок не сработает). Существующие ?type/&guests
+   * сохраняем (URL-API). Каталог узнаёт о выборе через CustomEvent
+   * "menu:pkg-preset" (SPA-переход без ремоунта — mount-эффект hacc-menu
+   * не сработал бы).
+   * c84-F1 (критик M1-D4): СКРОЛЛ ПЕРЕЕХАЛ в hacc-menu (обработчик события
+   * применяет пресет и ведёт к ТАБАМ открытой категории — раньше чипы
+   * вели на шапку #menu, табы оставались на 270–300px ниже фолда). Здесь
+   * только закрытие + URL + диспатч — двойной программный скролл (§52)
+   * исключён: скроллер один и знает DOM. */
+  const closeAndPresetPkg = (pkgIdx: number) => {
+    setOpen(false);
+    window.setTimeout(() => {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set("pkg", String(pkgIdx));
+        url.hash = "menu";
+        window.history.pushState(null, "", url);
+      } catch {
+        /* URL-конструктор падает только на не-http протоколе — noop */
+      }
+      window.dispatchEvent(
+        new CustomEvent("menu:pkg-preset", { detail: pkgIdx }),
+      );
+    }, DRAWER_NAV_DELAY_MS);
+  };
+
   // Header is `position: sticky; top: 0` and sits in normal flow AFTER the
   // 100vh hero (see page.tsx). Per task v5: "хеадер сначала находится внизу
   // секции херо и его даже не видно, потом херо вместе с ним мотается вверх и
@@ -821,6 +861,41 @@ export function SiteHeader() {
                 </motion.a>
               ))}
             </nav>
+
+            {/* c84-C: «Уровень меню» — быстрый выбор тарифа прямо из
+                навигации (владелец: ступени в каталоге неочевидны).
+                Клик = closeAndPresetPkg: дровер закрывается, скролл к
+                #menu, каталог применяет пресет (см. функцию выше).
+                Стиль — язык дровера: тонкая рамка бордо, ховер-заливка
+                (как FAB/CTA), тач ≥44px, подпись блока 13px.
+                c84-F3 (критик C, MAJOR): контраст метки 13px/700
+                text-ink/60 на белом = 4.08:1 < AA 4.5:1 (13px bold ≠
+                «large text») → /70 = ~5.3:1. Заодно убран невалидный
+                класс font-700 (шум — вес пинится инлайном). */}
+            <div className="mt-6 border-t border-border-line/50 pt-5">
+              <p
+                className="tott-body text-[13px] uppercase tracking-[0.14em] text-ink/70"
+                style={{ fontWeight: 700 }}
+              >
+                Выбрать тариф меню
+              </p>
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                {MENU_PKG_CHIPS.map((chip) => (
+                  <button
+                    key={chip.label}
+                    type="button"
+                    data-press
+                    data-testid={`hnav-pkg-${chip.idx}`}
+                    onClick={() => closeAndPresetPkg(chip.idx)}
+                    className="tott-body flex min-h-[44px] items-center justify-center border border-tott-burgundy/40 bg-transparent px-1 py-3 text-[13px] uppercase tracking-[0.04em] text-ink transition-colors duration-200 hover:border-tott-burgundy hover:bg-tott-burgundy hover:text-white"
+                    style={{ fontWeight: 700 }}
+                    aria-label={`Меню — уровень «${chip.label}»`}
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="mt-auto space-y-3 text-ink">
               <a

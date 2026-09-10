@@ -1077,7 +1077,10 @@ header[data-scrolled="true"] [data-mega-panel] {
 }
 .eyebrow-wide {
   font-family: var(--font-sans);
-  font-size: clamp(0.8rem, 1.1vw, 1.1rem);
+  /* c84-A (задача 3, живой класс — site-footer): min 12.8px → 13.5px
+     (нелайер-правило сильнее слоеной утилиты text-sm — фактический кегль
+     на мобиле определяла clamp-минималка). */
+  font-size: clamp(0.84375rem, 1.1vw, 1.1rem);
   font-weight: 500;
   letter-spacing: 0.3em;
   text-transform: uppercase;
@@ -2999,7 +3002,10 @@ header[data-scrolled="true"] [data-mega-panel] {
 .ea-eyebrow {
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
-  font-size: clamp(0.8125rem, 1.05vw, 0.95rem);
+  /* c84-A (задача 3, читаемость): min 13px → 14px (владелец: «некоторым
+     слишком мелко»); line-height/tracking сохранены. Живые потребители:
+     hacc-menu, ea-faq-accordion, events-video-carousel. */
+  font-size: clamp(0.875rem, 1.05vw, 0.95rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   /* F2: текст 13px → --ea-red-text (был --ea-red 4.17:1 → 6.01:1 AA) */
@@ -3801,7 +3807,10 @@ header[data-scrolled="true"] [data-mega-panel] {
   gap: 0.6rem;
   font-family: var(--font-lato), var(--font-sans), sans-serif;
   font-weight: 700;
-  font-size: 0.8rem; /* Cycle 40: 12.8px floor (was 11.5px) */
+  /* c84-A (задача 3, читаемость): 12.8px → 14px floor (владелец:
+     «некоторым слишком мелко, но должно остаться красиво» — живой
+     потребитель: tott-parallax-band). Cycle 40: было 12.8px (было 11.5px). */
+  font-size: 0.875rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--tott-burgundy);
@@ -4117,18 +4126,18 @@ header[data-scrolled="true"] [data-mega-panel] {
    и матчит phone-FAB (fixed bottom-6 right-6, lg:hidden). «Сломанный»
    селектор из аудита W1 — артефакт отображения терминала, съедающего
    последовательность [h.
-   C75 (§43): хардкод-высоты Cycle-70 (96px) протухли — контент баннера
-   вырос до 150px на 390×844 (замер agent-browser), лифт −92 оставлял
-   нижние 34px FAB под панелью. Теперь лифт считается от ЖИВОГО замера
-   --cookie-banner-h (ea-cookie-banner.tsx, ResizeObserver): низ FAB
-   (24px от низа) + лифт = bannerH + 20px запаса → лифт = bannerH − 4.
-   Фолбэк 150px — актуальный замер 390×844 на случай отсутствия переменной
-   (класс и переменная ставятся одним коммитом — окно равно нулю). ── */
+   c84-F1 (критики M1/M2, MAJOR): ЛИФТ УДАЛЁН — с баннером на самом низу
+   (bottom 16px) лифт поднимал FAB на −bannerH и он висел посреди экрана
+   поверх H1/H2 (замер M2 @320: перекрытие H1 32×55, H2 51×52). Новый
+   контракт: пока баннер открыт, FAB ГАСНЕТ (opacity 0 + pointer-events:
+   none) — плавный fade, никакого transform; после решения баннер уходит,
+   FAB возвращается. transform:none страхует от лифт-наследия. */
 @media (max-width: 1023px) {
   body.cookie-banner-open a[href^="tel:"][class*="fixed"] {
-    transform: translateY(
-      calc((var(--cookie-banner-h, 150px) - 4px) * -1)
-    );
+    opacity: 0;
+    pointer-events: none;
+    transform: none;
+    transition: opacity 0.3s ease;
   }
 }
 
@@ -4558,6 +4567,54 @@ html:not(.js) [style$="opacity:0"] {
     infinite;
 }
 
+/* c84-A (задача 4b,peek-ветка): мягкий фэйд самого низа hero. Назначение:
+   1) белый срез выглядывающей шапки (sticky-SiteHeader под 92svh-героя)
+   читается как ОСОЗНАННАЯ нижняя граница первого экрана — VLM-экспертиза
+   снапшота просила именно «градиент/тень, намекающую на продолжение»;
+   2) контрастный пьедестал под scroll-cue (линия 54px на тёмном видео).
+   Цвет — espresso #0A0908 (фон секции, не чистый чёрный), высота ~16svh,
+   максимум полупрозрачности 0.62 — низ видео не «проваливается» (поверх
+   основного градиента to-black/65 фактическая глубина ≤0.86). Только
+   фон, без transform — композитор не задействован. */
+.hero-bottom-fade {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: clamp(96px, 16svh, 180px);
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 9, 8, 0) 0%,
+    rgba(10, 9, 8, 0.5) 78%,
+    rgba(10, 9, 8, 0.62) 100%
+  );
+  pointer-events: none;
+}
+
+/* c84-A (задача 4c): scroll-cue исчезает при прокрутке — раньше cue
+   висел (opacity:1) над уходящим hero, пока секция не уезжала целиком.
+   Уход привязан к именованному #hero view-таймлайну (--hero-exit,
+   определён ниже): opacity 1→0 на первых 25% exit-диапазона
+   (≈0.23 высоты вьюпорта прокрутки). Анимируется ТОЛЬКО opacity
+   ОБЁРТКИ (.hero-cue-wrap): вход (hero-fade-in) живёт на ВНУТРЕННЕМ
+   .hero-cue, позиционирующий -translate-x-1/2 не входит в keyframes
+   (грабля §44 — transform в keyframes заменяет computed целиком);
+   две анимации на одном элементе не встречаются (правило c83-D).
+   Деградация: @supports (animation-timeline: view()) +
+   no-preference — иначе cue просто остаётся как раньше. */
+@keyframes hero-cue-exit {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-cue-wrap {
+      animation: hero-cue-exit linear both;
+      animation-timeline: --hero-exit;
+      animation-range: exit 0% exit 25%;
+    }
+  }
+}
+
 /* ============================================================================
    c83-D — HERO SCROLL-EXIT: «hero уезжает» по мере прокрутки.
 
@@ -4600,9 +4657,28 @@ html:not(.js) [style$="opacity:0"] {
    диапазоном прокрутки) → прогресс навечно 0. Именованный таймлайн
    (view-timeline-name) считает субъектом сам #hero относительно ДОКУМЕНТА
    — overflow секции больше не перехватывает; имя видно всем потомкам
-   секции. Замер: exit 0% = scrollY 0, exit 100% = 900px (100svh). */
+   секции. Замер: exit 0% = scrollY 0, exit 100% = высота hero (с c84-A
+   — 92svh; до — 100svh/900px @1440×900). */
 #hero {
   view-timeline-name: --hero-exit;
+  /* c84-A (задача 4b, hero-peek ~NN/G «illusion of completeness»):
+     100svh → 92svh: следующий контент (sticky-SiteHeader в потоке
+     после hero) выглядывает ~8% вьюпорта над фолдом — сигнал «сайт
+     продолжается» (6 из 8 юзеров NN/G не листали full-screen хиро).
+     Класс min-h убран из tott-hero.tsx — высота живёт ЗДЕСЬ: id-правило
+     бьёт слоеные утилиты, а vh-фоллбек страхует браузеры без svh
+     (вторая декларация игнорируется поддерживающими). Scroll-exit
+     view-таймлайн выше и sticky-детект шапки (rect.top ≤ 0) работают от
+     фактической высоты — пересчёта не требуют.
+     РЕШЕНИЕ по обязательному снапшоту (замер 390×844 + VLM, worklog
+     c84-A): peek ОСТАВЛЕН — 67px = лого+навигация шапки, в чистом
+     состоянии VLM читает его как осознанную подсказку; срез дополнен
+     .hero-bottom-fade (градиент-фэйд низа, выше). Откат на 100svh НЕ
+     сделан: known-интеракция первого визита (cookie-баннер поверх
+     метки «Листайте») существует и при 4-5svh (замер), у cookie-файла
+     чужое владение — передано оркестратору. */
+  min-height: 92vh;
+  min-height: 92svh;
 }
 
 @supports (animation-timeline: view()) {
@@ -4687,3 +4763,29 @@ html:not(.js) [style$="opacity:0"] {
     display: none;
   }
 }
+
+/* c84 (оркестратор): cookie-баннер в первый визит перекрывает метку
+   «Листайте» — пока баннер открыт, cue скрыт (visibility не конфликтует
+   с view()-анимацией opacity и hero-fade-in). После решения баннер
+   уходит, cue возвращается; повторные визиты чистые. Декоратив
+   (aria-hidden) — a11y не затронут. ВАЖНО: правило живёт В КОНЦЕ файла —
+   в средней части globals.css Turbopack его не эмитил (диагностика
+   c84: дубль на 4625-й строке выпадал из выдачи, тот же текст в конце —
+   работал; причина не локализована до конца, грабля задокументирована). */
+body.cookie-banner-open .hero-cue-wrap { visibility: hidden; }
+
+/* ============================================================================
+   c84-F1 (критик P1-D1, MAJOR) — LITE-ГЕЙТ ДОРОГИХ РАСТРОВЫХ АНИМАЦИЙ.
+   Замер P1 A/B на 2-ядерном хосте: футер 12–24 fps (fw-shine ×13 букв
+   225px + marquee-logos 9435px + vbl-shimmer + grain feTurbulence×multiply);
+   всё выключено → 60.1 fps. Класс html.lite-device ставит lenis-provider
+   (синхронный isLiteDevice() на монте — контракт src/lib/lite-device.ts:
+   saveData || 2g || deviceMemory≤2 || cores≤4). Анимации гаснут, статика
+   остаётся той же (как при prefers-reduced-motion). ВАЖНО: правила в КОНЦЕ
+   файла — в средней части globals.css Turbopack периодически не эмитит
+   топ-левел правила (диагностика c84 hero-cue: дубль на ~4625-й строке
+   выпадал, тот же текст в конце — применялся). */
+html.lite-device .marquee-track-logos { animation: none; }
+html.lite-device .fw-shimmer { animation: none; }
+html.lite-device .vertical-brand-label__word--accent { animation: none; }
+html.lite-device .grain::after { content: none; }

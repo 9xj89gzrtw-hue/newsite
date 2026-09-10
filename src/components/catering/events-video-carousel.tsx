@@ -50,6 +50,13 @@
  * the static poster; prefers-reduced-motion disables hover videos entirely.
  * The modal (unmuted + controls) and the «Смотреть видео» pill are unchanged.
  *
+ * c84 (Impl-D, lite-режим): useLiteDevice() → тизер-видео не играют ВООБЩЕ
+ * — тайлы живут статичными постерами (mp4 не грузится и не фейлится молча
+ * в экономном режиме, а осознанно заменён постером; preload="none" и так
+ * держал байты вне сети до первого play() — теперь и play() не случается).
+ * Клик/тап по play-pill НЕ гейчим: модалка — видео по требованию юзера
+ * (жест есть → play() разрешён), функциональность сохранена целиком.
+ *
  * Mobile: STILL horizontal scroll — no grid collapse. This is the magazine
  * horizontal-read signature (per EA + Ridgewells editorial layer brief).
  *
@@ -68,6 +75,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Play } from "lucide-react";
 
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
+import { useLiteDevice } from "@/hooks/use-lite-device";
 import "./events-video-carousel.css";
 
 /** EA Easing — quiet cubic-bezier used across the editorial layer. */
@@ -136,6 +144,9 @@ const TILES: EventTile[] = [
 
 export function EventsVideoCarousel() {
   const reduce = useReducedMotion();
+  // c84-D (lite-режим): слабое устройство/экономный режим → тизер-видео
+  // не играют вовсе (тайлы = статичные постеры), модалка по клику работает.
+  const lite = useLiteDevice();
   // C62 hydration-safety: entrance props serialize into SSR HTML — the
   // reduce branch resolves only after mount (direct branch = mismatch).
   const [mounted, setMounted] = useState(false);
@@ -214,9 +225,10 @@ export function EventsVideoCarousel() {
 
   /** Hover = ровно ОДНО играющее видео: вход в карточку ставит её и глушит
    *  остальных; выход — пауза этой. Гейты: fine pointer, не reduced-motion,
+   *  не lite (c84-D: слабый девайс/экономный режим — тизеры не играют),
    *  секция в вьюпорте, модалка закрыта. */
   const playHoverVideo = (i: number) => {
-    if (!canHoverVideo || reduce || activeIndex !== null) return;
+    if (!canHoverVideo || reduce || lite || activeIndex !== null) return;
     if (!inViewRef.current) return;
     hoverVideosRef.current.forEach((v, j) => {
       if (!v) return;

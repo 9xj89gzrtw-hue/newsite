@@ -512,8 +512,8 @@ export function SiteFooter() {
                 выдумываем: на сайте (llms.txt/config) она = «офис», поэтому
                 просто связка. Студия на Петроградке живёт в своём контексте
                 (FAQ/услуги дегустации) — легенда не трогает.
-                text-xs + cream/60 = 5.81:1 на тёмном футере (замер D2). */}
-            <p className="text-xs leading-relaxed text-cream/60">
+                text-[13px] + cream/60 = 5.6:1 на тёмном футере (замер D2; c84-F1: 12 → 13px — «мелко»). */}
+            <p className="text-[13px] leading-relaxed text-cream/60">
               Юридический адрес: {LEGAL_INFO.legalAddress} — реквизиты в{" "}
               <a
                 href="/offer"
@@ -627,7 +627,7 @@ export function SiteFooter() {
               <span className="font-display text-2xl font-semibold tracking-wide text-gold">
                 2 400+
               </span>
-              <span className="text-xs uppercase tracking-wider text-cream/60">
+              <span className="text-[13px] uppercase tracking-wider text-cream/60">
                 мероприятий с 2007 года
               </span>
             </p>
@@ -761,7 +761,7 @@ export function SiteFooter() {
             эспрессо #161312 (темнее прежнего slate) — контрасты /60 и
             gold только выросли (cream/60 ≈6.6:1, gold ≈8.2:1). Ссылки
             легала и так /60; · — декоративный (aria-hidden), не текст. */}
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-xs text-cream/60 md:flex-row md:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-[13px] text-cream/60 md:flex-row md:px-8">
           <div className="flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-4">
             <p className="text-center md:text-left">
               {/* FIX-5 (W1-D NIT): SITE_CONFIG.brandName несёт фирменную
@@ -796,7 +796,7 @@ export function SiteFooter() {
           </div>
           <a
             href={CONTACTS.phoneHref}
-            className="font-display tracking-wide text-cream/60 transition-colors hover:text-gold min-h-[44px] flex items-center"
+            className="font-display text-sm tracking-wide text-cream/60 transition-colors hover:text-gold min-h-[44px] flex items-center"
           >
             {CONTACTS.phone}
           </a>

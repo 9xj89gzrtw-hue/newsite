@@ -67,6 +67,18 @@ import { loadMetrika } from "@/lib/analytics";
  * z-[80] (Cycle 39 bottom-dock keeps the sticky header visible; above
  * site-header z-50 + announcement-bar z-55, below the mobile-menu overlay
  * which renders later in the DOM so stacks above naturally).
+ *
+ * c84-F1 (волна-1 критиков M1-D1/M2-№1/№3, СИСТЕМНЫЙ корень): подъём на
+ *   140px сам стал проблемой — карточка с 2-рядными кнопками (161px, ≤375)
+ *   накрывала eyebrow hero, CTA видео-блока, чекбоксы аддонов, поля даты;
+ *   «лифтованный» телефон-FAB (translateY −297px) висел посреди экрана
+ *   поверх H1/H2. НОВЫЙ контракт нижней док-зоны: баннер на мобиле —
+ *   САМЫЙ НИЖНИЙ элемент (bottom 16px + safe-area); всё что конфликтует
+ *   снизу — гасим на время баннера (cue уже скрыт visibility-правилом,
+ *   FAB скрывается opacity-правилом вместо лифта — globals.css).
+ *   Десктоп: карточка переезжает в ПРАВЫЙ нижний угол — контент секций
+ *   выровнен слева, первый визит больше не срезает CTA (замер M2 d1440:
+ *   −15px/31% высоты «Смотреть меню»). --cookie-banner-h не меняется.
  */
 
 const DISMISS_DAYS = 14;
@@ -332,19 +344,14 @@ export function EaCookieBanner() {
           aria-label="Уведомление об использовании cookies"
           data-component="ea-cookie-banner"
           /* 81-F2: компактная карточка вместо полноширинной полосы.
-             Внешний fixed-контейнер = трек позиционирования (мобайл:
-             inset-x-4 → карточка ≤358px центрирована; sm+: левый нижний
-             угол). 81-W2F1 (критик F HIGH): отступ снизу на мобиле —
-             140px + safe-area, НАД нижней зоной hero: декоративный
-             scroll-cue «Листайте» (y 715-796 на 390×844, замер
-             research/w2f1/probe-hero-390.js) и весь нижний клик-слой
-             свободны; телефон-FAB лифтится следов (глобальный лифт по
-             --cookie-banner-h = эффективному нижнему следу) и не
-             пересекается. Задача предлагала bottom ~100px, но 100 =
-             баннер до 744 — текст кия «Листайте» (715-735) оставался
-             под панелью; 140 clears всё с запасом 11px. sm+ — без
-             изменений (bottom-6). */
-          className="fixed z-[80] inset-x-4 bottom-[calc(140px+env(safe-area-inset-bottom,0px))] sm:inset-x-auto sm:bottom-6 sm:left-6"
+             c84-F1: мобайл — bottom 16px + safe-area (САМЫЙ низ док-зоны:
+             cue скрыт visibility-правилом, FAB скрыт opacity-правилом —
+             пока баннер открыт, никто под ним не конфликтует; после
+             решения всё возвращается). Десктоп — ПРАВЫЙ нижний угол
+             (bottom-6 right-6): контент секций выровнан слева (CTA
+             видео-блока, чек-панель) — первый визит больше не накрывает
+             интерактив (замер M2: −15px CTA «Смотреть меню» на d1440). */
+          className="fixed z-[80] inset-x-4 bottom-[calc(16px+env(safe-area-inset-bottom,0px))] sm:inset-x-auto sm:bottom-6 sm:left-auto sm:right-6"
           initial={initial}
           animate={animate}
           exit={exit}

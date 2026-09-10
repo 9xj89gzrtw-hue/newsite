@@ -67,6 +67,9 @@
 | **c83:** утилити-токены в КОММЕНТАРИЯХ кода (aspect + N:N в скобках) | Tailwind v4 сканирует комментарии как кандидаты → невалидный aspect-ratio N:N → **next build падает**, dev молчит | не писать bracket-токены в докблоках; гейт прод-сборкой |
 | **c83:** window.scrollTo в e2e | Lenis rAF возвращает свою позицию → «телепорты» | только __lenis.scrollTo(immediate) или wheel |
 | **c83:** headless agent-browser | отдаёт hover:false и reduce:true → «мёртвые» ховеры/анимации = ложные клеймы критиков | fine-pointer/RM-чеки — только Playwright |
+| **c84:** Lenis stale-limit после body-lock (дровер/модалка с position:fixed) | scrollTo МОЛЧА клампит таргет к 0 и early-return'ит: вызов был, кадров нет — интермиттинг fresh-load | ВСЕГДА `lenis.resize?.()` перед `lenis.scrollTo` после любого body-lock (прецедент: site-header unlock-restore, hacc-menu onPreset) |
+| **c84:** Lenis читает scroll-margin-top цели САМ | ручной `offset: -96` поверх CSS-маржина 96px = отступ ×2 (посадка 148 вместо 96) | offset: 0, отступ — только CSS scroll-margin-top |
+| **c84:** fresh-load layout-оседание ~44px | ленивые фото выше цели оседают ПОСЛЕ вычисления посадки — первый такт промахивается (52 вместо 96) | двухтактная коррекция (такт 2 ~720мс) с гвардом «юзер уехал сам» (\|Δ\| < 140px) |
 
 ## 3. Инфраструктура
 
@@ -193,8 +196,20 @@ bun run lint && bun run typecheck          # оба зелёные перед к
   сбрасывался ручным скроллом; критики в headless врут про ховеры/RM
   (hover:false, reduce:true — только Playwright); LH-Lantern mobile на
   общем боксе инфлирует LCP ×2 — верить real-пробе (0.35s).
+- **c84 §54:** 12 задач владельца «мобильная дружелюбность»: lite-гейт
+  (saveData||2g||mem≤2||cores≤4 — hero/gg/карусель-видео, Lenis+gsap,
+  gold-dust, растры футера гаснут; карта=window.open; 0 mp4/0 jspdf
+  на старте, 60.5fps против 20-35 full на 2 ядрах); hero-peek 92svh +
+  bottom-fade + cue-exit (view-таймлайн) + scroll-progress; морфинг
+  слов H2 (SSR-статика, IO-пауза, RM/lite); калькулятор: пакеты
+  (радиогруппа) + 6 допуслуг + sticky-бар + автоскролл с подсказкой;
+  чипы тарифов в дровере (CustomEvent-пресет + ?pkg=N); per-tariff
+  PDF (dynamic import, addFont на каждый doc); типографика min 12px.
+  3 слепых критика: C-REJECT (2 MAJOR a11y — lite-карта без клавиатуры,
+  контраст 4.08:1 — починено в c84-F3), A/B-APPROVE. Грабли — §2
+  (Lenis stale-limit/двойной scroll-margin/layout-оседание).
 
 ---
 
-*Файл обновлён c83 (~205 строк, §7). Полные истории циклов:
+*Файл обновлён c84 (~215 строк, §7). Полные истории циклов:
 `docs/AGENTS-HISTORY.md`, `git log worklog.md`.*
