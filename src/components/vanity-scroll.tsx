@@ -51,14 +51,21 @@ const VANITY_TARGETS: Readonly<Record<string, string>> = {
 
 /** 81-W2F1 (критик F MEDIUM, прыжок 0.7-2.3с + дрейф ±252px):
  *  РЕТАРГЕТЫ = максимум 2 коррекции после первого скролла. Первая (+600мс)
- *  реагирует на СДВИГ ЦЕЛИ (>100px — ленивые картинки выше дорисовались,
+ *  реагирует на СДВИГ ЦЕЛИ (>40px — ленивые картинки выше дорисовались,
  *  §38), вторая (+1200мс — плавный скролл уже закончился) добивает и случай
- *  «промаха» (|scrollY − desired| > 100). Обе скроллят behavior:'auto' —
+ *  «промаха» (|scrollY − desired| > 40). Обе скроллят behavior:'auto' —
  *  мгновенно (повторная анимация с той же цельб бесит, критик F). Сходимость
- *  без перескролла; взаимодействие юзера гасит всё (§35). */
-const CORRECTION_DELAYS_MS = [600, 1200] as const;
+ *  без перескролла; взаимодействие юзера гасит всё (§35).
+ *  c87-F8b (волна-2, посадка /events 168px вместо 84): ленивые фото выше
+ *  цели оседают на ~84px ПОСЛЕ посадки (замер: window.scrollTo точен, но
+ *  layout растёт позже; грабля c84 «оседание»); 84 < старого порога 100 —
+ *  коррекции молчали. Третий такт (+2600мс, после оседания картинок) с
+ *  жёстким порогом 24px — доводит до scroll-margin-точной посадки. */
+const CORRECTION_DELAYS_MS = [600, 1200, 2600] as const;
 /** Порог «цель сместилась» / «доехали мимо» — меньше не дёргаем. */
-const DRIFT_PX = 100;
+const DRIFT_PX = 40;
+/** Порог финального такта — ловит оседание ленивых картинок (≥24px). */
+const FINAL_DRIFT_PX = 24;
 /** Порог «юзер уже не на hero» (реставрация скролла back-nav) — не дёргаем. */
 const SCROLLY_GUARD_PX = 200;
 /** Взаимодействие юзера отменяет ретаргеты (§35). */
@@ -97,13 +104,18 @@ function scrollToTarget(
   if (!el) return;
   const lenis = getLenis();
   if (typeof lenis?.scrollTo === "function") {
-    const margin = parseFloat(getComputedStyle(el).scrollMarginTop || "0") || 0;
+    /* c87-F8 (критик волны-2 D1, MAJOR): offset — НОЛЬ. Lenis 1.3.26 САМ
+     * вычитает scroll-margin-top цели (lenis.mjs: rect.top − scrollMargin
+     * … += offset) — наш −margin поверх него давал отступ ×2: /events
+     * садился на 84px ниже задуманного (168 вместо 84). Грабля c84
+     * («ручной offset поверх CSS-маржина»), конвенция offset:0 как в
+     * hacc-menu/ea-founder-story/hacc-booking. */
     if (opts.instant) {
       /* 81-W2F1: коррекция — без анимации (immediate+force: мимо Lenis-цели,
        * в т.ч. когда внутренний limit устарел — грабля §2/§33). */
-      lenis.scrollTo(el, { offset: -margin, immediate: true, force: true });
+      lenis.scrollTo(el, { offset: 0, immediate: true, force: true });
     } else {
-      lenis.scrollTo(el, { offset: -margin, duration: opts.reduce ? 0 : 0.9 });
+      lenis.scrollTo(el, { offset: 0, duration: opts.reduce ? 0 : 0.9 });
     }
     return;
   }
@@ -167,16 +179,18 @@ export function VanityUrlScroll() {
       scrollToTarget(targetId, { reduce });
     };
 
-    /* Коррекции (максимум 2 — 81-W2F1):
+    /* Коррекции (максимум 3 — 81-W2F1 + c87-F8b):
      *  - скролл ещё может анимироваться → меряем СДВИГ ЦЕЛИ, а не позицию;
-     *  - вторая (после ~0.9с плавного скролла) ловит и промах посадки. */
-    const scrollCorrection = (checkOffTarget: boolean) => {
+     *  - вторая (после ~0.9с плавного скролла) ловит и промах посадки;
+     *  - третья (+2600мс) — осевшие ленивые картинки: доводка до 24px. */
+    const scrollCorrection = (checkOffTarget: boolean, finalPass: boolean) => {
       if (cancelled || !scrolledOnce) return;
       const desired = targetScrollTop(targetId);
       if (desired == null) return;
       const targetMoved =
         firstDesired != null && Math.abs(desired - firstDesired) > DRIFT_PX;
-      const offTarget = Math.abs(window.scrollY - desired) > DRIFT_PX;
+      const threshold = finalPass ? FINAL_DRIFT_PX : DRIFT_PX;
+      const offTarget = Math.abs(window.scrollY - desired) > threshold;
       if (!targetMoved && !(checkOffTarget && offTarget)) return;
       firstDesired = desired;
       scrollToTarget(targetId, { reduce, instant: true });
@@ -188,7 +202,10 @@ export function VanityUrlScroll() {
       if (cancelled) return;
       CORRECTION_DELAYS_MS.forEach((d, i) =>
         timers.push(
-          window.setTimeout(() => scrollCorrection(i === CORRECTION_DELAYS_MS.length - 1), d),
+          window.setTimeout(
+            () => scrollCorrection(i >= 1, i === CORRECTION_DELAYS_MS.length - 1),
+            d,
+          ),
         ),
       );
     };

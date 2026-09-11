@@ -75,7 +75,10 @@
 }
 
 .ea-evt-portfolio__scroller:focus-visible {
-  outline: 2px solid var(--ea-red);
+  /* F8-D5 (волна-2): контраст фокус-ринга 6.03:1 — канон сайта
+     (--ea-red-text), как у соседних nav-btn (4.17:1 у --ea-red — ниже
+     планки/site-канона). */
+  outline: 2px solid var(--ea-red-text, #b91431);
   outline-offset: 6px;
   border-radius: 2px;
 }
@@ -136,7 +139,7 @@
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.82) 0%,
-    rgba(0, 0, 0, 0.24) 55%,
+    rgba(0, 0, 0, 0.30) 55%,
     rgba(0, 0, 0, 0) 100%
   );
   color: var(--ea-white);
@@ -158,6 +161,10 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ea-white);
+  /* F8-D6 (волна-2): страховка контраста на низких широких карточках
+     (мобайл-панорама ~177px: заголовок попадает в зону градиента α≈0.4,
+     worst-case 2.85:1) — мягкая тень гарантирует читаемость. */
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
   opacity: 0.92;
   margin: 0;
 }
@@ -169,6 +176,7 @@
   line-height: 1.2;
   margin: 0.4rem 0 0;
   color: var(--ea-white);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
 }
 
 .ea-evt-portfolio__meta {
@@ -178,6 +186,7 @@
   margin: 0.4rem 0 0;
   color: var(--ea-cream);
   opacity: 0.9;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
 }
 
 /* c87-F2: стрелки prev/next — паттерн сиблинга events-video-carousel

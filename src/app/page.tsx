@@ -63,13 +63,13 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //                               тинты, Marck Script, табы пакетов).
 //    8. TottParallaxBand      — PARALLAX BAND. CSS-parallax bg + char-split
 //                               headline + "bon appétit" script. Cinematic
-//                               pause before the events video carousel.
+//                               pause before the events gallery.
 //
-//   ── ACT III: PROCESS (video carousel → process) ──
-//    9. EventsVideoCarousel   — carousel of 4 event-type video tiles with
-//                               looping muted autoplay teasers + fullscreen
-//                               click-to-play modal. Magazine scroll-snap
-//                               pattern, 5s auto-advance.
+//   ── ACT III: GALLERY (events portfolio → process) ──
+//    9. EaEventsPortfolio     — c87: фото-галерея 44 реальных событий
+//                               (владелец, Яндекс.Диск) — смешанные пропорции
+//                               при единой высоте, scroll-snap + автопрокрутка
+//                               4.5с + стрелки + WCAG-паузы.
 //   10. CepProcess            — «КАК МЫ РАБОТАЕМ» compact 4-step strip:
 //                               scroll-drawn red progress rail, sequential
 //                               step activation, ink-fill outline numerals.

@@ -119,7 +119,7 @@ const SIZES: Record<EventCard["ratio"], string> = {
  */
 const EVENTS: EventCard[] = [
   { src: "/media/c87/real-event-01.webp", ratio: "p", category: "Банкеты", title: "Длинный стол в светлом зале", meta: "рассадка · стекло и свет", alt: "Длинный банкетный стол в светлом зале с сервировкой на каждого гостя" },
-  { src: "/media/c87/real-event-02.webp", ratio: "l", category: "Подача", title: "Три подачи — лично каждому", meta: "порционная сервировка", alt: "Индивидуальная порционная сервировка из трёх блюд на белом столе" },
+  { src: "/media/c87/real-event-02.webp", ratio: "l", category: "Подача", title: "Три подачи на персону", meta: "порционная сервировка", alt: "Индивидуальная порционная сервировка из трёх блюд на белом столе" },
   { src: "/media/c87/real-event-03.webp", ratio: "p", category: "Банкеты", title: "Два яруса, люстры, цветы", meta: "ресторанный зал · ужин всем домом", alt: "Двухъярусный ресторанный зал с цветочным декором и люстрами" },
   { src: "/media/c87/real-event-04.webp", ratio: "p", category: "Фуршеты", title: "Морское на фуршетной линии", meta: "закуски и дары моря", alt: "Фуршетный стол крупным планом — закуски и морепродукты" },
   { src: "/media/c87/real-event-05.webp", ratio: "l", category: "Площадки", title: "Зал с панорамными окнами", meta: "свет со всех сторон", alt: "Банкетный зал с жёлтыми креслами и панорамными окнами" },
@@ -138,18 +138,18 @@ const EVENTS: EventCard[] = [
   { src: "/media/c87/real-event-18.webp", ratio: "p", category: "Банкеты", title: "Цветы и свечи", meta: "тёплый свет вдоль стола", alt: "Длинный банкетный стол с цветочными композициями и свечами" },
   { src: "/media/c87/real-event-19.webp", ratio: "s", category: "Подача", title: "Салаты в стаканах", meta: "прозрачная подача", alt: "Прозрачные стаканчики с мясными салатами крупным планом" },
   { src: "/media/c87/real-event-20.webp", ratio: "l", category: "Площадки", title: "Лофт с кирпичной стеной", meta: "станция блюд и напитков", alt: "Кейтеринг в помещении с кирпичной стеной — стойка с напитками и едой" },
-  { src: "/media/c87/real-event-21.webp", ratio: "p", category: "Банкеты", title: "Современный зал", meta: "ровный ритм столов", alt: "Банкетный зал в современном стиле с длинным столом" },
+  { src: "/media/c87/real-event-21.webp", ratio: "p", category: "Банкеты", title: "Длинный стол в салоне", meta: "закуски, посуда, бокалы", alt: "Длинный банкетный стол с закусками, посудой и бокалами в светлом салоне" },
   { src: "/media/c87/real-event-22.webp", ratio: "p", category: "Подача", title: "Тарталетки на подносе", meta: "чёрно-белый кадр", alt: "Чёрно-белое фото тарталеток на подносе" },
   { src: "/media/c87/real-event-23.webp", ratio: "l", category: "Банкеты", title: "Круглый стол у окна", meta: "белая скатерть · дневной свет", alt: "Круглый банкетный стол у окна с белой скатертью" },
   { src: "/media/c87/real-event-24.webp", ratio: "s", category: "Подача", title: "Канапе с ветчиной и сыром", meta: "плотная классика фуршета", alt: "Канапе с ветчиной и сыром на шпажках крупным планом" },
-  { src: "/media/c87/real-event-25.webp", ratio: "p", category: "Корпоратив", title: "Сцена и длинный стол", meta: "корпоративный формат", alt: "Современный зал с длинным столом и сценой с экраном в глубине" },
+  { src: "/media/c87/real-event-25.webp", ratio: "l", category: "Банкеты", title: "Белая скатерть, золотые тарелки", meta: "банкетная сервировка", alt: "Накрытый банкетный стол с белой скатертью, золотистыми тарелками и бокалами" },
   { src: "/media/c87/real-event-26.webp", ratio: "p", category: "Банкеты", title: "Официант у десертного стола", meta: "финальная подача вечера", alt: "Официант у стола с десертами в богато украшенном зале" },
   { src: "/media/c87/real-event-27.webp", ratio: "s", category: "Подача", title: "Канапе на шпажках", meta: "линия закусок", alt: "Канапе с рыбой на шпажках крупным планом" },
   { src: "/media/c87/real-event-28.webp", ratio: "l", category: "Площадки", title: "Белые шатры", meta: "чёрно-белый кадр · геометрия", alt: "Белые шатры на открытом воздухе — художественная чёрно-белая фотография" },
   { src: "/media/c87/real-event-29.webp", ratio: "l", category: "Банкеты", title: "Зелёная скатерть", meta: "приборы выровнены в линейку", alt: "Банкетный стол с зелёной скатертью и сервировкой" },
   { src: "/media/c87/real-event-30.webp", ratio: "p", category: "Банкеты", title: "Золотые тарелки", meta: "круглый стол · тёплый металл", alt: "Круглый стол с золотистыми тарелками и цветами" },
   { src: "/media/c87/real-event-31.webp", ratio: "s", category: "Подача", title: "Канапе с ветчиной и огурцом", meta: "свежий хруст", alt: "Канапе с ветчиной и огурцами на шпажках крупным планом" },
-  { src: "/media/c87/real-event-32.webp", ratio: "p", category: "Фуршеты", title: "Выпечка на линии", meta: "закуски и тёплое из печи", alt: "Фуршетный стол с закусками и выпечкой" },
+  { src: "/media/c87/real-event-32.webp", ratio: "p", category: "Фуршеты", title: "Закуски и десерты на линии", meta: "длинный фуршетный стол", alt: "Длинный стол с закусками, десертами и цветами" },
   { src: "/media/c87/real-event-33.webp", ratio: "p", category: "Банкеты", title: "Цветочная композиция", meta: "центр во весь стол", alt: "Длинный банкетный стол с обильной цветочной композицией по центру" },
   { src: "/media/c87/real-event-34.webp", ratio: "l", category: "Фуршеты", title: "Лофт-бар", meta: "бокалы, цветы, бутылки", alt: "Чёрный фуршетный стол с бокалами, цветами и бутылками в стиле лофт" },
   { src: "/media/c87/real-event-35.webp", ratio: "p", category: "Фуршеты", title: "Канапе и цветы", meta: "фуршетная линия", alt: "Фуршетный стол с канапе и цветами" },
@@ -157,11 +157,11 @@ const EVENTS: EventCard[] = [
   { src: "/media/c87/real-event-37.webp", ratio: "l", category: "Площадки", title: "Площадка под навесом", meta: "фуршет готов к приезду гостей", alt: "Площадка под тентом с высокими столиками для мероприятия" },
   { src: "/media/c87/real-event-38.webp", ratio: "p", category: "Фуршеты", title: "Длинная фуршетная линия", meta: "закуски и цветы в ритме", alt: "Длинный фуршетный стол с закусками и цветами" },
   { src: "/media/c87/real-event-39.webp", ratio: "p", category: "Банкеты", title: "Веранда сверху", meta: "гирлянды · белые скатерти", alt: "Терраса с гирляндами и длинными столами в белых скатертях, вид сверху" },
-  { src: "/media/c87/real-event-40.webp", ratio: "l", category: "Банкеты", title: "Красная скатерть", meta: "белые стулья в ряд", alt: "Длинный банкетный стол с красной скатертью и белыми стульями" },
-  { src: "/media/c87/real-event-41.webp", ratio: "p", category: "Фуршеты", title: "Вечер в полумраке", meta: "гости у фуршетных столов", alt: "Вечернее мероприятие — гости у фуршетных столов в полутёмном зале" },
+  { src: "/media/c87/real-event-40.webp", ratio: "xl", category: "Банкеты", title: "Красные скатерти", meta: "блюда и напитки вдоль столов", alt: "Длинные банкетные столы с красными скатертями, блюдами и напитками" },
+  { src: "/media/c87/real-event-41.webp", ratio: "p", category: "Фуршеты", title: "Вечер в полумраке", meta: "гости у столов · тёмный кадр", alt: "Вечернее мероприятие — гости у фуршетных столов в полутёмном зале" },
   { src: "/media/c87/real-event-42.webp", ratio: "p", category: "Фуршеты", title: "Цветы вдоль линии", meta: "мягкий фон · тёплый свет", alt: "Фуршетный стол с закусками и цветами" },
   { src: "/media/c87/real-event-43.webp", ratio: "p", category: "Фуршеты", title: "Стол с подсветкой", meta: "декор и свет линии", alt: "Длинный фуршетный стол с подсветкой и декором" },
-  { src: "/media/c87/real-event-44.webp", ratio: "s", category: "Банкеты", title: "Синий свет над круглым столом", meta: "вечерний кадр", alt: "Круглый стол с зелёной скатертью и синей подсветкой — вечерний кадр" },
+  { src: "/media/c87/real-event-44.webp", ratio: "xl", category: "Банкеты", title: "Круглый стол в зелёном свете", meta: "вечерний кадр", alt: "Накрытый круглый стол с посудой и зелёной подсветкой — вечерний кадр" },
 ];
 
 export function EaEventsPortfolio() {
@@ -174,6 +174,18 @@ export function EaEventsPortfolio() {
   const scrollerRef = useRef<HTMLUListElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /* F8: состояние присутствия пользователя на ленте — старт-гейты
+   * автопрокрутки (мышь внутри / фокус внутри). */
+  const pointerInsideRef = useRef(false);
+  const focusWithinRef = useRef(false);
+  /* F8-NIT: гейт «это наш собственный программный скролл» — собственный
+   * тик не должен перезапускать отсчёт (период уплывал 4.5→5.0с). */
+  const programmaticUntilRef = useRef(0);
+  /* F8: дебаунс возобновления — скролл-чорн Chrome гоняет
+   * pointerleave→pointerenter пары под покоящейся мышью; 250мс
+   * отсекает ложные «уходы». */
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navRef = useRef<HTMLDivElement | null>(null);
   /* F1: startAuto в scroll-listener'е вызывается из rAF-тика — держим
      свежую ссылку (useCallback-идентичность стабильна, но ref-паттерн
      сиблинга events-video-carousel не зависит от deps-пересборки). */
@@ -232,10 +244,12 @@ export function EaEventsPortfolio() {
     const max = scroller.scrollWidth - scroller.clientWidth;
     if (max <= 0) return;
     if (scroller.scrollLeft >= max - 4) {
+      programmaticUntilRef.current = performance.now() + 900;
       scroller.scrollTo({ left: 0, behavior: "smooth" });
       return;
     }
     const target = edgeTarget(1);
+    programmaticUntilRef.current = performance.now() + 900;
     if (target === null || target >= max - 4) {
       scroller.scrollTo({ left: max, behavior: "smooth" });
     } else {
@@ -245,6 +259,12 @@ export function EaEventsPortfolio() {
 
   const startAuto = useCallback(() => {
     if (reduce) return;
+    /* F8 (волна-2, hover-гонка): IO-старт/скролл-чорн не должны заводить
+     * автоплей под покоящейся мышью или фокусом — стартуем ТОЛЬКО когда
+     * лента свободна от пользователя. Замер критика: мышь на ленте до
+     * IO-старта → интервал заводился и pointerenter уже не приходил. */
+    if (pointerInsideRef.current || focusWithinRef.current) return;
+    if (document.hidden) return;
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(advance, AUTOPLAY_MS);
   }, [advance, reduce]);
@@ -260,7 +280,8 @@ export function EaEventsPortfolio() {
     startAutoRef.current = startAuto;
   }, [startAuto]);
 
-  /** F2: стрелки — переход на край соседней карточки + сброс отсчёта. */
+  /** F2: стрелки — переход на край соседней карточки + сброс отсчёта.
+   *  F8-D2 (волна-2): под reduce — мгновенно (сиблинг: instant-ветка). */
   const goTo = useCallback(
     (dir: 1 | -1) => {
       const scroller = scrollerRef.current;
@@ -268,13 +289,14 @@ export function EaEventsPortfolio() {
       const max = scroller.scrollWidth - scroller.clientWidth;
       const target = edgeTarget(dir);
       if (target === null) return;
+      programmaticUntilRef.current = performance.now() + 900;
       scroller.scrollTo({
         left: Math.max(0, Math.min(max, target)),
-        behavior: "smooth",
+        behavior: reduce ? "auto" : "smooth",
       });
       if (intervalRef.current) startAuto();
     },
-    [edgeTarget, startAuto],
+    [edgeTarget, reduce, startAuto],
   );
 
   // Start autoplay + pause when offscreen (perf).
@@ -283,9 +305,12 @@ export function EaEventsPortfolio() {
     const scroller = scrollerRef.current;
     if (!scroller) return;
     const section = scroller.closest("section");
+    /* F8-D3 (волна-2): латентная утечка — безсекционная ветка стартовала
+     * интервал БЕЗ cleanup. Секция всегда есть (это наш собственный
+     * <section>), но гигиена обязана быть полной. */
     if (!section) {
       startAuto();
-      return;
+      return () => stopAuto();
     }
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -295,38 +320,83 @@ export function EaEventsPortfolio() {
       { threshold: 0.25 },
     );
     io.observe(section);
+    /* F8-NIT (волна-2): скрытая вкладка — пауза (IO не реагирует на
+     * visibility, интервал тикал бы в фоне). */
+    const onVis = () => {
+      if (document.hidden) stopAuto();
+      else startAuto();
+    };
+    document.addEventListener("visibilitychange", onVis);
     return () => {
       io.disconnect();
+      document.removeEventListener("visibilitychange", onVis);
       stopAuto();
     };
   }, [reduce, startAuto, stopAuto]);
 
   /**
-   * F1 [WCAG 2.2.2 + c83-F4b]: пауза/сброс автопрокрутки. Дом-listeners
-   * напрямую (React-synthetic mouseenter в headless не покрыл потомков):
-   *  - pointerenter → пауза, pointerleave → возобновление (мышь и тач);
-   *  - focusin → пауза, focusout → возобновление (клавиатура/скринридер);
-   *  - ручной скролл (>30px за rAF-тик, троттлинг 150мс, ТОЛЬКО при живом
-   *    интервале) перезапускает отсчёт — тик не падает на инерцию свайпа.
-   * F2: End/Home скроллят ленту (было — страницу).
+   * F1 [WCAG 2.2.2 + c83-F4b] + F8 (волна-2, hover-гонка): пауза/сброс
+   * автопрокрутки. Дом-listeners напрямую:
+   *  - pointerenter → пауза; pointerleave → возобновление ЧЕРЕЗ ДЕБАУНС
+   *    250мс (Chrome при автоскролле ленты гонит pointerleave→pointerenter
+   *    пары под покоящейся мышью — мгновенный рестарт ломал паузу);
+   *  - focusin → пауза, focusout → возобновление (клавиатура/ридер);
+   *  - End/Home — и на ленте, и на стрелках (D4: фокус на кнопке — End
+   *    уводил СТРАНИЦУ в футер).
    */
   useEffect(() => {
     const scroller = scrollerRef.current;
+    const nav = navRef.current;
     if (!scroller) return;
-    const onPointerEnter = () => stopAuto();
-    const onPointerLeave = () => startAuto();
-    const onFocusIn = () => stopAuto();
-    const onFocusOut = () => startAuto();
+    /* F8: стартовое состояние — мышь, покоящаяся на ленте ДО монтирования,
+     * невидима для событий (pointerenter не приедет): читаем фактическое
+     * CSS-состояние :hover / document.activeElement — оно всегда правдиво. */
+    pointerInsideRef.current = scroller.matches(":hover");
+    focusWithinRef.current =
+      scroller.contains(document.activeElement) ||
+      !!nav?.contains(document.activeElement);
+    if (pointerInsideRef.current || focusWithinRef.current) stopAuto();
+    const scheduleResume = () => {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = setTimeout(() => {
+        resumeTimerRef.current = null;
+        startAuto();
+      }, 250);
+    };
+    const cancelResume = () => {
+      if (resumeTimerRef.current) {
+        clearTimeout(resumeTimerRef.current);
+        resumeTimerRef.current = null;
+      }
+    };
+    const onPointerEnter = () => {
+      pointerInsideRef.current = true;
+      cancelResume();
+      stopAuto();
+    };
+    const onPointerLeave = () => {
+      pointerInsideRef.current = false;
+      scheduleResume();
+    };
+    const onFocusIn = () => {
+      focusWithinRef.current = true;
+      cancelResume();
+      stopAuto();
+    };
+    const onFocusOut = () => {
+      focusWithinRef.current = false;
+      scheduleResume();
+    };
     const onKey = (e: KeyboardEvent) => {
       const max = scroller.scrollWidth - scroller.clientWidth;
       if (e.key === "End" && max > 0) {
-        /* F2: мгновенно — как нативный End/Home на скролл-контейнерах
-           (smooth-вариант гонялся с snap и мерился непоследовательно). */
         e.preventDefault();
+        programmaticUntilRef.current = performance.now() + 900;
         scroller.scrollTo({ left: max, behavior: "auto" });
         if (intervalRef.current) startAuto();
       } else if (e.key === "Home" && scroller.scrollLeft > 0) {
         e.preventDefault();
+        programmaticUntilRef.current = performance.now() + 900;
         scroller.scrollTo({ left: 0, behavior: "auto" });
         if (intervalRef.current) startAuto();
       }
@@ -336,12 +406,15 @@ export function EaEventsPortfolio() {
     scroller.addEventListener("focusin", onFocusIn);
     scroller.addEventListener("focusout", onFocusOut);
     scroller.addEventListener("keydown", onKey);
+    nav?.addEventListener("keydown", onKey);
     return () => {
       scroller.removeEventListener("pointerenter", onPointerEnter);
       scroller.removeEventListener("pointerleave", onPointerLeave);
       scroller.removeEventListener("focusin", onFocusIn);
       scroller.removeEventListener("focusout", onFocusOut);
       scroller.removeEventListener("keydown", onKey);
+      nav?.removeEventListener("keydown", onKey);
+      cancelResume();
     };
   }, [startAuto, stopAuto]);
 
@@ -363,8 +436,14 @@ export function EaEventsPortfolio() {
       const left = scroller.scrollLeft;
       const delta = left - lastLeft;
       lastLeft = left;
-      if (Math.abs(delta) > 30 && intervalRef.current) {
-        const now = performance.now();
+      const now = performance.now();
+      /* F8-NIT: собственный программный скролл (advance/goTo/End/Home)
+         не перезапускает отсчёт — период остаётся честным 4.5с. */
+      if (
+        Math.abs(delta) > 30 &&
+        intervalRef.current &&
+        now > programmaticUntilRef.current
+      ) {
         if (now - lastSwipeRestartAt > 150) {
           lastSwipeRestartAt = now;
           startAutoRef.current();
@@ -502,7 +581,7 @@ export function EaEventsPortfolio() {
                 <span className="ea-evt-portfolio__category">
                   {event.category}
                 </span>
-                <h3 className="ea-evt-portfolio__title">{event.title}</h3>
+                <p className="ea-evt-portfolio__title">{event.title}</p>
                 <p className="ea-evt-portfolio__meta">{event.meta}</p>
               </div>
             </li>
@@ -514,7 +593,7 @@ export function EaEventsPortfolio() {
             pointer-events: none — CSS [data-edge="true"]); клик сбрасывает
             отсчёт автопрокрутки (goTo → startAuto). Колёсная мышь больше
             не заперта в ленте. */}
-        <div className="ea-evt-portfolio__nav">
+        <div className="ea-evt-portfolio__nav" ref={navRef}>
           <button
             type="button"
             className="ea-evt-portfolio__nav-btn"
