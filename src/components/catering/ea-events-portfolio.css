@@ -19,6 +19,17 @@
   max-width: 38rem;
 }
 
+/* c87 — честная строка-доверия под H2: все кадры реальные.
+   Типографика — как ea-lead: приглушённый чернильный, 1rem/1.6. */
+.ea-evt-portfolio__sub {
+  margin: 0.9rem 0 0;
+  font-family: var(--ea-font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: color-mix(in oklch, var(--ea-ink) 78%, transparent);
+  max-width: 32rem;
+}
+
 .ea-evt-portfolio__h2 {
   margin-top: 0.85rem;
 }
@@ -38,6 +49,10 @@
 
 .ea-evt-portfolio__scroller {
   display: flex;
+  /* c87: mixed-height fix — stretch ломал aspect-ratio широких карточек
+     на мобиле (растягивал до высоты портретных). Центр — редакционный
+     ритм: карточки разной высоты висят на средней линии. */
+  align-items: center;
   gap: 1.5rem;
   list-style: none;
   margin: 0;
@@ -65,12 +80,22 @@
   border-radius: 2px;
 }
 
-/* — — — — — Event card — — — — — */
+/* — — — — — Event card (c87: mixed aspect, shared height) — — — — — */
 
+/*
+   c87 — «правда фото» (урок c60): кадр не режется под форму карточки —
+   форма подстраивается под кадр. Все карточки одной высоты (--evt-h),
+   ширина = высота × пропорция (--evt-r, unitless: 0.75 / 1 / 1.3333 /
+   1.7778 — inline из TSX). Широкие карточки капятся по 84vw (мобайл:
+   панорама остаётся панорамой, но не шире экрана); aspect-ratio держит
+   пропорцию при капе (высота уменьшается соответственно).
+*/
 .ea-evt-portfolio__card {
+  --evt-h: clamp(340px, 46vw, 475px);
   position: relative;
-  flex: 0 0 clamp(280px, 28vw, 380px);
-  aspect-ratio: 4 / 5;
+  flex: 0 0 auto;
+  width: min(calc(var(--evt-h) * var(--evt-r)), 84vw);
+  aspect-ratio: var(--evt-r);
   scroll-snap-align: start;
   border-radius: var(--ea-radius-soft);
   overflow: hidden;
@@ -78,6 +103,12 @@
   background: var(--ea-ink);
   margin: 0;
   padding: 0;
+}
+
+@media (max-width: 768px) {
+  .ea-evt-portfolio__card {
+    --evt-h: clamp(300px, 72vw, 360px);
+  }
 }
 
 /* Image hover — EA's scale(1.1)/200ms signature, refined to scale(1.06)/700ms
@@ -109,6 +140,14 @@
   );
   color: var(--ea-white);
   pointer-events: none;
+}
+
+/* c87: на низких широких карточках (мобайл-панорамы, высота < 260px)
+   текст-оверлей сжимается — иначе категория+титул+мета не помещаются. */
+@media (max-height: 500px) {
+  .ea-evt-portfolio__overlay {
+    padding: 1rem 1.1rem;
+  }
 }
 
 .ea-evt-portfolio__category {

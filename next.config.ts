@@ -39,11 +39,13 @@ const nextConfig: NextConfig = {
       { source: "/calculator", destination: "/#calculator" },
       { source: "/menu", destination: "/#menu" },
       /* 81-W2F1 (критик G NIT): якоря #events на главной НЕТ — реальный id
-         секции видео-карусели. Хэш до сервера не доходит (rewrite
-         прозрачен), фактический скролл ведёт vanity-scroll.tsx по
-         VANITY_TARGETS["/events"] = "events-video-carousel" — строка здесь
-         держит конфиг и цель синхронно. */
-      { source: "/events", destination: "/#events-video-carousel" },
+         секции фото-галереи событий (c87: видео-карусель снята с рендера,
+        Mounted EaEventsPortfolio держит id ea-events-portfolio). Хэш до
+         сервера не доходит (rewrite прозрачен), фактический скролл ведёт
+         vanity-scroll.tsx по VANITY_TARGETS["/events"] =
+         "ea-events-portfolio" — строка здесь держит конфиг и цель
+         синхронно. */
+      { source: "/events", destination: "/#ea-events-portfolio" },
       { source: "/contacts", destination: "/#contact" },
       { source: "/contact", destination: "/#contact" },
     ];

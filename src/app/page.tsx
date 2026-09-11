@@ -6,7 +6,7 @@ import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { HaccServices } from "@/components/catering/hacc-services";
 import { HaccMenu } from "@/components/catering/hacc-menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
-import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
+import { EaEventsPortfolio } from "@/components/catering/ea-events-portfolio";
 import { CepProcess } from "@/components/catering/cep-process";
 import { HaccBooking } from "@/components/catering/hacc-booking";
 import { TiltedAccent } from "@/components/catering/tilted-accent";
@@ -353,14 +353,20 @@ export default function Home() {
 
       {/* ── ACT III: PROCESS ── */}
 
-      {/* 9. EventsVideoCarousel — Cycle 32. RESTORED in Cycle 36. Carousel of 4
-             event-type video tiles with looping muted autoplay teasers + caption
-             panel + center play-pill CTA that opens a fullscreen modal with the
-             full unmuted video + controls. Magazine scroll-snap-x mandatory pattern,
-             5s auto-advance, pause-on-hover, ESC closes the modal. Sits between
-             TottParallaxBand (the editorial pause) and CepProcess (the "how we
-             work" algorithm) — a cinematic trust beat showing the food in motion. */}
-      <EventsVideoCarousel />
+      {/* 9. EaEventsPortfolio — Cycle 28 (EA editorial layer) · Cycle 87: фото-
+             галерея реальных событий. 44 кадра с реальных мероприятий владельца
+             (Яндекс.Диск, папка «Итоговые фото… на главную страницу») в
+             редакционном filmstrip со смешанными пропорциями при единой высоте
+             («правда фото»: кадр не режем под форму — форму под кадр).
+             Честное авторство — закрыл вопрос c86-CRIT3 (сток-кадры как «наши
+             события»). Магазин-скролл: scroll-snap-x mandatory, автопрокрутка
+             4.5с до следующей карточки, пауза на ховере, прогресс-бар EA-red.
+             Сидит между TottParallaxBand (редакционная пауза) и CepProcess
+             («как мы работаем») — trust-beat с реальными фотографиями.
+             Прежняя видео-карусель (сток-b-roll «Кухня в движении») снята с
+             рендера в c87 — компонент events-video-carousel.tsx остаётся на
+             диске, вернуть при появлении реальных съёмок. */}
+      <EaEventsPortfolio />
 
       {/* 10. CepProcess — Cycle 63. «КАК МЫ РАБОТАЕМ» — compact 4-step strip
               (ЗАЯВКА / СОЗВОН / НАКРЫВАЕМ / УБИРАЕМ): scroll-drawn red progress

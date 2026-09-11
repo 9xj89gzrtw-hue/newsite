@@ -37,11 +37,13 @@ import { useEffect } from "react";
  * Рендерит null — только эффект, ноль DOM.
  */
 
-/** vanity-path → id целевой секции. /events → карусель: якоря #events
- *  на странице НЕТ (finding критика B) — реальный id секции видео. */
+/** vanity-path → id целевой секции. /events → фото-галерея событий:
+ *  якоря #events на странице НЕТ (finding критика B) — реальный id
+ *  секции портфолио (c87: видео-карусель снята с рендера, цель —
+ *  ea-events-portfolio). */
 const VANITY_TARGETS: Readonly<Record<string, string>> = {
   "/menu": "menu",
-  "/events": "events-video-carousel",
+  "/events": "ea-events-portfolio",
   "/contacts": "contact",
   "/contact": "contact",
   "/calculator": "calculator",
