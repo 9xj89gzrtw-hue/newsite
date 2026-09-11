@@ -129,13 +129,24 @@ export function VanityUrlScroll() {
     /** Позиция цели в момент первого скролла — база для «цель сместилась». */
     let firstDesired: number | null = null;
     const timers: number[] = [];
-    const listeners: Array<[string, () => void]> = [];
+    const listeners: Array<[string, (e: Event) => void]> = [];
 
     const cancel = () => {
       cancelled = true;
     };
+    /* c87-F7 (критик волны-1 M3): клик по cookie-баннеру — не навигационное
+     * намерение (юридическая обязанность, рефлекторный клик) — посадку
+     * vanity-пути не отменяет. Замер критика: «ПРИНЯТЬ ВСЕ» до старта
+     * скролла держал юзера в топе на /events в 3/3 прогонов. */
+    const isCookieConsent = (e: Event) => {
+      const t = e.target as HTMLElement | null;
+      return !!t?.closest?.('[aria-label="Cookie consent"]');
+    };
     INTERACTION_EVENTS.forEach((ev) => {
-      const fn = () => cancel();
+      const fn = (e: Event) => {
+        if (isCookieConsent(e)) return;
+        cancel();
+      };
       window.addEventListener(ev, fn, { passive: true, capture: true });
       listeners.push([ev, fn]);
     });
@@ -185,11 +196,14 @@ export function VanityUrlScroll() {
     if (document.readyState === "complete") {
       timers.push(window.setTimeout(start, 0));
     } else {
-      const onLoad = () => {
-        timers.push(window.setTimeout(start, 0));
-      };
-      window.addEventListener("load", onLoad, { once: true });
-      listeners.push(["load", onLoad]);
+      /* c87-F7 (критик волны-1 M3): 'load' на тяжёлой странице приходит
+       * через 3–4с — посадка vanity-пути опаздывала (замер: прыжок на
+       * 4.2с, почти одновременно с cookie-баннером — выглядело как
+       * связка). Стартуем сразу после гидрации (+120мс): цель в
+       * SSR-HTML, дрейф ленивых картинок выше цели ловят коррекции
+       * 600/1200мс (81-W2F1). 'load'-фолбэк оставлен для раннего
+       * монтирования (readyState 'loading'). */
+      timers.push(window.setTimeout(start, 120));
     }
 
     return () => {

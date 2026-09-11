@@ -7,7 +7,7 @@
  *
  * REPLACES `mcu-photo-filmstrip.tsx` (Embla filmstrip, broken under React 19
  * per CYCLE-28-COMPONENT-AUDIT.md §3 — score 7/10). No carousel library: pure
- * CSS scroll-snap + a 4.5s auto-advance useEffect. Bulletproof on React 19.
+ * CSS scroll-snap + a 4.5s auto-advance. Bulletproof on React 19.
  *
  * CYCLE 87 — реальные фото владельца (44 кадра с Яндекс.Диска, папка
  * «Итоговые фото для сайта Нилов кейтеринг на главную страницу»):
@@ -19,27 +19,47 @@
  *    filmstrip, как в журнальных лентах Awwwards-уровня.
  *  - Подписи — только то, что видно на кадре: без выдуманных площадок и
  *    числа гостей (анти-паттерн «Ленэкспо · 1200 гостей» на стоке).
- *  - Ленивая загрузка: priority у первых двух карточек, остальное lazy
- *    (44 eager-запроса убили бы LCP-бюджет секции).
- *  - advance() идёт по offsetLeft следующей карточки — при смешанных
- *    ширинах «шаг = ширина первой карточки» больше не корректен.
- *  - real-event-41: кроп левых 60% исходника убирает чужой логотип со
- *    стены (§1 — объектный гейт); проверено VLM (research/c87).
+ *  - Ленивая загрузка: все карточки lazy (секция глубоко ниже фолда;
+ *    priority ниже фолда — анти-паттерн Next.js, конфликт с hero-LCP).
+ *  - advance() идёт по getBoundingClientRect-дельте следующей карточки —
+ *    offsetLeft наследует offsetParent секции и врал (карусель стояла).
+ *
+ * CYCLE 87-F (волна-1 слепых критиков, 3×REJECT → фиксы):
+ *  - F1 [WCAG 2.2.2 + c83-F4b]: автопрокрутку можно поставить на паузу —
+ *    pointerenter/focusin гасят тик, pointerleave/focusout возобновляют;
+ *    ручной скролл (>30px за rAF-тик при живом интервале, троттлинг 150мс)
+ *    перезапускает отсчёт. Дом-listeners напрямую — React-synthetic
+ *    mouseenter в headless-прогонах не покрыл карточки-потомки.
+ *  - F2 [C2/M1]: стрелки prev/next (паттерн сиблинга events-video-carousel:
+ *    44px, data-edge гасит на краях) + End/Home на ленте (раньше уводили
+ *    страницу в футер). Колёсная мышь больше не заперта.
+ *  - F3 [CRIT3 C1]: reduce-motion ветка заголовка — animate-финал (урок
+ *    c83 «FAQ под RM в opacity:0»: initial=false + whileInView=undefined
+ *    оставляет inline-стили первого рендера навсегда).
+ *  - F4 [CRIT3 M4]: прогресс-бар — прямой DOM-ref (ноль setState на кадр
+ *    прокрутки; 44-карточное поддерево больше не ре-рендерится).
+ *  - F5: advance доезжает до конца ленты, wrap на 0 — следующим тиком.
+ *  - F6 [CRIT2]: «44 кадра» (грамматика), подписи #11/#15/#25/#39 по факту
+ *    (автосалон/салон судна/сцена/веранда — VLM-верификация), кропы #35/#44
+ *    убирают чужие надписи (Cool'n'Art / экран «logistics»), порядок без
+ *    монотонных серий (было 7 портретов подряд в хвосте).
  *
  * EA design language grafted (per docs/EA-ANALYSIS.md §3.11 + §11):
  *  - Cream section bg (var(--ea-cream)) — same as EA's image-shadow tint.
  *  - Italic-as-fragment trailing phrase ("лучше всего" → italic + red).
  *  - Eyebrow (Barlow Semi Condensed Bold) + H2 (Playfair) + ea-text-link.
  *  - Image hover: scale(1.06) over 700ms (EA's 1.1/200ms refined to be quieter).
- *  - Bottom overlay panel (gradient → rgba(0,0,0,0.78)) with category tag +
+ *  - Bottom overlay panel (gradient → rgba(0,0,0,0.82)) with category tag +
  *    Playfair title + Montserrat meta — mirrors EA's "Our Events" cards.
  *  - Custom 2px × 100% red progress indicator (EA-red accent line).
  *
  * Motion:
- *  - Auto-advances every 4500ms to the next card's snap edge.
- *  - Pauses on mouseenter, resumes on mouseleave.
+ *  - Auto-advances every 4500ms to the next card's snap edge (конец ленты →
+ *    следующий тик wraps на старт).
+ *  - Pauses on pointerenter/focusin, resumes on pointerleave/focusout,
+ *    manual scroll resets the countdown (c83-F4b).
  *  - Respects `useReducedMotion` — when reduced, no auto-advance.
- *  - Subtle motion.div fade-up on header (respects reduced-motion).
+ *  - Subtle motion.div fade-up on header (respects reduced-motion + F3).
  *
  * Mobile: STILL horizontal scroll — no grid collapse. This is the magazine
  * horizontal-read signature (per EA + Ridgewells editorial layer brief).
@@ -94,7 +114,8 @@ const SIZES: Record<EventCard["ratio"], string> = {
 /**
  * 44 реальных события (Cycle 87) — фото владельца с Яндекс.Диска,
  * /public/media/c87/real-event-{01..44}.webp (webp q82, без апскейла,
- * новые имена — cache-bust §2). Подписи описывают только видимое.
+ * новые имена — cache-bust §2). Подписи описывают только видимое
+ * (VLM-верификация каждой карточки + прицельные прогоны спорных).
  */
 const EVENTS: EventCard[] = [
   { src: "/media/c87/real-event-01.webp", ratio: "p", category: "Банкеты", title: "Длинный стол в светлом зале", meta: "рассадка · стекло и свет", alt: "Длинный банкетный стол в светлом зале с сервировкой на каждого гостя" },
@@ -107,11 +128,11 @@ const EVENTS: EventCard[] = [
   { src: "/media/c87/real-event-08.webp", ratio: "s", category: "Подача", title: "Канапе с красной икрой", meta: "праздник на шпажке", alt: "Канапе с красной икрой на шпажках крупным планом" },
   { src: "/media/c87/real-event-09.webp", ratio: "xl", category: "Фуршеты", title: "Панорама фуршета", meta: "линия закусок · высокие столы", alt: "Широкая панорама фуршетного стола с закусками и высокими столиками" },
   { src: "/media/c87/real-event-10.webp", ratio: "p", category: "Банкеты", title: "Сервировка в светлом зале", meta: "банкет накрыт до прихода гостей", alt: "Сервированный банкетный стол с блюдами в светлом зале" },
-  { src: "/media/c87/real-event-11.webp", ratio: "l", category: "Площадки", title: "Зал с видом на город", meta: "высокие столы · много воздуха", alt: "Просторный светлый зал с высокими столиками и видом на улицу" },
+  { src: "/media/c87/real-event-11.webp", ratio: "l", category: "Площадки", title: "Фуршет в автосалоне", meta: "автомобиль в центре зала", alt: "Фуршетный стол в автосалоне вокруг красного автомобиля, за окнами парковка" },
   { src: "/media/c87/real-event-12.webp", ratio: "s", category: "Подача", title: "Десерты с ягодами", meta: "финал трапезы", alt: "Десерты на шпажках с ягодами крупным планом" },
   { src: "/media/c87/real-event-13.webp", ratio: "p", category: "Площадки", title: "Стол под белым шатром", meta: "приём на природе", alt: "Длинный банкетный стол под белым шатром с белыми стульями" },
   { src: "/media/c87/real-event-14.webp", ratio: "l", category: "Банкеты", title: "Закуски на золотых подставках", meta: "белая скатерть · ярусная подача", alt: "Банкетный стол с белой скатертью и закусками на золотистых подставках" },
-  { src: "/media/c87/real-event-15.webp", ratio: "p", category: "Банкеты", title: "Зал со стеклянной крышей", meta: "день внутри помещения", alt: "Длинный банкетный стол в узком зале со стеклянной крышей" },
+  { src: "/media/c87/real-event-15.webp", ratio: "p", category: "Площадки", title: "Салон судна", meta: "панорамные окна · река", alt: "Интерьер судна с панорамными окнами и прозрачной крышей, за окнами река и набережная" },
   { src: "/media/c87/real-event-16.webp", ratio: "s", category: "Подача", title: "Канапе с лососем", meta: "рыба и свежесть", alt: "Канапе с лососем на шпажках крупным планом" },
   { src: "/media/c87/real-event-17.webp", ratio: "l", category: "Площадки", title: "Терраса над водой", meta: "чёрная скатерть · отражения", alt: "Банкет на террасе с видом на воду, столы с чёрными скатертями" },
   { src: "/media/c87/real-event-18.webp", ratio: "p", category: "Банкеты", title: "Цветы и свечи", meta: "тёплый свет вдоль стола", alt: "Длинный банкетный стол с цветочными композициями и свечами" },
@@ -121,26 +142,26 @@ const EVENTS: EventCard[] = [
   { src: "/media/c87/real-event-22.webp", ratio: "p", category: "Подача", title: "Тарталетки на подносе", meta: "чёрно-белый кадр", alt: "Чёрно-белое фото тарталеток на подносе" },
   { src: "/media/c87/real-event-23.webp", ratio: "l", category: "Банкеты", title: "Круглый стол у окна", meta: "белая скатерть · дневной свет", alt: "Круглый банкетный стол у окна с белой скатертью" },
   { src: "/media/c87/real-event-24.webp", ratio: "s", category: "Подача", title: "Канапе с ветчиной и сыром", meta: "плотная классика фуршета", alt: "Канапе с ветчиной и сыром на шпажках крупным планом" },
-  { src: "/media/c87/real-event-25.webp", ratio: "l", category: "Площадки", title: "Зал с прозрачными стульями", meta: "сцена, экран, бар", alt: "Зал с прозрачными стульями, проекционным экраном и барной стойкой" },
+  { src: "/media/c87/real-event-25.webp", ratio: "p", category: "Корпоратив", title: "Сцена и длинный стол", meta: "корпоративный формат", alt: "Современный зал с длинным столом и сценой с экраном в глубине" },
   { src: "/media/c87/real-event-26.webp", ratio: "p", category: "Банкеты", title: "Официант у десертного стола", meta: "финальная подача вечера", alt: "Официант у стола с десертами в богато украшенном зале" },
   { src: "/media/c87/real-event-27.webp", ratio: "s", category: "Подача", title: "Канапе на шпажках", meta: "линия закусок", alt: "Канапе с рыбой на шпажках крупным планом" },
   { src: "/media/c87/real-event-28.webp", ratio: "l", category: "Площадки", title: "Белые шатры", meta: "чёрно-белый кадр · геометрия", alt: "Белые шатры на открытом воздухе — художественная чёрно-белая фотография" },
   { src: "/media/c87/real-event-29.webp", ratio: "l", category: "Банкеты", title: "Зелёная скатерть", meta: "приборы выровнены в линейку", alt: "Банкетный стол с зелёной скатертью и сервировкой" },
   { src: "/media/c87/real-event-30.webp", ratio: "p", category: "Банкеты", title: "Золотые тарелки", meta: "круглый стол · тёплый металл", alt: "Круглый стол с золотистыми тарелками и цветами" },
   { src: "/media/c87/real-event-31.webp", ratio: "s", category: "Подача", title: "Канапе с ветчиной и огурцом", meta: "свежий хруст", alt: "Канапе с ветчиной и огурцами на шпажках крупным планом" },
-  { src: "/media/c87/real-event-32.webp", ratio: "l", category: "Фуршеты", title: "Лофт-бар", meta: "бокалы, цветы, бутылки", alt: "Чёрный фуршетный стол с бокалами, цветами и бутылками в стиле лофт" },
+  { src: "/media/c87/real-event-32.webp", ratio: "p", category: "Фуршеты", title: "Выпечка на линии", meta: "закуски и тёплое из печи", alt: "Фуршетный стол с закусками и выпечкой" },
   { src: "/media/c87/real-event-33.webp", ratio: "p", category: "Банкеты", title: "Цветочная композиция", meta: "центр во весь стол", alt: "Длинный банкетный стол с обильной цветочной композицией по центру" },
-  { src: "/media/c87/real-event-34.webp", ratio: "p", category: "Фуршеты", title: "Выпечка на линии", meta: "закуски и тёплое из печи", alt: "Фуршетный стол с закусками и выпечкой" },
-  { src: "/media/c87/real-event-35.webp", ratio: "l", category: "Банкеты", title: "Красная скатерть", meta: "белые стулья в ряд", alt: "Длинный банкетный стол с красной скатертью и белыми стульями" },
+  { src: "/media/c87/real-event-34.webp", ratio: "l", category: "Фуршеты", title: "Лофт-бар", meta: "бокалы, цветы, бутылки", alt: "Чёрный фуршетный стол с бокалами, цветами и бутылками в стиле лофт" },
+  { src: "/media/c87/real-event-35.webp", ratio: "p", category: "Фуршеты", title: "Канапе и цветы", meta: "фуршетная линия", alt: "Фуршетный стол с канапе и цветами" },
   { src: "/media/c87/real-event-36.webp", ratio: "p", category: "Банкеты", title: "Цветы в стеклянных вазах", meta: "декор, который дышит", alt: "Стол с цветочными композициями в стеклянных вазах" },
   { src: "/media/c87/real-event-37.webp", ratio: "l", category: "Площадки", title: "Площадка под навесом", meta: "фуршет готов к приезду гостей", alt: "Площадка под тентом с высокими столиками для мероприятия" },
   { src: "/media/c87/real-event-38.webp", ratio: "p", category: "Фуршеты", title: "Длинная фуршетная линия", meta: "закуски и цветы в ритме", alt: "Длинный фуршетный стол с закусками и цветами" },
-  { src: "/media/c87/real-event-39.webp", ratio: "p", category: "Банкеты", title: "Стол сверху", meta: "изобильная линия подачи", alt: "Длинный банкетный стол с обильным фуршетом, вид сверху" },
-  { src: "/media/c87/real-event-40.webp", ratio: "p", category: "Фуршеты", title: "Канапе в современном пространстве", meta: "фуршет в глубине кадра", alt: "Фуршетный стол с закусками, канапе и цветами в современном интерьере" },
+  { src: "/media/c87/real-event-39.webp", ratio: "p", category: "Банкеты", title: "Веранда сверху", meta: "гирлянды · белые скатерти", alt: "Терраса с гирляндами и длинными столами в белых скатертях, вид сверху" },
+  { src: "/media/c87/real-event-40.webp", ratio: "l", category: "Банкеты", title: "Красная скатерть", meta: "белые стулья в ряд", alt: "Длинный банкетный стол с красной скатертью и белыми стульями" },
   { src: "/media/c87/real-event-41.webp", ratio: "p", category: "Фуршеты", title: "Вечер в полумраке", meta: "гости у фуршетных столов", alt: "Вечернее мероприятие — гости у фуршетных столов в полутёмном зале" },
   { src: "/media/c87/real-event-42.webp", ratio: "p", category: "Фуршеты", title: "Цветы вдоль линии", meta: "мягкий фон · тёплый свет", alt: "Фуршетный стол с закусками и цветами" },
   { src: "/media/c87/real-event-43.webp", ratio: "p", category: "Фуршеты", title: "Стол с подсветкой", meta: "декор и свет линии", alt: "Длинный фуршетный стол с подсветкой и декором" },
-  { src: "/media/c87/real-event-44.webp", ratio: "p", category: "Банкеты", title: "Синий свет над круглым столом", meta: "вечерний кадр", alt: "Круглый стол с зелёной скатертью и синей подсветкой — вечерний кадр" },
+  { src: "/media/c87/real-event-44.webp", ratio: "s", category: "Банкеты", title: "Синий свет над круглым столом", meta: "вечерний кадр", alt: "Круглый стол с зелёной скатертью и синей подсветкой — вечерний кадр" },
 ];
 
 export function EaEventsPortfolio() {
@@ -151,43 +172,76 @@ export function EaEventsPortfolio() {
   useEffect(() => setMounted(true), []);
   const reduceSettled = mounted && reduce;
   const scrollerRef = useRef<HTMLUListElement | null>(null);
+  const progressBarRef = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [progress, setProgress] = useState(0);
+  /* F1: startAuto в scroll-listener'е вызывается из rAF-тика — держим
+     свежую ссылку (useCallback-идентичность стабильна, но ref-паттерн
+     сиблинга events-video-carousel не зависит от deps-пересборки). */
+  const startAutoRef = useRef<() => void>(() => {});
+  /* F4: atStart/atEnd для стрелок — setState ТОЛЬКО при смене края
+     (не на кадр). Прогресс-бар — прямой DOM-ref, ноль setState на кадр. */
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
 
   /**
-   * c87: mixed card widths — advance to the NEXT card's snap edge,
-   * not by a fixed delta. Позиция считается ЧЕРЕЗ getBoundingClientRect-дельту
-   * относительно скроллера: offsetLeft карточек наследует offsetParent секции
-   * (скроллер position:static) и врал на ~padding — advance «промахивался»
-   * в snap-точку 0 и карусель стояла (найдено Playwright-замером: scrollLeft
-   * не менялся 10с при живом интервале). At the end, wrap back to the
-   * start (continuous-loop illusion; c83 lesson: end-detection checks the
-   * actual target, no phantom "end" when max is small).
+   * Позиция цели прокрутки: следующая (dir=+1) / предыдущая (dir=-1)
+   * карточка относительно текущего вида. Считается ЧЕРЕЗ
+   * getBoundingClientRect-дельту относительно скроллера: offsetLeft
+   * карточек наследует offsetParent секции (скроллер position:static)
+   * и врал на ~padding — advance «промахивался» в snap-точку 0 и
+   * карусель стояла (найдено Playwright-замером: scrollLeft не менялся
+   * 10с при живом интервале). Возвращает null, когда края нет.
+   */
+  const edgeTarget = useCallback((dir: 1 | -1): number | null => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return null;
+    const cards = scroller.querySelectorAll<HTMLElement>(
+      ".ea-evt-portfolio__card",
+    );
+    if (!cards.length) return null;
+    const base = scroller.getBoundingClientRect().left;
+    let target: number | null = null;
+    if (dir === 1) {
+      for (const card of Array.from(cards)) {
+        const rel = card.getBoundingClientRect().left - base;
+        if (rel > 8) {
+          target = Math.round(scroller.scrollLeft + rel);
+          break;
+        }
+      }
+    } else {
+      for (const card of Array.from(cards).reverse()) {
+        const rel = card.getBoundingClientRect().left - base;
+        if (rel < -8) {
+          target = Math.round(scroller.scrollLeft + rel);
+          break;
+        }
+      }
+    }
+    return target;
+  }, []);
+
+  /**
+   * c87-F5: доезжаем до конца ленты, wrap на старт — СЛЕДУЮЩИМ тиком
+   * (раньше джамп-кат из предпоследней позиции; урок c83 — end-детект
+   * по фактической позиции, не по «шаг ≥ max»).
    */
   const advance = useCallback(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
-    const cards = scroller.querySelectorAll<HTMLElement>(
-      ".ea-evt-portfolio__card",
-    );
-    if (!cards.length) return;
     const max = scroller.scrollWidth - scroller.clientWidth;
     if (max <= 0) return;
-    const base = scroller.getBoundingClientRect().left;
-    let target = -1;
-    for (const card of Array.from(cards)) {
-      const rel = card.getBoundingClientRect().left - base;
-      if (rel > 8) {
-        target = Math.round(scroller.scrollLeft + rel);
-        break;
-      }
-    }
-    if (target < 0 || target >= max - 4) {
+    if (scroller.scrollLeft >= max - 4) {
       scroller.scrollTo({ left: 0, behavior: "smooth" });
+      return;
+    }
+    const target = edgeTarget(1);
+    if (target === null || target >= max - 4) {
+      scroller.scrollTo({ left: max, behavior: "smooth" });
     } else {
       scroller.scrollTo({ left: target, behavior: "smooth" });
     }
-  }, []);
+  }, [edgeTarget]);
 
   const startAuto = useCallback(() => {
     if (reduce) return;
@@ -201,6 +255,27 @@ export function EaEventsPortfolio() {
       intervalRef.current = null;
     }
   }, []);
+
+  useEffect(() => {
+    startAutoRef.current = startAuto;
+  }, [startAuto]);
+
+  /** F2: стрелки — переход на край соседней карточки + сброс отсчёта. */
+  const goTo = useCallback(
+    (dir: 1 | -1) => {
+      const scroller = scrollerRef.current;
+      if (!scroller) return;
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      const target = edgeTarget(dir);
+      if (target === null) return;
+      scroller.scrollTo({
+        left: Math.max(0, Math.min(max, target)),
+        behavior: "smooth",
+      });
+      if (intervalRef.current) startAuto();
+    },
+    [edgeTarget, startAuto],
+  );
 
   // Start autoplay + pause when offscreen (perf).
   useEffect(() => {
@@ -226,20 +301,89 @@ export function EaEventsPortfolio() {
     };
   }, [reduce, startAuto, stopAuto]);
 
-  // Scroll-progress bar — rAF-throttled to keep scroll perf clean.
+  /**
+   * F1 [WCAG 2.2.2 + c83-F4b]: пауза/сброс автопрокрутки. Дом-listeners
+   * напрямую (React-synthetic mouseenter в headless не покрыл потомков):
+   *  - pointerenter → пауза, pointerleave → возобновление (мышь и тач);
+   *  - focusin → пауза, focusout → возобновление (клавиатура/скринридер);
+   *  - ручной скролл (>30px за rAF-тик, троттлинг 150мс, ТОЛЬКО при живом
+   *    интервале) перезапускает отсчёт — тик не падает на инерцию свайпа.
+   * F2: End/Home скроллят ленту (было — страницу).
+   */
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const onPointerEnter = () => stopAuto();
+    const onPointerLeave = () => startAuto();
+    const onFocusIn = () => stopAuto();
+    const onFocusOut = () => startAuto();
+    const onKey = (e: KeyboardEvent) => {
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      if (e.key === "End" && max > 0) {
+        /* F2: мгновенно — как нативный End/Home на скролл-контейнерах
+           (smooth-вариант гонялся с snap и мерился непоследовательно). */
+        e.preventDefault();
+        scroller.scrollTo({ left: max, behavior: "auto" });
+        if (intervalRef.current) startAuto();
+      } else if (e.key === "Home" && scroller.scrollLeft > 0) {
+        e.preventDefault();
+        scroller.scrollTo({ left: 0, behavior: "auto" });
+        if (intervalRef.current) startAuto();
+      }
+    };
+    scroller.addEventListener("pointerenter", onPointerEnter);
+    scroller.addEventListener("pointerleave", onPointerLeave);
+    scroller.addEventListener("focusin", onFocusIn);
+    scroller.addEventListener("focusout", onFocusOut);
+    scroller.addEventListener("keydown", onKey);
+    return () => {
+      scroller.removeEventListener("pointerenter", onPointerEnter);
+      scroller.removeEventListener("pointerleave", onPointerLeave);
+      scroller.removeEventListener("focusin", onFocusIn);
+      scroller.removeEventListener("focusout", onFocusOut);
+      scroller.removeEventListener("keydown", onKey);
+    };
+  }, [startAuto, stopAuto]);
+
+  /**
+   * F4: скролл-поток — прогресс-бар через ПРЯМОЙ DOM-ref (ноль setState
+   * на кадр: 44-карточное поддерево не ре-рендерится; доктрина сайта
+   * «ноль setState на кадр» из site-footer). Тот же поток считает
+   * atStart/atEnd для стрелок (setState только при СМЕНЕ края) и ловит
+   * ручной скролл для сброса отсчёта (F1).
+   */
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
     let ticking = false;
+    let lastLeft = scroller.scrollLeft;
+    let lastSwipeRestartAt = 0;
+    const measure = () => {
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      const left = scroller.scrollLeft;
+      const delta = left - lastLeft;
+      lastLeft = left;
+      if (Math.abs(delta) > 30 && intervalRef.current) {
+        const now = performance.now();
+        if (now - lastSwipeRestartAt > 150) {
+          lastSwipeRestartAt = now;
+          startAutoRef.current();
+        }
+      }
+      const start = left <= 4;
+      const end = max <= 0 || left + scroller.clientWidth >= scroller.scrollWidth - 4;
+      setAtStart((prev) => (prev === start ? prev : start));
+      setAtEnd((prev) => (prev === end ? prev : end));
+      if (progressBarRef.current) {
+        const pct = max > 0 ? left / max : 0;
+        progressBarRef.current.style.width = `${Math.max(0.08, Math.min(1, pct)) * 100}%`;
+      }
+      ticking = false;
+    };
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
-      requestAnimationFrame(() => {
-        const max = scroller.scrollWidth - scroller.clientWidth;
-        const pct = max > 0 ? scroller.scrollLeft / max : 0;
-        setProgress(pct);
-        ticking = false;
-      });
+      requestAnimationFrame(measure);
     };
     scroller.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -257,8 +401,14 @@ export function EaEventsPortfolio() {
           className="ea-evt-portfolio__top"
           initial={reduceSettled ? false : { opacity: 0, y: 24 }}
           whileInView={reduceSettled ? undefined : { opacity: 1, y: 0 }}
+          /* F3 [c83-урок]: RM-ветка обязана иметь animate-финал — иначе
+             inline-стили первого рендера (opacity:0/y:24) висят навсегда
+             (заголовок невидим под prefers-reduced-motion). */
+          animate={reduceSettled ? { opacity: 1, y: 0 } : undefined}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, ease: EASE }}
+          transition={
+            reduceSettled ? { duration: 0 } : { duration: 0.7, ease: EASE }
+          }
         >
           <div className="ea-evt-portfolio__heading-block">
             {/* Cycle 31 — gamma-style -6° tilted handwritten accent ABOVE the
@@ -280,14 +430,14 @@ export function EaEventsPortfolio() {
             {/* c87 — honest trust beat: все кадры реальные (закрывает
                 вопрос c86-CRIT3 о стоке). Короткая сенсорная строка. */}
             <p className="ea-evt-portfolio__sub">
-              Все {EVENTS.length} кадров — с наших мероприятий: банкетная
+              Все {EVENTS.length} кадра — с наших мероприятий: банкетная
               рассадка, фуршетные линии и подача.
             </p>
           </div>
           <Link
-            href="#ea-service-tabs"
+            href="#services"
             className="ea-text-link ea-evt-portfolio__all-link"
-            aria-label="Все события"
+            aria-label="Все события — форматы обслуживания"
           >
             Все события
             <svg
@@ -306,8 +456,6 @@ export function EaEventsPortfolio() {
           className="ea-evt-portfolio__scroller"
           aria-label="Фотогалерея событий — горизонтальная прокрутка"
           aria-roledescription="carousel"
-          onMouseEnter={stopAuto}
-          onMouseLeave={startAuto}
           tabIndex={0}
         >
           {EVENTS.map((event, i) => (
@@ -330,6 +478,8 @@ export function EaEventsPortfolio() {
                 внутренняя обёртка — h-full/w-full: высота определена
                 карточкой (aspect-ratio + width), aspect-класс больше
                 не нужен (при смешанных пропорциях он конфликтовал бы).
+                Все карточки lazy: секция глубоко ниже фолда, priority
+                здесь — анти-паттерн (конкуренция preload с hero-LCP).
               */}
               <ClipPathReveal
                 direction="alternate"
@@ -344,7 +494,6 @@ export function EaEventsPortfolio() {
                     fill
                     sizes={SIZES[event.ratio]}
                     className="ea-evt-portfolio__img object-cover"
-                    priority={i < 2}
                     quality={82}
                   />
                 </div>
@@ -360,12 +509,51 @@ export function EaEventsPortfolio() {
           ))}
         </ul>
 
+        {/* F2: стрелки prev/next — паттерн сиблинга events-video-carousel
+            (81-F2): на краю трека стрелка гаснет (opacity 40% +
+            pointer-events: none — CSS [data-edge="true"]); клик сбрасывает
+            отсчёт автопрокрутки (goTo → startAuto). Колёсная мышь больше
+            не заперта в ленте. */}
+        <div className="ea-evt-portfolio__nav">
+          <button
+            type="button"
+            className="ea-evt-portfolio__nav-btn"
+            data-edge={atStart ? "true" : undefined}
+            aria-disabled={atStart || undefined}
+            data-press
+            onClick={() => {
+              if (atStart) return;
+              goTo(-1);
+            }}
+            aria-label="Предыдущее фото"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="ea-evt-portfolio__nav-btn"
+            data-edge={atEnd ? "true" : undefined}
+            aria-disabled={atEnd || undefined}
+            data-press
+            onClick={() => {
+              if (atEnd) return;
+              goTo(1);
+            }}
+            aria-label="Следующее фото"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+
         <div className="ea-evt-portfolio__progress-track" aria-hidden="true">
           <div
+            ref={progressBarRef}
             className="ea-evt-portfolio__progress-bar"
-            style={{
-              width: `${Math.max(0.08, Math.min(1, progress)) * 100}%`,
-            }}
+            style={{ width: "8%" }}
           />
         </div>
       </div>

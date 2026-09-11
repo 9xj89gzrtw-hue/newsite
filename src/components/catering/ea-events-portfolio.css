@@ -112,10 +112,11 @@
 }
 
 /* Image hover — EA's scale(1.1)/200ms signature, refined to scale(1.06)/700ms
-   for a quieter, more cinematic feel. */
+   for a quieter, more cinematic feel.
+   c87-F: will-change УБРАН — 44 постоянных композит-слоев (§34: браузер
+   сам промоутит слой на время transition). */
 .ea-evt-portfolio__img {
   transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
 }
 
 .ea-evt-portfolio__card:hover .ea-evt-portfolio__img,
@@ -134,8 +135,8 @@
   padding: 1.5rem 1.4rem;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.78) 0%,
-    rgba(0, 0, 0, 0.20) 55%,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.24) 55%,
     rgba(0, 0, 0, 0) 100%
   );
   color: var(--ea-white);
@@ -179,6 +180,62 @@
   opacity: 0.9;
 }
 
+/* c87-F2: стрелки prev/next — паттерн сиблинга events-video-carousel
+   (81-F2): 44px тач-таргет, на краю гаснут (data-edge). */
+.ea-evt-portfolio__nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ea-evt-portfolio__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--ea-ink) 20%, transparent);
+  background: transparent;
+  color: var(--ea-ink);
+  cursor: pointer;
+  transition:
+    border-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.ea-evt-portfolio__nav-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ea-evt-portfolio__nav-btn:hover {
+  border-color: var(--ea-red);
+  color: var(--ea-red);
+  transform: scale(1.06);
+}
+
+.ea-evt-portfolio__nav-btn:focus-visible {
+  border-color: var(--ea-red);
+  color: var(--ea-red);
+  outline: 2px solid var(--ea-red-text, #b91431);
+  outline-offset: 2px;
+}
+
+/* На краю трека стрелка гаснет — кламп ленты, не баг скролла (81-F2). */
+.ea-evt-portfolio__nav-btn[data-edge="true"] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 /* — — — — — Custom 2px × 100% scroll progress indicator (pure CSS, JS-driven width) — — — — — */
 
 .ea-evt-portfolio__progress-track {
@@ -210,5 +267,10 @@
   }
   .ea-evt-portfolio__progress-bar {
     transition: none;
+  }
+  .ea-evt-portfolio__nav-btn,
+  .ea-evt-portfolio__nav-btn:hover {
+    transition: none;
+    transform: none;
   }
 }
