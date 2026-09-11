@@ -386,7 +386,15 @@ export function GgVideoShowcase() {
           {/* Subtitle — white @ 85%, max-w-2xl editorial column.
               Task 4-B: text-shadow for contrast in motion.
               c84-A (задача 1): mb-8 → mb-5 на мобиле (компактный стек
-              под пилл), md+ — как было. */}
+              под пилл), md+ — как было.
+              c86-F (перегруженность): было два предложения (~110 знаков)
+              — «Каждое блюдо — это режиссура вкуса, света и сервиса. От
+              идеи до последнего штриха мы создаём кино, которое можно
+              попробовать.» Абстракцию «режиссура вкуса/света/сервиса»
+              дублирует сама H2 (искусство/ритуал/спектакль/кино);
+              оставлена одна строка с тем же замыкающим «кино, которое
+              можно попробовать» (морфинг слова «кино» по-прежнему
+              закольцован с субтитлом, c84-A задача 2). */}
           <motion.p
             {...reveal(0.08)}
             className="mb-5 max-w-2xl text-white/85 md:mb-8"
@@ -397,9 +405,8 @@ export function GgVideoShowcase() {
               textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)",
             }}
           >
-            Каждое блюдо — это режиссура вкуса, света и сервиса. От идеи
-            до последнего штриха мы создаём кино, которое можно
-            попробовать.
+            Создаём кино, которое можно попробовать — от идеи до последнего
+            штриха.
           </motion.p>
 
           {/* CTA pills — 2 anchors, rounded-full, transparent bg + white
@@ -484,7 +491,12 @@ export function GgVideoShowcase() {
               data-press (WAAPI-свойство scale) не конфликтует. */
           className="gg-play-pill group inline-flex min-h-[44px] items-center justify-center hover:opacity-90"
           style={{
-            background: "transparent",
+            /* c86-F (читабельность): было transparent — worst-case в зоне
+               пила (26% высоты мобайл / центр десктопа: скрим ≈ 0.42)
+               над СВЕТЛЫМ кадром давал 4.2:1 для белого лейбла 14.4px —
+               ниже AA 4.5. Подложка 0.30 → ≥6.9:1 на любом кадре; пилл
+               остаётся призрачным (бордер + сквозь видно видео). */
+            background: "rgba(0, 0, 0, 0.3)",
             color: "#fff",
             border: "1px solid #fff",
             borderRadius: "9999px",

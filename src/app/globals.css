@@ -3016,7 +3016,12 @@ header[data-scrolled="true"] [data-mega-panel] {
   font-size: clamp(13px, 1.2vw, 14px);
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #8a6d1f; /* глубокое золото: 5.1:1 на креме — AA и в малом кегле */
+  /* c86-F (замер f-mobile-audit): прежнее «глубокое золото» #8a6d1f давало
+     4.54:1 на креме (комментарий ниже обещал 5.1 — не сходилось; в
+     reveal-мид-стейтах замерялось 4.47). Новый тон #7a6219 = 5.42:1 —
+     AA-запас для 13px капса; золотая линия-отбивка (::after) не тронута —
+     она декоративная, не текст. */
+  color: #7a6219;
   margin-bottom: 0.5rem;
 }
 .ea-chapter::after {
@@ -3024,6 +3029,12 @@ header[data-scrolled="true"] [data-mega-panel] {
   width: clamp(28px, 4vw, 56px);
   height: 1px;
   background: linear-gradient(to right, #c9a227, transparent);
+}
+/* c86-F: глава 06 живёт в тёмной .efs-секции (espresso #161312) — тёмное
+   золото #7a6219 там даёт ~3.1:1; в тёмном контексте берём секционный
+   акцент #C9A227 (замер ea-founder-story.css: 7.64:1 на #161312). */
+.efs .ea-chapter {
+  color: var(--efs-accent-text, #c9a227);
 }
 
 .ea-eyebrow {

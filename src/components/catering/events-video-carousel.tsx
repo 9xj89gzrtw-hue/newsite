@@ -120,9 +120,9 @@ const TILES: EventTile[] = [
     video: "/media/clips/catering-clip-2.mp4",
     poster: "/media/event-02.jpg",
     category: "Горячее",
-    title: "Тортелини с овощами",
+    title: "Тортеллини с овощами",
     meta: "Основная подача · в работе",
-    videoAlt: "Видео: тортелини с овощами — горячая подача",
+    videoAlt: "Видео: тортеллини с овощами — горячая подача",
   },
   {
     video: "/media/clips/catering-clip-3.mp4",
@@ -564,7 +564,7 @@ export function EventsVideoCarousel() {
     <section
       ref={sectionRef}
       id="events-video-carousel"
-      aria-label="Видео мероприятий"
+      aria-label="Видео кухни и подачи"
       className="ea-evt-video ea-section ea-section--cream"
     >
       <div className="ea-container ea-container--wide">
@@ -590,15 +590,15 @@ export function EventsVideoCarousel() {
             {/* c85 (понятность): глава 03 — единая нумерация главных глав
                 страницы (см. .ea-chapter в globals.css). Decorative. */}
             <span className="ea-chapter" aria-hidden="true">Глава 03</span>
-            <span className="ea-eyebrow--script">Видео с наших мероприятий</span>
+            <span className="ea-eyebrow--script">Кухня в движении</span>
             <h2 className="ea-section-h2 ea-evt-video__h2">
               {"Не только блюда. "}
               <i className="ea-italic-fragment">Всё событие</i>
               {"."}
             </h2>
             <p className="ea-evt-video__subtitle">
-              Живые кадры с наших мероприятий — кухня и подача, зал и свет,
-              команда и гости в движении.
+              Крупные планы подачи, зала и команды — как выглядит
+              сервис в деталях и в движении.
             </p>
           </div>
         </motion.div>
@@ -607,7 +607,7 @@ export function EventsVideoCarousel() {
         <ul
           ref={scrollerRef}
           className="ea-evt-video__scroller"
-          aria-label="Видео мероприятий — горизонтальная прокрутка"
+          aria-label="Видео кухни и подачи — горизонтальная прокрутка"
           aria-roledescription="carousel"
           onMouseEnter={stopAuto}
           onMouseLeave={startAuto}

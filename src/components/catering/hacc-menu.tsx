@@ -8,7 +8,7 @@
  * аккордеон-«корешки», те же пастельные тинты, Marck Script-заголовки,
  * магнитная CTA, ambient-подсветка секции.
  *
- * Один рэк из семи каталогов (Фуршет → Обеды в офис). Открытая панель:
+ * Один рэк каталогов (Фуршет → Барбекю). Открытая панель:
  *
  *   ┌ tag ───────── Marck Script title ───────── цена ┐
  *   │ фото пакета          │ Базовый / Стандарт / Премиум │
@@ -40,7 +40,7 @@
  *  - Список блюд — донорский паттерн gamma `.service-section__list`:
  *    одноколоночные строки с волосяной линейкой, без карточек и точек.
  *  - Скачивание PDF всего каталога — одна ссылка в шапке секции
- *    (generateMenuPdf("all")), а не семь дублирующих кнопок.
+ *    (generateMenuPdf("all")), а не дублирующие кнопки в каждой панели.
  *
  * Умершие элементы старого блока (и почему):
  *  - тёмный hero «фирменные блюда» — дублировал панели и стоящий выше
@@ -125,10 +125,6 @@ const META: Record<
     ctaLabel: "Рассчитать банкет",
     ctaHref: "#calculator",
     cursorLabel: "БАНКЕТ",
-    // симуляция C59 (Виктор, 25 гостей): минимум «от 30» не должен повисать;
-    // Мила (W6): крючок «дегустация» рядом с CTA (дегустация есть в FAQ)
-    hookNote:
-      "Меньше 30 гостей? Соберём и на такую компанию — посчитаем индивидуально. Доступна дегустация банкетного меню — детали при расчёте.",
   },
   "snack-box": {
     tint: "#E6EBDF",
@@ -148,16 +144,6 @@ const META: Record<
       "Включим вегетарианские позиции и в общий банкет: смешанный состав — это норма.",
   },
   bbq: { tint: "#F3E3E8", ctaLabel: "Рассчитать барбекю", ctaHref: "#calculator", cursorLabel: "БАРБЕКЮ" },
-  "office-lunch": {
-    tint: "#F5EEE2",
-    ctaLabel: "Заказать обеды",
-    ctaHref: "#contact",
-    priceLabel: "за порцию",
-    cursorLabel: "ОБЕДЫ",
-    // симуляция C59 (Елена): ответ про регулярность без выдуманных фактов
-    hookNote:
-      "Меню на неделю соберём под ваш офис: согласуем дни доставки и состав наборов.",
-  },
 };
 
 const FALLBACK_META = {
@@ -171,24 +157,19 @@ const FALLBACK_META = {
 /** Если у пакета нет фото — показываем проверенный фуршетный кадр. */
 const FALLBACK_PHOTO = "/media/furshet-1.jpg";
 
-/** Автозаметка-сниматель для ЛЮБОГО каталога: минимум гостей не должен
-    повисать вопросом (симуляции C59: Виктор 25, Ольга 14, Светлана 8).
-    Явный hookNote из META имеет приоритет. */
-function hookNoteFor(cat: MenuCat): string | undefined {
-  return `Меньше ${cat.minGuests} гостей? Посчитаем индивидуально — позвоните или оставьте заявку.`;
-}
-
 /** Калькулятор читает ?type=… через nuqs (подхватывает history.replaceState).
  *  c84-C: pkg — активная ступень открытой категории (контракт с блоком
- *  расчёта: nuqs-параметр pkg, как type/guests). */
-function presetCalculator(typeId: string, guests: number, pkgIdx?: number) {
+ *  расчёта: nuqs-параметр pkg, как type). c86-E: guests больше не пресетим —
+ *  ограничений по количеству гостей нет, калькулятор остаётся на своём
+ *  дефолте (30), юзер двигает слайдер сам. */
+function presetCalculator(typeId: string, pkgIdx?: number) {
   if (typeof window === "undefined") return;
   const pkg =
     pkgIdx !== undefined && pkgIdx >= 0 ? `&pkg=${pkgIdx}` : "";
   window.history.replaceState(
     null,
     "",
-    `/?type=${typeId}&guests=${guests}${pkg}#calculator`,
+    `/?type=${typeId}${pkg}#calculator`,
   );
 }
 
@@ -197,19 +178,12 @@ const MENUS: MenuCat[] = MENU_TYPES.map((m) => {
   return { ...m, ...meta, priceLabel: meta.priceLabel ?? "за гостя" };
 });
 
-/** Минимум банкетного каталога — для примера бюджета в приписке (из данных). */
+/** Ступень «от» банкетного каталога — для примера бюджета в приписке (из данных). */
 const banquetPerGuest =
   MENU_TYPES.find((m) => m.id === "banquet")?.perGuest ?? 4470;
 
-/** «от 20 гостей»: 21/101 → «гостя», остальное → «гостей». */
-function guestsLabel(n: number): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  const word = mod10 === 1 && mod100 !== 11 ? "гостя" : "гостей";
-  return `от ${n} ${word}`;
-}
-
-/** 1 блюдо / 2–4 блюда / 5+ блюд — для подписи «Ещё N …» у списка. */
+/** 1 блюдо / 2–4 блюда / 5+ блюд — для подписи «Ещё N …» у списка
+    и счётчика состава пакета. */
 function dishesWord(n: number): string {
   const mod10 = n % 10;
   const mod100 = n % 100;
@@ -241,7 +215,7 @@ function HandCheck() {
   );
 }
 
-/* ------------------------------------------------------------ rack (7 шт.) */
+/* ------------------------------------------------------------ rack */
 
 function MenuRack({
   cats,
@@ -549,8 +523,8 @@ function MenuRack({
         const item = itemRefs.current[idx];
         if (!item) return;
         /* c84-F2 (дефект оркестратора, замер 390×844 lite-ветка): цель —
-           блок деталей с табами (.hmenu__details: label «Выберите уровень
-           меню:» + табы + PDF-кнопка), а НЕ весь item. Весь item высок
+           блок деталей с табами (.hmenu__details: label над табами
+           + табы + PDF-кнопка), а НЕ весь item. Весь item высок
            (корешок + фото ~200px + список блюд): block:"center" клал
            табы на ~300px ВЫШЕ вьюпорта (scrollY 5974, tabs top −311 —
            юзер не видел применённый пресет — цель чипа убита). Ветка
@@ -935,7 +909,7 @@ function MenuRack({
         "hmenu__rack" + (expandedId !== null ? " is-expanded" : "")
       }
       role="group"
-      aria-label="Каталоги меню — семь направлений кейтеринга"
+      aria-label="Каталоги меню — направления кейтеринга"
       initial={reduceSettled ? false : "hidden"}
       whileInView={reduceSettled ? undefined : "show"}
       /* c83-F2: под reduce финал через animate (duration 0), а не через
@@ -955,7 +929,7 @@ function MenuRack({
         const isOpen = openIndex === k;
         /* дефолтная ступень — самая доступная: тогда цена в шапке совпадает
            с «от N» калькулятора и лидом (симуляция Марина C59/W2: у
-           snack-box минимальный пакет не первый в данных) */
+           snack-box самый дешёвый пакет не первый в данных) */
         const minIdx = cat.packages.reduce(
           (best, p, i, arr) => (p.pricePerGuest < arr[best].pricePerGuest ? i : best),
           0,
@@ -1067,14 +1041,12 @@ function MenuRack({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.34, ease: EASE }}
                     >
-                      {/* «от» — честно только у минимального пакета:
+                      {/* «от» — честно только у самого дешёвого пакета:
                           выбранная ступень показывает точную цену */}
                       {pkg && pkg.pricePerGuest === cat.perGuest ? "от " : ""}
                       {formatRUB(pkg ? pkg.pricePerGuest : cat.perGuest)}
                     </motion.span>
-                    <small>
-                      {cat.priceLabel} · {guestsLabel(cat.minGuests)}
-                    </small>
+                    <small>{cat.priceLabel}</small>
                   </span>
                 </div>
 
@@ -1125,21 +1097,16 @@ function MenuRack({
                     </motion.div>
                     <figcaption className="hmenu__media-cap">
                       <span className="hmenu__media-cap-name">{pkg.name}</span>
-                      {/* описание пакета: на 1024–1279 прячем (col ~246px —
-                          текст резался на 2-й строке без хвоста, аудитор C60);
-                          полный состав и так рядом — в списке блюд */}
-                      <span className="hmenu__media-cap-desc">
-                        {" · "}
-                        {pkg.description}
-                      </span>
                     </figcaption>
                   </figure>
 
                   <div className="hmenu__details">
-                    {/* c84-C: явная инструкция над табами (мобайл: непонятно,
-                        что ступени — кнопки, жалоба владельца) */}
+                    {/* c84-C/c86-E: явная инструкция над табами (мобайл:
+                        непонятно, что ступени — кнопки, жалоба владельца) +
+                        «цена за гостя» рядом с именами пакетов — числа
+                        в табах читаются без вопросов */}
                     <p className="hmenu__tabs-label">
-                      Выберите уровень меню:
+                      Уровень меню — цена за гостя:
                     </p>
 
                     {/* табы пакетов */}
@@ -1182,8 +1149,9 @@ function MenuRack({
                       ))}
                     </div>
 
-                    {/* c84-C: панель активного пакета — описание (мобайл)
-                        + кнопка per-tariff PDF (одна на активную ступень) */}
+                    {/* c84-C/c86-E: панель активного пакета — описание
+                        (что это: «N позиций — …», из данных) + кнопка
+                        per-tariff PDF (одна на активную ступень) */}
                     <div className="hmenu__pkgbar">
                       <p className="hmenu__pkg-desc">{pkg.description}</p>
                       <button
@@ -1214,7 +1182,9 @@ function MenuRack({
                     </div>
 
                     {/* блюда выбранного пакета. tabIndex=0 — панель со
-                        скроллом доступна с клавиатуры (APG tabs) */}
+                        скроллом доступна с клавиатуры (APG tabs).
+                        c86-E: счётчик состава над списком — «что это»
+                        в двух словах, выведен из длины данных, не руками */}
                     <div
                       className="hmenu__tabpanel"
                       id={`${baseId}-dishlist-${cat.id}`}
@@ -1223,6 +1193,9 @@ function MenuRack({
                       tabIndex={0}
                       aria-label={`Состав — ${pkg.name}`}
                     >
+                      <p className="hmenu__list-cap">
+                        Состав — {pkg.dishes.length} {dishesWord(pkg.dishes.length)}
+                      </p>
                       <div
                         className={
                           "hmenu__listwrap" +
@@ -1333,7 +1306,7 @@ function MenuRack({
 
                     {/* «включено» — галочки от руки, gamma-style */}
                     <div className="hmenu__incl">
-                      <p className="hmenu__incl-label">Включено в любой пакет</p>
+                      <p className="hmenu__incl-label">В любой пакет входит</p>
                       <ul className="hmenu__incl-grid">
                         {cat.included.map((inc) => (
                           <li key={inc} className="hmenu__incl-item">
@@ -1346,16 +1319,14 @@ function MenuRack({
                   </div>
                 </div>
 
-                {/* foot: описание + сниматель возражения + магнитная CTA.
-                    CTA калькулятора предварительно ставит ?type=&guests= —
-                    калькулятор открывается с нужным форматом (свадьба C59) */}
+                {/* foot: описание формата + магнитная CTA. CTA калькулятора
+                    предварительно ставит ?type= (и pkg) — калькулятор
+                    открывается с нужным форматом (свадьба C59) */}
                 <div className="hmenu__row-foot">
                   <div className="hmenu__foot-text">
                     <p className="hmenu__hook">{cat.description}</p>
-                    {(cat.hookNote ?? hookNoteFor(cat)) ? (
-                      <p className="hmenu__hook-note">
-                        {cat.hookNote ?? hookNoteFor(cat)}
-                      </p>
+                    {cat.hookNote ? (
+                      <p className="hmenu__hook-note">{cat.hookNote}</p>
                     ) : null}
                   </div>
                   <Magnetic className="hmenu__cta-wrap" strength={0.17}>
@@ -1365,7 +1336,7 @@ function MenuRack({
                       aria-label={`${cat.ctaLabel} — ${cat.label}`}
                       onClick={
                         cat.ctaHref === "#calculator"
-                          ? () => presetCalculator(cat.id, cat.minGuests, pkgIdx)
+                          ? () => presetCalculator(cat.id, pkgIdx)
                           : undefined
                       }
                     >
@@ -1483,8 +1454,8 @@ export function HaccMenu() {
               </i>
             </h2>
             <p className="hmenu__lede">
-              Семь каталогов — от канапе до мангала. Раскройте каталог:
-              состав пакетов, список блюд и цена за гостя.
+              От канапе до мангала. Раскройте каталог: пакеты, состав блюд
+              и цена за гостя.
             </p>
           </div>
           <div className="hmenu__meta">
@@ -1519,7 +1490,7 @@ export function HaccMenu() {
           буквы, как сургучная печать на краю каталога) */}
       <div className="ea-container ea-container--wide">
         <p className="hmenu__rack-label">
-          <span>От канапе до мангала — семь каталогов</span>
+          <span>Каталоги — от канапе до мангала</span>
           <img
             src="/brand/emblem-black-480.png"
             alt=""
@@ -1551,17 +1522,17 @@ export function HaccMenu() {
 
       {/* честная приписка под рэком: условия до заявки + ориентир бюджета
           (CFO/невеста C59/W5: коэффициент сезона публикуем, «не входит»
-          дублируем у цен, пример бюджета считаем ИЗ ДАННЫХ, не руками) */}
+          дублируем у цен, пример бюджета считаем ИЗ ДАННЫХ, не руками).
+          c86-E: ужата до главного — без FAQ-перекрёстных ссылок и
+          перечислений, читается одним взглядом */}
       <div className="ea-container ea-container--wide">
         <p className="hmenu__note">
-          Цены — за одного гостя. Условия называем заранее, до заявки: при
-          выборе даты в расчёте сразу виден сезонный коэффициент (май–сентябрь
-          и декабрь — ×1,15), срочные заказы — по правилам из
-          вопросов ниже. Ориентир: банкет на 40 гостей — от{" "}
-          {formatRUB(40 * banquetPerGuest)}. Алкоголь, аренда площадки,
-          музыка и расширенное оформление — отдельными строками по запросу.
-          Состав любого пакета пересобираем под ваше событие: замените
-          блюдо или соберите смешанный уровень — это нормальная практика.
+          Цены — за одного гостя. Сезонный коэффициент (май–сентябрь и
+          декабрь — ×1,15) виден в расчёте сразу, до заявки. Ориентир:
+          банкет на 40 гостей — от {formatRUB(40 * banquetPerGuest)}.
+          Алкоголь, аренда площадки и музыка — отдельными строками по
+          запросу. Состав любого пакета пересобираем под ваше событие:
+          заменить блюдо или смешать уровни — нормальная практика.
         </p>
       </div>
 
@@ -1569,8 +1540,8 @@ export function HaccMenu() {
           Заголовок — Marck Script-акцент с наклоном (тот же приём, что
           корешки рэка); золотая линейка перекликается с пульс-точкой бейджа
           «Отвечаем в любое время» в блоке заявки. CTA ведёт на #contact —
-          тот же якорь, что «Обсудить меню» вегетарианского и офисного
-          каталогов. Вход — whileInView (y+opacity, transform-only),
+          тот же якорь, что «Обсудить меню» вегетарианского каталога.
+          Вход — whileInView (y+opacity, transform-only),
           hydration-гейт как у шапки секции (C62 §34). */}
       <div className="ea-container ea-container--wide">
         <motion.div

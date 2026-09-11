@@ -36,6 +36,12 @@ import { ImageTrail } from "@/components/motion/image-trail";
  * a decorative (aria-hidden) Instagram-grid convention — alts describe
  * photos, not video.
  *
+ * c86-D (RF legal): каждое ВИДИМОЕ упоминание Instagram несёт маркер «*»
+ * (ссылка-хэндл в шапке секции — «Instagram* · @nilov_catering»); внизу
+ * секции — обязательная в РФ сноска про Meta (тем же экраном, что и
+ * упоминание). aria-label/alt остаются без звёздочки — скринридеру
+ * чистое имя читается лучше.
+ *
  * @see creativeedge-analysis.md §6.12 (Instagram grid)
  */
 const IG_TILES = [
@@ -152,7 +158,10 @@ export function CepInstagramGrid() {
           className="cep-nav-link inline-flex min-h-[44px] items-center gap-2 text-black transition-colors duration-300 hover:text-[var(--cep-red)]"
         >
           <Instagram className="size-5" aria-hidden="true" />
-          <span>{CONTACTS.instagram}</span>
+          {/* c86-D: «Instagram*» — видимый RF-маркер (Meta признана
+              экстремистской организацией в РФ, сноска — внизу секции).
+              Хэндл остаётся рядом: по нему узнают аккаунт. */}
+          <span>Instagram* · {CONTACTS.instagram}</span>
         </a>
       </div>
 
@@ -279,6 +288,23 @@ export function CepInstagramGrid() {
           );
         })}
       </motion.div>
+
+      {/* c86-D: RF legal footnote — маркер «Instagram*» стоит в шапке
+          секции (ссылка-хэндл), сноска обязана быть тем же экраном.
+          Идиома мелкого текста CEP-секций: cep-text + cep-black/60
+          (как авторы cep-testimonials); oklab-микс /60 на креме даёт
+          тёмно-серый ≈8:1 — AA с запасом (srgb-микс ≈5.5:1, тоже AA).
+          12px мобайл / 13px десктоп (этаж c84), max-w-xl — читаемая
+          мера строки; перенос по пробелам — «экстремистской»/
+          «Российской» умещаются без клипа на 390px. */}
+      <p
+        data-ig-note
+        className="cep-text mt-10 max-w-xl text-[12px] leading-relaxed text-cep-black/60 md:text-[13px]"
+      >
+        *Instagram принадлежит компании Meta, признанной экстремистской
+        организацией; её деятельность запрещена на территории Российской
+        Федерации.
+      </p>
 
       {/* Волна 1 / Task 1-c2: ImageTrail — ГЛАВНЫЙ мобильный вау секции.
           Свайп/скролл пальцем (или движение мыши) по секции оставляет

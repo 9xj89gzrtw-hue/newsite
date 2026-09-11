@@ -295,40 +295,75 @@ export function SiteHeader() {
     };
   }, []);
 
-  // c83-A (Impl-A, задача 2): scroll-spy подсветка активного пункта nav.
-  // IntersectionObserver (rootMargin -40%/-55% = «полоса» 40–45% vh) на
-  // секциях, на которые указывают пункты NAV (фактические href: #menu,
-  // #services, #about, #contact — их секции в page.tsx). IO — только
-  // триггер (вход/выход секции из полосы); в колбэке пересчитываем актив
-  // по живым rect'ам: активна ПОСЛЕДНЯЯ в документном порядке секция с
-  // top ≤ нижней кромки полосы (45% vh). Двунаправленно честно: вниз в
-  // «дырах» между nav-секциями (showcase/marquee/faq/instagram…) светится
-  // последняя пройденная; вверх — следующая гаснет, как только её верх
-  // вышел из полосы. #contact — сворачиваемая зона формы (grid 0fr внутри
-  // #calculator): для пункта наблюдаем секцию-носитель, иначе схлопнутый
-  // 0-высотой div никогда не пересечёт полосу. Состояние (не анимация):
-  // класс .is-active + aria-current="location" на desktop-ссылке (c83-F1);
-  // появление метки — CSS transition
-  // transform/opacity 180ms с гейтом reduce (css, п.4). Дровер и мобильный
-  // nav не затронуты (селектор — только <nav> внутри шапки).
+  // c86-B (жалоба владельца c86: «в хедере изначально почему-то подчеркнуты
+  // "контакты", хотя первый блок после херо — это видео»): scroll-spy v2.
+  //
+  // КОРЕНЬ БАГА v1 (доказан research/c86/b-scrollspy.cjs, DIAG C): в прод-
+  // пререндере конверс-блок приезжает SSR-шеллом (Suspense-fallback
+  // HaccBookingShell, 81-F3), а гидрация заменяет шелл живым виджетом.
+  // Эффект v1 успевал зарезолвить цели и навесить IO на узлы ШЕЛЛА; свап
+  // отваливал их от DOM; начальные IO-entries доставляются ПОСЛЕ свапа →
+  // recompute читал gBCR отваленных узлов (все нулевые) → «последняя
+  // секция с top ≤ 45%vh» = ПОСЛЕДНИЙ пункт NAV = #contact → «Контакты»
+  // горит прямо на герое — и навсегда: отваленные цели никогда не
+  // пересекут IO-полосу, spy заморожен (замер: active=[#contact] при
+  // scrollY=0, узел detached, rect.top=0, реальная зона на 9703px ниже).
+  // В dev :3001 виджет всегда в SSR-HTML — свапа нет, баг не виден (DIAG A).
+  //
+  // V2 — сигнальная сетка паттерна FX5 v2 (тёмный вотчер ниже в этом же
+  // файле): rAF-throttled scroll + resize + hashchange + ResizeObserver
+  // (body) + стартовая оценка. IO на целях УДАЛЁН: пересечение полосы
+  // всегда сопровождается одним из этих сигналов (скролл/resize/дрейф
+  // лэйаута), а асинхронная доставка начальных IO-entries в окне
+  // прод-свапа — сам источник бага. Self-healing: каждая оценка
+  // проверяет isConnected целей и при отвале перечитывает их из живого
+  // DOM — нулевые rect'ы отваленных узлов больше не голосуют.
+  //
+  // ЛИНИЯ АКТИВАЦИИ (спека c86-B): пункт загорается, когда верх СЕКЦИИ
+  // дошёл до посадочной полосы якорей = max(высота шапки, 96px) — контент
+  // реально под шапкой, ровно там, где его оставляет клик по пункту
+  // (конвенция scroll-margin-top сайта: 84px у section[id], 96px у услуг/
+  // меню/#calculator/#contact — Lenis и scrollIntoView сажают цель туда).
+  // Прежняя линия 45% vh зажигала пункт, когда секция была в середине
+  // экрана; видео-блок/marquee/бэнды под шапкой ничего не зажигают (нет
+  // пунктов — честно по ожиданию владельца). #contact → наблюдаем САМУ
+  // зону формы (div#contact; живёт в DOM всегда — контракт 8
+  // hacc-booking), а не секцию-носитель: «Контакты» загорается, когда
+  // зона реально под шапкой (замер 1280×800: на 1824px позже верха
+  // #calculator), а не когда верх секции вошёл в середину экрана.
+  // Лучшая = ПОСЛЕДНЯЯ в документном порядке секция с top ≤ линии —
+  // честно в обе стороны: вниз в «дырах» между nav-секциями (showcase/
+  // marquee/faq/instagram) светится последняя пройденная, вверх —
+  // следующая гаснет, как только её верх ушёл ниже полосы, на герое —
+  // ничего. Быстрые прыжки (якорь, vanity-URL, resize) ресинкятся
+  // сигналами выше; во время hero-exit apply() — no-op (state не меняется
+  // → ноль DOM-мутаций, фликера нет).
+  //
+  // Состояние (не анимация): класс .is-active + aria-current="location"
+  // на desktop-ссылке (c83-F1); появление метки — CSS transition
+  // transform/opacity 180ms с гейтом reduce (site-header.css §4).
+  // Дровер и мобильный nav не затронуты (селектор — только <nav> шапки).
   const activeHrefRef = useRef("");
   useEffect(() => {
     const header = headerRef.current;
-    if (!header || typeof IntersectionObserver === "undefined") return;
-    // href → наблюдаемый элемент (#contact → секция-носитель #calculator).
-    const targets: Array<{ href: string; el: Element }> = [];
-    for (const n of NAV) {
-      const anchor = document.querySelector(n.href);
-      if (!anchor) continue;
-      const el =
-        n.href === "#contact" ? (anchor.closest("section") ?? anchor) : anchor;
-      targets.push({ href: n.href, el });
-    }
-    if (targets.length === 0) return;
+    if (!header) return;
     const links = Array.from(
       header.querySelectorAll<HTMLAnchorElement>("nav a.hnav-link"),
     );
     if (links.length === 0) return;
+
+    // Цель каждого пункта — сам якорь (#contact — зона формы). Пересборка
+    // ленивая: isConnected-чек в recompute ловит прод-свап шелла и поздние
+    // монты (Suspense/vanity) — отваленный узел перечитывается из DOM.
+    const resolveTargets = () => {
+      const out: Array<{ href: string; el: Element }> = [];
+      for (const n of NAV) {
+        const el = document.querySelector(n.href);
+        if (el) out.push({ href: n.href, el });
+      }
+      return out;
+    };
+    let targets = resolveTargets();
 
     const apply = (href: string) => {
       if (href === activeHrefRef.current) return;
@@ -344,27 +379,46 @@ export function SiteHeader() {
       }
     };
 
+    let raf = 0;
     const recompute = () => {
-      // документный порядок = порядок текущих rect.top; линия отсчёта —
-      // нижняя кромка IO-полосы (45% vh): top ≤ неё → секция «дошла».
-      const line = window.innerHeight * 0.45;
-      let best = "";
+      raf = 0;
+      // Self-healing ДО замеров: отваленная цель даёт gBCR 0×0 и голосует
+      // «секция наверху» — корень бага «Контакты на герое» (докблок выше).
+      if (targets.length === 0 || targets.some((t) => !t.el.isConnected)) {
+        targets = resolveTargets();
+      }
+      // Посадочная полоса: якорные margin'ы (84/96px) против живой высоты
+      // шапки (+0.5 — допуск субпиксельной посадки).
+      const line = Math.max(header.offsetHeight || 84, 96) + 0.5;
       const tops = targets.map((t) => ({
         href: t.href,
         top: t.el.getBoundingClientRect().top,
       }));
       tops.sort((a, b) => a.top - b.top);
+      let best = "";
       for (const t of tops) if (t.top <= line) best = t.href;
       apply(best);
     };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(recompute);
+    };
 
-    const io = new IntersectionObserver(() => recompute(), {
-      rootMargin: "-40% 0px -55% 0px",
-    });
-    for (const t of targets) io.observe(t.el);
-    recompute(); // стартовое состояние (напр., reload с restore-scroll)
+    // Дрейф лэйаута без скролла (свап шелла, ленивые фото, раскрытие зоны
+    // формы #contact, late-монты) — RO догоняет геометрию (паттерн FX5-N2).
+    const ro = new ResizeObserver(schedule);
+    ro.observe(document.body);
+    // Быстрые прыжки: якорь из шапки/футера (нативный скролл-ивент в тот
+    // же тик + hashchange), vanity-URL (lenis-скролл = поток scroll-ивентов).
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    window.addEventListener("hashchange", schedule);
+    recompute(); // стартовое состояние (reload с restore-scroll, /#hash)
     return () => {
-      io.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("hashchange", schedule);
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
       apply(""); // снять метки при unmount
     };
   }, []);

@@ -201,6 +201,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type ComponentType,
   type ReactNode,
   type Ref,
 } from "react";
@@ -221,18 +222,24 @@ import {
   ArrowRight,
   CalendarDays,
   Check,
+  ChefHat,
   ChevronLeft,
+  Flower2,
   Instagram,
   Loader2,
   Mail,
   MapPin,
   MessageCircle,
   Minus,
+  Package,
   Phone,
   Plus,
   ReceiptText,
   Send,
   ShieldCheck,
+  Sparkles,
+  Users,
+  Wine,
 } from "lucide-react";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
@@ -336,11 +343,12 @@ function formatPhoneDisplay(raw: string): string {
 const SEASON_LABEL = "Высокий сезон: май–сентябрь и декабрь";
 const SEASON_CANON = `${SEASON_LABEL} — ×1,15`;
 
-/** Тики слайдера гостей — вехи; позиции считаются НЕЛИНЕЙНО (sliderPos). */
-const SLIDER_TICKS = [25, 50, 100, 200, 500];
+/** Тики слайдера гостей — вехи; позиции считаются НЕЛИНЕЙНО (sliderPos).
+    c86: добавлен ранний тик для малых заказов (формат «от одного гостя»). */
+const SLIDER_TICKS = [10, 25, 50, 100, 200, 500];
 const GUESTS_MAX = 500;
-/** Нижняя граница для «Ещё решаю» (без формата — считаем от 10). */
-const GUESTS_ABS_MIN = 10;
+/** c86: гостевых минимумов больше нет — заказ принимаем от одного гостя. */
+const GUESTS_ABS_MIN = 1;
 
 /**
  * Fix5 V1: НЕЛИНЕЙНАЯ шкала слайдера — чаще всего заказывают на 10–50 гостей,
@@ -381,6 +389,20 @@ const UNDECIDED_ID = "undecided";
 /** Конфетти — цвета бренда (ea-red/cep-red/cream/ink/gold), без неона. */
 const CONFETTI_COLORS = ["#E71D3A", "#FF360A", "#F7F5F5", "#1F2937", "#D4A373"];
 
+/**
+ * c86 (требование 3): иконки карточек допуслуг — по id из ADDONS.
+ * Компонент-фоллбек не нужен: список id замкнут в pricing.ts, но доступ
+ * через индекс остаётся безопасным (undefined → иконка не рендерится).
+ */
+const ADDON_ICONS: Record<string, ComponentType<{ className?: string }>> = {
+  equipment: Package,
+  waiters: Users,
+  chef: ChefHat,
+  show: Sparkles,
+  bar: Wine,
+  floristics: Flower2,
+};
+
 /** Fix5 V11: текст круговой печати (шаг угла = 360/длине текста — любой
  *  длины; task 7-E: interfood → nilov catering). */
 const HB_SPIN_TEXT = "смета-чек · nilov catering · с 2007 года ·";
@@ -388,7 +410,7 @@ const HB_SPIN_TEXT = "смета-чек · nilov catering · с 2007 года ·
 /** Катушка цифр odometer: 0–9 и дополнительный 0 на хвост 9→0. */
 const ODO_GLYPHS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 
-/** «от 20 гостей»: 21/101 → «гостя», остальное → «гостей» (канон hacc-menu). */
+/** Множественное число: без числа в тексте — «гостей», в единственном — «гостя» (канон hacc-menu). */
 function guestsLabel(n: number): string {
   const mod10 = n % 10;
   const mod100 = n % 100;
@@ -656,10 +678,6 @@ function MessengerGlyph({
   );
 }
 
-function MaxGlyph({ className }: { className?: string }) {
-  return <MessengerGlyph text="MAX" fontSize={9.5} className={className} />;
-}
-
 function VkGlyph({ className }: { className?: string }) {
   return <MessengerGlyph text="VK" fontSize={11.5} className={className} />;
 }
@@ -689,14 +707,6 @@ function useContactItems(): ContactItem[] {
         external: true,
       },
       {
-        /* Task 7-E: MAX — мессенджер из CONTACTS (агент A, config.ts). */
-        sub: "MAX",
-        label: CONTACTS.max,
-        href: CONTACTS.maxHref,
-        icon: MaxGlyph,
-        external: true,
-      },
-      {
         /* Task 7-E: VK — рядом с мессенджерами (был только в футере). */
         sub: "VK",
         label: CONTACTS.vk,
@@ -705,7 +715,9 @@ function useContactItems(): ContactItem[] {
         external: true,
       },
       {
-        sub: "Instagram",
+        /* c86-D/G: видимый маркер «*» — сноска о Meta (признана
+           экстремистской в РФ) живёт внизу секции Instagram и в футере. */
+        sub: "Instagram*",
         label: CONTACTS.instagram,
         href: CONTACTS.instagramHref,
         icon: Instagram,
@@ -933,7 +945,7 @@ const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTM
       {/* C5 (task 9-fix2) + Fix5 V9: строка доверия — только ВНЕВРЕМЕННЫЕ факты
           (владелец: «всё, что со временем устаревает, лучше не писать») —
           «с 2007 года» вместо «16 лет». */}
-      <p className="hb-trust">Работаем в Санкт-Петербурге с 2007 года · 2 400+ событий</p>
+      <p className="hb-trust">Работаем в Санкт-Петербурге с 2007 года</p>
 
       {/* Desktop: крупные строки */}
       <div className="hb-contacts__rows">
@@ -964,6 +976,23 @@ const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTM
           );
         })}
       </div>
+
+      {/* c86-CRIT3: сноска Meta рядом с видимым «Instagram*» в списке
+          контактов (RF-маркер; та же формулировка — в секции Instagram
+          и последней строкой футера). */}
+      <p
+        className="hb-meta-note"
+        style={{
+          margin: "0.9rem 0 0",
+          fontSize: "12px",
+          lineHeight: 1.45,
+          color: "color-mix(in srgb, var(--hb-ink) 60%, transparent)",
+        }}
+      >
+        *Instagram принадлежит компании Meta, признанной экстремистской
+        организацией; её деятельность запрещена на территории Российской
+        Федерации.
+      </p>
 
       <LazyMap />
     </div>
@@ -2566,7 +2595,7 @@ export function HaccBooking() {
   );
   /** Fix5 V6: «Ещё решаю» — псевдо-тип без цены/формата. */
   const isUndecided = typeId === UNDECIDED_ID;
-  /** Эффективный минимум: у undecided — общий минимум 10 (не 30 банкета). */
+  /** c86: минимум един для всех веток — от одного гостя. */
   const effMin = isUndecided ? GUESTS_ABS_MIN : current.minGuests;
   /* Q1 (task 9-fix2): кламп ДВУСТОРОННИЙ — URL ?guests=600 больше не даёт
      aria-valuenow=600 > aria-valuemax=500 и чек «на 600 гостей».
@@ -3293,22 +3322,20 @@ export function HaccBooking() {
                 </div>
               </div>
 
-              {/* C3 (task 9-fix2): ПОСТОЯННАЯ плашка у минимума — раньше сообщение
-                  жило <120 мс (кламп-эффект гасил условие в том же кадре). Теперь
-                  живёт, ПОКА гость стоит на минимуме; Fix5 V6: у undecided — свой
-                  текст (минимум формата неприменим). */}
+              {/* C3 (task 9-fix2): плашка живёт, ПОКА гость стоит на единице;
+                  c86: минимумы форматов сняты — текст без ограничений
+                  (владелец: «могут заказать хоть от одного человека»). */}
               {isUndecided ? (
                 guestsClamped === GUESTS_ABS_MIN && (
                   <p className="hb-minnote" role="status">
-                    Формат ещё не выбран — считаем от 10 {guestsLabel(GUESTS_ABS_MIN)}; вилку цен
+                    Формат ещё не выбран — посчитаем от одного гостя; точную вилку
                     покажем по звонку
                   </p>
                 )
               ) : (
                 guestsClamped === current.minGuests && (
                   <p className="hb-minnote" role="status">
-                    Минимум для «{current.label}» — {current.minGuests} {guestsLabel(current.minGuests)}:{" "}
-                    посчитаем от него
+                    Принимаем заказы от одного гостя — формат и меню обсудим по звонку
                   </p>
                 )
               )}
@@ -3316,10 +3343,14 @@ export function HaccBooking() {
 
             {/* 2b · Дополнительно (c84-B, задача 2) — ПОСЛЕ «Гости», ДО даты
                 (по вертикали мобайла это правильная ступень: цена уже
-                посчитана — сразу предлагаем усилить). 6 позиций из ADDONS:
-                нативный чекбокс (accent-color — канон hb-consent) + кликабельный
-                label-ряд + цена «+N ₽»; тумблер — живой пересчёт чека/бара.
-                У undecided блока нет — расчёта нет. */}
+                посчитана — сразу предлагаем усилить). Позиции из ADDONS.
+                c86 (требование 3): карточка-конструктор — иконка в мягком
+                бейдже + метка + цена; нативный чекбокс сохранён (a11y-канон
+                hb-consent, accent-color), кликабелен весь label-ряд; выбор —
+                CSS-переходы рамки/фона/цвета + прорисовка галочки
+                stroke-dashoffset, вход — стаггер whileInView (transform и
+                opacity), нажатие — пружина whileTap. У undecided блока
+                нет — расчёта нет. */}
             {!isUndecided && (
               <fieldset className="hb-block" ref={addonsZoneRef} data-hb-hide="addons">
                 <legend className="hb-label-caps">
@@ -3327,19 +3358,38 @@ export function HaccBooking() {
                   <span className="hb-label-caps__opt">— к любому пакету</span>
                 </legend>
                 <div className="hb-addons">
-                  {ADDONS.map((a) => {
+                  {ADDONS.map((a, i) => {
                     const on = addonIds.includes(a.id);
+                    const Icon = ADDON_ICONS[a.id];
                     return (
-                      <label key={a.id} className={`hb-addon ${on ? "hb-addon--on" : ""}`}>
+                      <motion.label
+                        key={`${a.id}${settled ? "-a" : "-s"}`}
+                        className={`hb-addon ${on ? "hb-addon--on" : ""}`}
+                        initial={settled ? { opacity: 0, y: 16 } : false}
+                        whileInView={settled ? { opacity: 1, y: 0 } : undefined}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.45, ease: EASE, delay: i * 0.05 }}
+                        whileTap={settled ? { scale: 0.97 } : undefined}
+                      >
                         <input
                           type="checkbox"
                           className="hb-addon__box"
                           checked={on}
                           onChange={() => toggleAddon(a.id)}
                         />
+                        <span className="hb-addon__icon" aria-hidden="true">
+                          {Icon ? <Icon className="hb-addon__glyph" /> : null}
+                          <svg className="hb-addon__mark" viewBox="0 0 14 14" fill="none">
+                            <circle className="hb-addon__mark-bg" cx="7" cy="7" r="6.4" />
+                            <path
+                              className="hb-addon__mark-check"
+                              d="M4 7.3 L6.1 9.4 L10.2 4.8"
+                            />
+                          </svg>
+                        </span>
                         <span className="hb-addon__label">{a.label}</span>
                         <span className="hb-addon__price">+{formatRUB(a.price)}</span>
-                      </label>
+                      </motion.label>
                     );
                   })}
                 </div>
@@ -3565,8 +3615,8 @@ export function HaccBooking() {
                     ) : (
                       <>
                         <p className="hb-note">
-                          Меньше {current.minGuests} {guestsLabel(current.minGuests)}? Посчитаем
-                          индивидуально — позвоните или оставьте заявку.
+                          Посчитаем индивидуально под ваше событие — формат и число
+                          гостей уточним по звонку.
                         </p>
                         {/* C1 (task 9-fix2): ПОСТОЯННАЯ сноска сезона — видна ДО ввода
                             необязательной даты (ожидания больше не занижаются на −15%).
@@ -3595,17 +3645,6 @@ export function HaccBooking() {
                         Дата события: {humanDate}
                       </PrintLine>
                     )}
-                    {/* W3 / K6 MINOR (задача 5): дегустационный триггер у чека —
-                        ФАКТ из FAQ (ea-faq-accordion FAQ_ITEMS: «приватную
-                        дегустацию в нашей студии на Петроградке. Шесть блюд…
-                        3500 ₽/чел. Сумма возвращается при заказе от 50 гостей»),
-                        дословные числа, ноль выдумки. Стиль — caption 13px
-                        (12.5 на <768), ink-63% ≥4.5:1 на бумаге (D5): не
-                        конкурирует с CTA под панелью, живёт в подоле чека
-                        ровно пока CTA виден (схлопывается вместе с notes). */}
-                    <p className="hb-note hb-note--tasting">
-                      {"Дегустация меню в студии — 3\u00A0500\u00A0₽ с человека, вернём при заказе от 50\u00A0гостей"}
-                    </p>
                   </div>
                 </div>
 

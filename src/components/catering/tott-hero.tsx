@@ -25,7 +25,8 @@ import { useLiteDevice } from "@/hooks/use-lite-device";
  *     "food as art" — the nilov catering brand tagline in their script font.
  *   - Centered stack: wordmark "nilov / catering." (Prata, two lines,
  *     gold dot) + subtitle
- *     "лучший кейтеринг Санкт-Петербурга" (Lato, tracked uppercase).
+ *     «Кейтеринг полного цикла в Санкт-Петербурге» (Lato, tracked uppercase;
+ *     c86-CRIT3: суперлатив «лучший» снят — ст. 5 ФЗ «О рекламе»).
  *   - Scroll cue bottom-center (animated line + "SCROLL" eyebrow).
  *   - NO cities strip, NO long subhead (per task v2: лишняя информация
  *     и города там не нужны).
@@ -233,7 +234,7 @@ export function TottHero() {
       ref={sectionRef}
       id="hero"
       data-header-theme="transparent"
-      aria-label="nilov catering — лучший кейтеринг Санкт-Петербурга"
+      aria-label="nilov catering — кейтеринг полного цикла в Санкт-Петербурге"
       /* c85 (указание владельца: «херо надо чтобы было во весь экран»):
          высота живёт в globals.css (#hero — id-специфичность бьёт
          утилиту): 100vh → 100svh → 100dvh (динамический вьюпорт —
@@ -257,7 +258,7 @@ export function TottHero() {
           as the video poster (the video overlays it once playing). */}
       <Image
         src={HERO_POSTER}
-        alt="Лучший банкетный стол — кейтеринг nilov catering"
+        alt="Банкетный стол при свечах — кейтеринг nilov catering"
         fill
         priority
         sizes="100vw"
@@ -315,7 +316,7 @@ export function TottHero() {
           1440×900 eyebrow «ЛУЧШИЙ КЕЙТЕРИНГ…» пересекался со scroll-cue
           «ЛИСТАЙТЕ»; +40 + bottom-12 (было bottom-28) дают зазор ≥8px), "food
           as art" made larger, and the eyebrow label wraps cleanly on mobile
-          ("Лучший кейтеринг" / "Санкт-Петербурга") via an explicit <br> that
+          ("Кейтеринг полного цикла" / "в Санкт-Петербурге") via an explicit <br> that
           only shows on small screens (hidden sm:inline).
           Composition:
             1. "nilov" / "catering." — massive high-contrast serif (Prata),
@@ -341,9 +342,9 @@ export function TottHero() {
             320px-экранах. */}
         <h1
           /* Cycle 40 SEO fix: the visible wordmark alone carries no keywords;
-             aria-label gives search engines «лучший кейтеринг
+             aria-label gives search engines «кейтеринг полного цикла
              Санкт-Петербурга» without changing the visual design. */
-          aria-label="nilov catering — лучший кейтеринг Санкт-Петербурга"
+          aria-label="nilov catering — кейтеринг полного цикла в Санкт-Петербурге"
           className="tott-display text-white"
           style={{
             fontSize: "clamp(3.5rem, 15vw, 10rem)",
@@ -359,7 +360,7 @@ export function TottHero() {
           {/* F4 / K3 SEO: визуально невидимое продолжение вордмарка — ключи
               «кейтеринг в Санкт-Петербурге» попадают в текстовое содержание
               H1 (Tailwind sr-only = clip-паттерн, см. stage-services.tsx).
-              aria-label H1 уже несёт «лучший кейтеринг Санкт-Петербурга» —
+              aria-label H1 уже несёт «кейтеринг полного цикла Санкт-Петербурга» —
               видимая часть «nilov catering» вложена в него (WCAG 2.5.3). */}
           <span className="sr-only"> — кейтеринг в Санкт-Петербурге</span>
         </h1>
@@ -400,7 +401,7 @@ export function TottHero() {
 
         {/* Eyebrow label — Lato (sans-serif, .tott-body) ALL CAPS, small,
             wide letter-spacing. Per task v10: "сделай чтобы на мобильных
-            версиях переносился лучший кейтеринг а следующая строга Санкт-
+            версиях переносился кейтеринг полного цикла, а следующая строка Санкт-
             Петербурга" — explicit <br className="sm:hidden"> after "кейтеринг"
             forces the wrap on mobile only; on sm+ screens the <br> is hidden
             so the label renders as one line. Generous editorial whitespace
@@ -412,7 +413,7 @@ export function TottHero() {
         <p
           className="tott-body text-white/85"
           style={{
-            fontSize: "clamp(12.5px, 1.4vw, 14px)",
+            fontSize: "clamp(13.5px, 1.4vw, 14px)",
             lineHeight: 1.4,
             letterSpacing: "0.35em",
             fontWeight: 700,
@@ -424,9 +425,9 @@ export function TottHero() {
             textShadow: "0 2px 20px rgba(0,0,0,0.4)",
           }}
         >
-          Лучший кейтеринг
+          Кейтеринг полного цикла
           <br className="sm:hidden" />
-          {" "}Санкт-Петербурга
+          {" "}в Санкт-Петербурге
         </p>
       </div>
 

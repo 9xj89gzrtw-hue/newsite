@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
-  animate,
   motion,
   useInView,
   useReducedMotion,
@@ -19,8 +18,14 @@ import "@/components/motion/c74-kinetic.css";
  *
  * Полный редизайн секции #about по концепту из research/c66/FOUNDER-RESEARCH.md
  * (эталоны: La Table de Joakim — основатель = лицо кухни; Dishoom — founding
- * myth «2007, одна печка, Петроградская»; Monarque — vision-подача; GEM —
- * subtle motion; /nk.studio — юбилейная хроника с live-цифрами).
+ * myth «одна печь, съёмная кухня»; Monarque — vision-подача; GEM — subtle
+ * motion).
+ *
+ * c86-C (жалоба владельца: числа стареют — «через год-два будет неактуально»):
+ * строка статистики и вся её машинерия удалены целиком, копирайт секции
+ * переписан кейтеринг-первично — ремесло, команда, ритуал застолья, работа
+ * на любой площадке. Цифр в About больше нет; место стата заняла личная
+ * строка-цитата основателя (тем же fadeUp-таймингом — ритм секции сохранён).
  *
  * ТЁМНАЯ editorial-секция (первая в нише about): тёплый ink #161312, cream
  * текст, зернистость CSS-only (SVG feTurbulence, opacity 0.055) + статичный
@@ -37,12 +42,12 @@ import "@/components/motion/c74-kinetic.css";
  *   title-case, uppercase даёт CSS text-transform; Playfair, cyrillic ✓,
  *   stroke cream 15%) со scrub-дрейфом по X (±40px; на <768 — ±14px,
  *   FIX-6/W1-A MINOR-1, вместе с мобильным капом 16.5vw в CSS).
- *   ПРАВАЯ (54%) — eyebrow «ОСНОВАТЕЛЬ · ШЕФ-ПОВАР», H2 «Всё начинается с
- *   рук.» (italic-фрагмент — канон сайта), красный hairline, 3 МИНИМАЛЬНЫЕ
- *   главы (2007 / Философия / Сегодня — все факты из прежнего копирайта,
- *   ничего не выдумано), inline-строка count-up (19 / 2 400+ / 120 000+,
-   портирован прежний CountUp), подпись Marck Script «чернильным» clip-reveal,
- *   CTA «Смотреть меню» (scrollToMenu: window.__lenis → lenis → native, §33).
+ *   ПРАВАЯ (54%) — eyebrow «ОСНОВАТЕЛЬ · НАША ИСТОРИЯ», H2 «Накрываем ваш
+ *   стол» (italic-фрагмент — канон сайта), красный hairline, 3 МИНИМАЛЬНЫЕ
+ *   главы (Начало / Философия / Команда), строка-цитата основателя (c86-C:
+ *   на месте прежней строки статистики, без цифр), подпись Marck Script
+ *   «чернильным» clip-reveal, CTA «Смотреть меню и пакеты» (scrollToMenu:
+ *   window.__lenis → lenis → native, §33).
  *
  * Мобайл (<1024): без sticky; фото → текст; сцена-карточка внахлёст; reveal-ы
  * короче (matchMedia-гейт, post-mount).
@@ -70,160 +75,29 @@ import "@/components/motion/c74-kinetic.css";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/* «2 400+», «120 000+» — из прежнего блока (цикл 28), не выдуманы; «19 лет»
-   считается от канона владельца (работаем с 2007 года, как в hacc-booking
-   V9) — не хардкод (F3, волна-A: в 2027-м стата врёт). «35 человек» и
-   «2 400+» из главы «Сегодня» сняты (F7): фигуры живут только в статах. */
-const FOUNDER_YEARS = new Date().getFullYear() - 2007;
-
-/* FX4 (волна-B): русская плюрализация — «19 лет» верно, но в 2028-м «21 лет»
-   уже неверно (21 → «год»). Каноническая тройка год/года/лет: mod10 1 → год;
-   2–4 → года; 0,5–9 → лет; исключение mod100 11–14 → лет
-   (1 год, 2 года, 5 лет, 11 лет, 21 год, 22 года, 25 лет). */
-function pluralRu(n: number, one: string, few: string, many: string): string {
-  const per100 = Math.abs(n) % 100;
-  if (per100 >= 11 && per100 <= 14) return many;
-  const per10 = Math.abs(n) % 10;
-  if (per10 === 1) return one;
-  if (per10 >= 2 && per10 <= 4) return few;
-  return many;
-}
-
-/* CX3 (волна-C): у «лет» подпись плюрализуется ПО КАДРАМ отсчёта — иначе
-   мид-флит читал «2 лет». plural-тройка + labelTail (хвост неизменен);
-   финальный label для SSR/no-JS/reduce остаётся прежней строкой. */
-type Stat = {
-  value: number;
-  suffix: string;
-  label: string;
-  plural?: readonly [string, string, string];
-  labelTail?: string;
-};
-
-const STATS: Stat[] = [
-  {
-    value: FOUNDER_YEARS,
-    suffix: "",
-    label: `${pluralRu(FOUNDER_YEARS, "год", "года", "лет")} в Петербурге`,
-    plural: ["год", "года", "лет"],
-    labelTail: " в Петербурге",
-  },
-  { value: 2400, suffix: "+", label: "событий" },
-  { value: 120000, suffix: "+", label: "гостей" },
-];
-
-/* Тезисные главы — сжатие прежних трёх абзацев (интонация founding myth). */
+/* Тезисные главы — founding myth кухни, которая едет к гостю (c86-C:
+   кейтеринг-первично, без цифр — числа стареют вместе с сайтом). */
 const CHAPTERS = [
   {
-    label: "2007",
-    // FX8 (волна-B): имя основателя жило только в подписи у самого низа —
-    // на мобиле до него доходили на ~85% прокрутки главы. Имя вплетено в
-    // главу-2007 (факт: подпись и alt уже называют Дмитрия Нилова).
+    // FX8 (волна-B): имя основателя вплетено в первую главу — на мобиле
+    // подпись у самого низа секции догоняют лишь к концу чтения глав.
+    // c86-C: год основания и адрес первой кухни сняты — устаревающие
+    // факты (жалоба владельца: числа стареют).
     // \u00A0 — имя не рвётся на переносе.
-    text: "Одна печка, три повара и съёмная кухня на Петроградской стороне. Так Дмитрий\u00A0Нилов начинал nilov catering.",
+    label: "Начало",
+    text: "Съёмная кухня, печь и вера, что хорошая еда не обязана жить в ресторане. Так Дмитрий\u00A0Нилов начинал nilov catering.",
   },
   {
     label: "Философия",
-    text: "Лук для супа томится шесть часов. Хлеб встаёт рано утром, когда залы ещё спят. Полуфабрикатов нет — только руки, время и температура.",
+    text: "Лук для супа томится до сладости, хлеб встаёт к утру, когда залы ещё спят. Сезон ведёт меню: ботвинья — летом, белые грибы — осенью. Полуфабрикатов нет — только руки, время и температура.",
   },
   {
-    label: "Сегодня",
-    // \u00A0 — неразрывные пробелы перед числами: число не отрывается от
-    // предлога и не рвётся внутри (minor-находка волны-1). F7 (волна-A):
-    // «2 400+» живёт только в стате ниже (без дублей цифр). FX7 (волна-B):
-    // «Берёмся за всё:» — единственная масс-маркет интонация секции,
-    // заменена на сенсорную подачу (B1, факты те же); ведущее «Сегодня»
-    // снято — оно уже в лейбле главы.
-    text: "nilov catering накрывает стол и на\u00A0камерной свадьбе на\u00A020 гостей, и на приёме на\u00A01\u00A0500 персон — в исторических особняках города.",
+    // c86-C: было «Сегодня» с численностью камерных свадеб и приёмов —
+    // теперь площадка-без-адреса, команда и сенсорная деталь.
+    label: "Команда",
+    text: "Ваша площадка — наша кухня: особняк, лофт, шатёр на поляне. Приезжают повара и официанты, и к нужному часу в зале пахнет свежим хлебом.",
   },
 ] as const;
-
-/**
- * CountUp — Cycle 67 (F8, волна-A: ноль ре-рендеров): финальное значение
- * живёт в HTML сразу (SSR/no-JS/reduce видят его без JS), при inView once —
- * отсчёт 0→target через Motion `animate()`, где onUpdate пишет textContent
- * ИМПЕРАТИВНО (ноль setState на кадр — было ~130 ре-рендеров на стату).
- * Страховка-таймер не нужна: без анимации в спане уже стоит финал.
- *
- * FX1 (волна-B): значение и суффикс — СОСЕДНИЕ узлы. Раньше onUpdate
- * перезаписывал весь span («2 400+») и после анимации «+» исчезал;
- * теперь пишется только в valueRef-узел, суффикс — статичный сиблинг
- * (SSR/no-JS читают конкатенацию «2 400+», скринридер — «2 400, плюс»).
- * B1-NIT: mid-flight значения квантуются (шаг 10 у тысяч, 100 у сотен
- * тысяч) — «2 398» не мигает; последний кадр пишет точный target.
- *
- * CX3 (волна-C): подпись стата тоже рендерится здесь (сиблинг значения) —
- * при заданном plural тройке она плюрализуется В ТОМ ЖЕ onUpdate
- * («2 года», «3 года» … «19 лет»; финал = «19 лет в Петербурге», хвост
- * labelTail бит-в-бит как в SSR). Reduce/no-JS/SSR: узел не трогается —
- * в HTML уже финал. setState по-прежнему ноль.
- */
-function CountUp({
-  to,
-  suffix,
-  label,
-  plural,
-  labelTail,
-  reduce,
-}: {
-  to: number;
-  suffix: string;
-  label: string;
-  plural?: readonly [string, string, string];
-  labelTail?: string;
-  reduce: boolean | null;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const valueRef = useRef<HTMLSpanElement>(null);
-  const labelRef = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  const hasAnimated = useRef(false);
-
-  useEffect(() => {
-    // Reduced-motion / до inView: финальное значение уже в HTML — не трогаем.
-    if (reduce || !inView || hasAnimated.current) return;
-    hasAnimated.current = true;
-    const node = valueRef.current;
-    if (!node) return;
-    const pl = plural ?? null;
-    const tail = labelTail ?? null;
-    const labelNode = pl && tail ? labelRef.current : null;
-    const writeLabel = (v: number) => {
-      if (labelNode && pl && tail) {
-        labelNode.textContent = pluralRu(v, pl[0], pl[1], pl[2]) + tail;
-      }
-    };
-    const step = to >= 100000 ? 100 : to >= 1000 ? 10 : 1;
-    const controls = animate(0, to, {
-      duration: 2.2,
-      ease: EASE,
-      onUpdate: (v) => {
-        const q = Math.round(v / step) * step;
-        node.textContent = q.toLocaleString("ru-RU");
-        writeLabel(q); // CX3: «2 года» мид-флит, не «2 лет»
-      },
-      onComplete: () => {
-        node.textContent = to.toLocaleString("ru-RU");
-        writeLabel(to);
-      },
-    });
-    return () => controls.stop(); // unmount посреди отсчёта — стоп (F8)
-  }, [inView, to, reduce, plural, labelTail]);
-
-  return (
-    <>
-      <span ref={ref} className="efs__stat-num" suppressHydrationWarning>
-        <span ref={valueRef} suppressHydrationWarning>
-          {to.toLocaleString("ru-RU")}
-        </span>
-        {suffix ? <span>{suffix}</span> : null}
-      </span>
-      <span ref={labelRef} className="efs__stat-label" suppressHydrationWarning>
-        {label}
-      </span>
-    </>
-  );
-}
 
 /**
  * Smooth-scroll к #menu для CTA «Смотреть меню». Cycle 66: основной путь —
@@ -638,7 +512,7 @@ export function EaFounderStory() {
               className="ea-eyebrow efs__eyebrow"
               {...fadeUp(0)}
             >
-              Основатель · Шеф-повар
+              Основатель · Наша история
             </motion.span>
 
             <motion.h2
@@ -647,7 +521,7 @@ export function EaFounderStory() {
               className="efs__h2 kinetic-h2"
               {...fadeUp(0.08)}
             >
-              Всё начинается с <i>рук.</i>
+              Накрываем <i>ваш</i> стол
             </motion.h2>
 
             {/* Красный hairline 64×2 — EA signature. */}
@@ -672,23 +546,30 @@ export function EaFounderStory() {
               ))}
             </div>
 
-            {/* Строка count-up: 19 / 2 400+ / 120 000+, hairline-делители,
-                tabular-nums. CX3: подпись года рендерится в CountUp —
-                плюрализуется по кадрам отсчёта. */}
-            <motion.div key={`stats-${on}`} className="efs__stats" {...fadeUp(0.4)}>
-              {STATS.map((stat) => (
-                <div key={stat.label} className="efs__stat">
-                  <CountUp
-                    to={stat.value}
-                    suffix={stat.suffix}
-                    label={stat.label}
-                    plural={stat.plural}
-                    labelTail={stat.labelTail}
-                    reduce={reduce}
-                  />
-                </div>
-              ))}
-            </motion.div>
+            {/* c86-C: личная строка основателя — на месте прежней строки
+                статистики (цифры удалены по указанию владельца: числа
+                стареют). Ритм секции сохранён: тот же fadeUp-слот, отступ
+                сверху равен прежнему, дальше — родной отступ .efs__sign-block.
+                Типографика — display-курсив editorial-цитаты; контраст
+                cream на ink ≈17:1 (как у H2, замер c67). */}
+            <motion.p
+              key={`quote-${on}`}
+              className="efs__quote"
+              {...fadeUp(0.4)}
+              style={{
+                margin: "4.25rem 0 0",
+                maxWidth: "34rem",
+                fontFamily: "var(--ea-font-display)",
+                fontStyle: "italic",
+                fontWeight: 400,
+                fontSize: "clamp(1.25rem, 1.7vw, 1.5625rem)",
+                lineHeight: 1.4,
+                color: "var(--efs-cream)",
+              }}
+            >
+              «Мне важно, чтобы к началу праздника стол уже дышал: тёплый
+              хлеб, живые цветы, свечи.»
+            </motion.p>
 
             {/* Подпись «чернильным письмом»: clip слева→направо 900ms после
                 глав; под ней caps-роль. */}
@@ -725,7 +606,7 @@ export function EaFounderStory() {
               >
                 <span className="efs__sign">Дмитрий Нилов</span>
               </motion.div>
-              {/* Роль живёт в eyebrow («Основатель · Шеф-повар») — в подписи
+              {/* Роль живёт в eyebrow («Основатель · Наша история») — в подписи
                   классическая форма: имя+бренд+город (дубль роли снят). */}
               <motion.p key={`role-${on}`} className="efs__sign-role" {...fadeUp(0.4)}>
                 nilov catering · Санкт-Петербург
@@ -749,7 +630,7 @@ export function EaFounderStory() {
                 data-press
                 className="ea-text-link"
               >
-                Смотреть меню
+                Смотреть меню и тарифы
                 <svg
                   className="ea-text-link__arrow"
                   viewBox="0 0 24 24"

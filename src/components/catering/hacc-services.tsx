@@ -64,7 +64,6 @@ import {
   useSpring,
 } from "framer-motion";
 import { ArrowUpRight, MousePointer2, Plus } from "lucide-react";
-import { MENU_TYPES } from "@/lib/pricing";
 
 import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
@@ -123,18 +122,14 @@ interface HaccService {
  * additionally deliver at any event).
  */
 /** Калькулятор читает ?type=… через nuqs (подхватывает history.replaceState) —
- *  тот же контракт, что presetCalculator в hacc-menu.tsx: CTA услуг теперь
- *  тоже ставит ?type=&guests= (K6-CRITICAL: без преселекта «Рассчитать
- *  фуршет» открывал дефолт-банкет 134 100 ₽ — ценовой шок +82%). */
-function presetCalculator(typeId: string, guests: number) {
+ *  тот же контракт, что presetCalculator в hacc-menu.tsx: CTA услуг ставит
+ *  ?type= (K6-CRITICAL: без преселекта «Рассчитать фуршет» открывал
+ *  дефолт-банкет — ценовой шок). c86-E: guests не пресетим — ограничения
+ *  по гостям сняты, калькулятор держит свой дефолт. */
+function presetCalculator(typeId: string) {
   if (typeof window === "undefined") return;
-  window.history.replaceState(null, "", `/?type=${typeId}&guests=${guests}#calculator`);
+  window.history.replaceState(null, "", `/?type=${typeId}#calculator`);
 }
-
-/** Минимум гостей формата (lib/pricing.ts) — для преселекта из услуг. */
-const CALC_MIN_GUESTS: Record<string, number> = Object.fromEntries(
-  MENU_TYPES.map((m) => [m.id, m.minGuests]),
-);
 
 const SERVICES: HaccService[] = [
   {
@@ -192,10 +187,10 @@ const SERVICES: HaccService[] = [
     id: "korporativ",
     index: "04",
     title: "Корпоратив",
-    hook: "Кофе — к первому перерыву, гала-ужин — к финалу: тайминг сходится до минуты.",
+    hook: "Кофе — к первому перерыву, гала-ужин — к финалу: всё подано вовремя.",
     price: "от 2\u00A0500\u00A0₽",
     priceLabel: "за гостя",
-    tag: "B2B",
+    tag: "Для компаний",
     tint: "#F6E9C9",
     media: "/media/gamma/c49-korporativ-hires.webp",
     mediaAlt: "Корпоративный гала-ужин с сервировкой",
@@ -241,8 +236,8 @@ const SERVICES: HaccService[] = [
     index: "07",
     title: "Выездной бар",
     hook: "Шейкер звенит, бокалы ледяные — бар живёт до последнего тоста.",
-    price: "от 900\u00A0₽",
-    priceLabel: "за гостя",
+    price: "от 32\u00A0000\u00A0₽",
+    priceLabel: "за событие",
     tag: "Миксология",
     tint: "#F5EEE2",
     media: "/media/c57/c57-bar.webp",
@@ -255,8 +250,8 @@ const SERVICES: HaccService[] = [
     index: "08",
     title: "Шоу-станции",
     hook: "Кухня выходит к столу: паста в облаке пара, карвинг под ножом шефа.",
-    price: "от 1\u00A0800\u00A0₽",
-    priceLabel: "за гостя",
+    price: "от 35\u00A0000\u00A0₽",
+    priceLabel: "за событие",
     tag: "Живая кухня",
     tint: "#F6E0DB",
     media: "/media/c57/c57-shou.webp",
@@ -300,7 +295,7 @@ const SERVICES: HaccService[] = [
     id: "veg-halal",
     index: "11",
     title: "Вегетарианское и халяль",
-    hook: "Сертификат — на халяль, сезонные овощи — в главную роль.",
+    hook: "Сертификат — на халяль, сезонные овощи — в главной роли.",
     /* 2 450 = vegetarian.perGuest (lib/pricing.ts): то же слово
        «вегетарианское» обязано стоить одинаково во всех блоках (C59/W7) */
     price: "от 2\u00A0450\u00A0₽",
@@ -899,15 +894,11 @@ function HaccRack({
                       className="ea-outline-btn hacc__cta"
                       aria-label={`${s.ctaLabel} — ${s.title}`}
                       /* C71-W3 (K6-CRITICAL): преселект формата до перехода —
-                       * калькулятор (nuqs-хуки) подхватит ?type=&guests= из
+                       * калькулятор (nuqs-хуки) подхватит ?type= из
                        * history.replaceState (контракт hacc-menu). */
                       onClick={
                         s.ctaHref === "#calculator" && s.calcType
-                          ? () =>
-                              presetCalculator(
-                                s.calcType as string,
-                                CALC_MIN_GUESTS[s.calcType] ?? 30,
-                              )
+                          ? () => presetCalculator(s.calcType as string)
                           : undefined
                       }
                     >

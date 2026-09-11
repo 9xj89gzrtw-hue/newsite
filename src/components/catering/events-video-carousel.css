@@ -141,13 +141,21 @@
   align-items: center;
   gap: 0.55rem;
   padding: 8px 16px;
-  background: transparent;
+  /* c86-F (читабельность): было transparent — аналитический worst-case
+     (светлый постер + градиент 0.30 в центре плитки) давал 3.25:1 для
+     белого лейбла 13px — ниже AA 4.5. Полупрозрачная тёмная подложка 0.35
+     + тень держат 6.5:1 на любом кадре; пилл остаётся «призрачным»
+     (бордер + сквозь виден постер). */
+  background: rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
   border: 1px solid #fff;
   border-radius: 9999px;
   color: #fff;
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
-  font-size: 0.82rem; /* Cycle 39: 13px — primary card CTA was unreadable at 11px */
+  /* c86-F: 13.12px → 14px — единый этаж бровей сайта (c84-A), primary
+     CTA карточки; Cycle 39 поднимал 11 → 13px по той же причине. */
+  font-size: 0.875rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   cursor: pointer;
@@ -159,7 +167,10 @@
 .ea-evt-video__card:hover .ea-evt-video__play,
 .ea-evt-video__card:focus-within .ea-evt-video__play {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.12);
+  /* c86-F: hover-фон был светлым rgba(255,255,255,0.12) — на светлом
+     постере он снижал контраст белого лейбла до ~2.9:1; теперь hover
+     затемняет (стекло), контраст только растёт. */
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .ea-evt-video__play:hover,
@@ -271,11 +282,14 @@
    #F7F5F5 = 5.9:1 ✓ AA — контраст теперь независим от постера под
    градиентом. Текст-тень больше не нужна (чип непрозрачный).
    Класс используется и в модалке (.ea-evt-video__modal-caption на тёмном
-   фоне) — чип одинаково читаем на обоих. */
+   фоне) — чип одинаково читаем на обоих.
+   c86-F (читабельность, мобайл): кегль 0.75rem (12px) → 0.8125rem (13px)
+   — этаж капс-микролейблов на мобиле (владелец: «плохо видно в мобильной
+   версии»); caps/letter-spacing-идиома сохранена. */
 .ea-evt-video__category {
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--ea-red-text, #B91431);

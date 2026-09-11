@@ -22,6 +22,8 @@ export type MenuType = {
   label: string;
   short: string;
   perGuest: number; // min price
+  // c86: ограничений по числу гостей нет — поле остаётся для совместимости,
+  // у всех типов единица (владелец: «могут заказать хоть от одного человека»)
   minGuests: number;
   priceUnit?: string; // "/чел" (default) | "за набор"
   description: string;
@@ -35,7 +37,7 @@ export const MENU_TYPES: MenuType[] = [
     label: "Фуршет",
     short: "Канапе и брускетты",
     perGuest: 2450,
-    minGuests: 20,
+    minGuests: 1,
     description: "Фуршетные столы, канапе, брускетты и горячие закуски — для приёмов, презентаций и арт-открытий.",
     included: [
       "Обслуживание официантами",
@@ -107,7 +109,7 @@ export const MENU_TYPES: MenuType[] = [
     label: "Банкет",
     short: "Полный банкет с обслуживанием",
     perGuest: 4470,
-    minGuests: 30,
+    minGuests: 1,
     description: "Классический банкет с полным обслуживанием: закуски, горячее, десерты. Свадебные и корпоративные банкеты.",
     included: [
       "Обслуживание официантами",
@@ -194,7 +196,7 @@ export const MENU_TYPES: MenuType[] = [
     label: "Доставка закусок",
     short: "Мобильный фуршет в коробках",
     perGuest: 660,
-    minGuests: 10,
+    minGuests: 1,
     priceUnit: "/чел",
     description: "Готовые наборы закусок в индивидуальной упаковке. Доставка по СПб.",
     included: [
@@ -202,7 +204,6 @@ export const MENU_TYPES: MenuType[] = [
       "Одноразовая посуда и приборы",
       "Индивидуальная упаковка каждой позиции",
       "Доставка по Санкт-Петербургу",
-      "Минимальный заказ — от 10 наборов",
     ],
     packages: [
       {
@@ -259,7 +260,7 @@ export const MENU_TYPES: MenuType[] = [
     label: "Кофе-брейк",
     short: "Для конференций и семинаров",
     perGuest: 900,
-    minGuests: 15,
+    minGuests: 1,
     description: "Кофе, чай, выпечка, снеки и фрукты для деловых мероприятий и конференций.",
     included: [
       "Обслуживание официантами",
@@ -328,7 +329,7 @@ export const MENU_TYPES: MenuType[] = [
     label: "Вегетарианское",
     short: "Сезонное меню без мяса",
     perGuest: 2450,
-    minGuests: 15,
+    minGuests: 1,
     description: "Сезонное вегетарианское меню с молочными продуктами.",
     included: [
       "Обслуживание официантами",
@@ -379,7 +380,7 @@ export const MENU_TYPES: MenuType[] = [
     label: "Барбекю",
     short: "Выездное барбекю",
     perGuest: 2200,
-    minGuests: 20,
+    minGuests: 1,
     description: "Гриль и открытый огонь — шашлыки, овощи-гриль. Для летних и загородных мероприятий.",
     included: [
       "Обслуживание официантами",
@@ -424,50 +425,6 @@ export const MENU_TYPES: MenuType[] = [
       },
     ],
   },
-  {
-    id: "office-lunch",
-    label: "Обеды в офис",
-    short: "Корпоративные обеды",
-    perGuest: 650,
-    minGuests: 10,
-    description: "Регулярные обеды для команд — салат, суп, горячее, десерт. Доставка по графику.",
-    included: [
-      "Обслуживание — доставка по графику",
-      "Индивидуальная упаковка, одноразовые приборы",
-      "Доставка в пределах КАД",
-      "Минимальный заказ — от 10 порций",
-    ],
-    packages: [
-      {
-        name: "Базовый",
-        pricePerGuest: 650,
-        description: "5 позиций — салат, суп, горячее, напиток",
-        photo: "/media/c60/c60-lunch.webp",
-        dishes: [
-          { name: "Салат на выбор: Оливье с курицей / Винегрет / Цезарь с куриным бедром", weight: "150 г" },
-          { name: "Суп на выбор: Борщ классический / Тыквенный-пюре / Грибной с лисичками", weight: "250 мл" },
-          { name: "Горячее на выбор: Котлета по-киевски / Паста Карбонара / Плов с бараниной", weight: "200 г" },
-          { name: "Компот / морс (клюквенный или брусничный)", weight: "200 мл" },
-          { name: "Десерт: пирожное «Картошка» / кекс ягодный", weight: "100 г" },
-        ],
-      },
-      {
-        name: "Расширенный",
-        pricePerGuest: 950,
-        description: "7 позиций — добавлены закуска и выпечка",
-        photo: "/media/c61/c61-lunch-ext.webp",
-        dishes: [
-          { name: "Закуска: брускетта с куриным паштетом и брусничным соусом / канапе с сыром", weight: "60 г" },
-          { name: "Салат на выбор из 5 видов (Оливье, Винегрет, Цезарь, Греческий, Мимоза)", weight: "150 г" },
-          { name: "Суп на выбор из 4 видов (Борщ, Тыквенный, Грибной, Минестроне)", weight: "250 мл" },
-          { name: "Горячее на выбор из 6 видов (Котлета по-киевски, Паста, Плов, Жаркое, Рыба, Бефстроганов)", weight: "200 г" },
-          { name: "Выпечка: пирожок с мясом / кекс ягодный / круассан", weight: "80 г" },
-          { name: "Компот / морс (клюквенный или брусничный)", weight: "200 мл" },
-          { name: "Свежие фрукты (сезонные)", weight: "100 г" },
-        ],
-      },
-    ],
-  },
 ];
 
 export type Addon = {
@@ -478,11 +435,11 @@ export type Addon = {
 
 export const ADDONS: Addon[] = [
   { id: "equipment", label: "Аренда оборудования", price: 15000 },
-  { id: "decor", label: "Оформление зала", price: 25000 },
-  { id: "cake", label: "Свадебный торт", price: 8000 },
-  { id: "champagne", label: "Пирамида из шампанского", price: 12000 },
-  { id: "fountain", label: "Шоколадный фонтан", price: 10000 },
-  { id: "registration", label: "Выездная регистрация", price: 20000 },
+  { id: "waiters", label: "Добавить официантов", price: 9000 },
+  { id: "chef", label: "Выезд шеф-повара", price: 28000 },
+  { id: "show", label: "Шоу-станция", price: 35000 },
+  { id: "bar", label: "Выездной бар", price: 32000 },
+  { id: "floristics", label: "Флористическое оформление", price: 25000 },
 ];
 
 export function seasonMultiplier(dateStr: string): number {
@@ -516,7 +473,10 @@ export function calcTotal(
   pkgName?: string;
 } {
   const t = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
-  const g = Math.max(guests, t.minGuests);
+  /* c86: минимумов гостей больше нет — расчёт от фактического числа
+     (защита только от мусора: как минимум один гость, максимум —
+     верхняя граница шкалы ×2). */
+  const g = Math.min(999, Math.max(1, Math.trunc(guests)));
   const clampedIdx = Math.max(0, Math.min(Math.trunc(pkgIdx), t.packages.length - 1));
   const pkg = t.packages[clampedIdx];
   const perGuest = pkg ? pkg.pricePerGuest : t.perGuest;

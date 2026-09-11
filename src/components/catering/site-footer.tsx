@@ -13,7 +13,6 @@ import {
   Mail,
   Heart,
   ChevronRight,
-  Instagram,
   Send,
   MessageCircle,
 } from "lucide-react";
@@ -383,14 +382,18 @@ function FooterSpotlight() {
  * (cream/gold — контрасты только выросли, см. K2-комментарий ниже).
  *
  * Layout (Task 2-c):
- * 1. «Сделано с любовью» (intro band, Great Vibes script + подзаголовок)
+ * 1. «Накрыто с любовью» (intro band, Marck Script + подзаголовок;
+ *    c86-D: было «Сделано с любовью» — фраза переписана под суть
+ *    кейтеринга — накрыть на стол)
  * 2. Двухколоночный контент: Контакты (расширенная) / Навигация
  *    — колонка «Нам доверяют» и полоса подписки удалены по запросу
- *    владельца; факт «2 400+ мероприятий с 2007 года» сохранён в контактах.
+ *    владельца; c86-D: стат «2 400+ мероприятий с 2007 года» снят
+ *    (de-numbering — владелец уводит сайт от чисел).
  * 3. Гигантский кинетический вордмарк «NILOV CATERING.» (wow-якорь,
  *    две строки «NILOV» / «CATERING.» — ребрендинг 3-A)
- * 4. «С гордостью обслуживаем» — маркие районов СПб
- * 5. Копирайт
+ * 4. «Накрываем столы по всему городу» — маркие районов СПб
+ * 5. Копирайт + RF-сноска Instagram* (c86-D: маркер — на кнопке
+ *    Instagram* в соц-строке, сноска Meta — последней строкой футера)
  */
 export function SiteFooter() {
   const year = useCurrentYear();
@@ -437,7 +440,11 @@ export function SiteFooter() {
       {/* Decorative top gold rule */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-gold/40 to-transparent" aria-hidden="true" />
 
-      {/* ============ Section 1 — «Сделано с любовью» intro band ============ */}
+      {/* ============ Section 1 — «Накрыто с любовью» intro band ============
+          c86-D: было «Сделано с любовью» — заменено на кейтеринговую
+          правду: накрывать на стол — суть ремесла. Скрипт/анимация
+          (Marck Script, золотая надпись + сердце, motion-каскад) — без
+          изменений. */}
       <div className="mx-auto max-w-7xl px-5 pt-16 pb-10 text-center md:px-8 md:pt-20">
         <motion.div
           {...motionProps}
@@ -453,7 +460,7 @@ export function SiteFooter() {
               className="font-script text-gold"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)" }}
             >
-              Сделано с любовью
+              Накрыто с любовью
             </span>
             <Heart
               className="size-7 fill-gold text-gold"
@@ -462,9 +469,9 @@ export function SiteFooter() {
             />
           </motion.div>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-cream/80 md:text-base">
-            Семейное торжество или праздник на сотню гостей — доверьте
-            кухню, сервировку и подачу нам, а сами наслаждайтесь днём в
-            кругу близких. Мы позаботимся обо всём.
+            Семейное торжество или большой праздник — мы накроем,
+            сервируем и подадим, а вы наслаждайтесь днём в кругу близких.
+            Мы позаботимся обо всём.
           </p>
         </motion.div>
       </div>
@@ -547,9 +554,14 @@ export function SiteFooter() {
               </a>
             </div>
 
-            {/* Соцсети — VK / MAX / Instagram / Telegram / WhatsApp.
-                MAX (max.ru/nilovcatering) — российский мессенджер, бейдж
-                в том же стиле, что VK (font-display-спан, не иконка).
+            {/* Соцсети — VK / Instagram / Telegram / WhatsApp
+                (c86-CRIT3: MAX снят — профиль 404).
+                c86-D: Instagram — единственная кнопка с ВИДИМОЙ подписью
+                «Instagram*» (RF-маркер; сноска Meta — последней строкой
+                футера): пилюля h-10 в идиоме VK/MAX (font-display-бейдж),
+                слово длиннее акронима — ширина авто + px, не size-10.
+                Ряд получил flex-wrap: на узких (<360px) экранах пилюля
+                аккуратно переносится на вторую строку, без overflow.
                 c83-B (Impl-B, задача 3b): y-hop глифа — подъём -4px +
                 заливка золотом на hover/focus-visible (CSS в
                 site-footer-anim.css; гейты fine-pointer + no-preference).
@@ -557,7 +569,7 @@ export function SiteFooter() {
                 wiggle — CSS-анимация transform rotate+scale на ТОЙ ЖЕ
                 кнопке по ТОМУ ЖЕ hover — два жеста конкурировали бы на
                 одном триггере); data-press сохранён. */}
-            <div className="mt-2 flex items-center gap-3">
+            <div className="mt-2 flex flex-wrap items-center gap-3">
               <a
                 href={CONTACTS.vkHref}
                 target="_blank"
@@ -570,29 +582,28 @@ export function SiteFooter() {
               >
                 <span className="fw-soc__glyph font-display text-xs font-bold uppercase text-cream">VK</span>
               </a>
-              <a
-                href={CONTACTS.maxHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="nilov catering в MAX (открывается в новой вкладке)"
-                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
-                    reduce → none). c83-B: wiggle → y-hop (см. VK выше). */
-                data-press
-              >
-                <span className="fw-soc__glyph font-display text-xs font-bold uppercase text-cream">MAX</span>
-              </a>
+              {/* c86-CRIT3: MAX-бейдж снят — max.ru/nilovcatering
+                  отвечает 404 (профиль не существует, см. site-config.ts);
+                  мёртвая ссылка в контактной зоне — анти-сигнал. Вернётся,
+                  когда владелец создаст профиль. */}
               <a
                 href={CONTACTS.instagramHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="nilov catering в Instagram (открывается в новой вкладке)"
-                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+                /* c86-D: RF-маркер «Instagram*» видимой подписью —
+                    звёздочка золотом (8.2:1 на espresso), текст кремом
+                    (17:1). aria-label чистый — скринридеру звёздочка
+                    не нужна. Иконку заменил текст-бейдж: слово — сам
+                    маркер, идиома VK/MAX. */
+                className="fw-soc flex h-10 items-center justify-center rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
                     reduce → none). c83-B: wiggle → y-hop (см. VK выше). */
                 data-press
               >
-                <Instagram className="fw-soc__glyph size-5 text-cream" aria-hidden="true" />
+                <span className="fw-soc__glyph font-display text-xs font-bold text-cream">
+                  Instagram<span className="text-gold">*</span>
+                </span>
               </a>
               <a
                 href={CONTACTS.telegramHref}
@@ -620,17 +631,10 @@ export function SiteFooter() {
               </a>
             </div>
 
-            {/* Task 2-c: факт «2 400+ мероприятий с 2007 года» сохранён из
-                удалённой колонки «Нам доверяют» — как брендовая строка-стат
-                под hairline. Цифры каноничны (цикл 28 / c66-V9: 2007). */}
-            <p className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-cream/10 pt-4">
-              <span className="font-display text-2xl font-semibold tracking-wide text-gold">
-                2 400+
-              </span>
-              <span className="text-[13px] uppercase tracking-wider text-cream/60">
-                мероприятий с 2007 года
-              </span>
-            </p>
+            {/* c86-D: стат «2 400+ мероприятий с 2007 года» удалён —
+                de-numbering (владелец уводит сайт от чисел); hairline
+                под ним ушёл вместе с блоком, колонка заканчивается
+                соц-строкой с помеченным Instagram*. */}
           </motion.section>
 
           {/* ---- Column 2: Навигация (компактная, hairline слева) ---- */}
@@ -695,12 +699,13 @@ export function SiteFooter() {
         ))}
       </VelocitySkew>
 
-      {/* ============ Section 4 — «С гордостью обслуживаем» маркие ============ */}
+      {/* ============ Section 4 — районы (c86-CRIT3: калкур
+          «С гордостью обслуживаем» → «Накрываем столы по всему городу») ============ */}
       <div className="border-t border-cream/10 bg-[#161312]/60">
         <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
           <div className="mb-4 flex flex-col items-center text-center">
             <SplitTextReveal as="h2" className="eyebrow-wide text-sm text-gold">
-              С гордостью обслуживаем
+              Накрываем столы по всему городу
             </SplitTextReveal>
             <p className="mt-2 text-sm text-cream/70">
               Санкт-Петербург и пригороды · Ленинградская область — выезд по договорённости
@@ -801,6 +806,20 @@ export function SiteFooter() {
             {CONTACTS.phone}
           </a>
         </div>
+
+        {/* c86-D: RF legal footnote — Instagram* помечен в соц-строке
+            (колонка «Контакты»), сноска стоит тем же экраном, последняя
+            строка футера. cream/60 на #161312 ≈ 5.9–6.6:1 (замеры D2 /
+            c84-F3, oklab/srgb-микс) — AA для мелкого кегля; 12px мобайл /
+            13px десктоп; max-w-2xl — читаемая мера, перенос по пробелам. */}
+        <p
+          data-ig-note
+          className="mx-auto max-w-2xl px-5 pb-6 text-center text-[12px] leading-relaxed text-cream/60 md:text-[13px]"
+        >
+          *Instagram принадлежит компании Meta, признанной экстремистской
+          организацией; её деятельность запрещена на территории Российской
+          Федерации.
+        </p>
       </div>
     </footer>
   );

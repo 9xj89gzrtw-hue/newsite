@@ -33,7 +33,7 @@
   --hacc-ink: var(--ea-ink, #1a1a1a);
   --hacc-red: var(--ea-red, #e71d3a);
   --hacc-red-deep: var(--ea-red-deep, #b91431);  /* AA-safe on tints */
-  --hacc-soft: rgba(26, 26, 26, 0.68);           /* AA on all tints  */
+  --hacc-soft: rgba(26, 26, 26, 0.78);           /* c86-F: 0.68 → 0.78 (жалоба «плохо видно») */
 }
 
 @media (min-width: 1600px) {
@@ -371,8 +371,8 @@
   justify-self: start;
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 700;
-  /* c84-F3 (критик A): 0.72rem → 0.75rem (12px). */
-  font-size: 0.75rem;
+  /* c84-F3: 0.72rem → 0.75rem; c86-F: 12px → 13px (жалоба «мелко»). */
+  font-size: 0.8125rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--hacc-red-deep);        /* AA: 5.9:1 on tints */
@@ -536,8 +536,9 @@
     /* 81-W2F2 (E MINOR, критик E): 0.66rem = 10.56px — микро-кегль
        («Форматы события» / «К любому формату» на мобиле); поднят до 11px.
        Десктоп 0.72rem (11.52px) не тронут.
-       c84-F3 (критик A, задача владельца «мелко»): 11px → 12px. */
-    font-size: 12px;
+       c84-F3 (критик A, задача владельца «мелко»): 11px → 12px.
+       c86-E: 12px → 13px — лейблы на мобиле не мельчают. */
+    font-size: 13px;
   }
 
   .hacc__rack {
@@ -670,6 +671,11 @@
   .hacc__price {
     justify-self: start;
     text-align: left;
+  }
+
+  /* c86-E: «за гостя» на мобиле — не мельче 13px */
+  .hacc__price small {
+    font-size: 13px;
   }
 
   .hacc__row-foot {

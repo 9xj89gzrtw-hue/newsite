@@ -155,16 +155,11 @@ function dottedLeader(
   doc.setLineDashPattern([], 0);
 }
 
-/** «от 20 гостей»: 21/101 → «гостя», остальное → «гостей». */
-function guestsWord(n: number): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  return mod10 === 1 && mod100 !== 11 ? "гостя" : "гостей";
-}
-
-/** Единица цены — как на сайте: «за гостя», у обедов «за порцию». */
+/** «от одного гостя»: единица везде — гость (c86: обеды в офис удалены
+ *  из каталога, «за порцию» больше не встречается). */
 function unitFor(m: MenuType): string {
-  return m.id === "office-lunch" ? "за порцию" : "за гостя";
+  void m;
+  return "за гостя";
 }
 
 /** «7 позиций» / «21 позиция» / «3 позиции» — счётчик состава. */
@@ -205,7 +200,6 @@ const TYPE_SLUGS: Record<string, string> = {
   "coffee-break": "coffee-break",
   vegetarian: "vegetarian",
   bbq: "bbq",
-  "office-lunch": "office-lunch",
 };
 
 const PKG_SLUGS: Record<string, string> = {
@@ -305,9 +299,11 @@ export async function buildMenuCatalogDoc(
        пакета» → блюда → «включено» → сезонная приписка + CTA */
     const price = `${formatRUB(pkg.pricePerGuest)} ${unitFor(single)}`;
     let title = `МЕНЮ — ${single.label.toUpperCase()} · ${pkg.name.toUpperCase()}`;
+    /* c86: гостевых минимумов нет — подпись без порога, состав согласуем
+       под любое число гостей (владелец: принимаем заказ от одного гостя). */
     let subline =
-      `Санкт-Петербург · ${genDate()} · от ${single.minGuests} ${guestsWord(single.minGuests)}` +
-      ` · состав согласуем под событие`;
+      `Санкт-Петербург · ${genDate()} · состав согласуем под событие` +
+      ` · принимаем заказ от одного гостя`;
     /* длинные пары («Доставка закусок · Горячее (3 шашлычка)» + цена)
        не влезают в строку титула — тариф уходит в подстроку */
     doc.setFont("Prata", "normal");
@@ -318,7 +314,7 @@ export async function buildMenuCatalogDoc(
     const pw = doc.getTextWidth(price);
     if (tw + pw + 12 > PAGE.contentW) {
       title = `МЕНЮ — ${single.label.toUpperCase()}`;
-      subline = `Санкт-Петербург · ${genDate()} · пакет «${pkg.name}» · от ${single.minGuests} ${guestsWord(single.minGuests)}`;
+      subline = `Санкт-Петербург · ${genDate()} · пакет «${pkg.name}» · состав согласуем под событие`;
     }
     let y = drawTitleBlock(doc, { title, price, subline });
     y = drawSinglePackage(doc, single, pkg, y);
