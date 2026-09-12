@@ -1,5 +1,17 @@
 User-agent: *
 Allow: /
 
+# Медиа и статика — разрешить индексацию (картинки в выдаче)
+Allow: /media/
+Allow: /brand/
+Allow: /_next/static/media/
+
+# Гео-карта сайта для Яндекс.Карт / Справочника
 Sitemap: https://nilovcatering.ru/sitemap.xml
+Sitemap: https://nilovcatering.ru/geo-sitemap.xml
+
+# Канонический хост для Яндекса (склейка зеркал)
 Host: https://nilovcatering.ru
+
+# Яндекс: игнорировать UTM/реферальные параметры (чистота индекса)
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&fbclid&ref&_ga

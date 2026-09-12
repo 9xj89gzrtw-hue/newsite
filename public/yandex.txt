@@ -1,0 +1,9 @@
+### Yandex geo / business directory hints (https://yandex.ru/support/webmaster)
+host: nilovcatering.ru
+sitemap: https://nilovcatering.ru/sitemap.xml
+sitemap: https://nilovcatering.ru/geo-sitemap.xml
+geo: 59.994868,30.275093
+address: Россия, Санкт-Петербург, ул. Полевая-Сабировская, 45к1
+phone: +7 (911) 941-72-05
+email: interfood-catering@yandex.ru
+opening_hours: 24/7 (заявки круглосуточно)

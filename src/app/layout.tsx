@@ -286,6 +286,27 @@ const jsonLd = {
   ],
 };
 
+/** BreadcrumbList JSON-LD — хлебные крошки для rich-snippet в выдаче
+ *  (Яндекс/Google показывают путь под заголовком результата). */
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Главная",
+      item: siteUrl + "/",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Публичная оферта",
+      item: siteUrl + "/offer",
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -377,6 +398,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
         />
         {/* Task 1-b (cycle-71): FAQPage JSON-LD перенесён в src/app/page.tsx —
             гайдлайн Google: разметка FAQ допустима только на странице с
