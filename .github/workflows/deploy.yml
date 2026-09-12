@@ -15,6 +15,9 @@ jobs:
     env:
       NEXT_PUBLIC_SITE_URL: "https://nilovcatering.ru"
       HOSTING_TARGET: "self-hosted"
+      NEXT_PUBLIC_YANDEX_METRIKA_ID: "112532826"
+      NEXT_PUBLIC_YANDEX_VERIFICATION: "2dc6d5030c8a432b"
+      NEXT_PUBLIC_GOOGLE_VERIFICATION: "owkuVbBpuvmi6CQ_7cv-0lKXqwfJVeDQWwf228DbYho"
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_USER: ${{ secrets.SSH_USER }}
       SSH_PORT: ${{ secrets.SSH_PORT }}
@@ -37,6 +40,9 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: "https://nilovcatering.ru"
           HOSTING_TARGET: "self-hosted"
+          NEXT_PUBLIC_YANDEX_METRIKA_ID: "112532826"
+          NEXT_PUBLIC_YANDEX_VERIFICATION: "2dc6d5030c8a432b"
+          NEXT_PUBLIC_GOOGLE_VERIFICATION: "owkuVbBpuvmi6CQ_7cv-0lKXqwfJVeDQWwf228DbYho"
 
       - name: Verify export
         run: |

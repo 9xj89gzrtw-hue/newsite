@@ -145,14 +145,18 @@ export function loadMetrika(): void {
     (first?.parentNode ?? document.head).insertBefore(k, first ?? null);
   }
 
-  // (3) init — параметры по ТЗ W3: клики по ссылкам и точный bounce — да,
-  //     вебвизор (запись сессий) — нет.
+  // (3) init — параметры по конфигу владельца (счётчик 112532826):
+  //     clickmap + trackLinks + accurateTrackBounce + webvisor (запись сессий
+  //     ВКЛЮЧЕНА — явное требование владельца). ecommerce:"dataLayer"
+  //     включает передачу корзины/событий в dataLayer (безопасно при его
+  //     отсутствии — просто активирует канал).
   try {
     w.ym?.(id, "init", {
       clickmap: true,
       trackLinks: true,
       accurateTrackBounce: true,
-      webvisor: false,
+      webvisor: true,
+      ecommerce: "dataLayer",
     });
   } catch {
     // очередь не должна иметь права падать
