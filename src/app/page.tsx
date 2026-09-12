@@ -6,7 +6,7 @@ import { GammaMarquee } from "@/components/catering/gamma-marquee";
 import { HaccServices } from "@/components/catering/hacc-services";
 import { HaccMenu } from "@/components/catering/hacc-menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
-import { EaEventsPortfolio } from "@/components/catering/ea-events-portfolio";
+import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
 import { CepProcess } from "@/components/catering/cep-process";
 import { HaccBooking } from "@/components/catering/hacc-booking";
 import { TiltedAccent } from "@/components/catering/tilted-accent";
@@ -50,8 +50,8 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //    3. GgVideoShowcase       — ggcatering.com-style 16:9 video block:
 //                               looping muted autoplay mp4 + "Кейтеринг как
 //                               *искусство*" overlay + Play pill + 2 CTAs.
-//    4. GammaMarquee          — infinite horizontal photo marquee (14 portrait
-//                               photos, CSS-keyframes -50% seam loop).
+//    4. GammaMarquee          — infinite horizontal photo marquee (44 real
+//                               owner photos, c88; CSS-keyframes -50% seam loop).
 //    5. GammaSeparator        — PARALLAX BAND. Full-bleed separator photo +
 //                               tilted "interfood" Marck Script watermark.
 //                               Task 2-a: moved here from the founder→FAQ gap.
@@ -65,11 +65,11 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //                               headline + "bon appétit" script. Cinematic
 //                               pause before the events gallery.
 //
-//   ── ACT III: GALLERY (events portfolio → process) ──
-//    9. EaEventsPortfolio     — c87: фото-галерея 44 реальных событий
-//                               (владелец, Яндекс.Диск) — смешанные пропорции
-//                               при единой высоте, scroll-snap + автопрокрутка
-//                               4.5с + стрелки + WCAG-паузы.
+//   ── ACT III: GALLERY (events video carousel → process) ──
+//    9. EventsVideoCarousel   — карусель 4 видео-тизеров (сток-b-roll «Кухня
+//                               в движении», c36; c87 ошибочно сняла с рендера
+//                               — c88 вернула). Модалка полного видео, снап,
+//                               автопрокрутка 5с, паузы hover/focus.
 //   10. CepProcess            — «КАК МЫ РАБОТАЕМ» compact 4-step strip:
 //                               scroll-drawn red progress rail, sequential
 //                               step activation, ink-fill outline numerals.
@@ -299,11 +299,16 @@ export default function Home() {
              (right after their hero + "Who we are" intro). */}
       <GgVideoShowcase />
 
-      {/* 4. GammaMarquee — Cycle 31. gammacatering.com signature infinite
-             horizontal photo marquee (CSS-keyframes -50% seam loop + WAAPI
-             playbackRate, children duplicated for seamless loop). 14 portrait
-             food/event photos. Pure photo scroll — no text overlay, per
-             gamma. The first wow photo moment after the video block. */}
+      {/* 4. GammaMarquee — Cycle 31 · Cycle 88: 44 реальных фото владельца
+             (Яндекс.Диск, конвейер c87 — webp q82, честные alt, лого-кропы)
+             вместо 14 стоковых gamma-кадров — по указанию владельца «наши
+             фотки» именно сюда, сразу за «Кейтеринг как искусство».
+             Бесконечная горизонтальная лента (CSS-keyframes -50% seam loop +
+             WAAPI playbackRate, дети задублированы для бесшовного цикла),
+             тайлы единой высоты с пропорцией самого кадра («правда фото»),
+             цикл 170с ≈ прежние ~110–115 px/s. Pure photo scroll — no text
+             overlay, per gamma. The first wow photo moment after the video
+             block. */}
       <GammaMarquee />
 
       {/* 5. GammaSeparator — PARALLAX BAND. Cycle 31 gammacatering.com signature
@@ -353,20 +358,18 @@ export default function Home() {
 
       {/* ── ACT III: PROCESS ── */}
 
-      {/* 9. EaEventsPortfolio — Cycle 28 (EA editorial layer) · Cycle 87: фото-
-             галерея реальных событий. 44 кадра с реальных мероприятий владельца
-             (Яндекс.Диск, папка «Итоговые фото… на главную страницу») в
-             редакционном filmstrip со смешанными пропорциями при единой высоте
-             («правда фото»: кадр не режем под форму — форму под кадр).
-             Честное авторство — закрыл вопрос c86-CRIT3 (сток-кадры как «наши
-             события»). Магазин-скролл: scroll-snap-x mandatory, автопрокрутка
-             4.5с до следующей карточки, пауза на ховере, прогресс-бар EA-red.
-             Сидит между TottParallaxBand (редакционная пауза) и CepProcess
-             («как мы работаем») — trust-beat с реальными фотографиями.
-             Прежняя видео-карусель (сток-b-roll «Кухня в движении») снята с
-             рендера в c87 — компонент events-video-carousel.tsx остаётся на
-             диске, вернуть при появлении реальных съёмок. */}
-      <EaEventsPortfolio />
+      {/* 9. EventsVideoCarousel — Cycle 32. RESTORED in Cycle 36 · Cycle 88
+             (c87 по ошибке подменила её фото-галереей EaEventsPortfolio —
+             видео-карусель вернули на место; реальные 44 фото переехали
+             в GammaMarquee №4, EaEventsPortfolio остаётся на диске по
+             конвенции репо). Carousel of 4
+             event-type video tiles with looping muted autoplay teasers + caption
+             panel + center play-pill CTA that opens a fullscreen modal with the
+             full unmuted video + controls. Magazine scroll-snap-x mandatory pattern,
+             5s auto-advance, pause-on-hover, ESC closes the modal. Sits between
+             TottParallaxBand (the editorial pause) and CepProcess (the "how we
+             work" algorithm) — a cinematic trust beat showing the food in motion. */}
+      <EventsVideoCarousel />
 
       {/* 10. CepProcess — Cycle 63. «КАК МЫ РАБОТАЕМ» — compact 4-step strip
               (ЗАЯВКА / СОЗВОН / НАКРЫВАЕМ / УБИРАЕМ): scroll-drawn red progress

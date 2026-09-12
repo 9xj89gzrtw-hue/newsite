@@ -45,7 +45,7 @@ const FOOTER_NAV = [
   { label: "Главная", href: "#main-content" },
   { label: "Услуги", href: "#services" },
   { label: "Меню и цены", href: "#menu" },
-  { label: "События", href: "#ea-events-portfolio" },
+  { label: "Видео событий", href: "#events-video-carousel" },
   { label: "Калькулятор", href: "#calculator" },
   { label: "О компании", href: "#about" },
   { label: "Вопросы и ответы", href: "#faq" },

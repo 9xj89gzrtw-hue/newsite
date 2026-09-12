@@ -436,7 +436,7 @@ function VenueCard({
 
             {/* "Смотреть события →" gold link. */}
             <a
-              href="#ea-events-portfolio"
+              href="#events-video-carousel"
               className="inline-flex items-center gap-2"
               style={{
                 color: "var(--gold)",
@@ -547,7 +547,7 @@ function StaticVenues() {
                   {v.name}
                 </h3>
                 <a
-                  href="#ea-events-portfolio"
+                  href="#events-video-carousel"
                   className="mt-3 inline-flex items-center gap-2 opacity-0 transition-opacity duration-500 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto"
                   style={{ color: "var(--ea-red)" }}
                 >

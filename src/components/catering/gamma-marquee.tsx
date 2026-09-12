@@ -10,15 +10,26 @@ import { useMounted } from "@/hooks/use-mounted";
  * explicitly called out as a must-have.
  *
  * Source: docs/advanced-technical/site_21_gamma.html §4567-4603
- *   .marquee-slider > .marquee-track > .marquee-item[] (14 portrait
- *   food/event photos). Gamma uses Splide (loop + AutoScroll + free drag)
- *   — we reproduce the same VISUAL result with a pure CSS keyframes loop
- *   (`@keyframes gamma-marquee-scroll` in globals.css: translate3d 0 →
- *   -50%, 40s linear infinite — the same -50% seam trick gamma uses for
- *   their TEXT marquee in §4611-4619). Children rendered TWICE for the
- *   seamless -50% loop — when the first set has fully scrolled out of
- *   view, the duplicate set is in the exact position the first started,
- *   so the animation loops without a visible jump.
+ *   .marquee-slider > .marquee-track > .marquee-item[] (у gamma — 14
+ *   портретных food/event фото). Gamma uses Splide (loop + AutoScroll +
+ *   free drag) — we reproduce the same VISUAL result with a pure CSS
+ *   keyframes loop (`@keyframes gamma-marquee-scroll` in globals.css:
+ *   translate3d 0 → -50%, 170s linear infinite — the same -50% seam trick
+ *   gamma uses for their TEXT marquee in §4611-4619). Children rendered
+ *   TWICE for the seamless -50% loop — when the first set has fully
+ *   scrolled out of view, the duplicate set is in the exact position the
+ *   first started, so the animation loops without a visible jump.
+ *
+ * CYCLE 88 — контент ленты: 44 РЕАЛЬНЫХ фото владельца (Яндекс.Диск,
+ * папка «Итоговые фото… на главную страницу»; конвейер c87: webp q82,
+ * честные alt только по видимому, лого-кропы волн критиков) вместо 14
+ * стоковых gamma-кадров — по указанию владельца «наши фотки» именно в
+ * эту ленту (сразу за «Кейтеринг как искусство»). «Правда фото» (урок
+ * c60): кадр НЕ режем под форму — тайлы единой ВЫСОТЫ (373px мобайл /
+ * 400px md+), ширина тайла = высота × пропорция кадра (портрет 3/4 ·
+ * квадрат 1/1 · альбом 4/3 · панорама 16/9) — редакционный ритм
+ * смешанных ширин журнальной ленты; верх/низ ленты выровнены
+ * пиксель-в-пиксель (то же требование VLM-critique #1).
  *
  * ANIMATION PIPELINE (Cycle 41 PERF FIX + Task 5-C; GSAP удалён —
  * stale-докблок пойман аудитом c83-2, фикс c83-D):
@@ -33,13 +44,15 @@ import { useMounted } from "@/hooks/use-mounted";
  *      (0.6…2.2) на существующей CSSAnimation (track.getAnimations()),
  *      rate никогда не возвращает анимацию в main thread.
  *
- * Photos: 14 portrait (~3:4) food/event photos from /media/gamma/ — the
- * same 14 images gamma uses in their homepage .marquee-slider. Each
- * rendered in a uniform 3:4 portrait frame (280px mobile, 300px md+)
- * with `next/image fill + object-cover` so every photo
- * occupies an identical box — top/bottom edges align pixel-perfectly
- * regardless of source aspect (VLM critique fix). 32px (mr-8) right
- * margin for editorial breathing room.
+ * Photos (c88): 44 реальных кадра из /media/c87/ — та же подборка, что
+ * прошла три волны слепых критиков в c87 (порядок, подписи, кропы
+ * чужих логотипов). Файлы: real-event-01..44.webp, исходники 614–1956px
+ * по ширине. Тайл: единая высота + aspect-ratio самого кадра
+ * (object-cover при совпадающей пропорции источника = кропа нет), 32px
+ * (mr-8) правый отступ — редакционное дыхание. Дюрация цикла 40с → 170с:
+ * сет из 44 смешанных кадров ≈ 19.5к px против 4.6к у 14 портретов —
+ * 170с держит прежнюю скорость ленты ~110–115 px/s (двелл кадра ~3.9с
+ * против ~2.9с у стока).
  * (c83: НЕ писать утилити-подобные токены «aspect + [N:N]» в комментариях —
  * Tailwind v4 сканирует комментарии как кандидаты классов и генерит
  * невалидный aspect-ratio N:N, от которого падает next build.)
@@ -83,79 +96,102 @@ import { useMounted } from "@/hooks/use-mounted";
  *      §4567-4603 (image marquee), §4611-4619 (text marquee — -50% seam)
  */
 
-/** 14 portrait food/event photos from /media/gamma/ — the exact set gamma
- *  uses in their homepage .marquee-slider (see site_21_gamma.html §304).
- *  Order matches gamma's source order so the visual rhythm of food /
- *  venue / people / detail shots matches the reference site. */
+/** Пропорция кадра (классификация c87 по нативным пропорциям файлов):
+ *  p — портрет 3/4, s — квадрат 1/1, l — альбом 4/3, xl — панорама 16/9. */
+type MarqueeRatio = "p" | "s" | "l" | "xl";
+
+/** Пропорция как CSS-строка для инлайн aspect-ratio тайла. */
+const RATIO_CSS: Record<MarqueeRatio, string> = {
+  p: "3 / 4",
+  s: "1 / 1",
+  l: "4 / 3",
+  xl: "16 / 9",
+};
+
+/** sizes-подсказка next/image — точная ширина слота по пропорции кадра
+ *  (высота тайла 373px мобайл / 400px md+, умноженная на пропорцию).
+ *  Retina просит слот×2 и капается шириной исходника. */
+const SIZES: Record<MarqueeRatio, string> = {
+  /* c88-F2 (критик волны-1): граница 767, а не 768 — Tailwind md:
+     срабатывает УЖЕ на 768px, и при vw=768 (iPad portrait) мобильная
+     подсказка врала на ~7% при десктопном слоте. */
+  p: "(max-width: 767px) 280px, 300px",
+  s: "(max-width: 767px) 373px, 400px",
+  l: "(max-width: 767px) 497px, 533px",
+  xl: "(max-width: 767px) 663px, 711px",
+};
+
+/** 44 реальных фото событий (c88; конвейер и alt — c87, три волны слепых
+ *  критиков): /media/c87/real-event-01..44.webp. Порядок — финальная
+ *  редакционная раскладка c87 (ритм «сцена↔еда», сильные открытие и
+ *  финал). alt описывает только видимое на кадре — без выдуманных
+ *  площадок и числа гостей. */
 const MARQUEE_PHOTOS: ReadonlyArray<{
   src: string;
+  ratio: MarqueeRatio;
   alt: string;
 }> = [
-  {
-    src: "/media/gamma/gamma-catering-waiter-canapes-trolley.jpg",
-    alt: "Официант-тележка с канапе",
-  },
-  {
-    src: "/media/gamma/gamma-catering-ice-cream-cart-lake.jpg",
-    alt: "Тележка с мороженым у озера",
-  },
-  {
-    src: "/media/gamma/gamma-catering-ballroom-chandelier-banquet.jpg",
-    alt: "Банкетный зал с люстрами",
-  },
-  {
-    src: "/media/gamma/gamma-catering-buffet.jpg",
-    alt: "Фуршетные закуски",
-  },
-  {
-    src: "/media/gamma/gamma-catering-caviar-fine-dining.jpg",
-    alt: "Икра — fine dining подача",
-  },
-  {
-    src: "/media/gamma/hochzeit-tischdekoration-zitronen-gedeck-gammacatering.jpg",
-    alt: "Свадебная сервировка с лимоном",
-  },
-  {
-    src: "/media/gamma/event-service-tischeindeckung-gala-gammacatering.jpg",
-    alt: "Сервировка стола для гала-ужина",
-  },
-  {
-    src: "/media/gamma/hochzeitslocation-orangerie-blumen-kronleuchter-gammacatering.jpg",
-    alt: "Оранжерея с цветами и люстрами",
-  },
-  {
-    src: "/media/gamma/showkueche-live-cooking-koeche-gammacatering.jpg",
-    alt: "Шоу-кухня — живая готовка",
-  },
-  {
-    src: "/media/gamma/flying-buffet-mini-quiche-sommerfest-gammacatering.jpg",
-    alt: "Летающий фуршет — мини-киши на летнем празднике",
-  },
-  {
-    src: "/media/gamma/blumendekoration-reagenzglas-vasen-event-gammacatering.jpg",
-    alt: "Цветы в пробирочных вазах на ивенте",
-  },
-  {
-    src: "/media/gamma/gammcatering_karriere_004.jpg",
-    alt: "Команда кейтеринга за работой",
-  },
-  {
-    src: "/media/gamma/firmenevent-messe-gala-bankett-gammacatering.jpg",
-    alt: "Корпоративное событие — выставка и гала-банкет",
-  },
-  {
-    src: "/media/gamma/sommelier-uniform-weinservice-gammacatering.jpg",
-    alt: "Сомелье — винный сервис",
-  },
+  { src: "/media/c87/real-event-01.webp", ratio: "p", alt: "Длинный банкетный стол в светлом зале с сервировкой на каждого гостя" },
+  { src: "/media/c87/real-event-02.webp", ratio: "l", alt: "Индивидуальная порционная сервировка из трёх блюд на белом столе" },
+  { src: "/media/c87/real-event-03.webp", ratio: "p", alt: "Двухъярусный ресторанный зал с цветочным декором и люстрами" },
+  { src: "/media/c87/real-event-04.webp", ratio: "p", alt: "Фуршетный стол крупным планом — закуски и морепродукты" },
+  { src: "/media/c87/real-event-05.webp", ratio: "l", alt: "Банкетный зал с жёлтыми креслами и панорамными окнами" },
+  { src: "/media/c87/real-event-06.webp", ratio: "p", alt: "Брускетты с лососем и сыром на деревянной доске" },
+  { src: "/media/c87/real-event-07.webp", ratio: "p", alt: "Просторный зал с высоким потолком и длинным банкетным столом" },
+  { src: "/media/c87/real-event-08.webp", ratio: "s", alt: "Канапе с красной икрой на шпажках крупным планом" },
+  { src: "/media/c87/real-event-09.webp", ratio: "xl", alt: "Широкая панорама фуршетного стола с закусками и высокими столиками" },
+  { src: "/media/c87/real-event-10.webp", ratio: "p", alt: "Сервированный банкетный стол с блюдами в светлом зале" },
+  { src: "/media/c87/real-event-11.webp", ratio: "l", alt: "Фуршетный стол в автосалоне вокруг красного автомобиля, за окнами парковка" },
+  { src: "/media/c87/real-event-12.webp", ratio: "s", alt: "Десерты на шпажках с ягодами крупным планом" },
+  { src: "/media/c87/real-event-13.webp", ratio: "p", alt: "Длинный банкетный стол под белым шатром с белыми стульями" },
+  { src: "/media/c87/real-event-14.webp", ratio: "l", alt: "Банкетный стол с белой скатертью и закусками на золотистых подставках" },
+  { src: "/media/c87/real-event-15.webp", ratio: "p", alt: "Интерьер судна с панорамными окнами и прозрачной крышей, за окнами река и набережная" },
+  { src: "/media/c87/real-event-16.webp", ratio: "s", alt: "Канапе с лососем на шпажках крупным планом" },
+  { src: "/media/c87/real-event-17.webp", ratio: "l", alt: "Банкет на террасе с видом на воду, столы с чёрными скатертями" },
+  { src: "/media/c87/real-event-18.webp", ratio: "p", alt: "Длинный банкетный стол с цветочными композициями и свечами" },
+  { src: "/media/c87/real-event-19.webp", ratio: "s", alt: "Прозрачные стаканчики с мясными салатами крупным планом" },
+  { src: "/media/c87/real-event-20.webp", ratio: "xl", alt: "Длинный стол с едой и мармитами у кирпичной стены, официанты на линии" },
+  { src: "/media/c87/real-event-21.webp", ratio: "p", alt: "Длинный банкетный стол с закусками, посудой и бокалами в светлом салоне" },
+  { src: "/media/c87/real-event-22.webp", ratio: "p", alt: "Чёрно-белое фото тарталеток на подносе" },
+  { src: "/media/c87/real-event-23.webp", ratio: "l", alt: "Круглый банкетный стол у окна с белой скатертью" },
+  { src: "/media/c87/real-event-24.webp", ratio: "s", alt: "Канапе с ветчиной и сыром на шпажках крупным планом" },
+  { src: "/media/c87/real-event-25.webp", ratio: "l", alt: "Накрытый банкетный стол с белой скатертью, золотистыми тарелками и бокалами" },
+  { src: "/media/c87/real-event-26.webp", ratio: "p", alt: "Официант у стола с десертами в богато украшенном зале" },
+  { src: "/media/c87/real-event-27.webp", ratio: "s", alt: "Канапе с рыбой на шпажках крупным планом" },
+  { src: "/media/c87/real-event-28.webp", ratio: "l", alt: "Белые шатры на открытом воздухе — художественная чёрно-белая фотография" },
+  { src: "/media/c87/real-event-29.webp", ratio: "l", alt: "Банкетный стол с зелёной скатертью и сервировкой" },
+  { src: "/media/c87/real-event-30.webp", ratio: "p", alt: "Круглый стол с золотистыми тарелками и цветами" },
+  { src: "/media/c87/real-event-31.webp", ratio: "s", alt: "Канапе с ветчиной и огурцами на шпажках крупным планом" },
+  { src: "/media/c87/real-event-32.webp", ratio: "p", alt: "Длинный стол с закусками, десертами и цветами" },
+  { src: "/media/c87/real-event-33.webp", ratio: "p", alt: "Длинный банкетный стол с обильной цветочной композицией по центру" },
+  { src: "/media/c87/real-event-34.webp", ratio: "l", alt: "Чёрный фуршетный стол с бокалами, цветами и бутылками в стиле лофт" },
+  { src: "/media/c87/real-event-35.webp", ratio: "p", alt: "Фуршетный стол с канапе и цветами" },
+  { src: "/media/c87/real-event-36.webp", ratio: "p", alt: "Стол с цветочными композициями в стеклянных вазах" },
+  { src: "/media/c87/real-event-37.webp", ratio: "l", alt: "Площадка под тентом с высокими столиками для мероприятия" },
+  { src: "/media/c87/real-event-38.webp", ratio: "p", alt: "Длинный фуршетный стол с закусками и цветами" },
+  { src: "/media/c87/real-event-39.webp", ratio: "p", alt: "Терраса с гирляндами и длинными столами в белых скатертях, вид сверху" },
+  { src: "/media/c87/real-event-40.webp", ratio: "xl", alt: "Длинные банкетные столы с красными скатертями, блюдами и напитками" },
+  { src: "/media/c87/real-event-41.webp", ratio: "p", alt: "Вечернее мероприятие — гости у фуршетных столов в полутёмном зале" },
+  { src: "/media/c87/real-event-42.webp", ratio: "p", alt: "Фуршетный стол с закусками и цветами" },
+  { src: "/media/c87/real-event-43.webp", ratio: "p", alt: "Длинный фуршетный стол с подсветкой и декором" },
+  { src: "/media/c87/real-event-44.webp", ratio: "xl", alt: "Накрытый круглый стол с посудой и зелёной подсветкой — вечерний кадр" },
 ];
 
-/** Photo tile — uniform portrait frame (280px mobile / 300px md+) with
- *  aspect-[3/4] so EVERY photo renders at an identical size and the
- *  top/bottom edges of the marquee band align pixel-perfectly. Using
- *  next/image `fill` + `object-cover` (instead of fixed width/height)
- *  so any source aspect crops cleanly into the portrait frame and the
- *  wrapper (not the image) owns the box dimensions — this is what
- *  eliminates the jagged-edge inconsistency VLM critique #1 called out.
+/** Photo tile — единая ВЫСОТА (373px мобайл / 400px md+), ширина
+ *  выводится из aspect-ratio САМОГО КАДРА (инлайн-стиль — пропорция у
+ *  каждого фото своя: портрет, квадрат, альбом, панорама). «Правда
+ *  фото» (c60/c88): кадр не режем под форму — форму подстраиваем под
+ *  кадр; object-cover при совпадающей пропорции источника = кропа нет,
+ *  а верх и низ ленты выровнены пиксель-в-пиксель (то же требование,
+ *  что закрывал VLM-critique #1 про рваные края). Тайл-обёртка (не
+ *  картинка) владеет боксом — fill + object-cover.
+ *
+ *  sizes — точная ширина слота по пропорции кадра; retina просит
+ *  слот×2 и капается исходником (замер c88: 41 из 44 источников
+ *  покрывают full-retina; перекропанные в c87 кадры 20, 25 и 44
+ *  отдают ~0.7–0.85× на retina-десктопе — те же файлы критики c87
+ *  уже одобрили при ещё более крупной карточке, апскейл на
+ *  движущейся ленте неразличим).
  *
  *  Rendered twice per set (see `<PhotoSet />`) for the seamless -50%
  *  loop. mr-8 (32px) right margin for editorial breathing room —
@@ -163,17 +199,20 @@ const MARQUEE_PHOTOS: ReadonlyArray<{
 function PhotoTile({
   src,
   alt,
+  ratio,
   /** Marks the duplicate clone as decorative for screen readers so the
    *  photo list is not announced twice. */
   ariaHidden = false,
 }: {
   src: string;
   alt: string;
+  ratio: MarqueeRatio;
   ariaHidden?: boolean;
 }): React.ReactElement {
   return (
     <span
-      className="gamma-marquee__item relative mr-8 inline-block aspect-[3/4] w-[280px] shrink-0 snap-start overflow-hidden md:w-[300px]"
+      className="gamma-marquee__item relative mr-8 inline-block h-[373px] shrink-0 snap-start overflow-hidden md:h-[400px]"
+      style={{ aspectRatio: RATIO_CSS[ratio] }}
       aria-hidden={ariaHidden || undefined}
       /* C78: двойной тап по фото — золотой всплеск искр (MicroDelights). */
       data-spark
@@ -182,34 +221,18 @@ function PhotoTile({
         src={src}
         alt={ariaHidden ? "" : alt}
         fill
-        /* 81-W2F2 (критик E волна-2, проверено измерением): 280px/300px —
-           ТОЧНЫЕ слоты тайла (замер: 280×373 @390 / 300×400 @1440),
-           апскейла нет на DPR1 (файл 384/484 = 1.28–1.73×). На retina
-           браузер просит w=640, НО оптимизатор капает до ширины
-           ИСХОДНИКОВ 482–484px (gammacatering.com оригиналы) = 0.81–0.86×
-           retina — это предел источников, sizes больше не выжать.
-           Найденные в репо hires (media/gamma/c49-*) — ДРУГИЕ кадры
-           (пиксель-корреляция ≤0.66 + VLM: не совпадают), подмена = смена
-           контента по конвейеру §4 — отдельный цикл.
-           81-W2F2b: sizes подняты до слот×1.15 (322/345) — запас 15%
-           из ТЗ (файл ≥ client×dpr×1.15): retina-мобайл теперь просит
-           w=750 (было 640): 13 файлов с капом источника получают тот же
-           484-пиксельный файл (байты не меняются), karriere (960 исх.)
-           получает 750 ≥ 644 ✓ — единственный тайл, где ТЗ-формула
-           выполнима; десктоп-выбор не меняется (345 → 384). Примечание:
-           naturalWidth критика (210×317 «апскейл 1.33×») был артефактом
-           Chromium: для srcset+w naturalWidth = intrinsic×sizes/candidate
-           (density-corrected), реальный файл = 484 (createImageBitmap,
-           research/w2f2b/measure2.json) — DPR1-апскейла в марки НЕТ. */
-        sizes="(max-width: 768px) 322px, 345px"
+        /* c88: слот = высота 373/400 × пропорция кадра (см. SIZES выше);
+           исходники c87 614–1956px — большинство покрывает retina-запрос
+           слот×2, оптимизатор капает до ширины исходника (детали и
+           история замеров — в докблоке PhotoTile). */
+        sizes={SIZES[ratio]}
         className="gamma-marquee__img absolute inset-0 h-full w-full object-cover"
         // FIX-4 [F3, W1-D]: было loading="eager" — React 19 SSR
-        // автоэмитит <link rel=preload as=image> для каждого <img> без
-        // loading="lazy" → 14 marquee-фото ниже фолда уходили в <head> как
-        // preload-и (19 SSR image-preload, из них 14 — marquee). Убираем
-        // eager — next/image по умолчанию ставит loading="lazy": preload-
-        // link-и исчезают, фото грузятся по мере захода в вьюпорт
-        // (горизонтальный скролл ленты подводит их в зону IO сам).
+        // автоэмитит preload-линк для каждого img без loading="lazy" —
+        // marquee-фото ниже фолда уходили в head как preload-и. Оставляем
+        // дефолт next/image (lazy): preload-линки не плодятся, фото
+        // грузятся по мере захода в вьюпорт — горизонтальный скролл ленты
+        // подводит их в зону IO сам (88 тайлов — особенно важно).
         // draggable=false so the user can't accidentally trigger the
         // browser's native image-drag gesture over the marquee (which
         // would otherwise interfere with the keyframes-driven motion).
@@ -219,9 +242,11 @@ function PhotoTile({
   );
 }
 
-/** One full set of 14 photos — rendered TWICE inside the track so the CSS
+/** One full set of 44 photos — rendered TWICE inside the track so the CSS
  *  keyframes loop translate3d(-50%) is seamless (when set 1 has fully
- *  exited left, set 2 is exactly where set 1 started). */
+ *  exited left, set 2 is exactly where set 1 started). Ширины тайлов
+ *  детерминированы (явная высота + aspect-ratio — не зависят от загрузки
+ *  картинок), поэтому шов -50% не плывёт при lazy-загрузке. */
 function PhotoSet({ ariaHidden = false }: { ariaHidden?: boolean }) {
   return (
     <span className="gamma-marquee__set flex shrink-0 items-center">
@@ -230,6 +255,7 @@ function PhotoSet({ ariaHidden = false }: { ariaHidden?: boolean }) {
           key={`${photo.src}-${i}`}
           src={photo.src}
           alt={photo.alt}
+          ratio={photo.ratio}
           ariaHidden={ariaHidden}
         />
       ))}
@@ -245,8 +271,10 @@ export function GammaMarquee() {
 
   // ── Marquee timing ──────────────────────────────────────────────────
   /** One full loop (0 → -50% of the track) in seconds. Must match the
-   *  CSS keyframes duration. */
-  const MARQUEE_DURATION_S = 40;
+   * CSS keyframes duration. c88: 170с — сет из 44 кадров ≈ 19.5к px
+   * (против 4.6к у 14 сток-портретов): скорость ленты осталась
+   * ~110–115 px/s, как была при 40с. */
+  const MARQUEE_DURATION_S = 170;
 
   // ── Drag state ──────────────────────────────────────────────────────
   // Cycle 31.1: the user requested the marquee be draggable by cursor
@@ -333,7 +361,7 @@ export function GammaMarquee() {
       delete sectionRef.current.dataset.dragging;
     }
     // Resume the CSS keyframes from wherever the user dropped the track.
-    // The keyframes run 0 → -50% (one set width, w px) over 40s. A track
+    // The keyframes run 0 → -50% (one set width, w px) over 170s. A track
     // at position X (in [-w, 0]) corresponds to animation progress
     // t = -X / w of the cycle — resume with a matching negative delay.
     const track = trackRef.current;
@@ -354,8 +382,14 @@ export function GammaMarquee() {
     }
     const progress = w > 0 ? -currentX / w : 0; // 0..1
     const resumeAt = progress * MARQUEE_DURATION_S;
-    // Drop the inline transform and restart the animation mid-cycle.
-    track.style.transform = "";
+    /* c88-F1 (критик волны-1, покадровый замер): прежний порядок —
+       transform="" сразу после pointerup — ставил трек в x=0 на ~2 кадра
+       до перезапуска кейфреймов (вспышка ленты в начало координат).
+       Фикс: замороженный инлайн-transform живёт, пока кейфреймы снова
+       не завладеют трансформом — сначала возвращаем анимацию с
+       отрицательной задержкой, и лишь потом снимаем инлайн-transform
+       (CSS-анимация в каскаде сильнее инлайн-стиля — ни в одном кадре
+       скачка не видно). */
     track.style.animation = "none";
     // Force a style flush so the animation restarts from scratch with
     // the negative delay (double rAF is the standard trick).
@@ -363,6 +397,7 @@ export function GammaMarquee() {
       requestAnimationFrame(() => {
         track.style.animation = "";
         track.style.animationDelay = `${-resumeAt}s`;
+        track.style.transform = "";
       });
     });
   }, []);
@@ -570,7 +605,7 @@ export function GammaMarquee() {
   return (
     <section
       ref={sectionRef}
-      aria-label="Фотогалерея — кейтеринг в движении"
+      aria-label="Фотогалерея — кадры с наших мероприятий"
       className="gamma-marquee relative w-full overflow-hidden bg-cream py-5"
       style={{
         // Cycle 31.1: edge-fade mask REMOVED per user request: "убери

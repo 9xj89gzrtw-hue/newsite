@@ -4144,7 +4144,11 @@ header[data-scrolled="true"] [data-mega-panel] {
 }
 
 .gamma-marquee__track--anim {
-  animation: gamma-marquee-scroll 40s linear infinite;
+  /* c88: 170s — сет из 44 реальных кадров ≈ 19.5к px (против 4.6к у 14
+     сток-портретов): 170с держит прежнюю скорость ленты ~110–115 px/s.
+     Синхронно с MARQUEE_DURATION_S в gamma-marquee.tsx — drag-resume
+     считает фазу возобновления от этой дюрации. */
+  animation: gamma-marquee-scroll 170s linear infinite;
   /* will-change живёт ТОЛЬКО здесь — c83-F1: дубль с Tailwind
      will-change-transform на треке (gamma-marquee.tsx) убран. */
   will-change: transform;
