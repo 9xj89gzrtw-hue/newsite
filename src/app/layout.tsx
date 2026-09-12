@@ -169,6 +169,20 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  /* SEO-верификация владения доменом для Яндекс.Вебмастер и Google Search
+   * Console. Коды — из env (NEXT_PUBLIC_YANDEX_VERIFICATION /
+   * NEXT_PUBLIC_GOOGLE_VERIFICATION); без них поле пустое и в <head> ничего
+   * не эмитится (сайт живёт как раньше). Владелец вписывает коды один раз
+   * в окружение деплоя (см. инструкцию в PR/README). */
+  verification: {
+    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined,
+    other: {
+      'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION
+        ? [process.env.NEXT_PUBLIC_YANDEX_VERIFICATION]
+        : [],
+    },
+  },
 };
 
 export const viewport: Viewport = {

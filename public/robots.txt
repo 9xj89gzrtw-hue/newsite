@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://nilovcatering.ru/sitemap.xml
+Host: https://nilovcatering.ru
