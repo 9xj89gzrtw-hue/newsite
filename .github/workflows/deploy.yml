@@ -17,9 +17,9 @@ jobs:
       HOSTING_TARGET: "self-hosted"
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_USER: ${{ secrets.SSH_USER }}
-      SSH_PASS: ${{ secrets.SSH_PASS }}
       SSH_PORT: ${{ secrets.SSH_PORT }}
       REMOTE_DIR: ${{ secrets.REMOTE_DIR }}
+      SSHPASS: ${{ secrets.SSH_PASS }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
