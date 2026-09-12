@@ -768,61 +768,59 @@ export function Contact() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!data.consent) {
       toast.error("Необходимо согласие на обработку персональных данных");
       return;
     }
 
     setFormStatus("loading");
-    
+
     try {
       const menuType = MENU_TYPES.find((m) => m.id === data.eventType);
-      const res = await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name,
-          phone: normalizePhone(data.phone),
-          email: data.email || undefined,
-          eventType: data.eventType || undefined,
-          guests: data.guests,
-          message: [
-            data.date && `Желаемая дата: ${data.date}`,
-            data.preferredTime && `Желаемое время звонка: ${data.preferredTime}`,
-            calcSnapshot?.total &&
-              `Расчёт с сайта: ~${calcSnapshot.total.toLocaleString("ru-RU")} ₽` +
-                (calcSnapshot.addons?.length
-                  ? ` (доп. услуги: ${calcSnapshot.addons.join(", ")})`
-                  : ""),
-          ].filter(Boolean).join("\n") || undefined,
-          consentAccepted: true,
-        }),
-      });
+      // Static-host deployment (shared PHP hosting, no server runtime):
+      // instead of POST /api/lead, we hand the lead to the manager via a
+      // pre-filled email. No backend, no secrets, works everywhere.
+      const lines = [
+        `Имя: ${data.name}`,
+        `Телефон: ${normalizePhone(data.phone)}`,
+        data.email ? `Email: ${data.email}` : "",
+        menuType ? `Тип мероприятия: ${menuType.label}` : "Тип мероприятия: (не выбран)",
+        `Гостей: ${data.guests}`,
+        data.date ? `Желаемая дата: ${data.date}` : "",
+        data.preferredTime ? `Желаемое время звонка: ${data.preferredTime}` : "",
+        calcSnapshot?.total
+          ? `Расчёт с сайта: ~${calcSnapshot.total.toLocaleString("ru-RU")} ₽${
+              calcSnapshot.addons?.length
+                ? ` (доп. услуги: ${calcSnapshot.addons.join(", ")})`
+                : ""
+            }`
+          : "",
+        "Согласие на обработку персональных данных: да",
+      ].filter(Boolean);
 
-      if (!res.ok) throw new Error("Submission failed");
+      const subject = encodeURIComponent(
+        `Заявка с сайта nilovcatering.ru — ${data.name || "без имени"}`,
+      );
+      const body = encodeURIComponent(lines.join("\n"));
+      const mailto = `mailto:interfood-catering@yandex.ru?subject=${subject}&body=${body}`;
 
       setFormStatus("success");
-      toast.success("Заявка отправлена! Перезвоним в течение 15 минут.");
-      
-      // Cycle 42: the success state persists until the user explicitly
-      // dismisses it («Отправить ещё одну заявку»).
+      toast.success("Открываем почту — отправьте письмо с заявкой. Или позвоните нам напрямую.");
+
       try {
         window.localStorage.removeItem(DRAFT_KEY);
       } catch {
         // ignore.
       }
-    } catch (err) {
+
+      // Open the user's mail client (best-effort; some mobile browsers
+      // block programmatic navigation — the success card still shows the
+      // manager's contacts as a fallback).
+      window.location.href = mailto;
+    } catch {
       setFormStatus("error");
-      
-      if (err instanceof TypeError && err.message.includes("fetch")) {
-        toast.error("Нет связи с сервером. Проверьте интернет-соединение.");
-      } else if (err instanceof Error) {
-        toast.error(err.message);
-      } else {
-        toast.error("Не удалось отправить. Позвоните нам напрямую.");
-      }
-      
+      toast.error("Не удалось открыть почту. Позвоните нам напрямую.");
       setTimeout(() => setFormStatus("idle"), 2000);
     }
   };

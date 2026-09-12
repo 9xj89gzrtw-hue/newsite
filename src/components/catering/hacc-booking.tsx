@@ -1219,55 +1219,55 @@ const LeadForm = memo(function LeadForm({
        * AbortSignal.timeout отвергает промис DOMException(name=
        * "TimeoutError") — он уходит в catch ниже (НЕ TypeError),
        * там отдельный тост и штатный ресет состояния. */
-      const res = await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: AbortSignal.timeout(15_000),
-        body: JSON.stringify({
-          name,
-          phone: normalizePhone(phone),
-          email: email || undefined,
-          // Fix5 V6: «Ещё решаю» шлётся БЕЗ формата (eventType undefined) —
-          // тип подберём по звонку.
-          eventType: undecided ? undefined : typeId || undefined,
-          guests,
-          message:
-            [
-              undecided && "Формат ещё не выбран — нужна помощь с подбором",
-              dateHuman && `Желаемая дата: ${dateHuman}`,
-              /* c84-B (задача 4): выбор пакета и допуслуг едет в лид текстом
-                 message (поля БД не меняем — schema.prisma неприкосновенна,
-                 zod-схема /api/lead уже принимает message ≤2000 и так). */
-              !undecided && pkgName && `Пакет: ${pkgName}`,
-              !undecided &&
-                selectedAddons.length > 0 &&
-                `Допуслуги: ${selectedAddons.map((a) => a.label).join(", ")}`,
-              preferredTime && `Желаемое время звонка: ${preferredTime}`,
-              !undecided && total > 0 && `Расчёт с сайта: ~${formatRUB(total)}`,
-              comment && `Комментарий: ${comment}`,
-            ]
-              .filter(Boolean)
-              .join("\n") || undefined,
-          consentAccepted: true,
-        }),
-      });
+      // Static-host deployment (shared PHP hosting, no server runtime):
+      // instead of POST /api/lead, hand the lead to the manager via a
+      // pre-filled email. No backend, no secrets, works everywhere.
+      const messageLines =
+        [
+          undecided && "Формат ещё не выбран — нужна помощь с подбором",
+          dateHuman && `Желаемая дата: ${dateHuman}`,
+          /* c84-B (задача 4): выбор пакета и допуслуг едет в лид текстом. */
+          !undecided && pkgName && `Пакет: ${pkgName}`,
+          !undecided &&
+            selectedAddons.length > 0 &&
+            `Допуслуги: ${selectedAddons.map((a) => a.label).join(", ")}`,
+          preferredTime && `Желаемое время звонка: ${preferredTime}`,
+          !undecided && total > 0 && `Расчёт с сайта: ~${formatRUB(total)}`,
+          comment && `Комментарий: ${comment}`,
+        ]
+          .filter(Boolean)
+          .join("\n") || "";
 
-      if (!res.ok) {
-        // SPEC §2.4: текст ошибки из 400-ответа читаем и показываем.
-        let serverError = "";
-        try {
-          const data = (await res.json()) as { error?: string };
-          if (data?.error) serverError = data.error;
-        } catch {
-          // тело не JSON — покажем дефолт
-        }
-        toast.error(serverError || "Не удалось отправить заявку. Позвоните нам напрямую.");
-        setStatus("idle");
-        submitInFlightRef.current = false;
-        return;
+      const subject = encodeURIComponent(
+        `Заявка с сайта nilovcatering.ru — ${name || "без имени"}`,
+      );
+      const body = encodeURIComponent(
+        [
+          `Имя: ${name}`,
+          `Телефон: ${normalizePhone(phone)}`,
+          email ? `Email: ${email}` : "",
+          undecided
+            ? "Формат: (ещё не выбран — нужна помощь)"
+            : `Формат: ${typeId || "(не указан)"}`,
+          `Гостей: ${guests}`,
+          messageLines,
+          "Согласие на обработку персональных данных: да",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      );
+      const mailto = `mailto:interfood-catering@yandex.ru?subject=${subject}&body=${body}`;
+
+      // SPEC §2.4: на статике «ошибка сервера» невозможна — просто открываем
+      // почту; success-карточка + салют показываются как при 2xx.
+      toast.success(`Заявка готова — отправьте письмо из почтового клиента. ${toastPromise}.`);
+      try {
+        window.location.href = mailto;
+      } catch {
+        // браузер заблокировал навигацию — success-карточка всё равно видна
       }
 
-      const data = (await res.json().catch(() => null)) as { id?: string | number } | null;
+      const data = null as { id?: string | number } | null;
       try {
         window.localStorage.removeItem(DRAFT_KEY);
       } catch {

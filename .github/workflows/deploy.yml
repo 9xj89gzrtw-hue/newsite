@@ -1,0 +1,57 @@
+name: Deploy to SpaceWeb (nilovcatering.ru)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-nilovcatering
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SITE_URL: "https://nilovcatering.ru"
+      HOSTING_TARGET: "self-hosted"
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PASS: ${{ secrets.SSH_PASS }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      REMOTE_DIR: ${{ secrets.REMOTE_DIR }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install deps
+        run: bun install --frozen-lockfile || bun install
+
+      - name: Build static export
+        run: bun run build
+        env:
+          NEXT_PUBLIC_SITE_URL: "https://nilovcatering.ru"
+          HOSTING_TARGET: "self-hosted"
+
+      - name: Verify export
+        run: |
+          test -f out/index.html || (echo "out/index.html missing"; exit 1)
+          echo "Export OK: $(du -sh out | cut -f1)"
+
+      - name: Install sshpass
+        run: sudo apt-get update -y && sudo apt-get install -y sshpass
+
+      - name: Rsync to hosting (public_html — the docRoot Apache actually serves)
+        run: |
+          sshpass -e rsync -az --delete \
+            -e "ssh -o StrictHostKeyChecking=accept-new -p ${SSH_PORT:-22}" \
+            --exclude='.git' --exclude='.github' --exclude='node_modules' \
+            out/ "$SSH_USER@$SSH_HOST:${REMOTE_DIR:-~/nilovcatering.ru/public_html/}"
+
+      - name: Done
+        run: echo "Deployed to ${REMOTE_DIR:-~/nilovcatering.ru/public_html/} on nilovcatering.ru"
