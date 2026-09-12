@@ -1262,7 +1262,7 @@ const LeadForm = memo(function LeadForm({
       // почту; success-карточка + салют показываются как при 2xx.
       toast.success(`Заявка готова — отправьте письмо из почтового клиента. ${toastPromise}.`);
       try {
-        window.location.href = mailto;
+        window.location.assign(mailto);
       } catch {
         // браузер заблокировал навигацию — success-карточка всё равно видна
       }

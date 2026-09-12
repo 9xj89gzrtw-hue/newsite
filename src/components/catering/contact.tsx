@@ -817,7 +817,7 @@ export function Contact() {
       // Open the user's mail client (best-effort; some mobile browsers
       // block programmatic navigation — the success card still shows the
       // manager's contacts as a fallback).
-      window.location.href = mailto;
+      window.location.assign(mailto);
     } catch {
       setFormStatus("error");
       toast.error("Не удалось открыть почту. Позвоните нам напрямую.");
