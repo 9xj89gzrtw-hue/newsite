@@ -131,3 +131,58 @@ Stage Summary:
 - 4/4 правки владельца в проде (после пуша): кнопка правее рейла,
   фото основателя без разводов, видео-модалка чёрный-фон/z-9990/iOS-лок,
   деплой идёт на SpaceWeb И Vercel.
+
+---
+Task ID: c92
+Agent: orchestrator
+Task: юзер: «телеграм канал поставь пока @nilov_catering; макс
+https://max.ru/u/f9LHodD0…; и проверь на ошибки сайт».
+
+Work Log:
+- Телеграм-канал: @nilov_official → @nilov_catering (t.me 200 OK) —
+  CONTACTS/SOCIALS (sameAs JSON-LD)/подписи в контактах+футере,
+  llms.txt +строка. Комментарии layout/hacc-booking/site-footer синхронны.
+- Макс: max.ru-заглушка → реальный профиль max.ru/u/f9LHodD0… (200 OK
+  под браузерным UA; дефолтный curl ловит 403 bot-щита max.ru — SvelteKit
+  SPA). Номер +7 911 826-39-26 остаётся подписью ссылки (контакты+футер).
+- analytics: max.ru добавлен в MESSENGER_HOSTS_RE (цель MESSENGER_CLICK);
+  ранее исключён осознанно (профиля не было — F2/cycle-71).
+- ПРОВЕРКА НА ОШИБКИ (главная находка): /offer, /privacy, /terms на проде
+  отдавали 403 Forbidden ВСЁ ВРЕМЯ с c69! Next.js static export кладёт
+  offer.html + КАТАЛОГ offer/ (только RSC-поладки __next.*.txt, БЕЗ
+  index.html): Apache mod_dir DirectorySlash на /offer даёт 301 → /offer/
+  (в Location подставляет http:// — Apache за nginx-фронтом видит http),
+  а в каталоге нет индекса → 403. Футер/sitemap/llms ссылаются на эти URL.
+  Фикс в 2 шага (53f0e2c + cc5b5e3): public/.htaccess — per-dir
+  RewriteRule ^(offer|privacy|terms)/?$ $1.html [L] + DirectorySlash Off
+  (на этом хостинге mod_dir redirect успевает раньше per-dir rewrite) +
+  ErrorDocument 404 /404.html (была дефолтная «Object not found!»).
+  Итог: /offer /privacy /terms → 200 ПРЯМО по https, без редиректов.
+  СОЗНАТЕЛЬНО без http→https редиректа: %{HTTPS} у Apache всегда off
+  (SSL терминирует nginx) — правило даст бесконечный цикл; канонизация
+  обеспечена rel=canonical. Экспорт копирует .htaccess-dotfile в out/.
+- Vercel-зеркало: canonical/og:url указывали на самого себя
+  (newsite-three-kappa.vercel.app) — NEXT_PUBLIC_SITE_URL в env проекта
+  существовал, но ПУСТОЙ (пустая строка → ||-фолбэк). Upsert через
+  Vercel API (v10 env, production+preview) = https://nilovcatering.ru;
+  после ребилда зеркало каноникалится на основной домен.
+- Верификация (agent-browser на живом проде + curl): lint/tsc/build
+  чистые; CI+deploy+deploy-vercel success ×3 пуши; в гидратированном DOM
+  t.me/nilov_catering ×3 (контакты/футер/инста-ряд) + JSON-LD,
+  max.ru/u/… ×2 (контакты+футер), stale 0; клик по футеру «Публичная
+  оферта» → /offer 200 https; калькулятор 50×4470=223 500 ₽ верно;
+  видео-модала z-9990/#000/скролл-лок, видео играет по настоящему клику
+  (пауза при synthetic-eval-click — артефакт headless, не баг);
+  BackToTop x=92; ImageTrail жив (3 пустых .it-img = idle-пул эффекта,
+  src появляются при движении мыши — by design); мобайл 390px без
+  горизонтального скролла; консоль/ошибки страницы пустые; VLM-скрины
+  десктоп+мобайл: NO DEFECTS; медиа-сэмплы 200.
+
+Stage Summary:
+- TG-канал @nilov_catering и MAX-профиль владельца — в проде (SpaceWeb
+  + Vercel-зеркало), аналитика кликов Макса включена.
+- КРИТИЧЕСКИЙ застарелый баг закрыт: юрстраницы (оферта/политика/условия)
+  403 со времён c69 → теперь 200 напрямую по https (+ брендированная 404).
+- Vercel-зеркало корректно каноникалится на nilovcatering.ru.
+- Коммиты: 640c202 (TG+Max), 53f0e2c (.htaccess), cc5b5e3 (DirectorySlash
+  Off); все задеплоены и проверены на живом сайте.
