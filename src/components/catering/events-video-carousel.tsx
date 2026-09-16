@@ -469,6 +469,15 @@ export function EventsVideoCarousel() {
     const onKey = (e: KeyboardEvent) => {
       /* Cycle 42 fix: route ESC through closeModal so focus returns to
          the opener tile (setActiveIndex(null) bypassed the return). */
+      /* c93 (заказчик): если видео в нативном фуллскрине — первый Esc
+         только ВЫХОДИТ из фуллскрина (делает браузер), модалку не трогаем:
+         иначе просмотр обрывался разом (Esc в фуллскрине закрывал и
+         фуллскрин, и модалку). Повторный Esc закроет модалку как раньше. */
+      const fsEl =
+        document.fullscreenElement ||
+        (document as Document & { webkitFullscreenElement?: Element | null })
+          .webkitFullscreenElement;
+      if (fsEl) return;
       if (e.key === "Escape") {
         e.preventDefault();
         closeModalRef.current();

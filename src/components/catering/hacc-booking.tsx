@@ -3079,7 +3079,9 @@ export function HaccBooking() {
           <span className="ea-chapter" aria-hidden="true">Глава 05</span>
           <TiltedAccent text="смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
           <h2 id="hbooking-heading" className="ea-section-h2">
-            {"Соберите банкет. "}
+            {/* c93 (заказчик): «Соберите банкет» → «Соберите меню» —
+               калькулятор собирает МЕНЮ любого формата, не только банкет. */}
+            {"Соберите меню. "}
             <i className="ea-italic-fragment hb-h2-line">Чек напечатается сразу.</i>
           </h2>
           <p className="hb-lede">
@@ -3090,7 +3092,7 @@ export function HaccBooking() {
 
         {/* ── Сцена: контролы 7 / красная панель 5 ── */}
         <div className="hb-grid">
-          {/* ═══ ЛЕВО: собери банкет ═══ */}
+          {/* ═══ ЛЕВО: собери меню ═══ */}
           <div className="hb-left">
             {/* 1 · Тип события — типографические кнопки.
                 D3: fieldset — наблюдаемая зона нижней полосы (data-hb-hide).

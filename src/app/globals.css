@@ -477,6 +477,19 @@ html.lenis body {
   body.catering-cursor * {
     cursor: none !important;
   }
+  /* c93 (заказчик: «в фуллскрине видео теряется курсор»): нативный
+     фуллскрин (кнопка ↗ в контролях <video>) рендерит элемент в top
+     layer браузера — кастомная линза (z-9999, обычный DOM) туда не
+     рисуется, а cursor:none с body наследуется потомками → в фуллскрине
+     НЕТ курсора вообще (невозможно попасть по контролам, только Esc).
+     Лечим возвращением системного курсора элементу в фуллскрине и его
+     потомкам (специфичность выше, чем у «*»-правила выше). */
+  body.catering-cursor :fullscreen,
+  body.catering-cursor :fullscreen *,
+  body.catering-cursor :-webkit-full-screen,
+  body.catering-cursor :-webkit-full-screen * {
+    cursor: auto !important;
+  }
   /* Cycle-73 юзабилити: над текстовыми полями системный I-beam честнее
      кастомной линзы — линза растворяется (cursor.tsx nativeZone), здесь
      возвращаем системный курсор. Слайдеры/чекбоксы/radio остаются под

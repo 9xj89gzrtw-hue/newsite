@@ -17,7 +17,8 @@ import { CONTACTS } from "@/lib/config";
  *  - крем-бумага #F7F5F1 на каждом листе, чернила espresso #161312,
  *    золото #C9A227 — линии, капс-подписи и акценты, #0A0908 — CTA-блок;
  *  - первая страница: espresso-полоса 36 мм («nilov catering» Prata 22 pt
- *    крем + золотая линия-отступ + «food as art» Marck Script золотом),
+ *    крем + золотая линия-отступ + «food as art» Marck Script золотом)
+ *    + ЭМБЛЕМА КОМПАНИИ (c93: белая версия колец, правый край полосы),
  *    под ней «МЕНЮ — {ТАРИФ}» Prata 15 pt + «Санкт-Петербург · {дата}»;
  *  - категории: золотая капс-подпись 10 pt с трекингом + волосяная линия
  *    espresso/15; блюда — единая сетка (координаты в DISH): имя Roboto-Bold
@@ -28,8 +29,10 @@ import { CONTACTS } from "@/lib/config";
  *    рукописная галочка золотом (та же кривая, что HandCheck на сайте);
  *  - футер каждой страницы: линия espresso/15, слева «nilov catering ·
  *    Санкт-Петербург», справа телефон + домен, по центру «стр. N из M»;
- *    последняя страница — CTA-блок «Соберите смету за 1 минуту» (espresso
- *    #0A0908, телефон золотом), прижатый к низу над футером.
+ *    страницы продолжения — малая эмблема (чёрная версия) в правом
+ *    верхнем углу (c93); последняя страница — CTA-блок «Соберите смету
+ *    за 1 минуту» (espresso #0A0908, телефон золотом), прижатый к низу
+ *    над футером.
  *
  * Поток (flow engine, наследие c61/c84): контент течёт сверху вниз; перед
  * каждым блоком — бюджет страницы; «сироты» запрещены: заголовок категории
@@ -122,6 +125,49 @@ async function loadFonts(doc: jsPDF): Promise<void> {
   doc.addFont("MarckScript-Regular.ttf", "Marck", "normal");
   doc.addFileToVFS("Prata-Regular.ttf", toBase64(prata));
   doc.addFont("Prata-Regular.ttf", "Prata", "normal");
+}
+
+/* c93: эмблема компании в каждом PDF. Обе версии — PNG 480×558 с
+   прозрачностью (кольца + «NILOV CATERING · St. Petersburg»): белая —
+   на espresso-полосу 1-й страницы, чёрная — в колонтитул страниц
+   продолжения. Кэш — как у шрифтов (модульный Promise, ошибка сети
+   сбрасывает); jsPDF 4.x дедуплицирует повторные addImage — файл
+   растёт только на одну копию PNG. */
+const EMBLEM = {
+  srcW: 480,
+  srcH: 558,
+  bandH: 26, // большая эмблема в бренд-полосе (полоса 36 мм, поля по 5)
+  contH: 8, // малая эмблема страниц продолжения (над линией колонтитула)
+  gap: 5, // воздух между эмблемой и соседним элементом
+  w(h: number) {
+    return (h * this.srcW) / this.srcH;
+  },
+};
+
+let logosFetch: Promise<[string, string]> | null = null;
+
+async function fetchPngDataUrl(url: string): Promise<string> {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`);
+  const buf = await r.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++)
+    binary += String.fromCharCode(bytes[i]);
+  return "data:image/png;base64," + btoa(binary);
+}
+
+function loadLogos(): Promise<[string, string]> {
+  if (!logosFetch) {
+    logosFetch = Promise.all([
+      fetchPngDataUrl("/brand/emblem-white-480.png"),
+      fetchPngDataUrl("/brand/emblem-black-480.png"),
+    ]).catch((err) => {
+      logosFetch = null; // allow retry on next click
+      throw err;
+    });
+  }
+  return logosFetch;
 }
 
 /* ────────────────────────────────────────────────────────── shared utils */
@@ -278,6 +324,15 @@ export async function buildMenuCatalogDoc(
 
   const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
   await loadFonts(doc);
+  /* c93: логотип компании — в каждый PDF. Сбой загрузки (сеть) НЕ валит
+     генерацию: логотип декоративен, меню без него валидно. */
+  let logoWhite: string | null = null;
+  let logoBlack: string | null = null;
+  try {
+    [logoWhite, logoBlack] = await loadLogos();
+  } catch {
+    /* тихо деградируем — кнопка не должна ломаться из-за декора */
+  }
   doc.setFont("Roboto");
   doc.setLineJoin("round");
   doc.setLineCap("round");
@@ -317,7 +372,7 @@ export async function buildMenuCatalogDoc(
       title = `МЕНЮ — ${single.label.toUpperCase()}`;
       subline = `Санкт-Петербург · ${genDate()} · пакет «${pkg.name}» · состав согласуем под событие`;
     }
-    let y = drawTitleBlock(doc, { title, price, subline });
+    let y = drawTitleBlock(doc, { title, price, subline, logoWhite });
     y = drawSinglePackage(doc, single, pkg, y);
     drawClosing(doc, y);
   } else if (types.length > 1) {
@@ -325,6 +380,7 @@ export async function buildMenuCatalogDoc(
     let y = drawTitleBlock(doc, {
       title: "ПОЛНЫЙ КАТАЛОГ МЕНЮ",
       subline: `Санкт-Петербург · ${genDate()} · ${MENU_TYPES.length} ${catalogsWord(MENU_TYPES.length)} — от канапе до мангала`,
+      logoWhite,
     });
     types.forEach((menu, i) => {
       y = drawCatalogSection(doc, menu, i === 0 ? y : y + 8);
@@ -337,12 +393,13 @@ export async function buildMenuCatalogDoc(
       title: `МЕНЮ — ${m.label.toUpperCase()}`,
       price: `от ${formatRUB(m.perGuest)} ${unitFor(m)}`,
       subline: `Санкт-Петербург · ${genDate()}`,
+      logoWhite,
     });
     y = drawCatalogSection(doc, m, y);
     drawClosing(doc, y);
   }
 
-  drawPageFooters(doc);
+  drawPageFooters(doc, logoBlack);
   return doc;
 }
 
@@ -385,8 +442,9 @@ function paintCream(doc: jsPDF) {
   doc.rect(0, 0, PAGE.w, PAGE.h, "F");
 }
 
-/** Бренд-полоса первой страницы: espresso 36 мм + золотые детали. */
-function drawBrandBand(doc: jsPDF) {
+/** Бренд-полоса первой страницы: espresso 36 мм + золотые детали +
+ *  эмблема компании (c93). logoWhite == null → вёрстка до-c93. */
+function drawBrandBand(doc: jsPDF, logoWhite: string | null) {
   doc.setFillColor(...C.espresso);
   doc.rect(0, 0, PAGE.w, PAGE.bandH, "F");
 
@@ -401,11 +459,27 @@ function drawBrandBand(doc: jsPDF) {
   doc.setLineWidth(0.35);
   doc.line(PAGE.mL, 20.5, PAGE.mL + 52, 20.5);
 
+  // c93: эмблема — правый край полосы, по центру высоты (поля 5 мм)
+  let scriptRight = PAGE.w - PAGE.mR;
+  if (logoWhite) {
+    const w = EMBLEM.w(EMBLEM.bandH);
+    doc.addImage(
+      logoWhite,
+      "PNG",
+      PAGE.w - PAGE.mR - w,
+      (PAGE.bandH - EMBLEM.bandH) / 2,
+      w,
+      EMBLEM.bandH,
+    );
+    // рукописный акцент уходит левее эмблемы, 5 мм воздуха
+    scriptRight = PAGE.w - PAGE.mR - w - EMBLEM.gap;
+  }
+
   // рукописный акцент — Marck Script золотом, справа ниже
   doc.setFont("Marck", "normal");
   doc.setFontSize(13);
   doc.setTextColor(...C.gold);
-  doc.text("food as art", PAGE.w - PAGE.mR, 30.5, { align: "right" });
+  doc.text("food as art", scriptRight, 30.5, { align: "right" });
 
   // золотая кромка низа полосы
   doc.setDrawColor(...C.gold);
@@ -416,9 +490,9 @@ function drawBrandBand(doc: jsPDF) {
 /** Титульный блок первой страницы (под полосой). Возвращает y контента. */
 function drawTitleBlock(
   doc: jsPDF,
-  opts: { title: string; price?: string; subline: string },
+  opts: { title: string; price?: string; subline: string; logoWhite?: string | null },
 ): number {
-  drawBrandBand(doc);
+  drawBrandBand(doc, opts.logoWhite ?? null);
 
   doc.setFont("Prata", "normal");
   doc.setFontSize(15);
@@ -465,11 +539,23 @@ function makeEnsure(doc: jsPDF, cur: { y: number }, contLabel: string) {
 }
 
 /** Футер каждой страницы: линия + бренд/город слева, стр. N из M по центру,
- *  телефон + домен справа. */
-function drawPageFooters(doc: jsPDF) {
+ *  телефон + домен справа. c93: на страницах продолжения (≥2) — малая
+ *  эмблема компании в правом верхнем углу (на 1-й — большая в полосе). */
+function drawPageFooters(doc: jsPDF, logoBlack: string | null) {
   const total = doc.getNumberOfPages();
   for (let i = 1; i <= total; i++) {
     doc.setPage(i);
+    if (i > 1 && logoBlack) {
+      const w = EMBLEM.w(EMBLEM.contH);
+      doc.addImage(
+        logoBlack,
+        "PNG",
+        PAGE.w - PAGE.mR - w,
+        6,
+        w,
+        EMBLEM.contH,
+      );
+    }
     hairline(doc, PAGE.mL, 282.5, PAGE.w - PAGE.mR, C.line, 0.2);
     doc.setFont("Roboto", "normal");
     doc.setFontSize(7.5);

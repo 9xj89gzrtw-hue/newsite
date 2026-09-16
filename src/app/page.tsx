@@ -253,7 +253,9 @@ function HaccBookingShell() {
           <span className="ea-chapter" aria-hidden="true">Глава 05</span>
           <TiltedAccent text="смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
           <h2 id="hbooking-heading" className="ea-section-h2">
-            {"Соберите банкет. "}
+            {/* c93 (заказчик): «Соберите банкет» → «Соберите меню» —
+               зеркало живого виджета (hacc-booking.tsx), 1:1. */}
+            {"Соберите меню. "}
             <i className="ea-italic-fragment hb-h2-line">Чек напечатается сразу.</i>
           </h2>
           <p className="hb-lede">
