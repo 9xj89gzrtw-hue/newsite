@@ -1,0 +1,23 @@
+# nilovcatering.ru — Apache за nginx-фронтом SpaceWeb (shared hosting).
+#
+# ЗАЧЕМ ЭТОТ ФАЙЛ (c92): Next.js static export кладёт юрстраницы как
+# offer.html + КАТАЛОГ offer/ (в каталоге только RSC-поладки __next.*.txt,
+# БЕЗ index.html). Apache mod_dir (DirectorySlash) на запрос /offer
+# отвечает 301 → /offer/, а в каталоге нет индекса → 403 Forbidden.
+# Per-dir mod_rewrite срабатывает РАНЬШЕ mod_dir fixup — отдаём *.html
+# по чистому URL без редиректа.
+#
+# СОЗНАТЕЛЬНО ЗДЕСЬ НЕТ: редиректа http → https. SSL терминирует
+# nginx-фронт, Apache видит соединение как http (%{HTTPS} всегда off) —
+# правило уведёт сайт в бесконечный редирект. Канонизация обеспечена
+# rel=canonical (все страницы отдают https://nilovcatering.ru/…).
+#
+# РАСШИРЕНИЕ: новая юрстраница /foo → добавить foo в скобки правила ниже.
+
+RewriteEngine On
+
+# Чистые URL юрстраниц: /offer, /privacy, /terms (и с хвостовым слэшем)
+RewriteRule ^(offer|privacy|terms)/?$ $1.html [L]
+
+# Брендированная 404 из экспорта вместо дефолтной «Object not found!»
+ErrorDocument 404 /404.html
