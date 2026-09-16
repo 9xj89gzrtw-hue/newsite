@@ -475,11 +475,17 @@ export function EventsVideoCarousel() {
       }
     };
     document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
+    /* c91: скролл-лок теперь и на <html> — iOS Safari игнорирует
+       overflow:hidden на body (страница под модалкой прокручивалась,
+       «карусель ездила» под открытым видео). Оба элемента, с cleanup. */
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
     };
   }, [activeIndex]);
 
@@ -566,6 +572,9 @@ export function EventsVideoCarousel() {
       document.querySelector("main"),
       document.querySelector("header"),
       document.querySelector('[data-component="ea-cookie-banner"]'),
+      /* c91: вертикальный бренд-рейл живёт в layout ВНЕ main (как и
+         куки) — тоже гасим под модалкой. */
+      document.querySelector(".vertical-brand-label"),
     ].filter((el): el is HTMLElement => el !== null);
     roots.forEach((el) => {
       el.setAttribute("inert", "");

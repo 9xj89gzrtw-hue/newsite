@@ -78,3 +78,30 @@ jobs:
 
       - name: Done
         run: echo "Deployed to ${REMOTE_DIR:-~/nilovcatering.ru/public_html/} on nilovcatering.ru"
+
+  # c91: второй контур деплоя — Vercel (зеркало продакшена).
+  # Почему CLI, а не Git-интеграцией: Vercel Hobby БЛОКИРУЕТ автодеплои
+  # от git-авторов, не привязанных к аккаунту (коммиты агента
+  # «Z User <z@container>» давали BLOCKED с 16.09). CLI-деплой по токену
+  # автор-агностичен. Проект уже существует: newsite (team_xVbscKLiDECkF…,
+  # prj_T3MSu27oTSSutClOCMJjMtQ2tcqU), build remote по vercel.json
+  # (static export, бун, env проекта: Metrika/verification добавлены c91).
+  deploy-vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Deploy to Vercel (production)
+        env:
+          VERCEL_ORG_ID: team_xVbscKLiDECkF6c3izew1I3J
+          VERCEL_PROJECT_ID: prj_T3MSu27oTSSutClOCMJjMtQ2tcqU
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          bunx vercel deploy --prod --yes
+          echo "Vercel production deployment triggered for $GITHUB_SHA"

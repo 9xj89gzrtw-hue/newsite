@@ -49,7 +49,14 @@ export function BackToTop() {
           : { y: 80, opacity: 0, scale: 0.6 }
       }
       transition={{ type: "spring", stiffness: 260, damping: 22 }}
-      className="group fixed bottom-6 left-6 z-50 flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-lg shadow-gold/30 hover:scale-110 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+      /* c91 (владелец: «кнопка перекрывается левым меню») — на десктопе
+         слева живёт вертикальный бренд-рейл .vertical-brand-label
+         (fixed left-0, ширина 72px, z-index 60 — НАД кнопкой z-50):
+         кнопка в left-6 (24px) целиком попадала в его полосу и клики
+         уходили в рейл. lg:left-[92px] = 72px рейл + 20px зазор —
+         кнопка встаёт правее рейла (lg = ≥1024px, ровно где рейл
+         появляется; ниже 1024px рейл display:none — left-6 остаётся). */
+      className="group fixed bottom-6 left-6 z-50 flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-lg shadow-gold/30 hover:scale-110 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-cream lg:left-[92px]"
       style={{ pointerEvents: visible ? "auto" : "none" }}
     >
       {/* Progress ring (gold) */}
