@@ -69,3 +69,27 @@ Stage Summary:
 - pm2 :3001 (interfood-catering-dev) стабилен; порт 3000 — родительский
   sandbox, не трогать. ffmpeg на этой машине: только background+polling
   (foreground убивается SIGKILL по завершении — см. урок c89 в AGENTS.md).
+
+---
+Task ID: c90
+Agent: orchestrator
+Task: фикс упавшего деплоя nilovcatering.ru (юзер: «не получилось задеплоить»).
+
+Work Log:
+- Диагноз по GitHub API: runs aa62892/8d3eb34 (16.09) — build/export OK,
+  падает шаг rsync: «Connection closed by host port 22», rc=255 (SSH-уровень).
+  deploy.yml/secrets между успехом 12.09 и провалом не менялись → transient
+  на стороне хостинга (блок IP раннера GitHub у SpaceWeb).
+- Ручной workflow_dispatch на main → успех; живой сайт проверен: c89-маркеры
+  на месте (826-39-26, 17 400, ИП Нилова), старые удалены («Как мы работаем»,
+  «Сезонный коэффициент»); 10/10 sampled media = 200.
+- deploy.yml: rsync-шаг получил 3 попытки с паузой 45с + ConnectTimeout=20
+  + ::group::-логика (устойчивость к transient-блокам IP раннеров).
+- Грабля инструментария: вывод bash-пайплайна съедает «[m» из «[main]» как
+  ANSI-reset → казалось, что branches-фильтр workflows испорчен («ain]»);
+  Read-инструментом файлы оказались целыми. Урок: подозрение на порчу
+  bracket-синтаксиса — проверять Read'ом, не bash-выводом.
+
+Stage Summary:
+- Деплой восстановлен, на проде коммит 8d3eb34 (весь пакет c89 владельца).
+- Ретраи rsync в deploy.yml защитят от повторения transient-блокировок.

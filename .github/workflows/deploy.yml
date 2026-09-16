@@ -54,10 +54,27 @@ jobs:
 
       - name: Rsync to hosting (public_html — the docRoot Apache actually serves)
         run: |
-          sshpass -e rsync -az --delete \
-            -e "ssh -o StrictHostKeyChecking=accept-new -p ${SSH_PORT:-22}" \
-            --exclude='.git' --exclude='.github' --exclude='node_modules' \
-            out/ "$SSH_USER@$SSH_HOST:${REMOTE_DIR:-~/nilovcatering.ru/public_html/}"
+          attempts=3
+          for i in $(seq 1 $attempts); do
+            echo "::group::Rsync attempt $i/$attempts"
+            if sshpass -e rsync -az --delete \
+                -e "ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -p ${SSH_PORT:-22}" \
+                --exclude='.git' --exclude='.github' --exclude='node_modules' \
+                out/ "$SSH_USER@$SSH_HOST:${REMOTE_DIR:-~/nilovcatering.ru/public_html/}"; then
+              echo "::endgroup::"
+              echo "Rsync OK on attempt $i"
+              exit 0
+            fi
+            rc=$?
+            echo "::endgroup::"
+            echo "Rsync failed with rc=$rc (attempt $i/$attempts)"
+            if [ "$i" -lt "$attempts" ]; then
+              echo "Waiting 45s before retry (transient SSH blocks on shared hosting)…"
+              sleep 45
+            fi
+          done
+          echo "::error::All $attempts rsync attempts failed (SSH connection issue with hosting)"
+          exit 1
 
       - name: Done
         run: echo "Deployed to ${REMOTE_DIR:-~/nilovcatering.ru/public_html/} on nilovcatering.ru"
