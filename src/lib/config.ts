@@ -75,19 +75,21 @@ export const CONTACTS = {
   whatsappHref: "https://wa.me/79119417205",
   telegram: "+7 911 941-72-05",
   telegramHref: "https://t.me/+79119417205",
-  // c89: Telegram-КАНАЛ компании (нашёл веб-поиском, 200 OK) — отдельная
-  // строка «Телеграм канал» в соцсетях; личный чат выше остаётся в «Напишите нам».
-  telegramChannel: "@nilov_official",
-  telegramChannelHref: "https://t.me/nilov_official",
+  // c89: Telegram-КАНАЛ компании — отдельная строка «Телеграм канал» в
+  // соцсетях; личный чат выше остаётся в «Напишите нам». c92: владелец
+  // уточнил канал — @nilov_catering (t.me 200 OK), было @nilov_official.
+  telegramChannel: "@nilov_catering",
+  telegramChannelHref: "https://t.me/nilov_catering",
   instagram: "@nilov_catering",
   instagramHref: "https://www.instagram.com/nilov_catering",
   vk: "nilovcatering",
   vkHref: "https://vk.com/nilovcatering",
-  // 3-A: MAX-мессенджер (max.ru). c89: профиль max.ru/nilovcatering
-  // НЕ существует (curl 404, проверено снова) — до уточнения владельцем
-  // ссылки ведут на max.ru; номер Макса +7 (911) 826-39-26 показывается текстом.
+  // 3-A: MAX-мессенджер (max.ru). c92: владелец дал реальный профиль
+  // (max.ru/u/f9LHodD0… — 200 OK под браузерным UA; дефолтный curl ловит
+  // 403 bot-щита). Номер +7 (911) 826-39-26 остаётся видимой подписью ссылки.
   max: "Макс",
-  maxHref: "https://max.ru",
+  maxHref:
+    "https://max.ru/u/f9LHodD0cOLcnReQpyQHwFiG5c5jpXP58e8Ni38wbQC2lpDWdSCYkXsZ8ak",
   maxPhone: "+7 (911) 826-39-26",
   // c89: SMS-канал — на основной номер компании.
   sms: "+7 911 941-72-05",

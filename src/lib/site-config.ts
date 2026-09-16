@@ -44,7 +44,7 @@ export const GUESTS_SERVED = 120000 as const;
 /**
  * Соцсети компании (c89: сверено с CONTACTS в lib/config.ts).
  * sameAs для JSON-LD — публичные ПРОФИЛИ: инстаграм, VK, телеграм-канал
- * @nilov_official (найден веб-поиском, 200 OK), YouTube @nilovcatering
+ * @nilov_catering (c92, от владельца; t.me 200 OK), YouTube @nilovcatering
  * (от владельца), Rutube (канал не найден — ссылка на поиск по бренду,
  * ждём точный URL). Личный чат t.me/+79119417205 и wa.me — контактные
  * каналы «Напишите нам», в sameAs не дублируются.
@@ -52,7 +52,7 @@ export const GUESTS_SERVED = 120000 as const;
 export const SOCIALS = {
   instagram: "https://www.instagram.com/nilov_catering",
   vk: "https://vk.com/nilovcatering",
-  telegramChannel: "https://t.me/nilov_official",
+  telegramChannel: "https://t.me/nilov_catering",
   youtube: "https://youtube.com/@nilovcatering",
   rutube: "https://rutube.ru/search/?query=nilov+catering",
 } as const;

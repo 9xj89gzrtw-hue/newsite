@@ -731,8 +731,8 @@ function useContactChannels(): ContactItem[] {
         external: true,
       },
       {
-        /* c89: Макс — мессенджер по второму номеру (диплинка нет,
-           max.ru-заглушка — см. комментарий в lib/config.ts). */
+        /* c89/c92: Макс — мессенджер по второму номеру; ссылка — реальный
+           профиль в MAX от владельца (см. maxHref в lib/config.ts). */
         sub: "Макс",
         label: CONTACTS.maxPhone,
         href: CONTACTS.maxHref,
@@ -782,8 +782,8 @@ function useSocialChannels(): ContactItem[] {
         external: true,
       },
       {
-        /* c89: Telegram-КАНАЛ (t.me/nilov_official) — отдельная строка
-           соцсетей; личный чат остаётся в «Напишите нам» слева. */
+        /* c89: Telegram-КАНАЛ (c92: t.me/nilov_catering, от владельца) —
+           отдельная строка соцсетей; личный чат — в «Напишите нам» слева. */
         sub: "Телеграм канал",
         label: CONTACTS.telegramChannel,
         href: CONTACTS.telegramChannelHref,

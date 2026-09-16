@@ -562,10 +562,10 @@ export function SiteFooter() {
               </a>
               {/* c89 (владелец): строка «Макс» — второй номер компании
                   (+7 911 826-39-26, CONTACTS.maxPhone). Ссылка —
-                  CONTACTS.maxHref (max.ru; профиль компании не существует,
-                  см. config.ts — ведёт на сайт мессенджера). Визуально —
-                  вторая ступень телефонной иерархии: тот же Phone-глиф,
-                  кегль text-sm (не lg), метка «Макс:» приглушена. */}
+                  CONTACTS.maxHref (c92: реальный профиль в MAX от владельца,
+                  см. config.ts). Визуально — вторая ступень телефонной
+                  иерархии: тот же Phone-глиф, кегль text-sm (не lg),
+                  метка «Макс:» приглушена. */}
               <a
                 href={CONTACTS.maxHref}
                 target="_blank"
@@ -629,8 +629,8 @@ export function SiteFooter() {
               >
                 <span className="fw-soc__glyph font-display text-xs font-bold uppercase text-cream">VK</span>
               </a>
-              {/* c89: Телеграм-КАНАЛ @nilov_official (личный чат-диплинк
-                  убран вместе с WhatsApp — см. докблок ряда). */}
+              {/* c89: Телеграм-КАНАЛ @nilov_catering (c92, от владельца;
+                  личный чат-диплинк убран вместе с WhatsApp — см. докблок). */}
               <a
                 href={CONTACTS.telegramChannelHref}
                 target="_blank"

@@ -190,10 +190,11 @@ export function trackGoal(
 
 /**
  * Хосты мессенджеров/соцсетей (ТЗ W3): wa.me, t.me, vk.com, instagram.
- * max.ru НЕ включён: профиль не существует (F2, cycle-71) — цель для
- * мёртвой ссылки не нужна.
+ * c92: max.ru ДОБАВЛЕН — владелец дал реальный профиль
+ * (max.ru/u/f9LHodD0…), клики по строке «Макс» теперь считаются
+ * целью MESSENGER_CLICK (раньше профиль не существовал — F2, cycle-71).
  */
-const MESSENGER_HOSTS_RE = /(?:wa\.me|t\.me|vk\.com|instagram\.com)/i;
+const MESSENGER_HOSTS_RE = /(?:wa\.me|t\.me|vk\.com|instagram\.com|max\.ru)/i;
 
 /** Классификация ссылки для document-level click-listener'а. */
 export function anchorClickGoal(href: string): {
