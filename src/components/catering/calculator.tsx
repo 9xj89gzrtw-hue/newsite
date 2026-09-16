@@ -30,7 +30,7 @@ import {
 import { Reveal } from "./reveal";
 import { Magnetic } from "@/components/motion/magnetic";
 import {
-  MENU_TYPES, ADDONS, calcTotal, formatRUB, seasonMultiplier,
+  MENU_TYPES, ADDONS, addonAmount, calcTotal, formatRUB, seasonMultiplier,
 } from "@/lib/pricing";
 
 /* ───────── Event type icon mapping ───────── */
@@ -430,7 +430,8 @@ export function Calculator() {
                 Дополнительно
                 {addons.length > 0 && (
                   <span className="ml-auto font-normal text-gold">
-                    +{formatRUB(ADDONS.filter(a => addons.includes(a.id)).reduce((s, a) => s + a.price, 0))}
+                    {/* c94: аренда — процент от сметы меню (addonAmount). */}
+                    +{formatRUB(ADDONS.filter(a => addons.includes(a.id)).reduce((s, a) => s + addonAmount(a, result.subtotal), 0))}
                   </span>
                 )}
               </label>
@@ -499,7 +500,10 @@ export function Calculator() {
                           {a.label}
                         </p>
                         <p className="font-mono text-xs text-ink/70">
-                          +{formatRUB(a.price)}
+                          {/* c94: процентная аренда — живой пересчёт, фикс — «от». */}
+                          {a.percent != null
+                            ? `+${a.percent}% ≈ ${formatRUB(addonAmount(a, result.subtotal))}`
+                            : `от ${formatRUB(a.price ?? 0)}`}
                         </p>
                       </div>
                     </motion.button>

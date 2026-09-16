@@ -443,19 +443,48 @@ export const MENU_TYPES: MenuType[] = [
 export type Addon = {
   id: string;
   label: string;
-  price: number;
+  /** c94: фиксированная МИНИМАЛЬНАЯ цена — везде печатается с предлогом
+   *  «от» (финальная зависит от события: шеф-повар/бар/шоу-станция/
+   *  флористика — от состава и площадки). */
+  price?: number;
+  /** c94 (заказчик): надбавка в ПРОЦЕНТАХ от подытога меню — аренда
+   *  оборудования/мебели масштабируется с событием (недочёт «фуршет на
+   *  200 человек, а мебели на 15 000 ₽»). База — только меню
+   *  (гости × цена/чел): без других допуслуг и без клампа MIN_ORDER —
+   *  прогноз предсказуем и растёт ровно с числом гостей. */
+  percent?: number;
 };
 
 export const ADDONS: Addon[] = [
-  { id: "equipment", label: "Аренда оборудования", price: 15000 },
+  { id: "equipment", label: "Аренда оборудования", percent: 15 },
   // c89: «Добавить официантов» убран (владелец: официанты входят в стоимость
-  // пакетов) — вместо него «Аренда мебели» от +15 000 ₽.
-  { id: "furniture", label: "Аренда мебели", price: 15000 },
+  // пакетов). c94: аренда — процентом от сметы меню (заказчик: «+15%»),
+  // было фикс +15 000 ₽.
+  { id: "furniture", label: "Аренда мебели", percent: 20 },
   { id: "chef", label: "Выезд шеф-повара", price: 28000 },
   { id: "show", label: "Шоу-станция", price: 35000 },
   { id: "bar", label: "Выездной бар", price: 32000 },
   { id: "floristics", label: "Флористическое оформление", price: 25000 },
 ];
+
+/** c94: сумма допуслуги для текущего подытога меню. Процентные (аренда)
+ *  считаются от подытога и растут вместе с событием, фиксированные — их
+ *  минимум «от». ЕДИНАЯ точка правды для карточек, чека, лида и calcTotal
+ *  (split-brain цен запрещён — урок c89 W1). */
+export function addonAmount(a: Addon, menuSubtotal: number): number {
+  return a.percent != null
+    ? Math.round((menuSubtotal * a.percent) / 100)
+    : (a.price ?? 0);
+}
+
+/** c94: допуслуга одной строкой для лида/сводки шага 2 —
+ *  «Аренда мебели (+20% ≈ 88 000 ₽)» / «Выезд шеф-повара (от 28 000 ₽)»:
+ *  менеджер видит базу расчёта, а не голый список названий. */
+export function addonNote(a: Addon, menuSubtotal: number): string {
+  return a.percent != null
+    ? `${a.label} (+${a.percent}% ≈ ${formatRUB(addonAmount(a, menuSubtotal))})`
+    : `${a.label} (от ${formatRUB(a.price ?? 0)})`;
+}
 
 /**
  * c89: минимальные суммы заказа по форматам (владелец):
@@ -522,8 +551,10 @@ export function calcTotal(
   const pkg = flat ? undefined : t.packages[clampedIdx];
   const perGuest = flat ? (t.calcPerGuest as number) : pkg ? pkg.pricePerGuest : t.perGuest;
   const subtotal = perGuest * g;
+  /* c94: аренда — процент от подытога меню (addonAmount), фикс-услуги —
+     минимум «от»; итог по-прежнему клампится снизу MIN_ORDER. */
   const addonsTotal = ADDONS.filter((a) => addonIds.includes(a.id)).reduce(
-    (s, a) => s + a.price,
+    (s, a) => s + addonAmount(a, subtotal),
     0,
   );
   const season = seasonMultiplier(dateStr);

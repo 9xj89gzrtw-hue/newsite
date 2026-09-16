@@ -1240,6 +1240,22 @@
 @media (max-width: 1023.98px) {
   .hb-panel { position: relative; }
 }
+/* c94 (критик B, D1 — замер подтверждён): на низких десктоп-вьюпортах
+   (720p) открытый cookie-баннер (fixed, низ) накрывал CTA «Оставить
+   заявку» sticky-панели чека на ВСЁМ диапазоне прилипания (замер:
+   ctaTop залипал на 625 при баннере 501–696, полоса ~840px скролла —
+   кнопка некликабельна до принятия cookies). Пока баннер открыт — панель
+   отлипает: relative + top:auto держит её в потоке (прокручивается под
+   баннером как обычный контент — CTA достижим скроллом) И сохраняет
+   positioned-контекст для абсолютного штампа. Приняли cookies — класс
+   body уходит, lg:sticky возвращается. Специфичность: unlayered-правило
+   компонента бьёт утилиту lg:sticky из @layer utilities каскада. */
+@media (min-width: 1024px) {
+  body.cookie-banner-open .hb-panel {
+    position: relative;
+    top: auto;
+  }
+}
 .hb-panel__caps {
   display: flex;
   justify-content: space-between;

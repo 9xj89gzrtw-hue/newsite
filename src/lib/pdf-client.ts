@@ -78,9 +78,10 @@ const C = {
 };
 
 /* Домен для колонтитулов/CTA: CONTACTS (lib/config) хранит телефон и email,
-   но не домен; SITE_URL — временный Vercel-деплой. Публичный домен компании
-   — interfood-catering.ru (домен email и действующий сайт бренда). */
-const SITE_DOMAIN = "interfood-catering.ru";
+   но не домен; SITE_URL — временный Vercel-деплой. c94 (заказчик): публичный
+   домен компании — nilovcatering.ru (в колонтитулах PDF оставался прежний
+   interfood-catering.ru — найден владельцем при вычитке). */
+const SITE_DOMAIN = "nilovcatering.ru";
 
 /* c84-C (баг, пойманный bun-верификацией): addFileToVFS пишет в ГЛОБАЛЬНЫЙ
    VFS jsPDF, но addFont регистрирует шрифт В ЭКЗЕМПЛЯРЕ документа. Прежний

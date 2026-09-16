@@ -864,6 +864,19 @@ export function SiteFooter() {
             referrerPolicy="no-referrer-when-downgrade"
             className="h-[260px] w-full rounded-2xl border border-cream/15 md:h-[320px]"
           />
+          {/* c94 (заказчик): просьба звонить до визита — офис не работает
+              «на проходную». Ссылка tel: в тон «открыть в Яндекс.Картах»:
+              номер не дублируется текстом — глагол и есть точка контакта. */}
+          <p className="mt-3 text-center text-sm text-cream/60">
+            Просим вас{" "}
+            <a
+              href={CONTACTS.phoneHref}
+              className="text-gold underline-offset-2 transition-colors hover:text-cream hover:underline"
+            >
+              позвонить нам заранее
+            </a>
+            , чтобы договориться о встрече
+          </p>
         </div>
       </div>
 

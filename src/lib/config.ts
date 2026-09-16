@@ -20,7 +20,9 @@ export const SITE_CONFIG = {
   slogan: "Кейтеринг, в котором чувствуют",
 
   // Domain — set via env (Timeweb/Vercel/any host)
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://newsite-three-kappa.vercel.app",
+  // c94 (критик A): фоллбек — боевой домен (был Vercel-URL: при сборке без
+  // env каноникалы уезжали на зеркало; прод-env стоит, фоллбек — страховка).
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://nilovcatering.ru",
 
   // Hosting target — informational, drives deployment docs
   hosting: (process.env.HOSTING_TARGET || "vercel") as "vercel" | "timeweb" | "self-hosted",

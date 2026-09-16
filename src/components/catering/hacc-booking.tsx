@@ -15,7 +15,9 @@
  *    строку «Минимальный заказ формата» с докрутом до 17 400 ₽;
  *  - сезонный коэффициент ×1,15 УДАЛЁН (seasonMultiplier → no-op в
  *    pricing.ts, UI-упоминания сняты здесь);
- *  - допуслуга «Добавить официантов» → «Аренда мебели» (+15 000 ₽);
+ *  - допуслуга «Добавить официантов» → «Аренда мебели»; c94 — аренда
+ *    (оборудование/мебель) считается ПРОЦЕНТОМ от сметы меню (+15%/+20%,
+ *    масштабируется с событием), остальные допуслуги — «от N ₽»;
  *  - якорь #contact ведёт на контакты компании (id на ContactsZone),
  *    зона формы — #lead-form, открывается только CTA «Оставить заявку».
  *
@@ -273,6 +275,8 @@ import {
   ADDONS,
   MENU_TYPES,
   MIN_ORDER,
+  addonAmount,
+  addonNote,
   calcTotal,
   formatRUB,
   type Addon,
@@ -409,7 +413,8 @@ const CONFETTI_COLORS = ["#E71D3A", "#FF360A", "#F7F5F5", "#1F2937", "#D4A373"];
  */
 const ADDON_ICONS: Record<string, ComponentType<{ className?: string }>> = {
   equipment: Package,
-  /* c89: «Добавить официантов» → «Аренда мебели» (ADDONS в pricing.ts). */
+  /* c89: «Добавить официантов» → «Аренда мебели» (ADDONS в pricing.ts);
+     c94 — цена карточки стала процентной (+20% ≈ от сметы). */
   furniture: Armchair,
   chef: ChefHat,
   show: Sparkles,
@@ -951,6 +956,7 @@ const LeadForm = memo(function LeadForm({
   dateHuman,
   dateIso,
   total,
+  subtotal,
   undecided,
   pkgIdx,
   addonIds,
@@ -965,6 +971,9 @@ const LeadForm = memo(function LeadForm({
   dateIso: string;
   /** 0 для undecided (V6) — строка «Расчёт с сайта» в POST не пишется. */
   total: number;
+  /** c94: подытог меню (гости × цена/чел) — база процентов аренды в
+   *  тексте лида/сводке (addonNote); у undecided не используется. */
+  subtotal: number;
   /** Fix5 V6: формат ещё не выбран — без цены, с необязательным комментарием. */
   undecided: boolean;
   /** c84-B (задача 4): 0-based индекс пакета — в message «Пакет: …» и в
@@ -1155,9 +1164,21 @@ const LeadForm = memo(function LeadForm({
           !undecided && pkgName && `Пакет: ${pkgName}`,
           !undecided &&
             selectedAddons.length > 0 &&
-            `Допуслуги: ${selectedAddons.map((a) => a.label).join(", ")}`,
+            /* c94: с базой расчёта — «Аренда мебели (+20% ≈ 88 000 ₽)»:
+               менеджер видит не список названий, а основу сметы. */
+            `Допуслуги: ${selectedAddons
+              .map((a) => addonNote(a, subtotal))
+              .join(", ")}`,
           preferredTime && `Желаемое время звонка: ${preferredTime}`,
-          !undecided && total > 0 && `Расчёт с сайта: ~${formatRUB(total)}`,
+          !undecided &&
+            total > 0 &&
+            /* c94: фикс-допуслуги — итог это минимум: «от N ₽» (в одном
+               тоне с чеком/баром), иначе «~N ₽». */
+            `Расчёт с сайта: ${
+              selectedAddons.some((a) => a.percent == null)
+                ? `от ${formatRUB(total)}`
+                : `~${formatRUB(total)}`
+            }`,
           comment && `Комментарий: ${comment}`,
         ]
           .filter(Boolean)
@@ -1220,9 +1241,12 @@ const LeadForm = memo(function LeadForm({
         guests,
         dateIso,
         total,
-        /* c84-B: снимок выбора (пакет + допуслуги) — в событие лида. */
+        /* c84-B: снимок выбора (пакет + допуслуги) — в событие лида.
+           c94 (критик C): в «Ещё решаю» чекбоксы допуслуг скрыты и лид их
+           не пишет — событие-снимок зеркалит письмо (скрытый выбор
+           не учитываем). */
         pkgIdx,
-        addonIds,
+        addonIds: undecided ? [] : addonIds,
       });
     } catch (err) {
       /* K4-F1 (Task 5): прерванный по таймауту fetch — отдельная причина
@@ -1481,11 +1505,22 @@ const LeadForm = memo(function LeadForm({
                   </div>
                 )}
                 {/* c84-B: выбранные допуслуги в мини-сводке шага 2 — юзер
-                    видит, что именно уедет в заявку (до кнопки Отправить). */}
-                {selectedAddons.length > 0 && (
+                    видит, что именно уедет в заявку (до кнопки Отправить).
+                    c94 (критик A, MAJOR): гейт !undecided — в режиме «Ещё
+                    решаю» чекбоксы допуслуг скрыты, но выбор живёт в стейте:
+                    сводка печатала «(+20% ≈ 0 ₽)» (subtotal=0), а лид их
+                    честно прятал. Теперь сводка и лид показывают ОДИНАКОВО
+                    (оба — только при выбранном формате). */}
+                {!undecided && selectedAddons.length > 0 && (
                   <div className="hb-summary__row">
                     <dt>Допуслуги</dt>
-                    <dd>{selectedAddons.map((a) => a.label).join(", ")}</dd>
+                    {/* c94: с ценой/базой — юзер видит, что именно и за
+                        сколько уедет в заявку (в одном формате с лидом). */}
+                    <dd>
+                      {selectedAddons
+                        .map((a) => addonNote(a, subtotal))
+                        .join(", ")}
+                    </dd>
                   </div>
                 )}
                 <div className="hb-summary__row">
@@ -1705,6 +1740,7 @@ function StickyBar({
   total,
   guests,
   addonsCount,
+  fromEstimate,
   visible,
   onCta,
   onTotal,
@@ -1714,6 +1750,9 @@ function StickyBar({
   guests: number;
   /** c84-B: N выбранных допуслуг — краткая метка «· +N доп.» в строке гостей. */
   addonsCount: number;
+  /** c94 (критик C): выбрана фикс-услуга «от N ₽» — итог печатается
+   *  минимумом («Итого от N ₽», без «~»), в одном тоне с чеком. */
+  fromEstimate: boolean;
   visible: boolean;
   onCta: () => void;
   /** c84-B: тап по блоку суммы — скролл к чек-панели (детализация цены). */
@@ -1788,11 +1827,16 @@ function StickyBar({
         type="button"
         className="hb-bar__total"
         onClick={onTotal}
-        aria-label={`Показать смету-чек: примерно ${total != null ? formatRUB(total) : "после подбора"}`}
+        aria-label={`Показать смету-чек: ${
+          total != null
+            ? `${fromEstimate ? "от" : "примерно"} ${formatRUB(total)}`
+            : "после подбора"
+        }`}
       >
-        <span className="hb-bar__total-label">Итого</span>
-        {/* Fix5 V6: у undecided цены нет — честный текст вместо «~0 ₽». */}
-        <b>{total != null ? `~${formatRUB(total)}` : "после подбора"}</b>
+        <span className="hb-bar__total-label">{fromEstimate ? "Итого от" : "Итого"}</span>
+        {/* Fix5 V6: у undecided цены нет — честный текст вместо «~0 ₽».
+            c94: фикс-допуслуги → «от N ₽» (минимум, без «~»), как в чеке. */}
+        <b>{total != null ? (fromEstimate ? formatRUB(total) : `~${formatRUB(total)}`) : "после подбора"}</b>
         <span className="hb-bar__guests">
           {guests} {guestsLabel(guests)}
           {addonsCount > 0 ? ` · +${addonsCount} доп.` : ""}
@@ -2160,24 +2204,34 @@ const ReceiptLines = memo(function ReceiptLines({
       </PrintLine>
 
       {/* c84-B (задача 2): КАЖДАЯ выбранная допуслуга — отдельной строкой
-          «label слева / +N ₽ справа» (стиль строк чека, value — red-deep:
-          доплаты читаются одним акцентом).
+          «label слева / +N ₽ или „от N ₽“ справа» (стиль строк чека, value —
+          red-deep: доплаты читаются одним акцентом).
           0 выбранных — не рисуем ничего. Максимум 6 строк (ADDONS.length)
           — чек растёт естественно, клип .hb-lines__clip растёт вместе. */}
-      {addons.map((a, i) => (
-        <PrintLine
-          key={a.id}
-          sig={`addon|${a.id}`}
-          index={2 + i}
-          active={active}
-          settled={settled}
-          delayBase={delayBase}
-          className="hb-line hb-line--addon"
-        >
-          <span className="hb-line__label">{a.label}</span>
-          <span className="hb-line__value">+{formatRUB(a.price)}</span>
-        </PrintLine>
-      ))}
+      {addons.map((a, i) => {
+        /* c94: аренда — «label · 20% / +N ₽» (живой пересчёт от подытога,
+           sig включает сумму — строка перевпечатывается при смене гостей);
+           фикс-услуги — «label / от N ₽» (минимум, без плюса). */
+        const amt = addonAmount(a, subtotal);
+        return (
+          <PrintLine
+            key={a.id}
+            sig={`addon|${a.id}|${a.percent != null ? amt : "flat"}`}
+            index={2 + i}
+            active={active}
+            settled={settled}
+            delayBase={delayBase}
+            className="hb-line hb-line--addon"
+          >
+            <span className="hb-line__label">
+              {a.percent != null ? `${a.label} · ${a.percent}%` : a.label}
+            </span>
+            <span className="hb-line__value">
+              {a.percent != null ? `+${formatRUB(amt)}` : `от ${formatRUB(a.price ?? 0)}`}
+            </span>
+          </PrintLine>
+        );
+      })}
 
       {/* c89: ЧЕСТНЫЙ докрут до минимума формата (MIN_ORDER в pricing.ts) —
           только когда чек ниже минимума (belowMinBy > 0): доплата печатается
@@ -2567,6 +2621,13 @@ export function HaccBooking() {
   const selectedAddons = useMemo(
     () => ADDONS.filter((a) => addonIds.includes(a.id)),
     [addonIds],
+  );
+  /** c94: выбрана хоть одна фикс-услуга «от N ₽» — итог чека печатается
+   *  минимумом: «Итого от N ₽» (проценты аренды точны, фиксы — нижняя
+   *  граница; без таких услуг «Итого» как раньше). */
+  const hasFromAddons = useMemo(
+    () => selectedAddons.some((a) => a.percent == null),
+    [selectedAddons],
   );
   /** Fix5 V6: «Ещё решаю» — псевдо-тип без цены/формата. */
   const isUndecided = typeId === UNDECIDED_ID;
@@ -3037,18 +3098,21 @@ export function HaccBooking() {
       setSrTotal(
         isUndecided
           ? `Заявка без расчёта — формат обсудим по звонку, ${guestsClamped} ${guestsLabel(guestsClamped)}`
-          : `Итого примерно ${formatRUB(result!.total)} за ${guestsClamped} ${guestsLabel(guestsClamped)}`,
+          : `${hasFromAddons ? "Итого от" : "Итого примерно"} ${formatRUB(result!.total)} за ${guestsClamped} ${guestsLabel(guestsClamped)}`,
       );
     }, 700);
     return () => clearTimeout(t);
-  }, [isUndecided, result, guestsClamped]);
+  }, [isUndecided, result, guestsClamped, hasFromAddons]);
 
   /** Fix5 V6: мета квитанции успеха — одна строка (у undecided — без цены).
    *  c84-B: пакет — в мету (владелец видит выбор лида без раскрытия).
    *  c89: у flat-типа (доставка закусок) вместо пакета — «от 1 200 ₽/чел». */
   const successMeta = isUndecided
     ? `Формат обсудим · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""}`
-    : `${current.label} · ${pkgHeadLabel} · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""} · ~${formatRUB(result!.total)}`;
+    : `${current.label} · ${pkgHeadLabel} · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""} · ${
+        /* c94: фикс-допуслуги → «от N ₽» (в одном тоне с чеком/баром). */
+        hasFromAddons ? `от ${formatRUB(result!.total)}` : `~${formatRUB(result!.total)}`
+      }`;
 
   /* c84-B (задача 3): микроподсказка — после первого ПОЛЬЗОВАТЕЛЬСКОГО выбора
      формата, пока «Пакет меню» вне вьюпорта и формат реальный (у undecided
@@ -3358,7 +3422,15 @@ export function HaccBooking() {
                           </svg>
                         </span>
                         <span className="hb-addon__label">{a.label}</span>
-                        <span className="hb-addon__price">+{formatRUB(a.price)}</span>
+                        {/* c94 (заказчик): аренда — процент от сметы меню с
+                            живым пересчётом «+20% ≈ 88 000 ₽» (меняется
+                            вместе с числом гостей); услуги — минимум
+                            «от N ₽». */}
+                        <span className="hb-addon__price">
+                          {a.percent != null
+                            ? `+${a.percent}% ≈ ${formatRUB(addonAmount(a, result!.subtotal))}`
+                            : `от ${formatRUB(a.price ?? 0)}`}
+                        </span>
                       </motion.label>
                     );
                   })}
@@ -3423,6 +3495,9 @@ export function HaccBooking() {
                       dateHuman={humanDate}
                       dateIso={dateValid}
                       total={receiptResult?.total ?? 0}
+                      /* c94: подытог меню — база процентов аренды в допуслугах
+                          лида/сводки (в одном такте с total — дебаунс-значение). */
+                      subtotal={receiptResult?.subtotal ?? 0}
                       /* c84-B: снимок выбора — в текст лида и событие. */
                       pkgIdx={pkgIdx}
                       addonIds={addonIds}
@@ -3543,7 +3618,11 @@ export function HaccBooking() {
                 {/* Итог — всегда видим (и в компакте); Fix5 V6: у undecided —
                     честное «после подбора» вместо числа. */}
                 <div className="hb-total">
-                  <span className="hb-total__label">{isUndecided ? "Смета" : "Итого"}</span>
+                  <span className="hb-total__label">
+                    {/* c94: выбрана хоть одна фикс-услуга «от N ₽» — итог
+                        честно печатается минимумом («Итого от»). */}
+                    {isUndecided ? "Смета" : hasFromAddons ? "Итого от" : "Итого"}
+                  </span>
                   <span className="hb-total__value">
                     {isUndecided ? (
                       <span className="hb-total__later">после подбора</span>
@@ -3698,6 +3777,7 @@ export function HaccBooking() {
           total={result?.total ?? null}
           guests={guestsClamped}
           addonsCount={addonIds.length}
+          fromEstimate={hasFromAddons}
           visible={barVisible}
           onCta={openForm}
           onTotal={scrollToCheck}

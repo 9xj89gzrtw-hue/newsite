@@ -15,9 +15,11 @@
  *    калькулятор hacc-booking.tsx.
  */
 
-/** Канонический домен сайта. Env-override — для деплоя на кастомный домен. */
+/** Канонический домен сайта. Env-override — для деплоя на кастомный домен.
+ *  c94 (критик A): фоллбек — боевой домен (был Vercel-URL: сборка без env
+ *  отправляла бы каноникалы/JSON-LD на зеркало). */
 export const SITE_URL: string =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://newsite-three-kappa.vercel.app";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://nilovcatering.ru";
 
 /** SITE_URL без хвостового слэша — база для склейки абсолютных ссылок
  *  (robots.ts, sitemap.ts, llms.txt, JSON-LD @id/image/logo). */
