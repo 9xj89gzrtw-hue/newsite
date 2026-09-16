@@ -16,6 +16,14 @@
 
 RewriteEngine On
 
+# Отключаем DirectorySlash (301 → /offer/): на этом хостинге mod_dir
+# успевает отредиректить ДО per-dir rewrite, причём в Location подставляет
+# http:// (SSL терминирует nginx, Apache видит http). Со слэшем страница
+# теперь отдаётся (правило ниже), но чистый URL /offer должен отдаваться
+# НАПРЯМУЮ по https — для этого гасим сам редирект. Побочных эффектов нет:
+# без слэша на каталоги сайт больше не ссылается.
+DirectorySlash Off
+
 # Чистые URL юрстраниц: /offer, /privacy, /terms (и с хвостовым слэшем)
 RewriteRule ^(offer|privacy|terms)/?$ $1.html [L]
 
