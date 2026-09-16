@@ -7,7 +7,6 @@ import { HaccServices } from "@/components/catering/hacc-services";
 import { HaccMenu } from "@/components/catering/hacc-menu";
 import { TottParallaxBand } from "@/components/catering/tott-parallax-band";
 import { EventsVideoCarousel } from "@/components/catering/events-video-carousel";
-import { CepProcess } from "@/components/catering/cep-process";
 import { HaccBooking } from "@/components/catering/hacc-booking";
 import { TiltedAccent } from "@/components/catering/tilted-accent";
 import { EaFounderStory } from "@/components/catering/ea-founder-story";
@@ -15,6 +14,12 @@ import { GammaSeparator } from "@/components/catering/gamma-separator";
 import { EaFaqAccordion } from "@/components/catering/ea-faq-accordion";
 import { CepInstagramGrid } from "@/components/catering/cep-instagram-grid";
 import { SiteFooter } from "@/components/catering/site-footer";
+/* c89 (3-g): BackToTop ВОЗВРАЩЁН в рендер — владелец: «нет кнопки
+   (стрелочки наверх)... приходится все заново наверх пролистывать».
+   Fixed bottom-LEFT (телефон-FAB — bottom-right), z-50 над мобильным
+   sticky-баром (z-40, hacc-booking.css); скрытие <1024px снято в
+   globals.css. Сам компонент не менялся (золотое кольцо прогресса). */
+import { BackToTop } from "@/components/catering/back-to-top";
 /* c84-A (задача 4a): ScrollProgress — полоса прогресса чтения, ЧИСТЫЙ
    CSS scroll-driven (animation-timeline: scroll(root), c74-kinetic.css),
    ноль JS-кадров; гварды reduced-motion/@supports/print — в CSS. Рендер
@@ -36,13 +41,16 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 // ggcatering.com. All editorial experiments (CEP/Salt Block/Ridgewells/MCulinary/
 // EA/TOTT/Gamma cycles 21-31) are condensed into a single coherent narrative:
 // hero → header → video → photo marquee → parallax band → services → menu →
-// parallax band → events video carousel → process → calculator+form → about →
+// founder story → parallax band → events video carousel → calculator+form →
 // FAQ → instagram → footer. Two parallax photo bands (GammaSeparator,
-// TottParallaxBand) bridge the major acts for cinematic pacing.
+// TottParallaxBand) bridge the major acts for cinematic pacing. c89 (3-g):
+// CepProcess («Как мы работаем») снят с рендера; founder story перенесён
+// сразу под меню («Не нашли нужное?»).
 //
-// SECTION ORDER (c83-D: приведён к ФАКТИЧЕСКОМУ рендеру — прежний список
-// упоминал DeliveryBlock (№13) и компоненты ранних итераций Task, которых
-// в рендере нет):
+// SECTION ORDER (c89/3-g: приведён к ФАКТИЧЕСКОМУ рендеру — CepProcess
+// «Как мы работаем» СНЯТ с рендера по указанию владельца, EaFounderStory
+// перенесён из акта IV сразу под финальный блок меню «Не нашли нужное?»;
+// прежние правки списка: c83-D, Task 2-a):
 //
 //   ── ACT I: BRAND PROMISE (hero → header → video → marquee) ──
 //    1. TottHero              — full-viewport bg video + "Interfood." wordmark
@@ -50,42 +58,51 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //    3. GgVideoShowcase       — ggcatering.com-style 16:9 video block:
 //                               looping muted autoplay mp4 + "Кейтеринг как
 //                               *искусство*" overlay + Play pill + 2 CTAs.
-//    4. GammaMarquee          — infinite horizontal photo marquee (44 real
-//                               owner photos, c88; CSS-keyframes -50% seam loop).
+//    4. GammaMarquee          — infinite horizontal photo marquee (36 real
+//                               owner photos, c88 — c89: 8 кадров снял
+//                               владелец; CSS-keyframes -50% seam loop).
 //    5. GammaSeparator        — PARALLAX BAND. Full-bleed separator photo +
 //                               tilted "interfood" Marck Script watermark.
 //                               Task 2-a: moved here from the founder→FAQ gap.
 //
-//   ── ACT II: WHAT WE OFFER (services → menu) ──
+//   ── ACT II: WHAT WE OFFER (services → menu → founder story) ──
 //    6. HaccServices          — gamma-style horizontal accordion «Каталог
-//                               услуг» (12 panels + prices + Ken Burns exhale).
+//                               услуг» (6 форматов + цены, c89/3-b; Ken
+//                               Burns exhale).
 //    7. HaccMenu              — меню-каталог в той же hacc-идиоме (корешки,
-//                               тинты, Marck Script, табы пакетов).
-//    8. TottParallaxBand      — PARALLAX BAND. CSS-parallax bg + char-split
-//                               headline + "bon appétit" script. Cinematic
-//                               pause before the events gallery.
+//                               тинты, Marck Script, табы пакетов); финальный
+//                               блок секции — «Не нашли нужное?».
+//    8. EaFounderStory        — founder-forward 2-col About: история кухни
+//                              + цитата основателя + CTA (c86-C: числа убраны).
+//                              c89/3-g: ПЕРЕНЕСЁН сюда из акта IV — «Главу 6
+//                              перенести сразу под "не нашли нужное?"»
+//                              (владелец); глава перенумерована 06 → 04.
 //
-//   ── ACT III: GALLERY (events video carousel → process) ──
-//    9. EventsVideoCarousel   — карусель 4 видео-тизеров (сток-b-roll «Кухня
+//   ── ACT III: GALLERY (parallax band → events video carousel) ──
+//    9. TottParallaxBand      — PARALLAX BAND. CSS-parallax bg + char-split
+//                               headline + "bon appétit" script. Cinematic
+//                               pause before the events gallery (c89: сидит за
+//                               founder story, который теперь замыкает акт II).
+//   10. EventsVideoCarousel   — карусель 4 видео-тизеров (сток-b-roll «Кухня
 //                               в движении», c36; c87 ошибочно сняла с рендера
 //                               — c88 вернула). Модалка полного видео, снап,
 //                               автопрокрутка 5с, паузы hover/focus.
-//   10. CepProcess            — «КАК МЫ РАБОТАЕМ» compact 4-step strip:
-//                               scroll-drawn red progress rail, sequential
-//                               step activation, ink-fill outline numerals.
 //
-//   ── ACT IV: CONVERSION (booking → about → FAQ → instagram → footer) ──
+//   ── ACT IV: CONVERSION (booking → FAQ → instagram → footer) ──
 //   11. HaccBooking           — Cycle 64 «СМЕТА-ЧЕК INTERFOOD»: merged
 //                              calculator + lead form + contacts in one
 //                              receipt scene (nuqs state, POST /api/lead).
-//                              Anchors: #calculator (section top), #contact
-//                              (form zone).
-//   12. EaFounderStory        — founder-forward 2-col About: история кухни
-//                              + цитата основателя + CTA (c86-C: числа убраны).
-//   13. EaFaqAccordion        — minimalist 6-item accordion (resolves
-//                              objections).
-//   14. CepInstagramGrid      — 3×3 IG grid with Reel play icons (social
-//                              proof).
+//                              Anchors: #calculator (section top), #lead-form
+//                              (form zone), #contact (contacts zone at the
+//                              section bottom — c89).
+//   12. EaFaqAccordion        — minimalist 6-item accordion (resolves
+//                              objections). Глава 06 (c89).
+//   13. CepInstagramGrid      — 3×3 IG grid with Reel play icons (social
+//                              proof). Глава 07 (c89).
+//   14. BackToTop             — floating ↑ button (fixed bottom-left, gold
+//                              progress ring). c89/3-g: ВОЗВРАЩЁН — Task 2-a
+//                              снимал его за компанию с FAB/рельсом глав;
+//                              владелец попросил стрелку наверх обратно.
 //   15. SiteFooter            — dark navy footer with newsletter + 3-col +
 //                              cities marquee.
 //
@@ -94,8 +111,9 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //   - GammaSeparator       between #4 photo marquee and #6 services — visual
 //                          breather (Task 2-a: moved from the founder→FAQ gap,
 //                          replacing CepEditorialDivider in this slot)
-//   - TottParallaxBand    between #7 menu and #9 events video carousel —
-//                          cinematic pause
+//   - TottParallaxBand    between #8 founder story and #10 events video
+//                          carousel — cinematic pause (c89: сдвинута за
+//                          founder story, который теперь сидит под меню)
 //
 // REMOVED (per user: "остальное убрать с сайта") — these 30+ components remain
 // on disk for reference but are no longer rendered:
@@ -114,7 +132,15 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //   replaced by GammaSeparator (moved up from the founder→FAQ gap);
 //   BackToTop — floating ↑ button dropped together with the ambient-audio
 //   FAB and the chapter-nav scroll rail in layout.tsx (fewer floating
-//   overlays over the content).
+//   overlays over the content). c89/3-g: BackToTop ВОЗВРАЩЁН (владелец
+//   попросил стрелку наверх) — см. №14 ниже.
+//
+// REMOVED in c89/3-g (files stay on disk per repo convention):
+//   CepProcess — «КАК МЫ РАБОТАЕМ» compact 4-step strip (бывш. №10) снят
+//   с рендера по указанию владельца; главы перенумерованы: 01 услуги,
+//   02 меню, 03 история основателя (под «Не нашли нужное?»), 04 видео-
+//   карусель, 05 смета-чек,
+//   06 FAQ, 07 инстаграм.
 //
 // F2 (cycle-71, K4-MAJOR): `export const dynamic = "force-dynamic"` УДАЛЁН.
 // Витрина полностью статична: все компоненты — клиентские, серверных
@@ -124,7 +150,7 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 
 /* Task 1-b (cycle-71): FAQPage JSON-LD перенесён ИЗ layout.tsx — гайдлайн
  * Google: схема FAQ должна жить на странице с ВИДИМЫМ FAQ-контентом
- * (EaFaqAccordion — секция 16 этой страницы; на /offer /privacy /terms
+ * (EaFaqAccordion — секция 12 этой страницы; на /offer /privacy /terms
  * видимого FAQ нет). Тексты 1-в-1 зеркалят FAQ_ITEMS из
  * ea-faq-accordion.tsx (Cycle 39). */
 const faqJsonLd = {
@@ -203,6 +229,11 @@ const faqJsonLd = {
  * виджет в SSR-HTML всегда); фоллбэк проверялся временным прямым рендером
  * (research/f3/) — прод-проверка сырого HTML за оркестратором (ребилд :3002
  * в этой сессии запрещён).
+ *
+ * c89 (3-g): #contact переехал на зону КОНТАКТОВ ВНИЗУ секции (ContactsZone
+ * виджета; зона формы теперь #lead-form, открывается CTA калькулятора) —
+ * якорь-держатель в шелле сидит у нижних плашек, 1:1 с новой геометрией
+ * виджета.
  */
 function HaccBookingShell() {
   return (
@@ -244,9 +275,12 @@ function HaccBookingShell() {
           <div className="h-[480px] rounded-3xl bg-cep-cream-warm ring-1 ring-ink/10 md:h-[620px] xl:h-auto" />
         </div>
 
-        {/* Якорь зоны формы: пустой div.hb-zone (scroll-margin-top: 96px —
-            как у живого #contact). После гидрации заменяется живым
-            div#contact виджета — дубля id нет (фоллбэк уходит целиком). */}
+        {/* c89 (3-g): якорь #contact живёт на зоне КОНТАКТОВ внизу секции
+            (ContactsZone виджета; зона формы — #lead-form). Держатель —
+            пустой div.hb-zone (scroll-margin-top: 96px, как у живой зоны)
+            стоит прямо перед нижними плашками — 1:1 с геометрией виджета.
+            После гидрации заменяется живым div#contact — дубля id нет
+            (фоллбэк уходит целиком). */}
         <div id="contact" className="hb-zone" />
 
         {/* Низ секции — контакты/карта: грубые плашки ≈ 750px живой зоны. */}
@@ -299,16 +333,17 @@ export default function Home() {
              (right after their hero + "Who we are" intro). */}
       <GgVideoShowcase />
 
-      {/* 4. GammaMarquee — Cycle 31 · Cycle 88: 44 реальных фото владельца
-             (Яндекс.Диск, конвейер c87 — webp q82, честные alt, лого-кропы)
-             вместо 14 стоковых gamma-кадров — по указанию владельца «наши
-             фотки» именно сюда, сразу за «Кейтеринг как искусство».
+      {/* 4. GammaMarquee — Cycle 31 · Cycle 88: 36 реальных фото владельца
+             (Яндекс.Диск, конвейер c87 — webp q82, честные alt, лого-кропы;
+             c89: 8 кадров сняты владельцем) вместо 14 стоковых gamma-кадров
+             — по указанию владельца «наши фотки» именно сюда, сразу за
+             «Кейтеринг как искусство».
              Бесконечная горизонтальная лента (CSS-keyframes -50% seam loop +
              WAAPI playbackRate, дети задублированы для бесшовного цикла),
              тайлы единой высоты с пропорцией самого кадра («правда фото»),
-             цикл 170с ≈ прежние ~110–115 px/s. Pure photo scroll — no text
-             overlay, per gamma. The first wow photo moment after the video
-             block. */}
+             цикл 137с (c89/3-a) ≈ прежние ~115 px/s. Pure photo scroll — no
+             text overlay, per gamma. The first wow photo moment after the
+             video block. */}
       <GammaMarquee />
 
       {/* 5. GammaSeparator — PARALLAX BAND. Cycle 31 gammacatering.com signature
@@ -326,15 +361,16 @@ export default function Home() {
       {/* 6. HaccServices — Cycle 49 NEW «Каталог услуг». Full redesign per
              user request: copy the gammacatering.com horizontal accordion
              ("Erlebnisse" haccordion) and make it better. One open panel +
-             11 vertical spines in a flex rack — the exact gamma mechanics
+             5 vertical spines in a flex rack (c89/3-b: 12 панелей схлопнуты
+             в 6 форматов) — the exact gamma mechanics
              (flex-grow 0→1 transition, spine widens when open, JS-fixed
              panel width so content never reflows mid-animation, is-resizing
              guard) — reverse-engineered in
              research/gamma-haccordion-research.md.
 
-             UPGRADES over gamma: 12 panels vs their 4 (prices, hooks,
-             per-service warm tints), inert + delayed visibility on closed
-             panels (fixes gamma's live Tab-focus-leak bug), full
+             UPGRADES over gamma: 6 форматов (c89/3-b) vs their 4 (prices,
+             hooks, per-service warm tints), inert + delayed visibility on
+             closed panels (fixes gamma's live Tab-focus-leak bug), full
              prefers-reduced-motion support, autoplay with progress line
              (pauses on hover/focus/hidden/out-of-view, stops after manual
              interaction), hover-intent opening (380ms, fine pointers),
@@ -348,49 +384,58 @@ export default function Home() {
       <HaccServices />
 
       {/* 7. Menu — Cycle 58: каталог меню в гамма-стиле блока услуг
-          (hacc-механика: корешки, тинты, Marck Script, табы пакетов). */}
+          (hacc-механика: корешки, тинты, Marck Script, табы пакетов).
+          Финальный блок секции — «Не нашли нужное?» (Task 7-E). */}
       <HaccMenu />
 
-      {/* 8. TottParallaxBand — PARALLAX BAND. Talk of the Town CSS-parallax bg
+      {/* 8. EaFounderStory — Cycle 28 founder-forward 2-col About: photo LEFT,
+              story + founder quote + CTA RIGHT (c86-C: строка чисел убрана).
+              Italic-as-fragment "Накрываем *ваш* стол." c89/3-g: ПЕРЕНЕСЁН
+              сюда (бывш. №15, акт IV) — «Главу 6 перенести сразу под "не
+              нашли нужное?"» (владелец): сидит сразу за финальным блоком
+              HaccMenu, до параллакс-ленты. Глава 06 → 04 (c89). */}
+      <EaFounderStory />
+
+      {/* 9. TottParallaxBand — PARALLAX BAND. Talk of the Town CSS-parallax bg
              (background-attachment:fixed) + char-split headline reveal + "bon
-             appétit" script accent. Editorial pause bridging Act II → Act III. */}
+             appétit" script accent. Editorial pause bridging Act II → Act III
+             (c89/3-g: теперь за founder story — тот замыкает акт II под
+             меню). */}
       <TottParallaxBand />
 
-      {/* ── ACT III: PROCESS ── */}
+      {/* ── ACT III: GALLERY ── */}
 
-      {/* 9. EventsVideoCarousel — Cycle 32. RESTORED in Cycle 36 · Cycle 88
+      {/* 10. EventsVideoCarousel — Cycle 32. RESTORED in Cycle 36 · Cycle 88
              (c87 по ошибке подменила её фото-галереей EaEventsPortfolio —
-             видео-карусель вернули на место; реальные 44 фото переехали
-             в GammaMarquee №4, EaEventsPortfolio остаётся на диске по
-             конвенции репо). Carousel of 4
+             видео-карусель вернули на место; реальные фото переехали в
+             GammaMarquee №4 — с c89 их 36, EaEventsPortfolio остаётся на
+             диске по конвенции репо). Carousel of 4
              event-type video tiles with looping muted autoplay teasers + caption
              panel + center play-pill CTA that opens a fullscreen modal with the
              full unmuted video + controls. Magazine scroll-snap-x mandatory pattern,
              5s auto-advance, pause-on-hover, ESC closes the modal. Sits between
-             TottParallaxBand (the editorial pause) and CepProcess (the "how we
-             work" algorithm) — a cinematic trust beat showing the food in motion. */}
+             TottParallaxBand (the editorial pause) and HaccBooking (the
+             receipt/calculator scene) — a cinematic trust beat showing the food
+             in motion. */}
       <EventsVideoCarousel />
-
-      {/* 10. CepProcess — Cycle 63. «КАК МЫ РАБОТАЕМ» — compact 4-step strip
-              (ЗАЯВКА / СОЗВОН / НАКРЫВАЕМ / УБИРАЕМ): scroll-drawn red progress
-              rail, sequential node/step activation, ink-fill outline numerals. */}
-      <CepProcess />
 
       {/* ── ACT IV: CONVERSION ── */}
 
-      {/* 14. HaccBooking — Cycle 64 «СМЕТА-ЧЕК INTERFOOD». Объединяет бывшие
+      {/* 11. HaccBooking — Cycle 64 «СМЕТА-ЧЕК INTERFOOD». Объединяет бывшие
               Calculator (14) и Contact (19) в одну сцену-предмет: слева — сбор
               банкета (тип события / слайдер гостей с одометром / дата), справа —
               красная панель с живым бумажным смета-чеком (itemized-строки,
-              spring-итог, честная сезонная строка ×1.15) + магнитная CTA.
-              Хендофф: чек сжимается в карточку-шапку, под контролами раскрывается
-              2-шаговая форма (контакты → отправка) с prefill из nuqs-стейта →
-              POST /api/lead → штамп + tear-off + конфетти. Низ секции —
-              контакты-зона: бейдж «Отвечаем в любое время», быстрые ссылки,
-              ленивая Яндекс-карта. Якоря: id="calculator" (секция) и
-              id="contact" (зона формы) — на них смотрят шапка, футер,
-              hacc-services, hacc-menu, delivery-block, privacy/offer,
-              gg-video-showcase. Спека: research/c64/SPEC.md; дизайн:
+              spring-итог; c89: сезонная строка ×1.15 УДАЛЕНА — calcTotal без
+              надбавки) + магнитная CTA. Хендофф: чек сжимается в карточку-шапку,
+              под контролами раскрывается 2-шаговая форма (контакты → отправка)
+              с prefill из nuqs-стейта → POST /api/lead → штамп + tear-off +
+              конфетти. Низ секции — контакты-зона: бейдж «Отвечаем в любое
+              время», быстрые ссылки, ленивая Яндекс-карта. Якоря (c89):
+              id="calculator" (секция), id="lead-form" (зона формы),
+              id="contact" (зона контактов внизу секции) — на #calculator
+              смотрят конверс-CTA (шапка «Заказать», hacc-services,
+              hacc-menu, gg-video-showcase), на #contact — «Контакты»
+              шапки/футера, privacy/offer. Спека: research/c64/SPEC.md; дизайн:
               research/c64/RESEARCH-DESIGN.md. Компонент обязан жить в
               Suspense (требование nuqs useQueryState). 81-F3 (S1): fallback —
               серверный SSR-shell (HaccBookingShell выше): якоря + H2 + скелет
@@ -401,31 +446,30 @@ export default function Home() {
         <HaccBooking />
       </Suspense>
 
-      {/* 15. EaFounderStory — Cycle 28 founder-forward 2-col About: photo LEFT,
-              story + founder quote + CTA RIGHT (c86-C: строка чисел убрана).
-              Italic-as-fragment "Накрываем *ваш* стол." */}
-      <EaFounderStory />
-
-      {/* 16. EaFaqAccordion — Cycle 28 minimalist single-column 6-item accordion
+      {/* 12. EaFaqAccordion — Cycle 28 minimalist single-column 6-item accordion
               (no tabs, no search, no feedback). EA restraint — the typography IS
-              the design. Resolves objections before the contact form.
-              Task 2-a: follows the founder block directly — the GammaSeparator
-              band that used to sit between them now lives at section 5. */}
+              the design. Resolves objections after the booking scene (c89/3-g:
+              founder story уехал под меню, FAQ остался перед инстаграмом).
+              Глава 07 → 06 (c89). */}
       <EaFaqAccordion />
 
-      {/* 17. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play icons.
-              Follow-along social proof. */}
+      {/* 13. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play icons.
+              Follow-along social proof. Глава 08 → 07 (c89, 3-f). */}
       <CepInstagramGrid />
 
-      {/* 18. SiteFooter — dark navy footer with newsletter + 3-col + cities marquee.
+      {/* 14. BackToTop — c89/3-g: ВОЗВРАЩЁН (Task 2-a снимал — см. докблок
+              импорта): плавающая ↑-кнопка, fixed bottom-LEFT + золотое кольцо
+              прогресса скролла; на <1024px больше НЕ прячется (правило скрытия
+              убрано из globals.css) — владелец листает с телефона. */}
+      <BackToTop />
+
+      {/* 15. SiteFooter — dark navy footer with newsletter + 3-col + cities marquee.
               Полные реквизиты/соцсети — здесь (HaccBooking дублирует только
-              быстрые CTA-контакты, SPEC §2.10). Task 2-a: BackToTop (бывш. №20)
-              удалён — плавающая ↑-кнопка больше не рендерится (компонент остался
-              на диске). */}
+              быстрые CTA-контакты, SPEC §2.10). */}
       <SiteFooter />
 
       {/* Task 1-b (cycle-71): FAQPage JSON-LD (перенос из layout.tsx) —
-          schema живёт там, где есть видимый FAQ-контент (секция 16,
+          schema живёт там, где есть видимый FAQ-контент (секция 12,
           EaFaqAccordion выше). Server component — рендер в SSR-HTML. */}
       <script
         type="application/ld+json"

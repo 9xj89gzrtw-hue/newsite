@@ -87,6 +87,16 @@ const ROTATE_INTERVAL_MS = 2600;
 /** Длительность exit/enter-флипа слова, с (mode="wait": полный цикл 2×). */
 const MORPH_DURATION_S = 0.45;
 
+/* ── c89 (3-d, Task 1 — владелец: «Видео которое сразу под херо вот это
+   поставить»): новый клип владельца с Яндекс.Диска (hero.mov, снят на
+   смартфон 1080×1920, 29.9с, СО ЗВУКОМ — диспенсеры с лимонадами +
+   сервированный банкетный стол с розовой скатертью). Десктоп играет
+   16:9 центр-кроп 1280×720; мобайл — портрет-кроп (подмена источника
+   в IO-эффекте ниже, паттерн tott-hero.tsx). Постер — кадр из клипа. */
+const SHOWCASE_VIDEO = "/media/c89/c89-showcase-720.mp4";
+const SHOWCASE_VIDEO_PORTRAIT = "/media/c89/c89-showcase-portrait-720.mp4";
+const SHOWCASE_POSTER = "/media/c89/c89-showcase-poster.webp";
+
 type Cta = {
   /** Visible label (Russian). */
   label: string;
@@ -165,10 +175,10 @@ export function GgVideoShowcase() {
 
   /** W4-FIX «видео-вау»: the clip plays as a muted loop as soon as the
    *  section is near the viewport (muted autoplay is always permitted) and
-   *  pauses when it scrolls away — the C71-P1 re-encoded 813KB
-   *  catering-clip-2-720.mp4 is a
+   *  pauses when it scrolls away — the c89 owner clip
+   *  (/media/c89/c89-showcase-720.mp4) is a
    *  DIFFERENT url from the hero's mculinary-hero.mp4 and preload="none"
-   *  keeps it out of the critical path. IO rootMargin -15%/-25% (V4-find: было 100px — секция на 917px попадала в margin при scroll=0 на mobile и 788KB тизер качался на СТАРТЕ, съедая экономию P1; теперь play() только когда секция реально в кадре)
+   *  keeps it out of the critical path. IO rootMargin -15%/-25% (V4-find: было 100px — секция на 917px попадала в margin при scroll=0 на mobile и тизер качался на СТАРТЕ, съедая экономию; теперь play() только когда секция реально в кадре)
    *  starts playback just before the section is revealed. Cleanup pauses
    *  on unmount. prefers-reduced-motion: no IO at all — the poster stays
    *  and the clip plays only after a user click. */
@@ -177,6 +187,30 @@ export function GgVideoShowcase() {
     const section = sectionRef.current;
     const video = videoRef.current;
     if (!section || !video) return;
+
+    /* c89 (3-d): мобильный источник видео — портрет-кроп
+     * c89-showcase-portrait-720.mp4 (клип владельца снят вертикально;
+     * 16:9-кроп на portrait-экране object-cover показывал бы узкую
+     * полосу центра). Паттерн tott-hero.tsx (81-W2F3): video.src ставится
+     * ПРЯМО на <video> (НЕ <source>.src) — по HTML-спецификации установка
+     * src-атрибута media-элемента гарантированно перезапускает алгоритм
+     * загрузки, а дочерний <source> (16:9, SSR-разметка не меняется)
+     * игнорируется. Подмена стоит ДО создания IO ниже, т.е. ВСЕГДА раньше
+     * первого play(); preload="none" держит байты обоих файлов до play() —
+     * мобайл качает только портрет-копию, десктоп — только 16:9.
+     * Гард по текущему атрибуту: эффект перезапускается (deps reduce/lite
+     * меняются после монта) — уже стоящий/играющий правильный источник не
+     * перезагружаем (переприсвоение src перезапустило бы загрузку). */
+    const isMobile =
+      window.matchMedia("(pointer: coarse)").matches ||
+      window.innerWidth < 768;
+    if (
+      isMobile &&
+      video.getAttribute("src") !== SHOWCASE_VIDEO_PORTRAIT
+    ) {
+      video.src = SHOWCASE_VIDEO_PORTRAIT;
+    }
+
     const io = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
@@ -267,19 +301,22 @@ export function GgVideoShowcase() {
             preload="none": the browser downloads nothing until play(); the
             poster attribute covers the pre-play frame (the old static
             <img> is gone — the video poster replaces it 1:1). The clip
-            (788KB catering-clip-2-720.mp4, C71-P1) differs from the hero video url, so
-            nothing is fetched in parallel with the hero. */}
+            (c89-showcase-720.mp4 — клип владельца c89, 16:9 центр-кроп;
+            на coarse/<768 IO-эффект выше подменяет источник на
+            -portrait-720) differs from the hero video url, so nothing is
+            fetched in parallel with the hero. 29.9s, со звуком — тизер
+            mute, Play-pill ниже расмучивает по клику. */}
         <video
           ref={videoRef}
           muted
           loop
           playsInline
           preload="none"
-          poster="/media/hero-premium/hero-premium-6-828.webp"
-          aria-label="Видео: кейтеринг как искусство — приготовление и подача блюд"
+          poster={SHOWCASE_POSTER}
+          aria-label="Видео: кейтеринг как искусство — лимонады в диспенсерах и сервировка банкетного стола"
           className="absolute inset-0 h-full w-full object-cover"
         >
-          <source src="/media/clips/catering-clip-2-720.mp4" type="video/mp4" />
+          <source src={SHOWCASE_VIDEO} type="video/mp4" />
         </video>
 
         {/* Dark scrim — Task 4-B readability hardening. Two stacked

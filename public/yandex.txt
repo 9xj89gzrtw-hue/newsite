@@ -3,7 +3,7 @@ host: nilovcatering.ru
 sitemap: https://nilovcatering.ru/sitemap.xml
 sitemap: https://nilovcatering.ru/geo-sitemap.xml
 geo: 59.994868,30.275093
-address: Россия, Санкт-Петербург, ул. Полевая-Сабировская, 45к1
+address: Россия, Санкт-Петербург, ул. Полевая Сабировская, 45, к. 1
 phone: +7 (911) 941-72-05
-email: interfood-catering@yandex.ru
+email: dmitry_nilov@mail.ru
 opening_hours: 24/7 (заявки круглосуточно)

@@ -30,7 +30,7 @@ export const PHONE_E164 = "+79119417205" as const;
 export const PHONE_PRETTY = "+7 (911) 941-72-05" as const;
 
 /** Email компании (CONTACTS.email / LEGAL_INFO.legalEmail — один и тот же). */
-export const EMAIL = "interfood-catering@yandex.ru" as const;
+export const EMAIL = "dmitry_nilov@mail.ru" as const;
 
 /** Год основания (foundingDate в JSON-LD, «с 2007 года» на сайте). */
 export const FOUNDED_YEAR = 2007 as const;
@@ -42,17 +42,19 @@ export const EVENTS_DONE = 2400 as const;
 export const GUESTS_SERVED = 120000 as const;
 
 /**
- * Соцсети компании (все — из site-footer.tsx / CONTACTS / JSON-LD sameAs).
- * F2 (K3-MINOR): max.ru/nilovcatering УДАЛЁН — профиль не существует
- * (curl 404), ссылка была мёртвой в sameAs/llms.txt. Видимая иконка MAX
- * в футере осталась (site-footer.tsx читает lib/config.ts — чужой файл,
- * отдан F4/оркестратору на решение).
+ * Соцсети компании (c89: сверено с CONTACTS в lib/config.ts).
+ * sameAs для JSON-LD — публичные ПРОФИЛИ: инстаграм, VK, телеграм-канал
+ * @nilov_official (найден веб-поиском, 200 OK), YouTube @nilovcatering
+ * (от владельца), Rutube (канал не найден — ссылка на поиск по бренду,
+ * ждём точный URL). Личный чат t.me/+79119417205 и wa.me — контактные
+ * каналы «Напишите нам», в sameAs не дублируются.
  */
 export const SOCIALS = {
   instagram: "https://www.instagram.com/nilov_catering",
   vk: "https://vk.com/nilovcatering",
-  telegram: "https://t.me/+79119417205",
-  whatsapp: "https://wa.me/79119417205",
+  telegramChannel: "https://t.me/nilov_official",
+  youtube: "https://youtube.com/@nilovcatering",
+  rutube: "https://rutube.ru/search/?query=nilov+catering",
 } as const;
 
 export type Socials = typeof SOCIALS;

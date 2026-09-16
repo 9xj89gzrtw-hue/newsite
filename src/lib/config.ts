@@ -39,18 +39,29 @@ export const SITE_CONFIG = {
  */
 export const LEGAL_INFO = {
   legalForm: "ИП",
-  legalName: "Нилов Дмитрий Игоревич",
-  // Реальные реквизиты (ЕГРИП, rusprofile.ru/egrul.nalog.ru):
-  ogrn: "314784710400402",
-  inn: "781433059704",
-  // Дата регистрации: 14.04.2014
-  registeredAt: "14 апреля 2014 г.",
+  // c89: смена юрлица по реквизитам владельца — ИП Нилова Анастасия
+  // Дмитриевна (замена ИП Нилова Д.И.). Документы /offer /privacy /terms
+  // читают этот же источник.
+  legalName: "Нилова Анастасия Дмитриевна",
+  // Реквизиты от владельца (c89; ОГРНИП 3-25-78-… — регистрация 2025):
+  ogrn: "325784700453130",
+  inn: "781442293901",
+  registeredAt: "",
   // Address for legal correspondence (ЗОПП ст. 8 + 152-ФЗ — full postal address)
-  // Индекс 191186 по официальной базе Почты России для дома 18.
-  legalAddress: "191186, г. Санкт-Петербург, ул. Большая Морская, д. 18, офис 33",
-  legalEmail: "interfood-catering@yandex.ru",
-  dataOfficer: "Нилов Дмитрий Игоревич",
-};
+  legalAddress:
+    "197345, г. Санкт-Петербург, ул. Мебельная, д. 45, корп. 2, литера А, кв. 407",
+  legalEmail: "dmitry_nilov@mail.ru",
+  dataOfficer: "Нилова Анастасия Дмитриевна",
+  // c89: банковские реквизиты (р/с в АО «ТБанк») — блок в подвале сайта.
+  bank: {
+    name: "АО «ТБанк»",
+    inn: "7710140679",
+    bik: "044525974",
+    account: "40802810200009199197",
+    corrAccount: "30101810145250000974",
+    address: "127287, г. Москва, ул. Хуторская 2-я, д. 38А, стр. 26",
+  },
+} as const;
 
 /**
  * Contacts — public-facing. Used across hero/contact/footer.
@@ -64,21 +75,37 @@ export const CONTACTS = {
   whatsappHref: "https://wa.me/79119417205",
   telegram: "+7 911 941-72-05",
   telegramHref: "https://t.me/+79119417205",
+  // c89: Telegram-КАНАЛ компании (нашёл веб-поиском, 200 OK) — отдельная
+  // строка «Телеграм канал» в соцсетях; личный чат выше остаётся в «Напишите нам».
+  telegramChannel: "@nilov_official",
+  telegramChannelHref: "https://t.me/nilov_official",
   instagram: "@nilov_catering",
   instagramHref: "https://www.instagram.com/nilov_catering",
   vk: "nilovcatering",
   vkHref: "https://vk.com/nilovcatering",
-  // 3-A: MAX-мессенджер (max.ru) — рядом с VK в соцсетях футера.
-  max: "nilovcatering",
-  maxHref: "https://max.ru/nilovcatering",
+  // 3-A: MAX-мессенджер (max.ru). c89: профиль max.ru/nilovcatering
+  // НЕ существует (curl 404, проверено снова) — до уточнения владельцем
+  // ссылки ведут на max.ru; номер Макса +7 (911) 826-39-26 показывается текстом.
+  max: "Макс",
+  maxHref: "https://max.ru",
+  maxPhone: "+7 (911) 826-39-26",
+  // c89: SMS-канал — на основной номер компании.
+  sms: "+7 911 941-72-05",
+  smsHref: "sms:+79119417205",
+  // c89: видео-соцсети (владелец дал YouTube; Rutube-канал не найден —
+  // ведёт на поиск Rutube по бренду, ждём точный URL от владельца).
+  youtube: "@nilovcatering",
+  youtubeHref: "https://youtube.com/@nilovcatering",
+  rutube: "nilov catering",
+  rutubeHref: "https://rutube.ru/search/?query=nilov+catering",
   city: "Санкт-Петербург",
-  email: "interfood-catering@yandex.ru",
-  // Cycle 65: публичный адрес офиса (владелец: «в контактах адрес другой —
-  // Полевая-Сабировская 45к1»). ЮРИДИЧЕСКИЙ адрес для документов — LEGAL_INFO
-  // (не трогать): здесь — только витринный адрес для людей.
-  address: "ул. Полевая-Сабировская, 45к1, Санкт-Петербург",
+  // c89: почта/фактический адрес по указанию владельца.
+  email: "dmitry_nilov@mail.ru",
+  // Cycle 65 + c89: публичный фактический адрес офиса — витринный, для людей
+  // (юридический — в LEGAL_INFO). Ссылка на Яндекс.Карты сохранена.
+  address: "ул. Полевая Сабировская, 45, к. 1, Санкт-Петербург",
   addressHref: "https://yandex.ru/maps/-/CTHo6Xkp",
-};
+} as const;
 
 /**
  * Analytics — Yandex.Metrika (Russian, 152-ФЗ-compliant if data stays in RF).

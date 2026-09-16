@@ -1000,14 +1000,11 @@ header[data-scrolled="true"] [data-mega-panel] {
   transform: translateY(-4px);
 }
 
-/* Hide back-to-top on mobile (VLM polish: redundant with scroll progress
-   line at top + 6 other persistent UI elements is too much on small screens).
-   Show only on lg+ where there's breathing room. */
-@media (max-width: 1023px) {
-  [data-back-to-top] {
-    display: none !important;
-  }
-}
+/* c89 (3-g): правило скрытия back-to-top <1024px УДАЛЕНО — владелец
+   листает сайт с телефона и попросил стрелку наверх («приходится все
+   заново наверх пролистывать»). Кнопка (fixed bottom-6 LEFT-6, z-50) не
+   конфликтует с телефон-FAB (bottom-RIGHT, z-[70]) и сидит НАД мобильным
+   sticky-баром смета-чека (.hb-bar, z-40 — hacc-booking.css). */
 
 /* Page-wide reduced-motion: kill infinite animations to respect users. */
 @media (prefers-reduced-motion: reduce) {
@@ -3013,7 +3010,7 @@ header[data-scrolled="true"] [data-mega-panel] {
   gap: 0.65em;
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
-  font-size: clamp(13px, 1.2vw, 14px);
+  font-size: clamp(13px, 1.2vw, 15px); /* c89 (3-g): верх клампа 14px → 15px — читаемость глав */
   letter-spacing: 0.22em;
   text-transform: uppercase;
   /* c86-F (замер f-mobile-audit): прежнее «глубокое золото» #8a6d1f давало
@@ -3042,8 +3039,9 @@ header[data-scrolled="true"] [data-mega-panel] {
   font-weight: 700;
   /* c84-A (задача 3, читаемость): min 13px → 14px (владелец: «некоторым
      слишком мелко»); line-height/tracking сохранены. Живые потребители:
-     hacc-menu, ea-faq-accordion, events-video-carousel. */
-  font-size: clamp(0.875rem, 1.05vw, 0.95rem);
+     hacc-menu, ea-faq-accordion, events-video-carousel.
+     c89 (3-g): пол поднят 0.875/0.95rem → 0.9/1rem (продолжение волны). */
+  font-size: clamp(0.9rem, 1.05vw, 1rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   /* F2: текст 13px → --ea-red-text (был --ea-red 4.17:1 → 6.01:1 AA) */
@@ -4144,11 +4142,11 @@ header[data-scrolled="true"] [data-mega-panel] {
 }
 
 .gamma-marquee__track--anim {
-  /* c88: 170s — сет из 44 реальных кадров ≈ 19.5к px (против 4.6к у 14
-     сток-портретов): 170с держит прежнюю скорость ленты ~110–115 px/s.
+  /* c89: 137s — сет из 36 реальных кадров ≈ 15.75к px (c88: 44 кадра
+     ≈ 19.5к px, 170с): 137с держит прежнюю скорость ленты ~110–115 px/s.
      Синхронно с MARQUEE_DURATION_S в gamma-marquee.tsx — drag-resume
      считает фазу возобновления от этой дюрации. */
-  animation: gamma-marquee-scroll 170s linear infinite;
+  animation: gamma-marquee-scroll 137s linear infinite;
   /* will-change живёт ТОЛЬКО здесь — c83-F1: дубль с Tailwind
      will-change-transform на треке (gamma-marquee.tsx) убран. */
   will-change: transform;

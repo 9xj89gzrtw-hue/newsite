@@ -1,20 +1,21 @@
 "use client";
 
 /**
- * HaccServices — «Каталог услуг» (Cycle 52: two six-spine racks)
+ * HaccServices — «Каталог услуг» (c89 / Task 3-b: ONE six-spine rack)
  * ---------------------------------------------------------------------------
- * User verdict after three passes: the SOLID tint spines read better than
- * the filmstrip experiment (reverted), and 12 spines crowd the composition —
- * so the catalog splits into TWO racks of six, the second below the first:
+ * Owner verdict: chapter 01 keeps a SINGLE accordion with six formats —
+ * Свадьбы, Корпоратив, Шоу-станции, Выездной бар, Вегетарианское и халяль,
+ * Гастро-боксы. Furshety/bankety/kofe-breyki/barbekyu/torty/logistika are
+ * dropped from the chapter (those formats live on in the menu catalog &
+ * /offer), and the second rack went with them — so the cycle-52 two-rack
+ * focus model (focusedRack / scroll-IO hysteresis / openByRack) is deleted
+ * too: one rack, one open panel, no focus juggling.
  *
- *   Rack A «Форматы события»        01–06  (фуршеты → барбекю)
- *   Rack B «К любому формату»        07–12  (бар → логистика)
+ * Six spines give the open panel ~71% of the rack width — gamma-grade
+ * cinema (the old 12-spine rack could only reach 67% while keeping the
+ * spines readable).
  *
- * Six spines per rack give the open panel ~71% of the rack width —
- * gamma-grade cinema (the 12-spine rack could only reach 67% while keeping
- * the spines readable). Each rack is a full gamma haccordion on its own.
- *
- * gamma mechanics (research/gamma-haccordion-research.md), per rack:
+ * gamma mechanics (research/gamma-haccordion-research.md):
  *  - flex-basis = closed spine width, flex-grow 0→1 opens (620ms easeInOutSine)
  *  - spine (vertical title) absolute at the item's left, widens when open
  *  - open panel: JS-measured FIXED px width → zero reflow mid-animation
@@ -24,21 +25,13 @@
  *    gamma's × is a no-op lie)
  *  - inert + delayed visibility on closed panels → no Tab focus leak
  *
- * Two-rack focus model (the only genuinely new machinery):
- *  - each rack owns its openIndex; opening in B never disturbs A
- *  - ONE rack plays at a time — the FOCUSED rack. Focus follows hover /
- *    click / keyboard, and scroll (IO hysteresis: a rack takes focus when
- *    visibly dominant; manual focus wins for 2.5s so scrolling past a rack
- *    the user is reading can't steal it back)
- *  - section-level ambient tint wash + live counter HUD mirror the focused
- *    rack's open panel (global index 01–12)
- *
- * Carried over from cycles 49–51: hover-intent opening (380ms, fine
- * pointers), staggered entrances per rack, spring mouse-parallax on the
- * open photo, magnetic CTA + arrow, script-title settle, perpetual Ken
- * Burns drift + unifying color grade, autoplay progress line (desktop,
- * focused rack only, stops after the first manual engagement — WCAG 2.2.2),
- * full prefers-reduced-motion, print styles, forced-colors.
+ * Carried over from cycles 49–52: hover-intent opening (380ms, fine
+ * pointers), staggered entrance, spring mouse-parallax on the open photo,
+ * magnetic CTA + arrow, script-title settle, perpetual Ken Burns drift +
+ * unifying color grade, autoplay progress line (desktop, stops after the
+ * first manual engagement — WCAG 2.2.2), section-level ambient tint wash
+ * mirroring the open panel, full prefers-reduced-motion, print styles,
+ * forced-colors.
  *
  * C83 (Impl-E): панельный «индекс-поп» — spine-номера удалены владельцем
  * (cycle-55: «зачем?» ×2), счётчик 01/12 — cycle-54, поэтому поп получает
@@ -80,10 +73,6 @@ const AUTOPLAY_MS = 6500;
 /** Baymard: hover-intent delay avoids flicker when sweeping across spines. */
 const HOVER_INTENT_MS = 380;
 const DESKTOP_MQ = "(min-width: 1024px)";
-/** Manual focus suppresses scroll-based focus switching for this long. */
-const FOCUS_STICKY_MS = 2500;
-/** IO hysteresis: a rack must beat the other by this ratio to take focus. */
-const FOCUS_RATIO_EDGE = 0.15;
 
 /**
  * Tiny 8×8 SVG placeholder (base64) — soft parchment wash before the photo
@@ -103,7 +92,7 @@ interface HaccService {
   price: string;
   priceLabel: string;
   tag: string;
-  /** warm per-service tint — 6 distinct families cycling over 12 panels */
+  /** warm per-service tint — 6 distinct families, one per panel (c89) */
   tint: string;
   media: string;
   mediaAlt: string;
@@ -116,10 +105,10 @@ interface HaccService {
 }
 
 /**
- * 12 services — validated copy carried over from Cycle 45 SpiralServices;
- * 2048px media (cycle-49). The split is semantic, not arbitrary: rack A is
- * event FORMATS (what kind of event), rack B is SERVICES & extras (what we
- * additionally deliver at any event).
+ * 6 услуг (c89 / Task 3-b: один аккордеон — только ключевые форматы;
+ * фуршеты/банкеты/кофе-брейки/барбекю/торты/логистика остались в
+ * меню-каталоге hacc-menu и /offer). Validated copy carried over from
+ * Cycle 45 SpiralServices; 2048px media (cycle-49).
  */
 /** Калькулятор читает ?type=… через nuqs (подхватывает history.replaceState) —
  *  тот же контракт, что presetCalculator в hacc-menu.tsx: CTA услуг ставит
@@ -133,45 +122,8 @@ function presetCalculator(typeId: string) {
 
 const SERVICES: HaccService[] = [
   {
-    id: "furshety",
-    index: "01",
-    title: "Фуршеты",
-    hook: "Канапе — тёплыми, коктейли — ледяными: подача не прерывается весь вечер.",
-    /* цена синхронизирована с прейскурантом меню/калькулятора
-       (lib/pricing.ts buffet.perGuest) — CFO-симуляция C59/W5 поймала
-       расползание «от 1 600» против «от 2 450» на одном экране */
-    price: "от 2\u00A0450\u00A0₽",
-    priceLabel: "за гостя",
-    tag: "Классическая подача",
-    tint: "#F5EEE2",
-    media: "/media/gamma/c49-furshet-hires.jpg",
-    mediaAlt: "Фуршетные закуски и канапе на подаче",
-    ctaLabel: "Рассчитать фуршет",
-    ctaHref: "#calculator",
-    /* C71-W3 (K6-CRITICAL): преселект типа в калькуляторе — юзер читал
-       «фуршет от 2 450 ₽», кликал и получал дефолт «Банкет 134 100 ₽»
-       (+82% шок цены). Мэппинг id услуги → id формата lib/pricing.ts. */
-    calcType: "buffet",
-  },
-  {
-    id: "bankety",
-    index: "02",
-    title: "Банкеты",
-    hook: "От аперитива до десерта вечер идёт по нотам — горячее подают горячим.",
-    /* синхронизировано с lib/pricing.ts banquet.perGuest (см. выше) */
-    price: "от 4\u00A0470\u00A0₽",
-    priceLabel: "за гостя",
-    tag: "Полная посадка",
-    tint: "#F6E0DB",
-    media: "/media/gamma/c49-banket-hires.jpg",
-    mediaAlt: "Банкетный ужин в зале с полным накрытием столов",
-    ctaLabel: "Рассчитать банкет",
-    ctaHref: "#calculator",
-    calcType: "banquet",
-  },
-  {
     id: "svadby",
-    index: "03",
+    index: "01",
     title: "Свадьбы",
     hook: "От утреннего кофе до ночного торта — весь день ведёт одна команда.",
     price: "от 5\u00A0500\u00A0₽",
@@ -180,12 +132,14 @@ const SERVICES: HaccService[] = [
     tint: "#E6EBDF",
     media: "/media/c53/svadby.webp",
     mediaAlt: "Свадебный банкет при свечах с сервировкой столов",
+    /* c89 (Task 3-b): #contact уезжает на зону контактов компании —
+       конверсионные CTA главы ведут в смета-чек (#calculator). */
     ctaLabel: "Обсудить свадьбу",
-    ctaHref: "#contact",
+    ctaHref: "#calculator",
   },
   {
     id: "korporativ",
-    index: "04",
+    index: "02",
     title: "Корпоратив",
     hook: "Кофе — к первому перерыву, гала-ужин — к финалу: всё подано вовремя.",
     price: "от 2\u00A0500\u00A0₽",
@@ -195,59 +149,11 @@ const SERVICES: HaccService[] = [
     media: "/media/gamma/c49-korporativ-hires.webp",
     mediaAlt: "Корпоративный гала-ужин с сервировкой",
     ctaLabel: "Получить смету",
-    ctaHref: "#contact",
-  },
-  {
-    id: "kofe-breyki",
-    index: "05",
-    title: "Кофе-брейки",
-    hook: "Выпечка ещё тёплая, кофе пахнет на весь этаж — к нужному часу.",
-    /* синхронизировано с lib/pricing.ts coffee-break.perGuest — CFO/офис-
-       симуляции C59 ловили расползание цен между плитками и каталогом */
-    price: "от 900\u00A0₽",
-    priceLabel: "за гостя",
-    tag: "Офис",
-    tint: "#F4DECD",
-    media: "/media/c53/kofe-stol.webp",
-    mediaAlt: "Кофе-брейк: круассаны, пирог и кофе с латте-артом",
-    ctaLabel: "Заказать кофе-брейк",
     ctaHref: "#calculator",
-    calcType: "coffee-break",
-  },
-  {
-    id: "barbekyu",
-    index: "06",
-    title: "Барбекю",
-    hook: "Рибай и овощи с мангала — живой огонь и ароматы, которые собирают гостей.",
-    /* синхронизировано с lib/pricing.ts bbq.perGuest (CTA ведёт в тот
-       калькулятор — цена обязана совпадать, симуляции C59) */
-    price: "от 2\u00A0200\u00A0₽",
-    priceLabel: "за гостя",
-    tag: "На природе",
-    tint: "#F3E3E8",
-    media: "/media/c55/barbekyu.webp",
-    mediaAlt: "Стейк на кости жарится на живых углях",
-    ctaLabel: "Рассчитать барбекю",
-    ctaHref: "#calculator",
-    calcType: "bbq",
-  },
-  {
-    id: "bar",
-    index: "07",
-    title: "Выездной бар",
-    hook: "Шейкер звенит, бокалы ледяные — бар живёт до последнего тоста.",
-    price: "от 32\u00A0000\u00A0₽",
-    priceLabel: "за событие",
-    tag: "Миксология",
-    tint: "#F5EEE2",
-    media: "/media/c57/c57-bar.webp",
-    mediaAlt: "Бармен в белой рубашке направляет дым от дымовой пушки на бокал с красным коктейлем — на стойке бутылки, ягоды и цитрусы",
-    ctaLabel: "Обсудить бар",
-    ctaHref: "#contact",
   },
   {
     id: "shou-stancii",
-    index: "08",
+    index: "03",
     title: "Шоу-станции",
     hook: "Кухня выходит к столу: паста в облаке пара, карвинг под ножом шефа.",
     price: "от 35\u00A0000\u00A0₽",
@@ -257,113 +163,93 @@ const SERVICES: HaccService[] = [
     media: "/media/c57/c57-shou.webp",
     mediaAlt: "Повар в колпаке и белой форме достаёт щипцами противень с блюдом из теплового шкафа",
     ctaLabel: "Обсудить станции",
-    ctaHref: "#contact",
+    ctaHref: "#calculator",
+  },
+  {
+    id: "bar",
+    index: "04",
+    title: "Выездной бар",
+    hook: "Шейкер звенит, бокалы ледяные — бар живёт до последнего тоста.",
+    price: "от 32\u00A0000\u00A0₽",
+    priceLabel: "за событие",
+    tag: "Миксология",
+    tint: "#F5EEE2",
+    media: "/media/c57/c57-bar.webp",
+    mediaAlt: "Бармен в белой рубашке направляет дым от дымовой пушки на бокал с красным коктейлем — на стойке бутылки, ягоды и цитрусы",
+    ctaLabel: "Обсудить бар",
+    ctaHref: "#calculator",
+  },
+  {
+    id: "veg-halal",
+    index: "05",
+    title: "Вегетарианское и халяль",
+    hook: "Сертификат — на халяль, сезонные овощи — в главной роли.",
+    /* 3 200 = vegetarian.perGuest (lib/pricing.ts, c89): то же слово
+       «вегетарианское» обязано стоить одинаково во всех блоках (C59/W7) */
+    price: "от 3\u00A0200\u00A0₽",
+    priceLabel: "за гостя",
+    tag: "Особые меню",
+    tint: "#F4DECD",
+    media: "/media/ridgewells-veg-mosaic.jpg",
+    mediaAlt: "Овощная мозаика вегетарианского меню",
+    /* c89: CTA ушёл с #contact в смета-чек; преселект vegetarian держит
+       цену панели и калькулятора одинаковой (K6-CRITICAL, см. calcType). */
+    ctaLabel: "Получить меню",
+    ctaHref: "#calculator",
+    calcType: "vegetarian",
   },
   {
     id: "gastro-boksy",
-    index: "09",
+    index: "06",
     title: "Гастро-боксы",
     hook: "Банкет, который помещается в коробке, — каждому гостю лично.",
-    /* синхронизировано с lib/pricing.ts snack-box.perGuest = 660 ₽/гость —
-       CTA плитки ведёт в калькулятор «Доставка закусок», цена обязана
-       совпадать (расхождение «650/660» на одном экране ловил аудит W1-C) */
-    price: "от 660\u00A0₽",
+    /* c89/W1-код-критик (MAJOR): цена панели = цена КАЛЬКУЛЯТОРА формата
+       (snack-box.calcPerGuest = 1 200 ₽) — CTA плитки пресетит калькулятор,
+       расхождение цен на одном экране недопустимо (K6-CRITICAL). Каталожные
+       пакеты à la carte (от 660 ₽) остаются в меню-каталоге (hacc-menu). */
+    price: "от 1\u00A0200\u00A0₽",
     priceLabel: "за гостя",
     tag: "Доставка",
-    tint: "#E6EBDF",
+    /* c89: #E6EBDF → #F3E3E8 — 6 панелей = 6 семейств тинтов без дублей
+       (раньше семьи циклились по 12 панелям). */
+    tint: "#F3E3E8",
     media: "/media/c57/c57-boksy.webp",
     mediaAlt: "Прозрачные коробки с закусками: виноград, сыр, оливки, крекеры и макаруны, перевязанные верёвкой",
     ctaLabel: "Заказать боксы",
     ctaHref: "#calculator",
     calcType: "snack-box",
   },
-  {
-    id: "torty",
-    index: "10",
-    title: "Торты на заказ",
-    hook: "Ярусы, текстуры, сезонные ягоды: торт как архитектура.",
-    price: "от 4\u00A0500\u00A0₽",
-    priceLabel: "за торт",
-    tag: "Десерт",
-    tint: "#F6E9C9",
-    media: "/media/c55/tort.webp",
-    mediaAlt: "Двухъярусный торт с клубникой, малиной и ежевикой",
-    ctaLabel: "Обсудить торт",
-    ctaHref: "#contact",
-  },
-  {
-    id: "veg-halal",
-    index: "11",
-    title: "Вегетарианское и халяль",
-    hook: "Сертификат — на халяль, сезонные овощи — в главной роли.",
-    /* 2 450 = vegetarian.perGuest (lib/pricing.ts): то же слово
-       «вегетарианское» обязано стоить одинаково во всех блоках (C59/W7) */
-    price: "от 2\u00A0450\u00A0₽",
-    priceLabel: "за гостя",
-    tag: "Особые меню",
-    tint: "#F4DECD",
-    media: "/media/ridgewells-veg-mosaic.jpg",
-    mediaAlt: "Овощная мозаика вегетарианского меню",
-    ctaLabel: "Получить меню",
-    ctaHref: "#contact",
-  },
-  {
-    id: "logistika",
-    index: "12",
-    title: "Логистика под ключ",
-    hook: "Посуда, мебель, текстиль, декор: привезли — сервировали — забрали.",
-    price: "под проект",
-    priceLabel: "смета за один день",
-    tag: "Всё, кроме еды",
-    tint: "#F3E3E8",
-    media: "/media/c57/c57-logistika.webp",
-    mediaAlt: "Лофт-зал с кирпичными стенами и люстрами: круглые столы в белых скатертях и золотистые стулья",
-    ctaLabel: "Обсудить логистику",
-    ctaHref: "#contact",
-  },
 ];
 
-/** The semantic split: event formats vs services & extras. */
-const GROUPS: { label: string }[] = [
-  { label: "Форматы события" },
-  { label: "К любому формату" },
-];
-
-const GROUP_SIZE = 6;
+/** c89 (Task 3-b): «в главе 1 всего один аккордеон» — единая группа из
+ *  шести форматов; второй рэк («К любому формату») и модель фокус-переключения
+ *  между рэками удалены вместе с его панелями. */
+const RACK_LABEL = "Форматы события";
 
 /* ----------------------------------------------------------- rack (6 items) */
 
 interface HaccRackProps {
   /** The six services this rack owns. */
   items: HaccService[];
-  /** Global index of items[0] (0 for rack A, 6 for rack B). */
-  offset: number;
   /** Group label — used for the rack's aria-label. */
   groupLabel: string;
-  /** Only the focused rack autoplays / shows its progress line. */
-  focused: boolean;
   /** Global autoplay liveness — dies on the first manual engagement. */
   playing: boolean;
   docHidden: boolean;
   reduced: boolean | null;
-  /** Report the rack's open panel (global index, or null = all closed). */
-  onOpen: (globalIndex: number | null) => void;
-  /** Hover — shifts focus to this rack (autoplay keeps living). */
-  onHoverRack: () => void;
-  /** Click / keyboard focus — shifts focus AND stops autoplay (WCAG 2.2.2). */
+  /** Report the rack's open panel (index, or null = all closed). */
+  onOpen: (index: number | null) => void;
+  /** Click / keyboard focus — stops autoplay (WCAG 2.2.2). */
   onEngageRack: () => void;
 }
 
 function HaccRack({
   items,
-  offset,
   groupLabel,
-  focused,
   playing,
   docHidden,
   reduced,
   onOpen,
-  onHoverRack,
   onEngageRack,
 }: HaccRackProps) {
   const baseId = useId();
@@ -391,7 +277,7 @@ function HaccRack({
   /** ≥1024px → autoplay allowed (mobile layout-shift guard) */
   const [isDesktop, setIsDesktop] = useState(false);
 
-  const paused = hovering || focusWithin || docHidden || !inView || !focused;
+  const paused = hovering || focusWithin || docHidden || !inView;
 
   /* mirror frequently-read values into refs for stable closures ---------- */
   const openIndexRef = useRef<number | null>(openIndex);
@@ -463,10 +349,10 @@ function HaccRack({
     };
   }, [N]);
 
-  /* report the open panel to the section (ambient + counter mirror it) --- */
+  /* report the open panel to the section (the ambient wash mirrors it) -- */
   useEffect(() => {
-    onOpen(openIndex === null ? null : offset + openIndex);
-  }, [openIndex, offset, onOpen]);
+    onOpen(openIndex);
+  }, [openIndex, onOpen]);
 
   /* ── visibility for autoplay pausing ─────────────────────────────────── */
   useEffect(() => {
@@ -480,14 +366,14 @@ function HaccRack({
     return () => io.disconnect();
   }, []);
 
-  /* ── autoplay: the FOCUSED rack advances every AUTOPLAY_MS while in
-     view and not paused. Unfocused racks freeze — one thing moves at a
-     time (premium restraint). ──────────────────────────────────────────── */
+  /* ── autoplay: the rack advances every AUTOPLAY_MS while in view and
+     not paused (hover / focus / hidden tab freeze it — premium restraint:
+     one thing moves at a time). ───────────────────────────────────────── */
   const nextAtRef = useRef(0);
   const remainingRef = useRef(AUTOPLAY_MS);
 
   useEffect(() => {
-    if (reduced || !playing || !focused || !isDesktop || openIndex === null)
+    if (reduced || !playing || !isDesktop || openIndex === null)
       return;
     nextAtRef.current = Date.now() + AUTOPLAY_MS;
     remainingRef.current = AUTOPLAY_MS;
@@ -508,7 +394,7 @@ function HaccRack({
     };
     const iv = window.setInterval(tick, 250);
     return () => window.clearInterval(iv);
-  }, [reduced, playing, focused, isDesktop, openIndex, N]);
+  }, [reduced, playing, isDesktop, openIndex, N]);
 
   /* ── open(): the single interaction entry point ──────────────────────── */
   const scrollTimer = useRef(0);
@@ -633,7 +519,7 @@ function HaccRack({
   const panelId = (i: number) => `${baseId}-panel-${items[i].id}`;
   const spineId = (i: number) => `${baseId}-spine-${items[i].id}`;
 
-  const autoplayOn = focused && playing && !reduced && isDesktop && openIndex !== null;
+  const autoplayOn = playing && !reduced && isDesktop && openIndex !== null;
 
   /* choreographed entrance — this rack's spines cascade (40ms stagger) --
      c83-F2 (V1b RM): под reduce варианты остаются ОПРЕДЕЛЁННЫМИ (нулевая
@@ -678,10 +564,7 @@ function HaccRack({
       viewport={{ once: true, margin: "-60px" }}
       variants={rackVariants}
       onMouseMove={onRackMouseMove}
-      onMouseEnter={() => {
-        setHovering(true);
-        onHoverRack();
-      }}
+      onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => {
         setHovering(false);
         clearHoverIntent();
@@ -750,7 +633,7 @@ function HaccRack({
                 <span className="hacc__spine-plus" aria-hidden="true">
                   <Plus />
                 </span>
-                {/* autoplay progress — focused rack's open spine only; the
+                {/* autoplay progress — the open spine only; the
                     inline duration var keeps CSS and JS clocks in sync */}
                 {autoplayOn && isOpen ? (
                   <span
@@ -926,23 +809,12 @@ export function HaccServices() {
   useEffect(() => setHeadMounted(true), []);
   const reduceSettled = headMounted && prefersReduced;
 
-  /** Which rack is "live" (autoplay + ambient + counter mirror it). */
-  const [focusedRack, setFocusedRack] = useState(0);
-  /** Each rack's open panel as a GLOBAL service index (null = all closed). */
-  const [openByRack, setOpenByRack] = useState<(number | null)[]>([
-    0,
-    GROUP_SIZE,
-  ]);
+  /** The open panel (service index, null = all closed) — drives the
+   *  ambient wash. SSR renders #1 open — matches the rack. */
+  const [activeIndex, setActiveIndex] = useState<number | null>(0);
   /** Autoplay liveness — dies on the first manual engagement (WCAG 2.2.2). */
   const [playing, setPlaying] = useState(true);
   const [docHidden, setDocHidden] = useState(false);
-
-  const groupRefs = [
-    useRef<HTMLDivElement | null>(null),
-    useRef<HTMLDivElement | null>(null),
-  ];
-  const ratioRef = useRef([0, 0]);
-  const manualUntilRef = useRef(0);
 
   /* document visibility — pause everything when the tab is hidden -------- */
   useEffect(() => {
@@ -951,53 +823,15 @@ export function HaccServices() {
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
-  /* scroll-based focus: the visibly dominant rack takes focus (with
-     hysteresis), unless the user manually focused one recently ---------- */
-  useEffect(() => {
-    const ios = groupRefs.map((ref, gi) => {
-      const io = new IntersectionObserver(
-        (entries) => {
-          ratioRef.current[gi] = entries[0]?.intersectionRatio ?? 0;
-          if (Date.now() < manualUntilRef.current) return;
-          const [ra, rb] = ratioRef.current;
-          const dominant = rb > ra + FOCUS_RATIO_EDGE ? 1 : ra > rb + FOCUS_RATIO_EDGE ? 0 : null;
-          if (dominant !== null) setFocusedRack(dominant);
-        },
-        { threshold: [0, 0.15, 0.3, 0.5, 0.7, 0.9] },
-      );
-      if (ref.current) io.observe(ref.current);
-      return io;
-    });
-    return () => ios.forEach((io) => io.disconnect());
+  /* stable handlers ------------------------------------------------------- */
+  /** Click / keyboard engagement — autoplay stops for good (WCAG 2.2.2).
+   *  c89: без второго рэка фокус-переключение не нужно — engage только
+   *  гасит автоплей. */
+  const handleEngage = useCallback(() => setPlaying(false), []);
+
+  const handleOpen = useCallback((index: number | null) => {
+    setActiveIndex((prev) => (prev === index ? prev : index));
   }, []);
-
-  /* stable handlers per rack --------------------------------------------- */
-  const handleHover = useCallback((gi: number) => {
-    manualUntilRef.current = Date.now() + FOCUS_STICKY_MS;
-    setFocusedRack(gi);
-  }, []);
-
-  const handleEngage = useCallback((gi: number) => {
-    manualUntilRef.current = Date.now() + FOCUS_STICKY_MS;
-    setFocusedRack(gi);
-    setPlaying(false);
-  }, []);
-
-  const handleOpen = useCallback((gi: number, globalIndex: number | null) => {
-    setOpenByRack((prev) =>
-      prev[gi] === globalIndex
-        ? prev
-        : prev.map((v, i) => (i === gi ? globalIndex : v)),
-    );
-  }, []);
-
-  const makeOnOpen = (gi: number) => (globalIndex: number | null) =>
-    handleOpen(gi, globalIndex);
-  const makeOnHover = (gi: number) => () => handleHover(gi);
-  const makeOnEngage = (gi: number) => () => handleEngage(gi);
-
-  /** The focused rack's open panel — drives the ambient wash + counter. */
-  const activeIndex = openByRack[focusedRack] ?? null;
 
   /* ─────────────────────────────────────────────────────────────── render */
 
@@ -1007,8 +841,8 @@ export function HaccServices() {
       aria-labelledby="hacc-heading"
       className="hacc ea-section ea-section--cream"
     >
-      {/* ambient tint wash — the section bg glows with the FOCUSED rack's
-          open panel tint. 12 stacked layers, opacity-only transitions. */}
+      {/* ambient tint wash — the section bg glows with the open panel's
+          tint. One layer per service, opacity-only transitions. */}
       <div className="hacc__ambient" aria-hidden="true">
         {SERVICES.map((s, i) => (
           <span
@@ -1022,7 +856,7 @@ export function HaccServices() {
         ))}
       </div>
 
-      {/* section head stays inside the site grid; the racks below go
+      {/* section head stays inside the site grid; the rack below goes
           full-bleed edge-to-edge — exactly like gamma's haccordion */}
       <div className="ea-container ea-container--wide">
         <motion.div
@@ -1067,13 +901,16 @@ export function HaccServices() {
               </i>
             </h2>
             <p className="hacc__lede">
-              От кофе-брейка на двадцать персон до свадьбы на пятьсот гостей:
+              {/* c89 (Task 3-b): кофе-брейк покинул главу — диапазон «от … до …»
+                  теперь между гастро-боксами (самый доступный формат) и свадьбой. */}
+              От гастро-боксов на двадцать персон до свадьбы на пятьсот гостей:
               формат определяет меню, команду и цену за гостя.
             </p>
           </div>
           {/* cycle-54: the big 01/12 counter is GONE — it ticked far from
-              where the eye reads (700px above rack B) and duplicated the
-              spine indices; pure decoration with no job. The hint stays. */}
+              where the eye reads (700px above the second rack, back when
+              there were two) and duplicated the spine indices; pure
+              decoration with no job. The hint stays. */}
           <div className="hacc__meta">
             <span className="hacc__hint" aria-hidden="true">
               <MousePointer2 aria-hidden="true" />
@@ -1083,32 +920,21 @@ export function HaccServices() {
         </motion.div>
       </div>
 
-      {/* — — — two racks of six: formats, then services & extras — — — */}
-      {GROUPS.map((g, gi) => (
-        <div
-          className="hacc__group"
-          key={g.label}
-          ref={groupRefs[gi]}
-          onMouseEnter={() => handleHover(gi)}
-          onFocusCapture={() => handleEngage(gi)}
-        >
-          <div className="ea-container ea-container--wide">
-            <p className="hacc__rack-label">{g.label}</p>
-          </div>
-          <HaccRack
-            items={SERVICES.slice(gi * GROUP_SIZE, gi * GROUP_SIZE + GROUP_SIZE)}
-            offset={gi * GROUP_SIZE}
-            groupLabel={g.label}
-            focused={focusedRack === gi}
-            playing={playing}
-            docHidden={docHidden}
-            reduced={prefersReduced}
-            onOpen={makeOnOpen(gi)}
-            onHoverRack={makeOnHover(gi)}
-            onEngageRack={makeOnEngage(gi)}
-          />
+      {/* — — — one rack of six spines — the event formats — — — */}
+      <div className="hacc__group" onFocusCapture={handleEngage}>
+        <div className="ea-container ea-container--wide">
+          <p className="hacc__rack-label">{RACK_LABEL}</p>
         </div>
-      ))}
+        <HaccRack
+          items={SERVICES}
+          groupLabel={RACK_LABEL}
+          playing={playing}
+          docHidden={docHidden}
+          reduced={prefersReduced}
+          onOpen={handleOpen}
+          onEngageRack={handleEngage}
+        />
+      </div>
     </section>
   );
 }

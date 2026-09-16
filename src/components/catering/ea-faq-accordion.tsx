@@ -242,14 +242,15 @@ export function EaFaqAccordion() {
             bold). Глобальную переменную НЕ трогаю (она используется и
             крупно — дивайдеры/карусельные точки), затемняю ТОЛЬКО здесь:
             #7A6362 = 5.10:1 ✓ AA. */}
-        {/* c85 (понятность): глава 07 — единая нумерация главных глав
-            страницы (см. .ea-chapter в globals.css). Decorative. */}
+        {/* c85 (понятность): глава 06 (c89/3-g: была 07 до снятия CepProcess
+            с рендера) — единая нумерация главных глав страницы (см.
+            .ea-chapter в globals.css). Decorative. */}
         <RevealP
           className="text-center"
           style={{ color: "#7A6362" }}
           {...reveal(0)}
         >
-          <span className="ea-chapter" aria-hidden="true">Глава 07</span>
+          <span className="ea-chapter" aria-hidden="true">Глава 06</span>
         </RevealP>
         <RevealP
           className="ea-eyebrow--script text-center"
@@ -274,7 +275,7 @@ export function EaFaqAccordion() {
           className="mt-6 text-center"
           style={{
             fontFamily: "var(--ea-font-body)",
-            fontSize: "0.9rem",
+            fontSize: "1rem" /* c89 (3-g): читаемость — было 0.9rem */,
             lineHeight: 1.7,
             color: "color-mix(in oklch, var(--ea-ink) 70%, transparent)",
             display: "flex",
@@ -288,7 +289,7 @@ export function EaFaqAccordion() {
           <span>
             Не нашли свой вопрос? Напишите или позвоните — отвечаем в любое время.
           </span>
-          <a href="#contact" className="ea-text-link" style={{ fontSize: "0.85rem" }}>
+          <a href="#contact" className="ea-text-link" style={{ fontSize: "0.95rem" }}>
             Задать вопрос
             <svg
               className="ea-text-link__arrow"
@@ -481,7 +482,7 @@ export function EaFaqAccordion() {
                       <p
                         style={{
                           fontFamily: "var(--ea-font-body)",
-                          fontSize: "0.95rem",
+                          fontSize: "1rem" /* c89 (3-g): читаемость — было 0.95rem */,
                           lineHeight: 1.7,
                           color: "color-mix(in oklch, var(--ea-ink) 82%, transparent)",
                           paddingBottom: "1.5rem",

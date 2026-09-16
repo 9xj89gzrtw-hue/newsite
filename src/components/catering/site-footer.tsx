@@ -14,11 +14,13 @@ import {
   Heart,
   ChevronRight,
   Send,
-  MessageCircle,
+  Youtube,
+  MonitorPlay,
 } from "lucide-react";
 import {
   SOPRANOS_CITIES,
   CONTACTS,
+  YANDEX_MAPS,
 } from "@/lib/media";
 import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
@@ -381,7 +383,7 @@ function FooterSpotlight() {
  * (bg-ink/60 банд, from-ink фейды) — следом. Текст остаётся светлым
  * (cream/gold — контрасты только выросли, см. K2-комментарий ниже).
  *
- * Layout (Task 2-c):
+ * Layout (Task 2-c; c89 — полоса реквизитов + карта):
  * 1. «Накрыто с любовью» (intro band, Marck Script + подзаголовок;
  *    c86-D: было «Сделано с любовью» — фраза переписана под суть
  *    кейтеринга — накрыть на стол)
@@ -389,8 +391,13 @@ function FooterSpotlight() {
  *    — колонка «Нам доверяют» и полоса подписки удалены по запросу
  *    владельца; c86-D: стат «2 400+ мероприятий с 2007 года» снят
  *    (de-numbering — владелец уводит сайт от чисел).
+ *    c89 в контактах: строка «Макс» (+7 911 826-39-26) под основным
+ *    телефоном; соц-ряд = 5 профилей (Instagram* · VK · Телеграм
+ *    канал · YouTube · Rutube, мессенджеры убраны в «Напишите нам»).
+ * 2R. Реквизиты (c89): dl ИП + счёта ТБанка (LEGAL_INFO + .bank).
  * 3. Гигантский кинетический вордмарк «NILOV CATERING.» (wow-якорь,
  *    две строки «NILOV» / «CATERING.» — ребрендинг 3-A)
+ * 3M. Яндекс.Карта офиса (c89: перенесена из зоны контактов в подвал).
  * 4. «Накрываем столы по всему городу» — маркие районов СПб
  * 5. Копирайт + RF-сноска Instagram* (c86-D: маркер — на кнопке
  *    Instagram* в соц-строке, сноска Meta — последней строкой футера)
@@ -519,8 +526,9 @@ export function SiteFooter() {
                 выдумываем: на сайте (llms.txt/config) она = «офис», поэтому
                 просто связка. Студия на Петроградке живёт в своём контексте
                 (FAQ/услуги дегустации) — легенда не трогает.
-                text-[13px] + cream/60 = 5.6:1 на тёмном футере (замер D2; c84-F1: 12 → 13px — «мелко»). */}
-            <p className="text-[13px] leading-relaxed text-cream/60">
+                c89 (читаемость для пожилых): text-sm (14px) + cream/60 —
+                бывший 13px-кегль поднят до шкалы 0.875rem+. */}
+            <p className="text-sm leading-relaxed text-cream/60">
               Юридический адрес: {LEGAL_INFO.legalAddress} — реквизиты в{" "}
               <a
                 href="/offer"
@@ -552,53 +560,57 @@ export function SiteFooter() {
                 />
                 {CONTACTS.phone}
               </a>
+              {/* c89 (владелец): строка «Макс» — второй номер компании
+                  (+7 911 826-39-26, CONTACTS.maxPhone). Ссылка —
+                  CONTACTS.maxHref (max.ru; профиль компании не существует,
+                  см. config.ts — ведёт на сайт мессенджера). Визуально —
+                  вторая ступень телефонной иерархии: тот же Phone-глиф,
+                  кегль text-sm (не lg), метка «Макс:» приглушена. */}
+              <a
+                href={CONTACTS.maxHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 text-sm text-cream/80 transition-colors hover:text-gold min-h-[44px]"
+              >
+                <Phone
+                  className="size-4 text-gold/70 transition-transform group-hover:rotate-12"
+                  aria-hidden="true"
+                />
+                <span className="text-cream/60">Макс:</span> {CONTACTS.maxPhone}
+              </a>
             </div>
 
-            {/* Соцсети — VK / Instagram / Telegram / WhatsApp
-                (c86-CRIT3: MAX снят — профиль 404).
-                c86-D: Instagram — единственная кнопка с ВИДИМОЙ подписью
-                «Instagram*» (RF-маркер; сноска Meta — последней строкой
-                футера): пилюля h-10 в идиоме VK/MAX (font-display-бейдж),
-                слово длиннее акронима — ширина авто + px, не size-10.
-                Ряд получил flex-wrap: на узких (<360px) экранах пилюля
-                аккуратно переносится на вторую строку, без overflow.
+            {/* Соцсети (c89, владелец): пять публичных профилей в порядке
+                письма — Instagram* · VK · Телеграм канал · YouTube · Rutube.
+                WhatsApp и Telegram-ЧАТ убраны из ряда — это мессенджеры
+                «Напишите нам» зоны контактов, а не соцсети (футер компактнее).
+                Все пять — ЕДИНАЯ идиома подписанных пилюль h-10 px-3.5
+                (читаемость для пожилых: подпись видимой текстом, не только
+                иконкой; flex-wrap переносит ряд на узких экранах без
+                overflow). Instagram — RF-маркер «*» (сноска Meta — последней
+                строкой футера). Rutube-канала пока нет — ссылка на поиск
+                Rutube по бренду (CONTACTS.rutubeHref, см. config.ts).
                 c83-B (Impl-B, задача 3b): y-hop глифа — подъём -4px +
                 заливка золотом на hover/focus-visible (CSS в
                 site-footer-anim.css; гейты fine-pointer + no-preference).
-                data-wiggle ЗАМЕНЁН на hop (разрешение задачи при конфликте:
-                wiggle — CSS-анимация transform rotate+scale на ТОЙ ЖЕ
-                кнопке по ТОМУ ЖЕ hover — два жеста конкурировали бы на
-                одном триггере); data-press сохранён. */}
+                fw-soc__glyph стоит и на иконке, и на подписи — поднимаются
+                вместе. data-wiggle ЗАМЕНЁН на hop (разрешение задачи при
+                конфликте: wiggle — CSS-анимация transform rotate+scale на
+                ТОЙ ЖЕ кнопке по ТОМУ ЖЕ hover — два жеста конкурировали бы
+                на одном триггере); data-press сохранён. */}
             <div className="mt-2 flex flex-wrap items-center gap-3">
-              <a
-                href={CONTACTS.vkHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="nilov catering в ВКонтакте (открывается в новой вкладке)"
-                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
-                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
-                    reduce → none). */
-                data-press
-              >
-                <span className="fw-soc__glyph font-display text-xs font-bold uppercase text-cream">VK</span>
-              </a>
-              {/* c86-CRIT3: MAX-бейдж снят — max.ru/nilovcatering
-                  отвечает 404 (профиль не существует, см. site-config.ts);
-                  мёртвая ссылка в контактной зоне — анти-сигнал. Вернётся,
-                  когда владелец создаст профиль. */}
+              {/* c86-D: RF-маркер «Instagram*» видимой подписью —
+                  звёздочка золотом (8.2:1 на espresso), текст кремом
+                  (17:1). aria-label чистый — скринридеру звёздочка
+                  не нужна. Текст-бейдж: слово — сам маркер. */}
               <a
                 href={CONTACTS.instagramHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="nilov catering в Instagram (открывается в новой вкладке)"
-                /* c86-D: RF-маркер «Instagram*» видимой подписью —
-                    звёздочка золотом (8.2:1 на espresso), текст кремом
-                    (17:1). aria-label чистый — скринридеру звёздочка
-                    не нужна. Иконку заменил текст-бейдж: слово — сам
-                    маркер, идиома VK/MAX. */
                 className="fw-soc flex h-10 items-center justify-center rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
-                    reduce → none). c83-B: wiggle → y-hop (см. VK выше). */
+                    reduce → none). c83-B: wiggle → y-hop (см. докблок ряда). */
                 data-press
               >
                 <span className="fw-soc__glyph font-display text-xs font-bold text-cream">
@@ -606,28 +618,62 @@ export function SiteFooter() {
                 </span>
               </a>
               <a
-                href={CONTACTS.telegramHref}
+                href={CONTACTS.vkHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="nilov catering в Telegram (открывается в новой вкладке)"
-                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+                aria-label="nilov catering в ВКонтакте (открывается в новой вкладке)"
+                className="fw-soc flex h-10 items-center justify-center rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
-                    reduce → none). c83-B: wiggle → y-hop (см. VK выше). */
+                    reduce → none). */
                 data-press
               >
-                <Send className="fw-soc__glyph size-5 text-cream" aria-hidden="true" />
+                <span className="fw-soc__glyph font-display text-xs font-bold uppercase text-cream">VK</span>
               </a>
+              {/* c89: Телеграм-КАНАЛ @nilov_official (личный чат-диплинк
+                  убран вместе с WhatsApp — см. докблок ряда). */}
               <a
-                href={CONTACTS.whatsappHref}
+                href={CONTACTS.telegramChannelHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Написать в WhatsApp (открывается в новой вкладке)"
-                className="fw-soc flex size-10 items-center justify-center rounded-full border border-cream/20 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px] min-w-[44px]"
+                aria-label="Телеграм-канал nilov catering (открывается в новой вкладке)"
+                className="fw-soc flex h-10 items-center justify-center gap-2 rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
-                    reduce → none). c83-B: wiggle → y-hop (см. VK выше). */
+                    reduce → none). c83-B: wiggle → y-hop (см. докблок ряда). */
                 data-press
               >
-                <MessageCircle className="fw-soc__glyph size-5 text-cream" aria-hidden="true" />
+                <Send className="fw-soc__glyph size-4 text-cream" aria-hidden="true" />
+                <span className="fw-soc__glyph font-display text-xs font-bold text-cream">
+                  Телеграм канал
+                </span>
+              </a>
+              {/* c89: YouTube-канал @nilovcatering (CONTACTS.youtubeHref). */}
+              <a
+                href={CONTACTS.youtubeHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube-канал nilov catering (открывается в новой вкладке)"
+                className="fw-soc flex h-10 items-center justify-center gap-2 rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
+                    reduce → none). c83-B: wiggle → y-hop (см. докблок ряда). */
+                data-press
+              >
+                <Youtube className="fw-soc__glyph size-4 text-cream" aria-hidden="true" />
+                <span className="fw-soc__glyph font-display text-xs font-bold text-cream">YouTube</span>
+              </a>
+              {/* c89: Rutube (MonitorPlay + подпись) — канала нет, ссылка
+                  на поиск по бренду (см. докблок ряда). */}
+              <a
+                href={CONTACTS.rutubeHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Rutube — видео nilov catering (открывается в новой вкладке)"
+                className="fw-soc flex h-10 items-center justify-center gap-2 rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
+                /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
+                    reduce → none). c83-B: wiggle → y-hop (см. докблок ряда). */
+                data-press
+              >
+                <MonitorPlay className="fw-soc__glyph size-4 text-cream" aria-hidden="true" />
+                <span className="fw-soc__glyph font-display text-xs font-bold text-cream">Rutube</span>
               </a>
             </div>
 
@@ -669,6 +715,85 @@ export function SiteFooter() {
             </ul>
           </motion.nav>
         </div>
+
+        {/* ---- Реквизиты ИП + счёта (c89, владелец дал полные банковские
+              реквизиты) — полоса под контактной сеткой, до вордмарка/карты.
+              Все значения — из config (LEGAL_INFO + LEGAL_INFO.bank), ноль
+              дублей: смена реквизитов в одном месте обновляет футер и
+              юр-документы. dl → 2 колонки (sm:grid-cols-2, мобайл — одна),
+              ячейка = метка над значением (длинные адреса переносятся без
+              обрезки). Кегль text-sm (14px ≥ 0.85rem) — читаемость для
+              пожилых; числа — tabular-nums, реквизиты копируют из браузера
+              без рваных разрядов. Название организации собрано из legalName
+              (капс — конвенция банковских реквизитов, как в письме
+              владельца). Reveal — тем же stagger-каскадом, что колонки
+              выше (custom={2}). */}
+        <motion.section
+          {...motionProps}
+          custom={2}
+          variants={columnVariants}
+          aria-labelledby="footer-req-heading"
+          className="mt-12 border-t border-cream/10 pt-8 md:mt-14"
+        >
+          <h2
+            id="footer-req-heading"
+            className="eyebrow-wide text-sm text-gold"
+          >
+            Реквизиты
+          </h2>
+          <dl className="mt-4 grid grid-cols-1 gap-x-10 gap-y-3 text-sm leading-relaxed sm:grid-cols-2">
+            <div className="flex flex-col">
+              <dt className="text-cream/60">Название организации</dt>
+              <dd className="tabular-nums text-cream/85">
+                {`ИНДИВИДУАЛЬНЫЙ ПРЕДПРИНИМАТЕЛЬ ${LEGAL_INFO.legalName.toUpperCase()}`}
+              </dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-cream/60">Юридический адрес</dt>
+              <dd className="text-cream/85">{LEGAL_INFO.legalAddress}</dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-cream/60">ИНН</dt>
+              <dd className="tabular-nums text-cream/85">{LEGAL_INFO.inn}</dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-cream/60">ОГРН/ОГРНИП</dt>
+              <dd className="tabular-nums text-cream/85">{LEGAL_INFO.ogrn}</dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-cream/60">Расчетный счет</dt>
+              <dd className="tabular-nums text-cream/85">
+                {LEGAL_INFO.bank.account}
+              </dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-cream/60">Банк</dt>
+              <dd className="text-cream/85">{LEGAL_INFO.bank.name}</dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-cream/60">ИНН банка</dt>
+              <dd className="tabular-nums text-cream/85">
+                {LEGAL_INFO.bank.inn}
+              </dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-cream/60">БИК банка</dt>
+              <dd className="tabular-nums text-cream/85">
+                {LEGAL_INFO.bank.bik}
+              </dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-cream/60">Корр. счет</dt>
+              <dd className="tabular-nums text-cream/85">
+                {LEGAL_INFO.bank.corrAccount}
+              </dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-cream/60">Адрес банка</dt>
+              <dd className="text-cream/85">{LEGAL_INFO.bank.address}</dd>
+            </div>
+          </dl>
+        </motion.section>
       </div>
 
       {/* ============ Section 3 — гигантский кинетический вордмарк ============
@@ -698,6 +823,49 @@ export function SiteFooter() {
           />
         ))}
       </VelocitySkew>
+
+      {/* ============ Section 3M — Яндекс.Карта офиса (c89) ============
+          Владелец: карту из зоны контактов либо убрать, либо перенести
+          «в самый подвал» — выбрали подвал (зона контактов разгружена,
+          3-e снял оттуда LazyMap). Простой lazy-iframe (YANDEX_MAPS.
+          embedSrc из media.ts — единый источник с CONTACTS.address):
+          никакого tap-to-activate — карта сразу интерактивна, loading=
+          "lazy" не тянет виджет до скролла к подвалу. Высота 260/320px,
+          скруглённые углы + тонкая рамка cream/15 — тёмная эстетика
+          футера. Подпись-строка: адрес (YANDEX_MAPS.address) + ссылка
+          «открыть в Яндекс.Картах» (YANDEX_MAPS.href — короткая ссылка
+          владельца). sandbox — минимальный набор для map-виджета
+          (скрипты + same-origin + presentation; попапы виджета не
+          нужны). Заголовок «Как нас найти» — eyebrow-идиома «Контактов»
+          /«Навигации»/«Реквизитов», по центру — как-header районов. */}
+      <div className="border-t border-cream/10">
+        <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-12">
+          <div className="mb-4 flex flex-col items-center text-center">
+            <SplitTextReveal as="h2" className="eyebrow-wide text-sm text-gold">
+              Как нас найти
+            </SplitTextReveal>
+            <p className="mt-2 text-sm text-cream/70">
+              {YANDEX_MAPS.address} ·{" "}
+              <a
+                href={YANDEX_MAPS.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gold underline-offset-2 transition-colors hover:text-cream hover:underline"
+              >
+                открыть в Яндекс.Картах
+              </a>
+            </p>
+          </div>
+          <iframe
+            src={YANDEX_MAPS.embedSrc}
+            title="Nilov Catering на карте — ул. Полевая Сабировская, 45, к. 1"
+            loading="lazy"
+            sandbox="allow-scripts allow-same-origin allow-presentation"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="h-[260px] w-full rounded-2xl border border-cream/15 md:h-[320px]"
+          />
+        </div>
+      </div>
 
       {/* ============ Section 4 — районы (c86-CRIT3: калкур
           «С гордостью обслуживаем» → «Накрываем столы по всему городу») ============ */}
@@ -810,11 +978,12 @@ export function SiteFooter() {
         {/* c86-D: RF legal footnote — Instagram* помечен в соц-строке
             (колонка «Контакты»), сноска стоит тем же экраном, последняя
             строка футера. cream/60 на #161312 ≈ 5.9–6.6:1 (замеры D2 /
-            c84-F3, oklab/srgb-микс) — AA для мелкого кегля; 12px мобайл /
-            13px десктоп; max-w-2xl — читаемая мера, перенос по пробелам. */}
+            c84-F3, oklab/srgb-микс) — AA для мелкого кегля; c89
+            (читаемость для пожилых): 12px мобайл → 13px на всех
+            вьюпортах; max-w-2xl — читаемая мера, перенос по пробелам. */}
         <p
           data-ig-note
-          className="mx-auto max-w-2xl px-5 pb-6 text-center text-[12px] leading-relaxed text-cream/60 md:text-[13px]"
+          className="mx-auto max-w-2xl px-5 pb-6 text-center text-[13px] leading-relaxed text-cream/60"
         >
           *Instagram принадлежит компании Meta, признанной экстремистской
           организацией; её деятельность запрещена на территории Российской

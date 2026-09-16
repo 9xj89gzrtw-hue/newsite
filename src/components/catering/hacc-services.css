@@ -1,12 +1,12 @@
 /* ============================================================================
-   HaccServices — «Каталог услуг»: TWO horizontal accordion racks (Cycle 52)
+   HaccServices — «Каталог услуг»: ONE horizontal accordion rack (c89 / Task 3-b)
    ----------------------------------------------------------------------------
-   gammacatering.com "Erlebnisse" haccordion, split into two racks of six
-   (user verdict: solid tint spines read better than the filmstrip
-   experiment, and 12 spines crowd the composition — two racks restore the
-   gamma-grade open-panel proportion, ~71% of the rack width).
+   gammacatering.com "Erlebnisse" haccordion, six spines in a single rack
+   (owner verdict c89: chapter 01 keeps one accordion — Свадьбы, Корпоратив,
+   Шоу-станции, Выездной бар, Вегетарианское и халяль, Гастро-боксы; the
+   former second rack went away with the trimmed formats).
 
-   gamma mechanics per rack (reverse-engineered,
+   gamma mechanics (reverse-engineered,
    research/gamma-haccordion-research.md):
    - flex-basis = closed spine width, flex-grow 0→1 opens the item
    - spine (vertical title) absolute at the item's left, widens when open
@@ -14,17 +14,17 @@
      → zero content reflow during the flex animation (the clip-wipe reveal)
    - .is-resizing guard kills transitions for 140ms on resize
    - easeInOutSine cubic-bezier(.37,0,.63,1), 620ms
-   - full-bleed racks (edge-to-edge like gamma)
+   - full-bleed rack (edge-to-edge like gamma)
 
-   The alive layer (cycles 50–51, kept): ambient tint wash, live counter
-   HUD, choreographed entrance per rack, spring mouse-parallax, magnetic
-   CTA, script-title settle, perpetual Ken Burns drift + unifying grade.
+   The alive layer (cycles 50–52, kept): ambient tint wash, choreographed
+   entrance, spring mouse-parallax, magnetic CTA, script-title settle,
+   perpetual Ken Burns drift + unifying grade.
    ========================================================================== */
 
 .hacc {
   /* ---- tokens (px by breakpoint so JS can parseFloat them — gamma trick).
-     TWO racks of six: spines can be generous again (readable, premium),
-     and the open panel still takes ~71% of the rack. -------------------- */
+     Six spines in ONE rack: they stay generous (readable, premium) and the
+     open panel still takes ~71% of the rack. -------------------- */
   --hacc-spine: 56px;        /* closed spine width  */
   --hacc-spine-open: 96px;   /* open spine width    */
   --hacc-gap: 4px;           /* rack gutter         */
@@ -81,13 +81,13 @@
   max-width: 56ch;
 }
 
-/* ────────────────────────────────────── group label + rack stack (Cycle 52) */
+/* ────────────────────────────── group label + rack (Cycle 52; c89: one) ── */
 
 .hacc__group + .hacc__group {
   margin-top: clamp(2.75rem, 5vw, 4.25rem);
 }
 
-/* eyebrow label above each rack: "01–06 Форматы события" + hairline rule */
+/* eyebrow label above the rack: «Форматы события» + hairline rule */
 .hacc__rack-label {
   display: flex;
   align-items: center;
@@ -130,8 +130,8 @@
   display: none;
 }
 
-/* Full-bleed: racks sit OUTSIDE .ea-container — edge-to-edge strips,
-   exactly like gamma's haccordion. Two of them, one per group. */
+/* Full-bleed: the rack sits OUTSIDE .ea-container — an edge-to-edge strip,
+   exactly like gamma's haccordion (one of them since c89). */
 .hacc__rack {
   position: relative;
   z-index: 1;
@@ -269,7 +269,7 @@
   }
 }
 
-/* autoplay progress line — the FOCUSED rack's open spine only */
+/* autoplay progress line — the open spine only */
 .hacc__spine-progress {
   width: calc(100% - 1.1rem);
   height: 4px;
@@ -759,9 +759,10 @@
 
 /* ════════════════════════════════════ Cycle 50 — premium pass (kept) ═══ */
 
-/* Ambient tint wash — 12 stacked layers, opacity-only transitions (the
-   manifesto stacked-overlay pattern; colors never animate themselves).
-   The section background slowly glows with the FOCUSED rack's open tint. */
+/* Ambient tint wash — one stacked layer per service (6), opacity-only
+   transitions (the manifesto stacked-overlay pattern; colors never animate
+   themselves). The section background slowly glows with the open panel's
+   tint. */
 .hacc__ambient {
   position: absolute;
   inset: 0;

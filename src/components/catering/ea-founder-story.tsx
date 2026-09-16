@@ -486,9 +486,13 @@ export function EaFounderStory() {
                     : {})}
                 >
                 <div className="efs__scene-frame">
+                  {/* c89 (3-g): фото сцены заменено (владелец: «на маленькой
+                      фото какие-то разводы, можно без них») — founder-scene-v5
+                      = кадр real-event-13 из ленты (банкетный стол под белым
+                      шатром, честные 3:4, VLM: чистый, без разводов/смаза). */}
                   <Image
-                    src="/media/c67/founder-scene-v4.webp"
-                    alt="Дмитрий Нилов у накрытого банкетного стола — сервировка, зелень и свечи перед праздником"
+                    src="/media/c67/founder-scene-v5.webp"
+                    alt="Накрытый банкетный стол под белым шатром — белая скатерть, сервировка и закуски в ожидании гостей"
                     fill
                     /* F9 (волна-A): 20vw при 1920 DPR2 просил w=828 против
                        достаточных 640 (слот карточки ~270px). Мобайл: 46vw
@@ -504,9 +508,10 @@ export function EaFounderStory() {
 
           {/* — — ПРАВАЯ: хроника одних рук — — */}
           <div className="efs__body">
-            {/* c85 (понятность): глава 06 — единая нумерация главных глав
+            {/* c85 (понятность): глава 03 (c89: была 06 до снятия
+                CepProcess с рендера) — единая нумерация главных глав
                 страницы (см. .ea-chapter в globals.css). Decorative. */}
-            <span className="ea-chapter" aria-hidden="true">Глава 06</span>
+            <span className="ea-chapter" aria-hidden="true">Глава 03</span>
             <motion.span
               key={`eyebrow-${on}`}
               className="ea-eyebrow efs__eyebrow"

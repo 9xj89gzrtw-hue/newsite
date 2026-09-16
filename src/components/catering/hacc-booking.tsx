@@ -6,7 +6,18 @@
  * Объединённый блок: калькулятор → живой бумажный смета-чек на красной
  * панели → инлайн-форма заявки → успех (штамп + tear-off + конфетти).
  * Контакты-зона с бейджем «Отвечаем в любое время» (task 7-E: live-статус
- * Открыто/Закрыто и график офиса удалены) и ленивой Яндекс-картой — низ секции.
+ * Открыто/Закрыто и график офиса удалены) — ДВЕ колонки (связь + соцсети,
+ * c89); Яндекс-карта перенесена в подвал (задача 3-f, site-footer).
+ *
+ * c89 (волна правок владельца, задача 3-e):
+ *  - «Доставка закусок» в калькуляторе — единая цена «от 1 200 ₽/чел»
+ *    (calcPerGuest), пакеты не выбираются: карточка-состав + чек печатает
+ *    строку «Минимальный заказ формата» с докрутом до 17 400 ₽;
+ *  - сезонный коэффициент ×1,15 УДАЛЁН (seasonMultiplier → no-op в
+ *    pricing.ts, UI-упоминания сняты здесь);
+ *  - допуслуга «Добавить официантов» → «Аренда мебели» (+15 000 ₽);
+ *  - якорь #contact ведёт на контакты компании (id на ContactsZone),
+ *    зона формы — #lead-form, открывается только CTA «Оставить заявку».
  *
  * Спецификация: research/c64/SPEC.md (12 контрактов §2 — соблюдены буквально,
  * см. карту контрактов в конце файла). Дизайн: research/c64/RESEARCH-DESIGN.md
@@ -26,7 +37,6 @@
  *    keystroke — perf-баг из RESEARCH-TECH §2.7);
  *  - Math.random — только в useMemo (конфетти; Fix5: № заявки приходит
  *    из API, локального генератора больше нет);
- *  - карта — IntersectionObserver-гейт (rootMargin 400px) + loading="lazy";
  *  - бесконечные анимации: Fix5 V11 добавил ТРИ микро-CSS-анимации
  *    (печать-кольцо, 2 блика); task 7-E — ОДИН framer-motion-пульс точки
  *    бейджа «Отвечаем в любое время» (scale+opacity, 2.4s) — все transform-only,
@@ -45,8 +55,10 @@
  *    IntersectionObserver isIntersecting=false (замер fix1-probe2: irH=0
  *    при bbox 422px) → вход не срабатывал никогда (пустая панель на мобиле).
  *    Теперь панель наблюдает (hidden: opacity+y), бумага наследует вариант;
- *  - D2: scroll-margin-top: 96px на #calculator/#contact (CSS) + двухтактный
- *    пере-якорь #contact после раскрытия формы (560ms + 1100ms, через lenis);
+ *  - D2: scroll-margin-top: 96px на якоря блока (CSS; c89: #calculator /
+ *    #contact (зона контактов) / #lead-form (зона формы)); двухтактный
+ *    пере-якорь #contact после раскрытия формы удалён вместе с
+ *    hashchange-поведением (якорь больше форму не открывает);
  *  - D3: sticky-bar живёт в DOM, скрытие — IO нижней полосы (rootMargin
  *    -140px, threshold 0.05, per-target Map §32) по зонам типов/CTA/контактов,
  *    показ/скрытие — transform+opacity (без mount-jump), hidden → inert;
@@ -68,14 +80,15 @@
  *  - Q2: прошедшая дата — инлайн-подсказка + исключение из расчёта;
  *  - Q3: aria-valuetext слайдера «N гостей»;
  *  - C1: постоянная сноска сезона ДО ввода даты + единый канон
- *    «Высокий сезон: май–сентябрь и декабрь — ×1,15» (SEASON_CANON);
+ *    «Высокий сезон: май–сентябрь и декабрь — ×1,15» (c89: сезон удалён
+ *    владельцем — сноска/строка чека/предупреждение у даты сняты);
  *  - C2: ISO-даты → «19 сентября 2026 г.» (чек, сводка, успех);
  *  - C3: постоянная плашка у минимума гостей (не исчезает за 120 мс);
  *  - C4: полный список «Включено» (без slice(0,3));
  *  - C5: строка доверия «16 лет · 2 400+ событий» у контактов (факты §0);
  *  - C6: обещание перезвона без часов — «Перезвоним сразу, как увидим заявку»
  *    (task 7-E: live-статус офиса удалён, отвечаем в любое время);
- *  - C7: «Мы перезвоним…», «{N} ₽/чел» / «≈… · высокий сезон ×1,15».
+ *  - C7: «Мы перезвоним…», «{N} ₽/чел» (c89: сезонная приписка снята).
  *
  * Fix3 (task 11-fix3, правки волны-2: mobile + типографика):
  *  - M1: лифт sticky-бара над куки-баннером (--hbooking-cookie-h через
@@ -84,10 +97,8 @@
  *  - M2: живая мини-сумма «≈ N ₽» под слайдером (строка ±5) — замыкает петлю
  *    «слайдер → цена» на обоих вьюпортах; БЕЗ aria-live (итог чека уже
  *    анонсируется, дубль спамил бы SR);
- *  - M3: карта — tap-to-activate: iframe pointer-events:none до активации,
- *    обёртка role="button" (клик/Enter/Space активируют, фокус — НЕТ:
- *    K7-FIX), после активации фокус уходит в iframe; чип-аффорданс
- *    по центру; деактивации при blur/уходе курсора НЕТ (не мигать);
+ *  - M3: карта — tap-to-activate (c89: карта переехала в подвал, пункт
+ *    исторический — здесь больше не применяется);
  *  - M4: ±5-кнопки ≥44px; мобильный кегль «от N ₽/чел» 13.5px;
  *  - M5: шаг 2 различим (подложка+рамка, узел «2»), шаг 1 после перехода
  *    приглушён (лейблы 0.55, поля редактируемые, возврат — кликом по легенде);
@@ -125,16 +136,18 @@
  *    eventType: undefined + пометку «нужна помощь с подбором». Услуги
  *    НЕ перечисляем (владелец: «выбор и так большой»).
  *  - V7 CTA ВЕДЁТ К ФОРМЕ: «Оставить заявку» (панель + sticky-бар) всегда
- *    скроллит к #contact трёхтактно (0/300/700мс — пережимает grid-раскрытие
- *    0.5s) и подсвечивает форму однократной анимацией (hb-zone-flash).
+ *    скроллит к зоне формы трёхтактно (0/300/700мс — пережимает
+ *    grid-раскрытие 0.5s; c89: цель — #lead-form) и подсвечивает форму
+ *    однократной анимацией (hb-zone-flash).
  *  - V8 ШАПКА: дубль «смета-чек»/«Расчёт и заявка» устранён — остаётся
  *    ТОЛЬКО наклонный TiltedAccent; «Чек напечатается сразу.» — с новой
  *    строки (блок-строка в H2); lede без «справа» (на мобиле чек снизу)
  *    + упоминание пути «ещё выбираете».
  *  - V9 ДОВЕРИЕ БЕЗ ВРЕМЕНИ: «16 лет» → «Работаем с 2007 года» (всё, что
  *    стареет, — не пишем).
- *  - V10 АДРЕС/КАРТА: Полевая-Сабировская 45к1 (YANDEX_MAPS, media.ts;
- *    короткая ссылка владельца как внешняя ссылка; iframe-title обновлён).
+ *  - V10 АДРЕС/КАРТА: Полевая-Сабировская 45к1 (c89: карта переехала в
+ *    подвал — YANDEX_MAPS остаётся в lib/media.ts для site-footer;
+ *    в контактах — строка-ссылка на Яндекс.Карты).
  *  - V11 WOW/МОБИЛ: вращающаяся круговая печать на панели (hb-spin, CSS
  *    rotate, 18s); блик-свип по бумажной CTA и по заливке слайдера (CSS
  *    keyframes, transform-only); вход блоков — СКРОЛЛ-ДРАЙВ (CSS
@@ -184,10 +197,11 @@
  *     сильнее по определению), запись дебаунс 300 мс;
  *  7. CustomEvent catering:calc-lead при успешном сабмите (addons: []) +
  *     слушатель catering:menu-select (строка И {typeId,guests} — оба шейпа);
- *  8. id="calculator" на секции, id="contact" на зоне формы;
+ *  8. id="calculator" на секции; c89: id="contact" — на зоне КОНТАКТОВ
+ *     компании, зона формы — id="lead-form" (открывается только CTA);
  *  9. toast-канон «Перезвоним сразу, как увидим заявку» (task 7-E: часы
  *     офиса и live-статус удалены — заявки принимаем круглосуточно);
- * 10. CONTACTS из lib/config.ts, карта YANDEX_MAPS.embedSrc, lazy;
+ * 10. CONTACTS из lib/config.ts (c89: карта — в site-footer, задача 3-f);
  * 11. mounted-гейты, aria-live (троттлинг 700мс), aria-pressed, fieldset/
  *     legend, 44px+, фокус в первое поле, reduced-motion → статика,
  *     чекбокс 152-ФЗ со ссылкой /privacy;
@@ -218,6 +232,7 @@ import {
 } from "framer-motion";
 import {
   AlertCircle,
+  Armchair,
   ArrowDown,
   ArrowRight,
   CalendarDays,
@@ -227,19 +242,20 @@ import {
   Flower2,
   Instagram,
   Loader2,
-  Mail,
   MapPin,
   MessageCircle,
+  MessageSquare,
   Minus,
   Package,
   Phone,
+  Play,
   Plus,
   ReceiptText,
   Send,
   ShieldCheck,
   Sparkles,
-  Users,
   Wine,
+  Youtube,
 } from "lucide-react";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
@@ -251,13 +267,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import type { ComponentProps } from "react";
 import type { Calendar as CalendarType } from "@/components/ui/calendar";
 import { useMounted } from "@/hooks/use-mounted";
-import { useLiteDevice } from "@/hooks/use-lite-device";
 import { CONTACTS } from "@/lib/config";
 import { anchorClickGoal, GOALS, trackGoal } from "@/lib/analytics";
-import { YANDEX_MAPS } from "@/lib/media";
 import {
   ADDONS,
   MENU_TYPES,
+  MIN_ORDER,
   calcTotal,
   formatRUB,
   type Addon,
@@ -335,13 +350,11 @@ function formatPhoneDisplay(raw: string): string {
   return raw;
 }
 
-/**
- * Канон сезона — ОДНА формулировка на весь блок (C1, task 9-fix2):
- * строка в чеке, сноска под чеком, подпись у даты. Никаких
- * «сезонный спрос» и «Сезон (май–сентябрь, декабрь)».
- */
-const SEASON_LABEL = "Высокий сезон: май–сентябрь и декабрь";
-const SEASON_CANON = `${SEASON_LABEL} — ×1,15`;
+/** c89: «Доставка закусок» в калькуляторе — единая цена без пакетов
+ *  (calcPerGuest в pricing.ts). Единые формулировки блока: состав для
+ *  карточки типа/квитка и подпись минимума (17 400 ₽, заказ за 48 часов). */
+const SNACK_BOX_SHORT = "Входят канапе, брускетты, салаты · заказ за 48 часов";
+const SNACK_BOX_COMPOSITION = "канапе, брускетты, салаты";
 
 /** Тики слайдера гостей — вехи; позиции считаются НЕЛИНЕЙНО (sliderPos).
     c86: добавлен ранний тик для малых заказов (формат «от одного гостя»). */
@@ -396,7 +409,8 @@ const CONFETTI_COLORS = ["#E71D3A", "#FF360A", "#F7F5F5", "#1F2937", "#D4A373"];
  */
 const ADDON_ICONS: Record<string, ComponentType<{ className?: string }>> = {
   equipment: Package,
-  waiters: Users,
+  /* c89: «Добавить официантов» → «Аренда мебели» (ADDONS в pricing.ts). */
+  furniture: Armchair,
   chef: ChefHat,
   show: Sparkles,
   bar: Wine,
@@ -682,7 +696,17 @@ function VkGlyph({ className }: { className?: string }) {
   return <MessengerGlyph text="VK" fontSize={11.5} className={className} />;
 }
 
-function useContactItems(): ContactItem[] {
+function MaxGlyph({ className }: { className?: string }) {
+  return <MessengerGlyph text="MAX" fontSize={9} className={className} />;
+}
+
+/**
+ * c89 (владелец: «по контактам всё в кучу»): контакты в ДВЕ колонки.
+ * Левая — «Связь с нами»: телефон + «Напишите нам:» (Телеграм, Вотсап,
+ * Макс, Смс, Адрес). Почта ушла из списка (владеет колонкой соцсетей
+ * футер; здесь — только каналы связи из письма владельца).
+ */
+function useContactChannels(): ContactItem[] {
   return useMemo(
     () => [
       {
@@ -693,46 +717,38 @@ function useContactItems(): ContactItem[] {
         highlight: true,
       },
       {
-        sub: "WhatsApp",
-        label: formatPhoneDisplay(CONTACTS.whatsapp),
-        href: CONTACTS.whatsappHref,
-        icon: MessageCircle,
-        external: true,
-      },
-      {
-        sub: "Telegram",
+        sub: "Телеграм",
         label: formatPhoneDisplay(CONTACTS.telegram),
         href: CONTACTS.telegramHref,
         icon: Send,
         external: true,
       },
       {
-        /* Task 7-E: VK — рядом с мессенджерами (был только в футере). */
-        sub: "VK",
-        label: CONTACTS.vk,
-        href: CONTACTS.vkHref,
-        icon: VkGlyph,
+        sub: "Вотсап",
+        label: formatPhoneDisplay(CONTACTS.whatsapp),
+        href: CONTACTS.whatsappHref,
+        icon: MessageCircle,
         external: true,
       },
       {
-        /* c86-D/G: видимый маркер «*» — сноска о Meta (признана
-           экстремистской в РФ) живёт внизу секции Instagram и в футере. */
-        sub: "Instagram*",
-        label: CONTACTS.instagram,
-        href: CONTACTS.instagramHref,
-        icon: Instagram,
+        /* c89: Макс — мессенджер по второму номеру (диплинка нет,
+           max.ru-заглушка — см. комментарий в lib/config.ts). */
+        sub: "Макс",
+        label: CONTACTS.maxPhone,
+        href: CONTACTS.maxHref,
+        icon: MaxGlyph,
         external: true,
       },
       {
-        sub: "Email",
-        label: CONTACTS.email,
-        href: `mailto:${CONTACTS.email}`,
-        icon: Mail,
+        sub: "Смс",
+        label: formatPhoneDisplay(CONTACTS.sms),
+        href: CONTACTS.smsHref,
+        icon: MessageSquare,
       },
       {
         sub: "Адрес",
-        label: YANDEX_MAPS.address,
-        href: YANDEX_MAPS.href,
+        label: CONTACTS.address,
+        href: CONTACTS.addressHref,
         icon: MapPin,
         external: true,
       },
@@ -741,7 +757,60 @@ function useContactItems(): ContactItem[] {
   );
 }
 
-/** Крупная контакт-строка (desktop ≥768). Hover — красное подчёркивание. */
+/**
+ * c89: правая колонка — «Наши аккаунты в соц. сетях:» (Инстаграм, VK,
+ * Телеграм канал, Youtube, Rutube). У Rutube нет lucide-пиктограммы —
+ * Play; у VK/MAX типографические глифы (MessengerGlyph).
+ */
+function useSocialChannels(): ContactItem[] {
+  return useMemo(
+    () => [
+      {
+        /* c86-D/G: видимый маркер «*» — сноска о Meta (признана
+           экстремистской в РФ) живёт внизу этой зоны и в футере. */
+        sub: "Инстаграм*",
+        label: CONTACTS.instagram,
+        href: CONTACTS.instagramHref,
+        icon: Instagram,
+        external: true,
+      },
+      {
+        sub: "Vk",
+        label: CONTACTS.vk,
+        href: CONTACTS.vkHref,
+        icon: VkGlyph,
+        external: true,
+      },
+      {
+        /* c89: Telegram-КАНАЛ (t.me/nilov_official) — отдельная строка
+           соцсетей; личный чат остаётся в «Напишите нам» слева. */
+        sub: "Телеграм канал",
+        label: CONTACTS.telegramChannel,
+        href: CONTACTS.telegramChannelHref,
+        icon: Send,
+        external: true,
+      },
+      {
+        sub: "Youtube",
+        label: CONTACTS.youtube,
+        href: CONTACTS.youtubeHref,
+        icon: Youtube,
+        external: true,
+      },
+      {
+        sub: "Rutube",
+        label: CONTACTS.rutube,
+        href: CONTACTS.rutubeHref,
+        icon: Play,
+        external: true,
+      },
+    ],
+    [],
+  );
+}
+
+/** Крупная контакт-строка (c89: единственная идиома списка — и desktop,
+ *  и мобайл; hover — красное подчёркивание). */
 function ContactRow({ item }: { item: ContactItem }) {
   const Icon = item.icon;
   return (
@@ -763,174 +832,35 @@ function ContactRow({ item }: { item: ContactItem }) {
   );
 }
 
-/** Тикер контактов (mobile <768) — чистая декорация, aria-hidden целиком;
- *  настоящие ссылки — в карточках под ним. Пауза на hover (CSS). */
-function ContactTicker({ items }: { items: ContactItem[] }) {
-  return (
-    <div className="hb-ticker" aria-hidden="true">
-      <div className="hb-ticker__inner">
-        {[0, 1].map((dup) => (
-          <div className="hb-ticker__track" data-dup={dup} key={dup}>
-            {items.map((it) => (
-              <span key={`${dup}-${it.sub}`} className="hb-ticker__item">
-                <it.icon className="size-4" aria-hidden="true" />
-                {it.sub} — {it.label}
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 /**
- * Яндекс-карта — гейт IntersectionObserver (rootMargin 400px) + native lazy.
- * M3 (task 11-fix3): стандартный tap-to-activate — до активации iframe
- * pointer-events:none (свайп над картой скроллит страницу, а не панорамирует
- * карту), поверх — чип «Нажмите, чтобы активировать карту». Активация: клик
- * по обёртке / Enter / Space (tabIndex=0, role="button" до активации).
- * src НЕ перезагружается — меняется только pointer-events.
- * Деактивации при blur/уходе курсора НЕТ (не мигать).
- * K7-FIX (P2 / 2.4.3): УБРАНА onFocus-активация — Tab на обёртку мгновенно
- * снимал tabIndex у сфокусированного div → браузер ронял фокус в <body>
- * (замер K7: activeElement=BODY, Enter/Space-хендлер недостижим). Теперь
- * фокус спокойно стоит на обёртке, активация — только явным действием
- * (клик/Enter/Space), и сразу после неё фокус передаётся ВНУТРЬ iframe —
- * клавиатурный пользователь может панорамировать карту стрелками;
- * снятие tabIndex обёртки больше не выбивает фокус (он уже в iframe).
+ * Контакты-зона (c89, редизайн по письму владельца «по контактам всё
+ * в кучу»): ДВЕ колонки — слева «Связь с нами» (телефон + «Напишите
+ * нам:» Телеграм/Вотсап/Макс/Смс/Адрес), справа «Наши аккаунты в соц.
+ * сетях:» (Инстаграм, VK, Телеграм канал, Youtube, Rutube); на мобиле
+ * колонки складываются в столбец (те же строки .hb-clink, тикер и
+ * карточки-дубли removed — один честный список).
+ * Яндекс-карта УБРАНА из зоны (владелец: переносим в подвал — там её
+ * рендерит site-footer, задача 3-f). Email живёт в футере/оферте.
+ * КОНТРАКТ 8 (c89): id="contact" — якорь шапки/футера/privacy/offer
+ * ведёт на КОНТАКТЫ компании, а не на форму заявки; форма открывается
+ * CTA «Оставить заявку» из калькулятора (зона #lead-form).
+ * D5 (task 7-fix1): React.memo с единственным stable-ref пропом —
+ * смена гостей/типа не перерисовывает зону контактов вовсе.
  */
-function LazyMap() {
-  const ref = useRef<HTMLDivElement>(null);
-  const frameRef = useRef<HTMLIFrameElement | null>(null);
-  const [near, setNear] = useState(false);
-  const [active, setActive] = useState(false);
-  /* c84-F1 (критик P1-D3, MINOR): в эконом-режиме/на слабых устройствах
-     живой iframe Яндекс-карты (172KB JS + cross-origin longtask 337ms на
-     3g-эмуляции) не грузится ВООБЩЕ — плейсхолдер-карточка с адресом;
-     тап ведёт на внешнюю карту (YANDEX_MAPS.href) в новой вкладке.
-     Функция «посмотреть где мы» сохранена, трафика ноль. */
-  const lite = useLiteDevice();
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || near || lite) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0];
-        if (e.isIntersecting) {
-          setNear(true);
-          io.disconnect();
-        }
-      },
-      { rootMargin: "400px 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [near, lite]);
-
-  /* K7-FIX (P2): активация с передачей фокуса в iframe. rAF — после
-   * коммита React (снятие role/tabIndex с обёртки): без этого браузер
-   * сбрасывал фокус на <body>. preventScroll — карту только что привели
-   * во вьюпорт (клик/Tab), автоскролла не нужно. */
-  const activate = useCallback(() => {
-    setActive(true);
-    requestAnimationFrame(() => {
-      frameRef.current?.focus({ preventScroll: true });
-    });
-  }, []);
-  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (!active && (e.key === "Enter" || e.key === " ")) {
-      e.preventDefault();
-      activate();
-    }
-  };
-  /* c84-F3 (критик C, MAJOR a11y): lite-ветка обязана оставаться
-     клавиатурно-доступной (WCAG 2.1.1 Level A) — раньше lite-див
-     терял role/tabIndex/onKeyDown, сохраняя onClick: users экономного
-     режима (та же аудитория lite) не могли открыть карту ни Enter'ом,
-     ни скринридером. Тап/Enter = window.open внешней карты. */
-  const onLiteKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      window.open(YANDEX_MAPS.href, "_blank", "noopener");
-    }
-  };
+const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTMLDivElement> }) {
+  const channels = useContactChannels();
+  const socials = useSocialChannels();
+  /* Левая колонка: телефон — первая строка, «Напишите нам:» — подзаголовок
+     перед мессенджерами (структура из письма владельца). */
+  const [phoneItem, ...writeUs] = channels;
 
   return (
     <div
-      ref={ref}
-      className="hb-map"
-      data-active={active && !lite ? "true" : "false"}
-      {...(!active && !lite
-        ? {
-            role: "button" as const,
-            tabIndex: 0 as const,
-            "aria-label": "Нажмите, чтобы активировать интерактивную карту",
-          }
-        : lite
-          ? {
-              role: "button" as const,
-              tabIndex: 0 as const,
-              "aria-label": "Открыть карту проезда в новой вкладке",
-            }
-          : {})}
-      onClick={lite ? () => window.open(YANDEX_MAPS.href, "_blank", "noopener") : activate}
-      onKeyDown={lite ? onLiteKeyDown : onKeyDown}
+      id="contact"
+      ref={hideRef}
+      data-hb-hide="contacts"
+      className="hb-contacts mt-16 md:mt-24"
     >
-      {near && !lite ? (
-        <>
-          <iframe
-            ref={frameRef}
-            src={YANDEX_MAPS.embedSrc}
-            title="Nilov Catering на карте — Санкт-Петербург, ул. Полевая-Сабировская, 45к1"
-            className="hb-map__iframe"
-            loading="lazy"
-            sandbox="allow-scripts allow-same-origin allow-presentation"
-            role="img"
-            tabIndex={active ? 0 : -1}
-            allowFullScreen
-          />
-          {/* Чип-аффорданс — только визуал (семантику даёт обёртка); сам
-              pointer-events:none — не мешает ни клику активации, ни свайпу. */}
-          {!active && (
-            <span className="hb-map__hint" aria-hidden="true">
-              <MapPin className="size-4" />
-              Нажмите, чтобы активировать карту
-            </span>
-          )}
-        </>
-      ) : (
-        <div className="hb-map__ph" aria-hidden="true">
-          <MapPin className="size-6" />
-          <span>{YANDEX_MAPS.address}</span>
-          {/* c84-F1: lite-подпись — честный аффорданс внешней карты.
-              c84-F3: в lite обёртка теперь role=button c aria-label —
-              внутренности всегда декоративны для SR (адрес дублируется
-              в контактах), было aria-hidden={lite?undefined:true}. */}
-          {lite && (
-            <span className="hb-map__hint">
-              <MapPin className="size-4" />
-              Открыть карту в новой вкладке
-            </span>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/** Контакты-зона: бейдж «Отвечаем в любое время» + крупные ссылки (desktop)
- *  / тикер + карточки (mobile) + ленивая карта. Реквизиты/соцсети футера
- *  НЕ дублируются (SPEC §2.10) — только быстрые CTA-контакты, мессенджеры
- *  (WA/TG/MAX/VK, task 7-E) и карта.
- *  D5 (task 7-fix1): React.memo с единственным stable-ref пропом —
- *  смена гостей/типа не перерисовывает зону контактов вовсе. */
-const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTMLDivElement> }) {
-  const items = useContactItems();
-
-  return (
-    <div ref={hideRef} data-hb-hide="contacts" className="hb-contacts mt-16 md:mt-24">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <span className="ea-eyebrow--script">Контакты</span>
@@ -947,37 +877,34 @@ const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTM
           «с 2007 года» вместо «16 лет». */}
       <p className="hb-trust">Работаем в Санкт-Петербурге с 2007 года</p>
 
-      {/* Desktop: крупные строки */}
-      <div className="hb-contacts__rows">
-        {items.map((it) => (
-          <ContactRow key={it.sub} item={it} />
-        ))}
+      {/* c89: две колонки (grid md:2col, мобайл — столбец) */}
+      <div className="hb-contacts__cols">
+        {/* ЛЕВАЯ колонка — связь с компанией */}
+        <div className="hb-contacts__col">
+          <h4 className="hb-contacts__sub">Связь с нами</h4>
+          <div className="hb-contacts__rows">
+            {phoneItem && <ContactRow item={phoneItem} />}
+          </div>
+          <h5 className="hb-contacts__sub hb-contacts__sub--inner">Напишите нам:</h5>
+          <div className="hb-contacts__rows">
+            {writeUs.map((it) => (
+              <ContactRow key={it.sub} item={it} />
+            ))}
+          </div>
+        </div>
+
+        {/* ПРАВАЯ колонка — аккаунты в соцсетях */}
+        <div className="hb-contacts__col">
+          <h4 className="hb-contacts__sub">Наши аккаунты в соц. сетях:</h4>
+          <div className="hb-contacts__rows">
+            {socials.map((it) => (
+              <ContactRow key={it.sub} item={it} />
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Mobile: тикер + карточки 2-col */}
-      <ContactTicker items={items} />
-      <div className="hb-contacts__cards">
-        {items.map((it) => {
-          const Icon = it.icon;
-          return (
-            <a
-              key={it.sub}
-              className="hb-ccard"
-              href={it.href}
-              {...(it.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-              aria-label={`${it.sub}: ${it.label}`}
-            >
-              <Icon className="size-5" aria-hidden="true" />
-              <span className="hb-ccard__body">
-                <span className="hb-ccard__sub">{it.sub}</span>
-                <span className="hb-ccard__value">{it.label}</span>
-              </span>
-            </a>
-          );
-        })}
-      </div>
-
-      {/* c86-CRIT3: сноска Meta рядом с видимым «Instagram*» в списке
+      {/* c86-CRIT3: сноска Meta рядом с видимым «Инстаграм*» в списке
           контактов (RF-маркер; та же формулировка — в секции Instagram
           и последней строкой футера). */}
       <p
@@ -993,8 +920,6 @@ const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTM
         организацией; её деятельность запрещена на территории Российской
         Федерации.
       </p>
-
-      <LazyMap />
     </div>
   );
 });
@@ -1256,7 +1181,9 @@ const LeadForm = memo(function LeadForm({
           .filter(Boolean)
           .join("\n"),
       );
-      const mailto = `mailto:interfood-catering@yandex.ru?subject=${subject}&body=${body}`;
+      /* c89/W1-код-критик CRITICAL: адрес лида — из конфига (смена почты
+         владельца), не хардкод. */
+      const mailto = `mailto:${CONTACTS.email}?subject=${subject}&body=${body}`;
 
       // SPEC §2.4: на статике «ошибка сервера» невозможна — просто открываем
       // почту; success-карточка + салют показываются как при 2xx.
@@ -1314,17 +1241,25 @@ const LeadForm = memo(function LeadForm({
   };
 
   const menuType = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
-  /* c84-B: производные выбора для сводки шага 2 и текста лида. */
+  /* c84-B: производные выбора для сводки шага 2 и текста лида.
+     c89: flat-тип (доставка закусок, calcPerGuest) — БЕЗ пакета: вместо
+     имени пакета в лид/сводку едет состав «Доставка закусок (канапе,
+     брускетты, салаты)» (письмо владельца). */
+  const flatType = menuType.calcPerGuest != null;
   const pkgName = undecided
     ? null
-    : (menuType.packages[
-        Math.max(0, Math.min(pkgIdx, menuType.packages.length - 1))
-      ]?.name ?? null);
+    : flatType
+      ? `${menuType.label} (${SNACK_BOX_COMPOSITION})`
+      : (menuType.packages[
+          Math.max(0, Math.min(pkgIdx, menuType.packages.length - 1))
+        ]?.name ?? null);
   const selectedAddons = ADDONS.filter((a) => addonIds.includes(a.id));
   /* Fix5 V6: формат в сводке — для undecided показываем честное «Подберём вместе». */
   const formatLabel = undecided
     ? "Подберём вместе"
-    : `${menuType.label}${pkgName ? ` · ${pkgName}` : ""}`;
+    : flatType
+      ? (pkgName as string)
+      : `${menuType.label}${pkgName ? ` · ${pkgName}` : ""}`;
 
   /* D3 (task 9-fix2): focus-хвосты (красные утилиты Tailwind) сняты —
      фокус поля теперь ink/золото из CSS; красный — ТОЛЬКО aria-invalid. */
@@ -1899,6 +1834,11 @@ const TypeGrid = memo(function TypeGrid({
     <div className="hb-types" role="group">
       {MENU_TYPES.map((m) => {
         const selected = m.id === typeId;
+        /* c89: доставка закусок — единая цена калькулятора (calcPerGuest
+           в pricing.ts) и состав в подписи карточки (владелец: «входят
+           канапе, брускетты, салаты… заказать меньше 17 400 нельзя…
+           заказ минимум за 48 часов»); остальным типам — каталог. */
+        const flat = m.calcPerGuest != null;
         return (
           <motion.button
             key={m.id}
@@ -1910,10 +1850,12 @@ const TypeGrid = memo(function TypeGrid({
           >
             <span className="hb-type__main">
               <span className="hb-type__label">{m.label}</span>
-              <span className="hb-type__short">{m.short}</span>
+              <span className="hb-type__short">
+                {flat ? SNACK_BOX_SHORT : m.short}
+              </span>
             </span>
             <span className="hb-type__price">
-              от {formatRUB(m.perGuest)}
+              от {formatRUB(m.calcPerGuest ?? m.perGuest)}
               {m.priceUnit ?? "/чел"}
             </span>
             {selected && (
@@ -2015,8 +1957,9 @@ function PrintLine({
  * Сегмент-контрол пакетов выбранного типа — React.memo в духе TypeGrid:
  * перерисовывается только при смене типа/пакета (props: type + pkgIdx +
  * stable onSelect). Данные — MENU_TYPES[i].packages (у банкета
- * Базовый/Стандарт/Премиум, у snack-box — именованные наборы: рендерим как
- * есть, 2–4 кнопки).
+ * Базовый/Стандарт/Премиум), рендерим как есть, 2–3 кнопки.
+ * c89: flat-тип (доставка закусок, calcPerGuest) пакеты НЕ выбирает —
+ * вместо сегмента одна статичная карточка-состав (см. ветку ниже).
  *
  * Доступность — ЧЕСТНЫЙ radiogroup (WAI-ARIA): контейнер role="radiogroup",
  * кнопки role="radio" + aria-checked, roving tabindex (tab останавливается
@@ -2026,7 +1969,7 @@ function PrintLine({
  * выбор ровно один из группы.
  *
  * Кнопки ≥44px (контент выше), на мобиле — full-width (grid 1col).
- * Цена — «от N ₽/чел» по канону карточек типов (N — база до сезона ×1,15).
+ * Цена — «от N ₽/чел» по канону карточек типов.
  */
 const PackageGrid = memo(function PackageGrid({
   type,
@@ -2040,6 +1983,29 @@ const PackageGrid = memo(function PackageGrid({
   settled: boolean;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
+
+  /* c89: доставка закусок — единая цена «от 1 200 ₽/чел», itemized-пакеты
+     (канапе/брускетты/салаты/горячее) из каталога НЕ показываем (владелец):
+     одна статичная карточка в идиоме кнопок — выбранное состояние,
+     неинтерактивна (курсор текстовый, в фокус не попадает). */
+  if (type.calcPerGuest != null) {
+    return (
+      <div className="hb-pkgs" role="group" aria-label={`Состав — ${type.label}`}>
+        <div className="hb-pkg hb-pkg--on hb-pkg--flat">
+          <span className="hb-pkg__name">{type.label}</span>
+          <span className="hb-pkg__price">
+            от {formatRUB(type.calcPerGuest)}
+            {type.priceUnit ?? "/чел"}
+          </span>
+          <span className="hb-pkg__desc">
+            Входят канапе, брускетты, салаты. Минимальный заказ{" "}
+            {formatRUB(MIN_ORDER[type.id] ?? 0)} · заказ принимается за 48
+            часов
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     /* Стрелки: +1/−1 с зацикливанием — паттерн ARIA radio group. */
@@ -2109,12 +2075,14 @@ const PackageGrid = memo(function PackageGrid({
 
 /**
  * Itemized-строки чека — React.memo (task 7-fix1 D5): перерисовываются
- * только при смене типа/гостей/сезона (все производные typeId+guests+date).
+ * только при смене типа/гостей/выбора (все производные typeId+guests).
  *
  * X2 (task 13-fix4): itemized-строки/«включено»/дата печатаются термопечатью
- * (PrintLine); строка сезона сохраняет СВОЙ вход/выход по высоте (AnimatePresence,
- * схлопывание подвала) — поверх добавлен clip-принт. Первый залп — с базой 0.2s,
- * чтобы печать началась по уже раскрывшейся бумаге (HB_PAPER_VARIANTS 0.1+0.7s).
+ * (PrintLine). Первый залп — с базой 0.2s, чтобы печать началась по уже
+ * раскрывшейся бумаге (HB_PAPER_VARIANTS 0.1+0.7s).
+ * c89: сезонная строка УДАЛЕНА (коэффициент ×1,15 снят владельцем),
+ * вместо неё — строка «Минимальный заказ формата»: когда чек ниже
+ * минимума, доплата-докрут печатается отдельной строкой (стиль аддонов).
  */
 const ReceiptLines = memo(function ReceiptLines({
   type,
@@ -2123,19 +2091,23 @@ const ReceiptLines = memo(function ReceiptLines({
   guests,
   perGuest,
   subtotal,
-  season,
+  belowMinBy,
   settled,
   active,
 }: {
   type: MenuType;
-  /** c84-B: имя выбранного пакета — строка типа печатает «Банкет · Стандарт». */
-  pkgName: string;
+  /** c84-B: имя выбранного пакета — строка типа печатает «Банкет · Стандарт».
+   *  c89: undefined у flat-типа (доставка закусок) — лейбл печатает
+   *  «Доставка закусок · от 1 200 ₽/чел» (пакета нет, цена единая). */
+  pkgName?: string;
   /** c84-B: ВЫБРАННЫЕ допуслуги (уже отфильтрованы) — по строке на каждую. */
   addons: Addon[];
   guests: number;
   perGuest: number;
   subtotal: number;
-  season: number;
+  /** c89: недостающая до минимума формата сумма (calcTotal) — печатается
+   *  строкой «Минимальный заказ формата +N ₽», когда чек ниже минимума. */
+  belowMinBy: number;
   settled: boolean;
   /** Чек вошёл во вьюпорт (печать активна). */
   active: boolean;
@@ -2155,9 +2127,10 @@ const ReceiptLines = memo(function ReceiptLines({
           как «fade-перерисовка».
           c84-B: «Банкет · Стандарт — цена/чел» — пакет в лейбл, цену за
           гостя выбранного пакета — в значение (та же цифра едет строкой
-          ниже как множитель подытога — чеки повторяют юнит-цену). */}
+          ниже как множитель подытога — чеки повторяют юнит-цену).
+          c89: flat-тип без пакета — «Доставка закусок · от 1 200 ₽/чел». */}
       <PrintLine
-        sig={`${type.id}|${pkgName}`}
+        sig={`${type.id}|${pkgName ?? `flat${perGuest}`}`}
         index={0}
         active={active}
         settled={settled}
@@ -2165,7 +2138,7 @@ const ReceiptLines = memo(function ReceiptLines({
         className="hb-line"
       >
         <span className="hb-line__label">
-          {type.label} · {pkgName}
+          {pkgName ? `${type.label} · ${pkgName}` : `${type.label} · от ${formatRUB(perGuest)}/чел`}
         </span>
         <span className="hb-line__value">{formatRUB(perGuest)}/чел</span>
       </PrintLine>
@@ -2187,8 +2160,8 @@ const ReceiptLines = memo(function ReceiptLines({
       </PrintLine>
 
       {/* c84-B (задача 2): КАЖДАЯ выбранная допуслуга — отдельной строкой
-          «label слева / +N ₽ справа» (стиль строк чека, value — red-deep,
-          как сезонная строка: доплаты читаются одним акцентом).
+          «label слева / +N ₽ справа» (стиль строк чека, value — red-deep:
+          доплаты читаются одним акцентом).
           0 выбранных — не рисуем ничего. Максимум 6 строк (ADDONS.length)
           — чек растёт естественно, клип .hb-lines__clip растёт вместе. */}
       {addons.map((a, i) => (
@@ -2206,39 +2179,33 @@ const ReceiptLines = memo(function ReceiptLines({
         </PrintLine>
       ))}
 
-      {/* ЧЕСТНАЯ строка сезона — только когда множитель > 1.
-          C1 (task 9-fix2): формулировка — единый канон SEASON_LABEL.
-          X2: вход = свой height-раскров + clip-принт; выход — прежний. */}
-      <AnimatePresence initial={false}>
-        {season > 1 && (
-          <motion.div
-            key="season"
-            className="hb-line hb-line--season"
-            initial={
-              settled
-                ? { opacity: 0, height: 0, clipPath: "inset(0% 100% 0% 0%)" }
-                : { opacity: 0, height: 0 }
-            }
-            animate={
-              settled
-                ? { opacity: 1, height: "auto", clipPath: "inset(0% 0% 0% 0%)" }
-                : { opacity: 1, height: "auto" }
-            }
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: EASE }}
-          >
-            <span className="hb-line__label">{SEASON_LABEL}</span>
-            <span className="hb-line__value">×1,15</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* c89: ЧЕСТНЫЙ докрут до минимума формата (MIN_ORDER в pricing.ts) —
+          только когда чек ниже минимума (belowMinBy > 0): доплата печатается
+          отдельной строкой в стиле аддонов, итог calcTotal уже включает её
+          (кламп Math.max). Владелец: «заказать меньше 17 400 нельзя»
+          (доставка закусок) / 85 000 ₽ банкетные форматы / 50 000 ₽ кофе-брейк. */}
+      {belowMinBy > 0 && (
+        <PrintLine
+          key="min-order"
+          sig={`min|${belowMinBy}`}
+          index={2 + addons.length}
+          active={active}
+          settled={settled}
+          delayBase={delayBase}
+          className="hb-line hb-line--min"
+        >
+          <span className="hb-line__label">Минимальный заказ формата</span>
+          <span className="hb-line__value">+{formatRUB(belowMinBy)}</span>
+        </PrintLine>
+      )}
 
       {/* C4 (task 9-fix2): ПОЛНЫЙ список «Включено» — без slice(0,3),
           «Доставка в пределах КАД» больше не теряется; высота естественная.
-          c84-B: индекс стаггера едет за аддонами (печать не склеивается). */}
+          c84-B: индекс стаггера едет за аддонами (печать не склеивается);
+          c89 — и за строкой минимума. */}
       <PrintLine
         sig={type.included.join("·")}
-        index={3 + addons.length}
+        index={3 + addons.length + (belowMinBy > 0 ? 1 : 0)}
         active={active}
         settled={settled}
         delayBase={delayBase}
@@ -2565,8 +2532,9 @@ export function HaccBooking() {
   }, []);
 
   /* W3: FORM_OPEN — ровно на переходе calc|success → form (клик CTA
-     «Оставить заявку», sticky-bar, якорь #contact из шапки/футера/оферты,
-     ресет «Отправить ещё одну заявку» — все пути раскрытия формы). */
+     «Оставить заявку» панели/sticky-бара и ресет «Отправить ещё одну
+     заявку» — все пути раскрытия формы; c89: якорь #contact форму больше
+     НЕ открывает, см. комментарий у scrollToZone). */
   const prevStageRef = useRef(stage);
   useEffect(() => {
     if (prevStageRef.current !== "form" && stage === "form") {
@@ -2588,6 +2556,13 @@ export function HaccBooking() {
   }, [pkgParam, pkgIdx, setPkgParam]);
   /** Выбранный пакет — шапка чека, сводка формы, лид. */
   const pkg = current.packages[pkgIdx] ?? current.packages[0];
+  /* c89: flat-тип (доставка закусок, calcPerGuest) — пакеты НЕ выбираются:
+     подпись для шапки чека/меты успеха печатает «от 1 200 ₽/чел» вместо
+     имени пакета (calcTotal для flat возвращает pkgName: undefined). */
+  const flatType = typeId !== UNDECIDED_ID && current.calcPerGuest != null;
+  const pkgHeadLabel = flatType
+    ? `от ${formatRUB(current.calcPerGuest as number)}/чел`
+    : pkg.name;
   /** c84-B: выбранные аддоны (объекты, для строк чека/summary/лида). */
   const selectedAddons = useMemo(
     () => ADDONS.filter((a) => addonIds.includes(a.id)),
@@ -2616,13 +2591,14 @@ export function HaccBooking() {
 
   /* Q2 (task 9-fix2): прошедшая дата, введённая вручную, больше не «молчит» —
      под полем появляется подсказка, а из расчёта дата исключается
-     (seasonMultiplier прошлой даты не должен менять итог). */
+     (c89: сезонного множителя больше нет — calcTotal без надбавки). */
   const dateInvalid = Boolean(date) && date < minToday;
   const dateValid = dateInvalid ? "" : date;
   const humanDate = useMemo(() => formatHumanDate(dateValid), [dateValid]);
 
   /* c84-B: расчёт от ВЫБРАННОГО пакета + выбранных допуслуг (итог =
-     (perGuest×guests + addons) × сезон — существующая формула calcTotal).
+     perGuest×guests + addons, c89 — без сезонного коэффициента;
+     MIN_ORDER клампит итог снизу — см. calcTotal в pricing.ts).
      Fix5 V6: у undecided расчёта НЕТ (result = null) — цены нигде не рендерятся. */
   const result = useMemo(
     () => (isUndecided ? null : calcTotal(typeId, guestsClamped, addonIds, dateValid, pkgIdx)),
@@ -2761,9 +2737,11 @@ export function HaccBooking() {
   }, [isUndecided]);
 
   /** Плавный скролл к зоне формы через window.__lenis (грабля §2/§33:
-      bare smooth-scroll Lenis перебивает; if/else — не ?? с side-effect). */
+      bare smooth-scroll Lenis перебивает; if/else — не ?? с side-effect).
+      c89: зона формы — #lead-form (id="contact" переехал на зону контактов
+      компании, см. ContactsZone). */
   const scrollToZone = useCallback(() => {
-    const el = document.getElementById("contact");
+    const el = document.getElementById("lead-form");
     if (!el) return;
     const lenis = (window as unknown as { __lenis?: { scrollTo?: (t: Element, o?: object) => void } }).__lenis;
     if (typeof lenis?.scrollTo === "function") {
@@ -2773,41 +2751,15 @@ export function HaccBooking() {
     }
   }, []);
 
-  /* КОНТРАКТ 8: на #contact смотрят шапка/футер/privacy/offer — открываем
-     форму при любом хэше (зона всегда в DOM, поэтому якорь валиден).
-     D2 (task 7-fix1): нативный прыжок ненадёжен дважды — Chrome сажает
-     якорь на 0-height зону ДО раскрытия, а Lenis может «дотянуть» мимо
-     (§33). Поэтому: CSS scroll-margin-top: 96px на оба якоря (правит
-     нативный прыжок) + ДВУХТАКТНЫЙ пере-якорь после раскрытия формы:
-     ~560ms (после grid-транзишна 0.5s) и ~1100ms (после lenis-сеттла),
-     оба через window.__lenis. Оба такта идемотентентны. */
-  useEffect(() => {
-    const timers: number[] = [];
-    const openFromHash = () => {
-      /* 81-F2 (критик B, vanity-URL): /contacts и /contact — rewrite на
-       * /#contact, но фрагмент до браузера НЕ доходит (hash пуст) — это
-       * контактное намерение кампании: открываем форму тем же путём, что
-       * и якорь. Проверка живёт в openFromHash (маунт-вызов); hashchange
-       * всегда несёт hash и проходит по первой ветке. */
-      const vanityContact =
-        !window.location.hash &&
-        (window.location.pathname === "/contacts" ||
-          window.location.pathname === "/contact");
-      if (window.location.hash !== "#contact" && !vanityContact) return;
-      setStage((s) => {
-        if (s !== "calc") return s;
-        return "form";
-      });
-      timers.push(window.setTimeout(scrollToZone, 560));
-      timers.push(window.setTimeout(scrollToZone, 1100));
-    };
-    openFromHash();
-    window.addEventListener("hashchange", openFromHash);
-    return () => {
-      timers.forEach((t) => window.clearTimeout(t));
-      window.removeEventListener("hashchange", openFromHash);
-    };
-  }, [scrollToZone]);
+  /* c89 (владелец: «когда нажимаешь контакты, попадаю на форму заявки —
+     надо на контакты компании»): якорь #contact больше НЕ открывает форму.
+     id="contact" живёт на ContactsZone (всегда в DOM и раскрыта) — якорь
+     шапки/футера/privacy/offer срабатывает нативно (scroll-margin-top: 96px
+     в CSS), vanity-пути /contacts|/contact скроллит vanity-scroll.tsx
+     (VANITY_TARGETS → "contact" — маппинг сохранён, цель теперь зона
+     контактов). Прежний hashchange-эффект openFromHash удалён вместе с
+     принудительным раскрытием формы; форма открывается ТОЛЬКО CTA
+     «Оставить заявку» (панель/sticky-бар, openForm ниже). */
 
   /** Хендофф: чек сжимается, форма раскрывается, фокус — в первое поле.
       Fix5 V7: CTA ВСЕГДА ведёт к форме (владелец: «не перекидывает на форму,
@@ -3092,10 +3044,11 @@ export function HaccBooking() {
   }, [isUndecided, result, guestsClamped]);
 
   /** Fix5 V6: мета квитанции успеха — одна строка (у undecided — без цены).
-   *  c84-B: пакет — в мету (владелец видит выбор лида без раскрытия). */
+   *  c84-B: пакет — в мету (владелец видит выбор лида без раскрытия).
+   *  c89: у flat-типа (доставка закусок) вместо пакета — «от 1 200 ₽/чел». */
   const successMeta = isUndecided
     ? `Формат обсудим · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""}`
-    : `${current.label} · ${pkg.name} · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""} · ~${formatRUB(result!.total)}`;
+    : `${current.label} · ${pkgHeadLabel} · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""} · ~${formatRUB(result!.total)}`;
 
   /* c84-B (задача 3): микроподсказка — после первого ПОЛЬЗОВАТЕЛЬСКОГО выбора
      формата, пока «Пакет меню» вне вьюпорта и формат реальный (у undecided
@@ -3167,11 +3120,15 @@ export function HaccBooking() {
 
             {/* 1b · Пакет меню (c84-B, задача 1) — сегмент-контрол МЕЖДУ
                 «Тип события» и «Гости» в идиоме карточек-типов: имя пакета,
-                цена/чел и короткое описание из pricing.ts. У undecided блока
-                нет — формат подбираем по звонку. D3: fieldset — зона бара. */}
+                цена/чел и короткое описание из pricing.ts. c89: у flat-типа
+                (доставка закусок) — статичная карточка-состав, легенда
+                блока — «Состав». У undecided блока нет — формат подбираем
+                по звонку. D3: fieldset — зона бара. */}
             {!isUndecided && (
               <fieldset className="hb-block" ref={pkgZoneRef} data-hb-hide="pkg">
-                <legend className="hb-label-caps">Пакет меню</legend>
+                <legend className="hb-label-caps">
+                  {flatType ? "Состав" : "Пакет меню"}
+                </legend>
                 <PackageGrid
                   type={current}
                   pkgIdx={pkgIdx}
@@ -3324,7 +3281,11 @@ export function HaccBooking() {
 
               {/* C3 (task 9-fix2): плашка живёт, ПОКА гость стоит на единице;
                   c86: минимумы форматов сняты — текст без ограничений
-                  (владелец: «могут заказать хоть от одного человека»). */}
+                  (владелец: «могут заказать хоть от одного человека»).
+                  c89: минимальная СУММА заказа формата (MIN_ORDER в
+                  pricing.ts) — у доставки закусок плашка постоянная
+                  (там же предупреждение «за 48 часов»), у остальных
+                  форматов появляется, пока чек ниже минимума. */}
               {isUndecided ? (
                 guestsClamped === GUESTS_ABS_MIN && (
                   <p className="hb-minnote" role="status">
@@ -3332,10 +3293,17 @@ export function HaccBooking() {
                     покажем по звонку
                   </p>
                 )
+              ) : flatType ? (
+                <p className="hb-minnote" role="status">
+                  Минимальный заказ доставки закусок —{" "}
+                  {formatRUB(MIN_ORDER[current.id] ?? 0)}. Например, 15 гостей ×{" "}
+                  {formatRUB(current.calcPerGuest ?? current.perGuest)} = 18 000 ₽.
+                  Заказ принимается за 48 часов.
+                </p>
               ) : (
-                guestsClamped === current.minGuests && (
+                result!.belowMinBy > 0 && (
                   <p className="hb-minnote" role="status">
-                    Принимаем заказы от одного гостя — формат и меню обсудим по звонку
+                    Минимальный заказ формата — {formatRUB(result!.minOrder)}
                   </p>
                 )
               )}
@@ -3424,18 +3392,15 @@ export function HaccBooking() {
                   Дата уже прошла — выберите будущую
                 </p>
               )}
-              {date && !isUndecided && result!.season > 1 && (
-                <p className="hb-minwarn mt-2">
-                  <CalendarDays className="size-3.5" aria-hidden="true" />
-                  {SEASON_CANON}
-                </p>
-              )}
+              {/* c89: предупреждение сезона (×1,15) удалено вместе с самим
+                  коэффициентом — calcTotal больше не надбавляет. */}
             </div>
 
-            {/* ═══ ЗОНА ФОРМЫ — КОНТРАКТ 8: id="contact". Живёт в DOM всегда
-                   (якоря шапки/футера/privacy/offer валидны); раскрытие —
-                   grid-rows 0fr→1fr; closed → inert (фокус не проваливается). */}
-            <div id="contact" className="hb-zone" data-open={stage !== "calc"}>
+            {/* ═══ ЗОНА ФОРМЫ — c89: id="lead-form" (якорь #contact уехал на
+                   зону контактов компании, см. ContactsZone). Живёт в DOM
+                   всегда; раскрытие — grid-rows 0fr→1fr; closed → inert
+                   (фокус не проваливается). */}
+            <div id="lead-form" className="hb-zone" data-open={stage !== "calc"}>
               <div className="hb-zone__inner">
                 <div className="hb-zone__body" inert={stage === "calc"}>
                   {stage === "success" ? (
@@ -3530,13 +3495,14 @@ export function HaccBooking() {
                   бумагу трясло под печать, которой здесь больше нет. */}
               <motion.div className="hb-paper" variants={HB_PAPER_VARIANTS} data-stage={stage}>
                 {/* Шапка чека (Fix5 V6: у undecided — без формата; c84-B:
-                    пакет — в шапку: «Банкет · Стандарт · 30 гостей»). */}
+                    пакет — в шапку: «Банкет · Стандарт · 30 гостей»;
+                    c89: flat-тип — «Доставка закусок · от 1 200 ₽/чел»). */}
                 <div className="hb-paper__head">
                   <span className="hb-paper__brand">Смета-чек</span>
                   <span className="hb-paper__type">
                     {isUndecided
                       ? `Формат обсудим · ${guestsClamped} ${guestsLabel(guestsClamped)}`
-                      : `${current.label} · ${pkg.name} · ${guestsClamped} ${guestsLabel(guestsClamped)}`}
+                      : `${current.label} · ${pkgHeadLabel} · ${guestsClamped} ${guestsLabel(guestsClamped)}`}
                   </span>
                 </div>
 
@@ -3557,12 +3523,12 @@ export function HaccBooking() {
                     ) : (
                       <ReceiptLines
                         type={current}
-                        pkgName={pkg.name}
+                        pkgName={receiptResult!.pkgName}
                         addons={selectedAddons}
                         guests={receiptGuests}
                         perGuest={receiptResult!.perGuest}
                         subtotal={receiptResult!.subtotal}
-                        season={receiptResult!.season}
+                        belowMinBy={receiptResult!.belowMinBy}
                         settled={settled}
                         active={paperInView}
                       />
@@ -3595,15 +3561,13 @@ export function HaccBooking() {
                   </p>
                 ) : (
                   <p className="hb-total__per">
-                    {/* C7 (task 9-fix2): без сезона — точная базовая цена из данных;
-                        с сезоном — «≈» + честный множитель. «₽/чел» без пробелов. */}
-                    {result!.season > 1
-                      ? `≈${formatRUB(Math.round(result!.perGuest * result!.season))}/чел · высокий сезон ×1,15 · ${guestsClamped} ${guestsLabel(guestsClamped)}`
-                      : `${formatRUB(result!.perGuest)}/чел · ${guestsClamped} ${guestsLabel(guestsClamped)}`}
+                    {/* C7 (task 9-fix2): точная базовая цена из данных; c89 —
+                        сезонного множителя больше нет. «₽/чел» без пробелов. */}
+                    {`${formatRUB(result!.perGuest)}/чел · ${guestsClamped} ${guestsLabel(guestsClamped)}`}
                   </p>
                 )}
 
-                {/* Подвал чека — честность минимума + сезон + дата (схлопывается) */}
+                {/* Подвал чека — честность минимума + дата (схлопывается) */}
                 <div className="hb-lines" aria-hidden={stage !== "calc"}>
                   <div className="hb-lines__clip">
                     <span className="hb-perfo" aria-hidden="true" />
@@ -3613,22 +3577,13 @@ export function HaccBooking() {
                         вопросов и соберём предложение под вашу задачу.
                       </p>
                     ) : (
-                      <>
-                        <p className="hb-note">
-                          Посчитаем индивидуально под ваше событие — формат и число
-                          гостей уточним по звонку.
-                        </p>
-                        {/* C1 (task 9-fix2): ПОСТОЯННАЯ сноска сезона — видна ДО ввода
-                            необязательной даты (ожидания больше не занижаются на −15%).
-                            Когда сезон уже в расчёте строкой выше — не дублируем. */}
-                        {result!.season <= 1 && (
-                          <p className="hb-note hb-note--season">
-                            {SEASON_CANON}
-                            {!date ? ". Выберите дату, чтобы увидеть её в расчёте." : ""}
-                          </p>
-                        )}
-                      </>
+                      <p className="hb-note">
+                        Посчитаем индивидуально под ваше событие — формат и число
+                        гостей уточним по звонку.
+                      </p>
                     )}
+                    {/* c89: постоянная сноска сезона удалена вместе с
+                        коэффициентом ×1,15 (calcTotal больше не надбавляет). */}
                     {/* C2 (task 9-fix2): дата — по-человечески; прошедшая (невалидная)
                         в чек не попадает — она объясняется подсказкой у поля. */}
                     {/* X2 (task 13-fix4): дата события печатается термопечатью

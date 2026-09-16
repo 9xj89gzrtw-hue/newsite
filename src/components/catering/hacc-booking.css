@@ -36,7 +36,8 @@
      Раньше было 4 кегля × 4 трекинга (0.06–0.18em) — мусорная шкала. */
   --hb-caps-eyebrow-fs: 0.78125rem; /* 12.5px */
   --hb-caps-eyebrow-ls: 0.18em;
-  --hb-caps-label-fs: 0.75rem;      /* 12px — c86-F: +0.5px (жалоба «мелко») */
+  --hb-caps-label-fs: 0.8125rem;    /* 13px — c89/W2-UX: +1px (владелец:
+                                     пожилые люди не увидят; контакты/формы) */
   --hb-caps-label-ls: 0.14em;
   color: var(--hb-ink);
   font-family: var(--hb-body-font);
@@ -81,13 +82,16 @@
 /* ------------------------------------------------------------------- сетка */
 
 /* D2 (task 7-fix1): нативный якорный прыжок (#calculator из футера,
-   #contact из шапки/privacy/offer) обязан оставлять место под sticky-шапку
-   (84px) — иначе якорь уезжает за верх вьюпорта.
+   #contact из шапки/privacy/offer — c89: это зона КОНТАКТОВ) обязан
+   оставлять место под sticky-шапку (96px) — иначе якорь уезжает за верх
+   вьюпорта.
    c84-B (задача 2): #hb-check — та же норма для нативного фоллбека тапа
    по сумме мобильного бара (scrollIntoView уважает scroll-margin: панель
-   чека приезжает ПОД шапкой, а не под ней; замер: header 73px на 390px). */
+   чека приезжает ПОД шапкой, а не под ней; замер: header 73px на 390px).
+   c89: #lead-form — зона формы (скролл CTA «Оставить заявку»). */
 .hbooking,
 .hb-zone,
+.hb-contacts,
 #hb-check { scroll-margin-top: 96px; }
 
 .hb-grid {
@@ -187,7 +191,8 @@
 .hb-type__price {
   display: block;
   margin-top: 0.45rem;
-  font-size: 0.78rem;
+  /* c89 (жалоба «мелко»): 0.78 → 0.85rem — цена формата несёт контент. */
+  font-size: 0.85rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   /* Fix5 (critic F1): 48% ≈ 3.12:1 — ниже AA; 63% ≈ 5:1 (канон .hb-note). */
@@ -256,7 +261,8 @@
 .hb-pkg--on .hb-pkg__name { color: var(--hb-red-deep); }
 .hb-pkg__price {
   margin-top: 2px;
-  font-size: 0.78rem;
+  /* c89 (жалоба «мелко»): 0.78 → 0.85rem. */
+  font-size: 0.85rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
@@ -264,7 +270,8 @@
 .hb-pkg--on .hb-pkg__price { color: var(--hb-red-deep); }
 .hb-pkg__desc {
   margin-top: 0.45rem;
-  font-size: 0.78rem;
+  /* c89 (жалоба «мелко»): 0.78 → 0.85rem. */
+  font-size: 0.85rem;
   line-height: 1.45;
   color: color-mix(in srgb, var(--hb-ink) 65%, transparent);
 }
@@ -276,6 +283,14 @@
   height: 2px;
   border-radius: 2px;
   background: var(--hb-red);
+}
+
+/* c89: статичная карточка-состав flat-типа (доставка закусок) — не кнопка:
+   курсор текстовый, ховер-лифт не обещает клика. */
+.hb-pkg--flat { cursor: default; }
+.hb-pkg--flat:hover {
+  border-color: var(--hb-red);
+  box-shadow: none;
 }
 
 /* ======================================== ДОПУСЛУГИ (c84-B, t.2; c86 — редизайн) */
@@ -451,16 +466,9 @@
   .hb-types-hint svg { animation: none; }
 }
 
-/* 2 · гости — odometer + слайдер */
+/* 2 · гости — odometer + слайдер (c89: .hb-minwarn удалён вместе с
+   сезонным предупреждением у даты) */
 
-.hb-minwarn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.78rem;
-  line-height: 1.35;
-  color: var(--hb-red-deep);
-}
 .hb-guests {
   display: flex;
   align-items: baseline;
@@ -893,7 +901,7 @@
   }
 }
 
-/* ============================================== ЗОНА ФОРМЫ (id="contact") */
+/* ================================================== ЗОНА ФОРМЫ (c89: id="lead-form") */
 
 .hb-zone {
   display: grid;
@@ -945,7 +953,9 @@
   background: var(--hb-cream);
   font-family: var(--hb-caps);
   font-weight: 700;
-  font-size: 0.62rem;
+  /* c89 (жалоба «мелко»): 0.62 → 0.75rem — цифра шага читается; в круге
+     22px помещается (place-items center, line-height 1). */
+  font-size: 0.75rem;
   line-height: 1;
   color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
@@ -1200,7 +1210,8 @@
 .hb-consent__link:hover { color: var(--hb-red); }
 .hb-hint {
   margin-top: 0.6rem;
-  font-size: 0.78rem;
+  /* c89 (жалоба «мелко»): 0.78 → 0.85rem. */
+  font-size: 0.85rem;
   color: color-mix(in srgb, var(--hb-ink) 52%, transparent);
 }
 .hb-safe {
@@ -1320,7 +1331,9 @@
   white-space: nowrap; /* «Смета-чек» не переносится («Смета- / чек» на мобиле) */
 }
 .hb-paper__type {
-  font-size: 0.74rem;
+  /* c89 (жалоба «мелко»): 0.74 → 0.85rem — формат/пакет/гости в шапке
+     чека несут контент (мобильный пол 13.5px ниже не даёт). */
+  font-size: 0.85rem;
   text-align: right;
   color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
   min-width: 0;
@@ -1374,14 +1387,14 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.hb-line--season .hb-line__label { color: var(--hb-red-deep); }
-.hb-line--season .hb-line__value { color: var(--hb-red-deep); }
 .hb-line--included {
   display: block;
   border-bottom: 0;
   padding-top: 0.45rem;
-  /* c84-F3 (критик A): 0.72rem → 0.75rem (12px) — сноска чека. */
-  font-size: 0.75rem;
+  /* c84-F3 (критик A): 0.72rem → 0.75rem (12px) — сноска чека.
+     c89 (жалоба «мелко»): 0.75 → 0.85rem — полный список «Включено»
+     несёт контент (мобильный пол 13.5px ниже не даёт). */
+  font-size: 0.85rem;
   line-height: 1.5;
   /* K7-FIX (P2 / 1.4.3): «Включено: …» ink 50% = 3.31:1 на бумаге #FDFCF9
      (FAIL) → 70% = 6.33:1 ✓. Кегль не тронут: X4-фикс держит ≥12px на
@@ -1390,8 +1403,11 @@
   color: color-mix(in srgb, var(--hb-ink) 70%, transparent);
 }
 /* c84-B: строка допуслуги в чеке — value red-deep (доплата читается тем же
-   акцентом, что сезонная строка; лейбл остаётся нейтральным). */
+   акцентом; лейбл остаётся нейтральным).
+   c89: .hb-line--season удалён (сезонного коэффициента больше нет). */
 .hb-line--addon .hb-line__value { color: var(--hb-red-deep); }
+/* c89: докрут до минимального заказа формата — тот же акцент доплаты. */
+.hb-line--min .hb-line__value { color: var(--hb-red-deep); }
 
 /* итог */
 
@@ -1450,7 +1466,9 @@
 }
 .hb-total__per {
   margin-top: 0.25rem;
-  font-size: 0.78rem;
+  /* c89 (жалоба «мелко»): 0.78 → 0.85rem — «N ₽/чел · M гостей» —
+     ключевая подпись итога. */
+  font-size: 0.85rem;
   color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
 }
 
@@ -1459,13 +1477,13 @@
 .hb-note {
   display: block;
   padding-top: 0.5rem;
-  font-size: 0.74rem;
+  /* c89 (жалоба «мелко»): 0.74 → 0.85rem. */
+  font-size: 0.85rem;
   line-height: 1.55;
   /* D5 (task 9-fix2): 58% ≈ 4.1:1 — ниже AA для мелкого кегля; 63% ≥ 4.5:1. */
   color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
 }
-/* C1 (task 9-fix2): сноска сезона — спокойная ink-60%, мелкая. */
-.hb-note--season { color: color-mix(in srgb, var(--hb-ink) 60%, transparent); }
+/* c89: .hb-note--season удалён — сезонного коэффициента больше нет. */
 
 /* отрывной хвост (успех) */
 
@@ -1672,7 +1690,9 @@
   white-space: nowrap;
 }
 .hb-bar__guests {
-  font-size: 0.7rem;
+  /* c89 (жалоба «мелко»): 0.7 → 0.8rem — «30 гостей · +2 доп.» в живом
+     баре (мобильный пол 13.5px ниже не даёт). */
+  font-size: 0.8rem;
   color: color-mix(in srgb, #fff 62%, transparent);
   white-space: nowrap;
 }
@@ -1710,7 +1730,10 @@
   }
 }
 
-/* ================================================== КОНТАКТЫ-ЗОНА */
+/* ================================================== КОНТАКТЫ-ЗОНА (c89:
+   ДВЕ колонки — «Связь с нами» / «Наши аккаунты в соц. сетях»;
+   карта переехала в подвал (site-footer, задача 3-f), тикер и мобильные
+   карточки-дубли сняты — один честный список .hb-clink на всех вьюпортах). */
 
 .hb-contacts__title {
   margin-top: 0.4rem;
@@ -1719,15 +1742,6 @@
   line-height: 1.15;
   color: var(--hb-ink);
 }
-.hb-contacts__hours {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.7rem;
-  font-size: 0.8rem;
-  color: color-mix(in srgb, var(--hb-ink) 58%, transparent);
-}
-.hb-contacts__hours svg { color: var(--hb-red); flex-shrink: 0; }
 
 /* C5 (task 9-fix2): строка доверия у контактов — только факты (AGENTS §0). */
 .hb-trust {
@@ -1737,6 +1751,38 @@
   line-height: 1.5;
   color: color-mix(in srgb, var(--hb-ink) 65%, transparent);
 }
+
+/* c89 (владелец: «по контактам всё в кучу»): сетка двух колонок —
+   на мобиле складывается в столбец. */
+.hb-contacts__cols {
+  margin-top: 1.1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: clamp(2rem, 4vw, 3.5rem);
+}
+@media (min-width: 768px) {
+  .hb-contacts__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Заголовок колонки («Связь с нами» / «Наши аккаунты в соц. сетях:»). */
+.hb-contacts__sub {
+  margin: 0 0 0.3rem;
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  /* T4: label-уровень капс-шкалы */
+  font-size: var(--hb-caps-label-fs);
+  letter-spacing: var(--hb-caps-label-ls);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
+}
+/* Внутренний подзаголовок «Напишите нам:» — строже и приглушённее. */
+.hb-contacts__sub--inner {
+  margin-top: 1.15rem;
+  color: color-mix(in srgb, var(--hb-ink) 52%, transparent);
+}
+
+/* Список строк — единственная идиома (desktop и мобайл). */
+.hb-contacts__rows { margin-top: 0.2rem; }
 
 /* live-бейдж Открыто/Закрыто */
 
@@ -1774,17 +1820,7 @@
 .hb-badge--closed .hb-badge__dot { background: var(--hb-red-deep); box-shadow: 0 0 0 3px rgba(185, 20, 49, 0.12); }
 .hb-badge__next { font-weight: 400; color: color-mix(in srgb, var(--hb-ink) 52%, transparent); }
 
-/* desktop: крупные строки */
-
-.hb-contacts__rows {
-  display: none;
-  margin-top: 1.1rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 2rem;
-}
-@media (min-width: 768px) {
-  .hb-contacts__rows { display: grid; }
-}
+/* строки-ссылки (стиль — ниже, .hb-clink) */
 .hb-clink {
   display: flex;
   align-items: center;
@@ -1838,145 +1874,9 @@
 .hb-clink:hover .hb-clink__arrow { transform: translateX(4px); color: var(--hb-red); }
 .hb-clink--hl .hb-clink__value { color: var(--hb-red-deep); }
 
-/* mobile: тикер + карточки */
-
-.hb-ticker {
-  display: block;
-  overflow: hidden;
-  margin-top: 1.1rem;
-  padding-block: 0.55rem;
-  border-block: 1px dashed color-mix(in srgb, var(--hb-ink) 18%, transparent);
-}
-@media (min-width: 768px) {
-  .hb-ticker { display: none; }
-}
-.hb-ticker__inner {
-  display: flex;
-  width: max-content;
-  animation: hb-marquee 30s linear infinite;
-}
-.hb-ticker:hover .hb-ticker__inner,
-.hb-ticker:focus-within .hb-ticker__inner {
-  animation-play-state: paused;
-}
-.hb-ticker__track { display: flex; align-items: center; }
-.hb-ticker__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding-inline: 0.9rem;
-  font-size: 0.8rem;
-  white-space: nowrap;
-  color: color-mix(in srgb, var(--hb-ink) 68%, transparent);
-}
-.hb-ticker__item svg { color: var(--hb-red); flex-shrink: 0; }
-@keyframes hb-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-.hb-contacts__cards {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
-  margin-top: 0.9rem;
-}
-@media (min-width: 768px) {
-  .hb-contacts__cards { display: none; }
-}
-.hb-ccard {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  min-height: 56px;
-  padding: 0.6rem 0.7rem;
-  border: 1px solid var(--hb-line);
-  border-radius: 14px;
-  background: #fff;
-  transition: border-color 0.22s ease, box-shadow 0.22s ease;
-}
-.hb-ccard:hover {
-  border-color: color-mix(in srgb, var(--hb-red) 55%, var(--hb-line));
-  box-shadow: 0 10px 22px -16px color-mix(in srgb, var(--hb-red) 60%, transparent);
-}
-.hb-ccard svg { color: var(--hb-red); flex-shrink: 0; }
-.hb-ccard__body { display: flex; flex-direction: column; min-width: 0; }
-.hb-ccard__sub {
-  font-family: var(--hb-caps);
-  font-weight: 700;
-  /* T4: label-уровень капс-шкалы (мобильный двойник .hb-clink__sub) */
-  font-size: var(--hb-caps-label-fs);
-  letter-spacing: var(--hb-caps-label-ls);
-  text-transform: uppercase;
-  /* D5 (task 9-fix2): мобильный двойник .hb-clink__sub — тот же контраст-фикс. */
-  color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
-}
-.hb-ccard__value {
-  /* c86-F: 12.8px → 13.4px (жалоба «мелко», телефоны/адреса). */
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--hb-ink);
-  overflow-wrap: break-word;
-}
-
-/* карта — ленивая, гейтится IntersectionObserver-ом в компоненте */
-
-.hb-map {
-  position: relative; /* M3: якорь чипа-аффорданса */
-  margin-top: 1.2rem;
-  height: clamp(220px, 30vw, 330px);
-  border: 1px solid var(--hb-line);
-  border-radius: 16px;
-  overflow: hidden;
-  background: #fff;
-}
-/* M3 (task 11-fix3): tap-to-activate — до активации iframe мёртв для
-   указателя (свайп над картой скроллит СТРАНИЦУ, а не панорамирует карту);
-   обёртка активируется кликом/Enter/Space/фокусом (см. LazyMap). */
-.hb-map__iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  display: block;
-  pointer-events: none;
-}
-.hb-map[data-active="true"] .hb-map__iframe { pointer-events: auto; }
-/* чип-аффорданс: cream/ink, по центру; pointer-events:none — не мешает
-   ни клику активации (проходит в обёртку), ни свайпу над чипом */
-.hb-map__hint {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  max-width: calc(100% - 2rem);
-  padding: 0.55rem 0.95rem;
-  border: 1px solid color-mix(in srgb, var(--hb-ink) 13%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--hb-cream) 94%, transparent);
-  color: var(--hb-ink);
-  font-size: 0.82rem;
-  font-weight: 600;
-  text-align: center;
-  box-shadow: 0 10px 24px -12px rgba(26, 26, 26, 0.35);
-  pointer-events: none;
-}
-.hb-map__hint svg { color: var(--hb-red); flex-shrink: 0; }
-.hb-map__ph {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  height: 100%;
-  border: 1px dashed color-mix(in srgb, var(--hb-ink) 16%, transparent);
-  border-radius: 16px;
-  margin: 0.5rem;
-  font-size: 0.82rem;
-  color: color-mix(in srgb, var(--hb-ink) 52%, transparent);
-}
-.hb-map__ph svg { color: var(--hb-red); }
+/* c89: тикер контактов, мобильные карточки .hb-ccard и Яндекс-карта
+   (.hb-map) удалены — колонки контактов рендерят строки .hb-clink на
+   всех вьюпортах, карту переносит в подвал site-footer (задача 3-f). */
 
 /* ================================================== T2 (task 11-fix3):
    МОБИЛЬНЫЙ МИКРОКЕГЛЬ ЧЕКА — только <768, desktop не тронут.
@@ -1990,7 +1890,6 @@
   .hb-line { font-size: 0.9375rem; }             /* 14 → 15px */
   .hb-line--included,
   .hb-note,
-  .hb-note--season,
   .hb-cta-note,
   .hb-paper__type { font-size: 0.84375rem; }    /* 12.5 → 13.5px */
   .hb-total__per { font-size: 0.9375rem; }      /* 13.5 → 15px */
@@ -2000,7 +1899,7 @@
    МОБИЛЬНЫЙ МИКРОКЕГЛЬ ≥12px — ВСЕ текстовые узлы блока (только <768,
    desktop не трогут). До правки <12px на 390: тики слайдера 10.88,
    шаг-цифры нити 9.92, .hb-label / .hb-label-caps__opt / .hb-label__opt /
-   .hb-panel__caps / .hb-total__label / .hb-ccard__sub / .hb-bar__total-label
+   .hb-panel__caps / .hb-total__label / .hb-bar__total-label
    11.5, .hb-safe 11.52, .hb-bar__guests 11.2. Полный замер до/после —
    research/c64/verify-fix4.json (x4_before / x4_after).
    c84-B (задача 5): пол 12 → 13.5px (замена X4-уровня, пороги media
@@ -2017,8 +1916,7 @@
   .hb-label,
   .hb-panel__caps,
   .hb-total__label,
-  .hb-bar__total-label,
-  .hb-ccard__sub { font-size: 0.84375rem; }    /* 12 → 13.5px */
+  .hb-bar__total-label { font-size: 0.84375rem; }    /* 12 → 13.5px */
   .hb-safe { font-size: 0.84375rem; }          /* 12 → 13.5px */
   .hb-bar__guests { font-size: 0.84375rem; }   /* 12 → 13.5px */
   .hb-pkg__price,
@@ -2181,7 +2079,7 @@
 
 /* ================================================== A11Y / MOTION */
 
-.hbooking :is(.hb-btn, .hb-type, .hb-pkg, .hb-clink, .hb-ccard, .hb-step-btn, .hb-bar__cta, .hb-bar__total, .hb-consent__link, .hb-date__trigger, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input, .hb-input, .hb-map, .hb-form__legend-btn):focus-visible {
+.hbooking :is(.hb-btn, .hb-type, .hb-pkg, .hb-clink, .hb-step-btn, .hb-bar__cta, .hb-bar__total, .hb-consent__link, .hb-date__trigger, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input, .hb-input, .hb-form__legend-btn):focus-visible {
   /* K7-FIX (P2 / 2.4.11): gold #D4A373 = 2.08:1 на креме → FAIL.
      --hb-red-deep #B91431: 6.03:1 на креме / 6.55:1 на белом ✓.
      Правило unlayered — перебивает и базовый globals-канон, и тайлвиндовый
@@ -2206,9 +2104,8 @@
    остаются разрешёнными — свайп-скролл страницы жив.
    СОЗНАТЕЛЬНО НЕ ТРОНУТЫ (грабля «не сломай свайпы»):
    - input[type=range] (слайдер гостей) — драг бегунка управляется UA;
-   - .hb-slider__rail/.hb-lines/.hb-ticker/.hb-map и прочие скролл/
-     жест-контейнеры — там нужны жесты по умолчанию (карта после
-     активации панамируется, тикер — hover-пауза без тапов);
+   - .hb-slider__rail/.hb-lines и прочие скролл-/жест-контейнеры —
+     там нужны жесты по умолчанию (c89: карта и тикер из блока ушли);
    - тики слайдера: сама кнопка на coarse pointer-events:none (C65) —
      правило безвредно, но осмысленно только для ::after-хит-полосы
      (тап-пресет: манипуляция ок, драг сквозь полосу по-прежнему
@@ -2225,7 +2122,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hb-ticker__inner { animation: none; }
   .hb-zone,
   .hb-lines,
   .hb-cta-zone { transition: none; }
@@ -2238,7 +2134,6 @@
   .hb-addon__mark-check,
   .hb-addon__price,
   .hb-clink,
-  .hb-ccard,
   .hb-btn,
   .hb-step-btn,
   .hb-bar,

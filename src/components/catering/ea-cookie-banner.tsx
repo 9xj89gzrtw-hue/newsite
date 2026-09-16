@@ -93,8 +93,9 @@ import { loadMetrika } from "@/lib/analytics";
  *   - кнопки: outline espresso (рамка espresso/35, ховер — инверсия:
  *     заливка espresso + крем-текст), «Принять все» — золотая заливка
  *     #C9A227 с espresso-текстом 8.22:1, приподнята мягкой золотой тенью;
- *     капс 12px, трекинг 0.04em, высота 44px; ≥390px — один ряд из трёх
- *     (flex-1), <390px — перенос (≤2 ряда, карта ≤190px);
+ *     капс 13px (c89: 12 → 13px — читаемость для пожилых), трекинг 0.03em,
+ *     высота 44px; на мобиле ряд переносится flex-wrap (≤2 ряда,
+ *     карта ≤190px) — бюджет в комментарии BTN_BASE_STYLE;
  *   - ссылки «Политика»/«Условия»: espresso-текст (18.32:1) с золотой
  *     нитью-подчёркиванием (чистое золото текстом на креме = 2.22:1 FAIL —
  *     поэтому золото только в декоративной нити, hover углубляет её).
@@ -150,11 +151,14 @@ const BTN_SOLID_CLASS =
 const BTN_BASE_STYLE: CSSProperties = {
   fontFamily: "var(--ea-font-eyebrow)",
   fontWeight: 700,
-  /* c85-A: капс 12px + трекинг 0.03em (шкала задачи 12-13px / 0.03-0.06em;
-     бюджет ряда на ≥390px: max-content кнопок 97+119+106 (замер dbg.cjs,
-     px-1.5) → px-1 + 0.03em ≈ 92+114+101 + 2×8 gap = 323 ≤ 332 контента
-     (карта px-3) — один ряд; на <390px — перенос flex-wrap, «Принять все»
-     полной строкой. Тач-таргет 44px (WCAG 2.5.5 / Apple HIG). */
+  /* c89 (читаемость для пожилых): капс 13px + трекинг 0.03em (было 12px).
+     Бюджет ряда: при 13px max-content кнопок ≈ 99+123+110 (12px-замер
+     c85-A ×1.083) + 2×8 gap = 348px > 332-334px контента карты даже на
+     ≥390px — один ряд из трёх больше НЕ влезает: flex-wrap переносит
+     «Принять все» полной строкой, ≤2 ряда (высота карты перемеряется
+     ResizeObserver'ом — лифты FAB/sticky-bar едут по реальной геометрии,
+     --cookie-banner-h остаётся честным). Тач-таргет 44px (WCAG 2.5.5 /
+     Apple HIG). */
   letterSpacing: "0.03em",
   textTransform: "uppercase",
   lineHeight: 1,
@@ -457,11 +461,10 @@ export function EaCookieBanner() {
                 Условия
               </a>.
             </p>
-            {/* Кнопки: ≥390px — один ряд из трёх (flex-1 + inline
-                min-width:max-content — равные доли, но не уже текста;
-                замер c85-A: чистый flex-1 сжимал «Необходимые» до 77px при
-                min-content 111px → overflow), <390px — аккуратный перенос
-                flex-wrap («Принять все» приезжает полной строкой).
+            {/* Кнопки: c89 — кегль 13px (читаемость для пожилых): ряд из
+                трёх НЕ влезает одной строкой даже на ≥390px (бюджет — в
+                комментарии BTN_BASE_STYLE) — flex-wrap переносит
+                («Принять все» приезжает полной строкой, ≤2 ряда).
                 whitespace-nowrap — «ПРИНЯТЬ ВСЕ» не рвётся в 2 строки
                 внутри кнопки. Один акцент: золотая заливка только у
                 «Принять все» — restraint-принцип докстринга. */}
@@ -470,7 +473,7 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("rejected")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_OUTLINE_CLASS} flex-1 whitespace-nowrap px-1 py-2 text-[12px]`}
+                className={`${BTN_OUTLINE_CLASS} flex-1 whitespace-nowrap px-1 py-2 text-[13px]`}
               >
                 Отклонить
               </button>
@@ -478,7 +481,7 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("essential")}
                 style={BTN_BASE_STYLE}
-                className={`${BTN_OUTLINE_CLASS} flex-1 whitespace-nowrap px-1 py-2 text-[12px]`}
+                className={`${BTN_OUTLINE_CLASS} flex-1 whitespace-nowrap px-1 py-2 text-[13px]`}
               >
                 Необходимые
               </button>
@@ -486,7 +489,7 @@ export function EaCookieBanner() {
                 type="button"
                 onClick={() => decide("accepted")}
                 style={BTN_SOLID_STYLE}
-                className={`${BTN_SOLID_CLASS} flex-1 whitespace-nowrap px-1 py-2 text-[12px]`}
+                className={`${BTN_SOLID_CLASS} flex-1 whitespace-nowrap px-1 py-2 text-[13px]`}
               >
                 Принять все
               </button>

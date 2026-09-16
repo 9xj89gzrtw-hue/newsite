@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { Instagram, Play } from "lucide-react";
+import { Instagram, Play, Send, Youtube, MonitorPlay } from "lucide-react";
 import { useMounted } from "@/hooks/use-mounted";
 import { CONTACTS } from "@/lib/config";
 import { ClipPathReveal } from "@/components/motion/clip-path-reveal";
@@ -41,6 +41,13 @@ import { ImageTrail } from "@/components/motion/image-trail";
  * секции — обязательная в РФ сноска про Meta (тем же экраном, что и
  * упоминание). aria-label/alt остаются без звёздочки — скринридеру
  * чистое имя читается лучше.
+ *
+ * c89: (а) глава перенумерована 08 → 07 (глава 04 «Как мы работаем»
+ * удалена другой задачей волны); (б) в шапке появился компактный ряд
+ * остальных соцсетей (VK · Телеграм канал · YouTube · Rutube) — все
+ * профили доступны с каждой секции-витрины; Instagram остаётся
+ * ПЕРВИЧНОЙ ссылкой секции (это инстаграм-сетка); (в) сноска Meta
+ * 12 → 13px (читаемость для пожилых).
  *
  * @see creativeedge-analysis.md §6.12 (Instagram grid)
  */
@@ -131,11 +138,13 @@ export function CepInstagramGrid() {
       {/* Header row — H2 + IG handle link */}
       <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-full">
-          {/* c85 (понятность): глава 08 — единая нумерация главных глав
-              страницы (см. .ea-chapter в globals.css). Decorative.
-              min-w-full — занимает строку целиком (flex-wrap), H2 и ссылка
-              продолжают прежнюю items-end-строку ниже. */}
-          <span className="ea-chapter" aria-hidden="true">Глава 08</span>
+          {/* c85 (понятность): единая нумерация главных глав страницы
+              (см. .ea-chapter в globals.css). Decorative. min-w-full —
+              занимает строку целиком (flex-wrap), H2 и ссылки
+              продолжают прежнюю items-end-строку ниже.
+              c89: 08 → 07 — глава 04 «Как мы работаем» удалена (волна c89),
+              хвост главы сдвинулся на единицу. */}
+          <span className="ea-chapter" aria-hidden="true">Глава 07</span>
         </div>
         {/*
           Cycle 34 WOW graft — sondaven.com split-line word stagger. The H2
@@ -163,6 +172,55 @@ export function CepInstagramGrid() {
               Хэндл остаётся рядом: по нему узнают аккаунт. */}
           <span>Instagram* · {CONTACTS.instagram}</span>
         </a>
+
+        {/* c89: компактный ряд остальных соцсетей (владелец — все
+            соцсети доступны): VK · Телеграм канал · YouTube · Rutube.
+            Instagram НЕ дублируется — он первичная ссылка секции выше
+            (это инстаграм-сетка). Пилюли в кремовой эстетике секции:
+            кегль 13px (читаемость для пожилых), тач-таргет 44px,
+            рамка black/15, ховер — cep-red (акцент CEP-секций).
+            Rutube-канала нет — ссылка на поиск по бренду (config.ts);
+            порядок — как в письме владельца (без Instagram). */}
+        <nav
+          aria-label="Мы в соцсетях"
+          className="flex min-w-full flex-wrap items-center gap-2"
+        >
+          <a
+            href={CONTACTS.vkHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-black/15 px-3.5 font-display text-[13px] font-bold uppercase text-black transition-colors duration-300 hover:border-[var(--cep-red)] hover:text-[var(--cep-red)]"
+          >
+            VK
+          </a>
+          <a
+            href={CONTACTS.telegramChannelHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-black/15 px-3.5 font-display text-[13px] font-bold text-black transition-colors duration-300 hover:border-[var(--cep-red)] hover:text-[var(--cep-red)]"
+          >
+            <Send className="size-4" aria-hidden="true" />
+            Телеграм канал
+          </a>
+          <a
+            href={CONTACTS.youtubeHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-black/15 px-3.5 font-display text-[13px] font-bold text-black transition-colors duration-300 hover:border-[var(--cep-red)] hover:text-[var(--cep-red)]"
+          >
+            <Youtube className="size-4" aria-hidden="true" />
+            YouTube
+          </a>
+          <a
+            href={CONTACTS.rutubeHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-black/15 px-3.5 font-display text-[13px] font-bold text-black transition-colors duration-300 hover:border-[var(--cep-red)] hover:text-[var(--cep-red)]"
+          >
+            <MonitorPlay className="size-4" aria-hidden="true" />
+            Rutube
+          </a>
+        </nav>
       </div>
 
       {/* 3×3 grid of square thumbnails */}
@@ -294,12 +352,13 @@ export function CepInstagramGrid() {
           Идиома мелкого текста CEP-секций: cep-text + cep-black/60
           (как авторы cep-testimonials); oklab-микс /60 на креме даёт
           тёмно-серый ≈8:1 — AA с запасом (srgb-микс ≈5.5:1, тоже AA).
-          12px мобайл / 13px десктоп (этаж c84), max-w-xl — читаемая
-          мера строки; перенос по пробелам — «экстремистской»/
-          «Российской» умещаются без клипа на 390px. */}
+          c89 (читаемость для пожилых): 13px на всех вьюпортах (было
+          12px мобайл); max-w-xl — читаемая мера строки; перенос по
+          пробелам — «экстремистской»/«Российской» умещаются без клипа
+          на 390px. */}
       <p
         data-ig-note
-        className="cep-text mt-10 max-w-xl text-[12px] leading-relaxed text-cep-black/60 md:text-[13px]"
+        className="cep-text mt-10 max-w-xl text-[13px] leading-relaxed text-cep-black/60"
       >
         *Instagram принадлежит компании Meta, признанной экстремистской
         организацией; её деятельность запрещена на территории Российской

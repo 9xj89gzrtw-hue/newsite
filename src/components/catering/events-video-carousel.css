@@ -1,6 +1,6 @@
 /* ============================================================================
    events-video-carousel — Section #9 (events video carousel)
-   Horizontal carousel of 4 event-type video tiles. Pure CSS scroll-snap.
+   Horizontal carousel of 6 event-type video tiles. Pure CSS scroll-snap.
    Self-contained scope: `.ea-evt-video__*`. Does NOT touch globals.css.
    Forked from ea-events-portfolio.css — same scroll-snap pattern, same
    progress-track, same reduced-motion handling. Adds: video tile + play
@@ -289,7 +289,10 @@
 .ea-evt-video__category {
   font-family: var(--ea-font-eyebrow);
   font-weight: 700;
-  font-size: 0.8125rem;
+  /* c89 (3-d, Task 3): 0.8125rem → 0.9rem — владельческие вертикальные
+     постеры 9:16 читаются мельче стоковых 4:5; кегль капс-лейбла поднят
+     до 0.9rem. caps/letter-spacing-идиома сохранена. */
+  font-size: 0.9rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--ea-red-text, #B91431);
@@ -311,7 +314,9 @@
 
 .ea-evt-video__meta {
   font-family: var(--ea-font-body);
-  font-size: 0.85rem;
+  /* c89 (3-d, Task 3): 0.85rem → 0.9rem — выравнивание этажа с капс-
+     лейблом (читабельность на вертикальных постерах). */
+  font-size: 0.9rem;
   line-height: 1.4;
   margin: 0.4rem 0 0;
   color: var(--ea-white);
@@ -364,15 +369,32 @@
 
 .ea-evt-video__modal-frame {
   position: relative;
-  width: min(96vw, 1100px);
+  /* c89 (3-d): вертикальные 9:16 клипы — рамка сжимается под контент
+     (ширина = видео/подпись), а не тянет прежние min(96vw, 1100px):
+     портретное видео на десктопе ~48vh шириной, 1100px были бы
+     абсурдно широкими. Модалка выше центрирует рамку
+     (justify-content: center). */
+  width: fit-content;
+  max-width: 96vw;
   display: flex;
   flex-direction: column;
+  /* видео и строка подписи центрируются относительно друг друга */
+  align-items: center;
   gap: 1rem;
 }
 
 .ea-evt-video__modal-video {
-  width: 100%;
-  aspect-ratio: 16 / 9;
+  /* c89 (3-d): вертикальный смартфейн-кадр 720×1280 (9:16) вместо
+     прежнего 16:9. Высота ≤86vh (место для строки подписи ниже),
+     ширина вычисляется из aspect-ratio (десктоп ~0.484×высоты экрана);
+     140vw-кап: на узких портретных экранах высота ограничивается так,
+     чтобы ширина ≤ 78.75vw ≤ max-width 96vw — клампы никогда не
+     спорят, ракурс не искажается. Строка подписи — строго ниже видео
+     (flex-column рамки). */
+  height: min(86vh, 140vw);
+  width: auto;
+  max-width: 96vw;
+  aspect-ratio: 9 / 16;
   border-radius: var(--ea-radius-soft);
   background: #000;
   box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.5);

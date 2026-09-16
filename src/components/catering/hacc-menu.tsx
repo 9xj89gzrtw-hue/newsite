@@ -132,6 +132,10 @@ const META: Record<
     ctaHref: "#calculator",
     priceLabel: "за гостя",
     cursorLabel: "ЗАКУСКИ",
+    /* 3-c (владелец): минимальный заказ и срок — под фотографией/списком,
+       красным акцентом (паттерн .hmenu__hook-note, как вег-мост C59) */
+    hookNote:
+      "Минимальный заказ 17 400 ₽. Заказ принимается за 48 часов.",
   },
   "coffee-break": { tint: "#F4DECD", ctaLabel: "Заказать кофе-брейк", ctaHref: "#calculator", cursorLabel: "КОФЕ-БРЕЙК" },
   vegetarian: {
@@ -252,6 +256,21 @@ function MenuRack({
    *  в конце списка — пилюля «Свернуть список». */
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  /* 3-c (жалоба «раздел банкет прыгает при переключении»): таб пакета
+     меняет состав списка — ремоунт по key=pkg.name рвёт внутренний
+     scrollTop и высоту (раскрытый рэк десктопа / мобильная колонка).
+     selectPkg фиксирует геометрию ДО ре-рендера; эффект после коммита
+     возвращает позицию скролла и проигрывает плавный переход высоты. */
+  const pkgSwitchRef = useRef<{
+    catId: string;
+    rackH: number;
+    panelH: number;
+    scrollTop: number;
+  } | null>(null);
+  /* Зеркало pkgs для selectPkg: клик по уже активному табу не оставляет
+     «мёртвый» замер (иначе поздний пресет анимировался бы от него). */
+  const pkgsRef = useRef<Record<string, number>>({});
+
   /** ≥1024px + fine pointer → hover-intent + параллакс разрешены. */
   const [desktopFine, setDesktopFine] = useState(false);
 
@@ -347,6 +366,31 @@ function MenuRack({
      (объявлен ДО open(): open применяет пресет к свежераскрытой категории) */
   const presetPkgRef = useRef<number | null>(null);
 
+  /** Программный скролл страницы: через Lenis, если он жив (гасит колесную
+      инерцию), иначе нативно. reduced-motion → мгновенно. Смещение на
+      sticky-шапку (~96px) УЖЕ учтено в y вызывающим кодом. 3-c: поднят
+      выше open() — схлоп раскрытого рэка при смене категории скроллит
+      верх новой панели в кадр (как collapseList). */
+  const scrollPageTo = useCallback(
+    (y: number) => {
+      const target = Math.max(0, y);
+      const lenis = (
+        window as unknown as {
+          __lenis?: { scrollTo: (t: number, o?: object) => void };
+        }
+      ).__lenis;
+      if (lenis?.scrollTo) {
+        lenis.scrollTo(target, { duration: 1.1 });
+      } else {
+        window.scrollTo({
+          top: target,
+          behavior: reduced ? "auto" : "smooth",
+        });
+      }
+    },
+    [reduced],
+  );
+
   /** force=true — явное указание уровня (чип дровера / ?pkg в URL):
    *  перекрывает и ручной выбор таба в ОТКРЫТОЙ категории — это более
    *  свежий интент юзера. force=false (переключение категории в open()):
@@ -372,14 +416,47 @@ function MenuRack({
     (i: number, manual: boolean) => {
       if (i < 0 || i >= N) return;
       suppressHoverUntil.current = Date.now() + 700;
-      /* смена категории при раскрытом списке: мгновенный схлоп без
-         анимации — иначе высотная и ширинная анимации рэка конфликтуют */
+      /* смена категории при раскрытом списке (3-c/C): раньше классы
+         снимались мгновенно — раздел прыгал вверх на ~700px. Теперь схлоп
+         анимируется measured-переходом (шаблон collapseList: замер →
+         is-animating → inline height); ширины корешков перетекают
+         параллельно и не конфликтуют — высоту рэка ведёт inline */
       const rack = rackRef.current;
       if (rack && expandedId !== null) {
-        rack.classList.remove("is-animating");
-        rack.classList.remove("is-expanded");
-        rack.style.height = "";
         setExpandedId(null);
+        const seq = ++animSeq.current;
+        const finish = () => {
+          if (seq !== animSeq.current) return;
+          rack.classList.remove("is-animating");
+          rack.classList.remove("is-expanded");
+          rack.style.height = "";
+        };
+        if (reduced) {
+          finish();
+        } else {
+          const curH = rack.getBoundingClientRect().height;
+          rack.classList.add("is-animating");
+          rack.classList.remove("is-expanded");
+          const targetH = rack.clientHeight; // clamp компактного рэка
+          rack.style.height = `${curH}px`;
+          void rack.offsetHeight;
+          rack.style.height = `${targetH}px`;
+          const onEnd = (ev: TransitionEvent) => {
+            if (ev.target !== rack || ev.propertyName !== "height") return;
+            finish();
+          };
+          rack.addEventListener("transitionend", onEnd);
+          // страховка: transitionend может не прийти (вкладка в фоне и т.п.)
+          window.setTimeout(() => {
+            rack.removeEventListener("transitionend", onEnd);
+            finish();
+          }, 950);
+          /* верх рэка — в кадр (sticky-шапка ≈96px): после схлопа читатель
+             остаётся у шапки новой панели, а не в пустоте под рэком */
+          scrollPageTo(
+            rack.getBoundingClientRect().top + window.scrollY - 96,
+          );
+        }
       }
       if (openIndexRef.current === i) {
         // Мобильный: крестик обещает toggle — закрываем (в услугах так же).
@@ -411,7 +488,7 @@ function MenuRack({
         }, 600);
       }
     },
-    [N, reduced, expandedId, applyPresetPkg],
+    [N, reduced, expandedId, applyPresetPkg, scrollPageTo],
   );
 
   /* hover-intent (desktop, fine pointer) ----------------------------------- */
@@ -497,9 +574,32 @@ function MenuRack({
   );
 
   /* табы пакетов: role=tablist + стрелки ------------------------------------ */
-  const selectPkg = useCallback((catId: string, i: number) => {
-    setPkgs((prev) => (prev[catId] === i ? prev : { ...prev, [catId]: i }));
-  }, []);
+  const selectPkg = useCallback(
+    (catId: string, i: number) => {
+      /* 3-c: замер геометрии ДО ре-рендера — отправная высота рэка (B/D),
+         высота мобильной панели (D) и внутренний scrollTop списка (A).
+         Только на реальную смену (клик по активному табу — no-op) */
+      if (pkgsRef.current[catId] !== i) {
+        const k = cats.findIndex((c) => c.id === catId);
+        const rack = rackRef.current;
+        const el = k >= 0 ? listRefs.current[k] : null;
+        const panel =
+          k >= 0
+            ? itemRefs.current[k]?.querySelector<HTMLElement>(".hmenu__open")
+            : null;
+        if (rack) {
+          pkgSwitchRef.current = {
+            catId,
+            rackH: rack.getBoundingClientRect().height,
+            panelH: panel ? panel.getBoundingClientRect().height : 0,
+            scrollTop: el ? el.scrollTop : 0,
+          };
+        }
+      }
+      setPkgs((prev) => (prev[catId] === i ? prev : { ...prev, [catId]: i }));
+    },
+    [cats],
+  );
 
   /* c84-C: слушатели пресета тарифа (см. applyPresetPkg выше).
      c84-F1 (критик M1-D4, MINOR): чипы вели на ШАПКУ #menu — табы
@@ -726,28 +826,90 @@ function MenuRack({
      прерванного схлопа убивал новое раскрытие на 950-м миллисекунде) */
   const animSeq = useRef(0);
 
-  /** Программный скролл страницы: через Lenis, если он жив (гасит колесную
-      инерцию), иначе нативно. reduced-motion → мгновенно. Смещение на
-      sticky-шапку (~96px) УЖЕ учтено в y вызывающим кодом. */
-  const scrollPageTo = useCallback(
-    (y: number) => {
-      const target = Math.max(0, y);
-      const lenis = (
-        window as unknown as {
-          __lenis?: { scrollTo: (t: number, o?: object) => void };
+  /* 3-c/A+B+D: смена пакета — плавные переходы вместо прыжков -------------
+     Ремоунт списка (key=pkg.name, кроссфейд C59) сбрасывает внутренний
+     scrollTop в 0 и мгновенно меняет высоту панели (раскрытый рэк десктопа
+     и мобильная колонка держат списки разной длины). selectPkg зафиксировал
+     геометрию ДО ре-рендера; здесь возвращаем позицию скролла и уводим её
+     наверх (A), а высоту ведём measured-переходом по шаблону expandList
+     (B — рэк, D — grid-строка панели на мобильном, где inline на рэке
+     переполнился бы за его границы). */
+  useEffect(() => {
+    pkgsRef.current = pkgs;
+    const cap = pkgSwitchRef.current;
+    pkgSwitchRef.current = null;
+    if (!cap || openIndex === null || reduced) return;
+    const cat = cats[openIndex];
+    const rack = rackRef.current;
+    if (!cat || cat.id !== cap.catId || !rack) return;
+
+    /* A: внутренний скролл умирает вместе со старым ul — новый стартует
+       с 0. Возвращаем прежнюю позицию (мгновенно: входной стаггер списка
+       ещё прозрачен, мигания не видно) и плавно уводим наверх — честный
+       «возврат к началу» вместо жёсткой смены картинки */
+    const el = listRefs.current[openIndex];
+    if (el && cap.scrollTop > 0 && el.scrollHeight > el.clientHeight + 1) {
+      el.scrollTo({
+        top: Math.min(cap.scrollTop, el.scrollHeight - el.clientHeight),
+        behavior: "instant",
+      });
+      el.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+    }
+
+    if (window.matchMedia(DESKTOP_MQ).matches) {
+      /* B: высота рэка. В компактном рэке высота clamp-нута классом и не
+         меняется — ветка вырождается в no-op по дельте замеров */
+      rack.style.height = "";
+      const newH = rack.getBoundingClientRect().height;
+      if (Math.abs(newH - cap.rackH) <= 4) return;
+      const seq = ++animSeq.current;
+      rack.classList.add("is-animating");
+      rack.style.height = `${cap.rackH}px`;
+      void rack.offsetHeight;
+      rack.style.height = `${newH}px`;
+      const finish = () => {
+        if (seq !== animSeq.current) return;
+        rack.classList.remove("is-animating");
+        rack.style.height = "";
+      };
+      const onEnd = (ev: TransitionEvent) => {
+        if (ev.target !== rack || ev.propertyName !== "height") return;
+        finish();
+      };
+      rack.addEventListener("transitionend", onEnd);
+      window.setTimeout(() => {
+        rack.removeEventListener("transitionend", onEnd);
+        finish();
+      }, 950);
+    } else {
+      /* D: мобильный — анимируем grid-строку панели (у неё уже есть
+         transition grid-template-rows): коробка item растёт плавно и
+         ведёт высоту рэка за собой, ничего не перекрывая */
+      const item = itemRefs.current[openIndex];
+      const panel = item?.querySelector<HTMLElement>(".hmenu__open");
+      if (!item || !panel) return;
+      item.style.gridTemplateRows = "";
+      const newH = panel.getBoundingClientRect().height;
+      if (cap.panelH <= 0 || Math.abs(newH - cap.panelH) <= 4) return;
+      item.style.gridTemplateRows = `auto ${cap.panelH}px`;
+      void item.offsetHeight;
+      item.style.gridTemplateRows = `auto ${newH}px`;
+      const finish = () => {
+        item.style.gridTemplateRows = "";
+      };
+      const onEnd = (ev: TransitionEvent) => {
+        if (ev.target !== item || ev.propertyName !== "grid-template-rows") {
+          return;
         }
-      ).__lenis;
-      if (lenis?.scrollTo) {
-        lenis.scrollTo(target, { duration: 1.1 });
-      } else {
-        window.scrollTo({
-          top: target,
-          behavior: reduced ? "auto" : "smooth",
-        });
-      }
-    },
-    [reduced],
-  );
+        finish();
+      };
+      item.addEventListener("transitionend", onEnd);
+      window.setTimeout(() => {
+        item.removeEventListener("transitionend", onEnd);
+        finish();
+      }, 950);
+    }
+  }, [pkgs, openIndex, cats, reduced]);
 
   const expandList = useCallback(
     (catId: string, k: number) => {
@@ -1041,10 +1203,9 @@ function MenuRack({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.34, ease: EASE }}
                     >
-                      {/* «от» — честно только у самого дешёвого пакета:
-                          выбранная ступень показывает точную цену */}
-                      {pkg && pkg.pricePerGuest === cat.perGuest ? "от " : ""}
-                      {formatRUB(pkg ? pkg.pricePerGuest : cat.perGuest)}
+                      {/* 3-c: «от» у любой ступени — состав пакета
+                          пересобирается под событие, точной цены нет */}
+                      от {formatRUB(pkg ? pkg.pricePerGuest : cat.perGuest)}
                     </motion.span>
                     <small>{cat.priceLabel}</small>
                   </span>
@@ -1140,10 +1301,12 @@ function MenuRack({
                           }
                         >
                           {/* цена видна ДО клика — сравнение ступеней без
-                              переключения (симуляции Марина/Артём C59/W2) */}
+                              переключения (симуляции Марина/Артём C59/W2).
+                              3-c: «от» у каждой ступени — единая рамка
+                              честной цены, как в шапке панели */}
                           <span className="hmenu__tab-name">{p.name}</span>
                           <span className="hmenu__tab-sum">
-                            {formatRUB(p.pricePerGuest)}
+                            от {formatRUB(p.pricePerGuest)}
                           </span>
                         </button>
                       ))}
@@ -1521,15 +1684,14 @@ export function HaccMenu() {
       </div>
 
       {/* честная приписка под рэком: условия до заявки + ориентир бюджета
-          (CFO/невеста C59/W5: коэффициент сезона публикуем, «не входит»
-          дублируем у цен, пример бюджета считаем ИЗ ДАННЫХ, не руками).
-          c86-E: ужата до главного — без FAQ-перекрёстных ссылок и
-          перечислений, читается одним взглядом */}
+          (CFO/невеста C59/W5: «не входит» дублируем у цен, пример бюджета
+          считаем ИЗ ДАННЫХ, не руками). c86-E: ужата до главного — без
+          FAQ-перекрёстных ссылок и перечислений, читается одним взглядом.
+          3-c: сезонный коэффициент отменён (pricing.ts давно без него) —
+          предложение убрано и здесь, и в PDF */}
       <div className="ea-container ea-container--wide">
         <p className="hmenu__note">
-          Цены — за одного гостя. Сезонный коэффициент (май–сентябрь и
-          декабрь — ×1,15) виден в расчёте сразу, до заявки. Ориентир:
-          банкет на 40 гостей — от {formatRUB(40 * banquetPerGuest)}.
+          Цены — за одного гостя. Ориентир: банкет на 40 гостей — от {formatRUB(40 * banquetPerGuest)}.
           Алкоголь, аренда площадки и музыка — отдельными строками по
           запросу. Состав любого пакета пересобираем под ваше событие:
           заменить блюдо или смешать уровни — нормальная практика.

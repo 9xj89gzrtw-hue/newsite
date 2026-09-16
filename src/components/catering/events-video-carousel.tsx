@@ -3,7 +3,7 @@
 /**
  * EventsVideoCarousel — Section #9 of the new site structure.
  * ----------------------------------------------------------------------------
- * Horizontal carousel of 4 event-type video tiles. Pure CSS scroll-snap
+ * Horizontal carousel of 6 event-type video tiles. Pure CSS scroll-snap
  * + a 5s auto-advance `useEffect`. Clicking a tile opens a fullscreen
  * modal with the full video unmuted + native controls + Escape-to-close.
  *
@@ -26,10 +26,13 @@
  *  - ggcatering-style play-pill CTA overlay on each tile (1px solid white,
  *    radius 9999px, padding 8px/16px) — clicking opens the modal.
  *
- * Source strategy: we don't have separate per-event video clips, so the
- * two existing repo teaser videos (mculinary-hero.mp4 + gg-hero-video.mp4)
- * are REUSED in rotation across the 4 tiles. Posters come from the existing
- * /media/event-0[1-4].{png,jpg} assets.
+ * Source strategy (c89, 3-d — владелец: «замени на эти видео»): 6
+ * вертикальных смартфейн-клипов владельца с Яндекс.Диска
+ * (car-1..6.mov, 1080×1920) перекодированы в
+ * /media/c89/c89-event-1..6.mp4 (720×1280) + постеры
+ * c89-event-N-poster.webp (640×1138, 9:16). Подписи — ЧЕСТНЫЕ,
+ * сверены по фактическим кадрам (VLM): без выдуманных сюжетов.
+ * Все ролики со звуком; hover-тизеры mute, модалка — controls.
  *
  * Motion:
  *  - Auto-advances every 5000ms — c83-F3: на следующую snap-точку трека
@@ -100,45 +103,63 @@ type EventTile = {
 };
 
 /**
- * 4 tiles with genuinely DIFFERENT video clips (Cycle 39 honesty fix:
- * previously all 4 tiles opened the same full video while captions
- * promised different event stories). The mculinary b-roll (28s) is cut
- * into 4 unique 7-second fragments via ffmpeg — each tile opens its own
- * clip in a fullscreen modal: crostini appetizers / tortellini / dessert /
- * plated main. Posters come from /media/event-0[1-4] assets.
+ * 6 tiles — реальные видео с мероприятий владельца (c89, 3-d: заменили
+ * стоковые 4 тайла с b-roll). Каждый тайл открывает СВОЙ клип в фуллскрин-
+ * модалке (вертикальный 9:16 кадр): сервировка на яхте / канапе / бар с
+ * живыми цветами / диспенсеры с лимонадами / фуршет у высоких столов /
+ * стол с канделябрами. Подписи VLM-сверены по фактическим кадрам —
+ * без выдуманных сюжетов (продолжение линии честности Cycle 39).
+ * Постеры c89-event-N-poster.webp 640×1138 (9:16) — плитки 4:5
+ * object-cover, кроп предсказуем.
  */
 const TILES: EventTile[] = [
   {
-    video: "/media/clips/catering-clip-1.mp4",
-    poster: "/media/event-01.png",
+    video: "/media/c89/c89-event-1.mp4",
+    poster: "/media/c89/c89-event-1-poster.webp",
+    category: "Банкеты",
+    title: "Сервировка на яхте",
+    meta: "Длинный стол · белая скатерть · вода и напитки",
+    videoAlt: "Банкетный зал на яхте: длинные столы с белыми скатертями и сервировкой",
+  },
+  {
+    video: "/media/c89/c89-event-2.mp4",
+    poster: "/media/c89/c89-event-2-poster.webp",
     category: "Закуски",
-    title: "Кростини и канапе",
-    meta: "Старт банкета · первая подача",
-    videoAlt: "Видео: кростини с топпингами — подача закусок",
+    title: "Канапе с лососем",
+    meta: "Фуршетная подача · ассорти на блюде",
+    videoAlt: "Блюдо с канапе из хлеба, лосося, ветчины, оливок и лимона",
   },
   {
-    video: "/media/clips/catering-clip-2.mp4",
-    poster: "/media/event-02.jpg",
-    category: "Горячее",
-    title: "Тортеллини с овощами",
-    meta: "Основная подача · в работе",
-    videoAlt: "Видео: тортеллини с овощами — горячая подача",
+    video: "/media/c89/c89-event-3.mp4",
+    poster: "/media/c89/c89-event-3-poster.webp",
+    category: "Выездной бар",
+    title: "Бар с живыми цветами",
+    meta: "Оформление стойки · ромашки и гвоздики",
+    videoAlt: "Барная стойка, украшенная букетами свежих цветов",
   },
   {
-    video: "/media/clips/catering-clip-3.mp4",
-    poster: "/media/event-03.jpg",
-    category: "Десерты",
-    title: "Меренга и мороженое",
-    meta: "Финал трапезы · авторский десерт",
-    videoAlt: "Видео: десерт с меренгой и мороженым",
+    video: "/media/c89/c89-event-4.mp4",
+    poster: "/media/c89/c89-event-4-poster.webp",
+    category: "Напитки",
+    title: "Диспенсеры и сервировка",
+    meta: "Лимонады · бокалы · розовая скатерть",
+    videoAlt: "Стеклянные диспенсеры с напитками и сервированный круглый стол",
   },
   {
-    video: "/media/clips/catering-clip-4.mp4",
-    poster: "/media/event-04.jpg",
-    category: "Мастерство шефа",
-    title: "Авторское горячее",
-    meta: "Мясо с гарниром · порционная подача",
-    videoAlt: "Видео: авторское горячее блюдо с мясом и гарниром",
+    video: "/media/c89/c89-event-5.mp4",
+    poster: "/media/c89/c89-event-5-poster.webp",
+    category: "Фуршеты",
+    title: "Фуршет у высоких столов",
+    meta: "Зал с колоннами · гости общаются",
+    videoAlt: "Гости у высоких столов на фуршете в зале с колоннами",
+  },
+  {
+    video: "/media/c89/c89-event-6.mp4",
+    poster: "/media/c89/c89-event-6-poster.webp",
+    category: "Банкеты",
+    title: "Стол с канделябрами",
+    meta: "Свечи · осенний букет · зелёные стулья",
+    videoAlt: "Банкетный стол со свечами в канделябрах и осенним букетом",
   },
 ];
 
@@ -589,7 +610,7 @@ export function EventsVideoCarousel() {
           <div className="ea-evt-video__heading-block">
             {/* c85 (понятность): глава 03 — единая нумерация главных глав
                 страницы (см. .ea-chapter в globals.css). Decorative. */}
-            <span className="ea-chapter" aria-hidden="true">Глава 03</span>
+            <span className="ea-chapter" aria-hidden="true">Глава 04</span>
             <span className="ea-eyebrow--script">Кухня в движении</span>
             <h2 className="ea-section-h2 ea-evt-video__h2">
               {"Не только блюда. "}
@@ -629,8 +650,8 @@ export function EventsVideoCarousel() {
             >
               {/* Poster image — the visual base of the tile (alt text carries
                   the content description for AT).
-                  FIX-4 [F3, W1-D]: было сырой <img loading="eager"> — 4
-                  постера качались сразу (~640КБ, карусель ниже фолда) +
+                  FIX-4 [F3, W1-D]: было сырой <img loading="eager"> — все
+                  постеры качались сразу (~640КБ, карусель ниже фолда) +
                   React 19 SSR автоэмитил <link rel=preload as=image> для
                   каждого eager-<img>. Теперь next/image (fill + lazy по
                   умолчанию): постеры оптимизируются в webp и грузятся

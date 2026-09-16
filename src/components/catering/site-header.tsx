@@ -12,7 +12,6 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone, Send, MessageCircle } from "lucide-react";
 import { CONTACTS } from "@/lib/media";
-import { HoverScramble } from "@/components/motion/hover-scramble";
 import { Magnetic } from "@/components/motion/magnetic";
 import "./site-header.css"; /* C77: kinetic-header эффекты (см. докблок css) */
 
@@ -327,8 +326,9 @@ export function SiteHeader() {
   // Прежняя линия 45% vh зажигала пункт, когда секция была в середине
   // экрана; видео-блок/marquee/бэнды под шапкой ничего не зажигают (нет
   // пунктов — честно по ожиданию владельца). #contact → наблюдаем САМУ
-  // зону формы (div#contact; живёт в DOM всегда — контракт 8
-  // hacc-booking), а не секцию-носитель: «Контакты» загорается, когда
+  // зону контактов (div#contact; c89: переехала в низ секции hacc-booking,
+  // живёт в DOM всегда — контракт 8), а не секцию-носитель: «Контакты»
+  // загорается, когда
   // зона реально под шапкой (замер 1280×800: на 1824px позже верха
   // #calculator), а не когда верх секции вошёл в середину экрана.
   // Лучшая = ПОСЛЕДНЯЯ в документном порядке секция с top ≤ линии —
@@ -352,7 +352,8 @@ export function SiteHeader() {
     );
     if (links.length === 0) return;
 
-    // Цель каждого пункта — сам якорь (#contact — зона формы). Пересборка
+    // Цель каждого пункта — сам якорь (#contact — зона контактов, c89).
+    // Пересборка
     // ленивая: isConnected-чек в recompute ловит прод-свап шелла и поздние
     // монты (Suspense/vanity) — отваленный узел перечитывается из DOM.
     const resolveTargets = () => {
@@ -571,21 +572,21 @@ export function SiteHeader() {
    * «не работает» для всех пунктов мобильного меню.
    *
    * ФИКС: preventDefault + навигация ПОСЛЕ restore (DRAWER_NAV_DELAY_MS):
-   * 1) тот же хэш в URL — location.hash (нативный прыжок с учётом
-   *    scroll-margin-top секций + hashchange-события: #contact открывает
-   *    форму в hacc-booking, FX5-N2 перекеширует шапку);
-   * 2) если хэш УЖЕ равен цели (повторный клик) — hashchange не придёт,
-   *    скроллим руками через __lenis (§33) с нативным фоллбеком.
+   *   c89/W2-UX: ВСЕГДА ведём через __lenis.scrollTo (§33) — нативный
+   *   прыжок location.hash на тач-устройствах откатывался rAF-петлёй
+   *   Lenis (замер: клик «Меню» в drawer → scrollY остался 0 — жалоба
+   *   владельца №23 «не спускает к вариантам меню»). Hash обновляем
+   *   тихо через history.pushState (без нативного прыжка), scroll-spy
+   *   шапки работает по IntersectionObserver — hashchange не нужен.
    * Десктоп (nav в шапке) не затронут — там якоря работают без lock'а. */
   const closeAndNavigate = (href: string) => {
     setOpen(false);
     window.setTimeout(() => {
-      if (window.location.hash !== href) {
-        window.location.hash = href;
-        return;
-      }
       const el = document.querySelector(href);
       if (!el) return;
+      if (window.location.hash !== href) {
+        history.pushState(null, "", href);
+      }
       const lenis = (
         window as unknown as {
           __lenis?: { scrollTo?: (t: Element, o?: object) => void };
@@ -617,13 +618,16 @@ export function SiteHeader() {
      Магнит тянет к курсору только обёртку (spring, transform-only):
      data-press (WAAPI scale на самом <a>, §52 — разные элементы, не
      конфликтует), slide-fill ::after, focus-visible, таб-порядок (обёртка
-     div не фокусируема) и aria не меняются. */
+     div не фокусируема) и aria не меняются.
+     c89 (3-g): href #contact → #calculator — «Заказать» конверс-CTA, ведёт
+     в смета-чек; #contact с c89 — якорь зоны КОНТАКТОВ компании (низ
+     секции hacc-booking). */
   const ctaNode = (
     <a
-      href="#contact"
+      href="#calculator"
       /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
       data-press
-      className={`hcta-btn tott-body hidden min-h-[44px] items-center justify-center border-2 bg-transparent px-5 text-[13px] font-700 uppercase tracking-[0.08em] sm:inline-flex ${
+      className={`hcta-btn tott-body hidden min-h-[44px] items-center justify-center border-2 bg-transparent px-5 text-sm font-700 uppercase tracking-[0.08em] sm:inline-flex ${
         dark ? "border-[#F7F5F5]/80 text-[#F7F5F5]" : "border-black text-black"
       }`}
       style={{ fontWeight: 700, borderRadius: 0 }}
@@ -694,9 +698,12 @@ export function SiteHeader() {
           </a>
 
           {/* Nav CENTER — 5 items in Lato (hidden on mobile).
-              C78: на pointerenter лейбл «декодируется» (HoverScramble,
-              кириллический шум, ширина локализуется). Итоговый текст живёт
-              в aria-label ссылки — скрамбл декоративен (§1 a11y). */}
+              c89 (3-g): скрамбл-анимация лейблов УБРАНА — владелец:
+              «уберем эту функцию, с шрифтом, как-то не очень, и экран
+              прыгает, как-будто лаг». Лейблы рендерятся статичным текстом
+              (бывший C78-декодер был чисто декоративен); сам компонент
+              остаётся на диске (конвенция репо; потребителей больше нет — подчёркивания и
+              scroll-spy в site-header.css от него не зависели. */}
           <nav
             className="hidden lg:flex items-center gap-8"
             aria-label="Основная навигация"
@@ -712,7 +719,7 @@ export function SiteHeader() {
                 }`}
                 style={{ fontWeight: 700 }}
               >
-                <HoverScramble text={n.label} />
+                {n.label}
               </a>
             ))}
           </nav>
@@ -739,7 +746,9 @@ export function SiteHeader() {
             </a>
             {/* Заказать — BLACK OUTLINE button (task v7: "кнопка заказать в
                 черной рамке а не черном квадрате"). Transparent bg, black
-                border, black text, square corners, hover fills black. → #contact
+                border, black text, square corners, hover fills black.
+                → #calculator (c89/3-g: конверс-CTA в смета-чек; #contact —
+                якорь контактов, не формы).
                 C77: hover-инверсию ведёт .hcta-btn (slide-fill панелью
                 снизу + инверсия текста; схемы — через [data-header-scheme]).
                 c83-A: магнит — утилита Magnetic (fine-pointer и reduce
@@ -906,7 +915,7 @@ export function SiteHeader() {
                   rel="noopener noreferrer"
                   /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
                   data-press
-                  className="tott-body flex min-h-[48px] items-center justify-center gap-2 border border-ink/15 bg-cream px-3 py-3 text-[13px] uppercase tracking-[0.04em] text-ink transition-colors duration-200 hover:border-tott-burgundy hover:bg-tott-burgundy hover:text-white"
+                  className="tott-body flex min-h-[48px] items-center justify-center gap-2 border border-ink/15 bg-cream px-3 py-3 text-sm uppercase tracking-[0.04em] text-ink transition-colors duration-200 hover:border-tott-burgundy hover:bg-tott-burgundy hover:text-white"
                   style={{ fontWeight: 700 }}
                   aria-label="Написать в Telegram (открывается в новой вкладке)"
                 >
@@ -919,7 +928,7 @@ export function SiteHeader() {
                   rel="noopener noreferrer"
                   /* C79: тач-нажатие — WAAPI-пружина (MicroDelights). */
                   data-press
-                  className="tott-body flex min-h-[48px] items-center justify-center gap-2 border border-ink/15 bg-cream px-3 py-3 text-[13px] uppercase tracking-[0.04em] text-ink transition-colors duration-200 hover:border-tott-burgundy hover:bg-tott-burgundy hover:text-white"
+                  className="tott-body flex min-h-[48px] items-center justify-center gap-2 border border-ink/15 bg-cream px-3 py-3 text-sm uppercase tracking-[0.04em] text-ink transition-colors duration-200 hover:border-tott-burgundy hover:bg-tott-burgundy hover:text-white"
                   style={{ fontWeight: 700 }}
                   aria-label="Написать в WhatsApp (открывается в новой вкладке)"
                 >
@@ -931,7 +940,7 @@ export function SiteHeader() {
                   паттерн бейджа калькулятора (пульс в site-header.css,
                   reduce-motion — статика). */}
               <p
-                className="mt-3 flex items-center gap-2 text-[12px] uppercase tracking-[0.14em] text-ink/70"
+                className="mt-3 flex items-center gap-2 text-[13px] uppercase tracking-[0.14em] text-ink/70"
                 style={{ fontWeight: 700 }}
               >
                 <span className="hnav-live-dot" aria-hidden="true" />

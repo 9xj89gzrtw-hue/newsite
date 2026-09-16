@@ -296,8 +296,9 @@ export async function buildMenuCatalogDoc(
 
   if (pkg && single) {
     /* c85-C: документ одного тарифа — титул → лид типа → капс «состав
-       пакета» → блюда → «включено» → сезонная приписка + CTA */
-    const price = `${formatRUB(pkg.pricePerGuest)} ${unitFor(single)}`;
+       пакета» → блюда → «включено» → приписка условий + CTA. 3-c: цена
+       с «от» — единая рамка честной цены, как у табов на сайте */
+    const price = `от ${formatRUB(pkg.pricePerGuest)} ${unitFor(single)}`;
     let title = `МЕНЮ — ${single.label.toUpperCase()} · ${pkg.name.toUpperCase()}`;
     /* c86: гостевых минимумов нет — подпись без порога, состав согласуем
        под любое число гостей (владелец: принимаем заказ от одного гостя). */
@@ -571,7 +572,8 @@ function drawPackageIntro(
   doc.setFont("Roboto", "bold");
   doc.setFontSize(10.5);
   doc.text(
-    `${formatRUB(pkg.pricePerGuest)} ${unitFor(menu)}`,
+    /* 3-c: «от» у каждой ступени — как в табах меню на сайте */
+    `от ${formatRUB(pkg.pricePerGuest)} ${unitFor(menu)}`,
     PAGE.w - PAGE.mR,
     y + PKG.base,
     { align: "right" },
@@ -753,24 +755,31 @@ function drawHandCheck(
 
 /* ─────────────────────────────────────────── финал: приписка + CTA-блок */
 
-/** Сезонная приписка + CTA «Соберите смету за 1 минуту», прижатый к низу. */
+/** Приписка условий (цены за гостя, включённые официанты, минимальные
+    заказы форматов) + CTA «Соберите смету за 1 минуту», прижатый к низу. */
 function drawClosing(doc: jsPDF, y0: number) {
   let y = y0 + 2;
   const ctaH = 24;
   const yCta = PAGE.bottom - ctaH - 3.5;
-  if (y + 4.5 > yCta - 6) {
+  doc.setFont("Roboto", "italic");
+  doc.setFontSize(7.5);
+  /* 3-c: сезонный коэффициент отменён — вместо него честные условия.
+     Шрифт/кегль выставлены ДО splitTextToSize (перенос считается по
+     ним); длинная строка минимумов честно бьётся на несколько строк */
+  const lines = [
+    "Цены — за одного гостя. Официанты входят в стоимость пакетов.",
+    "Минимальный заказ: фуршет, банкет, вегетарианское и барбекю — 85 000 ₽, кофе-брейк — 50 000 ₽, доставка закусок — 17 400 ₽ (заказ принимается за 48 часов).",
+  ].flatMap((t) => doc.splitTextToSize(t, PAGE.contentW));
+  const blockH = (lines.length - 1) * 3.4;
+  if (y + 4.5 + blockH > yCta - 6) {
     doc.addPage();
     paintCream(doc);
     y = CONTENT_TOP;
   }
-  doc.setFont("Roboto", "italic");
-  doc.setFontSize(7.5);
   doc.setTextColor(...C.faint);
-  doc.text(
-    "Цены — за одного гостя. В высокий сезон (май–сентябрь, декабрь) действует коэффициент ×1,15.",
-    PAGE.mL,
-    y + 4,
-  );
+  lines.forEach((line, i) => {
+    doc.text(line, PAGE.mL, y + 4 + i * 3.4);
+  });
   drawCta(doc, yCta);
 }
 

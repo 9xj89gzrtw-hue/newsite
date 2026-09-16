@@ -22,6 +22,10 @@ export type MenuType = {
   label: string;
   short: string;
   perGuest: number; // min price
+  // c89: единая цена формата в КАЛЬКУЛЯТОРЕ, если отличается от
+  // каталогной (доставка закусок: каталог — от 660 ₽ по пакетам,
+  // калькулятор — от 1 200 ₽/чел «всё включено»).
+  calcPerGuest?: number;
   // c86: ограничений по числу гостей нет — поле остаётся для совместимости,
   // у всех типов единица (владелец: «могут заказать хоть от одного человека»)
   minGuests: number;
@@ -196,6 +200,9 @@ export const MENU_TYPES: MenuType[] = [
     label: "Доставка закусок",
     short: "Мобильный фуршет в коробках",
     perGuest: 660,
+    // c89: в КАЛЬКУЛЯТОРЕ доставка закусок — единая цена «от 1 200 ₽/чел»
+    // (владелец): в меню-каталоге остаются детализированные пакеты ниже.
+    calcPerGuest: 1200,
     minGuests: 1,
     priceUnit: "/чел",
     description: "Готовые наборы закусок в индивидуальной упаковке. Доставка по СПб.",
@@ -328,7 +335,8 @@ export const MENU_TYPES: MenuType[] = [
     id: "vegetarian",
     label: "Вегетарианское",
     short: "Сезонное меню без мяса",
-    perGuest: 2450,
+    // c89: цены владельца — Базовый 3200 / Премиум 4250
+    perGuest: 3200,
     minGuests: 1,
     description: "Сезонное вегетарианское меню с молочными продуктами.",
     included: [
@@ -340,7 +348,7 @@ export const MENU_TYPES: MenuType[] = [
     packages: [
       {
         name: "Базовый",
-        pricePerGuest: 2450,
+        pricePerGuest: 3200,
         description: "8 позиций — канапе, брускетты, салаты",
         photo: "/media/c61/c61-veg-basic.webp",
         dishes: [
@@ -356,7 +364,7 @@ export const MENU_TYPES: MenuType[] = [
       },
       {
         name: "Премиум",
-        pricePerGuest: 3250,
+        pricePerGuest: 4250,
         description: "11 позиций — добавлены средиземноморские шашлычки и гратен",
         photo: "/media/c60/c60-veg.webp",
         dishes: [
@@ -379,7 +387,8 @@ export const MENU_TYPES: MenuType[] = [
     id: "bbq",
     label: "Барбекю",
     short: "Выездное барбекю",
-    perGuest: 2200,
+    // c89: цены владельца — Базовый 2900 / Премиум 4450 (+2 новых гарнира)
+    perGuest: 2900,
     minGuests: 1,
     description: "Гриль и открытый огонь — шашлыки, овощи-гриль. Для летних и загородных мероприятий.",
     included: [
@@ -392,14 +401,16 @@ export const MENU_TYPES: MenuType[] = [
     packages: [
       {
         name: "Базовый",
-        pricePerGuest: 2200,
-        description: "7 позиций — шашлык из свинины и курицы, овощи-гриль",
+        pricePerGuest: 2900,
+        description: "9 позиций — шашлык из свинины и курицы, овощи-гриль, салаты",
         photo: "/media/c60/c60-bbq.webp",
         dishes: [
           { name: "Шашлык из свиной вырезки в маринаде из горчицы и розмарина", weight: "200 г" },
           { name: "Шашлык из куриного бедра в йогурте и специях", weight: "180 г" },
           { name: "Люля-кебаб из баранины с зирой и кинзой", weight: "180 г" },
           { name: "Гриль-овощи (цукини, баклажан, паприка) с соусом песто", weight: "150 г" },
+          { name: "Листовой салат", weight: "150 г" },
+          { name: "Ассорти летних овощей", weight: "150 г" },
           { name: "Кукуруза на гриле с травяным маслом", weight: "1 шт" },
           { name: "Соусы домашние (3 вида: томатный, чесночный, карри)", weight: "50 г" },
           { name: "Хлеб-лепёшка на углях", weight: "80 г" },
@@ -407,8 +418,8 @@ export const MENU_TYPES: MenuType[] = [
       },
       {
         name: "Премиум",
-        pricePerGuest: 3500,
-        description: "10 позиций — добавлены лосось на кедровой доске, морепродукты, бургеры",
+        pricePerGuest: 4450,
+        description: "12 позиций — добавлены лосось на кедровой доске, морепродукты, бургеры",
         photo: "/media/c61/c61-bbq-premium.webp",
         dishes: [
           { name: "Шашлык из свиной вырезки в маринаде из горчицы и розмарина", weight: "200 г" },
@@ -417,6 +428,8 @@ export const MENU_TYPES: MenuType[] = [
           { name: "Кебаб из баранины с зирой и кориандром", weight: "180 г" },
           { name: "Средиземноморский шашлычок из морепродуктов — гребешок, креветка, осьминог", weight: "150 г" },
           { name: "Гриль-овощи (цукини, баклажан, паприка) с соусом песто", weight: "150 г" },
+          { name: "Листовой салат", weight: "150 г" },
+          { name: "Ассорти летних овощей", weight: "150 г" },
           { name: "Кукуруза на гриле с травяным маслом", weight: "1 шт" },
           { name: "Бургер с говяжьей котлетой, сыром чеддер и маринованным огурцом", weight: "250 г" },
           { name: "Соусы домашние (3 вида: томатный, чесночный, карри)", weight: "50 г" },
@@ -435,17 +448,37 @@ export type Addon = {
 
 export const ADDONS: Addon[] = [
   { id: "equipment", label: "Аренда оборудования", price: 15000 },
-  { id: "waiters", label: "Добавить официантов", price: 9000 },
+  // c89: «Добавить официантов» убран (владелец: официанты входят в стоимость
+  // пакетов) — вместо него «Аренда мебели» от +15 000 ₽.
+  { id: "furniture", label: "Аренда мебели", price: 15000 },
   { id: "chef", label: "Выезд шеф-повара", price: 28000 },
   { id: "show", label: "Шоу-станция", price: 35000 },
   { id: "bar", label: "Выездной бар", price: 32000 },
   { id: "floristics", label: "Флористическое оформление", price: 25000 },
 ];
 
-export function seasonMultiplier(dateStr: string): number {
-  if (!dateStr) return 1;
-  const m = new Date(dateStr).getMonth() + 1;
-  if ([5, 6, 7, 8, 9, 12].includes(m)) return 1.15;
+/**
+ * c89: минимальные суммы заказа по форматам (владелец):
+ * фуршет/банкет/вегетарианское/барбекю — 85 000 ₽, кофе-брейк — 50 000 ₽,
+ * доставка закусок — 17 400 ₽ (заказ минимум за 48 часов). В калькуляторе
+ * чек не может опуститься ниже минимума формата (см. calcTotal).
+ */
+export const MIN_ORDER: Record<string, number> = {
+  buffet: 85000,
+  banquet: 85000,
+  vegetarian: 85000,
+  bbq: 85000,
+  "coffee-break": 50000,
+  "snack-box": 17400,
+};
+
+/**
+ * c89: сезонный коэффициент ×1,15 УДАЛЁН по указанию владельца
+ * («Сезонный коэффициент вообще убрать»). seasonMultiplier оставлен как
+ * no-op-заглушка, чтобы старые импорты не роняли сборку; calcTotal всегда
+ * считает без надбавки.
+ */
+export function seasonMultiplier(_dateStr: string): number {
   return 1;
 }
 
@@ -457,6 +490,10 @@ export function seasonMultiplier(dateStr: string): number {
  * ВЫБРАННОГО пакета (чек/строка «N гостей × X ₽» печатает её же);
  * pkgName — для чека и текста лида (null быть не может — packages всегда
  * непустые, но тип поля честный optional для будущих типов без пакетов).
+ * c89: для snack-box калькулятор игнорирует пакеты (единая цена
+ * t.calcPerGuest) и применяет MIN_ORDER — total не ниже минимума формата,
+ * ниже минимума чек печатает строку «Минимальный заказ» с недостающей
+ * суммой (доставка закусок — честный «докрут» до 17 400 ₽).
  */
 export function calcTotal(
   typeId: string,
@@ -471,22 +508,31 @@ export function calcTotal(
   season: number;
   total: number;
   pkgName?: string;
+  minOrder: number;
+  belowMinBy: number;
 } {
   const t = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
   /* c86: минимумов гостей больше нет — расчёт от фактического числа
      (защита только от мусора: как минимум один гость, максимум —
      верхняя граница шкалы ×2). */
   const g = Math.min(999, Math.max(1, Math.trunc(guests)));
+  /* c89: snack-box в калькуляторе — без выбора пакета, единая цена. */
+  const flat = t.calcPerGuest != null;
   const clampedIdx = Math.max(0, Math.min(Math.trunc(pkgIdx), t.packages.length - 1));
-  const pkg = t.packages[clampedIdx];
-  const perGuest = pkg ? pkg.pricePerGuest : t.perGuest;
+  const pkg = flat ? undefined : t.packages[clampedIdx];
+  const perGuest = flat ? (t.calcPerGuest as number) : pkg ? pkg.pricePerGuest : t.perGuest;
   const subtotal = perGuest * g;
   const addonsTotal = ADDONS.filter((a) => addonIds.includes(a.id)).reduce(
     (s, a) => s + a.price,
     0,
   );
   const season = seasonMultiplier(dateStr);
-  const total = Math.round((subtotal + addonsTotal) * season);
+  const raw = subtotal + addonsTotal;
+  /* c89: минимальный заказ формата — чек не ниже минимума (доставка
+     закусок 17 400 ₽; банкетные форматы 85 000 ₽; кофе-брейк 50 000 ₽). */
+  const minOrder = MIN_ORDER[t.id] ?? 0;
+  const total = Math.max(Math.round(raw), minOrder);
+  const belowMinBy = raw < minOrder ? minOrder - Math.round(raw) : 0;
   return {
     perGuest,
     subtotal,
@@ -494,6 +540,8 @@ export function calcTotal(
     season,
     total,
     pkgName: pkg?.name,
+    minOrder,
+    belowMinBy,
   };
 }
 

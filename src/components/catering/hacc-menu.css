@@ -103,7 +103,8 @@
 .hmenu__pdf-status {
   min-height: 1.1em;
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.78rem;
+  /* 3-c (владелец «мелко»): 0.78 → 0.85rem — контентный текст статуса */
+  font-size: 0.85rem;
   color: var(--hmenu-red-deep);
   text-align: right;
 }
@@ -114,8 +115,9 @@
   gap: 0.5rem;
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 600;
-  /* c84-F3 (критик A): 0.72rem → 0.75rem (12px). */
-  font-size: 0.75rem;
+  /* c84-F3 (критик A): 0.72rem → 0.75rem (12px).
+     3-c (владелец «мелко»): 0.75 → 0.85rem — инструкция читается сразу. */
+  font-size: 0.85rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--hmenu-soft);
@@ -591,8 +593,9 @@
   display: block;
   font-family: var(--ea-font-eyebrow), sans-serif;
   font-weight: 600;
-  font-size: 0.78rem;   /* C60 (Ольга): «за гостя» читалась мельче цены — риск
-                           прочесть 2 450 ₽ как цену стола; ключевые слова — крупнее */
+  /* C60 (Ольга): «за гостя» читалась мельче цены — риск прочесть
+     2 450 ₽ как цену стола. 3-c (владелец «мелко»): 0.78 → 0.85rem */
+  font-size: 0.85rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(26, 26, 26, 0.78);
@@ -882,7 +885,8 @@
 .hmenu__pkgpdf-status {
   flex-basis: 100%;
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.78rem;
+  /* 3-c (владелец «мелко»): 0.78 → 0.85rem — как статус в шапке секции */
+  font-size: 0.85rem;
   color: var(--hmenu-red-deep);
 }
 
@@ -1381,11 +1385,13 @@
   }
 
   .hmenu__tab-name {
-    font-size: 0.78rem;
+    /* 3-c (владелец «мелко»): 0.78 → 0.85rem — синхронно с ценой ступени */
+    font-size: 0.85rem;
   }
 
   .hmenu__tab-sum {
-    font-size: 0.76rem;
+    /* 3-c (владелец «мелко»): 0.76 → 0.85rem — имя и цена одной крупности */
+    font-size: 0.85rem;
   }
 
   /* c84-C: вертикальный бюджет узкой панели — пилюля per-tariff PDF
@@ -1398,7 +1404,8 @@
 
   .hmenu__pkgpdf {
     padding: 0.3rem 0.85rem;
-    font-size: 0.72rem;
+    /* 3-c (владелец «мелко»): 0.72 → 0.8rem — нижний порог кнопки */
+    font-size: 0.8rem;
     box-shadow: 0 2px 8px rgba(26, 26, 26, 0.08);
   }
 
