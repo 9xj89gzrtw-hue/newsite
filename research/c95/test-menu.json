@@ -6,7 +6,7 @@
             "packages": [
                 {
                     "name": "p",
-                    "pricePerGuest": 100.5
+                    "pricePerGuest": "250"
                 }
             ]
         }
