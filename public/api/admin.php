@@ -58,6 +58,12 @@ function h_login(string $method): void
     if ($method !== 'POST') {
         json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
     }
+    /* c95-W2-E MINOR-2: глобальный предохранитель логина (60/15 мин со всех
+     *  IP) — иначе распределённый брутфорс создаёт неограниченно rl-файлов,
+     *  перебирая XFF/сети. Плюс прежний пер-IP лимит 8/15 мин. */
+    if (!rl_check_global('loginall', 60, 900)) {
+        json_response(429, ['ok' => false, 'error' => 'locked', 'retryAfterSec' => rl_last_retry_after()]);
+    }
     if (!rl_check('login', 8, 900)) { // брутфорс: 8 попыток / 15 мин на IP
         json_response(429, ['ok' => false, 'error' => 'locked', 'retryAfterSec' => rl_last_retry_after()]);
     }
@@ -84,11 +90,21 @@ function h_login(string $method): void
     json_response(200, ['ok' => true, 'expiresAt' => $exp]);
 }
 
-/** action=logout: сброс cookie. Без авторизации. */
+/** action=logout: сброс cookie + отзыв сессии (эпоха). c95-W2-E MINOR-1:
+ *  cookie могла быть украдена — простое удаление из браузера не отзывает
+ *  её серверно. Для одного владельца «выйти» = «выйти везде» — приемлемо
+ *  (второе устройство просто перелогинится; сессии и так 12ч). */
 function h_logout(string $method): void
 {
     if ($method !== 'POST') {
         json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
+    }
+    /* Эпоху поднимаем только если сессия была валидна — анонимный logout
+     * не сбрасывает чужие сессии (иначе любой гость мог бы «выгнать» владельца). */
+    if (current_session() !== null) {
+        $s = load_settings();
+        $s['sessionEpoch'] = (int)($s['sessionEpoch'] ?? 0) + 1;
+        save_settings($s);
     }
     clear_admin_cookie();
     json_response(200, ['ok' => true]);
@@ -792,16 +808,21 @@ function validate_menu(array $menu): array
             if (array_key_exists('description', $t) && !$str($t['description'], 500)) {
                 $add($n . ': пустой или слишком длинный description (до 500 символов)');
             }
-            // цены формата (каталог/калькулятор) — положительные целые
+            // цены формата (каталог/калькулятор) — положительные целые.
+            // c95-W2-E MINOR-4: верхние границы (1e6/1e4) — иначе в scratch
+            // проходили 999999999999 (разрыв калькулятора при публикации).
             foreach (['perGuest', 'calcPerGuest', 'minGuests'] as $pf) {
                 if (!array_key_exists($pf, $t)) {
                     continue;
                 }
                 $v = $t[$pf];
+                $max = ($pf === 'minGuests') ? 10000 : 1000000;
                 if (!is_int($v)) {
                     $add($n . ': ' . $pf . ' — цена должна быть целым числом');
                 } elseif ($v < 1) {
                     $add($n . ': ' . $pf . ' должен быть больше нуля');
+                } elseif ($v > $max) {
+                    $add($n . ': ' . $pf . ' — недопустимо большое значение (максимум ' . $max . ')');
                 }
             }
             if (array_key_exists('included', $t)) {

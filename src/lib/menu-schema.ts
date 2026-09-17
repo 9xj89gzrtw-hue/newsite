@@ -20,6 +20,11 @@ const PositiveInt = z
   .int("ожидалось целое число")
   .positive("ожидалось число больше нуля");
 
+/** c95-W2-E MINOR-4: верхние границы цен/гостей — паритет с PHP-валидацией
+ *  (иначе в чек уезжают 12-значные числа после опечатки в админке). */
+const PriceInt = PositiveInt.max(1_000_000, "цена недопустимо велика (максимум 1 000 000)");
+const GuestsInt = PositiveInt.max(10_000, "число гостей недопустимо велико (максимум 10 000)");
+
 /* ----------------------------------------------------------------- shapes */
 
 export const DishSchema = z.object({
@@ -32,7 +37,7 @@ export const DishSchema = z.object({
 export const MenuPackageSchema = z.object({
   /** «Базовый» | «Стандарт» | «Премиум» (или название набора для snack-box). */
   name: NonEmptyString,
-  pricePerGuest: PositiveInt,
+  pricePerGuest: PriceInt,
   description: NonEmptyString,
   /** Путь в /media (опционально — не у всех пакетов есть фото). */
   photo: NonEmptyString.optional(),
@@ -47,14 +52,14 @@ export const MenuTypeSchema = z.object({
   label: NonEmptyString,
   short: NonEmptyString,
   /** Минимальная цена формата в каталоге. */
-  perGuest: PositiveInt,
+  perGuest: PriceInt,
   /** Единая цена формата в КАЛЬКУЛЯТОРЕ, если отличается от каталогной
    *  (доставка закусок: каталог — от 660 ₽ по пакетам, калькулятор —
    *  от 1 200 ₽/чел «всё включено»). */
-  calcPerGuest: PositiveInt.optional(),
+  calcPerGuest: PriceInt.optional(),
   /** c86: ограничений по числу гостей нет — поле для совместимости (у
    *  всех типов единица, «могут заказать хоть от одного человека»). */
-  minGuests: PositiveInt,
+  minGuests: GuestsInt,
   /** "/чел" (по умолчанию) | "за набор". */
   priceUnit: NonEmptyString.optional(),
   description: NonEmptyString,

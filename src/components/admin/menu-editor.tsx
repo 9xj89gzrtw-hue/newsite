@@ -618,7 +618,22 @@ function MediaPickerDialog({
     if (!files) return [];
     const q = query.trim().toLowerCase();
     if (!q) return files;
-    return files.filter((f) => f.toLowerCase().includes(q));
+    /* c95-W2-F: имена файлов в /media — латиница (banket, furshet, svadby…),
+     * а владелец ищет по-русски («банкет»). Транслитерируем запрос и ищем
+     * оба варианта: «банкет» находит c60-banket-1.webp. */
+    const translit = q.replace(/[а-яё]/g, (ch) => {
+      const map: Record<string, string> = {
+        а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh",
+        з: "z", и: "i", й: "y", к: "k", л: "l", м: "m", н: "n", о: "o",
+        п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "ts",
+        ч: "ch", ш: "sh", щ: "sch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu",
+        я: "ya",
+      };
+      return map[ch] ?? ch;
+    });
+    return files.filter(
+      (f) => f.toLowerCase().includes(q) || f.toLowerCase().includes(translit),
+    );
   }, [files, query]);
 
   return (
