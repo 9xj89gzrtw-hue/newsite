@@ -28,11 +28,15 @@ import {
 } from "lucide-react";
 import {
   apiChangePassword,
+  apiMailLog,
+  apiMailTest,
   apiSaveSettings,
   apiTgCheck,
   apiTgDiscover,
   apiTgTest,
   type AdminSettings,
+  type MailLogEntry,
+  type MailTestResult,
   type TgChat,
   type TgTriedBase,
 } from "./api";
@@ -71,6 +75,17 @@ export function SettingsView({
 
 /* ------------------------------------------------------------------ email */
 
+const TRANSPORT_LABELS: Record<string, string> = {
+  smtp: "SMTP",
+  mail: "почта хостинга",
+  "mail-fallback": "почта хостинга (SMTP не сработал)",
+  none: "не отправлено",
+};
+
+function transportLabel(t: string | null | undefined): string {
+  return (t && TRANSPORT_LABELS[t]) || t || "—";
+}
+
 function EmailCard({
   settings,
   onSettingsChange,
@@ -81,7 +96,29 @@ function EmailCard({
   const [email, setEmail] = useState(settings.notifyEmail);
   const [saving, setSaving] = useState(false);
 
+  /* c97: тест письма + журнал отправок */
+  const [testTo, setTestTo] = useState("");
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<MailTestResult | null>(null);
+  const [logOpen, setLogOpen] = useState(false);
+  const [logLoading, setLogLoading] = useState(false);
+  const [logEntries, setLogEntries] = useState<MailLogEntry[]>([]);
+
+  /* c97: SMTP-блок */
+  const [smtpOpen, setSmtpOpen] = useState(false);
+  const [smtpHost, setSmtpHost] = useState(settings.smtpHost);
+  const [smtpPort, setSmtpPort] = useState(settings.smtpPort === null ? "" : String(settings.smtpPort));
+  const [smtpUser, setSmtpUser] = useState(settings.smtpUser);
+  const [smtpPass, setSmtpPass] = useState("");
+  const [smtpSaving, setSmtpSaving] = useState(false);
+
   useEffect(() => setEmail(settings.notifyEmail), [settings.notifyEmail]);
+  useEffect(() => setSmtpHost(settings.smtpHost), [settings.smtpHost]);
+  useEffect(() => setSmtpUser(settings.smtpUser), [settings.smtpUser]);
+  useEffect(
+    () => setSmtpPort(settings.smtpPort === null ? "" : String(settings.smtpPort)),
+    [settings.smtpPort],
+  );
 
   const save = async () => {
     setSaving(true);
@@ -99,6 +136,87 @@ function EmailCard({
     }
   };
 
+  const sendTest = async () => {
+    setTesting(true);
+    setTestResult(null);
+    const r = await apiMailTest(testTo.trim() || undefined);
+    setTesting(false);
+    setTestResult(r);
+    if (r.ok) {
+      toast.success(`Тестовое письмо отправлено на ${r.to}`);
+    }
+    if (logOpen) void loadLog();
+  };
+
+  const loadLog = async () => {
+    setLogLoading(true);
+    const r = await apiMailLog(10);
+    setLogLoading(false);
+    setLogEntries(r.entries);
+  };
+
+  const toggleLog = () => {
+    const next = !logOpen;
+    setLogOpen(next);
+    if (next && logEntries.length === 0) void loadLog();
+  };
+
+  const saveSmtp = async () => {
+    const host = smtpHost.trim();
+    const user = smtpUser.trim();
+    const port = smtpPort.trim() === "" ? null : Number(smtpPort.trim());
+    if (host === "" && user === "" && smtpPass === "") {
+      // полное отключение SMTP
+      setSmtpSaving(true);
+      const r = await apiSaveSettings({ smtpHost: null, smtpUser: null, smtpPass: "", clearSmtpPass: true });
+      setSmtpSaving(false);
+      if (r.ok === true) {
+        onSettingsChange({ ...settings, smtpHost: "", smtpUser: "", smtpSet: false, smtpPassMasked: "" });
+        toast.success("SMTP отключён — письма идут через почту хостинга");
+      } else {
+        toast.error("Не удалось сохранить — попробуйте ещё раз");
+      }
+      return;
+    }
+    if (host !== "" && !user) {
+      toast.error("Укажите email ящика (логин SMTP)");
+      return;
+    }
+    if (user && !host) {
+      toast.error("Укажите сервер SMTP (для SpaceWeb — smtp.spaceweb.ru)");
+      return;
+    }
+    if (port !== null && (!Number.isInteger(port) || port < 1 || port > 65535)) {
+      toast.error("Порт — число от 1 до 65535 (обычно 465)");
+      return;
+    }
+    setSmtpSaving(true);
+    const r = await apiSaveSettings({
+      smtpHost: host === "" ? null : host,
+      smtpUser: user === "" ? null : user,
+      smtpPort: port,
+      ...(smtpPass.trim() !== "" ? { smtpPass: smtpPass } : {}),
+    });
+    setSmtpSaving(false);
+    if (r.ok === true) {
+      const patch: Partial<AdminSettings> = { smtpHost: host, smtpUser: user, smtpPort: port };
+      if (smtpPass.trim() !== "") {
+        patch.smtpPassMasked =
+          smtpPass.trim().slice(0, 2) + "••••" + smtpPass.trim().slice(-2);
+      }
+      if (host && user && (smtpPass.trim() !== "" || settings.smtpPassMasked)) {
+        patch.smtpSet = true;
+      }
+      onSettingsChange({ ...settings, ...patch } as AdminSettings);
+      setSmtpPass("");
+      toast.success("SMTP-настройки сохранены — отправьте тестовое письмо");
+    } else {
+      toast.error(
+        r.error === "validation" ? "Проверьте поля — похоже, в них опечатка" : "Не удалось сохранить — попробуйте ещё раз",
+      );
+    }
+  };
+
   return (
     <Card className="rounded-2xl border-border-line/80 shadow-none">
       <CardContent className="p-5">
@@ -109,7 +227,9 @@ function EmailCard({
           </h3>
         </div>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-          На этот адрес приходят письма о каждой новой заявке с сайта.
+          На этот адрес приходят письма о каждой новой заявке с сайта. Клиенту,
+          оставившему свой email, автоматически отправляется подтверждение
+          с копией расчёта.
         </p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <div className="flex-1">
@@ -132,9 +252,278 @@ function EmailCard({
             Сохранить
           </Button>
         </div>
+
+        {/* c97: тест почты */}
+        <div className="mt-4 rounded-xl border border-border-line/70 bg-parchment/30 p-4">
+          <div className="flex items-center gap-2">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink/10 text-ink">
+              <Send className="size-3.5" />
+            </span>
+            <h4 className="text-[14px] font-semibold text-ink">Проверка почты</h4>
+          </div>
+          <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
+            Отправим тестовое письмо тем же каналом, что и уведомления о
+            заявках. Оставьте поле пустым — отправим на email уведомлений.
+          </p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <div className="flex-1">
+              <TextField
+                value={testTo}
+                onChange={setTestTo}
+                placeholder={settings.notifyEmail || "кому отправить тест"}
+                inputMode="email"
+                type="email"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 rounded-xl text-[14px]"
+              disabled={testing}
+              onClick={sendTest}
+            >
+              {testing ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+              Отправить тест
+            </Button>
+          </div>
+          {testResult ? (
+            <div
+              className={cn(
+                "mt-3 rounded-lg p-3 text-[13px] leading-relaxed",
+                testResult.ok
+                  ? "bg-gold/10 text-ink"
+                  : "bg-destructive/10 text-ink",
+              )}
+            >
+              {testResult.ok ? (
+                <>
+                  <span className="inline-flex items-center gap-1.5 font-medium">
+                    <Check className="size-4 text-gold" />
+                    Письмо передано сервером ({transportLabel(testResult.transport)}) на {testResult.to}.
+                  </span>{" "}
+                  Проверьте ящик — если письма нет, загляните в папку «Спам»
+                  и отметьте его «не спам»; если и там нет — настройте SMTP ниже.
+                </>
+              ) : (
+                <>
+                  <span className="font-medium">Отправка не удалась.</span>{" "}
+                  {testResult.detail || errorText(testResult.error)}
+                </>
+              )}
+            </div>
+          ) : null}
+        </div>
+
+        {/* c97: журнал отправок */}
+        <div className="mt-4 border-t border-border-line/60 pt-2">
+          <button
+            type="button"
+            className="flex min-h-11 w-full items-center justify-between gap-2 py-1 text-left text-[13.5px] font-medium text-ink-soft"
+            aria-expanded={logOpen}
+            onClick={toggleLog}
+          >
+            Последние отправки писем
+            <ChevronDown
+              className={cn("size-4 shrink-0 transition-transform", logOpen && "rotate-180")}
+            />
+          </button>
+          {logOpen ? (
+            <div className="pb-2">
+              {logLoading ? (
+                <p className="flex items-center gap-2 py-2 text-[13px] text-ink-soft">
+                  <Loader2 className="size-4 animate-spin" /> Загружаем журнал…
+                </p>
+              ) : logEntries.length === 0 ? (
+                <p className="py-2 text-[12.5px] text-ink-soft/80">
+                  Пока ничего не отправлялось — отправьте тестовое письмо.
+                </p>
+              ) : (
+                <div className="max-h-72 overflow-y-auto">
+                  <table className="w-full border-separate border-spacing-0 text-[12.5px]">
+                    <tbody>
+                      {logEntries.map((e, i) => (
+                        <tr key={i} className="align-top">
+                          <td className="whitespace-nowrap py-1.5 pr-3 text-ink-soft/70">
+                            {e.ts ? formatMailDate(e.ts) : "—"}
+                          </td>
+                          <td className="py-1.5 pr-3 text-ink">
+                            {e.subject}
+                            <span className="block text-[11.5px] text-ink-soft/70">
+                              {e.to} · {contextLabel(e.context)}
+                            </span>
+                          </td>
+                          <td className="whitespace-nowrap py-1.5 text-right">
+                            {e.ok ? (
+                              <span className="inline-flex items-center gap-1 font-medium text-ink">
+                                <Check className="size-3.5 text-gold" /> ок
+                              </span>
+                            ) : (
+                              <span className="font-medium text-destructive">
+                                сбой
+                                {e.error ? (
+                                  <span className="block max-w-48 font-normal text-[11.5px] leading-snug text-destructive/80">
+                                    {e.error}
+                                  </span>
+                                ) : null}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              <p className="mt-2 text-[12px] text-ink-soft/70">
+                «ок» = сервер принял письмо к доставке. Если письмо не пришло,
+                проверьте папку «Спам» или настройте SMTP ниже.
+              </p>
+            </div>
+          ) : null}
+        </div>
+
+        {/* c97: SMTP */}
+        <div className="mt-2 border-t border-border-line/60 pt-2">
+          <button
+            type="button"
+            className="flex min-h-11 w-full items-center justify-between gap-2 py-1 text-left text-[13.5px] font-medium text-ink-soft"
+            aria-expanded={smtpOpen}
+            onClick={() => setSmtpOpen((v) => !v)}
+          >
+            Надёжная доставка: SMTP-ящик сайта {settings.smtpSet ? "· включён" : ""}
+            <ChevronDown
+              className={cn("size-4 shrink-0 transition-transform", smtpOpen && "rotate-180")}
+            />
+          </button>
+          {smtpOpen ? (
+            <div className="pb-2">
+              {settings.smtpSet ? (
+                <p className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-gold/10 px-2.5 py-1.5 text-[12.5px] font-medium text-ink">
+                  <ShieldCheck className="size-4 text-gold" />
+                  Письма подписаны вашим ящиком {settings.smtpUser || settings.smtpHost} —
+                  надёжная доставка, не спам
+                </p>
+              ) : (
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-soft/80">
+                  Без SMTP письма отправляет сам хостинг — Gmail и Mail.ru
+                  иногда кладут их в спам. Настроив SMTP-ящик, вы получаете
+                  подписанные письма, которые доходят надёжно (5 минут
+                  один раз).
+                </p>
+              )}
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div>
+                  <FieldLabel htmlFor="smtp-host">Сервер SMTP</FieldLabel>
+                  <TextField
+                    id="smtp-host"
+                    value={smtpHost}
+                    onChange={setSmtpHost}
+                    placeholder="smtp.spaceweb.ru"
+                    inputMode="url"
+                  />
+                </div>
+                <div>
+                  <FieldLabel htmlFor="smtp-port" hint="обычно 465">Порт</FieldLabel>
+                  <TextField
+                    id="smtp-port"
+                    value={smtpPort}
+                    onChange={setSmtpPort}
+                    placeholder="465"
+                    inputMode="decimal"
+                  />
+                </div>
+                <div>
+                  <FieldLabel htmlFor="smtp-user">Ящик (логин)</FieldLabel>
+                  <TextField
+                    id="smtp-user"
+                    value={smtpUser}
+                    onChange={setSmtpUser}
+                    placeholder="noreply@nilovcatering.ru"
+                    inputMode="email"
+                    type="email"
+                  />
+                </div>
+                <div>
+                  <FieldLabel
+                    htmlFor="smtp-pass"
+                    hint={settings.smtpPassMasked ? `сохранён ${settings.smtpPassMasked}` : undefined}
+                  >
+                    Пароль
+                  </FieldLabel>
+                  <TextField
+                    id="smtp-pass"
+                    value={smtpPass}
+                    onChange={setSmtpPass}
+                    placeholder={settings.smtpPassMasked ? "оставьте пустым, чтобы не менять" : "пароль ящика"}
+                    type="password"
+                    autoComplete="new-password"
+                  />
+                </div>
+              </div>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+                <Button
+                  type="button"
+                  className="h-11 rounded-xl px-6 text-[14px]"
+                  disabled={smtpSaving}
+                  onClick={saveSmtp}
+                >
+                  {smtpSaving ? <Loader2 className="size-4 animate-spin" /> : null}
+                  Сохранить SMTP
+                </Button>
+                <p className="text-[12.5px] leading-relaxed text-ink-soft/80">
+                  Как создать ящик: панель SpaceWeb → «Почта» → «Ящики» →
+                  «Создать» (например, <code>noreply@nilovcatering.ru</code>)
+                  → пароль из панели вставьте сюда. Отправитель писем станет
+                  этим ящиком — письма подписаны DKIM и не попадают в спам.
+                </p>
+              </div>
+            </div>
+          ) : null}
+        </div>
       </CardContent>
     </Card>
   );
+}
+
+/** c97: короткие подписи ошибок теста почты. */
+function errorText(error: string | null): string {
+  switch (error) {
+    case "no_recipient":
+      return "Укажите адрес получателя или заполните «Email для уведомлений» выше.";
+    case "mail_disabled":
+      return "Хостинг запретил отправку писем — настройте SMTP ниже, это решит проблему.";
+    case "mail_failed":
+      return "Хостинг не принял письмо (sendmail). Настройка SMTP ниже обычно решает это.";
+    case "rate":
+      return "Слишком много тестов — подождите немного и попробуйте снова.";
+    default:
+      return "Сервер не смог отправить письмо. Настройка SMTP ниже обычно решает это.";
+  }
+}
+
+/** c97: подпись контекста в журнале почты. */
+function contextLabel(ctx: string): string {
+  switch (ctx) {
+    case "lead-owner":
+      return "уведомление вам";
+    case "lead-client":
+      return "подтверждение клиенту";
+    case "test":
+      return "тест";
+    default:
+      return ctx;
+  }
+}
+
+/** c97: дата для журнала почты (UNIX-секунды → ru-RU). */
+function formatMailDate(ts: number): string {
+  const d = new Date(ts > 1e12 ? ts : ts * 1000);
+  return d.toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 /* --------------------------------------------------------------- telegram */

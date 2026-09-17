@@ -835,10 +835,12 @@ export function AdminApp({
       {/* ── диалоги ────────────────────────────────────────────────────── */}
 
       {/* c96: подтверждение публикации со сводкой «что именно изменится» */}
+      {/* c97: computeMenuDiff — только при открытом диалоге (иначе считался
+          на каждый рендер админки); + защита от пакетов без dishes */}
       <PublishConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        diff={menu && serverMenu ? computeMenuDiff(serverMenu, menu) : []}
+        diff={confirmOpen && menu && serverMenu ? computeMenuDiff(serverMenu, menu) : []}
         busy={pub.phase === "saving"}
         onConfirm={() => void doPublish()}
       />
@@ -1270,8 +1272,8 @@ export function computeMenuDiff(server: MenuData, draft: MenuData): string[] {
       if (sp.pricePerGuest !== p.pricePerGuest) {
         out.push(`${where}: ${formatRUB(sp.pricePerGuest)} → ${formatRUB(p.pricePerGuest)}`);
       }
-      if (sp.dishes.length !== p.dishes.length) {
-        out.push(`${where}: блюд ${sp.dishes.length} → ${p.dishes.length}`);
+      if ((sp.dishes?.length ?? 0) !== (p.dishes?.length ?? 0)) {
+        out.push(`${where}: блюд ${sp.dishes?.length ?? 0} → ${p.dishes?.length ?? 0}`);
       }
     }
     for (const p of s.packages) {

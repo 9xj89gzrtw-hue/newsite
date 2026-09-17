@@ -209,6 +209,46 @@ function leads_archive_path(): string
     return server_data_dir() . '/leads-archive.json';
 }
 
+/** c97 — журнал попыток отправки почты (server-data/mail-log.json). */
+function mail_log_path(): string
+{
+    return server_data_dir() . '/mail-log.json';
+}
+
+/** c97 — лимит журнала почты (шт; старейшие выбрасываются). */
+const MAIL_LOG_CAP = 300;
+
+/**
+ * c97 — прочитать журнал почты (новые сверху), максимум $limit записей.
+ * Для диагностики в админке («последние отправки» в разделе «Почта»).
+ */
+function mail_log_read(int $limit = 30): array
+{
+    $arr = read_json_file(mail_log_path());
+    if (!is_array($arr)) {
+        return [];
+    }
+    $arr = array_values(array_filter($arr, 'is_array'));
+    $arr = array_slice($arr, -$limit);
+    return array_reverse($arr);
+}
+
+/**
+ * c97 — добавить запись в журнал почты (append + cap 300, под локом).
+ * Никогда не бросает исключений: журнал не должен ломать отправку.
+ */
+function mail_log_append(array $entry): void
+{
+    $entry['ts'] = time();
+    update_json_file(mail_log_path(), static function (array $cur) use ($entry): array {
+        $cur[] = $entry;
+        if (count($cur) > MAIL_LOG_CAP) {
+            $cur = array_slice($cur, count($cur) - MAIL_LOG_CAP);
+        }
+        return $cur;
+    });
+}
+
 /** Каталог runtime-данных: создать (0775) + анти-листинг index.html. */
 function ensure_server_data_dir(): void
 {
@@ -310,6 +350,16 @@ function default_settings(): array
         'tgBotToken' => null,
         'tgChatId' => null,
         'tgApiBase' => null,
+        // c97: SMTP для надёжной доставки почты (ящик на хостинге,
+        // например noreply@nilovcatering.ru — панель SpaceWeb → Почта).
+        // Заполняется владельцем в «Настройках → Почта»; письма через SMTP
+        // подписываются DKIM хостинга и не попадают в спам. Пароль —
+        // server-side, в UI маскируется (как tgBotToken).
+        'smtpHost' => null,
+        'smtpPort' => null,
+        'smtpUser' => null,
+        'smtpPass' => null,
+        'smtpFrom' => null,
         // c96: последняя рабочая база Bot API — сервер запоминает её после
         // первого успешного вызова (владелец развернул воркер / ожил прямой
         // api.telegram.org), чтобы каждый следующий вызов не платил
@@ -337,7 +387,37 @@ function load_settings(): array
     if (!is_int($merged['sessionEpoch'])) {
         $merged['sessionEpoch'] = is_numeric($merged['sessionEpoch']) ? (int)$merged['sessionEpoch'] : 0;
     }
+    // c97: smtpPort — int 1..65535 (мусор из испорченного файла — в null,
+    // SMTP просто неактивен, письма идут через mail())
+    if ($merged['smtpPort'] !== null) {
+        $p = is_int($merged['smtpPort']) ? $merged['smtpPort'] : (is_numeric($merged['smtpPort']) ? (int)$merged['smtpPort'] : 0);
+        $merged['smtpPort'] = ($p >= 1 && $p <= 65535) ? $p : null;
+    }
     return $merged;
+}
+
+/**
+ * c97 — валидная ли SMTP-конфигурация (host+user+pass заполнены).
+ * port по умолчанию 465 (SSL) — стандарт SpaceWeb/большинства хостингов.
+ */
+function smtp_config(array $s): ?array
+{
+    $host = is_string($s['smtpHost'] ?? null) ? trim($s['smtpHost']) : '';
+    $user = is_string($s['smtpUser'] ?? null) ? trim($s['smtpUser']) : '';
+    $pass = is_string($s['smtpPass'] ?? null) ? $s['smtpPass'] : '';
+    if ($host === '' || $user === '' || $pass === '') {
+        return null;
+    }
+    $from = is_string($s['smtpFrom'] ?? null) ? trim($s['smtpFrom']) : '';
+    return [
+        'host' => $host,
+        'port' => is_int($s['smtpPort'] ?? null) ? $s['smtpPort'] : 465,
+        'user' => $user,
+        'pass' => $pass,
+        // From должен совпадать с ящиком авторизации (DKIM-выравнивание),
+        // кастомный smtpFrom — только если владелец задал его осознанно
+        'from' => ($from !== '' && filter_var($from, FILTER_VALIDATE_EMAIL)) ? $from : $user,
+    ];
 }
 
 function save_settings(array $settings): bool
@@ -913,24 +993,60 @@ function tg_send(string $token, string $apiBase, string $chatId, string $html): 
 
 /* ------------------------------- mail ----------------------------------- */
 
+/** Отображаемое имя отправителя для писем сайта. */
+const MAIL_FROM_NAME = 'Nilov Catering';
+/** Домен сайта для Message-ID (RFC 5322: <ts.rand@domain>). */
+const MAIL_DOMAIN = 'nilovcatering.ru';
+
 /**
- * Уведомление по mail() (SpaceWeb: sendmail, From — ящик домена,
- * см. R-REPORT §3). Тема кодируется =?UTF-8?B?…?=, клиент в Reply-To.
+ * c97 — тема письма в encoded-word (=?UTF-8?B?…?=), кусками ≤ 75 байт
+ * (RFC 2047). Длинные темы надёжно принимаются Gmail/mail.ru.
  */
-function mail_notify(string $to, string $subject, string $bodyText, ?string $replyTo = null, ?string $from = null): bool
+function mail_subject_enc(string $subject): string
 {
-    /* c95: guard — на хостинге mail() может быть отключена (тестовый период,
-     * лимиты, политика хостера); локальные статические сборки PHP тоже могут
-     * её не иметь. Тихая деградация: заявка уже сохранена в JSON. */
-    if (!function_exists('mail')) {
-        return false;
+    $subject = str_replace(["\r", "\n"], ' ', $subject);
+    $words = [];
+    // режем на куски по 12 UTF-8-символов (модификатор u — суррогатных
+    // разрезов нет): 12 симв. = до 48 байт base64 + обвязка ≈ 20 байт —
+    // каждый encoded-word в лимите 75 байт (RFC 2047)
+    if (preg_match_all('/.{1,12}/us', $subject, $m) && !empty($m[0])) {
+        foreach ($m[0] as $chunk) {
+            $words[] = '=?UTF-8?B?' . base64_encode($chunk) . '?=';
+        }
     }
-    if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
-        return false;
-    }
-    $from = ($from !== null && $from !== '') ? $from : 'noreply@nilovcatering.ru';
+    return $words === [] ? '=?UTF-8?B??=' : implode("\r\n ", $words);
+}
+
+/** c97 — уникальный Message-ID (отсутствие — сильный спам-сигнал Gmail). */
+function mail_message_id(): string
+{
+    return '<' . time() . '.' . bin2hex(random_bytes(8)) . '@' . MAIL_DOMAIN . '>';
+}
+
+/**
+ * c97 — тело письма: CRLF, точка в начале строки защищена (RFC 5321
+ * «dot-stuffing» — иначе SMTP-транспорте разорвёт письмо).
+ */
+function mail_body_crlf(string $bodyText): string
+{
+    $body = str_replace(["\r\n", "\r"], "\n", $bodyText);
+    $body = str_replace("\n", "\r\n", $body);
+    return preg_replace('/^\./m', '..', $body);
+}
+
+/**
+ * c97 — общий набор заголовков (без To/Subject: SMTP добавляет их
+ * сам из параметров, а mail() ставит из своих аргументов — дубликаты
+ * ломают письмо).
+ * Date и Message-ID обязательны: их отсутствие — один из главных
+ * спам-сигналов у Gmail (в c95 их не было — вероятная причина пропажи).
+ */
+function mail_headers(string $fromEmail, ?string $replyTo): array
+{
     $headers = [
-        'From: Nilov Catering <' . $from . '>',
+        'From: ' . MAIL_FROM_NAME . ' <' . $fromEmail . '>',
+        'Date: ' . date('r'),
+        'Message-ID: ' . mail_message_id(),
         'MIME-Version: 1.0',
         'Content-Type: text/plain; charset=UTF-8',
         'Content-Transfer-Encoding: 8bit',
@@ -938,9 +1054,231 @@ function mail_notify(string $to, string $subject, string $bodyText, ?string $rep
     if ($replyTo !== null && $replyTo !== '' && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
         $headers[] = 'Reply-To: ' . $replyTo;
     }
-    // тело: нормализуем переводы строк к CRLF (RFC 5322)
-    $body = str_replace(["\r\n", "\r"], "\n", $bodyText);
-    $body = str_replace("\n", "\r\n", $body);
-    $subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-    return @mail($to, $subject, $body, implode("\r\n", $headers));
+    return $headers;
+}
+
+/**
+ * c97 — SMTP-клиент по сырому сокету (без phpmailer: хостинг-агностично,
+ * расширений не требуется — fsockopen + stream crypto из ядра PHP).
+ * Поддерживает SSL (465) и STARTTLS (587/25) + AUTH LOGIN.
+ * Возвращает ['ok'=>bool, 'error'=>?string, 'detail'=>?string].
+ */
+function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?string $replyTo): array
+{
+    $host = $cfg['host'];
+    $port = (int)$cfg['port'];
+    $errno = 0;
+    $errstr = '';
+    $ctx = stream_context_create(['ssl' => [
+        'verify_peer' => true,
+        'verify_peer_name' => true,
+        'SNI_enabled' => true,
+    ]]);
+    $fp = @stream_socket_client(
+        'tcp://' . $host . ':' . $port,
+        $errno,
+        $errstr,
+        10.0,
+        STREAM_CLIENT_CONNECT,
+        $ctx
+    );
+    if ($fp === false) {
+        return ['ok' => false, 'error' => 'connect_failed', 'detail' => str_trunc("{$errstr} ({$errno})", 200)];
+    }
+    stream_set_timeout($fp, 15);
+
+    /** Читает SMTP-ответ (многострочный «250-…» / «250 …»), возвращает код. */
+    $readCode = static function () use ($fp): array {
+        $code = 0;
+        $text = '';
+        while (($line = fgets($fp, 1024)) !== false) {
+            $text .= $line;
+            if (strlen($line) < 4 || $line[3] !== '-') {
+                $code = (int)substr($line, 0, 3);
+                break;
+            }
+        }
+        return [$code, trim($text)];
+    };
+    /** Пишет команду и читает ответ; false — таймаут/обрыв. */
+    $cmd = static function (string $c, string $expect) use ($fp, $readCode): array {
+        if (fwrite($fp, $c . "\r\n") === false) {
+            return [0, 'write_failed'];
+        }
+        [$code, $text] = $readCode();
+        if ($code === 0) {
+            return [0, 'timeout'];
+        }
+        if ($expect !== '' && $code !== (int)$expect) {
+            return [$code, str_trunc($text, 300)];
+        }
+        return [$code, $text];
+    };
+    /** Включает TLS на текущем сокете (STARTTLS после EHLO). */
+    $startTls = static function () use ($fp): bool {
+        if (!@stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+            // некоторые PHP без перечисления методов: пробуем любой клиентский
+            return (bool)@stream_socket_enable_crypto($fp, true);
+        }
+        return true;
+    };
+
+    try {
+        // 465 — implicit TLS (крипта до приветствия); 587/25 — STARTTLS
+        $implicitTls = ($port === 465);
+        if ($implicitTls) {
+            // блокирующий сокет: рукопожатие выполняется в одном вызове;
+            // при неудаче — вторая попытка с ANY (хостинги со старым TLS)
+            $tlsOk = @stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)
+                || @stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
+            if (!$tlsOk) {
+                return ['ok' => false, 'error' => 'tls_failed', 'detail' => 'SSL-рукопожатие не удалось (порт 465)'];
+            }
+        }
+        [$code, $text] = $readCode();
+        if ($code !== 220) {
+            return ['ok' => false, 'error' => 'bad_greeting', 'detail' => str_trunc($text, 200)];
+        }
+
+        [$code, $text] = $cmd('EHLO ' . MAIL_DOMAIN, '250');
+        if ($code !== 250) {
+            return ['ok' => false, 'error' => 'ehlo_failed', 'detail' => $text];
+        }
+
+        if (!$implicitTls && strpos($text, 'STARTTLS') !== false) {
+            [$code, $text] = $cmd('STARTTLS', '220');
+            if ($code !== 220) {
+                return ['ok' => false, 'error' => 'starttls_failed', 'detail' => $text];
+            }
+            if (!$startTls()) {
+                return ['ok' => false, 'error' => 'tls_failed', 'detail' => 'STARTTLS-рукопожатие не удалось'];
+            }
+            [$code, $text] = $cmd('EHLO ' . MAIL_DOMAIN, '250');
+            if ($code !== 250) {
+                return ['ok' => false, 'error' => 'ehlo_after_tls_failed', 'detail' => $text];
+            }
+        }
+
+        [$code, $text] = $cmd('AUTH LOGIN', '334');
+        if ($code !== 334) {
+            return ['ok' => false, 'error' => 'auth_not_offered', 'detail' => $text];
+        }
+        [$code, $text] = $cmd(base64_encode($cfg['user']), '334');
+        if ($code !== 334) {
+            return ['ok' => false, 'error' => 'auth_user_rejected', 'detail' => $text];
+        }
+        [$code, $text] = $cmd(base64_encode($cfg['pass']), '235');
+        if ($code !== 235) {
+            return ['ok' => false, 'error' => 'auth_failed', 'detail' => str_trunc('Логин или пароль SMTP не приняты сервером', 200)];
+        }
+
+        [$code, $text] = $cmd('MAIL FROM:<' . $cfg['from'] . '>', '250');
+        if ($code !== 250) {
+            return ['ok' => false, 'error' => 'mail_from_rejected', 'detail' => $text];
+        }
+        [$code, $text] = $cmd('RCPT TO:<' . $to . '>', '250');
+        if ($code !== 250 && $code !== 251) {
+            return ['ok' => false, 'error' => 'rcpt_rejected', 'detail' => $text];
+        }
+        [$code, $text] = $cmd('DATA', '354');
+        if ($code !== 354) {
+            return ['ok' => false, 'error' => 'data_rejected', 'detail' => $text];
+        }
+
+        $subjectEnc = mail_subject_enc($subject);
+        // SMTP-путь: To/Subject в заголовках DATA (в отличие от mail(),
+        // которая добавляет их сама из своих аргументов)
+        $headers = array_merge(
+            ['To: ' . $to, 'Subject: ' . $subjectEnc],
+            mail_headers($cfg['from'], $replyTo)
+        );
+        $msg = implode("\r\n", $headers) . "\r\n\r\n" . mail_body_crlf($bodyText) . "\r\n.";
+        [$code, $text] = $cmd($msg, '250');
+        if ($code !== 250) {
+            return ['ok' => false, 'error' => 'message_rejected', 'detail' => $text];
+        }
+        @fwrite($fp, "QUIT\r\n");
+        return ['ok' => true, 'error' => null, 'detail' => null];
+    } finally {
+        @fclose($fp);
+    }
+}
+
+/**
+ * c97 — ЕДИНАЯ точка отправки почты: SMTP (если настроен) → фолбэк
+ * mail() → честный отказ. Каждая попытка пишется в журнал
+ * (server-data/mail-log.json), который виден в админке — владелец
+ * больше не узнаёт о нерабочей почте «неожиданно».
+ *
+ * $context — метка для журнала: 'lead-owner' | 'lead-client' | 'test'.
+ * Возвращает ['ok'=>bool, 'transport'=>'smtp'|'mail'|'mail-fallback'|'none',
+ * 'error'=>?string, 'detail'=>?string].
+ */
+function mail_send(string $to, string $subject, string $bodyText, ?string $replyTo = null, string $context = 'test'): array
+{
+    if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        $r = ['ok' => false, 'transport' => 'none', 'error' => 'invalid_recipient', 'detail' => $to];
+        mail_log_append(['to' => str_trunc($to, 120), 'context' => $context, 'subject' => str_trunc($subject, 100),
+            'transport' => 'none', 'ok' => false, 'error' => 'invalid_recipient']);
+        return $r;
+    }
+
+    $settings = load_settings();
+    $secrets = load_secrets(false);
+    $smtp = smtp_config($settings);
+
+    if ($smtp !== null) {
+        $r = smtp_send($smtp, $to, $subject, $bodyText, $replyTo);
+        if ($r['ok'] === true) {
+            mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
+                'transport' => 'smtp', 'ok' => true, 'error' => null]);
+            return ['ok' => true, 'transport' => 'smtp', 'error' => null, 'detail' => null];
+        }
+        // SMTP настроен, но не сработал (пароль/сеть) — НЕ теряем письмо:
+        // пробуем mail() сервера, обе попытки в журнале.
+        mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
+            'transport' => 'smtp', 'ok' => false, 'error' => str_trunc((string)$r['error'], 100),
+            'detail' => str_trunc((string)($r['detail'] ?? ''), 200)]);
+    }
+
+    /* mail()-путь: sendmail хостинга. c97 — с Date/Message-ID (без них
+     * Gmail кладёт в спам или молча отбраковывает — главный подозреваемый
+     * в «почта не работает» у владельца). */
+    if (!function_exists('mail')) {
+        mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
+            'transport' => 'none', 'ok' => false, 'error' => 'mail_disabled', 'detail' => 'mail() отключена на хостинге, SMTP не настроен']);
+        return ['ok' => false, 'transport' => 'none', 'error' => 'mail_disabled',
+            'detail' => 'Функция mail() отключена на хостинге; настройте SMTP в разделе «Почта»'];
+    }
+
+    $from = (string)($secrets['notify_from'] ?: 'noreply@' . MAIL_DOMAIN);
+    if ($smtp !== null && $smtp['from'] !== '') {
+        $from = $smtp['from']; // выравнивание From с SMTP-ящиком
+    }
+    // mail() сама ставит To/Subject из аргументов — в заголовках их НЕ дублируем
+    $headers = mail_headers($from, $replyTo);
+    $ok = @mail($to, mail_subject_enc($subject), mail_body_crlf($bodyText), implode("\r\n", $headers));
+
+    $transport = ($smtp !== null) ? 'mail-fallback' : 'mail';
+    mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
+        'transport' => $transport, 'ok' => (bool)$ok,
+        'error' => $ok ? null : 'mail() вернула false (sendmail не принял письмо)']);
+    return [
+        'ok' => (bool)$ok,
+        'transport' => $transport,
+        'error' => $ok ? null : 'mail_failed',
+        'detail' => $ok ? null : ($smtp !== null
+            ? 'SMTP не сработал (' . str_trunc((string)($r['error'] ?? '?'), 120) . '), sendmail тоже не принял письмо'
+            : 'sendmail хостинга не принял письмо'),
+    ];
+}
+
+/**
+ * c95-легаси-обёртка (использовалась в lead.php до c97) — теперь через
+ * mail_send(). Оставлена для совместимости смоук-тестов.
+ */
+function mail_notify(string $to, string $subject, string $bodyText, ?string $replyTo = null, ?string $from = null): bool
+{
+    $r = mail_send($to, $subject, $bodyText, $replyTo, 'legacy');
+    return $r['ok'] === true;
 }

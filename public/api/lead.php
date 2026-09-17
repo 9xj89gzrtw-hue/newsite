@@ -142,11 +142,11 @@ $stored = store_lead($lead);
 if ($stored && function_exists('fastcgi_finish_request')) {
     send_lead_response(200, ['ok' => true, 'id' => $lead['id']]);
     fastcgi_finish_request();
-    lead_notify_all($lead);
+    lead_notify_and_store_status($lead);
     exit;
 }
 
-$notify = lead_notify_all($lead);
+$notify = lead_notify_and_store_status($lead);
 
 /* Не записано И ни одно уведомление не доставлено → честный 500:
    клиент переключится на mailto-фоллбэк. */
@@ -173,12 +173,14 @@ function send_lead_response(int $status, array $body): void
     echo json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
 }
 
-/** Все уведомления по заявке (TG + mail). true — хоть одно доставлено. */
-function lead_notify_all(array $lead): bool
+/** Все уведомления по заявке (TG + mail владельцу + подтверждение клиенту).
+ * true — хоть одно доставлено. c97: статусы также пишутся в запись лида
+ * (notify: tg/mail/client/mailTransport) — видно в разделе «Заявки». */
+function lead_notify_all(array $lead): array
 {
     $settings = load_settings();
     $secrets = load_secrets(false);
-    $delivered = false;
+    $status = ['tg' => false, 'mail' => false, 'client' => null, 'mailTransport' => null];
 
     $chatId = $settings['tgChatId'] ?? null;
     $token = $settings['tgBotToken'] ?? null;
@@ -188,21 +190,70 @@ function lead_notify_all(array $lead): bool
          * деградирует с 03.2026. maxBases=2 — бюджет таймаутов (лид
          * не должен висеть на мёртвых базах), почта всегда догонит. */
         $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId, lead_tg_text($lead), 2);
-        $delivered = $delivered || $tg['ok'] === true;
+        $status['tg'] = ($tg['ok'] === true);
     }
 
     $notifyEmail = (string)($settings['notifyEmail'] ?: NOTIFY_EMAIL_FALLBACK);
     if ($notifyEmail !== '') {
-        $mailOk = mail_notify(
+        /* c97: единый канал mail_send — SMTP (если настроен) → mail() с
+         * обязательными Date/Message-ID (без них Gmail отбраковывал
+         * письма — вероятная причина «почта не работает»). Клиент в
+         * Reply-To: владелец отвечает посетителю прямо из письма. */
+        $mail = mail_send(
             $notifyEmail,
             'Новая заявка с сайта — ' . $lead['name'],
             lead_mail_text($lead),
-            $lead['email'],
-            (string)($secrets['notify_from'] ?: 'noreply@nilovcatering.ru')
+            is_string($lead['email']) && $lead['email'] !== '' ? $lead['email'] : null,
+            'lead-owner'
         );
-        $delivered = $delivered || $mailOk === true;
+        $status['mail'] = ($mail['ok'] === true);
+        $status['mailTransport'] = is_string($mail['transport'] ?? null) ? $mail['transport'] : null;
     }
-    return $delivered;
+
+    /* c97: подтверждение КЛИЕНТУ — если посетитель указал email, ему
+     * уходит копия заявки с контактами (Reply-To — на владельца:
+     * ответ клиента на письмо приходит владельцу напрямую). */
+    if (is_string($lead['email']) && $lead['email'] !== '') {
+        $client = mail_send(
+            $lead['email'],
+            'Ваша заявка в Nilov Catering принята',
+            lead_client_mail_text($lead),
+            $notifyEmail !== '' ? $notifyEmail : null,
+            'lead-client'
+        );
+        $status['client'] = ($client['ok'] === true);
+    }
+    return $status;
+}
+
+/**
+ * c97 — обёртка над lead_notify_all: доставляет уведомления и дописывает
+ * их статусы в сохранённую запись лида (leads.json). Возвращает true,
+ * если доставлено хоть одно уведомление (критерий «принято» с c95).
+ */
+function lead_notify_and_store_status(array $lead): bool
+{
+    $status = lead_notify_all($lead);
+    $any = $status['tg'] === true || $status['mail'] === true || $status['client'] === true;
+    // пишем только если было хоть одно уведомление (иначе файл не трогаем)
+    if ($status['mail'] === true || $status['client'] !== null || $status['tg'] === true) {
+        update_json_file(leads_path(), static function (array $leads) use ($lead, $status): ?array {
+            foreach ($leads as $i => $l) {
+                if (($l['id'] ?? null) === $lead['id']) {
+                    $leads[$i]['notify'] = [
+                        'ts' => time(),
+                        'tg' => (bool)$status['tg'],
+                        'mail' => (bool)$status['mail'],
+                        'client' => isset($status['client']) ? (bool)$status['client'] : null,
+                        'mailTransport' => is_string($status['mailTransport'] ?? null) ? $status['mailTransport'] : null,
+                    ];
+                    return $leads;
+                }
+            }
+            return null; // лид не найден (архив?) — отменяем запись
+        });
+    }
+    return $any;
 }
 
 function make_lead_id(): string
@@ -317,5 +368,56 @@ function lead_mail_text(array $lead): string
     $lines[] = '';
     $lines[] = 'Дата заявки: ' . date('d.m.Y H:i:s', (int)$lead['ts']);
     $lines[] = 'ID: ' . $lead['id'];
-    return implode("\n", $lines);
+    return implode("\r\n", $lines);
+}
+
+/**
+ * c97 — подтверждение КЛИЕНТУ (уходит на email посетителя, если указан).
+ * Копия расчёта + контакты; ответ на письмо уходит владельцу (Reply-To).
+ */
+function lead_client_mail_text(array $lead): string
+{
+    $p = is_array($lead['payload']) ? $lead['payload'] : [];
+    $lines = [
+        'Здравствуйте, ' . $lead['name'] . '!',
+        '',
+        'Ваша заявка на сайте nilovcatering.ru получена — спасибо!',
+        'Мы свяжемся с вами по телефону ' . $lead['phone'] . ' в ближайшее время.',
+        '',
+    ];
+    $details = [];
+    if (!empty($p['pkgName']) && is_string($p['pkgName'])) {
+        $details[] = 'Формат: ' . $p['pkgName'];
+    }
+    if (isset($p['guests']) && is_numeric($p['guests'])) {
+        $details[] = 'Гостей: ' . (string)$p['guests'];
+    }
+    if (!empty($p['dateIso']) && is_string($p['dateIso'])) {
+        $details[] = 'Дата: ' . $p['dateIso'];
+    }
+    if (!empty($p['preferredTime']) && is_string($p['preferredTime'])) {
+        $details[] = 'Время: ' . $p['preferredTime'];
+    }
+    if (isset($p['total']) && is_numeric($p['total'])) {
+        $details[] = 'Предварительный расчёт: ' . number_format((float)$p['total'], 0, ',', ' ') . ' ₽';
+    }
+    if (!empty($lead['comment'])) {
+        $details[] = 'Ваш комментарий: ' . str_trunc($lead['comment'], 500);
+    }
+    if ($details !== []) {
+        $lines[] = 'КОПИЯ ВАШЕЙ ЗАЯВКИ';
+        foreach ($details as $d) {
+            $lines[] = '— ' . $d;
+        }
+        $lines[] = '';
+    }
+    $lines[] = 'Есть вопросы? Просто ответьте на это письмо — оно придёт нам напрямую.';
+    $lines[] = '';
+    $lines[] = 'Телефон / WhatsApp: +7 (911) 941-72-05';
+    $lines[] = 'Telegram: https://t.me/nilov_catering';
+    $lines[] = 'Сайт: https://nilovcatering.ru';
+    $lines[] = '';
+    $lines[] = 'Хорошего дня!';
+    $lines[] = 'Команда Nilov Catering — кейтеринг, в котором чувствуют';
+    return implode("\r\n", $lines);
 }

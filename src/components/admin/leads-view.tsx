@@ -15,8 +15,10 @@ import {
   Inbox,
   Loader2,
   Mail,
+  MessageCircle,
   Phone,
   RotateCcw,
+  Send,
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -510,6 +512,9 @@ function LeadCard({
           </p>
         ) : null}
 
+        {/* c97: статусы доставки уведомлений (TG/почта/клиенту) */}
+        <NotifyBadges lead={lead} />
+
         {chips.length > 0 ? (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {chips.map((c, i) => (
@@ -541,5 +546,66 @@ function LeadCard({
         ) : null}
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * c97 — компактные статусы доставки уведомлений по заявке:
+ * Telegram / почта владельцу / подтверждение клиенту. Показываются после
+ * первой отправки (поле notify появляется в записи лида после уведомлений).
+ */
+function NotifyBadges({ lead }: { lead: Lead }) {
+  const n = lead.notify;
+  if (!n) return null;
+
+  const items: { key: string; ok: boolean; label: string; icon: React.ReactNode }[] = [];
+  items.push({
+    key: "tg",
+    ok: n.tg === true,
+    label: "Telegram",
+    icon: <MessageCircle className="size-3" />,
+  });
+  items.push({
+    key: "mail",
+    ok: n.mail === true,
+    label: n.mailTransport === "smtp" ? "почта (SMTP)" : "почта",
+    icon: <Mail className="size-3" />,
+  });
+  if (n.client === true || n.client === false) {
+    items.push({
+      key: "client",
+      ok: n.client === true,
+      label: "клиенту",
+      icon: <Send className="size-3" />,
+    });
+  }
+  const deliveredAny = items.some((i) => i.ok);
+
+  return (
+    <div
+      className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border-line/50 pt-2 text-[11.5px] text-ink-soft/70"
+      aria-label="Статусы доставки уведомлений"
+    >
+      <span className="font-medium">Уведомления:</span>
+      {items.map((i) => (
+        <span
+          key={i.key}
+          className={cn(
+            "inline-flex items-center gap-1",
+            i.ok ? "text-ink" : "text-destructive",
+          )}
+        >
+          {i.ok ? (
+            <Check className="size-3.5 text-gold" />
+          ) : (
+            <span className="text-[13px] leading-none">✕</span>
+          )}
+          {i.icon} {i.label}
+        </span>
+      ))}
+      {!deliveredAny ? (
+        <span className="text-destructive">— ни одно не доставлено</span>
+      ) : null}
+    </div>
   );
 }

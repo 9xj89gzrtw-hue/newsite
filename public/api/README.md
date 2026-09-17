@@ -37,7 +37,13 @@ addonIds, total, preferredTime, undecided, …), `honeypot`, `elapsedMs`.
 Хранение: `server-data/leads.json` (cap 1000; старейшие → `leads-archive.json`,
 cap 5000). Полный IP не хранится — только md5-префикс. Уведомления: Telegram
 Bot API (если в настройках есть токен+chat_id; API-base переопределяемый) +
-`mail()` на `settings.notifyEmail` (фолбэк `NOTIFY_EMAIL_FALLBACK`).
+почта через `mail_send()` (SMTP из настроек → фолбэк `mail()`) на
+`settings.notifyEmail` (фолбэк `NOTIFY_EMAIL_FALLBACK`). c97: клиенту с email
+уходит подтверждение (копия расчёта + контакты, Reply-To — владелец);
+статусы доставки пишутся в запись лида (`notify: {tg,mail,client,mailTransport}`)
+и в журнал `server-data/mail-log.json` (cap 300). Почтовые письма всегда
+с Date/Message-ID (без них Gmail отбраковывает) и encoded-word-темой
+чанками ≤ 75 байт.
 
 ## /api/admin.php?action=… — админка
 
@@ -56,10 +62,12 @@ Bot API (если в настройках есть токен+chat_id; API-base 
 | `leads`        | GET   | ✓    | `&limit=1..500&offset` | `200 {ok,total,leads[]}` (новые сверху) |
 | `lead-update`  | POST  | ✓    | `{id,read?,archived?}` | `200` \| `404` |
 | `lead-delete`  | POST  | ✓    | `{id}`           | `200` \| `404` |
-| `settings`     | GET/POST | ✓ | GET — чтение; POST `{notifyEmail?,tgChatId?,tgApiBase?,tgBotToken?,clearBotToken?}` | GET: `{notifyEmail,tgChatId,tgApiBase,botTokenSet,botTokenMasked}` (полный токен НЕ отдаётся) · POST: `200 {ok}` \| `400 validation` |
+| `settings`     | GET/POST | ✓ | GET — чтение; POST `{notifyEmail?,tgChatId?,tgApiBase?,tgBotToken?,clearBotToken?,smtpHost?,smtpPort?,smtpUser?,smtpPass?,clearSmtpPass?,smtpFrom?}` (пустой smtpPass НЕ затирает) | GET: `{notifyEmail,tgChatId,tgApiBase,botTokenSet,botTokenMasked,smtpHost,smtpPort,smtpUser,smtpFrom,smtpSet,smtpPassMasked}` (токен и пароль только маской) · POST: `200 {ok}` \| `400 validation` |
 | `tg-check`     | POST  | ✓    | `{token?}` (иначе сохранённый) | `200 {ok:true,botName,botUsername}` \| `200 {ok:false,error:unauthorized\|network}` (getMe) |
 | `tg-discover`  | POST  | ✓    | —                | `200 {ok,chats:[{id,name,type}],hint?}` (getUpdates; напишите боту сообщение) |
 | `tg-test`      | POST  | ✓    | `{chatId?,token?}` | `200 {ok:true}` \| `200 {ok:false,error,retryAfterSec?}` (sendMessage) |
+| `mail-test`    | POST  | ✓    | `{to?}` (иначе notifyEmail/фолбэк) | `200 {ok,to,transport,error?,detail?}` — тестовое письмо тем же каналом, что заявки (rate 10/час) |
+| `mail-log`     | GET   | ✓    | `&limit=1..50` (по умолчанию 10) | `200 {ok,entries:[{ts,to,context,subject,transport,ok,error?}]}` (новые сверху) |
 | `password`     | POST  | ✓    | `{current,new}`  | `200 {ok}` · `401 bad_password` · `429 locked` (5/час) · `400 validation` (новый 8–128) |
 
 Неизвестный action → `404 {error:unknown_action}`.

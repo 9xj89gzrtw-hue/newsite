@@ -47,6 +47,8 @@ match ($action) {
     'tg-check' => h_tg_check($method),
     'tg-discover' => h_tg_discover($method),
     'tg-test' => h_tg_test($method),
+    'mail-test' => h_mail_test($method),
+    'mail-log' => h_mail_log($method),
     'password' => h_password($method),
     default => json_response(404, ['ok' => false, 'error' => 'unknown_action']),
 };
@@ -482,6 +484,13 @@ function h_settings(string $method): void
             'tgWorkingBase' => $s['tgWorkingBase'] ?? null,
             'botTokenSet' => is_string($s['tgBotToken']) && $s['tgBotToken'] !== '',
             'botTokenMasked' => mask_bot_token($s['tgBotToken']),
+            // c97: SMTP (для надёжной доставки почты). Пароль — только маска.
+            'smtpHost' => $s['smtpHost'],
+            'smtpPort' => $s['smtpPort'],
+            'smtpUser' => $s['smtpUser'],
+            'smtpFrom' => $s['smtpFrom'],
+            'smtpSet' => smtp_config($s) !== null,
+            'smtpPassMasked' => mask_secret($s['smtpPass']),
         ]]);
     }
     if ($method !== 'POST') {
@@ -504,6 +513,67 @@ function h_settings(string $method): void
             $bad('notifyEmail: некорректный email');
         }
     }
+
+    /* c97 — SMTP-поля. Валидация строгая: smtpHost — hostname; smtpUser —
+     * email; smtpPass — свободная строка (пароли хостингов бывают с
+     * спецсимволами); smtpFrom — email или null. */
+    if (array_key_exists('smtpHost', $body)) {
+        $v = $body['smtpHost'];
+        if ($v === null || $v === '') {
+            $s['smtpHost'] = null;
+        } elseif (is_string($v) && preg_match('/^[a-zA-Z0-9.-]{3,190}$/', trim($v)) === 1) {
+            $s['smtpHost'] = trim($v);
+        } else {
+            $bad('smtpHost: 3–190 символов, латиница/цифры/точки/дефисы');
+        }
+    }
+    if (array_key_exists('smtpPort', $body)) {
+        $v = $body['smtpPort'];
+        if ($v === null || $v === '') {
+            $s['smtpPort'] = null;
+        } elseif (is_int($v) && $v >= 1 && $v <= 65535) {
+            $s['smtpPort'] = $v;
+        } elseif (is_string($v) && ctype_digit($v) && (int)$v >= 1 && (int)$v <= 65535) {
+            $s['smtpPort'] = (int)$v;
+        } else {
+            $bad('smtpPort: целое число 1–65535 (обычно 465)');
+        }
+    }
+    if (array_key_exists('smtpUser', $body)) {
+        $v = $body['smtpUser'];
+        if ($v === null || $v === '') {
+            $s['smtpUser'] = null;
+        } elseif (is_string($v) && strlen($v) <= 120 && filter_var(trim($v), FILTER_VALIDATE_EMAIL)) {
+            $s['smtpUser'] = trim($v);
+        } else {
+            $bad('smtpUser: email ящика на хостинге (например, noreply@nilovcatering.ru)');
+        }
+    }
+    if (array_key_exists('smtpPass', $body)) {
+        $v = $body['smtpPass'];
+        if ($v !== null && $v !== '') {
+            if (!is_string($v) || strlen($v) > 200) {
+                $bad('smtpPass: до 200 символов');
+            }
+            $s['smtpPass'] = $v;
+        }
+        // пустое значение НЕ затирает сохранённый пароль (маска в UI);
+        // для очистки — clearSmtpPass
+    }
+    if (!empty($body['clearSmtpPass'])) {
+        $s['smtpPass'] = null;
+    }
+    if (array_key_exists('smtpFrom', $body)) {
+        $v = $body['smtpFrom'];
+        if ($v === null || $v === '') {
+            $s['smtpFrom'] = null;
+        } elseif (is_string($v) && strlen($v) <= 120 && filter_var(trim($v), FILTER_VALIDATE_EMAIL)) {
+            $s['smtpFrom'] = trim($v);
+        } else {
+            $bad('smtpFrom: некорректный email');
+        }
+    }
+
     if (array_key_exists('tgChatId', $body)) {
         $v = $body['tgChatId'];
         if ($v === null || $v === '') {
@@ -699,6 +769,74 @@ function h_tg_test(string $method): void
     json_response(200, $resp);
 }
 
+/**
+ * c97 — action=mail-test (POST, auth, {to?}): тестовое письмо через тот же
+ * канал, что и уведомления о заявках (SMTP → mail()). Полная диагностика:
+ * транспорт, результат, журнал — владелец видит состояние почты сразу.
+ */
+function h_mail_test(string $method): void
+{
+    if ($method !== 'POST') {
+        json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
+    }
+    require_admin();
+    if (!rl_check('mailtest', 10, 3600)) {
+        json_response(429, ['ok' => false, 'error' => 'rate', 'retryAfterSec' => rl_last_retry_after()]);
+    }
+    $body = read_json_body_or_400(8192);
+    $s = load_settings();
+
+    $to = $body['to'] ?? null;
+    if (!is_string($to) || $to === '') {
+        $to = (string)($s['notifyEmail'] ?: NOTIFY_EMAIL_FALLBACK);
+    }
+    if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        json_response(400, ['ok' => false, 'error' => 'no_recipient',
+            'detail' => 'Укажите email получателя (или заполните «Email для уведомлений»)']);
+    }
+
+    $smtp = smtp_config($s);
+    $r = mail_send(
+        $to,
+        'Тест почты — Nilov Catering',
+        "Тестовое письмо из админ-панели nilovcatering.ru.\n\n"
+        . "Если вы читаете это письмо — почта работает.\n"
+        . "Отправка шла через транспорт: " . ($smtp !== null ? 'SMTP (' . $smtp['host'] . ')' : 'sendmail хостинга (mail)') . ".\n\n"
+        . "Уведомления о заявках и подтверждения клиентам уходят этим же каналом.",
+        null,
+        'test'
+    );
+    $resp = ['ok' => $r['ok'] === true, 'to' => $to,
+        'transport' => $r['transport'] ?? null, 'error' => $r['error'] ?? null, 'detail' => $r['detail'] ?? null];
+    json_response(200, $resp);
+}
+
+/** c97 — action=mail-log (GET, auth, &limit=1..50): последние отправки почты. */
+function h_mail_log(string $method): void
+{
+    if ($method !== 'GET') {
+        json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
+    }
+    require_admin();
+    $limit = is_string($_GET['limit'] ?? null) ? (int)$_GET['limit'] : 10;
+    if ($limit < 1 || $limit > 50) {
+        $limit = 10;
+    }
+    $entries = array_map(static function (array $e): array {
+        // наружу только безопасные поля
+        return [
+            'ts' => $e['ts'] ?? null,
+            'to' => $e['to'] ?? '',
+            'context' => $e['context'] ?? '',
+            'subject' => $e['subject'] ?? '',
+            'transport' => $e['transport'] ?? '',
+            'ok' => (bool)($e['ok'] ?? false),
+            'error' => $e['error'] ?? null,
+        ];
+    }, mail_log_read($limit));
+    json_response(200, ['ok' => true, 'entries' => $entries]);
+}
+
 /** action=password (POST, auth, {current, new}): смена пароля админки. */
 function h_password(string $method): void
 {
@@ -748,6 +886,19 @@ function mask_bot_token(mixed $token): ?string
         return substr($token, 0, 4) . '…';
     }
     return substr($token, 0, 4) . '…' . substr($token, -4);
+}
+
+/** c97 — маскировка секрета (SMTP-пароль): «ab…yz», полный не отдаём. */
+function mask_secret(mixed $secret): ?string
+{
+    if (!is_string($secret) || $secret === '') {
+        return null;
+    }
+    $len = strlen($secret);
+    if ($len <= 6) {
+        return '••••';
+    }
+    return substr($secret, 0, 2) . '••••' . substr($secret, -2);
 }
 
 /**

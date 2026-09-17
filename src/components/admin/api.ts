@@ -118,6 +118,8 @@ export interface Lead {
   email?: string;
   comment?: string;
   payload?: Record<string, unknown>;
+  /** c97: доставлены ли уведомления (TG/почта/клиенту) — после отправки. */
+  notify?: LeadNotify;
 }
 
 export interface AdminSettings {
@@ -128,6 +130,22 @@ export interface AdminSettings {
   tgWorkingBase: string;
   botTokenSet: boolean;
   botTokenMasked: string;
+  /** c97: SMTP для надёжной доставки почты (SpaceWeb и др.). */
+  smtpHost: string;
+  smtpPort: number | null;
+  smtpUser: string;
+  smtpFrom: string;
+  smtpSet: boolean;
+  smtpPassMasked: string;
+}
+
+/** c97: статус доставки уведомлений по заявке (lead.php → leads.json). */
+export interface LeadNotify {
+  ts: number | string;
+  tg: boolean;
+  mail: boolean;
+  client: boolean | null;
+  mailTransport?: string | null;
 }
 
 /* 4-F2: 'cancelled' — деплой вытеснен более новой публикацией (конкурирующий
@@ -421,6 +439,12 @@ export async function apiGetSettings(
         tgWorkingBase: String(s.tgWorkingBase ?? ""),
         botTokenSet: s.botTokenSet === true,
         botTokenMasked: String(s.botTokenMasked ?? ""),
+        smtpHost: String(s.smtpHost ?? ""),
+        smtpPort: s.smtpPort === null || s.smtpPort === undefined ? null : Number(s.smtpPort),
+        smtpUser: String(s.smtpUser ?? ""),
+        smtpFrom: String(s.smtpFrom ?? ""),
+        smtpSet: s.smtpSet === true,
+        smtpPassMasked: String(s.smtpPassMasked ?? ""),
       },
     };
   }
@@ -433,6 +457,13 @@ export type SettingsPatch = {
   tgApiBase?: string;
   tgBotToken?: string;
   clearBotToken?: boolean;
+  /** c97: SMTP-поля (пустой smtpPass не затирает сохранённый пароль). */
+  smtpHost?: string | null;
+  smtpPort?: number | null;
+  smtpUser?: string | null;
+  smtpPass?: string;
+  clearSmtpPass?: boolean;
+  smtpFrom?: string | null;
 };
 
 export async function apiSaveSettings(
@@ -530,6 +561,64 @@ export async function apiTgTest(
       : undefined,
     tried,
   };
+}
+
+/** c97: результат теста почты (тот же канал, что уведомления о заявках). */
+export type MailTestResult = {
+  ok: boolean;
+  to: string;
+  transport: string | null;
+  error: string | null;
+  detail: string | null;
+};
+
+export async function apiMailTest(
+  to?: string,
+): Promise<MailTestResult> {
+  const r = await adminApi("mail-test", {
+    method: "POST",
+    body: to ? { to } : {},
+  });
+  if (r.status === 400) {
+    return {
+      ok: false,
+      to: to ?? "",
+      transport: null,
+      error: "no_recipient",
+      detail: String(r.body?.detail ?? ""),
+    };
+  }
+  return {
+    ok: r.body?.ok === true,
+    to: String(r.body?.to ?? to ?? ""),
+    transport: r.body?.transport ? String(r.body.transport) : null,
+    error: r.body?.error ? String(r.body.error) : null,
+    detail: r.body?.detail ? String(r.body.detail) : null,
+  };
+}
+
+/** c97: запись журнала почты для UI диагностики. */
+export interface MailLogEntry {
+  ts: number | null;
+  to: string;
+  context: string;
+  subject: string;
+  transport: string;
+  ok: boolean;
+  error: string | null;
+}
+
+export async function apiMailLog(
+  limit = 10,
+): Promise<{ ok: boolean; entries: MailLogEntry[] }> {
+  const r = await adminApi("mail-log", {
+    method: "GET",
+    params: { limit: String(limit) },
+  });
+  if (r.status === 200 && r.body?.ok === true && Array.isArray(r.body.entries)) {
+    return { ok: true, entries: r.body.entries as MailLogEntry[] };
+  }
+  return { ok: false, entries: [] };
 }
 
 export type PasswordResult =
@@ -770,6 +859,28 @@ async function mockApi(
           }
           mockSettings.notifyEmail = b.notifyEmail;
         }
+        /* c97: SMTP — как в проде (пустой пароль не затирает). */
+        if (b.clearSmtpPass) {
+          mockSettings.smtpPassMasked = "";
+          mockSettings.smtpSet = false;
+          mockSettings.smtpHost = "";
+          mockSettings.smtpUser = "";
+        }
+        if (typeof b.smtpHost === "string" || b.smtpHost === null) {
+          mockSettings.smtpHost = String(b.smtpHost ?? "");
+        }
+        if (typeof b.smtpUser === "string" || b.smtpUser === null) {
+          mockSettings.smtpUser = String(b.smtpUser ?? "");
+        }
+        if (typeof b.smtpPort === "number" || b.smtpPort === null) {
+          mockSettings.smtpPort = (b.smtpPort as number | null) ?? null;
+        }
+        if (typeof b.smtpPass === "string" && b.smtpPass) {
+          mockSettings.smtpPassMasked = b.smtpPass.slice(0, 2) + "••••" + b.smtpPass.slice(-2);
+        }
+        mockSettings.smtpSet = Boolean(
+          mockSettings.smtpHost && mockSettings.smtpUser && mockSettings.smtpPassMasked,
+        );
         return { status: 200, body: { ok: true } };
       }
       return { status: 200, body: { ok: true, settings: { ...mockSettings } } };
@@ -802,6 +913,44 @@ async function mockApi(
       };
     case "tg-test":
       return { status: 200, body: { ok: true } };
+    case "mail-test":
+      return {
+        status: 200,
+        body: {
+          ok: true,
+          to: String(body.to ?? mockSettings.notifyEmail),
+          transport: mockSettings.smtpSet ? "smtp" : "mail",
+          error: null,
+          detail: null,
+        },
+      };
+    case "mail-log":
+      return {
+        status: 200,
+        body: {
+          ok: true,
+          entries: [
+            {
+              ts: Math.floor(Date.now() / 1000) - 600,
+              to: mockSettings.notifyEmail,
+              context: "lead-owner",
+              subject: "Новая заявка с сайта — Анна Соколова",
+              transport: mockSettings.smtpSet ? "smtp" : "mail",
+              ok: true,
+              error: null,
+            },
+            {
+              ts: Math.floor(Date.now() / 1000) - 3600,
+              to: "anna.s@example.com",
+              context: "lead-client",
+              subject: "Ваша заявка в Nilov Catering принята",
+              transport: "mail",
+              ok: false,
+              error: "mail() вернула false (sendmail не принял письмо)",
+            },
+          ],
+        },
+      };
     case "password": {
       const current = String(body.current ?? "");
       const next = String(body.new ?? "");
@@ -821,6 +970,12 @@ const mockSettings: AdminSettings = {
   tgWorkingBase: "",
   botTokenSet: false,
   botTokenMasked: "",
+  smtpHost: "",
+  smtpPort: null,
+  smtpUser: "",
+  smtpFrom: "",
+  smtpSet: false,
+  smtpPassMasked: "",
 };
 
 const now = Date.now();
@@ -845,6 +1000,13 @@ const mockLeads: Lead[] = [
       total: 223_500,
       dateIso: "2026-12-06",
       preferredTime: "18:00",
+    },
+    notify: {
+      ts: unix(12),
+      tg: true,
+      mail: true,
+      client: true,
+      mailTransport: "mail",
     },
   },
   {
