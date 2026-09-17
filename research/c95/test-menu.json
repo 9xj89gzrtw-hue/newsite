@@ -1,0 +1,26 @@
+{
+  "menuTypes": [
+    {
+      "id": "banket",
+      "label": "Банкет",
+      "minOrder": {
+        "perGuest": 1500
+      },
+      "packages": [
+        {
+          "name": "Классик",
+          "pricePerGuest": 1900
+        },
+        {
+          "name": "Премиум",
+          "pricePerGuest": 3200
+        }
+      ]
+    }
+  ],
+  "addons": [],
+  "minOrder": {
+    "perGuest": 1000
+  },
+  "servicePanels": []
+}
