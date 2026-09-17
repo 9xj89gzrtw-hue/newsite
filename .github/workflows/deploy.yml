@@ -55,11 +55,16 @@ jobs:
       - name: Rsync to hosting (public_html — the docRoot Apache actually serves)
         run: |
           attempts=3
+          # c95: server-data/ (runtime-состояние: заявки, настройки, rate-limit
+          # счётчики) и config/secrets.php (секреты, пишет CI шагом ниже)
+          # живут ТОЛЬКО на хостинге — исключены из синхронизации, чтобы
+          # rsync --delete никогда их не перезаписал и не удалил.
           for i in $(seq 1 $attempts); do
             echo "::group::Rsync attempt $i/$attempts"
             if sshpass -e rsync -az --delete \
                 -e "ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -p ${SSH_PORT:-22}" \
                 --exclude='.git' --exclude='.github' --exclude='node_modules' \
+                --exclude='server-data/*.json' --exclude='server-data/*.lock' --exclude='config/secrets.php' \
                 out/ "$SSH_USER@$SSH_HOST:${REMOTE_DIR:-~/nilovcatering.ru/public_html/}"; then
               echo "::endgroup::"
               echo "Rsync OK on attempt $i"
@@ -76,6 +81,82 @@ jobs:
           echo "::error::All $attempts rsync attempts failed (SSH connection issue with hosting)"
           exit 1
 
+      # c95: секреты админки (GH-токен, bcrypt-хэш, HMAC-ключ) существуют
+      # ТОЛЬКО на хостинге в config/secrets.php — вне git (.gitignore) и вне
+      # rsync (exclude выше). Шаг перезаписывает файл актуальными значениями
+      # из GitHub Secrets, поэтому безопасно повторяется на каждом деплое.
+      # Паттерн «локальная сборка + rsync» выбран вместо scp/heredoc-через-ssh:
+      # у rsync та же семантика удалённого «~», что у основного деплоя, а
+      # printf-аргументы не проходят повторный shell-парсинг (важно: bcrypt-хэш
+      # содержит $2y$10$… — некавыченный heredoc раскрыл бы $2 как позиционный).
+      - name: Provision admin secrets (idempotent)
+        env:
+          ADMIN_GH_TOKEN: ${{ secrets.ADMIN_GH_TOKEN }}
+          ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
+          ADMIN_HMAC_KEY: ${{ secrets.ADMIN_HMAC_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$ADMIN_GH_TOKEN" ] || [ -z "$ADMIN_PASSWORD_HASH" ] || [ -z "$ADMIN_HMAC_KEY" ]; then
+            echo "::warning::Какой-то из секретов ADMIN_GH_TOKEN/ADMIN_PASSWORD_HASH/ADMIN_HMAC_KEY пуст — secrets.php будет с пустыми значениями (админка ответит not_configured)"
+          fi
+
+          # 1) Каталоги до загрузки (важно при самом первом деплое после c95).
+          #    Дефолт \$HOME раскрывается НА ХОСТИНГЕ, а не локально.
+          sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -p "${SSH_PORT:-22}" "$SSH_USER@$SSH_HOST" \
+            "mkdir -p ${REMOTE_DIR:-\$HOME/nilovcatering.ru/public_html}/config ${REMOTE_DIR:-\$HOME/nilovcatering.ru/public_html}/server-data"
+
+          # 2) Собираем PHP-файл локально (формат ключей = secrets.example.php).
+          secrets_tmp="$(mktemp)"
+          chmod 600 "$secrets_tmp"
+          trap 'rm -f "$secrets_tmp"' EXIT
+          {
+            printf '<?php\n'
+            printf '// c95: файл создаёт CI из GitHub Secrets. НЕ коммитить и не редактировать руками.\n'
+            printf '// Формат ключей: public/config/secrets.example.php\n'
+            printf 'return [\n'
+            printf "    'gh_token' => '%s',\n" "$ADMIN_GH_TOKEN"
+            printf "    'gh_repo' => '9xj89gzrtw-hue/newsite',\n"
+            printf "    'gh_path' => 'src/data/menu.json',\n"
+            printf "    'hmac_key' => '%s',\n" "$ADMIN_HMAC_KEY"
+            printf "    'password_hash_default' => '%s',\n" "$ADMIN_PASSWORD_HASH"
+            printf "    'tg_api_base' => 'https://api.telegram.org',\n"
+            printf "    'notify_from' => 'noreply@nilovcatering.ru',\n"
+            printf '];\n'
+          } > "$secrets_tmp"
+
+          # 3) Загружаем rsync-ом — те же ssh-опции и семантика «~» в REMOTE_DIR,
+          #    что и в основном деплое (у scp/SFTP свои правила путей).
+          sshpass -e rsync -az \
+            -e "ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -p ${SSH_PORT:-22}" \
+            "$secrets_tmp" "$SSH_USER@$SSH_HOST:${REMOTE_DIR:-~/nilovcatering.ru/public_html}/config/secrets.php"
+
+          # 4) Best-effort проверка синтаксиса на хостинге: php CLI может быть
+          #    недоступен в неинтерактивном ssh — это НЕ ошибка деплоя.
+          if ! sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -p "${SSH_PORT:-22}" "$SSH_USER@$SSH_HOST" \
+              "php -l '${REMOTE_DIR:-\$HOME/nilovcatering.ru/public_html}/config/secrets.php'"; then
+            echo "::warning::php -l для config/secrets.php не выполнен (нет php CLI или синтаксис битый) — проверьте файл на хостинге"
+          fi
+
+      # c95: смоук-тест живости PHP после деплоя. GET на POST-only эндпоинт
+      # обязан вернуть 405 — значит Apache исполняет lead.php, а не отдаёт
+      # файл статикой. Предупреждение (не фейл), чтобы не блокировать релиз.
+      - name: Verify admin API on production (non-fatal)
+        run: |
+          code=000
+          for i in 1 2 3; do
+            if [ "$i" -gt 1 ]; then sleep 10; fi
+            if code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 https://nilovcatering.ru/api/lead.php)"; then
+              if [ "$code" = "405" ]; then
+                break
+              fi
+            fi
+          done
+          if [ "$code" = "405" ]; then
+            echo "API OK: GET /api/lead.php → 405 (POST only), attempt $i/3"
+          else
+            echo "::warning::GET https://nilovcatering.ru/api/lead.php → HTTP ${code} (ожидался 405). Проверьте PHP/деплой вручную — деплой НЕ прерван."
+          fi
+
       - name: Done
         run: echo "Deployed to ${REMOTE_DIR:-~/nilovcatering.ru/public_html/} on nilovcatering.ru"
 
@@ -86,6 +167,10 @@ jobs:
   # автор-агностичен. Проект уже существует: newsite (team_xVbscKLiDECkF…,
   # prj_T3MSu27oTSSutClOCMJjMtQ2tcqU), build remote по vercel.json
   # (static export, бун, env проекта: Metrika/verification добавлены c91).
+  # c95: зеркало — ТОЛЬКО статика. PHP не исполняется на Vercel, поэтому
+  # /api/*, /config/*, /server-data/* закрыты redirect-ами на /404 в
+  # vercel.json (rewrites не годятся: у Vercel файловая система приоритетнее
+  # rewrites — исходники .php иначе раздавались бы как статики).
   deploy-vercel:
     runs-on: ubuntu-latest
     steps:

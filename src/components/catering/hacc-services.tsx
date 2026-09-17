@@ -62,6 +62,7 @@ import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
 import { ScrambleText } from "@/components/motion/scramble-text";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
+import { SERVICE_PANELS } from "@/lib/pricing";
 import "./hacc-services.css";
 
 /* ------------------------------------------------------------------ config */
@@ -120,13 +121,28 @@ function presetCalculator(typeId: string) {
   window.history.replaceState(null, "", `/?type=${typeId}#calculator`);
 }
 
+/* c95 (Task 1-a): цены плиток — из src/data/menu.json (servicePanels),
+ * через SERVICE_PANELS в lib/pricing.ts: та же точка правды, что у
+ * калькулятора и каталога. Мэтчинг по id плитки; отсутствие записи —
+ * ошибка сборки (fail fast, статику с битой плиткой не собираем). */
+const PANEL_PRICE: Record<string, string> = Object.fromEntries(
+  SERVICE_PANELS.map((p) => [p.id, p.priceLabel]),
+);
+function panelPrice(id: string): string {
+  const priceLabel = PANEL_PRICE[id];
+  if (priceLabel == null) {
+    throw new Error(`hacc-services: в menu.json нет servicePanels["${id}"]`);
+  }
+  return priceLabel;
+}
+
 const SERVICES: HaccService[] = [
   {
     id: "svadby",
     index: "01",
     title: "Свадьбы",
     hook: "От утреннего кофе до ночного торта — весь день ведёт одна команда.",
-    price: "от 5\u00A0500\u00A0₽",
+    price: panelPrice("svadby"),
     priceLabel: "за гостя",
     tag: "Под ключ",
     tint: "#E6EBDF",
@@ -142,7 +158,7 @@ const SERVICES: HaccService[] = [
     index: "02",
     title: "Корпоратив",
     hook: "Кофе — к первому перерыву, гала-ужин — к финалу: всё подано вовремя.",
-    price: "от 2\u00A0500\u00A0₽",
+    price: panelPrice("korporativ"),
     priceLabel: "за гостя",
     tag: "Для компаний",
     tint: "#F6E9C9",
@@ -156,7 +172,7 @@ const SERVICES: HaccService[] = [
     index: "03",
     title: "Шоу-станции",
     hook: "Кухня выходит к столу: паста в облаке пара, карвинг под ножом шефа.",
-    price: "от 35\u00A0000\u00A0₽",
+    price: panelPrice("shou-stancii"),
     priceLabel: "за событие",
     tag: "Живая кухня",
     tint: "#F6E0DB",
@@ -170,7 +186,7 @@ const SERVICES: HaccService[] = [
     index: "04",
     title: "Выездной бар",
     hook: "Шейкер звенит, бокалы ледяные — бар живёт до последнего тоста.",
-    price: "от 32\u00A0000\u00A0₽",
+    price: panelPrice("bar"),
     priceLabel: "за событие",
     tag: "Миксология",
     tint: "#F5EEE2",
@@ -184,9 +200,9 @@ const SERVICES: HaccService[] = [
     index: "05",
     title: "Вегетарианское и халяль",
     hook: "Сертификат — на халяль, сезонные овощи — в главной роли.",
-    /* 3 200 = vegetarian.perGuest (lib/pricing.ts, c89): то же слово
+    /* 3 200 = vegetarian.perGuest (menu.json, c89): то же слово
        «вегетарианское» обязано стоить одинаково во всех блоках (C59/W7) */
-    price: "от 3\u00A0200\u00A0₽",
+    price: panelPrice("veg-halal"),
     priceLabel: "за гостя",
     tag: "Особые меню",
     tint: "#F4DECD",
@@ -204,10 +220,11 @@ const SERVICES: HaccService[] = [
     title: "Гастро-боксы",
     hook: "Банкет, который помещается в коробке, — каждому гостю лично.",
     /* c89/W1-код-критик (MAJOR): цена панели = цена КАЛЬКУЛЯТОРА формата
-       (snack-box.calcPerGuest = 1 200 ₽) — CTA плитки пресетит калькулятор,
-       расхождение цен на одном экране недопустимо (K6-CRITICAL). Каталожные
-       пакеты à la carte (от 660 ₽) остаются в меню-каталоге (hacc-menu). */
-    price: "от 1\u00A0200\u00A0₽",
+       (snack-box.calcPerGuest = 1 200 ₽, menu.json) — CTA плитки пресетит
+       калькулятор, расхождение цен на одном экране недопустимо (K6-CRITICAL).
+       Каталожные пакеты à la carte (от 660 ₽) остаются в меню-каталоге
+       (hacc-menu). */
+    price: panelPrice("gastro-boksy"),
     priceLabel: "за гостя",
     tag: "Доставка",
     /* c89: #E6EBDF → #F3E3E8 — 6 панелей = 6 семейств тинтов без дублей

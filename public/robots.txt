@@ -1,6 +1,12 @@
 User-agent: *
 Allow: /
 
+# Админка и серверные эндпоинты — не индексировать (c95)
+Disallow: /admin
+Disallow: /api/
+Disallow: /server-data/
+Disallow: /config/
+
 # Медиа и статика — разрешить индексацию (картинки в выдаче)
 Allow: /media/
 Allow: /brand/

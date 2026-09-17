@@ -134,3 +134,13 @@ docs/gamma-haccordion.png
 
 # Cycle 32 — research screenshots & VLM analysis artifacts (not part of repo)
 /research/
+
+# c95 — серверные секреты и runtime-данные админки (пишет CI на хостинг,
+# в git не попадают никогда: токен GitHub, хэш пароля, HMAC-ключ, заявки)
+public/config/secrets.php
+public/server-data/*.json
+public/server-data/*.lock
+
+# c95 (Task 1-a): сгенерированные артефакты данных — пересобираются
+# scripts/gen-static-data.ts на каждом build (меню-копия + манифест медиа)
+public/data/
