@@ -62,7 +62,7 @@ import { SmartImage } from "@/components/media/smart-image";
 import { Magnetic } from "@/components/motion/magnetic";
 import { ScrambleText } from "@/components/motion/scramble-text";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
-import { SERVICE_PANELS } from "@/lib/pricing";
+import { SERVICE_PANELS, type ServicePanel } from "@/lib/pricing";
 import "./hacc-services.css";
 
 /* ------------------------------------------------------------------ config */
@@ -110,6 +110,10 @@ interface HaccService {
  * фуршеты/банкеты/кофе-брейки/барбекю/торты/логистика остались в
  * меню-каталоге hacc-menu и /offer). Validated copy carried over from
  * Cycle 45 SpiralServices; 2048px media (cycle-49).
+ * 4-F2: ЗАГОЛОВКИ плиток (title) — из menu.json (servicePanels[].label,
+ * см. panelTitle ниже): их правит админ-панель c95 («Цены на плитках
+ * услуг» → поле «Заголовок»). Остальной копирайт (hook/tag/cta/mediaAlt)
+ * валидирован и живёт здесь.
  */
 /** Калькулятор читает ?type=… через nuqs (подхватывает history.replaceState) —
  *  тот же контракт, что presetCalculator в hacc-menu.tsx: CTA услуг ставит
@@ -121,26 +125,39 @@ function presetCalculator(typeId: string) {
   window.history.replaceState(null, "", `/?type=${typeId}#calculator`);
 }
 
-/* c95 (Task 1-a): цены плиток — из src/data/menu.json (servicePanels),
+/* c95 (Task 1-a): данные плиток — из src/data/menu.json (servicePanels),
  * через SERVICE_PANELS в lib/pricing.ts: та же точка правды, что у
  * калькулятора и каталога. Мэтчинг по id плитки; отсутствие записи —
- * ошибка сборки (fail fast, статику с битой плиткой не собираем). */
-const PANEL_PRICE: Record<string, string> = Object.fromEntries(
-  SERVICE_PANELS.map((p) => [p.id, p.priceLabel]),
+ * ошибка сборки (fail fast, статику с битой плиткой не собираем).
+ *
+ * 4-F2 (критик C, M1 — «мёртвое поле админки»): отсюда же берём и
+ * ЗАГОЛОВКИ плиток — servicePanels[].label редактируется в админ-панели
+ * c95, до фикса эта правка не влияла на сайт (title был захардкожен).
+ * Описания, юниты (priceLabel «за гостя»/«за событие»), тинты и медиа
+ * остаются захардкоженными — этих полей в JSON нет. */
+const PANEL: Record<string, ServicePanel> = Object.fromEntries(
+  SERVICE_PANELS.map((p) => [p.id, p]),
 );
 function panelPrice(id: string): string {
-  const priceLabel = PANEL_PRICE[id];
-  if (priceLabel == null) {
+  const panel = PANEL[id];
+  if (panel == null) {
     throw new Error(`hacc-services: в menu.json нет servicePanels["${id}"]`);
   }
-  return priceLabel;
+  return panel.priceLabel;
+}
+function panelTitle(id: string): string {
+  const panel = PANEL[id];
+  if (panel == null) {
+    throw new Error(`hacc-services: в menu.json нет servicePanels["${id}"]`);
+  }
+  return panel.label;
 }
 
 const SERVICES: HaccService[] = [
   {
     id: "svadby",
     index: "01",
-    title: "Свадьбы",
+    title: panelTitle("svadby"),
     hook: "От утреннего кофе до ночного торта — весь день ведёт одна команда.",
     price: panelPrice("svadby"),
     priceLabel: "за гостя",
@@ -156,7 +173,7 @@ const SERVICES: HaccService[] = [
   {
     id: "korporativ",
     index: "02",
-    title: "Корпоратив",
+    title: panelTitle("korporativ"),
     hook: "Кофе — к первому перерыву, гала-ужин — к финалу: всё подано вовремя.",
     price: panelPrice("korporativ"),
     priceLabel: "за гостя",
@@ -170,7 +187,7 @@ const SERVICES: HaccService[] = [
   {
     id: "shou-stancii",
     index: "03",
-    title: "Шоу-станции",
+    title: panelTitle("shou-stancii"),
     hook: "Кухня выходит к столу: паста в облаке пара, карвинг под ножом шефа.",
     price: panelPrice("shou-stancii"),
     priceLabel: "за событие",
@@ -184,7 +201,7 @@ const SERVICES: HaccService[] = [
   {
     id: "bar",
     index: "04",
-    title: "Выездной бар",
+    title: panelTitle("bar"),
     hook: "Шейкер звенит, бокалы ледяные — бар живёт до последнего тоста.",
     price: panelPrice("bar"),
     priceLabel: "за событие",
@@ -198,7 +215,7 @@ const SERVICES: HaccService[] = [
   {
     id: "veg-halal",
     index: "05",
-    title: "Вегетарианское и халяль",
+    title: panelTitle("veg-halal"),
     hook: "Сертификат — на халяль, сезонные овощи — в главной роли.",
     /* 3 200 = vegetarian.perGuest (menu.json, c89): то же слово
        «вегетарианское» обязано стоить одинаково во всех блоках (C59/W7) */
@@ -217,7 +234,7 @@ const SERVICES: HaccService[] = [
   {
     id: "gastro-boksy",
     index: "06",
-    title: "Гастро-боксы",
+    title: panelTitle("gastro-boksy"),
     hook: "Банкет, который помещается в коробке, — каждому гостю лично.",
     /* c89/W1-код-критик (MAJOR): цена панели = цена КАЛЬКУЛЯТОРА формата
        (snack-box.calcPerGuest = 1 200 ₽, menu.json) — CTA плитки пресетит

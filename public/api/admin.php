@@ -25,9 +25,16 @@ header('X-Robots-Tag: noindex, nofollow');
 $method = is_string($_SERVER['REQUEST_METHOD'] ?? null) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 $action = is_string($_GET['action'] ?? null) ? $_GET['action'] : '';
 
+// CSRF defense-in-depth: первичная защита — SameSite=Strict на сессионной
+// cookie; этот барьер (Origin-allowlist + XRW для POST) — бэкстоп для
+// легаси-браузеров без поддержки SameSite. Наш клиент шлёт XRW всегда
+// (src/components/admin/api.ts), login не исключение.
+require_same_origin($method === 'GET');
+
 match ($action) {
     'login' => h_login($method),
     'logout' => h_logout($method),
+    'logout-all' => h_logout_all($method),
     'session' => h_session($method),
     'data' => h_data($method),
     'save' => h_save($method),
@@ -71,7 +78,9 @@ function h_login(string $method): void
         json_response(401, ['ok' => false, 'error' => 'bad_password']);
     }
     $exp = time() + SESSION_TTL_SEC;
-    set_admin_cookie($exp, $key);
+    // cookie подписывается ТЕКУЩЕЙ эпохой сессий (см. current_session)
+    $epoch = (int)($settings['sessionEpoch'] ?? 0);
+    set_admin_cookie($exp, $key, $epoch);
     json_response(200, ['ok' => true, 'expiresAt' => $exp]);
 }
 
@@ -80,6 +89,23 @@ function h_logout(string $method): void
 {
     if ($method !== 'POST') {
         json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
+    }
+    clear_admin_cookie();
+    json_response(200, ['ok' => true]);
+}
+
+/** action=logout-all (POST, auth): инкремент эпохи — отзыв ВСЕХ сессий
+ *  (включая чужие браузеры), своя cookie сбрасывается. */
+function h_logout_all(string $method): void
+{
+    if ($method !== 'POST') {
+        json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
+    }
+    require_admin();
+    $s = load_settings();
+    $s['sessionEpoch'] = (int)($s['sessionEpoch'] ?? 0) + 1;
+    if (!save_settings($s)) {
+        json_response(500, ['ok' => false, 'error' => 'storage']);
     }
     clear_admin_cookie();
     json_response(200, ['ok' => true]);
@@ -183,20 +209,22 @@ function h_save(string $method): void
         json_response(409, ['ok' => false, 'error' => 'conflict']);
     }
 
-    // 2) серверная структурная валидация (отсечь мусор до коммита)
-    $err = validate_menu($menu);
-    if ($err !== null) {
-        json_response(400, ['ok' => false, 'error' => 'validation', 'detail' => $err]);
+    // 2) серверная валидация (паритет zod-гейту src/lib/menu-schema.ts
+    //    по типам/диапазонам) — отсечь мусор ДО коммита
+    $errors = validate_menu($menu);
+    if ($errors !== []) {
+        json_response(400, [
+            'ok' => false,
+            'error' => 'validation',
+            'detail' => implode(' ', $errors),
+            'errors' => $errors,
+        ]);
     }
 
-    // 3) PUT contents (commit в main; дальше публикует деплой-воркфлоу)
-    $json = json_encode(
-        $menu,
-        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_INVALID_UTF8_SUBSTITUTE
-    );
-    if ($json === false) {
-        json_response(500, ['ok' => false, 'error' => 'encode_failed']);
-    }
+    // 3) PUT contents (commit в main; дальше публикует деплой-воркфлоу).
+    //    Кодируем с 2-пробельным отступом и \n в конце — как файл в репо,
+    //    чтобы диффы публикаций были минимальными.
+    $json = pretty_json_2sp($menu) . "\n";
     $msg = (is_string($message) && trim($message) !== '') ? trim($message) : 'обновление меню и цен';
     $put = [
         'message' => 'chore(admin): ' . $msg,
@@ -239,7 +267,15 @@ function h_status(string $method): void
     if (!is_string($sha) || preg_match('/^[0-9a-f]{7,40}$/i', $sha) !== 1) {
         json_response(400, ['ok' => false, 'error' => 'validation', 'detail' => 'sha: hex 7–40 символов']);
     }
-    $r = gh_api('GET', '/repos/' . $secrets['gh_repo'] . '/actions/runs?per_page=10&head_sha=' . rawurlencode($sha), null, (string)$secrets['gh_token']);
+    // Раны ТОЛЬКО деплой-воркфлоу (файл deploy.yml, путь-сегмент — имя файла):
+    // общий /actions/runs смешивал CI+Deploy с нестабильным порядком и давал
+    // ложные «Сборка не удалась» при успешном деплое (критика 4-W1-D).
+    $r = gh_api(
+        'GET',
+        '/repos/' . $secrets['gh_repo'] . '/actions/workflows/deploy.yml/runs?per_page=10&head_sha=' . rawurlencode($sha),
+        null,
+        (string)$secrets['gh_token']
+    );
     if ($r['errno'] !== 0 && $r['status'] === 0) {
         json_response(502, ['ok' => false, 'error' => 'network']);
     }
@@ -257,7 +293,16 @@ function h_status(string $method): void
             if ($st === 'queued' || $st === 'in_progress') {
                 $resp['state'] = 'building';
             } elseif ($st === 'completed') {
-                $resp['state'] = (($run['conclusion'] ?? null) === 'success') ? 'success' : 'failure';
+                $conclusion = (string)($run['conclusion'] ?? '');
+                if ($conclusion === 'success') {
+                    $resp['state'] = 'success';
+                } elseif ($conclusion === 'cancelled') {
+                    // отменённый ран (напр., вытеснен новым деплоем при
+                    // cancel-in-progress) не равен упавшему — своё состояние
+                    $resp['state'] = 'cancelled';
+                } else {
+                    $resp['state'] = 'failure';
+                }
             }
             if (!empty($run['html_url'])) {
                 $resp['htmlUrl'] = (string)$run['html_url'];
@@ -613,6 +658,9 @@ function h_password(string $method): void
         json_response(401, ['ok' => false, 'error' => 'bad_password']);
     }
     $s['passwordHash'] = password_hash($new, PASSWORD_BCRYPT, ['cost' => 12]);
+    // смена пароля отзывает ВСЕ выданные cookie: инкремент эпохи сессий —
+    // старые подписи (со старой эпохой) больше не сходятся (4-W1-A MAJOR-2)
+    $s['sessionEpoch'] = (int)($s['sessionEpoch'] ?? 0) + 1;
     if (!save_settings($s)) {
         json_response(500, ['ok' => false, 'error' => 'storage']);
     }
@@ -635,96 +683,252 @@ function mask_bot_token(mixed $token): ?string
 }
 
 /**
- * Серверная структурная валидация menu.json перед коммитом.
- * null = ок; строка = человекочитаемая ошибка (RU).
- *
- * Жёстко проверяем каркас (типы/пакеты/цены — то, что ломает сайт);
- * addons/minOrder/servicePanels проверяются по типу и объёму там, где
- * присутствуют (корень или тип), их детальная схема принадлежит слою данных.
+ * Серверная валидация menu.json перед коммитом (4-W1-A MINOR / 4-W1-C):
+ * паритет с zod-гейтом src/lib/menu-schema.ts по типам и диапазонам.
+ * Цены — строго int: json_decode даёт int для «4500», float для «4500.5»
+ * и string для «\"250\"» — обе нецелые формы отклоняем. Перекрёстные
+ * инварианты (minOrder ↔ menuTypes и т.п.) остаются сборочному гейту.
+ * Возвращает список ошибок (RU, максимум 5); [] = ок.
  */
-function validate_menu(array $menu): ?string
+function validate_menu(array $menu): array
 {
+    $errors = [];
+    $add = static function (string $msg) use (&$errors): void {
+        if (count($errors) < 5) {
+            $errors[] = $msg;
+        }
+    };
     $json = json_encode($menu, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if (!is_string($json)) {
-        return 'Меню не сериализуется в JSON';
+        return ['Меню не сериализуется в JSON'];
     }
     if (strlen($json) > 400 * 1024) {
-        return 'Файл меню слишком большой (больше 400 КБ)';
+        $add('Файл меню слишком большой (больше 400 КБ)');
     }
+
+    /* --- локальные проверки-замыкания (общие для корня и формата) --- */
+    // непустая строка до $cap символов (UTF-8)
+    $str = static function (mixed $v, int $cap): bool {
+        return is_string($v) && trim($v) !== '' && slen($v) <= $cap;
+    };
+    // addons: ≤20; РОВНО одно из price (int 100..1000000) | percent (int 1..200)
+    $checkAddons = static function (mixed $list, string $where) use ($add): void {
+        if (!is_array($list)) {
+            $add($where . ': addons должен быть массивом');
+            return;
+        }
+        if (count($list) > 20) {
+            $add($where . ': слишком много допуслуг (максимум 20)');
+        }
+        foreach ($list as $ai => $a) {
+            $an = $where . ', допуслуга №' . ($ai + 1);
+            if (!is_array($a)) {
+                $add($an . ': должен быть объектом');
+                continue;
+            }
+            $label = $a['label'] ?? null;
+            if (!is_string($label) || trim($label) === '' || slen($label) > 200) {
+                $add($an . ': пустой или слишком длинный label (до 200 символов)');
+            }
+            $hasPrice = array_key_exists('price', $a);
+            $hasPercent = array_key_exists('percent', $a);
+            if ($hasPrice === $hasPercent) { // задано оба или ни одного
+                $add($an . ': должно быть РОВНО одно из полей price | percent');
+            } elseif ($hasPrice) {
+                if (!is_int($a['price'])) {
+                    $add($an . ': цена должна быть целым числом');
+                } elseif ($a['price'] < 100 || $a['price'] > 1000000) {
+                    $add($an . ': price должен быть от 100 до 1 000 000');
+                }
+            } elseif (!is_int($a['percent'])) {
+                $add($an . ': процент должен быть целым числом');
+            } elseif ($a['percent'] < 1 || $a['percent'] > 200) {
+                $add($an . ': percent должен быть от 1 до 200');
+            }
+        }
+    };
+    // minOrder: значения — int 0..10000000 (минимальная сумма заказа)
+    $checkMinOrder = static function (mixed $mo, string $where) use ($add): void {
+        if (!is_array($mo)) {
+            $add($where . ': minOrder должен быть объектом');
+            return;
+        }
+        foreach ($mo as $v) {
+            if (!is_int($v)) {
+                $add($where . ': minOrder — цена должна быть целым числом');
+            } elseif ($v < 0 || $v > 10000000) {
+                $add($where . ': minOrder должен быть от 0 до 10 000 000');
+            }
+        }
+    };
+
     $types = $menu['menuTypes'] ?? null;
     if (!is_array($types) || count($types) < 1 || count($types) > 12) {
-        return 'menuTypes: должен быть массивом из 1–12 форматов кейтеринга';
+        $add('menuTypes: должен быть массивом из 1–12 форматов кейтеринга');
+    } else {
+        $seenIds = [];
+        foreach ($types as $ti => $t) {
+            $n = 'Формат №' . ($ti + 1);
+            if (!is_array($t)) {
+                $add($n . ': должен быть объектом');
+                continue;
+            }
+            $id = $t['id'] ?? null;
+            if (!is_string($id) || trim($id) === '' || strlen($id) > 64) {
+                $add($n . ': пустой или слишком длинный id');
+                $id = null;
+            } elseif (in_array($id, $seenIds, true)) {
+                $add('Дубликат id формата: ' . $id);
+            } else {
+                $seenIds[] = $id;
+            }
+            $n = $id !== null ? 'Формат «' . $id . '»' : $n;
+            if (!$str($t['label'] ?? null, 200)) {
+                $add($n . ': пустой или слишком длинный label (до 200 символов)');
+            }
+            if (array_key_exists('short', $t) && !$str($t['short'], 200)) {
+                $add($n . ': пустой или слишком длинный short (до 200 символов)');
+            }
+            if (array_key_exists('description', $t) && !$str($t['description'], 500)) {
+                $add($n . ': пустой или слишком длинный description (до 500 символов)');
+            }
+            // цены формата (каталог/калькулятор) — положительные целые
+            foreach (['perGuest', 'calcPerGuest', 'minGuests'] as $pf) {
+                if (!array_key_exists($pf, $t)) {
+                    continue;
+                }
+                $v = $t[$pf];
+                if (!is_int($v)) {
+                    $add($n . ': ' . $pf . ' — цена должна быть целым числом');
+                } elseif ($v < 1) {
+                    $add($n . ': ' . $pf . ' должен быть больше нуля');
+                }
+            }
+            if (array_key_exists('included', $t)) {
+                $inc = $t['included'];
+                if (!is_array($inc)) {
+                    $add($n . ': included должен быть массивом');
+                } else {
+                    if (count($inc) > 20) {
+                        $add($n . ': слишком много пунктов included (максимум 20)');
+                    }
+                    foreach ($inc as $s) {
+                        if (!is_string($s) || trim($s) === '' || slen($s) > 200) {
+                            $add($n . ': included — непустые строки до 200 символов');
+                            break;
+                        }
+                    }
+                }
+            }
+            $pkgs = $t['packages'] ?? null;
+            if (!is_array($pkgs) || count($pkgs) < 1 || count($pkgs) > 6) {
+                $add($n . ': packages должен содержать 1–6 пакетов');
+                continue;
+            }
+            foreach ($pkgs as $pi => $p) {
+                $pn = $n . ', пакет №' . ($pi + 1);
+                if (!is_array($p)) {
+                    $add($pn . ': должен быть объектом');
+                    continue;
+                }
+                $name = $p['name'] ?? null;
+                if (!$str($name, 200)) {
+                    $add($pn . ': пустое или слишком длинное name (до 200 символов)');
+                    $name = null;
+                }
+                $pnt = $name !== null ? $n . ', пакет «' . $name . '»' : $pn;
+                $ppg = $p['pricePerGuest'] ?? null;
+                if (!is_int($ppg)) {
+                    $add($pnt . ': цена должна быть целым числом');
+                } elseif ($ppg < 100 || $ppg > 100000) {
+                    $add($pnt . ': pricePerGuest должен быть от 100 до 100 000');
+                }
+                if (array_key_exists('description', $p) && !$str($p['description'], 500)) {
+                    $add($pnt . ': пустой или слишком длинный description (до 500 символов)');
+                }
+                if (array_key_exists('dishes', $p)) {
+                    $dishes = $p['dishes'];
+                    if (!is_array($dishes) || count($dishes) < 1 || count($dishes) > 60) {
+                        $add($pnt . ': dishes должен содержать 1–60 позиций');
+                    } else {
+                        foreach ($dishes as $dish) {
+                            $dn = is_array($dish) ? ($dish['name'] ?? null) : null;
+                            if (!is_string($dn) || trim($dn) === '' || slen($dn) > 300) {
+                                $add($pnt . ': название блюда — строка 1–300 символов');
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (array_key_exists('addons', $t)) {
+                $checkAddons($t['addons'], $n);
+            }
+            if (array_key_exists('minOrder', $t)) {
+                $checkMinOrder($t['minOrder'], $n);
+            }
+        }
     }
-    $seenIds = [];
-    foreach ($types as $ti => $t) {
-        $n = 'Формат №' . ($ti + 1);
-        if (!is_array($t)) {
-            return $n . ': должен быть объектом';
-        }
-        $id = $t['id'] ?? null;
-        if (!is_string($id) || trim($id) === '' || strlen($id) > 64) {
-            return $n . ': пустой или слишком длинный id';
-        }
-        if (in_array($id, $seenIds, true)) {
-            return 'Дубликат id формата: ' . $id;
-        }
-        $seenIds[] = $id;
-        $n = 'Формат «' . $id . '»';
-        $label = $t['label'] ?? null;
-        if (!is_string($label) || trim($label) === '' || slen($label) > 120) {
-            return $n . ': пустой или слишком длинный label';
-        }
-        $pkgs = $t['packages'] ?? null;
-        if (!is_array($pkgs) || count($pkgs) < 1 || count($pkgs) > 6) {
-            return $n . ': packages должен содержать 1–6 пакетов';
-        }
-        foreach ($pkgs as $pi => $p) {
-            $pn = $n . ', пакет №' . ($pi + 1);
-            if (!is_array($p)) {
-                return $pn . ': должен быть объектом';
+
+    if (array_key_exists('addons', $menu)) {
+        $checkAddons($menu['addons'], 'addons (корень)');
+    }
+    if (array_key_exists('minOrder', $menu)) {
+        $checkMinOrder($menu['minOrder'], 'minOrder (корень)');
+    }
+    if (array_key_exists('servicePanels', $menu)) {
+        $panels = $menu['servicePanels'];
+        if (!is_array($panels)) {
+            $add('servicePanels: должен быть массивом');
+        } else {
+            if (count($panels) > 12) {
+                $add('Слишком много сервисных панелей (максимум 12)');
             }
-            $name = $p['name'] ?? null;
-            if (!is_string($name) || trim($name) === '' || slen($name) > 120) {
-                return $pn . ': пустое или слишком длинное name';
+            foreach ($panels as $si => $panel) {
+                $sn = 'Плитка услуг №' . ($si + 1);
+                if (!is_array($panel)) {
+                    $add($sn . ': должен быть объектом');
+                    continue;
+                }
+                if (!$str($panel['label'] ?? null, 120)) {
+                    $add($sn . ': пустой или слишком длинный label (до 120 символов)');
+                }
+                if (!$str($panel['priceLabel'] ?? null, 60)) {
+                    $add($sn . ': пустой или слишком длинный priceLabel (до 60 символов)');
+                }
             }
-            $price = $p['pricePerGuest'] ?? null;
-            if (!is_numeric($price)) {
-                return $pn . ' («' . $name . '»): pricePerGuest должен быть числом';
-            }
-            if ((float)$price < 100 || (float)$price > 100000) {
-                return $pn . ' («' . $name . '»): pricePerGuest должен быть от 100 до 100 000';
-            }
-        }
-        if (isset($t['addons'])) {
-            if (!is_array($t['addons'])) {
-                return $n . ': addons должен быть массивом';
-            }
-            if (count($t['addons']) > 20) {
-                return $n . ': слишком много допуслуг (максимум 20)';
-            }
-        }
-        if (isset($t['minOrder']) && !is_array($t['minOrder'])) {
-            return $n . ': minOrder должен быть объектом';
         }
     }
-    if (isset($menu['addons'])) {
-        if (!is_array($menu['addons'])) {
-            return 'addons (корень): должен быть массивом';
-        }
-        if (count($menu['addons']) > 20) {
-            return 'Слишком много допуслуг в корне (максимум 20)';
-        }
+    return $errors;
+}
+
+/**
+ * JSON с 2-пробельным отступом — как исходный src/data/menu.json в репо,
+ * чтобы публикации из админки давали минимальные диффы. Список/объект
+ * различаем array_is_list; строки/ключи — без экранирования юникода
+ * и слэшей; пустой массив печатается как [].
+ */
+function pretty_json_2sp(mixed $data, int $depth = 0): string
+{
+    $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE;
+    if (!is_array($data)) {
+        return json_encode($data, $flags);
     }
-    if (isset($menu['minOrder']) && !is_array($menu['minOrder'])) {
-        return 'minOrder (корень): должен быть объектом';
+    if ($data === []) {
+        return '[]';
     }
-    if (isset($menu['servicePanels'])) {
-        if (!is_array($menu['servicePanels'])) {
-            return 'servicePanels: должен быть массивом';
+    $pad = str_repeat('  ', $depth + 1);
+    $close = str_repeat('  ', $depth);
+    if (array_is_list($data)) {
+        $items = [];
+        foreach ($data as $v) {
+            $items[] = $pad . pretty_json_2sp($v, $depth + 1);
         }
-        if (count($menu['servicePanels']) > 12) {
-            return 'Слишком много сервисных панелей (максимум 12)';
-        }
+        return "[\n" . implode(",\n", $items) . "\n" . $close . "]";
     }
-    return null;
+    $items = [];
+    foreach ($data as $k => $v) {
+        $items[] = $pad . json_encode((string)$k, $flags) . ': ' . pretty_json_2sp($v, $depth + 1);
+    }
+    return "{\n" . implode(",\n", $items) . "\n" . $close . "}";
 }

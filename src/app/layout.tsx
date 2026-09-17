@@ -126,7 +126,12 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   title: {
-    default: "nilov catering — Кейтеринг в Санкт-Петербурге от 1 200 ₽/чел",
+    /* 4-F2 (критик D, MINOR): «от 1 200 ₽/чел» — не хардкод, а фрагмент
+     * metaPriceFragments() из menu.json (snack-box = calcPerGuest — тот же
+     * источник, что у description ниже): цена в title синхронна с
+     * калькулятором и меняется публикацией из админ-панели. Строка вывода
+     * байт-идентична прежней захардкоженной (обычный пробел в «1 200»). */
+    default: `nilov catering — Кейтеринг в Санкт-Петербурге от ${metaPrices.snackBox} ₽/чел`,
     template: "%s | nilov catering",
   },
   /* F2 (K3-MINOR): 192 → 152 симв. — ключи сохранены: «кейтеринг Санкт-Петербург",

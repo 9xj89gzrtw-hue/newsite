@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   ExternalLink,
   Inbox,
+  Info,
   LayoutGrid,
   Loader2,
   LogOut,
@@ -38,6 +39,7 @@ import {
   apiStatus,
   disableMockMode,
   DRAFT_KEY,
+  isVercelMirror,
   type AdminSettings,
   type Lead,
 } from "./api";
@@ -103,6 +105,9 @@ type PubState =
     }
   | { phase: "success"; htmlUrl?: string }
   | { phase: "failure"; htmlUrl?: string }
+  /* 4-F2: публикация вытеснена более новой (конкурирующий publish отменил
+   * идущий деплой) — терминальное состояние для этого sha. */
+  | { phase: "cancelled"; htmlUrl?: string }
   | { phase: "unknown" };
 
 interface Draft {
@@ -204,6 +209,9 @@ export function AdminApp({
   }, []);
 
   useEffect(() => {
+    /* 4-F2: на зеркале Vercel панель не грузится вообще (карточка-заглушка
+     * ниже) — ни одного API-вызова. */
+    if (isVercelMirror()) return;
     void loadApp();
   }, [loadApp]);
 
@@ -231,6 +239,7 @@ export function AdminApp({
   /* ---------------------------------------------------------- заявки 60с */
 
   useEffect(() => {
+    if (isVercelMirror()) return; /* 4-F2: зеркало — без API-вызовов */
     const i = setInterval(async () => {
       if (document.visibilityState !== "visible") return;
       const r = await apiGetLeads();
@@ -399,13 +408,15 @@ export function AdminApp({
     }
   };
 
-  /* поллинг статуса сборки (шаг 5с, потолок 6 минут) */
+  /* поллинг статуса сборки (шаг 5с). 4-F2: потолок поднят 6 → 10 минут —
+   * реальный деплой c95 замерен в 6м23с: старого потолка не хватало,
+   * поллинг сдавался раньше сборки. */
   useEffect(() => {
     if (pub.phase !== "building") return;
     let cancelled = false;
     const interval = setInterval(async () => {
       if (cancelled) return;
-      if (Date.now() - pub.startedAt > 6 * 60_000) {
+      if (Date.now() - pub.startedAt > 10 * 60_000) {
         setPub({ phase: "unknown" });
         return;
       }
@@ -426,6 +437,15 @@ export function AdminApp({
       }
       if (r.ok === true && r.data.state === "failure") {
         setPub({ phase: "failure", htmlUrl: r.data.htmlUrl ?? pub.htmlUrl });
+        return;
+      }
+      /* 4-F2: 'cancelled' — эту публикацию вытеснила более новая
+       * (конкурирующий publish отменил идущий деплой). Терминально
+       * для ЭТОГО sha: эффект выше не перезапустится (phase больше
+       * не «building»), ничего не дозапрашиваем — новая публикация
+       * пойдёт собственным циклом. */
+      if (r.ok === true && r.data.state === "cancelled") {
+        setPub({ phase: "cancelled", htmlUrl: r.data.htmlUrl ?? pub.htmlUrl });
       }
     }, 5000);
     return () => {
@@ -452,6 +472,16 @@ export function AdminApp({
 
   const unread = leads.filter((l) => !l.read).length;
   const activeNav = NAV.find((n) => n.id === section);
+
+  /* 4-F2: зеркало Vercel (*.vercel.app) — вместо панели карточка со ссылкой
+   * на основной домен: /api/* там закрыты редиректом, логин и публикация
+   * невозможны (раньше владелец видел бесконечный экран входа с «нет
+   * связи»). Возврат стоит ПОСЛЕ всех хуков — хуки всегда вызываются в
+   * одном порядке; эффекты выше погашены isVercelMirror — ни одного
+   * API-вызова (apiSession на зеркале тоже не ходит в сеть, см. api.ts). */
+  if (isVercelMirror()) {
+    return <VercelMirrorNotice />;
+  }
 
   return (
     <div className="min-h-svh bg-background text-foreground">
@@ -1002,6 +1032,37 @@ function PublishBanner({
       </div>
     );
   }
+  if (pub.phase === "cancelled") {
+    /* 4-F2: вытеснена более новой публикацией — информационное сообщение
+     * (не ошибка): ждать завершения новой публикации. */
+    return (
+      <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-border-line/70 bg-accent/50 px-4 py-3 text-[14px] text-ink">
+        <Info className="size-5 shrink-0 text-ink-soft/70" />
+        <span className="min-w-0 flex-1">
+          Публикация отменена — её заменила более новая. Дождитесь завершения
+          новой публикации.
+        </span>
+        {pub.htmlUrl ? (
+          <a
+            href={pub.htmlUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-9 items-center gap-1 text-[13px] font-medium text-ink-soft underline decoration-dotted underline-offset-2 hover:text-ink"
+          >
+            Ход сборки <ExternalLink className="size-3.5" />
+          </a>
+        ) : null}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Скрыть"
+          className="-m-1 flex size-9 items-center justify-center rounded-full text-ink-soft/70 hover:bg-accent"
+        >
+          <X className="size-4" />
+        </button>
+      </div>
+    );
+  }
   return (
     <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border-line/70 bg-accent/50 px-4 py-3 text-[14px] text-ink-soft">
       <AlertTriangle className="size-4 text-ink-soft/60" />
@@ -1051,6 +1112,41 @@ function ValidationErrors({
         >
           <X className="size-4" />
         </button>
+      </div>
+    </div>
+  );
+}
+
+/* --------------------------------------------------- 4-F2: mirror notice */
+
+/** Карточка вместо панели на зеркале Vercel (*.vercel.app): /api/* там
+ *  закрыты редиректом 302→/404 (PHP не исполняется) — вход и публикация
+ *  невозможны, ведём на основной домен. Центрирована, в стиле LoginScreen. */
+function VercelMirrorNotice() {
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center bg-background px-4 py-10">
+      <div className="w-full max-w-md">
+        <div className="mb-8 text-center">
+          <p className="font-serif text-[34px] leading-none font-medium text-ink">
+            nilov catering<span className="text-gold">.</span>
+          </p>
+          <p className="mt-2 text-[11px] tracking-[0.22em] text-ink-soft/70 uppercase">
+            панель управления
+          </p>
+        </div>
+        <Card className="rounded-2xl border-border-line/80 shadow-sm">
+          <CardContent className="p-6 text-center">
+            <p className="text-[15px] leading-relaxed text-ink">
+              Админ-панель работает только на основном домене — откройте{" "}
+              <a
+                href="https://nilovcatering.ru/admin"
+                className="font-medium text-gold underline decoration-gold/40 underline-offset-2"
+              >
+                https://nilovcatering.ru/admin
+              </a>
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

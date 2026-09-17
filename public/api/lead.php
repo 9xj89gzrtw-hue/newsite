@@ -6,7 +6,8 @@ declare(strict_types=1);
  *
  * Без авторизации (публичная форма сайта). Защита:
  *  - same-origin (X-Requested-With + Origin-allowlist);
- *  - rate limit: 6/час и 30/сутки на IP (файловые счётчики, flock);
+ *  - rate limit: 6/час и 30/сутки на IP + глобальный предохранитель
+ *    120/час на всё (файловые счётчики, flock);
  *  - honeypot + elapsedMs — молчаливая ловля ботов (отвечаем ok:true,
  *    ничего не сохранляя и не отправляя);
  *  - все поля ограничены по длине/формату, JSON-тело ≤ 64 КБ.
@@ -29,7 +30,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
 
 require_same_origin(false); // POST: обязателен X-Requested-With + Origin-allowlist
 
-if (!rl_check('lead', 6, 3600) || !rl_check('leadday', 30, 86400)) {
+// Глобальный предохранитель — ДО per-IP проверок: ротация XFF/прокси-пул
+// обнуляет per-IP счётчики, общий лимит 120 заявок/час держит спам-волну.
+if (!rl_check_global('leadall', 120, 3600)
+    || !rl_check('lead', 6, 3600)
+    || !rl_check('leadday', 30, 86400)) {
     json_response(429, ['ok' => false, 'error' => 'rate', 'retryAfterSec' => rl_last_retry_after()]);
 }
 
@@ -42,8 +47,11 @@ if (is_string($honeypot) && trim($honeypot) !== '') {
     $trap = true; // боты заполняют невидимое поле
 }
 $elapsedMs = $body['elapsedMs'] ?? null;
-if (is_int($elapsedMs) && $elapsedMs >= 0 && $elapsedMs < 1500) {
-    $trap = true; // форма отправлена быстрее 1.5 c — человек так не может
+// elapsedMs проставляет наш form-JS: ОТСУТСТВИЕ ключа = бот без нашего JS
+// (curl/скрипт), значение <1500 мс = быстрее человека. Оба случая —
+// молчаливый фейковый ok:true без сохранения и уведомлений.
+if (!is_int($elapsedMs) || $elapsedMs < 1500) {
+    $trap = true;
 }
 if ($trap) {
     json_response(200, ['ok' => true, 'id' => make_lead_id()]);

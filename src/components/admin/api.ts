@@ -15,7 +15,9 @@
  *    (`bun test` против локального PHP `php -S 127.0.0.1:3007`); в браузере
  *    всегда same-origin ('' по умолчанию, NEXT_PUBLIC_ADMIN_API_BASE — запасной
  *    вариант для нестандартных зеркал).
- *  - MOCK-режим (`?mock=1` на /admin → localStorage 'nilov-admin-mock'):
+ *  - MOCK-режим (`?mock=1` на /admin → localStorage 'nilov-admin-mock';
+ *    4-F2: активируется ТОЛЬКО на localhost/127.0.0.1 — на проде/зеркале
+ *    флаг не ставится и авто-стирается):
  *    полностью эмулирует API реалистичными данными — сквозной e2e UI
  *    на dev-сервере Next (PHP там не исполняется). Меню для мока —
  *    динамический импорт src/data/menu.json (отдельный чанк, не грузится
@@ -40,7 +42,23 @@ export const MOCK_FLAG_KEY = "nilov-admin-mock";
 const MOCK_SESSION_KEY = "nilov-admin-mock-session";
 export const DRAFT_KEY = "nilov-admin-draft-v1";
 
+/** 4-F2 (критик D, MINOR «?mock=1 залипает в localStorage»): демо-режим
+ *  разрешён ТОЛЬКО на localhost/127.0.0.1. На любом другом хосте (прод
+ *  nilovcatering.ru, зеркало *.vercel.app) флаг не ставится и, если залип
+ *  с прошлого визита, стирается при первой же проверке — прод не может
+ *  незаметно оказаться в демо. */
+function isLocalHost(): boolean {
+  if (typeof window === "undefined") return false;
+  const h = window.location.hostname;
+  return h === "localhost" || h === "127.0.0.1";
+}
+
 export function enableMockMode(): void {
+  if (!isLocalHost()) {
+    /* не localhost — флаг не ставим, залипший стираем */
+    disableMockMode();
+    return;
+  }
   try {
     window.localStorage.setItem(MOCK_FLAG_KEY, "1");
   } catch {
@@ -50,6 +68,15 @@ export function enableMockMode(): void {
 
 export function isMockMode(): boolean {
   if (typeof window === "undefined") return false;
+  if (!isLocalHost()) {
+    /* safety-авточистка: чужой хост никогда не отвечает моком */
+    try {
+      window.localStorage.removeItem(MOCK_FLAG_KEY);
+    } catch {
+      /* ignore */
+    }
+    return false;
+  }
   try {
     return window.localStorage.getItem(MOCK_FLAG_KEY) === "1";
   } catch {
@@ -64,6 +91,17 @@ export function disableMockMode(): void {
   } catch {
     /* ignore */
   }
+}
+
+/** 4-F2: зеркало Vercel (*.vercel.app) — /api/* там закрыты редиректом
+ *  302→/404 (vercel.json), PHP не исполняется: логин и публикация
+ *  невозможны. Функция (а не модульная константа) — вызывается где нужно
+ *  и легко тестируется; host не меняется без полной перезагрузки страницы. */
+export function isVercelMirror(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.location.host.endsWith(".vercel.app")
+  );
 }
 
 /* ------------------------------------------------------------------- types */
@@ -90,7 +128,9 @@ export interface AdminSettings {
   botTokenMasked: string;
 }
 
-export type BuildState = "unknown" | "building" | "success" | "failure";
+/* 4-F2: 'cancelled' — деплой вытеснен более новой публикацией (конкурирующий
+ *  publish отменяет идущий деплой; состояние возвращает admin.php). */
+export type BuildState = "unknown" | "building" | "success" | "failure" | "cancelled";
 
 export interface AdminApiOptions {
   method?: "GET" | "POST";
@@ -119,6 +159,11 @@ export async function adminApi(
   opts: AdminApiOptions = {},
 ): Promise<ApiResponse> {
   if (isMockMode()) return mockApi(action, opts);
+  /* 4-F2: на зеркале Vercel в сеть не ходим вовсе — /api/* закрыты
+   * редиректом 302→/404. Все вызовы тихо «падают» (статус 0 без тоста),
+   * а вместо экрана входа AdminApp показывает карточку-заглушку
+   * (см. isVercelMirror в admin-app.tsx). */
+  if (isVercelMirror()) return { status: 0, body: null };
 
   const method = opts.method ?? (opts.body === undefined ? "GET" : "POST");
   const base = opts.base ?? API_BASE;
@@ -162,6 +207,9 @@ export async function adminApi(
 export async function apiSession(
   opts: Pick<AdminApiOptions, "base" | "headers"> = {},
 ): Promise<{ ok: boolean }> {
+  /* 4-F2: на зеркале «сессию» пропускаем без сети — панель смонтируется
+   * и покажет карточку-заглушку (вход там всё равно невозможен). */
+  if (isVercelMirror()) return { ok: true };
   const r = await adminApi("session", { ...opts, expect401: true });
   return { ok: r.status === 200 && r.body?.ok === true };
 }
@@ -480,6 +528,16 @@ let mockSavedAt = 0;
 /** Меню, «закоммиченное» через save (мок-аналог GitHub contents). */
 let mockSavedMenu: MenuData | null = null;
 
+/* MOCK-ONLY (4-F2): debug-аффорданс состояния 'cancelled' для демо-режима.
+ * Публикация, чьё сообщение коммита содержит «тест отмены», на ПЕРВОМ
+ * опросе статуса отвечает 'building', на ВТОРОМ — 'cancelled' (вместо
+ * success): так баннер отмены можно показать и проверить в демо.
+ * Существует ТОЛЬКО здесь, в мок-слое — в проде 'cancelled' приходит из
+ * admin.php, когда деплой вытеснен более новой публикацией. Никаких
+ * скрытых триггеров — только явная строка в сообщении коммита. */
+let mockCancelArmed = false;
+let mockStatusPolls = 0;
+
 async function mockApi(
   action: string,
   opts: AdminApiOptions,
@@ -551,6 +609,11 @@ async function mockApi(
       }
       mockSavedAt = Date.now();
       mockSavedMenu = structuredClone(menu);
+      /* MOCK-ONLY (4-F2): вооружение debug-аффорданса — см. объявление
+       * mockCancelArmed выше (только «тест отмены» в сообщении коммита). */
+      mockCancelArmed =
+        typeof body.message === "string" && body.message.includes("тест отмены");
+      mockStatusPolls = 0;
       return {
         status: 200,
         body: {
@@ -564,6 +627,30 @@ async function mockApi(
       const sha = String(opts.params?.sha ?? "");
       if (!sha.startsWith("mock-") || !mockSavedAt) {
         return { status: 200, body: { ok: true, state: "unknown" } };
+      }
+      mockStatusPolls++;
+      /* MOCK-ONLY (4-F2): ветка «тест отмены» — building → cancelled
+       * (второй опрос вместо success), чтобы отработать баннер отмены. */
+      if (mockCancelArmed) {
+        if (mockStatusPolls === 1) {
+          return {
+            status: 200,
+            body: {
+              ok: true,
+              state: "building",
+              htmlUrl: "https://github.com/9xj89gzrtw-hue/newsite/actions",
+              runStartedAt: new Date(mockSavedAt).toISOString(),
+            },
+          };
+        }
+        return {
+          status: 200,
+          body: {
+            ok: true,
+            state: "cancelled",
+            htmlUrl: "https://github.com/9xj89gzrtw-hue/newsite/actions",
+          },
+        };
       }
       const elapsed = Date.now() - mockSavedAt;
       if (elapsed < 3000) {

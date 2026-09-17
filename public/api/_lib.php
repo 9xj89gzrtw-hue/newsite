@@ -79,6 +79,7 @@ function json_response(int $status, array $body): never
     if (!headers_sent()) {
         http_response_code($status);
         header('Content-Type: application/json; charset=utf-8');
+        header('X-Content-Type-Options: nosniff');
         header('X-Robots-Tag: noindex, nofollow');
         header('Cache-Control: no-store, must-revalidate');
         header('Pragma: no-cache');
@@ -312,6 +313,9 @@ function default_settings(): array
         // passwordHash перекрывает secrets.password_hash_default после
         // смены пароля владельцем через UI (action=password).
         'passwordHash' => null,
+        // Эпоха сессий: входит в HMAC подписи cookie; инкремент при смене
+        // пароля / logout-all мгновенно отзывает ВСЕ выданные cookie.
+        'sessionEpoch' => 0,
     ];
 }
 
@@ -321,7 +325,13 @@ function load_settings(): array
     if (!is_array($s)) {
         return default_settings();
     }
-    return array_merge(default_settings(), array_intersect_key($s, default_settings()));
+    $merged = array_merge(default_settings(), array_intersect_key($s, default_settings()));
+    // sessionEpoch обязан быть int; числоподобное значение из вручную
+    // испорченного файла приводим, мусор — в 0 (не окирпичиваем админку)
+    if (!is_int($merged['sessionEpoch'])) {
+        $merged['sessionEpoch'] = is_numeric($merged['sessionEpoch']) ? (int)$merged['sessionEpoch'] : 0;
+    }
+    return $merged;
 }
 
 function save_settings(array $settings): bool
@@ -334,16 +344,18 @@ function save_settings(array $settings): bool
 /* ------------------------- rate limiting (IP) --------------------------- */
 
 /**
- * IP клиента: X-Forwarded-For (первый хоп ставит nginx-фронт SpaceWeb),
- * фолбэк REMOTE_ADDR. Значение НЕ сохраняем целиком — только md5-префикс.
+ * IP клиента: из X-Forwarded-For берём ПОСЛЕДНИЙ элемент, фолбэк REMOTE_ADDR.
+ * Значение НЕ сохраняем целиком — только md5-префикс.
  */
 function ip(): string
 {
     $xff = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
     if (is_string($xff) && $xff !== '') {
-        $first = trim(explode(',', $xff)[0]);
-        if ($first !== '') {
-            return substr($first, 0, 45);
+        // nginx дописывает реальный IP клиента ПОСЛЕДНИМ; первый элемент подделывает клиент
+        $parts = explode(',', $xff);
+        $last = trim((string)end($parts));
+        if ($last !== '') {
+            return substr($last, 0, 45);
         }
     }
     $ra = $_SERVER['REMOTE_ADDR'] ?? '';
@@ -358,21 +370,41 @@ function ip(): string
  */
 function rl_check(string $bucket, int $max, int $windowSec): bool
 {
-    $GLOBALS['nilov_rl_retry_after'] ??= 60;
     ensure_server_data_dir();
     $safeBucket = preg_replace('/[^a-z0-9]/', '', strtolower($bucket));
     $file = server_data_dir() . '/rl-' . $safeBucket . '-' . md5(ip()) . '.json';
+    return rl_check_file($file, $max, $windowSec);
+}
+
+/**
+ * Глобальный предохранитель БЕЗ привязки к IP: один общий счётчик на bucket
+ * (server-data/rl-g-<bucket>.json). Ловит спам-волны с ротацией
+ * X-Forwarded-For/прокси-пулов, когда per-IP лимиты ничего не жгут.
+ */
+function rl_check_global(string $bucket, int $max, int $windowSec): bool
+{
+    ensure_server_data_dir();
+    $safeBucket = preg_replace('/[^a-z0-9]/', '', strtolower($bucket));
+    $file = server_data_dir() . '/rl-g-' . $safeBucket . '.json';
+    return rl_check_file($file, $max, $windowSec);
+}
+
+/** Общий файловый счётчик (flock) поверх одного файла-счётчика. */
+function rl_check_file(string $file, int $max, int $windowSec): bool
+{
+    rl_sweep(); // самопроизвольная подчистка устаревших rl-файлов
+    $GLOBALS['nilov_rl_retry_after'] ??= 60;
     $now = time();
     $fp = @fopen($file, 'c+');
     if ($fp === false) {
         return true;
     }
     $allowed = true;
+    $start = $now;
     if (@flock($fp, LOCK_EX)) {
         $raw = stream_get_contents($fp);
         $d = is_string($raw) ? json_decode($raw, true) : null;
         $count = 0;
-        $start = $now;
         if (is_array($d) && isset($d['c'], $d['t']) && ($now - (int)$d['t']) < $windowSec) {
             $count = (int)$d['c'];
             $start = (int)$d['t'];
@@ -395,6 +427,38 @@ function rl_check(string $bucket, int $max, int $windowSec): bool
         header('Retry-After: ' . $retry);
     }
     return $allowed;
+}
+
+/**
+ * Подчистка rl-*.json старше 25 ч: срабатывает на ~5% запросов
+ * (random_int(1,20)===1), не чаще одного раза на запрос. 25 ч больше
+ * самого длинного окна счётчиков (leadday, 24 ч) — живые счётчики
+ * не трогаем; ротация IP больше не расползается тысячами инодов.
+ */
+function rl_sweep(): void
+{
+    if (($GLOBALS['nilov_rl_swept'] ?? false) === true) {
+        return;
+    }
+    $GLOBALS['nilov_rl_swept'] = true;
+    try {
+        if (random_int(1, 20) !== 1) {
+            return;
+        }
+    } catch (Throwable $e) {
+        return; // fail-open, как и весь rate-limiter
+    }
+    $files = glob(server_data_dir() . '/rl-*.json');
+    if (!is_array($files)) {
+        return;
+    }
+    $cutoff = time() - 25 * 3600;
+    foreach ($files as $f) {
+        $m = @filemtime($f);
+        if ($m !== false && $m < $cutoff) {
+            @unlink($f);
+        }
+    }
 }
 
 /** Остаток секунд до сброса последнего сработавшего лимита (для тела 429). */
@@ -433,18 +497,19 @@ function require_same_origin(bool $isGet = false): void
 
 /* --------------------- сессия админа (HMAC-cookie) --------------------- */
 
-function make_session_cookie_value(int $exp, string $key): string
+function make_session_cookie_value(int $exp, int $epoch, string $key): string
 {
-    return $exp . '.' . hash_hmac('sha256', (string)$exp, $key);
+    // подпись включает эпоху сессий: инкремент эпохи отзывает все cookie разом
+    return $exp . '.' . hash_hmac('sha256', $exp . '|' . $epoch, $key);
 }
 
 /**
  * Выдать сессионную cookie. Secure=true всегда: SSL терминирует nginx,
  * $_SERVER['HTTPS'] у Apache пуст (R-REPORT §3), сайт https-only.
  */
-function set_admin_cookie(int $exp, string $key): void
+function set_admin_cookie(int $exp, string $key, int $epoch): void
 {
-    setcookie(SESSION_COOKIE, make_session_cookie_value($exp, $key), [
+    setcookie(SESSION_COOKIE, make_session_cookie_value($exp, $epoch, $key), [
         'expires' => $exp,
         'path' => '/',
         'secure' => true,
@@ -469,8 +534,11 @@ function clear_admin_cookie(): void
 
 /**
  * Валидная сессия → expiry (unix), иначе null.
- * Значение cookie: "<exp10digits>" . "." . hash_hmac('sha256', exp, key);
- * подпись сверяется timing-safe (hash_equals), expiry — не в прошлом.
+ * Значение cookie: "<exp10digits>" . "." .
+ * hash_hmac('sha256', exp . '|' . sessionEpoch, key); подпись сверяется
+ * timing-safe (hash_equals) против ТЕКУЩЕЙ эпохи из настроек — смена пароля
+ * или logout-all инкрементируют эпоху и все старые cookie отмирают.
+ * expiry — не в прошлом.
  */
 function current_session(): ?int
 {
@@ -491,7 +559,11 @@ function current_session(): ?int
     if (strlen($key) < 32) {
         return null;
     }
-    if (!hash_equals(hash_hmac('sha256', $exp, $key), $sig)) {
+    $epoch = load_settings()['sessionEpoch'] ?? 0;
+    if (!is_int($epoch) || $epoch < 0) {
+        return null; // битая эпоха — fail-closed, сессий нет
+    }
+    if (!hash_equals(hash_hmac('sha256', $exp . '|' . $epoch, $key), $sig)) {
         return null;
     }
     $expI = (int)$exp;

@@ -31,14 +31,8 @@ jobs:
       - name: Validate menu data
         run: bun scripts/validate-menu.ts
 
-      # c95: gen-static-data пишет public/data/ (gitignore) и перегенерирует
-      # строку цен в public/llms.txt из menu.json. Если llms.txt в репо
-      # отличается от свежесгенерированного — он устарел (кто-то правил
-      # menu.json без регенерации) — фейлим с подсказкой.
-      - name: Static data freshness (llms.txt)
-        run: |
-          bun scripts/gen-static-data.ts
-          if ! git diff --exit-code -- public/llms.txt; then
-            echo "::error::public/llms.txt не соответствует src/data/menu.json — запустите 'bun scripts/gen-static-data.ts' и закоммитьте файл"
-            exit 1
-          fi
+      # c95 (4-W1-D): шаг «Static data freshness (llms.txt)» УДАЛЁН —
+      # публикация из админки коммитит ТОЛЬКО src/data/menu.json, а
+      # деплой всё равно регенерирует public/llms.txt на сборке
+      # (deploy.yml → gen-static-data.ts перед next build). Диф-гейт
+      # гарантированно краснел на каждой легитимной публикации цены.
