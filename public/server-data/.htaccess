@@ -1,0 +1,5 @@
+# c95: runtime-данные API (заявки, настройки, rate-limit счётчики).
+# Apache 2.4 (SpaceWeb): ТОЛЬКО директивы 2.4, без Order/Deny (смиксовать
+# 2.2+2.4 нельзя — упадёт сайт; R-REPORT §3). Дублирует RedirectMatch 404
+# из корневого .htaccess — защита в глубину.
+Require all denied

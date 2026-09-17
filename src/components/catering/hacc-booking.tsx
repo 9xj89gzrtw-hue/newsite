@@ -271,6 +271,9 @@ import type { Calendar as CalendarType } from "@/components/ui/calendar";
 import { useMounted } from "@/hooks/use-mounted";
 import { CONTACTS } from "@/lib/config";
 import { anchorClickGoal, GOALS, trackGoal } from "@/lib/analytics";
+/* c95 (1-d): реальная отправка лида — POST /api/lead.php (same-origin PHP
+ * на статик-экспорте), mailto — фоллбэк. */
+import { submitLead, type LeadResult } from "@/lib/submit-lead";
 import {
   ADDONS,
   MENU_TYPES,
@@ -1023,6 +1026,19 @@ const LeadForm = memo(function LeadForm({
   const phoneRef = useRef<HTMLInputElement>(null);
   /** M5 (task 11-fix3): контейнер шага 2 — цель скролла после «Далее». */
   const step2Ref = useRef<HTMLDivElement>(null);
+  /* c95 (1-d): анти-спам-поля для POST /api/lead.php — honeypot
+   * (невидимое поле: заполняют только боты; значение читается по рефу
+   * на сабмите, чтобы ловить и DOM-заполнение без React-событий) и
+   * elapsedMs — время от маунта формы до отправки (мгновенный POST ≈
+   * бот). Дата маунта — реф-инициализация при первом рендере; форма
+   * живёт от загрузки страницы (зона схлопнута, но смонтирована). */
+  const honeypotRef = useRef<HTMLInputElement>(null);
+  const mountedAtRef = useRef(Date.now());
+  /* c95 (1-d): диагностика фоллбэка — ОДИН console.warn на маунт формы
+   * (без toast-спама на повторные сбои). Реф, не module-переменная:
+   * запись в обработчике события разрешена (React Compiler §37, тот же
+   * паттерн, что submitInFlightRef). */
+  const fallbackWarnedRef = useRef(false);
 
   /* --- draft restore (один раз на маунт) --- */
   useEffect(() => {
@@ -1147,15 +1163,13 @@ const LeadForm = memo(function LeadForm({
     submitInFlightRef.current = true;
     setStatus("loading");
     try {
-      /* K4-F1 (Task 5): таймаут 15с —fetch без AbortSignal мог висеть
+      /* K4-F1 (Task 5): таймаут — fetch без AbortSignal мог висеть
        * бесконечно (мёртвый upstream/потеря сети на середине): кнопка
        * «Отправляем…» и submitInFlightRef оставались залочены навсегда.
        * AbortSignal.timeout отвергает промис DOMException(name=
-       * "TimeoutError") — он уходит в catch ниже (НЕ TypeError),
-       * там отдельный тост и штатный ресет состояния. */
-      // Static-host deployment (shared PHP hosting, no server runtime):
-      // instead of POST /api/lead, hand the lead to the manager via a
-      // pre-filled email. No backend, no secrets, works everywhere.
+       * "TimeoutError") — теперь это внутри submitLead (12 c) и
+       * схлопывается в {ok:false,reason:"network"}, а этот catch —
+       * страховка от неожиданных исключений (штатный ресет состояния). */
       const messageLines =
         [
           undecided && "Формат ещё не выбран — нужна помощь с подбором",
@@ -1203,9 +1217,92 @@ const LeadForm = memo(function LeadForm({
           .join("\n"),
       );
       /* c89/W1-код-критик CRITICAL: адрес лида — из конфига (смена почты
-         владельца), не хардкод. */
+         владельца), не хардкод. MAILTO — фоллбэк на случай, когда
+         /api/lead.php недоступен (до c95 это был единственный путь). */
       const mailto = `mailto:${CONTACTS.email}?subject=${subject}&body=${body}`;
 
+      /* c95 (1-d): сначала РЕАЛЬНАЯ отправка — same-origin POST
+       * /api/lead.php (PHP на статик-хостинге; тело и анти-спам-поля —
+       * см. src/lib/submit-lead.ts). submitLead не бросает исключений:
+       * любой сбой (сеть/таймаут/500/не-JSON) → {ok:false} → ветка
+       * mailto-фоллбэка ниже. */
+      let result: LeadResult;
+      try {
+        result = await submitLead({
+          name: name.trim(),
+          phone,
+          email: email || undefined,
+          comment: messageLines || undefined,
+          source: "calculator",
+          consent,
+          honeypot: honeypotRef.current?.value ?? "",
+          elapsedMs: Math.max(0, Date.now() - mountedAtRef.current),
+          /* Снимок расчёта (маленький объект — Контракт 7 + поля
+             текстового письма, чтобы сервер собрал то же сообщение). */
+          payload: {
+            typeId,
+            guests,
+            dateIso,
+            pkgIdx,
+            pkgName,
+            pkgLabel: pkgName,
+            addonIds: undecided ? [] : addonIds,
+            addons: undecided
+              ? []
+              : selectedAddons.map((a) => addonNote(a, subtotal)),
+            total,
+            subtotal,
+            preferredTime,
+            undecided,
+          },
+        });
+      } catch {
+        /* Страховка: submitLead сам не бросает, но неожиданное
+           окружение (нет AbortSignal.timeout) не должно ломать UX. */
+        result = { ok: false, reason: "network" };
+      }
+
+      /* ── УСПЕХ (200 {ok:true,id}): заявка уже у владельца — один
+       * тост, черновик снят, салют, аналитика и onSuccess(id) —
+       * БЕЗ открытия почтового клиента (так отличаемся от ветки
+       * фоллбэка ниже).
+       *
+       * Проверка `!== false`, а не `if (result.ok)`: tsconfig проекта
+       * без strictNullChecks — truthiness-дискриминант НЕ сужает union
+       * в дополнении (проверено tsc 5.9.3), а явное сравнение сужает
+       * обе ветки. */
+      if (result.ok !== false) {
+        try {
+          window.localStorage.removeItem(DRAFT_KEY);
+        } catch {
+          // non-critical
+        }
+        toast.success(`Заявка принята! ${toastPromise}.`);
+        fireGoldConfetti(formEl);
+        trackGoal(GOALS.LEAD_SUBMIT);
+        onSuccess(result.id, {
+          typeId,
+          guests,
+          dateIso,
+          total,
+          pkgIdx,
+          addonIds: undecided ? [] : addonIds,
+        });
+        return;
+      }
+
+      /* ── ФОЛЛБЭК: эндпоинт недоступен/отверг запрос — деградация к
+       * ТОЧНОМУ поведению до c95 (mailto + двухшаговый UX: тост
+       * «отправьте письмо» → почтовый клиент → успех). Один
+       * console.warn на страницу — диагностика без toast-спама. */
+      if (!fallbackWarnedRef.current) {
+        fallbackWarnedRef.current = true;
+        console.warn(
+          `[lead] POST /api/lead.php не прошёл (reason=${result.reason}${
+            result.retryAfterSec ? `, retryAfterSec=${result.retryAfterSec}` : ""
+          }) — включаю mailto-фоллбэк`,
+        );
+      }
       // SPEC §2.4: на статике «ошибка сервера» невозможна — просто открываем
       // почту; success-карточка + салют показываются как при 2xx.
       toast.success(`Заявка готова — отправьте письмо из почтового клиента. ${toastPromise}.`);
@@ -1215,7 +1312,6 @@ const LeadForm = memo(function LeadForm({
         // браузер заблокировал навигацию — success-карточка всё равно видна
       }
 
-      const data = null as { id?: string | number } | null;
       try {
         window.localStorage.removeItem(DRAFT_KEY);
       } catch {
@@ -1228,23 +1324,14 @@ const LeadForm = memo(function LeadForm({
       /* W3 / K6-CRITICAL: LEAD_SUBMIT — терминальная цель воронки (201),
        * рядом с салютом. Форма после успеха размонтируется — дублей нет. */
       trackGoal(GOALS.LEAD_SUBMIT);
-      /* КОНТРАКТ 7: снимок расчёта — из пропсов формы. LeadForm —
-         React.memo, и он НЕ пересобирается на кадрах драга только
-         потому, что handleSuccess — стабильная ссылка (useCallback с
-         пустыми зависимостями в родителе, §28), а остальные пропсы —
-         дебаунс-значения. React Compiler в проекте НЕ включён —
-         стабильность достигается вручную (было: комментарий врал про
-         «компилятор сохраняет memo»). */
-      onSuccess(data?.id, {
+      /* КОНТРАКТ 7: снимок расчёта — из пропсов формы (id нет — заявка
+         ушла через почту клиента, серверного номера не существует). */
+      onSuccess(undefined, {
         // typeId-пропс уже нормализован родителем (undecided → "undecided")
         typeId,
         guests,
         dateIso,
         total,
-        /* c84-B: снимок выбора (пакет + допуслуги) — в событие лида.
-           c94 (критик C): в «Ещё решаю» чекбоксы допуслуг скрыты и лид их
-           не пишет — событие-снимок зеркалит письмо (скрытый выбор
-           не учитываем). */
         pkgIdx,
         addonIds: undecided ? [] : addonIds,
       });
@@ -1297,6 +1384,21 @@ const LeadForm = memo(function LeadForm({
       aria-label="Форма заявки на кейтеринг"
       noValidate
     >
+      {/* c95 (1-d): honeypot — невидимое для людей поле (заполняют только
+          боты); значение читается по рефу на сабмите (ловит и DOM-заполнение
+          без React-событий) и уходит в POST /api/lead.php. sr-only (не
+          display:none — часть ботов такие поля пропускают), вне таб-порядка
+          и a11y-дерева. */}
+      <input
+        ref={honeypotRef}
+        type="text"
+        name="company_website"
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden="true"
+        autoComplete="off"
+        defaultValue=""
+      />
       {/* Нить-прогресс: тонкая красная «строчка» слева (не визард-полоса).
           D4 (task 9-fix2): два узла с цифрами шагов — активный залит красным. */}
       <span className="hb-form__thread" aria-hidden="true">

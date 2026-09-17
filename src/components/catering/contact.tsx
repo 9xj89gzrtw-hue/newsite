@@ -29,6 +29,10 @@ import { Reveal } from "./reveal";
 import { Magnetic } from "@/components/motion/magnetic";
 import { CONTACTS, YANDEX_MAPS } from "@/lib/media";
 import { MENU_TYPES } from "@/lib/pricing";
+/* c95 (1-d): реальная отправка лида — POST /api/lead.php (same-origin PHP
+ * на статик-экспорте), mailto — фоллбэк. CONTACTS выше — ре-экспорт того же
+ * объекта из @/lib/config (единый источник истины). */
+import { submitLead, type LeadResult } from "@/lib/submit-lead";
 
 const STEPS = ["Тип мероприятия", "Гости и дата", "Контакты", "Отправить"];
 const DRAFT_KEY = "catering-lead-draft";
@@ -657,6 +661,14 @@ export function Contact() {
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const formRef = useRef<HTMLFormElement>(null);
+  /* c95 (1-d): анти-спам-поля для POST /api/lead.php — honeypot
+   * (невидимое поле: заполняют только боты; читаем по рефу на сабмите)
+   * и elapsedMs — время от маунта формы до отправки. */
+  const honeypotRef = useRef<HTMLInputElement>(null);
+  const mountedAtRef = useRef(Date.now());
+  /* c95 (1-d): диагностика фоллбэка — ОДИН console.warn на маунт формы
+   * (без toast-спама). Реф, не module-переменная (React Compiler §37). */
+  const fallbackWarnedRef = useRef(false);
   const prefersReducedMotion = useReducedMotion();
   // C62 hydration-safety: the step-panel initial prop serializes into SSR —
   // the reduce variant resolves only after mount (direct branch = mismatch).
@@ -778,9 +790,10 @@ export function Contact() {
 
     try {
       const menuType = MENU_TYPES.find((m) => m.id === data.eventType);
-      // Static-host deployment (shared PHP hosting, no server runtime):
-      // instead of POST /api/lead, we hand the lead to the manager via a
-      // pre-filled email. No backend, no secrets, works everywhere.
+      // Mailto — ФОЛЛБЭК c95 (1-d): до этого цикла был единственным путём
+      // («static-host deployment, no server runtime»); теперь рядом со
+      // статикой живёт same-origin PHP-эндпоинт /api/lead.php, и письмо
+      // открывается только если он недоступен.
       const lines = [
         `Имя: ${data.name}`,
         `Телефон: ${normalizePhone(data.phone)}`,
@@ -803,8 +816,81 @@ export function Contact() {
         `Заявка с сайта nilovcatering.ru — ${data.name || "без имени"}`,
       );
       const body = encodeURIComponent(lines.join("\n"));
-      const mailto = `mailto:interfood-catering@yandex.ru?subject=${subject}&body=${body}`;
+      /* c95 (1-d) FIX CRITICAL: был ХАРДКОД старой почты
+       * interfood-catering@yandex.ru (c89 поправил только hacc-booking) —
+       * теперь из конфига, как везде (контакт-карточка выше использует
+       * тот же CONTACTS). */
+      const mailto = `mailto:${CONTACTS.email}?subject=${subject}&body=${body}`;
 
+      /* c95 (1-d): сначала РЕАЛЬНАЯ отправка — POST /api/lead.php.
+       * comment — детали события (тип/гости/дата/время/расчёт) без
+       * дублей name/phone/email (уехали в поля лида). submitLead не
+       * бросает: любой сбой → {ok:false} → ветка mailto-фоллбэка. */
+      const result: LeadResult = await submitLead({
+        name: data.name.trim(),
+        phone: data.phone,
+        email: data.email || undefined,
+        comment:
+          [
+            menuType
+              ? `Тип мероприятия: ${menuType.label}`
+              : "Тип мероприятия: (не выбран)",
+            `Гостей: ${data.guests}`,
+            data.date ? `Желаемая дата: ${data.date}` : "",
+            data.preferredTime ? `Желаемое время звонка: ${data.preferredTime}` : "",
+            calcSnapshot?.total
+              ? `Расчёт с сайта: ~${calcSnapshot.total.toLocaleString("ru-RU")} ₽${
+                  calcSnapshot.addons?.length
+                    ? ` (доп. услуги: ${calcSnapshot.addons.join(", ")})`
+                    : ""
+                }`
+              : "",
+          ]
+            .filter(Boolean)
+            .join("\n") || undefined,
+        source: "contact",
+        consent: data.consent,
+        honeypot: honeypotRef.current?.value ?? "",
+        elapsedMs: Math.max(0, Date.now() - mountedAtRef.current),
+        /* Снимок шагов формы (маленький объект). */
+        payload: {
+          eventType: data.eventType,
+          eventLabel: menuType?.label ?? "",
+          guests: data.guests,
+          date: data.date || "",
+          preferredTime: data.preferredTime,
+          calcTotal: calcSnapshot?.total ?? null,
+          calcAddons: calcSnapshot?.addons ?? null,
+        },
+      });
+
+      /* ── УСПЕХ (200 {ok:true,id}): заявка уже у владельца — успех-оверлей
+       * и БЕЗ открытия почтового клиента. Проверка `!== false` (а не
+       * truthiness): tsconfig без strictNullChecks не сужает union в
+       * дополнении — явное сравнение сужает обе ветки (tsc 5.9.3). */
+      if (result.ok !== false) {
+        setFormStatus("success");
+        toast.success(
+          "Заявка отправлена! Мы перезвоним в течение 15 минут в рабочее время.",
+        );
+        try {
+          window.localStorage.removeItem(DRAFT_KEY);
+        } catch {
+          // ignore.
+        }
+        return;
+      }
+
+      /* ── ФОЛЛБЭК: прежнее поведение 1:1 (до c95) — открыть почту с
+       * предзаполненным письмом. Один console.warn на страницу. */
+      if (!fallbackWarnedRef.current) {
+        fallbackWarnedRef.current = true;
+        console.warn(
+          `[lead] POST /api/lead.php не прошёл (reason=${result.reason}${
+            result.retryAfterSec ? `, retryAfterSec=${result.retryAfterSec}` : ""
+          }) — включаю mailto-фоллбэк`,
+        );
+      }
       setFormStatus("success");
       toast.success("Открываем почту — отправьте письмо с заявкой. Или позвоните нам напрямую.");
 
@@ -962,6 +1048,19 @@ export function Contact() {
               aria-label="Многошаговая форма заявки на кейтеринг"
               className="relative overflow-hidden rounded-3xl border border-border-line bg-white p-6 shadow-xl shadow-ink/5 md:p-9"
             >
+              {/* c95 (1-d): honeypot — невидимое для людей поле (заполняют
+                  только боты); значение читается по рефу на сабмите и уходит
+                  в POST /api/lead.php. sr-only, вне таб-порядка и a11y-дерева. */}
+              <input
+                ref={honeypotRef}
+                type="text"
+                name="company_website"
+                className="sr-only"
+                tabIndex={-1}
+                aria-hidden="true"
+                autoComplete="off"
+                defaultValue=""
+              />
               {/* Success overlay */}
               <AnimatePresence mode="wait">
                 {formStatus === "success" ? (

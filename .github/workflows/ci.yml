@@ -25,3 +25,20 @@ jobs:
 
       - name: Typecheck
         run: bun run typecheck
+
+      # c95: единый источник меню/цен src/data/menu.json — тот же контракт,
+      # что и в npm-скрипте build (до next build).
+      - name: Validate menu data
+        run: bun scripts/validate-menu.ts
+
+      # c95: gen-static-data пишет public/data/ (gitignore) и перегенерирует
+      # строку цен в public/llms.txt из menu.json. Если llms.txt в репо
+      # отличается от свежесгенерированного — он устарел (кто-то правил
+      # menu.json без регенерации) — фейлим с подсказкой.
+      - name: Static data freshness (llms.txt)
+        run: |
+          bun scripts/gen-static-data.ts
+          if ! git diff --exit-code -- public/llms.txt; then
+            echo "::error::public/llms.txt не соответствует src/data/menu.json — запустите 'bun scripts/gen-static-data.ts' и закоммитьте файл"
+            exit 1
+          fi

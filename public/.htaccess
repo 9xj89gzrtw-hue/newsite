@@ -25,7 +25,10 @@ RewriteEngine On
 DirectorySlash Off
 
 # Чистые URL юрстраниц: /offer, /privacy, /terms (и с хвостовым слэшем)
-RewriteRule ^(offer|privacy|terms)/?$ $1.html [L]
+RewriteRule ^(offer|privacy|terms|admin)/?$ $1.html [L]
+
+# c95: серверные каталоги runtime-данных и секретов — недоступны из веба
+RedirectMatch 404 ^/(server-data|config)(/.*)?$
 
 # Брендированная 404 из экспорта вместо дефолтной «Object not found!»
 ErrorDocument 404 /404.html

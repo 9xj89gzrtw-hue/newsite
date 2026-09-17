@@ -14,6 +14,7 @@ import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { CONTACTS } from "@/lib/config";
+import { metaPriceFragments } from "@/lib/pricing";
 import {
   SITE_URL,
   PHONE_E164,
@@ -109,6 +110,12 @@ const marck = Marck_Script({
 // (при переезде на свой домен правится одна строка там / env NEXT_PUBLIC_SITE_URL).
 const siteUrl = SITE_URL;
 
+/* c95 (Task 1-a): ценовые фрагменты меты — из единого menu.json через
+   lib/pricing.ts (те же значения, что в калькуляторе/каталоге/llms.txt).
+   Разделитель тысяч — обычный пробел, как в исторической мете: вывод
+   байт-идентичен прежним захардкоженным строкам. */
+const metaPrices = metaPriceFragments();
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   icons: {
@@ -125,8 +132,7 @@ export const metadata: Metadata = {
   /* F2 (K3-MINOR): 192 → 152 симв. — ключи сохранены: «кейтеринг Санкт-Петербург",
    * цены-ЦИ (900/1200/2450/4470), телефон. Усечение хвоста «Рассчитайте стоимость
    * онлайн за 30 секунд» — CTA-фраза дублирована в title. */
-  description:
-    "Кейтеринг в Санкт-Петербурге: доставка закусок от 1 200 ₽, кофе-брейк от 900 ₽, фуршет от 2 450 ₽, банкет от 4 470 ₽/чел. Смета за 30 секунд: +7 (911) 941-72-05.",
+  description: `Кейтеринг в Санкт-Петербурге: доставка закусок от ${metaPrices.snackBox} ₽, кофе-брейк от ${metaPrices.coffeeBreak} ₽, фуршет от ${metaPrices.buffet} ₽, банкет от ${metaPrices.banquet} ₽/чел. Смета за 30 секунд: +7 (911) 941-72-05.`,
   keywords: [
     "кейтеринг",
     "кейтеринг СПб",
@@ -215,7 +221,7 @@ const jsonLd = {
   "@id": siteUrl + "#organization",
   name: "nilov catering",
   alternateName: "NILOV CATERING",
-  description: "«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Доставка закусок от 1 200 ₽, кофе-брейк от 900 ₽, фуршет от 2 450 ₽, банкет от 4 470 ₽ за человека; заказы — от одного гостя.",
+  description: `«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Доставка закусок от ${metaPrices.snackBox} ₽, кофе-брейк от ${metaPrices.coffeeBreak} ₽, фуршет от ${metaPrices.buffet} ₽, банкет от ${metaPrices.banquet} ₽ за человека; заказы — от одного гостя.`,
   url: siteUrl,
   image: siteUrl + "/og-image.jpg",
   logo: siteUrl + "/brand/logo-512.png",
