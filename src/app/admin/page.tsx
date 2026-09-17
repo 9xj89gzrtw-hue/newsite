@@ -16,6 +16,13 @@
  *
  * ?mock=1 → localStorage 'nilov-admin-mock' — api.ts отвечает
  * реалистичными фейковыми данными (сквозной e2e без PHP на dev-сервере).
+ *
+ * c96 (ФИКС СКРОЛЛА): раньше здесь поллился __lenis.stop() — stop() в
+ *  lenis блокирует скролл наглухо (preventDefault wheel + overflow:hidden
+ *  через класс lenis-stopped), из-за чего владелец не мог прокрутить панель
+ *  вниз. Теперь Lenis вообще не создаётся на /admin (см. lenis-provider.tsx,
+ *  isAdmin-гард), а ниже — CSS-страховка: даже если lenis-классы каким-то
+ *  образом остались на <html>, скролл админки всё равно живой.
  */
 import { useEffect, useState } from "react";
 import { Loader2, Lock } from "lucide-react";
@@ -25,19 +32,6 @@ import { apiLogin, apiSession, enableMockMode, isMockMode } from "@/components/a
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-
-/** Остановить гладкий скролл сайта (Lenis из корневого layout) — в админке
- *  нужен нативный: таблицы/карточки и так длинные, инерция мешает попадать в
- *  поля. Инстанс создаётся родительским эффектом ПОСЛЕ эффектов детей —
- *  поллим коротко. stop() не удаляет инстанс: страницы сайта не затронуты. */
-function stopSiteLenis() {
-  const w = window as unknown as { __lenis?: { stop: () => void } };
-  if (w.__lenis) {
-    w.__lenis.stop();
-    return true;
-  }
-  return false;
-}
 
 /** Скрыть слои сайта, вредные панели; вернуть системный курсор. */
 const ADMIN_NEUTRALIZE_CSS = `
@@ -77,6 +71,12 @@ body:has(.admin-root) > div[class*="z-[100]"] { display: none !important; }
 .admin-root a { cursor: pointer; }
 .admin-root button, .admin-root [role="button"], .admin-root label { cursor: pointer; }
 .admin-root input, .admin-root textarea { cursor: text; }
+/* c96: страховка скролла — классы остановленного Lenis не должны гасить
+   прокрутку админки, даже если залетели на <html> до гидрации. */
+html[data-admin-page].lenis-stopped,
+html[data-admin-page].lenis-locked,
+html[data-admin-page].lenis,
+html.lenis-stopped:has(body .admin-root) { overflow: auto !important; }
 `;
 
 type Phase = "loading" | "login" | "app";
@@ -97,17 +97,22 @@ export default function AdminPage() {
     });
     const onUnauth = () => setPhase("login");
     window.addEventListener("nilov-admin-unauth", onUnauth);
-    /* Lenis: родительский провайдер создаёт инстанс после наших эффектов —
-     * опрашиваем до минуты, останавливаем при появлении. */
-    const lenisPoll = setInterval(() => {
-      if (stopSiteLenis()) clearInterval(lenisPoll);
-    }, 150);
-    const lenisGiveUp = setTimeout(() => clearInterval(lenisPoll), 60_000);
+    /* c96: Lenis здесь больше не останавливаем (stop() глушил скролл
+     *  наглухо) — провайдер просто не создаёт его на /admin. Если на
+     *  странице почему-то остался живой инстанс (устаревший кэш бандла),
+     *  разрушаем целиком: destroy() снимает listeners и lenis-классы. */
+    const w = window as unknown as { __lenis?: { destroy: () => void } };
+    if (w.__lenis) {
+      try {
+        w.__lenis.destroy();
+      } catch {
+        /* ignore */
+      }
+      delete w.__lenis;
+    }
     return () => {
       cancelled = true;
       window.removeEventListener("nilov-admin-unauth", onUnauth);
-      clearInterval(lenisPoll);
-      clearTimeout(lenisGiveUp);
     };
   }, []);
 

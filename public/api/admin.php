@@ -42,6 +42,7 @@ match ($action) {
     'leads' => h_leads($method),
     'lead-update' => h_lead_update($method),
     'lead-delete' => h_lead_delete($method),
+    'leads-read-all' => h_leads_read_all($method),
     'settings' => h_settings($method),
     'tg-check' => h_tg_check($method),
     'tg-discover' => h_tg_discover($method),
@@ -404,6 +405,30 @@ function h_lead_update(string $method): void
     json_response(200, ['ok' => true]);
 }
 
+/** c96 — action=leads-read-all (POST, auth): пометить все непрочитанные
+ *  заявки прочитанными одним действием (кнопка «Прочитать все» в UI). */
+function h_leads_read_all(string $method): void
+{
+    if ($method !== 'POST') {
+        json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
+    }
+    require_admin();
+    $changed = 0;
+    $ok = update_json_file(leads_path(), static function (array $leads) use (&$changed): array {
+        foreach ($leads as $i => $l) {
+            if (is_array($l) && ($l['read'] ?? true) !== true) {
+                $leads[$i]['read'] = true;
+                $changed++;
+            }
+        }
+        return $leads;
+    });
+    if (!$ok) {
+        json_response(500, ['ok' => false, 'error' => 'storage']);
+    }
+    json_response(200, ['ok' => true, 'updated' => $changed]);
+}
+
 /** action=lead-delete (POST, auth, {id}). */
 function h_lead_delete(string $method): void
 {
@@ -446,6 +471,8 @@ function h_settings(string $method): void
             'notifyEmail' => $s['notifyEmail'],
             'tgChatId' => $s['tgChatId'],
             'tgApiBase' => $s['tgApiBase'],
+            // c96: активная (последняя успешная) база Bot API — read-only
+            'tgWorkingBase' => $s['tgWorkingBase'] ?? null,
             'botTokenSet' => is_string($s['tgBotToken']) && $s['tgBotToken'] !== '',
             'botTokenMasked' => mask_bot_token($s['tgBotToken']),
         ]]);
@@ -522,7 +549,6 @@ function h_tg_check(string $method): void
     $body = read_json_body_or_400(8192);
     $secrets = load_secrets(false);
     $s = load_settings();
-    $apiBase = (string)($s['tgApiBase'] ?: ($secrets['tg_api_base'] ?: 'https://api.telegram.org'));
     $token = null;
     if (is_string($body['token'] ?? null) && preg_match(TG_TOKEN_RE, $body['token']) === 1) {
         $token = $body['token'];
@@ -533,12 +559,17 @@ function h_tg_check(string $method): void
     if ($token === null || $token === '') {
         json_response(400, ['ok' => false, 'error' => 'no_token']);
     }
-    $r = tg_api($token, $apiBase, 'getMe', null);
+    /* c96: перебор баз (зеркало владельца → api.telegram.org → …):
+     * транспортный сбой → следующая база; 2xx–4xx = TG ответил. */
+    $r = tg_api_try($token, tg_api_bases($s, $secrets), 'getMe', null);
     if ($r['errno'] !== 0 || $r['status'] === 0) {
-        json_response(200, ['ok' => false, 'error' => 'network']);
+        json_response(200, ['ok' => false, 'error' => 'network', 'tried' => $r['tried'] ?? []]);
+    }
+    if (is_string($r['base'] ?? null) && $r['base'] !== '') {
+        tg_remember_working_base($r['base']);
     }
     if ($r['status'] === 401 || $r['status'] === 404) {
-        json_response(200, ['ok' => false, 'error' => 'unauthorized']);
+        json_response(200, ['ok' => false, 'error' => 'unauthorized', 'base' => $r['base'] ?? null]);
     }
     if ($r['status'] === 200 && is_array($r['data']) && ($r['data']['ok'] ?? null) === true) {
         $res = $r['data']['result'] ?? [];
@@ -546,9 +577,10 @@ function h_tg_check(string $method): void
             'ok' => true,
             'botName' => is_array($res) && is_string($res['first_name'] ?? null) ? $res['first_name'] : null,
             'botUsername' => is_array($res) && is_string($res['username'] ?? null) ? $res['username'] : null,
+            'base' => $r['base'] ?? null,
         ]);
     }
-    json_response(200, ['ok' => false, 'error' => 'network']);
+    json_response(200, ['ok' => false, 'error' => 'network', 'tried' => $r['tried'] ?? []]);
 }
 
 /** action=tg-discover (POST, auth): getUpdates → список чатов для выбора. */
@@ -564,10 +596,13 @@ function h_tg_discover(string $method): void
     if ($token === '') {
         json_response(400, ['ok' => false, 'error' => 'no_token']);
     }
-    $apiBase = (string)($s['tgApiBase'] ?: ($secrets['tg_api_base'] ?: 'https://api.telegram.org'));
-    $r = tg_api($token, $apiBase, 'getUpdates', null);
+    /* c96: перебор баз — как tg-check. */
+    $r = tg_api_try($token, tg_api_bases($s, $secrets), 'getUpdates', null);
     if ($r['errno'] !== 0 || $r['status'] === 0) {
-        json_response(200, ['ok' => false, 'error' => 'network']);
+        json_response(200, ['ok' => false, 'error' => 'network', 'tried' => $r['tried'] ?? []]);
+    }
+    if (is_string($r['base'] ?? null) && $r['base'] !== '') {
+        tg_remember_working_base($r['base']);
     }
     if ($r['status'] === 401 || $r['status'] === 404) {
         json_response(200, ['ok' => false, 'error' => 'unauthorized']);
@@ -635,14 +670,17 @@ function h_tg_test(string $method): void
     if (!is_string($chatId) || $chatId === '' || strlen($chatId) > 32) {
         json_response(400, ['ok' => false, 'error' => 'no_chat_id']);
     }
-    $apiBase = (string)($s['tgApiBase'] ?: ($secrets['tg_api_base'] ?: 'https://api.telegram.org'));
-    $r = tg_send($token, $apiBase, $chatId, '<b>Тест связи</b> — уведомления о заявках работают ✅');
+    /* c96: перебор баз + запоминание рабочей (tg_send_fb). */
+    $r = tg_send_fb($token, tg_api_bases($s, $secrets), $chatId, '<b>Тест связи</b> — уведомления о заявках работают ✅');
     if ($r['ok'] === true) {
-        json_response(200, ['ok' => true]);
+        json_response(200, ['ok' => true, 'base' => $r['base'] ?? null]);
     }
     $resp = ['ok' => false, 'error' => $r['error'] ?? 'tg_error'];
     if (isset($r['retryAfterSec'])) {
         $resp['retryAfterSec'] = $r['retryAfterSec'];
+    }
+    if (($r['error'] ?? '') === 'network') {
+        $resp['tried'] = $r['tried'] ?? [];
     }
     json_response(200, $resp);
 }

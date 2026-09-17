@@ -313,5 +313,29 @@ bun run lint && bun run typecheck          # оба зелёные перед к
   настроить TG-бота (мастер в админке); TG-API из РФ нестабилен с 03.2026 —
   поле tgApiBase в настройках + email-фолбэк + хранение заявок всегда.
 
-*Файл обновлён c95 (~300 строк, §7). Полные истории циклов:
+- **c96 §60:** ФИКС СКРОЛЛА АДМИНКИ (жалоба владельца «нельзя скролить
+  вниз»): lenis.stop() ГЛУШИТ скролл наглухо — preventDefault на все
+  wheel/touch (onVirtualScroll: isStopped → preventDefault) + класс
+  lenis-stopped (globals.css: overflow:hidden). В headless не ловится:
+  prefers-reduced-motion → Lenis вообще не создаётся. Правильно: НЕ
+  инициализировать Lenis на /admin (LenisProvider: isAdmin-гард по
+  usePathname, deps [lite, isAdmin] — SPA-навигация пересобирает эффект,
+  destroy() снимает listeners И lenis-классы), + CSS-страховка
+  html[data-admin-page].lenis-stopped {overflow:auto!important}.
+  УРОК: «остановить» библиотеку ≠ «не запускать»; проверять fixed-баги
+  в окружении, где воспроизводится (не headless-reduce).
+  + расширение админки (поиск по меню, массовые цены ±% с округлением
+  и превью, дубли блюд/пакетов, свёртка всего, фильтр заявок Все/Новые,
+  копирование телефона, CSV-экспорт, «Прочитать все» leads-read-all,
+  beforeunload-гард, сводка изменений перед публикацией с диффом цен).
+  + Telegram из РФ: публичных зеркал Bot API НЕТ (токен в URL → публичный
+  прокси = перехватчик; research/c96/tg-mirrors.md) — решение: свой
+  Cloudflare Worker (код в админке с кнопкой «Скопировать», инструкция
+  в самой ошибке), PHP-фолбэк-цепочка tg_api_bases (запомненная рабочая
+  база → зеркало владельца → secrets → api.telegram.org → доп.),
+  переключение ТОЛЬКО по транспортным ошибкам/5xx (401/400/429 = TG
+  жив), tgWorkingBase запоминается сервером под flock. Смоук 68/68 +
+  c96-тесты 16/16 + браузерный e2e (скролл/формы/лиды/TG-ошибка).
+
+*Файл обновлён c96 (§60). Полные истории циклов:
 `docs/AGENTS-HISTORY.md`, `git log worklog.md`.*

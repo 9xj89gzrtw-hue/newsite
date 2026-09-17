@@ -28,12 +28,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { validateMenuData, type MenuData } from "@/lib/menu-schema";
+import { formatRUB } from "@/lib/pricing";
 import {
   apiGetData,
   apiGetLeads,
   apiGetSettings,
   apiLeadDelete,
   apiLeadUpdate,
+  apiLeadsReadAll,
   apiLogout,
   apiSaveMenu,
   apiStatus,
@@ -146,6 +148,10 @@ export function AdminApp({
   const [settings, setSettings] = useState<AdminSettings | null>(null);
   const [section, setSection] = useState<SectionId>("menu");
   const [refreshingLeads, setRefreshingLeads] = useState(false);
+  /** c96: массовая отметка «прочитано». */
+  const [readingAll, setReadingAll] = useState(false);
+  /** c96: подтверждение публикации со сводкой изменений. */
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [draftOffer, setDraftOffer] = useState<Draft | null>(null);
   const [pub, setPub] = useState<PubState>({ phase: "idle" });
@@ -236,6 +242,18 @@ export function AdminApp({
     return () => clearTimeout(t);
   }, [menu, dirty, loadState, draftOffer]);
 
+  /* c96: гарда закрытия вкладки с несохранёнными правками — как в почте:
+   * браузер спросит подтверждение, черновик при этом уже автосохранён. */
+  useEffect(() => {
+    if (!dirty) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty]);
+
   /* ---------------------------------------------------------- заявки 60с */
 
   useEffect(() => {
@@ -280,6 +298,21 @@ export function AdminApp({
       toast.success("Заявка удалена");
     } else {
       toast.error("Не удалось удалить — попробуйте ещё раз");
+    }
+  };
+
+  /** c96: «Прочитать все» — один запрос, затем обновление списка. */
+  const readAllLeads = async () => {
+    setReadingAll(true);
+    const r = await apiLeadsReadAll();
+    setReadingAll(false);
+    if (r.ok === true) {
+      setLeads((ls) => ls.map((l) => ({ ...l, read: true })));
+      toast.success(
+        r.updated ? `Отмечено прочитанными: ${r.updated}` : "Непрочитанных не было",
+      );
+    } else {
+      toast.error("Не удалось — попробуйте ещё раз");
     }
   };
 
@@ -336,6 +369,13 @@ export function AdminApp({
       return;
     }
     setValidErrors(null);
+    /* c96: перед публикацией — сводка изменений (что именно уйдёт на сайт). */
+    setConfirmOpen(true);
+  };
+
+  const doPublish = async () => {
+    setConfirmOpen(false);
+    if (!menu || pub.phase === "saving") return;
     setPub({ phase: "saving" });
     const r = await apiSaveMenu(
       menu,
@@ -658,6 +698,8 @@ export function AdminApp({
                   menu={menu}
                   onPatch={patchLead}
                   onDelete={deleteLead}
+                  onReadAll={readAllLeads}
+                  readingAll={readingAll}
                   onRefresh={refreshLeads}
                   refreshing={refreshingLeads}
                 />
@@ -791,6 +833,16 @@ export function AdminApp({
       </div>
 
       {/* ── диалоги ────────────────────────────────────────────────────── */}
+
+      {/* c96: подтверждение публикации со сводкой «что именно изменится» */}
+      <PublishConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        diff={menu && serverMenu ? computeMenuDiff(serverMenu, menu) : []}
+        busy={pub.phase === "saving"}
+        onConfirm={() => void doPublish()}
+      />
+
       <AlertDialog open={conflictOpen} onOpenChange={setConflictOpen}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
@@ -1163,5 +1215,180 @@ function AppSkeleton() {
       <Skeleton className="h-14 w-full rounded-2xl" />
       <Skeleton className="h-40 w-full rounded-2xl" />
     </div>
+  );
+}
+
+/* ------------------------------------------------- c96: сводка изменений */
+
+/**
+ * Diff «сервер → черновик» простыми словами для владельца: что уйдёт на
+ * сайт после публикации. Возвращает список строк (цены, составы,
+ * добавления/удаления). Фиксирует только значимое для сайта — цены,
+ * названия, составы; правки описаний схлопываются в одну строку.
+ */
+export function computeMenuDiff(server: MenuData, draft: MenuData): string[] {
+  const out: string[] = [];
+  const S = JSON.stringify(server);
+  const D = JSON.stringify(draft);
+
+  const sById = new Map(server.menuTypes.map((t) => [t.id, t]));
+  const dById = new Map(draft.menuTypes.map((t) => [t.id, t]));
+
+  for (const t of draft.menuTypes) {
+    const s = sById.get(t.id);
+    if (!s) {
+      out.push(`Новый формат: «${t.label}» (от ${formatRUB(t.perGuest)})`);
+      continue;
+    }
+    if (s.label !== t.label) out.push(`«${s.label}» → «${t.label}»`);
+    if (s.perGuest !== t.perGuest) {
+      out.push(`«${t.label}»: цена «от» ${formatRUB(s.perGuest)} → ${formatRUB(t.perGuest)}`);
+    }
+    if ((s.calcPerGuest ?? null) !== (t.calcPerGuest ?? null)) {
+      const a = s.calcPerGuest ?? s.perGuest;
+      const b = t.calcPerGuest ?? t.perGuest;
+      if (a !== b) {
+        out.push(`«${t.label}»: цена калькулятора ${formatRUB(a)} → ${formatRUB(b)}`);
+      }
+    }
+    if (s.minGuests !== t.minGuests) {
+      out.push(`«${t.label}»: мин. гостей ${s.minGuests} → ${t.minGuests}`);
+    }
+    const sm = server.minOrder[s.id];
+    const dm = draft.minOrder[t.id];
+    if (sm !== dm) {
+      out.push(`«${t.label}»: мин. заказ ${formatRUB(sm ?? 0)} → ${formatRUB(dm ?? 0)}`);
+    }
+    const sPkg = new Map(s.packages.map((p) => [p.name, p]));
+    for (const p of t.packages) {
+      const sp = sPkg.get(p.name);
+      const where = `«${t.label}» · ${p.name}`;
+      if (!sp) {
+        out.push(`${where}: новый пакет (${formatRUB(p.pricePerGuest)}/гость)`);
+        continue;
+      }
+      if (sp.pricePerGuest !== p.pricePerGuest) {
+        out.push(`${where}: ${formatRUB(sp.pricePerGuest)} → ${formatRUB(p.pricePerGuest)}`);
+      }
+      if (sp.dishes.length !== p.dishes.length) {
+        out.push(`${where}: блюд ${sp.dishes.length} → ${p.dishes.length}`);
+      }
+    }
+    for (const p of s.packages) {
+      if (!t.packages.some((p2) => p2.name === p.name)) {
+        out.push(`«${t.label}»: удалён пакет «${p.name}»`);
+      }
+    }
+  }
+  for (const t of server.menuTypes) {
+    if (!dById.has(t.id)) out.push(`Удалён формат «${t.label}»`);
+  }
+
+  const sAdd = new Map(server.addons.map((a) => [a.id, a]));
+  for (const a of draft.addons) {
+    const sa = sAdd.get(a.id);
+    if (!sa) {
+      out.push(`Новая допуслуга: «${a.label}»`);
+      continue;
+    }
+    if ((sa.price ?? null) !== (a.price ?? null) && (sa.price ?? a.price) !== undefined) {
+      out.push(`Допуслуга «${a.label}»: ${formatRUB(sa.price ?? 0)} → ${formatRUB(a.price ?? 0)}`);
+    }
+    if ((sa.percent ?? null) !== (a.percent ?? null)) {
+      out.push(`Допуслуга «${a.label}»: ${sa.percent ?? 0}% → ${a.percent ?? 0}%`);
+    }
+  }
+  for (const a of server.addons) {
+    if (!draft.addons.some((x) => x.id === a.id)) {
+      out.push(`Удалена допуслуга «${a.label}»`);
+    }
+  }
+
+  const sPan = new Map(server.servicePanels.map((p) => [p.id, p]));
+  for (const p of draft.servicePanels) {
+    const sp = sPan.get(p.id);
+    if (sp && sp.priceLabel !== p.priceLabel) {
+      out.push(`Плитка «${p.label}»: цена «${sp.priceLabel}» → «${p.priceLabel}»`);
+    }
+  }
+
+  /* всё, что не попало в явные категории (описания, «что входит», фото) */
+  if (S === D) return out;
+  if (out.length === 0) {
+    out.push("Правки в описаниях и прочих полях (цены не менялись)");
+  }
+  return out;
+}
+
+function PublishConfirmDialog({
+  open,
+  onOpenChange,
+  diff,
+  busy,
+  onConfirm,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  diff: string[];
+  busy: boolean;
+  onConfirm: () => void;
+}) {
+  const MAX = 30;
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="max-h-[85vh] rounded-2xl">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="font-serif">
+            Опубликовать изменения?
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            После публикации сайт, калькулятор и PDF обновятся автоматически —
+            обычно это занимает 3–7 минут.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <p className="text-[13.5px] font-medium text-ink">Что изменится:</p>
+        <div
+          data-lenis-prevent
+          className="max-h-64 overflow-y-auto rounded-xl border border-border-line/70 bg-parchment/40 p-3"
+        >
+          {diff.length === 0 ? (
+            <p className="text-[13.5px] text-ink-soft">Правки в описаниях и прочих полях</p>
+          ) : (
+            <ul className="space-y-1">
+              {diff.slice(0, MAX).map((line, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-[13px] leading-relaxed text-ink"
+                >
+                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-gold" />
+                  <span>{line}</span>
+                </li>
+              ))}
+              {diff.length > MAX ? (
+                <li className="pt-1 text-[12.5px] text-ink-soft/80">
+                  …и ещё {diff.length - MAX}
+                </li>
+              ) : null}
+            </ul>
+          )}
+        </div>
+        <AlertDialogFooter className="gap-2">
+          <AlertDialogCancel className="h-11 rounded-xl">
+            {busy ? "Публикую…" : "Отмена"}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            className="h-11 rounded-xl bg-gradient-to-r from-gold to-terracotta font-semibold text-white shadow-md shadow-gold/25 hover:opacity-95"
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }}
+          >
+            <UploadCloud className="size-4" />
+            {busy ? <Loader2 className="size-4 animate-spin" /> : null}
+            Опубликовать
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

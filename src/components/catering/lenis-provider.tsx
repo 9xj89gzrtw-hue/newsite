@@ -1,6 +1,7 @@
 "use client";
 
 import Lenis from "lenis";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useLiteDevice } from "@/hooks/use-lite-device";
 import { isLiteDevice, startFpsProbeOnce, subscribeLiteDevice } from "@/lib/lite-device";
@@ -37,9 +38,22 @@ import { isLiteDevice, startFpsProbeOnce, subscribeLiteDevice } from "@/lib/lite
  * футер 12–24fps → 60.1 при отключении). Ставится при lite И снимается
  * при анмаунте; reduced-motion отдельным классом НЕ дублируется — его
  * CSS-гварды уже существуют.
+ *
+ * c96 (ФИКС СКРОЛЛА АДМИНКИ): на /admin Lenis НЕ инициализируется вовсе
+ *  (ранний выход по pathname). Раньше админ-страница вызывала __lenis.stop()
+ *  — но stop() в lenis 1.x делает preventDefault на ВСЕ wheel/touch-события
+ *  (onVirtualScroll: isStopped → e.preventDefault()) + вешает класс
+ *  lenis-stopped (globals.css: .lenis.lenis-stopped { overflow: hidden }) —
+ *  админка становилась ПОЛНОСТЬЮ нескроллируемой (в headless-тестах
+ *  воспроизводства не было: prefers-reduced-motion → Lenis не создавался).
+ *  isAdmin в deps: при SPA-навигации сайт ↔ /admin эффект пересобирается —
+ *  destroy() при уходе на /admin (снимает listeners И lenis-классы через
+ *  cleanUpClassName), пересоздание при возврате на сайт.
  */
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const lite = useLiteDevice();
+  const pathname = usePathname() ?? "";
+  const isAdmin = pathname.startsWith("/admin");
 
   /* c84-F1: html.lite-device — CSS-гейт растровых анимаций (см. докстринг).
      Эффект без deps: класс живёт пока живёт провайдер (layout) — при
@@ -69,6 +83,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
        качались в Data Saver из-за mount-race хука). */
     if (
       typeof window === "undefined" ||
+      isAdmin ||
       isLiteDevice() ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
       lite
@@ -119,7 +134,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       delete (window as unknown as { __lenis?: Lenis }).__lenis;
       lenis.destroy();
     };
-  }, [lite]);
+  }, [lite, isAdmin]);
 
   return <>{children}</>;
 }

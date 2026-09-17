@@ -9,6 +9,9 @@
 import { useState } from "react";
 import {
   Check,
+  CheckCheck,
+  Copy,
+  Download,
   Inbox,
   Loader2,
   Mail,
@@ -16,6 +19,7 @@ import {
   RotateCcw,
   Trash2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { formatRUB } from "@/lib/pricing";
 import type { MenuData } from "@/lib/menu-schema";
 import type { Lead } from "./api";
@@ -165,6 +169,8 @@ export function LeadsView({
   menu,
   onPatch,
   onDelete,
+  onReadAll,
+  readingAll,
   onRefresh,
   refreshing,
 }: {
@@ -173,12 +179,56 @@ export function LeadsView({
   menu: MenuData | null;
   onPatch: (id: string, patch: { read?: boolean }) => void;
   onDelete: (id: string) => void;
+  /** c96: пометить все прочитанными (одним запросом на сервер). */
+  onReadAll: () => void;
+  readingAll: boolean;
   onRefresh: () => void;
   refreshing: boolean;
 }) {
   const unread = leads.filter((l) => !l.read).length;
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "unread">("all");
   const deleteLead = leads.find((l) => l.id === deleteId);
+
+  /* c96: статистика — сегодня и за 7 дней (владельцу важно не пропустить). */
+  const dayStart = new Date();
+  dayStart.setHours(0, 0, 0, 0);
+  const todayCount = leads.filter((l) => {
+    const ts = typeof l.ts === "number" ? l.ts * (l.ts > 1e12 ? 1 : 1000) : 0;
+    return ts >= dayStart.getTime();
+  }).length;
+
+  const visible = filter === "all" ? leads : leads.filter((l) => !l.read);
+
+  /* c96: экспорт CSV — все загруженные заявки, разделитель «;», BOM для Excel. */
+  const exportCsv = () => {
+    const esc = (v: string) => `"${v.replace(/"/g, "''")}"`;
+    const rows = [
+      ["Дата", "Имя", "Телефон", "Email", "Источник", "Комментарий", "ID"],
+      ...leads.map((l) => [
+        formatLeadDate(l.ts),
+        l.name,
+        l.phone,
+        l.email ?? "",
+        SOURCE_LABELS[l.source] ?? l.source,
+        (l.comment ?? "").replace(/[\r\n]+/g, " "),
+        l.id,
+      ]),
+    ];
+    const csv = "\uFEFF" + rows.map((r) => r.map(esc).join(";")).join("\r\n");
+    try {
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `zayavki-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      toast.success(`Экспортировано заявок: ${leads.length}`);
+    } catch {
+      toast.error("Не удалось сформировать CSV — попробуйте ещё раз");
+    }
+  };
 
   return (
     <section>
@@ -188,24 +238,77 @@ export function LeadsView({
           description={
             total === 0
               ? "Заявки с сайта будут появляться здесь."
-              : `Всего ${total}. Непрочитанных: ${unread}.`
+              : `Всего ${total} · сегодня ${todayCount} · непрочитанных ${unread}.`
           }
         />
-        <Button
-          type="button"
-          variant="outline"
-          className="h-11 rounded-xl text-[14px]"
-          onClick={onRefresh}
-          disabled={refreshing}
-        >
-          {refreshing ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <RotateCcw className="size-4" />
-          )}
-          Обновить
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          {unread > 0 ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 rounded-xl text-[14px]"
+              onClick={onReadAll}
+              disabled={readingAll}
+            >
+              {readingAll ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <CheckCheck className="size-4" />
+              )}
+              Прочитать все
+            </Button>
+          ) : null}
+          {leads.length > 0 ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 rounded-xl text-[14px]"
+              onClick={exportCsv}
+            >
+              <Download className="size-4" /> CSV
+            </Button>
+          ) : null}
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 rounded-xl text-[14px]"
+            onClick={onRefresh}
+            disabled={refreshing}
+          >
+            {refreshing ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <RotateCcw className="size-4" />
+            )}
+            Обновить
+          </Button>
+        </div>
       </div>
+
+      {leads.length > 0 ? (
+        <div className="mb-3 inline-flex rounded-xl border border-border-line/70 bg-parchment/40 p-1">
+          {([
+            ["all", `Все (${leads.length})`],
+            ["unread", `Новые (${unread})`],
+          ] as const).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setFilter(id)}
+              aria-pressed={filter === id}
+              className={cn(
+                "min-h-9 rounded-lg px-3.5 text-[13.5px] font-medium transition-colors",
+                filter === id
+                  ? "bg-background text-ink shadow-sm"
+                  : "text-ink-soft hover:text-ink",
+                id === "unread" && unread > 0 && filter !== id && "text-gold",
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {leads.length === 0 ? (
         <Card className="rounded-2xl border-border-line/80 shadow-none">
@@ -218,9 +321,18 @@ export function LeadsView({
             </p>
           </CardContent>
         </Card>
+      ) : visible.length === 0 ? (
+        <Card className="rounded-2xl border-border-line/80 shadow-none">
+          <CardContent className="py-12 text-center">
+            <CheckCheck className="mx-auto size-10 text-gold" />
+            <p className="mt-3 text-[15px] font-medium text-ink">
+              Непрочитанных нет — всё обработано
+            </p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-3">
-          {leads.map((lead) => (
+          {visible.map((lead) => (
             <LeadCard
               key={lead.id}
               lead={lead}
@@ -274,6 +386,20 @@ function LeadCard({
   onDelete: () => void;
 }) {
   const { chips, rest } = payloadChips(lead.payload, menu);
+  const [copied, setCopied] = useState(false);
+
+  /* c96: копирование телефона — звонить из CRM/мессенджера удобнее. */
+  const copyPhone = async () => {
+    try {
+      await navigator.clipboard.writeText(lead.phone);
+      setCopied(true);
+      toast.success("Телефон скопирован");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Не удалось скопировать");
+    }
+  };
+
   return (
     <Card
       className={cn(
@@ -343,22 +469,33 @@ function LeadCard({
         </div>
 
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <a
-            href={`tel:${lead.phone.replace(/[^\d+]/g, "")}`}
-            className="inline-flex min-h-11 items-center gap-2.5 rounded-xl border border-border-line bg-background px-3.5 text-[15px] font-medium text-ink transition-colors hover:border-gold/50 hover:text-gold"
-          >
-            <Phone className="size-4 shrink-0 text-gold" />
-            {lead.phone}
-          </a>
-          {lead.email ? (
+          <div className="flex flex-wrap items-center gap-2">
             <a
-              href={`mailto:${lead.email}`}
-              className="inline-flex min-h-11 items-center gap-2.5 rounded-xl border border-border-line bg-background px-3.5 text-[15px] text-ink transition-colors hover:border-gold/50 hover:text-gold"
+              href={`tel:${lead.phone.replace(/[^\d+]/g, "")}`}
+              className="inline-flex min-h-11 items-center gap-2.5 rounded-xl border border-border-line bg-background px-3.5 text-[15px] font-medium text-ink transition-colors hover:border-gold/50 hover:text-gold"
             >
-              <Mail className="size-4 shrink-0 text-gold" />
-              {lead.email}
+              <Phone className="size-4 shrink-0 text-gold" />
+              {lead.phone}
             </a>
-          ) : null}
+            <button
+              type="button"
+              onClick={copyPhone}
+              aria-label="Скопировать телефон"
+              title="Скопировать телефон"
+              className="inline-flex size-11 items-center justify-center rounded-xl border border-border-line bg-background text-ink-soft transition-colors hover:border-gold/50 hover:text-gold"
+            >
+              {copied ? <Check className="size-4 text-gold" /> : <Copy className="size-4" />}
+            </button>
+            {lead.email ? (
+              <a
+                href={`mailto:${lead.email}`}
+                className="inline-flex min-h-11 items-center gap-2.5 rounded-xl border border-border-line bg-background px-3.5 text-[15px] text-ink transition-colors hover:border-gold/50 hover:text-gold"
+              >
+                <Mail className="size-4 shrink-0 text-gold" />
+                {lead.email}
+              </a>
+            ) : null}
+          </div>
         </div>
 
         {lead.comment ? (

@@ -124,6 +124,8 @@ export interface AdminSettings {
   notifyEmail: string;
   tgChatId: string;
   tgApiBase: string;
+  /** c96: последняя успешная база Bot API (read-only из UI). */
+  tgWorkingBase: string;
   botTokenSet: boolean;
   botTokenMasked: string;
 }
@@ -385,6 +387,18 @@ export async function apiLeadUpdate(
   return r.status === 200 && r.body?.ok === true;
 }
 
+/** c96 — пометить ВСЕ заявки прочитанными одним запросом. */
+export async function apiLeadsReadAll(): Promise<{
+  ok: boolean;
+  updated?: number;
+}> {
+  const r = await adminApi("leads-read-all", { method: "POST", body: {} });
+  if (r.status === 200 && r.body?.ok === true) {
+    return { ok: true, updated: Number(r.body.updated ?? 0) };
+  }
+  return { ok: false };
+}
+
 export async function apiLeadDelete(id: string): Promise<boolean> {
   const r = await adminApi("lead-delete", { method: "POST", body: { id } });
   return r.status === 200 && r.body?.ok === true;
@@ -404,6 +418,7 @@ export async function apiGetSettings(
         notifyEmail: String(s.notifyEmail ?? ""),
         tgChatId: String(s.tgChatId ?? ""),
         tgApiBase: String(s.tgApiBase ?? ""),
+        tgWorkingBase: String(s.tgWorkingBase ?? ""),
         botTokenSet: s.botTokenSet === true,
         botTokenMasked: String(s.botTokenMasked ?? ""),
       },
@@ -432,11 +447,19 @@ export async function apiSaveSettings(
   return { ok: false };
 }
 
+export interface TgTriedBase {
+  base: string;
+  errno: number;
+  error: string;
+  status: number;
+}
+
 export async function apiTgCheck(
   token?: string,
   opts: Pick<AdminApiOptions, "base" | "headers"> = {},
 ): Promise<
-  { ok: true; botName: string; botUsername: string } | { ok: false; error: string }
+  | { ok: true; botName: string; botUsername: string; base?: string }
+  | { ok: false; error: string; tried?: TgTriedBase[] }
 > {
   const r = await adminApi("tg-check", {
     method: "POST",
@@ -448,9 +471,13 @@ export async function apiTgCheck(
       ok: true,
       botName: String(r.body.botName ?? ""),
       botUsername: String(r.body.botUsername ?? ""),
+      base: r.body.base ? String(r.body.base) : undefined,
     };
   }
-  return { ok: false, error: String(r.body?.error ?? "network") };
+  const tried = Array.isArray(r.body?.tried)
+    ? (r.body.tried as TgTriedBase[])
+    : undefined;
+  return { ok: false, error: String(r.body?.error ?? "network"), tried };
 }
 
 export interface TgChat {
@@ -475,18 +502,33 @@ export async function apiTgDiscover(): Promise<
 
 export async function apiTgTest(
   chatId?: string,
-): Promise<{ ok: boolean; error?: string; retryAfterSec?: number }> {
+): Promise<{
+  ok: boolean;
+  error?: string;
+  retryAfterSec?: number;
+  base?: string;
+  tried?: TgTriedBase[];
+}> {
   const r = await adminApi("tg-test", {
     method: "POST",
     body: chatId ? { chatId } : {},
   });
-  if (r.body && r.body.ok === true) return { ok: true };
+  if (r.body && r.body.ok === true) {
+    return {
+      ok: true,
+      base: r.body.base ? String(r.body.base) : undefined,
+    };
+  }
+  const tried = Array.isArray(r.body?.tried)
+    ? (r.body.tried as TgTriedBase[])
+    : undefined;
   return {
     ok: false,
     error: String(r.body?.error ?? "network"),
     retryAfterSec: r.body?.retryAfterSec
       ? Number(r.body.retryAfterSec)
       : undefined,
+    tried,
   };
 }
 
@@ -697,6 +739,16 @@ async function mockApi(
       mockLeads.splice(idx, 1);
       return { status: 200, body: { ok: true } };
     }
+    case "leads-read-all": {
+      let updated = 0;
+      for (const l of mockLeads) {
+        if (!l.read) {
+          l.read = true;
+          updated++;
+        }
+      }
+      return { status: 200, body: { ok: true, updated } };
+    }
     case "settings": {
       if (opts.method === "POST" || opts.body !== undefined) {
         const b = body;
@@ -733,6 +785,7 @@ async function mockApi(
           ok: true,
           botName: "Nilov Catering Bot",
           botUsername: "nilov_catering_bot",
+          base: mockSettings.tgApiBase || "https://api.telegram.org",
         },
       };
     }
@@ -765,6 +818,7 @@ const mockSettings: AdminSettings = {
   notifyEmail: "dmitry_nilov@mail.ru",
   tgChatId: "",
   tgApiBase: "",
+  tgWorkingBase: "",
   botTokenSet: false,
   botTokenMasked: "",
 };

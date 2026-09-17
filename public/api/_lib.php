@@ -310,6 +310,12 @@ function default_settings(): array
         'tgBotToken' => null,
         'tgChatId' => null,
         'tgApiBase' => null,
+        // c96: последняя рабочая база Bot API — сервер запоминает её после
+        // первого успешного вызова (владелец развернул воркер / ожил прямой
+        // api.telegram.org), чтобы каждый следующий вызов не платил
+        // 5–7-секундным таймаутом на мёртвой базе. Пишется только сервером
+        // (tg_remember_working_base), в UI — read-only.
+        'tgWorkingBase' => null,
         // passwordHash перекрывает secrets.password_hash_default после
         // смены пароля владельцем через UI (action=password).
         'passwordHash' => null,
@@ -713,6 +719,132 @@ function tg_api(string $token, string $apiBase, string $apiMethod, ?array $body)
         'errno' => $r['errno'],
         'error' => $r['error'],
     ];
+}
+
+/**
+ * c96 — список API-баз Bot API в порядке попытки:
+ *  1) авто-запомненная рабочая база (tgWorkingBase);
+ *  2) зеркало владельца из «Настройки → Дополнительно» (tgApiBase);
+ *  3) зеркало из secrets (tg_api_base);
+ *  4) основной https://api.telegram.org;
+ *  5) дополнительные зеркала из secrets (tg_api_bases, массив).
+ * Публичных зеркал Bot API не существует (токен в URL → публичный прокси
+ * = перехватчик токенов, см. research/c96/tg-mirrors.md) — владелец
+ * разворачивает СВОЙ Cloudflare Worker и вставляет URL в настройки.
+ */
+function tg_api_bases(array $s, array $secrets): array
+{
+    $bases = [];
+    $push = static function (mixed $b) use (&$bases): void {
+        if (!is_string($b)) {
+            return;
+        }
+        $b = rtrim(trim($b), '/');
+        if ($b !== '' && str_starts_with($b, 'https://') && strlen($b) <= 200 && !in_array($b, $bases, true)) {
+            $bases[] = $b;
+        }
+    };
+    $push($s['tgWorkingBase'] ?? null);
+    $push($s['tgApiBase'] ?? null);
+    $push($secrets['tg_api_base'] ?? null);
+    $push('https://api.telegram.org');
+    $extra = $secrets['tg_api_bases'] ?? null;
+    if (is_array($extra)) {
+        foreach ($extra as $b) {
+            $push($b);
+        }
+    }
+    return $bases;
+}
+
+/**
+ * c96 — вызов TG API с перебором баз: транспортный сбой (errno!==0,
+ * status 0 или 5xx) → следующая база. HTTP 2xx–4xx = сервер жив
+ * (токен/чат/лимиты проверяет сам Telegram — на них НЕ переключаемся).
+ * Возвращает результат + 'base' (какая сработала) и 'tried' (диагностика
+ * для UI: какие базы и с какой ошибкой пробовали).
+ */
+function tg_api_try(string $token, array $bases, string $apiMethod, ?array $body): array
+{
+    $tried = [];
+    $last = ['status' => 0, 'data' => null, 'errno' => -1, 'error' => 'no_bases', 'base' => null, 'tried' => []];
+    foreach ($bases as $base) {
+        $r = tg_api($token, (string)$base, $apiMethod, $body);
+        $r['base'] = $base;
+        $tried[] = [
+            'base' => $base,
+            'errno' => $r['errno'],
+            'error' => str_trunc((string)$r['error'], 120),
+            'status' => $r['status'],
+        ];
+        $transportFail = $r['errno'] !== 0 || $r['status'] === 0 || $r['status'] >= 500;
+        if (!$transportFail) {
+            $r['tried'] = $tried;
+            return $r;
+        }
+        $last = $r;
+    }
+    $last['tried'] = $tried;
+    return $last;
+}
+
+/**
+ * c96 — запомнить рабочую базу TG (см. default_settings/tgWorkingBase).
+ * Пишет только при изменении, под flock; безопасна при конкурентных лидах.
+ */
+function tg_remember_working_base(string $base): void
+{
+    $base = rtrim(trim($base), '/');
+    if ($base === '' || !str_starts_with($base, 'https://') || strlen($base) > 200) {
+        return;
+    }
+    update_json_file(settings_path(), static function (array $cur) use ($base): array {
+        if (($cur['tgWorkingBase'] ?? null) === $base) {
+            return $cur;
+        }
+        $cur['tgWorkingBase'] = $base;
+        return $cur;
+    });
+}
+
+/**
+ * c96 — sendMessage с перебором баз и запоминанием рабочей: замена tg_send
+ * в прод-путях (lead.php, админ-мастер). Возвращает как tg_send плюс
+ * 'tried' (диагностика сетевых неудач) и 'base' на успехе.
+ */
+function tg_send_fb(string $token, array $bases, string $chatId, string $html): array
+{
+    $html = str_trunc($html, 3800); // лимит TG 4096 после парсинга — берём запас
+    $r = tg_api_try($token, $bases, 'sendMessage', [
+        'chat_id' => $chatId,
+        'text' => $html,
+        'parse_mode' => 'HTML',
+        'link_preview_options' => ['is_disabled' => true],
+    ]);
+    if ($r['errno'] !== 0 || $r['status'] === 0) {
+        return ['ok' => false, 'status' => 0, 'error' => 'network', 'tried' => $r['tried'] ?? []];
+    }
+    if ($r['status'] === 200 && is_array($r['data']) && ($r['data']['ok'] ?? null) === true) {
+        if (is_string($r['base'] ?? null) && $r['base'] !== '') {
+            tg_remember_working_base($r['base']);
+        }
+        return ['ok' => true, 'status' => 200, 'base' => $r['base'] ?? null];
+    }
+    if ($r['status'] === 429) {
+        $ra = null;
+        if (is_array($r['data']) && isset($r['data']['parameters']['retry_after'])) {
+            $ra = max(1, (int)$r['data']['parameters']['retry_after']);
+        }
+        return ['ok' => false, 'status' => 429, 'error' => 'rate_limit', 'retryAfterSec' => $ra, 'base' => $r['base'] ?? null];
+    }
+    if ($r['status'] === 401 || $r['status'] === 404) {
+        return ['ok' => false, 'status' => $r['status'], 'error' => 'unauthorized', 'base' => $r['base'] ?? null];
+    }
+    $desc = 'tg_error';
+    if (is_array($r['data']) && isset($r['data']['description']) && is_string($r['data']['description'])) {
+        $desc = $r['data']['description'];
+    }
+    return ['ok' => false, 'status' => $r['status'], 'error' => $desc, 'base' => $r['base'] ?? null];
 }
 
 /**

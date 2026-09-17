@@ -143,8 +143,11 @@ $tgOk = null; // null = не пытались, true/false = результат
 $chatId = $settings['tgChatId'] ?? null;
 $token = $settings['tgBotToken'] ?? null;
 if (is_string($token) && $token !== '' && is_string($chatId) && $chatId !== '') {
-    $apiBase = (string)($settings['tgApiBase'] ?: ($secrets['tg_api_base'] ?: 'https://api.telegram.org'));
-    $tg = tg_send($token, $apiBase, $chatId, lead_tg_text($lead));
+    /* c96: перебор баз Bot API (зеркало владельца → api.telegram.org):
+     * api.telegram.org с РФ-хостингов деградирует с 03.2026 — своя база
+     * (Cloudflare Worker) вставляется в «Настройках», успешная база
+     * запоминается и используется первой (без таймаутов на мёртвой). */
+    $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId, lead_tg_text($lead));
     $tgOk = $tg['ok'] === true;
 }
 
