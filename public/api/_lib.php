@@ -777,7 +777,10 @@ function tg_api_try(string $token, array $bases, string $apiMethod, ?array $body
             'error' => str_trunc((string)$r['error'], 120),
             'status' => $r['status'],
         ];
-        $transportFail = $r['errno'] !== 0 || $r['status'] === 0 || $r['status'] >= 500;
+        /* c96-CRIT-A: 3xx — тоже транспортный сбой (TG Bot API легитимно
+         * не отвечает редиректами; база-редирект вроде t.me блокировала
+         * весь фолбэк). 2xx–4xx = сервер жив. */
+        $transportFail = $r['errno'] !== 0 || $r['status'] === 0 || $r['status'] >= 300;
         if (!$transportFail) {
             $r['tried'] = $tried;
             return $r;
@@ -808,13 +811,35 @@ function tg_remember_working_base(string $base): void
 }
 
 /**
+ * c96-CRIT-A — сбросить запомненную базу (сетевой сбой по всем базам).
+ * Самозалечивание: следующая успешная база запишется при первом успехе;
+ * без сброса мёртвая база висела первой в цепочке вечно.
+ */
+function tg_forget_working_base(): void
+{
+    update_json_file(settings_path(), static function (array $cur): array {
+        if (array_key_exists('tgWorkingBase', $cur)) {
+            unset($cur['tgWorkingBase']);
+        }
+        return $cur;
+    });
+}
+
+/**
  * c96 — sendMessage с перебором баз и запоминанием рабочей: замена tg_send
  * в прод-путях (lead.php, админ-мастер). Возвращает как tg_send плюс
  * 'tried' (диагностика сетевых неудач) и 'base' на успехе.
+ *
+ * c96-CRIT-A: $maxBases ограничивает бюджет таймаутов (лид-путь передаёт 2 —
+ * мёртвая запомненная база + одна запасная, дальше mail()-фолбэк); при
+ * полном сетевом сбое запомненная база сбрасывается (самозалечивание).
  */
-function tg_send_fb(string $token, array $bases, string $chatId, string $html): array
+function tg_send_fb(string $token, array $bases, string $chatId, string $html, int $maxBases = 0): array
 {
     $html = str_trunc($html, 3800); // лимит TG 4096 после парсинга — берём запас
+    if ($maxBases > 0 && count($bases) > $maxBases) {
+        $bases = array_slice($bases, 0, $maxBases);
+    }
     $r = tg_api_try($token, $bases, 'sendMessage', [
         'chat_id' => $chatId,
         'text' => $html,
@@ -822,6 +847,7 @@ function tg_send_fb(string $token, array $bases, string $chatId, string $html): 
         'link_preview_options' => ['is_disabled' => true],
     ]);
     if ($r['errno'] !== 0 || $r['status'] === 0) {
+        tg_forget_working_base();
         return ['ok' => false, 'status' => 0, 'error' => 'network', 'tried' => $r['tried'] ?? []];
     }
     if ($r['status'] === 200 && is_array($r['data']) && ($r['data']['ok'] ?? null) === true) {

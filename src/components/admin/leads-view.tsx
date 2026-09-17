@@ -200,9 +200,15 @@ export function LeadsView({
 
   const visible = filter === "all" ? leads : leads.filter((l) => !l.read);
 
-  /* c96: экспорт CSV — все загруженные заявки, разделитель «;», BOM для Excel. */
+  /* c96: экспорт CSV — все загруженные заявки, разделитель «;», BOM для Excel.
+   * c96-CRIT-A: экранирование по RFC-4180 (кавычки — удвоением) + защита
+   * от формул-инъекций (ячейка, начинающаяся с = + - @, префиксуется «'» —
+   * Excel тогда не исполняет её как формулу). */
   const exportCsv = () => {
-    const esc = (v: string) => `"${v.replace(/"/g, "''")}"`;
+    const esc = (v: string) => {
+      const safe = /^[=+@\-\t\r]/.test(v) ? `'${v}` : v;
+      return `"${safe.replace(/"/g, '""')}"`;
+    };
     const rows = [
       ["Дата", "Имя", "Телефон", "Email", "Источник", "Комментарий", "ID"],
       ...leads.map((l) => [

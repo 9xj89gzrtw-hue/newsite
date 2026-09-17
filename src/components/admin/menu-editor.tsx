@@ -831,10 +831,13 @@ function BulkPriceDialog({
     }
   }, [open]);
 
-  /* c96: расчёт лёгкий (десятки строк), мемоизация не нужна. */
+  /* c96: расчёт лёгкий (десятки строк), мемоизация не нужна.
+   * c96-CRIT-A: превью и применение считают ОДИНАКОВО — с клампом zod
+   * (100..100 000), чтобы «что показали» == «что применилось». */
+  const clampPrice = (v: number) => Math.min(100000, Math.max(100, Math.round(v)));
   const applyRound = (v: number) => {
     const step = roundTo > 0 ? roundTo : 1;
-    return Math.max(step, Math.round(v / step) * step);
+    return clampPrice(Math.max(step, Math.round(v / step) * step));
   };
 
   const targets: { label: string; from: number; to: number }[] = [];
@@ -863,8 +866,6 @@ function BulkPriceDialog({
       });
     }
   }
-
-  const clampPrice = (v: number) => Math.min(100000, Math.max(100, Math.round(v)));
 
   const apply = () => {
     const idxs =

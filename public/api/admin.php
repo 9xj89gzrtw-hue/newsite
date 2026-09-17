@@ -413,6 +413,13 @@ function h_leads_read_all(string $method): void
         json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
     }
     require_admin();
+    /* c96-CRIT-A: битый/отсутствующий leads.json не затираем пустышкой —
+     * update_json_file с невалидным JSON начал бы с []. */
+    $raw = is_file(leads_path()) ? (string)@file_get_contents(leads_path()) : '';
+    $decoded = $raw === '' ? [] : json_decode($raw, true);
+    if ($raw !== '' && !is_array($decoded)) {
+        json_response(500, ['ok' => false, 'error' => 'storage']);
+    }
     $changed = 0;
     $ok = update_json_file(leads_path(), static function (array $leads) use (&$changed): array {
         foreach ($leads as $i => $l) {
@@ -563,15 +570,18 @@ function h_tg_check(string $method): void
      * транспортный сбой → следующая база; 2xx–4xx = TG ответил. */
     $r = tg_api_try($token, tg_api_bases($s, $secrets), 'getMe', null);
     if ($r['errno'] !== 0 || $r['status'] === 0) {
+        tg_forget_working_base(); // c96-CRIT-A: мёртвая база не висит вечно
         json_response(200, ['ok' => false, 'error' => 'network', 'tried' => $r['tried'] ?? []]);
-    }
-    if (is_string($r['base'] ?? null) && $r['base'] !== '') {
-        tg_remember_working_base($r['base']);
     }
     if ($r['status'] === 401 || $r['status'] === 404) {
         json_response(200, ['ok' => false, 'error' => 'unauthorized', 'base' => $r['base'] ?? null]);
     }
     if ($r['status'] === 200 && is_array($r['data']) && ($r['data']['ok'] ?? null) === true) {
+        /* c96-CRIT-A: запоминаем ТОЛЬКО настоящий успех getMe — 401/404 от
+         * случайного «зеркала»-ловушки больше не фиксируются как рабочие. */
+        if (is_string($r['base'] ?? null) && $r['base'] !== '') {
+            tg_remember_working_base($r['base']);
+        }
         $res = $r['data']['result'] ?? [];
         json_response(200, [
             'ok' => true,
@@ -599,9 +609,13 @@ function h_tg_discover(string $method): void
     /* c96: перебор баз — как tg-check. */
     $r = tg_api_try($token, tg_api_bases($s, $secrets), 'getUpdates', null);
     if ($r['errno'] !== 0 || $r['status'] === 0) {
+        tg_forget_working_base(); // c96-CRIT-A
         json_response(200, ['ok' => false, 'error' => 'network', 'tried' => $r['tried'] ?? []]);
     }
-    if (is_string($r['base'] ?? null) && $r['base'] !== '') {
+    /* c96-CRIT-A: и здесь — только 200-ok ниже фиксирует базу (в конце
+     * успешной ветки getUpdates). */
+    if ($r['status'] === 200 && is_array($r['data']) && ($r['data']['ok'] ?? null) === true
+        && is_string($r['base'] ?? null) && $r['base'] !== '') {
         tg_remember_working_base($r['base']);
     }
     if ($r['status'] === 401 || $r['status'] === 404) {

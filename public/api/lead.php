@@ -135,43 +135,75 @@ $lead = [
 
 $stored = store_lead($lead);
 
-/* ------------------------- уведомления ------------------------------- */
-$settings = load_settings();
-$secrets = load_secrets(false);
-
-$tgOk = null; // null = не пытались, true/false = результат
-$chatId = $settings['tgChatId'] ?? null;
-$token = $settings['tgBotToken'] ?? null;
-if (is_string($token) && $token !== '' && is_string($chatId) && $chatId !== '') {
-    /* c96: перебор баз Bot API (зеркало владельца → api.telegram.org):
-     * api.telegram.org с РФ-хостингов деградирует с 03.2026 — своя база
-     * (Cloudflare Worker) вставляется в «Настройках», успешная база
-     * запоминается и используется первой (без таймаутов на мёртвой). */
-    $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId, lead_tg_text($lead));
-    $tgOk = $tg['ok'] === true;
+/* c96-CRIT-A (таймаут-бюджет): заявка ЗАПИСАНА → отвечаем посетителю
+ * СРАЗУ; уведомления догоняют после ответа (fastcgi_finish_request на
+ * PHP-FPM хостинга; в CLI-тестах функции нет — синхронный путь как в c95).
+ * Раньше 2 мёртвые TG-базы держали форму 10+ секунд. */
+if ($stored && function_exists('fastcgi_finish_request')) {
+    send_lead_response(200, ['ok' => true, 'id' => $lead['id']]);
+    fastcgi_finish_request();
+    lead_notify_all($lead);
+    exit;
 }
 
-$mailOk = null;
-$notifyEmail = (string)($settings['notifyEmail'] ?: NOTIFY_EMAIL_FALLBACK);
-if ($notifyEmail !== '') {
-    $mailOk = mail_notify(
-        $notifyEmail,
-        'Новая заявка с сайта — ' . $lead['name'],
-        lead_mail_text($lead),
-        $lead['email'],
-        (string)($secrets['notify_from'] ?: 'noreply@nilovcatering.ru')
-    );
-}
+$notify = lead_notify_all($lead);
 
 /* Не записано И ни одно уведомление не доставлено → честный 500:
-   клиент переключится на mailto-фолбэк. */
-if (!$stored && $tgOk !== true && $mailOk !== true) {
+   клиент переключится на mailto-фоллбэк. */
+if (!$stored && $notify !== true) {
     json_response(500, ['ok' => false, 'error' => 'delivery']);
 }
 
 json_response(200, ['ok' => true, 'id' => $lead['id']]);
 
 /* ============================ функции ================================ */
+
+/** Ответ JSON без exit (нужно для fastcgi_finish_request: ответ уже
+ *  отправлен, но PHP-код продолжает исполняться в фоне). */
+function send_lead_response(int $status, array $body): void
+{
+    if (!headers_sent()) {
+        http_response_code($status);
+        header('Content-Type: application/json; charset=utf-8');
+        header('X-Content-Type-Options: nosniff');
+        header('X-Robots-Tag: noindex, nofollow');
+        header('Cache-Control: no-store, must-revalidate');
+        header('Pragma: no-cache');
+    }
+    echo json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
+}
+
+/** Все уведомления по заявке (TG + mail). true — хоть одно доставлено. */
+function lead_notify_all(array $lead): bool
+{
+    $settings = load_settings();
+    $secrets = load_secrets(false);
+    $delivered = false;
+
+    $chatId = $settings['tgChatId'] ?? null;
+    $token = $settings['tgBotToken'] ?? null;
+    if (is_string($token) && $token !== '' && is_string($chatId) && $chatId !== '') {
+        /* c96: перебор баз Bot API (запомненная рабочая → зеркало
+         * владельца → api.telegram.org); api.telegram.org с РФ-хостингов
+         * деградирует с 03.2026. maxBases=2 — бюджет таймаутов (лид
+         * не должен висеть на мёртвых базах), почта всегда догонит. */
+        $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId, lead_tg_text($lead), 2);
+        $delivered = $delivered || $tg['ok'] === true;
+    }
+
+    $notifyEmail = (string)($settings['notifyEmail'] ?: NOTIFY_EMAIL_FALLBACK);
+    if ($notifyEmail !== '') {
+        $mailOk = mail_notify(
+            $notifyEmail,
+            'Новая заявка с сайта — ' . $lead['name'],
+            lead_mail_text($lead),
+            $lead['email'],
+            (string)($secrets['notify_from'] ?: 'noreply@nilovcatering.ru')
+        );
+        $delivered = $delivered || $mailOk === true;
+    }
+    return $delivered;
+}
 
 function make_lead_id(): string
 {

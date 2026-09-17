@@ -253,6 +253,12 @@ function TelegramCard({
         );
         return;
       }
+      /* c96-CRIT-A: нет токена вообще (ввели пусто и в настройках пусто) —
+       * не выдаём «сетевой сбой», а просим ввести токен. */
+      if (r.error === "no_token") {
+        setTokenError("Сначала вставьте токен бота — он от BotFather.");
+        return;
+      }
       /* network (или иная транспортная ошибка всех баз) — объясняем. */
       setNetworkFail(true);
       setTriedInfo(describeTried(r.tried));
