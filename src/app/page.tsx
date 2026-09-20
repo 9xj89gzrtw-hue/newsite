@@ -20,14 +20,11 @@ import { SiteFooter } from "@/components/catering/site-footer";
    sticky-баром (z-40, hacc-booking.css); скрытие <1024px снято в
    globals.css. Сам компонент не менялся (золотое кольцо прогресса). */
 import { BackToTop } from "@/components/catering/back-to-top";
-/* c84-A (задача 4a): ScrollProgress — полоса прогресса чтения, ЧИСТЫЙ
-   CSS scroll-driven (animation-timeline: scroll(root), c74-kinetic.css),
-   ноль JS-кадров; гварды reduced-motion/@supports/print — в CSS. Рендер
-   ОДИН раз, первым ребёнком <main>: fixed-полоса z-90 над sticky-хедером
-   (DOM-порядок не влияет на позицию; первый ребёнок = в потоке разметки
-   полоса читается раньше секций). Server Component — попадает в SSR-HTML
-   без гидрации. */
-import { ScrollProgress } from "@/components/catering/scroll-progress";
+/* c98-FIX1 (критик 3 MINOR): дубль ScrollProgress — компонент рендерился
+   ОДНОВРЕМЕННО в layout.tsx (C74, все страницы) и здесь (c84-A) — два
+   идентичных fixed-дива с идеальным перекрытием. Снята копия ЗДЕСЬ:
+   layout-версия покрывает и главную, и /offer /privacy /terms (текстовые
+   страницы с длинной прокруткой — там полоса полезнее всего). */
 /* 81-F2b: vanity-URL /menu /events /contacts /calculator приезжают на
    главную через next.config-rewritы с scrollY=0 (hash до браузера не
    доходит) — клиентский скроллер ведёт к целевой секции (см. докстринг
@@ -303,9 +300,8 @@ export default function Home() {
       tabIndex={-1}
       className="flex min-h-screen flex-col bg-cream outline-none"
     >
-      {/* c84-A (задача 4a): полоса прогресса чтения — первый ребёнок
-          <main> (см. импорт-блок). */}
-      <ScrollProgress />
+      {/* c98-FIX1: ScrollProgress снят отсюда (дубль с layout.tsx — см.
+          импорт-блок); полоса живёт в layout и покрывает эту страницу. */}
 
       {/* W4-AUDIT NOTE: espresso theme-flip (GammaSeparator) остаётся скрытым
           под bg-cream — секции сидят на захардкоженном --ea-cream с тёмным

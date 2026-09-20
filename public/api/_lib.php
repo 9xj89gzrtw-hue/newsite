@@ -249,6 +249,50 @@ function mail_log_append(array $entry): void
     });
 }
 
+/* --------------------- c98-A: журнал спам-ловушек ---------------------- */
+
+/** c98-A — журнал сабмитов, пойманных анти-спам ловушками (spam-log.json). */
+function spam_log_path(): string
+{
+    return server_data_dir() . '/spam-log.json';
+}
+
+/** c98-A — лимит журнала ловушек (шт; старейшие выбрасываются). */
+const SPAM_LOG_CAP = 300;
+
+/**
+ * c98-A — прочитать журнал ловушек (новые сверху), максимум $limit записей.
+ * До c98 «пойманные» сабмиты умирали молча (фейковый ok:true) — если туда
+ * попадал реальный клиент, лид терялся БЕЗ СЛЕДА. Теперь каждая ловушка
+ * оставляет запись: владелец видит её в разделе «Заявки» и может проверить.
+ */
+function spam_log_read(int $limit = 50): array
+{
+    $arr = read_json_file(spam_log_path());
+    if (!is_array($arr)) {
+        return [];
+    }
+    $arr = array_values(array_filter($arr, 'is_array'));
+    $arr = array_slice($arr, -$limit);
+    return array_reverse($arr);
+}
+
+/**
+ * c98-A — добавить запись в журнал ловушек (append + cap 300, под локом).
+ * Никогда не бросает исключений и не влияет на ответ клиенту.
+ */
+function spam_log_append(array $entry): void
+{
+    $entry['ts'] = time();
+    update_json_file(spam_log_path(), static function (array $cur) use ($entry): array {
+        $cur[] = $entry;
+        if (count($cur) > SPAM_LOG_CAP) {
+            $cur = array_slice($cur, count($cur) - SPAM_LOG_CAP);
+        }
+        return $cur;
+    });
+}
+
 /** Каталог runtime-данных: создать (0775) + анти-листинг index.html. */
 function ensure_server_data_dir(): void
 {
@@ -314,6 +358,18 @@ function write_json_atomic(string $path, array $data): bool
  * быть переименован, это не ломает сериализацию писателей).
  * Колбэк получает текущий массив (или []); вернёт массив — запись,
  * вернёт null — отмена записи.
+ *
+ * c98-A (непотеряемость): БИТЫЙ файл (не пустой, ≥3 байт, но JSON не
+ * декодируется) больше НЕ затирается пустым массивом — раньше store_lead
+ * на битом leads.json получал [] и перезаписывал файл одной новой заявкой,
+ * теряя ВСЕ старые (главные подозреваемые в «лид потерян без следа»).
+ * Теперь битый файл переименовывается в <имя>.corrupt-<Ymd-His>.json
+ * (данные сохранены для ручного восстановления), работа продолжается
+ * с пустого массива. Переименование — под тем же локом: конкурентные
+ * писатели не потеряют только что записанное. Колбэку вторым аргументом
+ * передаётся имя backup-файла (string|null) — store_lead пишет его в
+ * поле rescuedFrom лида; прочие колбэки объявляют один параметр, лишний
+ * аргумент PHP молча игнорирует (back-compat, проверено тестом).
  */
 function update_json_file(string $path, callable $fn): bool
 {
@@ -329,7 +385,21 @@ function update_json_file(string $path, callable $fn): bool
     try {
         $current = is_file($path) ? @file_get_contents($path) : false;
         $arr = is_string($current) ? json_decode($current, true) : null;
-        $new = $fn(is_array($arr) ? $arr : []);
+        $rescuedFrom = null;
+        $rawTrim = is_string($current) ? trim($current) : '';
+        if ($rawTrim !== '' && strlen($rawTrim) > 2 && !is_array($arr)) {
+            // «[]» и пробелы — валидный пустой JSON; мусор ≥3 байт — авария
+            $rescuedFrom = basename($path, '.json') . '.corrupt-' . date('Ymd-His') . '.json';
+            @rename($path, dirname($path) . '/' . $rescuedFrom);
+            if (!is_file($path)) {
+                $arr = null; // начинаем новый файл с пустого массива
+            } else {
+                // переименовать не удалось (права?) — НЕ рискуем затиранием:
+                // отмена записи, вызывающий получит false (= сбой хранения)
+                return false;
+            }
+        }
+        $new = $fn(is_array($arr) ? $arr : [], $rescuedFrom);
         if (!is_array($new)) {
             return false;
         }
@@ -558,9 +628,13 @@ function rl_last_retry_after(): int
 /**
  * Same-origin защита (см. R-REPORT §5): заголовок Origin ∈ allowlist
  * (или отсутствует — топ-левел GET-навигации Origin не шлют).
- * Для POST дополнительно обязателен кастомный заголовок
- * X-Requested-With: XMLHttpRequest — кросс-доменный fetch с кастомным
- * заголовком требует preflight, который наш сервер не разрешает.
+ *
+ * c98-A (sendBeacon): браузерный beacon НЕ может ставить кастомные
+ * заголовки — X-Requested-With там физически невозможен. Но sendBeacon
+ * (как и fetch) ВСЕГДА шлёт Origin, и кросс-доменный JS не способен его
+ * подделать. Новое правило: Origin ∈ allowlist → пропускаем и без XRW;
+ * XRW остаётся обязательным при ОТСУТСТВУЮЩЕМ Origin (старые клиенты,
+ * curl — как до c98). Чужой Origin отсекается выше в любом случае.
  */
 function require_same_origin(bool $isGet = false): void
 {
@@ -573,6 +647,10 @@ function require_same_origin(bool $isGet = false): void
         json_response(403, ['ok' => false, 'error' => 'origin']);
     }
     if ($isGet) {
+        return;
+    }
+    // доверенный same-origin Origin — сам по себе достаточный CSRF-барьер
+    if (is_string($origin) && $origin !== '' && in_array($origin, NILOV_ORIGIN_ALLOW, true)) {
         return;
     }
     $xrw = $_SERVER['HTTP_X_REQUESTED_WITH'] ?? '';
@@ -1062,6 +1140,15 @@ function mail_headers(string $fromEmail, ?string $replyTo): array
  * расширений не требуется — fsockopen + stream crypto из ядра PHP).
  * Поддерживает SSL (465) и STARTTLS (587/25) + AUTH LOGIN.
  * Возвращает ['ok'=>bool, 'error'=>?string, 'detail'=>?string].
+ *
+ * c98-FIX1 (критик2 E2, MAJOR): бюджет ОДНОГО письма — 15с wall-clock,
+ * таймаут операции — 5с (было: connect 10с + stream_set_timeout(15) на
+ * КАЖДУЮ из ~11 операций ≈ до ~190с на письмо; писем два + ретрай — один
+ * FPM-воркер висел минутами ПОСЛЕ ответа клиенту). Дедлайн сверяется
+ * перед каждой командой; остаток бюджета становится таймаутом операции —
+ * письмо физически не может занять больше ~15с. Таймаут чтения помечается
+ * отдельным кодом 'smtp_timeout' (было 'bad_greeting'/'ehlo_failed' с
+ * пустым текстом) — lead.php различает «мёртвый» канал для ретрая.
  */
 function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?string $replyTo): array
 {
@@ -1069,6 +1156,9 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
     $port = (int)$cfg['port'];
     $errno = 0;
     $errstr = '';
+    $letterBudgetSec = 15.0; // c98-FIX1: общий бюджет письма, сек
+    $opTimeoutSec = 5.0;      // c98-FIX1: таймаут одной операции (было 15)
+    $deadline = microtime(true) + $letterBudgetSec;
     $ctx = stream_context_create(['ssl' => [
         'verify_peer' => true,
         'verify_peer_name' => true,
@@ -1078,30 +1168,70 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
         'tcp://' . $host . ':' . $port,
         $errno,
         $errstr,
-        10.0,
+        5.0, // c98-FIX1: connect тоже в бюджете письма (было 10с)
         STREAM_CLIENT_CONNECT,
         $ctx
     );
     if ($fp === false) {
         return ['ok' => false, 'error' => 'connect_failed', 'detail' => str_trunc("{$errstr} ({$errno})", 200)];
     }
-    stream_set_timeout($fp, 15);
+    /* c98-FIX1: таймаут операции = min(5с, остаток бюджета) — последняя
+     * операция не выйдет за дедлайн письма; false = бюджет исчерпан. */
+    $tuneTimeout = static function () use ($fp, $deadline, $opTimeoutSec): bool {
+        $left = $deadline - microtime(true);
+        if ($left <= 0) {
+            return false;
+        }
+        $t = min($opTimeoutSec, $left);
+        $sec = (int)floor($t);
+        $usec = (int)round(($t - $sec) * 1000000);
+        stream_set_timeout($fp, $sec, $usec);
+        return true;
+    };
 
-    /** Читает SMTP-ответ (многострочный «250-…» / «250 …»), возвращает код. */
-    $readCode = static function () use ($fp): array {
+    /** Читает SMTP-ответ (многострочный «250-…» / «250 …»), возвращает код.
+     * c98-FIX2 (критик5 MAJOR-1): дедлайн письма/кап проверяются НА КАЖДОЙ
+     * continuation-строке — прежде $tuneTimeout ставился ОДИН раз до цикла,
+     * и сервер, бесконечно стримящий «250-…», кормил fgets вечно: таймаут
+     * срабатывал только при МОЛЧАНИИ сокета, воркер умирал от memory
+     * exhausted (~65МБ ответа за ~37с при бюджете 15с/письмо). Капы:
+     * ≤200 строк / ≤64КБ текста (реальные SMTP-ответы — единицы строк);
+     * исчерпание → код 0 'smtp_timeout' (lead.php классифицирует канал
+     * «мёртвый» для ретрая). */
+    $readCode = static function () use ($fp, $tuneTimeout, $deadline): array {
+        if (!$tuneTimeout()) {
+            return [0, 'timeout_budget'];
+        }
         $code = 0;
         $text = '';
+        $maxLines = 200;
+        $maxBytes = 65536;
+        $lines = 0;
         while (($line = fgets($fp, 1024)) !== false) {
             $text .= $line;
+            $lines++;
             if (strlen($line) < 4 || $line[3] !== '-') {
                 $code = (int)substr($line, 0, 3);
                 break;
+            }
+            /* continuation «250-…»: сверяем бюджет и капы ПЕРЕД следующей
+             * строкой + подтягиваем сокет-таймаут под остаток бюджета. */
+            if (
+                $lines >= $maxLines ||
+                strlen($text) >= $maxBytes ||
+                microtime(true) >= $deadline ||
+                !$tuneTimeout()
+            ) {
+                return [0, 'smtp_timeout'];
             }
         }
         return [$code, trim($text)];
     };
     /** Пишет команду и читает ответ; false — таймаут/обрыв. */
-    $cmd = static function (string $c, string $expect) use ($fp, $readCode): array {
+    $cmd = static function (string $c, string $expect) use ($fp, $readCode, $tuneTimeout): array {
+        if (!$tuneTimeout()) {
+            return [0, 'timeout_budget'];
+        }
         if (fwrite($fp, $c . "\r\n") === false) {
             return [0, 'write_failed'];
         }
@@ -1137,52 +1267,53 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
         }
         [$code, $text] = $readCode();
         if ($code !== 220) {
-            return ['ok' => false, 'error' => 'bad_greeting', 'detail' => str_trunc($text, 200)];
+            // c98-FIX1: code 0 = таймаут приветствия (мёртвый сервер) — свой код
+            return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'bad_greeting'), 'detail' => str_trunc($text, 200)];
         }
 
         [$code, $text] = $cmd('EHLO ' . MAIL_DOMAIN, '250');
         if ($code !== 250) {
-            return ['ok' => false, 'error' => 'ehlo_failed', 'detail' => $text];
+            return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'ehlo_failed'), 'detail' => $text];
         }
 
         if (!$implicitTls && strpos($text, 'STARTTLS') !== false) {
             [$code, $text] = $cmd('STARTTLS', '220');
             if ($code !== 220) {
-                return ['ok' => false, 'error' => 'starttls_failed', 'detail' => $text];
+                return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'starttls_failed'), 'detail' => $text];
             }
             if (!$startTls()) {
                 return ['ok' => false, 'error' => 'tls_failed', 'detail' => 'STARTTLS-рукопожатие не удалось'];
             }
             [$code, $text] = $cmd('EHLO ' . MAIL_DOMAIN, '250');
             if ($code !== 250) {
-                return ['ok' => false, 'error' => 'ehlo_after_tls_failed', 'detail' => $text];
+                return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'ehlo_after_tls_failed'), 'detail' => $text];
             }
         }
 
         [$code, $text] = $cmd('AUTH LOGIN', '334');
         if ($code !== 334) {
-            return ['ok' => false, 'error' => 'auth_not_offered', 'detail' => $text];
+            return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'auth_not_offered'), 'detail' => $text];
         }
         [$code, $text] = $cmd(base64_encode($cfg['user']), '334');
         if ($code !== 334) {
-            return ['ok' => false, 'error' => 'auth_user_rejected', 'detail' => $text];
+            return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'auth_user_rejected'), 'detail' => $text];
         }
         [$code, $text] = $cmd(base64_encode($cfg['pass']), '235');
         if ($code !== 235) {
-            return ['ok' => false, 'error' => 'auth_failed', 'detail' => str_trunc('Логин или пароль SMTP не приняты сервером', 200)];
+            return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'auth_failed'), 'detail' => str_trunc('Логин или пароль SMTP не приняты сервером', 200)];
         }
 
         [$code, $text] = $cmd('MAIL FROM:<' . $cfg['from'] . '>', '250');
         if ($code !== 250) {
-            return ['ok' => false, 'error' => 'mail_from_rejected', 'detail' => $text];
+            return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'mail_from_rejected'), 'detail' => $text];
         }
         [$code, $text] = $cmd('RCPT TO:<' . $to . '>', '250');
         if ($code !== 250 && $code !== 251) {
-            return ['ok' => false, 'error' => 'rcpt_rejected', 'detail' => $text];
+            return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'rcpt_rejected'), 'detail' => $text];
         }
         [$code, $text] = $cmd('DATA', '354');
         if ($code !== 354) {
-            return ['ok' => false, 'error' => 'data_rejected', 'detail' => $text];
+            return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'data_rejected'), 'detail' => $text];
         }
 
         $subjectEnc = mail_subject_enc($subject);
@@ -1195,7 +1326,7 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
         $msg = implode("\r\n", $headers) . "\r\n\r\n" . mail_body_crlf($bodyText) . "\r\n.";
         [$code, $text] = $cmd($msg, '250');
         if ($code !== 250) {
-            return ['ok' => false, 'error' => 'message_rejected', 'detail' => $text];
+            return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'message_rejected'), 'detail' => $text];
         }
         @fwrite($fp, "QUIT\r\n");
         return ['ok' => true, 'error' => null, 'detail' => null];
@@ -1213,11 +1344,15 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
  * $context — метка для журнала: 'lead-owner' | 'lead-client' | 'test'.
  * Возвращает ['ok'=>bool, 'transport'=>'smtp'|'mail'|'mail-fallback'|'none',
  * 'error'=>?string, 'detail'=>?string].
+ * c98-FIX1 (критик2 E2): + 'smtpError' — исходный код ошибки SMTP
+ * ('smtp_timeout'/'auth_failed'/…), если SMTP пробовался и провалился
+ * (даже когда mail()-фолбэк спас письмо) — lead.php классифицирует канал
+ * для решения о ретрае (dead/crit/retry).
  */
 function mail_send(string $to, string $subject, string $bodyText, ?string $replyTo = null, string $context = 'test'): array
 {
     if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
-        $r = ['ok' => false, 'transport' => 'none', 'error' => 'invalid_recipient', 'detail' => $to];
+        $r = ['ok' => false, 'transport' => 'none', 'error' => 'invalid_recipient', 'detail' => $to, 'smtpError' => null];
         mail_log_append(['to' => str_trunc($to, 120), 'context' => $context, 'subject' => str_trunc($subject, 100),
             'transport' => 'none', 'ok' => false, 'error' => 'invalid_recipient']);
         return $r;
@@ -1232,7 +1367,7 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
         if ($r['ok'] === true) {
             mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
                 'transport' => 'smtp', 'ok' => true, 'error' => null]);
-            return ['ok' => true, 'transport' => 'smtp', 'error' => null, 'detail' => null];
+            return ['ok' => true, 'transport' => 'smtp', 'error' => null, 'detail' => null, 'smtpError' => null];
         }
         // SMTP настроен, но не сработал (пароль/сеть) — НЕ теряем письмо:
         // пробуем mail() сервера, обе попытки в журнале.
@@ -1248,7 +1383,8 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
         mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
             'transport' => 'none', 'ok' => false, 'error' => 'mail_disabled', 'detail' => 'mail() отключена на хостинге, SMTP не настроен']);
         return ['ok' => false, 'transport' => 'none', 'error' => 'mail_disabled',
-            'detail' => 'Функция mail() отключена на хостинге; настройте SMTP в разделе «Почта»'];
+            'detail' => 'Функция mail() отключена на хостинге; настройте SMTP в разделе «Почта»',
+            'smtpError' => (($smtp !== null && !($r['ok'] ?? true)) ? (string)$r['error'] : null)];
     }
 
     $from = (string)($secrets['notify_from'] ?: 'noreply@' . MAIL_DOMAIN);
@@ -1270,6 +1406,8 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
         'detail' => $ok ? null : ($smtp !== null
             ? 'SMTP не сработал (' . str_trunc((string)($r['error'] ?? '?'), 120) . '), sendmail тоже не принял письмо'
             : 'sendmail хостинга не принял письмо'),
+        // c98-FIX1 (критик2 E2): причина провала SMTP — класс ретрая в lead.php
+        'smtpError' => (($smtp !== null && !($r['ok'] ?? true)) ? (string)$r['error'] : null),
     ];
 }
 

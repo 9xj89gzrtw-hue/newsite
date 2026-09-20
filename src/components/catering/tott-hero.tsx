@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
-import { isLiteDevice } from "@/lib/lite-device";
-import { useLiteDevice } from "@/hooks/use-lite-device";
+import { isDataSaverLite, isLiteDevice } from "@/lib/lite-device";
+import { useDataSaverLite, useLiteDevice } from "@/hooks/use-lite-device";
 
 /**
  * TottHero — Talk of the Town (talkofthetownatlanta.com) hero graft (Cycle 30).
@@ -71,15 +71,35 @@ const HERO_VIDEO = "/media/mculinary/mculinary-hero-720.mp4";
    Подмена источника — в IO-эффекте ДО первого play() (см. там). */
 const HERO_VIDEO_MOBILE =
   "/media/mculinary/mculinary-hero-portrait-720.mp4";
-const HERO_POSTER = "/media/hero-premium/hero-premium-6.jpg";
-/* C71-P1 / K8-CRITICAL (Task 2): poster-атрибут видео тянул RAW jpg 595KB
-   рядом с next/image-копией (~77KB webp) — двойная загрузка одного визуала.
-   Новый постер — заранее оптимизированный sharp-webp 828px q82 (67KB,
-   public/media/hero-premium/hero-premium-6-828.webp): виден долю секунды
-   до старта видео на десктопе и остаётся статичным hero на mobile
-   (видео там не играет — coarse-гейт эффекта выше). LCP-<Image> (z-0,
-   next/image-оптимизация) НЕ тронут — он остаётся приоритетным кадром. */
-const HERO_VIDEO_POSTER = "/media/hero-premium/hero-premium-6-828.webp";
+/* c98-C (задача B — владелец: «у заказчика на старом компьютере не
+   загружается видео херо, только фото, он хочет чтобы видео
+   загружалось»): 480p-копии для слабых девайсов (детектируются
+   lib/lite-device.ts: cores≤4 не-WebKit / deviceMemory≤2 / FPS-зонд
+   p80>40ms). Перекодированы оркестратором из ОРИГИНАЛА в h264:
+   десктоп-лайт 640×360 — 711KB, мобайл-лайт 360×640 — 736KB
+   (c98-FIX1: фактические размеры; в докблоках было «~300KB» —
+   экономия против 720p вдвое меньше расчётной). ПОЛИТИКА c98-C
+   двухуровневая: lite (слабое железо) → видео ИГРАЕТ, но 480p;
+   dataSaver/2g (isDataSaverLite) → постер (байты дороже вау);
+   reduce → постер. Подключение источника — в IO-эффекте ниже. */
+const HERO_VIDEO_LITE = "/media/mculinary/mculinary-hero-480-lite.mp4";
+const HERO_VIDEO_MOBILE_LITE =
+  "/media/mculinary/mculinary-hero-portrait-480-lite.mp4";
+/* c98-D (задача владельца: «не нравится фото под видео — поставь
+   красивое, чтобы первый экран смотрелся как картина в рамке»):
+   замена hero-premium-6 (круглый стол с гигантским цветочным центром,
+   еда не видна, статично) на hero-c98 — драматичный фуршетный стол
+   (паста с икрой, тартар, канапе, лобстер-роллы, десерты, коктейли,
+   сухой лёд-дым), тёмный moody-стоп-кадр той же кинематографической
+   лиги, что hero-видео. 2400×1350 JPEG q80 327KB (меньше 595KB
+   прежнего), воздух в кадре — вордмарк «nilov catering.» читается.
+   Конвейер §4: image-search → VLM-гейт запретов (текст/вотермарки —
+   чисто) → sharp. Новое имя файла = cache-bust (§2). */
+const HERO_POSTER = "/media/hero-premium/hero-c98.jpg";
+/* c98-D: постер видео — 828px WebP-копия нового hero-c98 (57KB, q82).
+   Дедупликация с LCP-<Image> прежнего цикла сохранена: тот же визуал,
+   один оптимизированный файл в poster-атрибуте. */
+const HERO_VIDEO_POSTER = "/media/hero-premium/hero-c98-828.webp";
 
 /* ════════════ Cycle-72 — hero «чистый как картина» (прямое указание
    владельца, §1.3 «пользователь — лучший критик» + §1.6 «вкусовая правка
@@ -97,10 +117,18 @@ const HERO_VIDEO_POSTER = "/media/hero-premium/hero-premium-6-828.webp";
 export function TottHero() {
   const reduce = useReducedMotion();
   /* c84-A (задача 5): единый lite-детектор оркестратора (saveData || 2g ||
-     deviceMemory ≤ 2 || cores ≤ 4, контракт src/lib/lite-device.ts)
-     заменяет локальный saveData/2g-гейт ниже: lite → постер без видео
-     (как прежде при saveData), IO/LCP-гейты не переписаны. */
+     deviceMemory ≤ 2 || cores ≤ 4 + FPS-зонд, контракт
+     src/lib/lite-device.ts). c98-C (задача B): lite БОЛЬШЕ не выключает
+     видео — стейт теперь (а) выбирает 480p-источник в IO-эффекте и
+     (б) перезапускает эффект при флипе (deps), чтобы даунгрейднуть
+     источник/погасить видео при включившемся dataSaver.
+     c98-FIX1 (критик1 #3): + реактивная трафик-ветка — флип Data Saver
+     ПОСЛЕ уже установленного lite не виден deps [reduce, lite]
+     (setLite(true)===true — React bailout), а видео должно гаситься
+     в постер и на уже-lite-девайсе (becomeLite уведомляет при дельте
+     фактора, см. lib/lite-device.ts). */
   const lite = useLiteDevice();
+  const dataSaver = useDataSaverLite();
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -118,6 +146,9 @@ export function TottHero() {
    * юзера. Защиты, которые остались:
    * - saveData / соединение 2g (Network Information API) → постер:
    *   трафик владельца устройства дороже вау-эффекта;
+   * - c98-C (задача B): слабое железо (lite: cores/mem/FPS-зонд) БОЛЬШЕ
+   *   не гасит видео — играет 480p-копия (711KB/736KB, c98-FIX1: факт
+   *   вместо прежней оценки «~300KB»), выбор в эффекте ниже;
    * - мобильный старт ждёт декода LCP-<img> (кап 2.5s) — видео не
    *   конкурирует с первым кадром страницы за канал;
    * - ретрай play() на первом касании — iOS Low Power Mode отклоняет
@@ -125,48 +156,99 @@ export function TottHero() {
    * - prefers-reduced-motion: IO не создаём — статичный постер (§39).
    */
   useEffect(() => {
-    if (reduce || lite) return;
+    /* c98-C (задача B): гейт ПЕРЕПИСАН — было `reduce || lite` (lite =
+       слабое железо ИЛИ трафик — ПОЛНОСТЬЮ выключал видео, старый ПК
+       оставался с фото, жалоба владельца), стало `reduce ||
+       isDataSaverLite()` (экономия трафика — единственное основание
+       показать постер): слабое железо играет 480p-копию (выбор источника
+       ниже). deps [reduce, lite, dataSaver]: флип lite (FPS-зонд после
+       первого скролла) перезапускает эффект — источник переградится на
+       480p-копию по гварду ниже (уже играющее/загруженное 720p НЕ
+       перегружается, c98-FIX1); dataSaver-флип (в т.ч. ПОСЛЕ уже
+       установленного lite — раньше невидим из-за React-bailout) гасит
+       видео: ранний return + cleanup pause() → постер. Стейт dataSaver
+       здесь и в deps, и в гейте — live-isDataSaverLite() остаётся
+       страховкой mount-race (первый коммит эффекта ещё видит false). */
+    if (reduce || dataSaver || isDataSaverLite()) return;
     const section = sectionRef.current;
     const video = videoRef.current;
     if (!section || !video) return;
 
-    /* c84-A (задача 5): saveData/2g-гейт (Network Information API,
-       локальная проверка) ЗАМЕНЁН на единый useLiteDevice() выше —
-       порог расширен до deviceMemory/cores (adaptive loading, Osmani;
-       docs/C84-MOBILE-UX-RESEARCH.md §4.3+§5.1). Поведение то же:
-       lite → IO не создаётся, видео не стартует, постер остаётся. */
-
     const isMobile =
       window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
 
-    /* 81-W2F3 [H #3] / c82: мобильный источник видео (портрет-кроп 480×720). Ставим video.src ПРЯМО на
-     * <video> (НЕ <source>.src): по HTML-спецификации установка/изменение
-     * src-атрибута самого media-элемента ГАРАНТИРОВАННО перезапускает
-     * алгоритм загрузки (load), а подмена дочернего <source>.src
-     * пере-выбирается только пока networkState === NETWORK_EMPTY —
-     * ненадёжно. При src-атрибуте на <video> дочерний <source> (720,
-     * SSR-разметка не меняется) игнорируется — грузится только -480.
-     * preload="none" держит байты обоих файлов до первого play(), а play()
-     * вызывается только ниже по этому же эффекту (IO/тап) — то есть
-     * ПОДМЕНА ВСЕГДА РАНЬШЕ play: сетевой перехват на мобиле видит ровно
-     * один mp4 (-480), -720 не запрашивается вовсе. Десктоп — <source> 720. */
+    /* c98-C: слабость читается СИНХРОННО из модуль-кэша (mount-race-паттерн
+       c84-A, см. tryPlay ниже) — стейт-lite первым коммитом ещё false, а
+       статически слабый ПК (cores≤4 не-WebKit / mem≤2) должен получить
+       480p-копию СРАЗУ, без двойной загрузки 720p→480p; зондовый
+       даунгрейд доедет ререндером lite=true (deps эффекта) и переградится
+       здесь же этим же кодом. */
+    const liteNow = lite || isLiteDevice();
+    const mobileSrc = liteNow ? HERO_VIDEO_MOBILE_LITE : HERO_VIDEO_MOBILE;
+    const desktopSrc = liteNow ? HERO_VIDEO_LITE : HERO_VIDEO;
+
+    /* c98-FIX1 (критик1 #4, MINOR): ГВАРД ЗОНДОВОГО ДАУНГРЕЙДА — ПРАВИЛО:
+     *  (1) video.currentSrc уже lite-файл («-lite» в URL) → не трогаем:
+     *      это ровно тот источник, что нужен;
+     *  (2) видео УЖЕ ИГРАЕТ с данными (paused=false, readyState≥2) → НЕ
+     *      подменяем: 720p УЖЕ скачан, пользы от 480p нет, а src-swap
+     *      перезапускает загрузку на живом плеере (рывок + флеш постера
+     *      + пауза в cleanup); доигрывает скачанное до конца сессии;
+     *  (3) иначе (ещё не играет / не успело загрузиться) → подменяем на
+     *      lite-копию (экономия байтов ещё возможна).
+     * Случай (2) покрывает зондовый даунгрейд ПОСЛЕ первого скролла:
+     * FPS-зонд срабатывает на первом скролле, а к этому моменту hero-видео
+     * уже играет (readyState≥2) → 720p остаётся до конца сессии. */
+    const alreadyLiteSrc = video.currentSrc.includes("-lite");
+    const playingWithData = !video.paused && video.readyState >= 2;
+
+    /* 81-W2F3 / c82 / c98-C: источник ставится video.src ПРЯМО на <video>
+     * (НЕ <source>.src): по HTML-спецификации установка src-атрибута
+     * media-элемента гарантированно перезапускает алгоритм загрузки, а
+     * дочерний <source> (720, SSR-разметка не меняется) игнорируется.
+     * preload="none" держит байты всех файлов до первого play() — грузится
+     * ровно один mp4. ГАРД ПО ТЕКУЩЕМУ АТРИБУТУ (паттерн gg-video-showcase,
+     * c98-C): эффект перезапускается (deps reduce/lite/dataSaver) — уже
+     * стоящий правильный источник не переприсваиваем (перезапись src
+     * перезапустила бы загрузку играющего видео). Десктоп НЕ-lite — прежний
+     * <source>-ребёнок 720 (атрибут не трогаем); десктоп-lite — тот же
+     * прямой-src паттерн. */
     if (isMobile) {
-      video.src = HERO_VIDEO_MOBILE;
+      if (
+        !alreadyLiteSrc &&
+        !playingWithData &&
+        video.getAttribute("src") !== mobileSrc
+      ) {
+        video.src = mobileSrc;
+      }
+    } else if (
+      liteNow &&
+      !alreadyLiteSrc &&
+      !playingWithData &&
+      video.getAttribute("src") !== desktopSrc
+    ) {
+      video.src = desktopSrc;
     }
 
     let cancelled = false;
+    /* c98-FIX1 (критик1 #12): незакрытые ожидания LCP-кадра — снимаются в
+     * cleanup (листенер + кап-таймер), а не живут до своей сработки. */
+    let pendingImg: HTMLImageElement | null = null;
+    let pendingTimer: number | undefined;
     const tryPlay = () => {
       if (cancelled) return;
-      /* c84-A (задача 5, mount-race — находка Impl-D): первый коммит
-         эффектов стартует с lite=false (useLiteDevice поднимает стейт
-         тем же коммитом ПОСЛЕ этого эффекта) — гонка успевала скачать
-         hero-mp4 на lite-девайсах ДО flip-ререндера. Лечится синхронной
-         проверкой МОДУЛЬ-КЭША в момент play: вызванный выше useLiteDevice
-         (тот же компонент) уже вычислил кэш, а IO-коллбэк/тап приходят
-         асинхронно позже — гейт гарантированно видит lite без гонки.
-         Даунгрейд post-play (connection.change) остаётся на ререндер-ветку
-         эффекта (deps reduce/lite) → cleanup pause(). */
-      if (isLiteDevice()) return;
+      /* c84-A (задача 5, mount-race) / c98-C: гейт play — теперь ТОЛЬКО
+         экономия трафика: первый коммит эффектов стартует с lite=false
+         (useLiteDevice поднимает стейт тем же коммитом ПОСЛЕ этого
+         эффекта) — синхронный isDataSaverLite() в момент play закрывает
+         окно гонки для saveData/2g (вызванный выше хук уже вычислил окно
+         окружения, а IO-коллбэк/тап приходят асинхронно позже).
+         Прежний isLiteDevice()-гейт ЗНАЧИТЕЛЬНО шире: он гасил play и на
+         слабом железе — теперь им 480p-копия выше, play разрешён
+         (задача владельца «видео должно грузиться»). Даунгрейд post-play
+         (connection.change) остаётся на ререндер-ветку эффекта
+         (deps reduce/lite/dataSaver, c98-FIX1) → cleanup pause(). */
+      if (isDataSaverLite()) return;
       // Muted-луп — разрешён всегда; отказ просто оставляет постер.
       void video.play().catch(() => {
         /* autoplay rejected (iOS Low Power Mode и т.п.) — постер
@@ -184,14 +266,27 @@ export function TottHero() {
         tryPlay();
         return;
       }
-      /* Ждём LCP-кадр: видео не встаёт в очередь раньше первого экрана. */
+      /* Ждём LCP-кадр: видео не встаёт в очередь раньше первого экрана.
+       * c98-FIX1 (критик1 #12): и load-листенер, и кап-таймер снимаются в
+       * cleanup эффекта ниже — листенер не переживает компонент/эффект
+       * (прежде защищал только cancelled-флаг: tryPlay становился no-op,
+       * но листенер и таймер жили до собственной сработки). */
+      pendingImg = img;
       img.addEventListener("load", tryPlay, { once: true });
-      window.setTimeout(tryPlay, 2500); /* кап: load может не прийти. */
+      pendingTimer = window.setTimeout(tryPlay, 2500); /* кап: load может не прийти */
     };
 
-    /* iOS Low Power Mode: первый тап легализует muted-play. */
+    /* iOS Low Power Mode: первый тап легализует muted-play.
+     * c98-FIX2 (критик4 MINOR#4): гард вьюпорта — тап стреляет в ЛЮБОМ
+     * месте страницы (юзер доехал до калькулятора momentum-скроллом без
+     * касаний), а IO паузит только на ИЗМЕНЕНИЕ пересечения: играющий
+     * вне кадра hero жёг декод/байты до конца сессии. section.bottom > 0
+     * = секция ещё видна (хоть пиксель ниже верха вьюпорта). Не в кадре —
+     * листенеры всё равно снимаются (одноразовый ретрай не копится). */
     const retryOnTouch = () => {
-      tryPlay();
+      if (section.getBoundingClientRect().bottom > 0) {
+        tryPlay();
+      }
       window.removeEventListener("touchend", retryOnTouch);
       window.removeEventListener("touchstart", retryOnTouch);
     };
@@ -218,8 +313,13 @@ export function TottHero() {
       video.pause();
       window.removeEventListener("touchend", retryOnTouch);
       window.removeEventListener("touchstart", retryOnTouch);
+      /* c98-FIX1 (критик1 #12): честная самоотчистка ожидания LCP-кадра. */
+      if (pendingImg) pendingImg.removeEventListener("load", tryPlay);
+      pendingImg = null;
+      if (pendingTimer !== undefined) window.clearTimeout(pendingTimer);
+      pendingTimer = undefined;
     };
-  }, [reduce, lite]);
+  }, [reduce, lite, dataSaver]);
 
   /** FIX-4: React не сериализует атрибут `muted` в SSR-HTML (known
    *  React #10389) — пиним DOM-свойство на монте, чтобы muted-autoplay
@@ -227,6 +327,51 @@ export function TottHero() {
   useEffect(() => {
     const video = videoRef.current;
     if (video) video.muted = true;
+  }, []);
+
+  /* c98-C (задача B): страховка «видео не грузится / не декодируется» на
+   *  совсем древних браузерах — hero не должен оставаться ПУСТЫМ, если
+   *  видео погибло: гасим <video>, приоритетный LCP-постер-<Image> (z-0,
+   *  всегда отрендерен) остаётся hero-картиной. Два одноразовых триггера
+   *  (hide идемпотентен):
+   *   1) error на <video> — В ФАЗЕ CAPTURE: error от <source>-ребёнка НЕ
+   *      всплывает, но ловится родителем в capture-фазе (десктоп без
+   *      src-подмены грузит именно через <source>);
+   *   2) watchdog «старт был, кадра нет»: через 8с после события play
+   *      readyState < 2 (HAVE_CURRENT_DATA — ни одного кадра) → декодер
+   *      мёртв/сеть встала. Событие playing (кадры пошли) снимает таймер;
+   *      re-play (IO-возврат, тап-ретрай) перевзводит его.
+   *  Работает независимо от lite-политики — слабый ПК должен ВИДЕТЬ видео
+   *  (задача владельца), фолбэк — только на реальный сбой. Хирургию
+   *  src/load() намеренно НЕ делаем: load() без src-атрибута
+   *  ПЕРЕВЫБИРАЕТ <source>-ребёнка и ПЕРЕЗАПУСКАЕТ загрузку 720p —
+   *  обратный эффект; display:none + pause() достаточно (на error-пути
+   *  браузер уже оборвал сам запрос). */
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const hide = () => {
+      video.pause();
+      video.style.display = "none"; /* постер-<Image> под ним остаётся */
+    };
+    video.addEventListener("error", hide, { once: true, capture: true });
+    let watchdog: number | undefined;
+    const onPlay = () => {
+      window.clearTimeout(watchdog);
+      watchdog = window.setTimeout(() => {
+        /* readyState < 2 = HAVE_CURRENT_DATA нет — ни кадра за 8с. */
+        if (video.readyState < 2) hide();
+      }, 8000);
+    };
+    const onPlaying = () => window.clearTimeout(watchdog);
+    video.addEventListener("play", onPlay);
+    video.addEventListener("playing", onPlaying);
+    return () => {
+      window.clearTimeout(watchdog);
+      video.removeEventListener("error", hide, { capture: true });
+      video.removeEventListener("play", onPlay);
+      video.removeEventListener("playing", onPlaying);
+    };
   }, []);
 
   return (

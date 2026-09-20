@@ -1,150 +1,237 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 /**
- * Preloader — LIGHT THEME
+ * Preloader — c98-E: БЕЛЫЙ «МУЗЕЙНЫЙ» ВХОД (прямой запрос владельца:
+ * «логотип вращается на белом фоне пока идёт загрузка, индикатор загрузки
+ * прямо в логотипе»). Замена дверному таймлайну 81-F1 — философию «CSS
+ * первым, JS только чистит» сохраняем, но снятие привязано к РЕАЛЬНОЙ
+ * готовности (hero-постер), а не к фиксированному таймлайну:
  *
- * 4-panel door preloader with cream/gold colors.
- * Only shows on first visit per session.
- *
- * Task 6-D (nilov rebrand): the text wordmark center is replaced by the
- * round NILOV badge — black circle on cream doors (max contrast). Entrance:
- * spring scale 0.6→1 + rotate -8°→0 with a light bounce, followed by two
- * gold pulse rings expanding from the badge edge (scale + opacity only —
- * no layout-affecting properties, per AGENTS.md animation rules).
- * The caption "NILOV CATERING" fades in under the badge.
- *
- * ══ 81-F1 (performance fixer, критик 81-W1-D): ВЫХОД ДВЕРЕЙ — CSS-ТАЙМЛАЙН,
- * не framer-after-hydration. Прежний механизм держал opaque-двери до
- * гидрации + 450ms dwell + 345ms exit — на медленном мобиле это 8-9s
- * поверх LCP. Теперь:
- *   • панели (.pre-panel, keyframes pre-panel-exit в globals.css) уходят
- *     шторкой вверх через 0.45s от загрузки стилей (0.3s +
- *     var(--i)*0.015s микро-стаггер — хореография та же);
- *   • бейдж-кластер (.pre-cluster) растворяется fade-out 0.18s на 0.45s;
- *   • корень [data-preloader-root] в 0.82s уходит из потока событий
- *     (visibility/pointer-events) — тапы сквозь оверлей свободны ДО
- *     JS-чистки; итог: hero открыт ≤0.8s от первого кадра БЕЗ JavaScript;
- *   • ЭТОТ компонент после гидрации только ЧИСТИТ DOM (setDone ~1.2s от
- *     монта — страховка от вечного z-10000 слоя) и ставит sessionStorage.
- *     Двери он БОЛЬШЕ НЕ ДЕРЖИТ — show-стейт/AnimatePresence не нужны.
- *   • Вход бейджа/колец/caption остался на framer (декор, не блокирует
- *     LCP): при поздней гидрации они просто не успевают появиться —
- *     кластер уже растворён CSS. Входы БЕЗ exit-пропов (выход — CSS).
- *   • Повторный визит за сессию: инлайн-скрипт в начале <body>
- *     (layout.tsx) ставит [data-no-preloader] на <html> до парсинга
- *     дверей → CSS глушит их display:none первым же стайл-резолвом.
- *   • prefers-reduced-motion: display:none из CSS — двери не красятся
- *     вовсе (раньше убирались на гидрации); no-JS: noscript-стиль
- *     layout.tsx (см. data-preloader-root на корне ниже).
+ * • Вращение бейджа (.pre-logo-spin → @keyframes pre-logo-spin 9s linear
+ *   infinite, globals.css) — compositor-only transform; элемент сидит в
+ *   SSR-HTML, анимация стартует от первого пейнта, НЕ ждёт гидрации —
+ *   «логотип уже крутится», пока грузится JS.
+ * • Кольцо прогресса — SVG circle pathLength=1 ВОКРУГ бейджа: до гидрации
+ *   стоит на статичных 12% (атрибут stroke-dashoffset в SSR-разметке — нет
+ *   прыжков); после гидрации JS пишет style.strokeDashoffset через ref —
+ *   БЕЗ ре-рендеров (грабля c85 §2: 259 inline-записей на кадр).
+ * • Прогресс честный, с потолком 90% до real-ready: DOM parsed → 35%,
+ *   hero-постер complete/load → 60%, window load → 90%, готовность к
+ *   снятию → 100% (монотонный max, ниже не опускается).
+ * • Снятие = min-show 600мс (от навигации, анти-«вспышка») ∧ (ready ∨
+ *   ЖЁСТКИЙ КАП 3.0с) — RM-ветка min-show пропускает (мгновенно по
+ *   ready, c98-FIX1: раньше докблок это обещал, а код применял таймер).
+ *   ready = hero-постер загружен (querySelector
+ *   '#hero img' complete/load/error; ФОЛБЭК без #hero — window load).
+ *   Выход: класс .pre-done → fade 0.5s + scale 0.98 бейджа, visibility:
+ *   hidden с 300мс (тапы сквозь — сразу, pointer-events:none) → DOM-чистка
+ *   (unmount) через ~340мс от старта fade — к этому моменту opacity уже
+ *   ~5% (easeOutCubic), хвост режется незаметно.
+ * • CSS-страховка мёртвого JS: [data-preloader-root] сам гаснет
+ *   pre-root-release на 4.2с (globals.css; c98-FIX1: было 3.4с — впритык к
+ *   JS-пути 3.0с+340мс, при поздней гидрации замер критика 3.83с входил в
+ *   страховку с запасом 0.17с; теперь ≥0.4с запаса при любом взводе) —
+ *   JS-путь успевает раньше, анимация реально стреляет только при мёртвой/
+ *   зависшей гидрации.
+ * • Повторный визит за сессию: инлайн-скрипт в начале <body> (layout.tsx)
+ *   ставит [data-no-preloader] на <html> до парсинга → CSS
+ *   display:none первым же стайл-резолвом. No-JS: noscript-стиль
+ *   layout.tsx. sessionStorage «catering-preloaded» — здесь.
+ * • prefers-reduced-motion: бейдж СТАТИЧЕН (CSS гасит вращение), кольцо
+ *   остаётся (не vestibular-триггер), снятие мгновенно по ready — JS
+ *   пропускает min-show (arm с wait=0, c98-FIX1 — теперь честно) и fade
+ *   (setDone напрямую, без .pre-done).
+ * • Перф: только transform/opacity/stroke-dashoffset; оверлей непрозрачный
+ *   белый поверх, hero <Image priority> грузится ПАРАЛЕЛЬНО под ним —
+ *   LCP-путь не блокируется. Логотип — сырой 41KB PNG (unoptimized:
+ *   /_next/image-раундтрип пережил бы прелоадер). Никаких шрифтов/GIF/видео.
  */
 export function Preloader() {
   const [done, setDone] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<SVGCircleElement>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // Reduced-motion: CSS уже погасил двери (display:none) — чистим DOM.
-      setDone(true);
-      return;
+
+    /* Session-флаг для СЛЕДУЮЩЕЙ навигации (повторный визит прячется
+       инлайн-скриптом layout.tsx + [data-no-preloader] ещё до гидрации).
+       RM-юзер тоже «потребил» вход — флаг ставим во всех ветках. */
+    try {
+      sessionStorage.setItem("catering-preloaded", "1");
+    } catch {
+      /* Safari private mode — молча (как в инлайн-гейте layout.tsx). */
     }
-    // Session-флаг для СЛЕДУЮЩЕЙ навигации (повторный визит прячется
-    // инлайн-скриптом layout.tsx + CSS [data-no-preloader] ещё до гидрации).
-    sessionStorage.setItem("catering-preloaded", "1");
-    // Страховка-DOM-чистка: двери уже ушли CSS-таймлайном (≤0.8s от paint),
-    // корень вне потока событий с 0.82s — здесь только убираем слой из DOM.
-    const t = setTimeout(() => setDone(true), 1200);
-    return () => clearTimeout(t);
+
+    /* RM: снятие мгновенно по ready — без min-show и без fade-класса
+       (CSS RM-блок уже погасил вращение и transition-плавность). */
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* ── Прогресс: монотонный max, потолок 0.9 до real-ready ── */
+    let progress = 0.12; /* SSR-старт кольца (stroke-dashoffset .88) */
+    const applyProgress = (target: number) => {
+      const v = Math.min(1, Math.max(progress, target));
+      if (v === progress) return;
+      progress = v;
+      /* ref-запись inline-style поверх SSR-атрибута — ноль ре-рендеров */
+      if (ringRef.current) {
+        ringRef.current.style.strokeDashoffset = (1 - v).toFixed(3);
+      }
+    };
+
+    const cleanups: Array<() => void> = [];
+    const on = (
+      target: EventTarget,
+      type: string,
+      fn: () => void,
+    ) => {
+      target.addEventListener(type, fn, { once: true });
+      cleanups.push(() => target.removeEventListener(type, fn));
+    };
+
+    /* DOM parsed → 35% (гидрация всегда после DCL — ветка на всякий случай) */
+    if (document.readyState !== "loading") applyProgress(0.35);
+    else on(document, "DOMContentLoaded", () => applyProgress(0.35));
+
+    /* ── Снятие: min-show 600мс (ОТ НАВИГАЦИИ — performance.now) ∧ ready ∨
+       кап 3.0с (тоже от навигации: поздняя гидрация не продлевает оверлей). ── */
+    const MIN_SHOW = 600;
+    const HARD_CAP = 3000;
+    let removed = false;
+    let removeTimer: number | undefined;
+    const remove = () => {
+      if (removed) return;
+      removed = true;
+      if (reduce) {
+        setDone(true); /* RM: мгновенно, без fade */
+        return;
+      }
+      rootRef.current?.classList.add("pre-done");
+      /* DOM-чистка через 340мс от старта fade: visibility:hidden уже
+         сработал (300мс), opacity ~5% — хвост transition не виден. */
+      removeTimer = window.setTimeout(() => setDone(true), 340);
+    };
+    const arm = () => {
+      applyProgress(1); /* real-ready → кольцо до упора */
+      /* c98-FIX1 (критик1 #8, NIT→FIX): RM — честное «мгновенное снятие по
+       * ready»: wait=0 (докблок это всегда обещал, код применял min-show).
+       * Не-зеро-таймер сохранён для обычного пути (анти-«вспышка»). */
+      const wait = reduce ? 0 : Math.max(0, MIN_SHOW - performance.now());
+      removeTimer = window.setTimeout(remove, wait);
+    };
+
+    /* ready = hero-постер загружен; error постера = complete → тоже ready
+       (не виснем на битой картинке). Нет #hero (напр. /admin) — фолбэк
+       window load. Секция #hero сидит в SSR-HTML — img виден сразу. */
+    const heroImg = document.querySelector(
+      "#hero img",
+    ) as HTMLImageElement | null;
+    if (heroImg) {
+      const onHero = () => {
+        applyProgress(0.6); /* +25% — LCP-кадр на месте */
+        arm();
+      };
+      if (heroImg.complete) onHero();
+      else {
+        on(heroImg, "load", onHero);
+        on(heroImg, "error", onHero);
+      }
+    } else {
+      if (document.readyState === "complete") arm();
+      else on(window, "load", arm);
+    }
+
+    /* window load → 90% (потолок до real-ready: arm() единственный путь к 1) */
+    const onLoad = () => applyProgress(0.9);
+    if (document.readyState === "complete") onLoad();
+    else on(window, "load", onLoad);
+
+    /* ЖЁСТКИЙ КАП: зависший запрос не вешает белый экран навсегда. */
+    const capDelay = Math.max(0, HARD_CAP - performance.now());
+    const cap = window.setTimeout(remove, capDelay);
+
+    return () => {
+      cleanups.forEach((fn) => fn());
+      window.clearTimeout(cap);
+      if (removeTimer !== undefined) window.clearTimeout(removeTimer);
+    };
   }, []);
 
   if (done) return null;
 
-  const panels = [0, 1, 2, 3];
   return (
-    <div data-preloader-root className="fixed inset-0 z-[10000] flex">
-      {/* NILOV badge cluster — screen-centered, floating above the doors.
-          pointer-events-none so it never blocks the page beneath.
-          NB: no entrance on this wrapper (carried by the badge spring /
-          ring pulses / caption fade below); the wrapper only OWNS the CSS
-          exit fade (.pre-cluster — см. globals.css, 81-F1). */}
-      <div className="pre-cluster pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center">
-        <div className="relative flex items-center justify-center">
-          {/* Gold pulse rings — expand from the badge edge, 2 staggered
-              cycles each (transform/opacity only). C71-P1: тайминги
-              сжаты под 450ms-долл (0.55/0.35+r*0.15 → 0.3/0.12+r*0.08). */}
-          {[0, 1].map((r) => (
-            <motion.span
-              key={r}
-              className="absolute inset-0 rounded-full border-[1.5px] border-[#D4A574]"
-              aria-hidden
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: [0.95, 1.12, 1.8], opacity: [0, 0.7, 0] }}
-              transition={{
-                duration: 0.3,
-                repeat: 2,
-                delay: 0.12 + r * 0.08,
-                ease: "easeOut",
-                times: [0, 0.2, 1],
-              }}
-            />
-          ))}
-          {/* The round NILOV badge — black circle, white letters, gold
-              arcs. Spring entrance: scale 0.6→1, rotate -8°→0, light
-              bounce. C71-P1: пружина жёстче (260/18 → 320/22) и старт
-              раньше (0.15 → 0.05) — бейдж успевает «приземлиться» внутри
-              450ms-долла. `unoptimized`: the preloader lives <0.5s — the
-              /_next/image optimizer round-trip (slow on first, cold
-              request) could outlive it and leave empty doors; the raw
-              256px PNG is only 41KB, so it is served as-is. */}
-          <motion.div
-            initial={{ scale: 0.6, rotate: -8, opacity: 0 }}
-            animate={{ scale: 1, rotate: 0, opacity: 1 }}
-            transition={{
-              type: "spring",
-              stiffness: 320,
-              damping: 22,
-              delay: 0.05,
-            }}
+    <div
+      ref={rootRef}
+      data-preloader-root
+      role="status"
+      aria-label="Загрузка сайта"
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-white"
+    >
+      {/* Центр-кластер: SVG-гейдж (кольцо прогресса r=47, stroke 2.5) с
+          вращающимся бейджем внутри (диаметр 64 из 100 юнитов viewBox) +
+          caption. Кольцо стартует со static 12% (dashoffset-атрибут ниже),
+          JS двигает его ref-записями — разметка не меняется после гидрации
+          (SSR-паритет). */}
+      <div className="flex flex-col items-center">
+        <div className="relative">
+          <svg
+            viewBox="0 0 100 100"
+            className="block size-[176px] md:size-[208px]"
+            aria-hidden="true"
           >
+            {/* След колец — тёплый полутон на белом, не спорит с бейджем */}
+            <circle
+              className="pre-ring-track"
+              cx="50"
+              cy="50"
+              r="47"
+              fill="none"
+              strokeWidth="2.5"
+            />
+            {/* Прогресс: pathLength=1 → dasharray 1; видимо 1−offset долей
+                дуги; rotate(-90) — старт с 12 часов, по ходу часов. Цвет —
+                фирменный --gold (globals.css :root), transition 0.3s — в
+                .pre-ring (globals.css, c98-E). */}
+            <circle
+              ref={ringRef}
+              className="pre-ring"
+              cx="50"
+              cy="50"
+              r="47"
+              fill="none"
+              strokeWidth="2.5"
+              pathLength={1}
+              strokeDasharray={1}
+              strokeDashoffset={0.88}
+              strokeLinecap="round"
+              transform="rotate(-90 50 50)"
+            />
+          </svg>
+          {/* Бейдж-обёртка владеет scale-выходом (0.98 при .pre-done);
+              вращение — на самом img (.pre-logo-spin): transform-свойства
+              не конфликтуют (урок c81 — масштаб и поворот на разных узлах). */}
+          <div className="pre-logo-wrap absolute inset-0 flex items-center justify-center">
             <Image
               src="/brand/logo-256.png"
-              alt="Логотип nilov catering — круглый бейдж"
+              alt=""
               width={256}
               height={256}
               priority
               unoptimized
-              className="size-[120px] md:size-[150px]"
+              className="pre-logo-spin size-[64%]"
             />
-          </motion.div>
+          </div>
         </div>
-        {/* Caption — spaced caps, gold, fades in after the badge lands.
-            C71-P1: delay 0.55 → 0.2, duration 0.5 → 0.3 (вписывается в
-            450ms-долл вместе со спрингом бейджа). */}
-        <motion.span
-          className="tott-body mt-5 text-[11px] font-700 uppercase tracking-[0.35em] text-gold/70"
-          style={{ fontWeight: 700 }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.3 }}
-        >
+        {/* Caption — мелкий tracking-широкий, спокойный тёплый графит на
+            белом (.pre-caption, контраст 5.7:1); Karla уже в head (tott-body),
+            новых шрифтовых запросов прелоадер не создаёт. */}
+        <span className="pre-caption tott-body mt-6 text-[11px] font-bold uppercase tracking-[0.35em]">
           NILOV&nbsp;CATERING
-        </motion.span>
+        </span>
       </div>
-
-      {/* Door panels — 81-F1: ВЫХОД на CSS (.pre-panel → pre-panel-exit
-          0.3s cubic-bezier(.83,0,.17,1), delay calc(.45s + var(--i)*.015s),
-          fill both — см. globals.css). Тот же градиент/бордюры/стаггер,
-          что и раньше; --i — микро-стаггер панелей (0/1/2/3). */}
-      {panels.map((i) => (
-        <div
-          key={i}
-          className="pre-panel h-full flex-1 bg-gradient-to-b from-cream to-parchment border-r border-white/20 last:border-r-0"
-          style={{ "--i": i } as React.CSSProperties}
-        />
-      ))}
     </div>
   );
 }

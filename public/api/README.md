@@ -19,23 +19,35 @@ PHP ≥ 8.1 без фреймворков, живёт в статик-экспо
 
 ## POST /api/lead.php — заявка (без авторизации)
 
-Защита: same-origin (`X-Requested-With: XMLHttpRequest` + Origin ∈ allowlist:
-прод / localhost:3001 / localhost:3005 / зеркало Vercel); rate-limit 6/час и
-30/сутки на IP; honeypot + `elapsedMs<1500` → молчаливый фейковый `ok:true`
-(без сохранения и уведомлений).
+Защита: same-origin (Origin ∈ allowlist: прод / localhost:3001 /
+localhost:3005 / зеркало Vercel; c98-A: same-origin Origin достаточен и БЕЗ
+`X-Requested-With` — так проходят sendBeacon-запросы; без Origin XRW обязателен,
+как раньше); rate-limit 12/час и 60/сутки на IP (c98-A: было 6/30) + глобальный
+120/час; honeypot ИЛИ `elapsedMs<1500` → фейковый `ok:true` + запись в
+`server-data/spam-log.json` (c98-A: раньше молчаливая смерть — реальный клиент
+терялся без следа; ОТСУТСТВУЮЩИЙ `elapsedMs` больше НЕ ловушка — старый
+кэш-бандл не слал поле).
 
 Тело: `name` (1–100), `phone` (7–25, ≥9 цифр), `source` ∈
 `calculator|contact|footer`, `consent:true`; опционально `email` (≤120),
 `comment` (≤2000), `payload` (объект ≤8 КБ: typeId, guests, dateIso, pkgName,
-addonIds, total, preferredTime, undecided, …), `honeypot`, `elapsedMs`.
+addonIds, total, preferredTime, undecided, …), `honeypot`, `elapsedMs`,
+`clientId` (c98-A: UUID v4, 8–64 hex — идемпотентность: ретрай/sendBeacon-дубль
+с тем же clientId возвращает `200 {ok:true,id,dedupe:true}` без повторной
+записи и уведомлений; хранится в записи лида).
 
-Ответы: `200 {ok:true,id}` · `400 {error:validation|bad_json|too_large}`
+Ответы: `200 {ok:true,id[,dedupe:true]}` · `400 {error:validation|bad_json|too_large}`
 · `403 {error:origin}` · `405` · `429 {error:rate,retryAfterSec}` ·
 `500 {error:delivery}` — только если заявка НЕ записана и ни одно уведомление
 (Telegram + mail) не доставлено (клиент переключается на mailto-фолбэк).
 
 Хранение: `server-data/leads.json` (cap 1000; старейшие → `leads-archive.json`,
-cap 5000). Полный IP не хранится — только md5-префикс. Уведомления: Telegram
+cap 5000). c98-A: битый `leads.json`/`leads-archive.json` НЕ затирается —
+бэкапится в `<имя>.corrupt-<Ymd-His>.json`, новая заявка получает
+`rescuedFrom` (защита от «весь файл заявок перезаписан одной строкой»).
+Полный провал уведомлений → `lead.notify`-статусы (✕✕ в админке) + запись
+`lead-notify-fail` в mail-log.json + один ретрай через 5с в фоне после
+`fastcgi_finish_request`. Полный IP не хранится — только md5-префикс. Уведомления: Telegram
 Bot API (если в настройках есть токен+chat_id; API-base переопределяемый) +
 почта через `mail_send()` (SMTP из настроек → фолбэк `mail()`) на
 `settings.notifyEmail` (фолбэк `NOTIFY_EMAIL_FALLBACK`). c97: клиенту с email
@@ -67,7 +79,8 @@ Bot API (если в настройках есть токен+chat_id; API-base 
 | `tg-discover`  | POST  | ✓    | —                | `200 {ok,chats:[{id,name,type}],hint?}` (getUpdates; напишите боту сообщение) |
 | `tg-test`      | POST  | ✓    | `{chatId?,token?}` | `200 {ok:true}` \| `200 {ok:false,error,retryAfterSec?}` (sendMessage) |
 | `mail-test`    | POST  | ✓    | `{to?}` (иначе notifyEmail/фолбэк) | `200 {ok,to,transport,error?,detail?}` — тестовое письмо тем же каналом, что заявки (rate 10/час) |
-| `mail-log`     | GET   | ✓    | `&limit=1..50` (по умолчанию 10) | `200 {ok,entries:[{ts,to,context,subject,transport,ok,error?}]}` (новые сверху) |
+| `mail-log`     | GET   | ✓    | `&limit=1..50` (по умолчанию 10) | `200 {ok,entries:[{ts,to,context,subject,transport,ok,error?}]}` (новые сверху; c98-A: контекст `lead-notify-fail` = уведомление о заявке не доставлено ни одним каналом) |
+| `spam-log`     | GET   | ✓    | `&limit=1..50` (по умолчанию 5)  | c98-A: `200 {ok,entries:[{ts,reason,elapsedMs,name,phone,email?,comment?,source,clientId?}]}` — сабмиты, пойманные honeypot/elapsed-ловушками (новые сверху) |
 | `password`     | POST  | ✓    | `{current,new}`  | `200 {ok}` · `401 bad_password` · `429 locked` (5/час) · `400 validation` (новый 8–128) |
 
 Неизвестный action → `404 {error:unknown_action}`.
@@ -79,7 +92,9 @@ Bot API (если в настройках есть токен+chat_id; API-base 
   `500 {error:"not_configured"}` (кроме `lead.php` — он работает и без
   секретов, просто без TG/mail-уведомлений).
 - `../server-data/` — runtime: `settings.json`, `leads.json`,
-  `leads-archive.json`, `rl-*.json` (счётчики rate-limit). Закрыт из веба
+  `leads-archive.json`, `spam-log.json` (c98-A, cap 300), `mail-log.json`,
+  `*.corrupt-*.json` (c98-A: спасённые битые файлы), `rl-*.json` (счётчики
+  rate-limit). Закрыт из веба
   (`Require all denied` + RedirectMatch 404 в корневом .htaccess).
   При деплое rsync пишет каталог заново, но `--delete` затирает только файлы,
   которых нет в экспорте — server-data живёт между деплоями (заявки теряются

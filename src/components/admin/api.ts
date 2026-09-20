@@ -118,6 +118,10 @@ export interface Lead {
   email?: string;
   comment?: string;
   payload?: Record<string, unknown>;
+  /** c98-A: ключ идемпотентности (UUID от клиента) — дедуп ретраев. */
+  clientId?: string | null;
+  /** c98-A: имя backup-файла, если лид записан после битого leads.json. */
+  rescuedFrom?: string;
   /** c97: доставлены ли уведомления (TG/почта/клиенту) — после отправки. */
   notify?: LeadNotify;
 }
@@ -617,6 +621,35 @@ export async function apiMailLog(
   });
   if (r.status === 200 && r.body?.ok === true && Array.isArray(r.body.entries)) {
     return { ok: true, entries: r.body.entries as MailLogEntry[] };
+  }
+  return { ok: false, entries: [] };
+}
+
+/** c98-A: сабмит, пойманный анти-спам ловушкой (honeypot/elapsedMs). */
+export interface SpamLogEntry {
+  ts: number | null;
+  /** 'honeypot' | 'elapsed' */
+  reason: string;
+  elapsedMs: number | null;
+  name: string;
+  phone: string;
+  email: string | null;
+  comment: string | null;
+  source: string;
+  clientId: string | null;
+}
+
+/** c98-A: журнал спам-ловушек — если туда попал реальный клиент, владелец
+ *  видит его имя/телефон и может перезвонить (до c98 лид терялся без следа). */
+export async function apiSpamLog(
+  limit = 5,
+): Promise<{ ok: boolean; entries: SpamLogEntry[] }> {
+  const r = await adminApi("spam-log", {
+    method: "GET",
+    params: { limit: String(limit) },
+  });
+  if (r.status === 200 && r.body?.ok === true && Array.isArray(r.body.entries)) {
+    return { ok: true, entries: r.body.entries as SpamLogEntry[] };
   }
   return { ok: false, entries: [] };
 }

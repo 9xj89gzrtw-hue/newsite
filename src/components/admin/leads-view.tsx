@@ -6,7 +6,7 @@
  */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Check,
   CheckCheck,
@@ -19,13 +19,14 @@ import {
   Phone,
   RotateCcw,
   Send,
+  ShieldAlert,
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatRUB } from "@/lib/pricing";
 import type { MenuData } from "@/lib/menu-schema";
-import type { Lead } from "./api";
-import { apiLeadDelete, apiLeadUpdate } from "./api";
+import type { Lead, SpamLogEntry } from "./api";
+import { apiLeadDelete, apiLeadUpdate, apiSpamLog } from "./api";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -352,6 +353,10 @@ export function LeadsView({
         </div>
       )}
 
+      {/* c98-A: сабмиты, пойманные анти-спам ловушками — до c98 они
+          умирали молча; реальный клиент мог потеряться без следа. */}
+      <SpamTrapCard />
+
       <AlertDialog open={deleteId !== null} onOpenChange={(v) => !v && setDeleteId(null)}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
@@ -435,6 +440,21 @@ function LeadCard({
               >
                 {SOURCE_LABELS[lead.source] ?? lead.source}
               </Badge>
+              {/* c98-FIX1 (критик2 #6, MINOR): rescuedFrom — заявка записана
+                  ПОВЕРХ битого leads.json (старые данные спасены в
+                  leads.corrupt-*.json). До фикса поле существовало только в
+                  JSON/интерфейсе — владелец не видел маркер и не знал про
+                  аварию хранилища. Тон destructive — сигнал «проверить
+                  вручную»; title подсказывает, где искать бэкап. */}
+              {lead.rescuedFrom ? (
+                <Badge
+                  variant="outline"
+                  className="rounded-full border-destructive/40 text-[11px] font-normal text-destructive"
+                  title={`Данные восстановлены после сбоя хранилища (${lead.rescuedFrom}) — проверьте заявки из бэкапа вручную`}
+                >
+                  восстановлено после сбоя хранилища
+                </Badge>
+              ) : null}
             </div>
             <p className="mt-0.5 text-[12.5px] text-ink-soft/80">
               {formatLeadDate(lead.ts)}
@@ -607,5 +627,108 @@ function NotifyBadges({ lead }: { lead: Lead }) {
         <span className="text-destructive">— ни одно не доставлено</span>
       ) : null}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------ spam trap (c98-A) */
+
+const SPAM_REASON_LABELS: Record<string, string> = {
+  honeypot: "заполнено скрытое поле",
+  elapsed: "отправлено мгновенно",
+};
+
+/**
+ * c98-A — «Ловушка спама»: сабмиты, пойманные honeypot/elapsed-ловушками.
+ * Показывается ТОЛЬКО если записи есть: сюда мог попасть реальный клиент
+ * (например, старый кэш-бандл без elapsedMs) — владелец проверяет и
+ * перезванивает. Данные те же, что у бейджей доставки: мини-таблица.
+ */
+function SpamTrapCard() {
+  const [entries, setEntries] = useState<SpamLogEntry[]>([]);
+  const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  /* Последние 5 — тихая загрузка при появлении раздела «Заявки»;
+   * пустой журнал не занимает место (секция не рендерится). */
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    void apiSpamLog(5).then((r) => {
+      if (alive) setEntries(r.entries);
+      if (alive) setLoading(false);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  if (loading) return null;
+  if (entries.length === 0) return null;
+
+  const showAll = async () => {
+    setLoading(true);
+    const r = await apiSpamLog(50);
+    setEntries(r.entries);
+    setLoading(false);
+    setExpanded(true);
+  };
+
+  return (
+    <Card className="mt-6 rounded-2xl border-border-line/80 shadow-none">
+      <CardContent className="p-4 sm:p-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <ShieldAlert className="size-4 text-ink-soft" />
+          <h3 className="text-[14px] font-semibold text-ink">Ловушка спама</h3>
+          <span className="text-[12px] text-ink-soft/70">
+            последние {entries.length}
+          </span>
+        </div>
+        <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft/80">
+          Сюда попадают подозрительные отправки форм. Реальный клиент мог
+          попасть по ошибке — проверьте: если это заказчик, просто
+          перезвоните ему.
+        </p>
+        <div className="mt-3 space-y-1.5">
+          {entries.map((e, i) => (
+            <div
+              key={i}
+              className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-ink-soft"
+            >
+              <span className="text-ink-soft/70">
+                {e.ts ? formatLeadDate(e.ts) : "—"}
+              </span>
+              <Badge
+                variant="outline"
+                className="rounded-full border-border-line text-[11px] font-normal text-ink-soft"
+              >
+                {SPAM_REASON_LABELS[e.reason] ?? e.reason}
+              </Badge>
+              {e.name ? <span className="text-ink">{e.name}</span> : null}
+              {e.phone ? (
+                <a
+                  href={`tel:${e.phone.replace(/[^\d+]/g, "")}`}
+                  className="font-medium text-ink hover:text-gold"
+                >
+                  {e.phone}
+                </a>
+              ) : null}
+              {e.email ? <span>{e.email}</span> : null}
+            </div>
+          ))}
+        </div>
+        {!expanded && entries.length >= 5 ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-3 h-9 rounded-xl text-[13px]"
+            onClick={showAll}
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="size-4 animate-spin" /> : null}
+            Показать все
+          </Button>
+        ) : null}
+      </CardContent>
+    </Card>
   );
 }

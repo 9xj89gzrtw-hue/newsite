@@ -477,6 +477,43 @@ function EmailCard({
                   этим ящиком — письма подписаны DKIM и не попадают в спам.
                 </p>
               </div>
+
+              {/* c98-A: письма на Gmail/Яндекс — пароль приложения */}
+              <div className="mt-4 rounded-xl border border-border-line/70 bg-parchment/30 p-4">
+                <h4 className="text-[13.5px] font-semibold text-ink">
+                  Хотите отправлять с Gmail или Яндекс-почты?
+                </h4>
+                <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft/90">
+                  Обычный пароль не подойдёт — нужен «пароль приложения»
+                  (специальный для программ). Настраивается один раз:
+                </p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-lg border border-border-line/70 bg-background p-3">
+                    <p className="text-[12.5px] font-semibold text-ink">Gmail</p>
+                    <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[12px] leading-relaxed text-ink-soft">
+                      <li>Аккаунт Google → Безопасность → включите 2-шаговую проверку.</li>
+                      <li>Там же → «Пароли приложений» → создайте (для «Почта»).</li>
+                      <li>Сюда: сервер <code>smtp.gmail.com</code>, порт <code>465</code>,
+                        ящик — ваш Gmail, пароль — 16 символов из пароля приложения.</li>
+                    </ol>
+                  </div>
+                  <div className="rounded-lg border border-border-line/70 bg-background p-3">
+                    <p className="text-[12.5px] font-semibold text-ink">Яндекс</p>
+                    <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[12px] leading-relaxed text-ink-soft">
+                      <li>Яндекс ID → Безопасность → включите «Пароли приложений».</li>
+                      <li>Создайте пароль приложения (для «почты»).</li>
+                      <li>Сюда: сервер <code>smtp.yandex.ru</code>, порт <code>465</code>,
+                        ящик — ваш Яндекс-логин, пароль приложения. Отправитель
+                        (From) должен совпадать с логином.</li>
+                    </ol>
+                  </div>
+                </div>
+                <p className="mt-2.5 text-[12px] leading-relaxed text-ink-soft/80">
+                  Текущий канал (через хостинг) уже работает — если письмо
+                  «не пришло», проверьте папку «Спам». SMTP добавит к письмам
+                  DKIM-подпись выбранного провайдера.
+                </p>
+              </div>
             </div>
           ) : null}
         </div>

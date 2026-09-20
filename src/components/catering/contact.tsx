@@ -659,6 +659,12 @@ export function Contact() {
   // outgoing lead so «Отправить заявку с расчётом» keeps its promise.
   const [calcSnapshot, setCalcSnapshot] = useState<CalcSnapshot | null>(null);
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
+  /* c98-FIX2 (критик4 MAJOR#2): queued-режим успех-оверлея — сервер НЕ
+   * подтвердил приём (сеть/сбой), заявка живёт в localStorage-outbox
+   * (доотправится автоматически, c98-A) + открылся mailto. Оверлей больше
+   * НЕ врёт «мы получили вашу заявку» — честный текст в тоне
+   * hacc-booking (c98-FIX1): «сохранена — отправим автоматически». */
+  const [formQueued, setFormQueued] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const formRef = useRef<HTMLFormElement>(null);
   /* c95 (1-d): анти-спам-поля для POST /api/lead.php — honeypot
@@ -869,6 +875,7 @@ export function Contact() {
        * truthiness): tsconfig без strictNullChecks не сужает union в
        * дополнении — явное сравнение сужает обе ветки (tsc 5.9.3). */
       if (result.ok !== false) {
+        setFormQueued(false);
         setFormStatus("success");
         toast.success(
           "Заявка отправлена! Мы перезвоним в течение 15 минут в рабочее время.",
@@ -881,18 +888,26 @@ export function Contact() {
         return;
       }
 
-      /* ── ФОЛЛБЭК: прежнее поведение 1:1 (до c95) — открыть почту с
-       * предзаполненным письмом. Один console.warn на страницу. */
+      /* ── ФОЛЛБЭК (mailto + outbox): эндпоинт недоступен/отверг запрос.
+       * Один console.warn на страницу (диагностика без toast-спама).
+       * c98-FIX2 (критик4 MAJOR#2): оверлей — ЧЕСТНЫЙ queued-статус
+       * («сохранена», НЕ «мы получили»): заявка в outbox (доотправится
+       * автоматически при следующем визите, ≤3 попыток) + mailto как
+       * параллельный быстрый канал — тот же тон, что в hacc-booking
+       * c98-FIX1 (раньше оверлей противоречил и тосту, и факту). */
       if (!fallbackWarnedRef.current) {
         fallbackWarnedRef.current = true;
         console.warn(
           `[lead] POST /api/lead.php не прошёл (reason=${result.reason}${
             result.retryAfterSec ? `, retryAfterSec=${result.retryAfterSec}` : ""
-          }) — включаю mailto-фоллбэк`,
+          }) — включаю mailto-фоллбэк + outbox-доотправку`,
         );
       }
+      setFormQueued(true);
       setFormStatus("success");
-      toast.success("Открываем почту — отправьте письмо с заявкой. Или позвоните нам напрямую.");
+      toast.success(
+        "Заявка сохранена — отправим автоматически. Открылся почтовый клиент? Нажмите «Отправить», и она придёт быстрее.",
+      );
 
       try {
         window.localStorage.removeItem(DRAFT_KEY);
@@ -1078,7 +1093,8 @@ export function Contact() {
                       transition={{ delay: 0.4 }}
                       className="mt-4 text-center font-display text-xl text-ink"
                     >
-                      Заявка отправлена!
+                      {/* c98-FIX2: queued — «сохранена», а не «отправлена». */}
+                      {formQueued ? "Заявка сохранена" : "Заявка отправлена!"}
                     </motion.p>
                     <motion.p
                       initial={{ opacity: 0, y: 10 }}
@@ -1086,8 +1102,24 @@ export function Contact() {
                       transition={{ delay: 0.6 }}
                       className="mt-2 text-sm text-ink/70"
                     >
-                      Мы получили вашу заявку и перезвоним в течение 15 минут
-                      в рабочее время (Пн–Пт 9:00–19:00, Сб 10:00–16:00).
+                      {/* c98-FIX2 (критик4 MAJOR#2): фолббэк-ветка больше НЕ
+                          обещает «мы получили и перезвоним» — сервер заявку
+                          не принял; честный текст про авто-доотправку outbox
+                          + ускорение через почтового клиента. */}
+                      {formQueued ? (
+                        <>
+                          Заявка сохранена и <b>отправится автоматически</b> —
+                          как только связь восстановится. Если открылся
+                          почтовый клиент — нажмите «Отправить», и она
+                          придёт мгновенно.
+                        </>
+                      ) : (
+                        <>
+                          Мы получили вашу заявку и перезвоним в течение 15
+                          минут в рабочее время (Пн–Пт 9:00–19:00,
+                          Сб 10:00–16:00).
+                        </>
+                      )}
                     </motion.p>
                     <motion.button
                       type="button"
@@ -1097,6 +1129,7 @@ export function Contact() {
                       onClick={() => {
                         setData(EMPTY);
                         setStep(0);
+                        setFormQueued(false); // c98-FIX2: сброс queued-статуса
                         setFormStatus("idle");
                       }}
                       className="mt-6 min-h-[44px] rounded-full border border-border-line px-6 py-3 text-sm font-medium text-ink/70 transition-colors hover:border-gold hover:text-gold"

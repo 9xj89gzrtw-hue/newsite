@@ -21,6 +21,18 @@
  *  - якорь #contact ведёт на контакты компании (id на ContactsZone),
  *    зона формы — #lead-form, открывается только CTA «Оставить заявку».
  *
+ * c98-B (джиттер калькулятора на мобильных — «дёргается в определённом
+ *  положении экрана»): (1) hb-sway — вращение бумаги чека ±0.8° по всей
+ *  прокрутке секции — выключено на <768 (hacc-booking.css);
+ *  (2) sticky-bar — гистерезис 300мс на скрытие: IO зон/секции осциллирует
+ *  у границ полосы, бар мигал (transform 0.35s) вместе с лифтом FAB
+ *  (body:has-селектор); (3) ретаргет-скролл +1030мс в
+ *  scheduleScrollAfterType удалён — вторая lenis-команда посреди первой
+ *  анимации = видимый рывок; (4) openForm — ОДИН скролл (600мс, гвард
+ *  «юзер уехал сам») вместо трёх тактов 0/300/700; (5) микроподсказка
+ *  «Пакет и гости — ниже» — защёлкнута: её монтирование в потоке прыгало
+ *  лэйаутом ~30px у порога IO 0.35 туда-обратно.
+ *
  * Спецификация: research/c64/SPEC.md (12 контрактов §2 — соблюдены буквально,
  * см. карту контрактов в конце файла). Дизайн: research/c64/RESEARCH-DESIGN.md
  * («Смета-чек», one-screen booking cockpit).
@@ -1292,24 +1304,28 @@ const LeadForm = memo(function LeadForm({
       }
 
       /* ── ФОЛЛБЭК: эндпоинт недоступен/отверг запрос — деградация к
-       * ТОЧНОМУ поведению до c95 (mailto + двухшаговый UX: тост
-       * «отправьте письмо» → почтовый клиент → успех). Один
-       * console.warn на страницу — диагностика без toast-спама. */
+       * mailto + outbox (c98-A). Один console.warn на страницу —
+       * диагностика без toast-спама.
+       * c98-FIX1 (критик 3 MAJOR «ложная квитанция»): было ДВА
+       * противоречащих тоста («отправьте письмо» → «Заявка принята!») +
+       * клиентский фейковый №. Теперь ОДИН честный тост: заявка в outbox
+       * (доотправится автоматически), почтовый клиент — параллельный
+       * быстрый канал; квитанция в queued-режиме без номера. */
       if (!fallbackWarnedRef.current) {
         fallbackWarnedRef.current = true;
         console.warn(
           `[lead] POST /api/lead.php не прошёл (reason=${result.reason}${
             result.retryAfterSec ? `, retryAfterSec=${result.retryAfterSec}` : ""
-          }) — включаю mailto-фоллбэк`,
+          }) — включаю mailto-фоллбэк + outbox-доотправку`,
         );
       }
-      // SPEC §2.4: на статике «ошибка сервера» невозможна — просто открываем
-      // почту; success-карточка + салют показываются как при 2xx.
-      toast.success(`Заявка готова — отправьте письмо из почтового клиента. ${toastPromise}.`);
+      toast.success(
+        "Заявка сохранена — отправим автоматически. Открылся почтовый клиент? Нажмите «Отправить», и она придёт быстрее.",
+      );
       try {
         window.location.assign(mailto);
       } catch {
-        // браузер заблокировал навигацию — success-карточка всё равно видна
+        // браузер заблокировал навигацию — outbox всё равно доотправит
       }
 
       try {
@@ -1317,7 +1333,6 @@ const LeadForm = memo(function LeadForm({
       } catch {
         // non-critical
       }
-      toast.success(`Заявка принята! ${toastPromise}.`);
       /* C71 (Task 1-c2): золотой салют из формы — эмоциональная точка
        * конверсии (reduce-motion → noop внутри утилиты, анти-спам ≤2). */
       fireGoldConfetti(formEl);
@@ -1764,13 +1779,17 @@ function ConfettiBurst() {
  * formatLeadNo); CUID из API не показываем. */
 function SuccessPanel({
   leadNo,
+  queued,
   metaLine,
   promiseLine,
   onReset,
   settled,
 }: {
-  /** Отображаемый номер (ДДММ-ЧЧММ) — всегда есть на этапе success. */
+  /** Отображаемый номер (ДДММ-ЧЧММ) — есть только при серверном подтверждении
+   *  (c98-FIX1: queued-режим без номера — без ложных обещаний). */
   leadNo: string;
+  /** c98-FIX1 (критик 3 MAJOR): фолббэк-ветка — заявка в outbox, номера нет. */
+  queued: boolean;
   metaLine: string;
   promiseLine: string;
   onReset: () => void;
@@ -1803,10 +1822,25 @@ function SuccessPanel({
           animate={{ scale: 1, opacity: 1, filter: "blur(0px)", rotate: -12 }}
           transition={{ duration: 0.45, delay: 0.2, ease: "backOut" }}
         >
-          Заявка принята
+          {/* c98-FIX1: queued-режим — честный статус «сохранена» (сервер не
+              подтвердил приём), а не «принята». */}
+          {queued ? "Заявка сохранена" : "Заявка принята"}
         </motion.span>
+        {/* c98-FIX1: в queued-режиме НЕТ номера (сервер его не выдал) —
+            честная строка про автоматическую доотправку outbox'ом c98-A
+            (при следующем визите, ≤3 попыток) + подстраховка почтой. */}
         <p className="hb-success__no">
-          Номер заявки: <b>№ {leadNo}</b>
+          {queued ? (
+            <>
+              Заявка сохранена и <b>отправится автоматически</b> — как только
+              связь восстановится. Если открылся почтовый клиент — нажмите
+              «Отправить», и она придёт мгновенно.
+            </>
+          ) : (
+            <>
+              Номер заявки: <b>№ {leadNo}</b>
+            </>
+          )}
         </p>
         {/* C6+C7 (task 9-fix2): динамическое обещание, с заглавной. */}
         <p className="hb-success__script">{promiseLine}</p>
@@ -2641,8 +2675,14 @@ export function HaccBooking() {
   const [stage, setStage] = useState<Stage>("calc");
   const [leadId, setLeadId] = useState<string | number | undefined>(undefined);
   /* 81-F2: отображаемый номер квитанции (ДДММ-ЧЧММ, из времени приёма) —
-   * CUID-подобный id из API не рендерим (критик B). */
+   * CUID-подобный id из API не рендерим (критик B).
+   * c98-FIX1 (критик 3 MAJOR «ложная квитанция»): id===undefined = сервер
+   * НЕ подтвердил приём (mailto-фолббэк) → НЕТ фейкового номера: квитанция
+   * честно показывает «сохранена — отправим автоматически» (outbox c98-A
+   * доотправит при следующем визите), а не «принята № …». */
   const [leadNo, setLeadNo] = useState("");
+  /** c98-FIX1: режим «в очереди» — success-карточка без серверного номера. */
+  const [leadQueued, setLeadQueued] = useState(false);
   /** X2 (task 13-fix4): чек вошёл во вьюпорт — с этого момента строки
    *  «печатаются» (PrintLine); до того — статика (SSR/no-JS/reduce §34). */
   const [paperInView, setPaperInView] = useState(false);
@@ -2839,19 +2879,38 @@ export function HaccBooking() {
     return () => window.removeEventListener("catering:menu-select", handler);
   }, [setTypeId, setPkgParam]);
 
-  /* Sticky-bar виден только у секции (один IO, без scroll-listener'ов). */
+  /* Sticky-bar виден только у секции (один IO, без scroll-listener'ов).
+     c98-B (джиттер у границ секции): показ — мгновенно, скрытие —
+     гистерезис 300мс непрерывного «секции нет» (таймер сбрасывается любым
+     возвратом isIntersecting). Раньше мгновенное setNear(false) у границы
+     + осцилляция скролла (хвост Lenis duration 1.2 / резинка iOS) мигали
+     баром — transform 0.35s туда-обратно — и тянули лифт FAB
+     (body:has(.hb-bar[data-visible]) в CSS). */
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
+    let hideTimer = 0;
     const io = new IntersectionObserver(
       (entries) => {
         const e = entries[0];
-        setNear(e.isIntersecting);
+        if (e.isIntersecting) {
+          window.clearTimeout(hideTimer);
+          hideTimer = 0;
+          setNear(true);
+        } else if (!hideTimer) {
+          hideTimer = window.setTimeout(() => {
+            hideTimer = 0;
+            setNear(false);
+          }, 300);
+        }
       },
       { rootMargin: "140px 0px 0px 0px" },
     );
     io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      window.clearTimeout(hideTimer);
+    };
   }, []);
 
   /* D3 (task 7-fix1): ОДИН IO на зоны (типы / пакеты / гости / допуслуги /
@@ -2873,26 +2932,59 @@ export function HaccBooking() {
     ].filter((el): el is NonNullable<(typeof els)[number]> => !!el);
     if (!els.length) return;
     const state = new Map<HTMLElement, boolean>();
+    /* c98-B (джиттер «в определённом положении экрана»): IO нижней полосы
+       переключается на КАЖДОМ пересечении границы зоны — у границы полоса
+       осциллирует (хвост Lenis / инерция iOS), бар многократно уезжал/
+       въезжал (transform 0.35s) вместе с лифтом FAB (body:has-селектор).
+       Гистерезис: скрытие — только после 300мс НЕПРЕРЫВНОГО покрытия
+       полосы хоть одной зоной (таймер гасится любым «полоса свободна»),
+       показ — мгновенно. Осцилляция границы теперь просто держит бар. */
+    let hideTimer = 0;
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) state.set(e.target as HTMLElement, e.isIntersecting);
-        setZonesUnder([...state.values()].some(Boolean));
+        const anyUnder = [...state.values()].some(Boolean);
+        if (anyUnder) {
+          if (!hideTimer) {
+            hideTimer = window.setTimeout(() => {
+              hideTimer = 0;
+              setZonesUnder(true);
+            }, 300);
+          }
+        } else {
+          window.clearTimeout(hideTimer);
+          hideTimer = 0;
+          setZonesUnder(false);
+        }
       },
       { rootMargin: "-83% 0px 0px 0px", threshold: 0 },
     );
     for (const el of els) io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      window.clearTimeout(hideTimer);
+    };
   }, [isUndecided]);
 
   /* c84-B (задача 3): IO на блок «Пакет меню» — гейт микроподсказки
      «Пакет и гости — ниже ↓» (гаснет, когда блок в кадре). Пересборка по
-     isUndecided — как у зон выше (блок монтируется/размонтируется). */
+     isUndecided — как у зон выше (блок монтируется/размонтируется).
+     c98-B (джиттер калькулятора): подсказка — элемент ПОТОКА (~30px), а
+     гейт был двусторонним (true/false у порога 0.35): скролл вверх-вниз
+     у границы «блок на 35% в кадре» монтировал/размонтировал её — весь
+     контент ниже прыгал на ~30px при каждом переключении, осцилляция
+     хвоста Lenis доводила до серий (то самое «дёргается в определённом
+     положении»). Теперь ЗАЩЁЛКА: блок увидели один раз — подсказка не
+     возвращается (навигационная роль исчерпана: юзер уже знает, что
+     продолжение ниже; ДО первого взгляда на блок — как раньше). */
   useEffect(() => {
     if (isUndecided) return;
     const el = pkgZoneRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
-      (entries) => setPkgInView(entries[0]?.isIntersecting ?? false),
+      (entries) => {
+        if (entries[0]?.isIntersecting) setPkgInView(true); // latch, c98-B
+      },
       { threshold: 0.35 },
     );
     io.observe(el);
@@ -2926,17 +3018,25 @@ export function HaccBooking() {
 
   /** Хендофф: чек сжимается, форма раскрывается, фокус — в первое поле.
       Fix5 V7: CTA ВСЕГДА ведёт к форме (владелец: «не перекидывает на форму,
-      на мобиле можно не заметить, что форма появилась сверху») — трёхтактный
-      скролл (0/300/700мс переживает grid-раскрытие 0.5s + lenis-сеттл) и
-      однократная подсветка зоны (hb-zone-flash в CSS по data-open). */
+      на мобиле можно не заметить, что форма появилась сверху») и однократная
+      подсветка зоны (hb-zone-flash в CSS по data-open).
+      c98-B (тройной рывок скролла): было ТРИ команды (0/300/700мс) — каждая
+      lenis.scrollTo ПЕРЕЗАПУСКАЛА анимацию с текущей позиции (сброс скорости
+      посреди полёта) → видимые ступени. Теперь ОДИН скролл через 600мс —
+      ПОСЛЕ завершения grid-раскрытия зоны (0.5s): верх #lead-form при
+      раскрытии не смещается (зона растёт вниз), лэйаут к команде устоялся.
+      Гвард «юзер уехал сам» (паттерн c84, |Δ|<140): прокрутился за окно
+      600мс дальше 140px — не тащим обратно к форме. */
   const openForm = useCallback(() => {
     setStage((s) => {
       if (s !== "calc") return s;
       return "form";
     });
-    scrollToZone();
-    window.setTimeout(scrollToZone, 300);
-    window.setTimeout(scrollToZone, 700);
+    const startY = window.scrollY;
+    window.setTimeout(() => {
+      if (Math.abs(window.scrollY - startY) > 140) return; // юзер уехал сам
+      scrollToZone();
+    }, 600);
     const delay = settled ? 780 : 0;
     window.setTimeout(() => {
       document.getElementById("hb-name")?.focus({ preventScroll: true });
@@ -2981,14 +3081,17 @@ export function HaccBooking() {
      накрывает легенду блока; в lite-режиме c84-D Lenis-инстанса нет —
      грабля §52 не применима, нативный smooth безопасен; мобильный путь
      как раз идёт сюда — lite-детект включен на мобиле).
-     РЕТАРГЕТ (+1030мс): карточки пакетов могут дрейфовать и ПОСЛЕ старта
-     скролла (§2/§66 — «scrollIntoView во время layout-сдвига: цель
-     устаревает»). Защита от борьбы с юзером: коррекция ТОЛЬКО если скролл
-     ДОШЁЛ до командованной позиции (|scrollY − цель| < 140) — если юзер
-     уже уехал сам, не дёргаем его обратно. */
+     c98-B (ДВОЙНОЙ РЫВОК СКРОЛЛА): ретаргет-таймер +1030мс УДАЛЁН вместе
+     с typeCommandedYRef. Срабатывание на 420+1030=1450мс попадало в ХВОСТ
+     первой lenis-анимации (старт 420мс + duration 0.9с ⇒ сеттл ~1320мс,
+     экспоненциальный easing тянет след до ~1.5с): гвард |Δ|<140 почти
+     всегда ПРОПУСКАЛ (скролл уже сошёлся к командованной Y) → вторая
+     lenis.scrollTo перезапускала анимацию с текущей позиции — видимый
+     второй скачок. Единственного скролла достаточно: rect цели читается
+     ПОСЛЕ оседания лэйаута (420мс), а дрейфа цели ниже по потоку больше
+     нет — подсказка «Пакет и гости — ниже» с c98-B защёлкнута и не
+     размонтируется посреди полёта. */
   const typeScrollTimerRef = useRef(0);
-  const typeRetargetTimerRef = useRef(0);
-  const typeCommandedYRef = useRef(-1);
   /* Гейт стадии — ref, а не deps: колбек остаётся стабильным для
      memo-детей (TypeGrid), а таймер читает актуальную стадию ПОСЛЕ
      коммита (эффект ниже обновляет её на каждом переходе). */
@@ -3001,11 +3104,9 @@ export function HaccBooking() {
       window as unknown as { __lenis?: { scrollTo?: (t: Element, o?: object) => void } }
     ).__lenis;
     if (typeof lenis?.scrollTo === "function") {
-      typeCommandedYRef.current = Math.max(0, el.getBoundingClientRect().top + window.scrollY - 100);
       lenis.scrollTo(el, { offset: -100, duration });
     } else {
       const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - 100);
-      typeCommandedYRef.current = top;
       window.scrollTo({ top, behavior: "smooth" });
     }
   }, []);
@@ -3017,22 +3118,12 @@ export function HaccBooking() {
       const coarse = window.matchMedia?.("(pointer: coarse)").matches ?? false;
       if (!(window.innerWidth < 1280 || coarse)) return;
       window.clearTimeout(typeScrollTimerRef.current);
-      window.clearTimeout(typeRetargetTimerRef.current);
       typeScrollTimerRef.current = window.setTimeout(() => {
         const el = selectedId === UNDECIDED_ID ? guestsZoneRef.current : pkgZoneRef.current;
         if (!el || !el.isConnected) return;
         const r = el.getBoundingClientRect();
         if (r.top >= 0 && r.bottom <= window.innerHeight) return;
         scrollBlockIntoView(el);
-        /* Ретаргет после оседания скролла — короткая коррекция 0.45с. */
-        typeRetargetTimerRef.current = window.setTimeout(() => {
-          const el2 = selectedId === UNDECIDED_ID ? guestsZoneRef.current : pkgZoneRef.current;
-          const commanded = typeCommandedYRef.current;
-          if (!el2 || !el2.isConnected || commanded < 0) return;
-          if (Math.abs(window.scrollY - commanded) > 140) return; // юзер уехал сам
-          const r2 = el2.getBoundingClientRect();
-          if (r2.top < 40 || r2.top > 460) scrollBlockIntoView(el2, 0.45);
-        }, 1030);
       }, 420);
     },
     [scrollBlockIntoView],
@@ -3040,7 +3131,6 @@ export function HaccBooking() {
   useEffect(
     () => () => {
       window.clearTimeout(typeScrollTimerRef.current);
-      window.clearTimeout(typeRetargetTimerRef.current);
     },
     [],
   );
@@ -3063,9 +3153,16 @@ export function HaccBooking() {
       },
     ) => {
       /* CUID остаётся внутренним id (не рендерится), квитанция получает
-       * человекочитаемый № из времени приёма (81-F2). */
+       * человекочитаемый № из времени приёма (81-F2). c98-FIX1: без
+       * серверного подтверждения → без номера, режим queued.
+       * c98-FIX2 (критик4 MINOR#3): `!id`, а не `id === undefined` —
+       * postLead возвращает {ok:true,id:""} для 200-ответа без поля id
+       * (документированный инвариант submit-lead.ts: пустой id = принята,
+       * номер НЕ показываем); пустая строка прежде проходила как
+       * «подтверждено с номером» → квитанция с № из клиентских часов. */
       setLeadId(id);
-      setLeadNo(formatLeadNo(new Date()));
+      setLeadQueued(!id);
+      setLeadNo(!id ? "" : formatLeadNo(new Date()));
       setStage("success");
       /* 81-W2F1 (критик F MINOR + № заявки): квитанция после сабмита
        * оказывалась НАД вьюпортом (замер: top −230) — юзер видел только
@@ -3133,6 +3230,7 @@ export function HaccBooking() {
   const resetToForm = useCallback(() => {
     setLeadId(undefined);
     setLeadNo("");
+    setLeadQueued(false);
     setDate("");
     setStage("form");
     /* LeadForm монтируется следующим коммитом — таймер 120 мс даёт
@@ -3582,6 +3680,7 @@ export function HaccBooking() {
                   {stage === "success" ? (
                     <SuccessPanel
                       leadNo={leadNo}
+                      queued={leadQueued}
                       metaLine={successMeta}
                       promiseLine={scriptPromise}
                       onReset={resetToForm}
@@ -3659,7 +3758,13 @@ export function HaccBooking() {
                     (урок волны-1 D2: не дублировать печать).
                     81-F2: № — человекочитаемый leadNo (ДДММ-ЧЧММ), не CUID. */}
                 {stage === "success" ? (
-                  leadNo ? `Заявка принята · № ${leadNo}` : "Заявка принята"
+                  leadQueued ? (
+                    "Заявка сохранена — отправим автоматически"
+                  ) : leadNo ? (
+                    `Заявка принята · № ${leadNo}`
+                  ) : (
+                    "Заявка принята"
+                  )
                 ) : (
                   <>
                     Предварительная смета

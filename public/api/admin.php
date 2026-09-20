@@ -49,6 +49,7 @@ match ($action) {
     'tg-test' => h_tg_test($method),
     'mail-test' => h_mail_test($method),
     'mail-log' => h_mail_log($method),
+    'spam-log' => h_spam_log($method),
     'password' => h_password($method),
     default => json_response(404, ['ok' => false, 'error' => 'unknown_action']),
 };
@@ -834,6 +835,37 @@ function h_mail_log(string $method): void
             'error' => $e['error'] ?? null,
         ];
     }, mail_log_read($limit));
+    json_response(200, ['ok' => true, 'entries' => $entries]);
+}
+
+/** c98-A — action=spam-log (GET, auth, &limit=1..50): сабмиты, пойманные
+ *  анти-спам ловушками (honeypot/elapsedMs). До c98 они умирали молча;
+ *  теперь владелец видит их в «Заявках → Ловушка спама» и может проверить,
+ *  не попал ли туда реальный клиент. Только для залогиненного (как mail-log). */
+function h_spam_log(string $method): void
+{
+    if ($method !== 'GET') {
+        json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
+    }
+    require_admin();
+    $limit = is_string($_GET['limit'] ?? null) ? (int)$_GET['limit'] : 5;
+    if ($limit < 1 || $limit > 50) {
+        $limit = 5;
+    }
+    $entries = array_map(static function (array $e): array {
+        // наружу поля, нужные владельцу для проверки «реальный ли клиент»
+        return [
+            'ts' => $e['ts'] ?? null,
+            'reason' => $e['reason'] ?? '',
+            'elapsedMs' => isset($e['elapsedMs']) && is_int($e['elapsedMs']) ? $e['elapsedMs'] : null,
+            'name' => $e['name'] ?? '',
+            'phone' => $e['phone'] ?? '',
+            'email' => $e['email'] ?? null,
+            'comment' => $e['comment'] ?? null,
+            'source' => $e['source'] ?? '',
+            'clientId' => $e['clientId'] ?? null,
+        ];
+    }, spam_log_read($limit));
     json_response(200, ['ok' => true, 'entries' => $entries]);
 }
 

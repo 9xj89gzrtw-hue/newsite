@@ -9,6 +9,9 @@ import { Preloader } from "@/components/catering/preloader";
 import { EaCookieBanner } from "@/components/catering/ea-cookie-banner";
 import { GrainOverlay } from "@/components/catering/grain";
 import { ScrollProgress } from "@/components/catering/scroll-progress";
+/* c98-FIX2 (критик5 MINOR-5): авто-резенд outbox заявок — на ВСЕХ страницах
+ * (прежде side-effect импорта submit-lead.ts работал только на главной). */
+import { LeadOutboxResender } from "@/components/lead-outbox-resender";
 import { MicroDelights } from "@/components/motion/micro-delights";
 import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
@@ -461,6 +464,11 @@ export default function RootLayout({
             </ThemeFlipProvider>
           </LenisProvider>
         </NuqsAdapter>
+        {/* c98-FIX2 (критик5 MINOR-5): авто-резенд outbox — после провайдеров,
+            рендерит null (useEffect → resendPendingLeads(), guard от дублей).
+            /offer /privacy /terms теперь тоже доотправляют застрявшие
+            заявки — не только главная с формой. */}
+        <LeadOutboxResender />
         <Toaster />
         <noscript>
           <div style={{ padding: '2rem', fontFamily: 'sans-serif', textAlign: 'center' }}>

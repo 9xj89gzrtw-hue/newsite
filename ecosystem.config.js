@@ -14,7 +14,7 @@ module.exports = {
       instances: 1,
       exec_mode: "fork",
       autorestart: true,
-      max_memory_restart: "1G",
+      max_memory_restart: "3G",
       error_file: "./logs/err.log",
       out_file: "./logs/out.log",
       log_date_format: "YYYY-MM-DD HH:mm:ss",
