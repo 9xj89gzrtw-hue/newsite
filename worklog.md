@@ -322,3 +322,48 @@ Stage Summary:
 - SEO/БРЕНД: NILOV CATERING капсом (title/JSON-LD/og-image/письма), новый description (суть в первых 160), favicon.svg, robots.txt для ИИ-краулеров (RFC 9309), llms-full.txt (генерится из menu.json), «искусствоискусство» вылечено.
 - ДОК: docs/ADVERTISING-PLAN.md (440 строк: каналы, бюджеты, CPA-формулы, сезонность, цели Метрики).
 - ВСЁ ЗАКОММИЧЕНО И ЗАДЕПЛОЕНО СЛЕДУЮЩИМ ШАГОМ (см. ниже в git).
+
+---
+Task ID: c99-PROD
+Agent: main
+Task: Прод-верификация деплоя f560c09 (CI success → Deploy to SpaceWeb success)
+
+Work Log:
+- CI (lint+typecheck+validate-menu): success. Deploy: build-and-deploy success
+  (Build → Verify export → Rsync → Provision → Verify admin API); deploy-vercel
+  (зеркало) подвис на лимите деплоев — известное с c98, на прод НЕ влияет.
+- ГЛАВНАЯ: 200, title «NILOV CATERING — Кейтеринг в Санкт-Петербурге от
+  900 ₽/чел», новый description (155 симв., суть в первом предложении),
+  JSON-LD name=NILOV CATERING + alternateName[Нилов Кейтеринг, nilov catering,
+  ИП Нилова А.Д.].
+- favicon.svg: 200, ПЕРВЫЙ в <link rel=icon> (SVG → PNG → ICO); llms-full.txt:
+  200; menu-pdf/menu-buffet-1.pdf: 200 (вложения на хостинге, lead.php их
+  видит); robots.txt: группы ИИ-краулеров (OAI-SearchBot/GPTBot/PerplexityBot/
+  ClaudeBot/Bingbot) продублированы по RFC 9309.
+- og-image.jpg: байт-в-байт равен локальной капс-версии (wordmark NILOV
+  CATERING. — VLM-проверка без обрезки).
+- «искусствоискусство» в HTML: 0 вхождений (сниппет-баг Яндекса закрыт);
+  структура h2: <i aria-label="искусство"> + ОДНО видимое вхождение.
+- /api/vars.php: 200 {"ok":true,metrikaId:null,webvisor:true,clickmap:true,
+  gaId:null,customHead:null} — дефолтное состояние (env-счётчик 112532826
+  активен, пока владелец не впишет свой). СЕКРЕТОВ в ответе нет.
+- ЖИВАЯ ЗАЯВКА: POST /api/lead.php (typeId=buffet, pkgIdx=1, email) →
+  {"ok":true,"id":"20260921-015956-51c218"}; повтор тем же clientId →
+  {"ok":true,"dedupe":true} — идемпотентность на проде. Письмо клиенту ушло
+  с PDF-вложением «Фуршет · Стандарт» (путь байт-эквивалентен проверенному
+  A-tests раундтрипу); владелец увидит «вложение: 1» в «Настройках → Журнал
+  почты». Тест-лид «ТЕСТ c99 (можно удалить)» оставлен — удалить в «Заявках».
+- НАБЛЮДЕНИЕ (не баг): хостинг подменяет Cache-Control vars.php →
+  «no-store, must-revalidate» вместо public,max-age=300 (nginx-фронт SpaceWeb
+  перекрывает заголовок для PHP; остальные наши заголовки проходят). Эффект
+  ЛУЧШЕ задуманного: настройки аналитики подхватываются СРАЗУ, а не ≤5 мин
+  (текст тоста «в течение 5 минут» остаётся корректным как верхняя граница).
+
+Stage Summary:
+- ПРОД ПОЛНОСТЬЮ НА c99: PDF-вложения, рантайм-аналитика, SEO-бренд, robots,
+  llms-full, favicon.svg, og-капс, сниппет-фикс. Заявки принимаются и
+  дедупятся; письма с меню уходят.
+- ВЛАДЕЛЬЦУ (руками): (а) вписать свой ID Метрики в «Настройки → Аналитика»
+  (пусто = env-счётчик 112532826); (б) Яндекс Бизнес/Вебмастер — чек-лист
+  29 шагов в research/c99/R1-REPORT.md (логотип в выдаче = карточка Бизнеса);
+  (в) рекламный план — docs/ADVERTISING-PLAN.md; (г) удалить тест-лид c99.
