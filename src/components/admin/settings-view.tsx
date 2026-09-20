@@ -14,6 +14,7 @@
 import { useEffect, useState } from "react";
 import {
   AtSign,
+  BarChart3,
   Check,
   ChevronDown,
   Copy,
@@ -44,12 +45,15 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { METRICA_ID } from "@/lib/analytics";
 import {
   FieldLabel,
   HintText,
   SectionHeader,
+  TextAreaField,
   TextField,
 } from "./ui-bits";
 
@@ -68,6 +72,7 @@ export function SettingsView({
       />
       <EmailCard settings={settings} onSettingsChange={onSettingsChange} />
       <TelegramCard settings={settings} onSettingsChange={onSettingsChange} />
+      <AnalyticsCard settings={settings} onSettingsChange={onSettingsChange} />
       <PasswordCard />
     </section>
   );
@@ -350,7 +355,13 @@ function EmailCard({
                             {e.subject}
                             <span className="block text-[11.5px] text-ink-soft/70">
                               {e.to} · {contextLabel(e.context)}
+                              {e.attach > 0 ? ` · вложение: ${e.attach}` : ""}
                             </span>
+                            {e.detail ? (
+                              <span className="mt-0.5 block max-w-72 text-[11.5px] leading-snug text-ink-soft/70">
+                                {e.detail}
+                              </span>
+                            ) : null}
                           </td>
                           <td className="whitespace-nowrap py-1.5 text-right">
                             {e.ok ? (
@@ -1238,6 +1249,209 @@ function Step({
         {children}
       </fieldset>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------- analytics */
+
+/**
+ * c99-C — карточка «Аналитика»: счётчики и пиксели меняет владелец сам,
+ * без передеплоя. Сайт читает значения РАНТАЙМ через /api/vars.php
+ * (кеш 5 мин) после cookie-consent — 152-ФЗ соблюдён: до согласия
+ * ноль сторонних запросов. Все значения публичны (ID счётчиков и так
+ * видны в исходнике страницы) — секретов нет, отдаются без масок.
+ */
+function AnalyticsCard({
+  settings,
+  onSettingsChange,
+}: {
+  settings: AdminSettings;
+  onSettingsChange: (s: AdminSettings) => void;
+}) {
+  const [metrikaId, setMetrikaId] = useState(settings.metrikaId);
+  const [webvisor, setWebvisor] = useState(settings.metrikaWebvisor);
+  const [clickmap, setClickmap] = useState(settings.metrikaClickmap);
+  const [gaId, setGaId] = useState(settings.gaId);
+  const [customHead, setCustomHead] = useState(settings.customHeadHtml);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => setMetrikaId(settings.metrikaId), [settings.metrikaId]);
+  useEffect(() => setWebvisor(settings.metrikaWebvisor), [settings.metrikaWebvisor]);
+  useEffect(() => setClickmap(settings.metrikaClickmap), [settings.metrikaClickmap]);
+  useEffect(() => setGaId(settings.gaId), [settings.gaId]);
+  useEffect(() => setCustomHead(settings.customHeadHtml), [settings.customHeadHtml]);
+
+  // локальная нормализация = серверная (admin.php): UI никогда не
+  // показывает как «сохранённое» то, что сервер обратит в null
+  // c99-fix (критик E2-m6): «мусор с цифрами» (abc / 12) — красная рамка,
+  // а не молчаливая серая кнопка (раньше metrikaOk был true при пустых
+  // digits — владельец не понимал, почему сохранить нельзя)
+  const metrikaRaw = metrikaId.trim();
+  const metrikaDigits = metrikaId.replace(/\D+/g, "");
+  const metrikaOk = metrikaRaw === "" || /^[0-9]{5,10}$/.test(metrikaDigits);
+  const gaTrim = gaId.trim();
+  const gaOk = gaTrim === "" || /^G-[A-Z0-9]{4,12}$/i.test(gaTrim);
+
+  const dirty =
+    metrikaDigits !== settings.metrikaId ||
+    webvisor !== settings.metrikaWebvisor ||
+    clickmap !== settings.metrikaClickmap ||
+    gaTrim.toUpperCase() !== settings.gaId ||
+    customHead !== settings.customHeadHtml;
+
+  const save = async () => {
+    // пре-валидация на клиенте: сервер аналитику нормализует молча (мусор
+    // → null, ответ 200) — без этой проверки владелец считал бы «настроено»,
+    // а на деле счётчик выключен
+    if (!metrikaOk) {
+      toast.error("Номер счётчика — 5–10 цифр (например 112532826)");
+      return;
+    }
+    if (!gaOk) {
+      toast.error("Google Analytics ID выглядит не так — формат G-XXXXXXXXXX");
+      return;
+    }
+    if (customHead.length > 8000) {
+      toast.error("Дополнительный код — до 8000 символов");
+      return;
+    }
+    setSaving(true);
+    const r = await apiSaveSettings({
+      metrikaId: metrikaDigits === "" ? null : metrikaDigits,
+      metrikaWebvisor: webvisor,
+      metrikaClickmap: clickmap,
+      gaId: gaTrim === "" ? null : gaTrim.toUpperCase(),
+      customHeadHtml: customHead === "" ? null : customHead,
+    });
+    setSaving(false);
+    if (r.ok === true) {
+      const gaSaved = gaTrim === "" ? "" : gaTrim.toUpperCase();
+      onSettingsChange({
+        ...settings,
+        metrikaId: metrikaDigits,
+        metrikaWebvisor: webvisor,
+        metrikaClickmap: clickmap,
+        gaId: gaSaved,
+        customHeadHtml: customHead,
+      });
+      toast.success(
+        "Аналитика сохранена — сайт подхватит новые настройки в течение 5 минут",
+      );
+    } else {
+      toast.error(
+        r.error === "validation"
+          ? "Проверьте поля — например, код без «</textarea» и до 8000 символов"
+          : "Не удалось сохранить — попробуйте ещё раз",
+      );
+    }
+  };
+
+  const envHint =
+    METRICA_ID === ""
+      ? "сейчас ID из деплоя не задан — без своего номера счётчик не работает"
+      : `сейчас используется ID из деплоя: ${METRICA_ID}`;
+
+  return (
+    <Card className="rounded-2xl border-border-line/80 shadow-none">
+      <CardContent className="p-5">
+        <div className="flex items-center gap-2.5">
+          <BarChart3 className="size-5 text-gold" />
+          <h3 className="font-serif text-[19px] font-medium text-ink">
+            Аналитика
+          </h3>
+        </div>
+        <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
+          Счётчики посещаемости и рекламные пиксели. Сайт применяет их сам,
+          без пересборки — изменения подхватываются в течение 5 минут,
+          только после согласия посетителя на cookies (152-ФЗ).
+        </p>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <FieldLabel htmlFor="an-metrika" hint="цифры">
+              Счётчик Яндекс.Метрики (ID)
+            </FieldLabel>
+            <TextField
+              id="an-metrika"
+              value={metrikaId}
+              onChange={setMetrikaId}
+              placeholder="например 112532826"
+              inputMode="numeric"
+              className={cn(!metrikaOk && "border-destructive")}
+            />
+            <HintText>Оставьте пустым — {envHint}.</HintText>
+          </div>
+          <div>
+            <FieldLabel htmlFor="an-ga" hint="вид G-XXXXXXXXXX">
+              Google Analytics 4 (ID)
+            </FieldLabel>
+            <TextField
+              id="an-ga"
+              value={gaId}
+              onChange={setGaId}
+              placeholder="G-ABCD12345"
+              className={cn(!gaOk && "border-destructive")}
+            />
+            <HintText>
+              Пусто — Google Analytics не подключается. Создаётся в GA4:
+              «Администратор → Потоки данных».
+            </HintText>
+          </div>
+        </div>
+
+        <div className="mt-2 grid gap-1 sm:grid-cols-2">
+          <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-1 py-1">
+            <Checkbox
+              checked={webvisor}
+              onCheckedChange={(v) => setWebvisor(v === true)}
+              aria-label="Вебвизор (запись сессий)"
+            />
+            <span className="text-[14px] leading-snug text-ink">
+              Вебвизор — запись сессий посетителей
+            </span>
+          </label>
+          <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-1 py-1">
+            <Checkbox
+              checked={clickmap}
+              onCheckedChange={(v) => setClickmap(v === true)}
+              aria-label="Клик-карта"
+            />
+            <span className="text-[14px] leading-snug text-ink">
+              Клик-карта — карта кликов по страницам
+            </span>
+          </label>
+        </div>
+
+        <div className="mt-4">
+          <FieldLabel htmlFor="an-custom" hint="до 8000 символов">
+            Дополнительный код (пиксели, Roistat, Top100…)
+          </FieldLabel>
+          <TextAreaField
+            id="an-custom"
+            value={customHead}
+            onChange={setCustomHead}
+            placeholder="<script>… код пикселя из рекламного кабинета …</script>"
+            rows={5}
+            className="font-mono text-[13px]"
+          />
+          <HintText>
+            Вставьте код целиком — он добавляется в &lt;head&gt; сайта и
+            запускается после согласия посетителя на cookies. Яндекс.Метрика
+            и GA4 настраиваются выше, сюда — всё остальное.
+          </HintText>
+        </div>
+
+        <Button
+          type="button"
+          className="mt-3 h-11 rounded-xl px-6 text-[14px]"
+          disabled={saving || !dirty}
+          onClick={save}
+        >
+          {saving ? <Loader2 className="size-4 animate-spin" /> : null}
+          Сохранить
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 

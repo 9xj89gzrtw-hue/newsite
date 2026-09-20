@@ -4,21 +4,21 @@ import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Политика конфиденциальности",
   description:
-    "Как мы собираем, храним и защищаем ваши персональные данные в соответствии с 152-ФЗ. nilov catering, СПб.",
+    "Как мы собираем, храним и защищаем ваши персональные данные в соответствии с 152-ФЗ. NILOV CATERING, СПб.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/privacy" },
   openGraph: {
-    title: "Политика конфиденциальности — nilov catering",
+    title: "Политика конфиденциальности — NILOV CATERING",
     description: "Как мы защищаем ваши персональные данные в соответствии с 152-ФЗ.",
     type: "website",
     url: "/privacy",
     locale: "ru_RU",
-    siteName: "nilov catering",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — выездной кейтеринг в Санкт-Петербурге" }],
+    siteName: "NILOV CATERING",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "NILOV CATERING — выездной кейтеринг в Санкт-Петербурге" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Политика конфиденциальности — nilov catering",
+    title: "Политика конфиденциальности — NILOV CATERING",
     description: "Как мы защищаем ваши персональные данные в соответствии с 152-ФЗ.",
     images: ["/og-image.jpg"],
   },

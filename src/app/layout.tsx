@@ -122,25 +122,38 @@ const metaPrices = metaPriceFragments();
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   icons: {
+    /* c99 (R1-отчёт): SVG-фавиконка — ПЕРВОЙ в списке: Яндекс рекомендует
+     * формат SVG для сниппета («120×120 или SVG» — отображается чётче);
+     * PNG/ICO остаются фоллбэками старых браузеров. Итог: один
+     * канонический link на тип, порядок приоритета — сверху вниз. */
     icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicon.ico", sizes: "any" },
     ],
     apple: "/apple-touch-icon.png",
   },
   title: {
-    /* 4-F2 (критик D, MINOR): «от 1 200 ₽/чел» — не хардкод, а фрагмент
-     * metaPriceFragments() из menu.json (snack-box = calcPerGuest — тот же
-     * источник, что у description ниже): цена в title синхронна с
-     * калькулятором и меняется публикацией из админ-панели. Строка вывода
-     * байт-идентична прежней захардкоженной (обычный пробел в «1 200»). */
-    default: `nilov catering — Кейтеринг в Санкт-Петербурге от ${metaPrices.snackBox} ₽/чел`,
-    template: "%s | nilov catering",
+    /* c99 (запрос владельца: имя в выдаче — капсом): бренд в title —
+     * «NILOV CATERING», цена — МИНИМАЛЬНЫЙ кейтеринговый формат
+     * (кофе-брейк, coffeeBreak из menu.json), а не «доставка закусок»:
+     * «кейтеринг от 900 ₽/чел» честен и ближе к брендовому запросу.
+     * Цены по-прежнему из metaPriceFragments() — синхронны калькулятору
+     * и меняются публикацией из админ-панели. */
+    default: `NILOV CATERING — Кейтеринг в Санкт-Петербурге от ${metaPrices.coffeeBreak} ₽/чел`,
+    template: "%s | NILOV CATERING",
   },
-  /* F2 (K3-MINOR): 192 → 152 симв. — ключи сохранены: «кейтеринг Санкт-Петербург",
-   * цены-ЦИ (900/1200/2450/4470), телефон. Усечение хвоста «Рассчитайте стоимость
-   * онлайн за 30 секунд» — CTA-фраза дублирована в title. */
-  description: `Кейтеринг в Санкт-Петербурге: доставка закусок от ${metaPrices.snackBox} ₽, кофе-брейк от ${metaPrices.coffeeBreak} ₽, фуршет от ${metaPrices.buffet} ₽, банкет от ${metaPrices.banquet} ₽/чел. Смета за 30 секунд: +7 (911) 941-72-05.`,
+  /* c99: новый description против мусорного сниппета Яндекса (было:
+   * «Листайте» + пункты меню + задвоенное «искусствоискусство» — Яндекс
+   * брал текст из DOM, т.к. старое описание не отвечало брендовому
+   * запросу). Теперь смысл — в первом предложении (кейтеринг полного
+   * цикла + форматы), далее УТП, цена-минимум и телефон (Яндекс любит
+   * конкретику в начале ~160 симв.). Длина 155 симв. при coffeeBreak=900.
+   * Цена — из menu.json (мета меняется публикацией из админки). */
+  description: `Кейтеринг полного цикла в Санкт-Петербурге: фуршеты, банкеты, кофе-брейки, барбекю. Повара и официанты на вашей площадке. От ${metaPrices.coffeeBreak} ₽/чел. +7 (911) 941-72-05.`,
+  /* c99 (R1): связка с кириллическим запросом «нилов кейтеринг» —
+   * домен nilovcatering.ru = транслитерация, добавляем написания
+   * в обоих регистрах + гео-ключи форматов. */
   keywords: [
     "кейтеринг",
     "кейтеринг СПб",
@@ -149,26 +162,33 @@ export const metadata: Metadata = {
     "банкет",
     "выездной ресторан",
     "nilov catering",
+    "нилов кейтеринг",
+    "Нилов кейтеринг",
+    "nilov catering спб",
+    "кейтеринг на мероприятие спб",
+    "фуршет спб",
+    "банкет спб",
   ],
-  authors: [{ name: "nilov catering" }],
+  authors: [{ name: "NILOV CATERING" }],
   /* F2 (K3-NIT): hreflang убран — сайт одноязычный (ru), languages был
    * объявлен только на главной (на /offer /privacy /terms его нет) —
    * по гайдлайну одноязычному сайту hreflang не нужен. Canonical остаётся. */
   alternates: { canonical: "/" },
   openGraph: {
-    title: "nilov catering — Кейтеринг в Санкт-Петербурге",
-    description:
-      "Выездной кейтеринг полного цикла. Видео, фото, интерактивный калькулятор стоимости.",
+    title: "NILOV CATERING — Кейтеринг в Санкт-Петербурге",
+    /* c99: OG/Twitter-описания синхронны основному description — один
+     * источник смысла для соцпревью и сниппетов. */
+    description: `Кейтеринг полного цикла в Санкт-Петербурге: фуршеты, банкеты, кофе-брейки, барбекю. Повара и официанты на вашей площадке. От ${metaPrices.coffeeBreak} ₽/чел. +7 (911) 941-72-05.`,
     type: "website",
     locale: "ru_RU",
     url: siteUrl,
-    siteName: "nilov catering",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — круглый бейдж, кейтеринг Санкт-Петербурга" }],
+    siteName: "NILOV CATERING",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "NILOV CATERING — круглый бейдж, кейтеринг Санкт-Петербурга" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "nilov catering — Кейтеринг в Санкт-Петербурге",
-    description: "Выездной кейтеринг полного цикла. Рассчитайте стоимость онлайн.",
+    title: "NILOV CATERING — Кейтеринг в Санкт-Петербурге",
+    description: `Кейтеринг полного цикла в Санкт-Петербурге: фуршеты, банкеты, кофе-брейки, барбекю. Повара и официанты на вашей площадке. От ${metaPrices.coffeeBreak} ₽/чел. +7 (911) 941-72-05.`,
     images: ["/og-image.jpg"],
   },
   manifest: "/manifest.json",
@@ -227,8 +247,12 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": ["FoodEstablishment", "LocalBusiness"],
   "@id": siteUrl + "#organization",
-  name: "nilov catering",
-  alternateName: "NILOV CATERING",
+  /* c99 (R1): name — капс-бренд для сниппетов/колдунщиков; alternateName —
+   * кириллическое «Нилов Кейтеринг» связывает запрос «нилов кейтеринг»
+   * с транслит-доменом nilovcatering.ru (+ строчное латинское и юрлицо
+   * для распознавания сущности в карточках/агрегаторах). */
+  name: "NILOV CATERING",
+  alternateName: ["Нилов Кейтеринг", "nilov catering", "ИП Нилова А.Д."],
   description: `«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Доставка закусок от ${metaPrices.snackBox} ₽, кофе-брейк от ${metaPrices.coffeeBreak} ₽, фуршет от ${metaPrices.buffet} ₽, банкет от ${metaPrices.banquet} ₽ за человека; заказы — от одного гостя.`,
   url: siteUrl,
   image: siteUrl + "/og-image.jpg",

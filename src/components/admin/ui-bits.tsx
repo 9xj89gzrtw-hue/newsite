@@ -56,7 +56,7 @@ export function TextField({
   className?: string;
   id?: string;
   autoComplete?: string;
-  inputMode?: "text" | "decimal" | "tel" | "email" | "url";
+  inputMode?: "text" | "numeric" | "decimal" | "tel" | "email" | "url";
   type?: "text" | "password" | "search" | "email";
 }) {
   return (

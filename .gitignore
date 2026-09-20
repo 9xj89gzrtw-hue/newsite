@@ -144,3 +144,8 @@ public/server-data/*.lock
 # c95 (Task 1-a): сгенерированные артефакты данных — пересобираются
 # scripts/gen-static-data.ts на каждом build (меню-копия + манифест медиа)
 public/data/
+
+# c99 (Task 1): PDF-меню для email-вложений — пересобираются
+# scripts/gen-menu-pdfs.ts на каждом build (17 тарифов + каталог + манифест;
+# внутри PDF дата генерации — файлы меняются каждый билд, в git им не место)
+public/menu-pdf/

@@ -25,21 +25,21 @@ import { CONTACTS } from "@/lib/config";
  *     images остаются для корректного соцпревью по битой ссылке. */
 export const metadata: Metadata = {
   title: "Страница не найдена",
-  description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с nilov catering.",
+  description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с NILOV CATERING.",
   robots: null,
   alternates: null,
   openGraph: {
-    title: "Страница не найдена | nilov catering",
-    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с nilov catering.",
+    title: "Страница не найдена | NILOV CATERING",
+    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с NILOV CATERING.",
     type: "website",
     locale: "ru_RU",
-    siteName: "nilov catering",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — кейтеринг Санкт-Петербурга" }],
+    siteName: "NILOV CATERING",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "NILOV CATERING — кейтеринг Санкт-Петербурга" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Страница не найдена | nilov catering",
-    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с nilov catering.",
+    title: "Страница не найдена | NILOV CATERING",
+    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с NILOV CATERING.",
     images: ["/og-image.jpg"],
   },
 };

@@ -4,21 +4,21 @@ import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Публичная оферта",
   description:
-    "Условия оказания кейтеринговых услуг: стоимость, порядок оплаты, расторжение договора. nilov catering, Санкт-Петербург.",
+    "Условия оказания кейтеринговых услуг: стоимость, порядок оплаты, расторжение договора. NILOV CATERING, Санкт-Петербург.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/offer" },
   openGraph: {
-    title: "Публичная оферта — nilov catering",
+    title: "Публичная оферта — NILOV CATERING",
     description: "Условия оказания кейтеринговых услуг: стоимость, порядок оплаты.",
     type: "website",
     url: "/offer",
     locale: "ru_RU",
-    siteName: "nilov catering",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — выездной кейтеринг в Санкт-Петербурге" }],
+    siteName: "NILOV CATERING",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "NILOV CATERING — выездной кейтеринг в Санкт-Петербурге" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Публичная оферта — nilov catering",
+    title: "Публичная оферта — NILOV CATERING",
     description: "Условия оказания кейтеринговых услуг: стоимость, порядок оплаты.",
     images: ["/og-image.jpg"],
   },

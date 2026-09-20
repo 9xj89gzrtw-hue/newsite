@@ -292,7 +292,7 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
      * отличие от ==false, который не отличает провал от «не настроено»). */
     $status = ['tg' => false, 'tgAttempted' => false, 'tgErr' => null,
         'mail' => false, 'mailAttempted' => false, 'mailErr' => null,
-        'client' => null, 'clientErr' => null, 'mailTransport' => null];
+        'client' => null, 'clientErr' => null, 'clientPdf' => null, 'mailTransport' => null];
 
     $chatId = $settings['tgChatId'] ?? null;
     $token = $settings['tgBotToken'] ?? null;
@@ -334,17 +334,62 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
 
     /* c97: подтверждение КЛИЕНТУ — если посетитель указал email, ему
      * уходит копия заявки с контактами (Reply-To — на владельца:
-     * ответ клиента на письмо приходит владельцу напрямую). */
+     * ответ клиента на письмо приходит владельцу напрямую).
+     * c99: + PDF-меню ЕГО тарифа во вложении (меню = «витрина»
+     * конверсии: клиент держит меню перед звонком менеджера).
+     * Подбор: typeId+pkgIdx из калькулятора → тип без пакета → полный
+     * каталог. Файл отсутствует/большой 2МБ — письмо уходит БЕЗ вложения
+     * (доставка текста важнее вложения), пропуск журналируется
+     * ('attachSkipped') и виден в mail-log админки. */
     if (!in_array('client', $skip, true)
         && is_string($lead['email']) && $lead['email'] !== '' && $inBudget()) {
+        $attachments = [];
+        $attachLabel = null;
+        $attachSkipped = null;
+        $p = is_array($lead['payload']) ? $lead['payload'] : [];
+        $pdfEntry = menu_pdf_for_payload($p);
+        if ($pdfEntry !== null) {
+            $bytes = menu_pdf_bytes($pdfEntry);
+            if ($bytes !== null) {
+                $attachments[] = [
+                    'bytes' => $bytes,
+                    'name' => (string)($pdfEntry['fileName'] ?? 'menu.pdf'),
+                    'entry' => $pdfEntry,
+                ];
+                $attachLabel = (string)($pdfEntry['label'] ?? 'PDF-меню');
+            } else {
+                $attachSkipped = 'pdf_file_missing_or_too_large';
+            }
+        } else {
+            $attachSkipped = 'no_manifest';
+        }
         $client = mail_send(
             $lead['email'],
-            'Ваша заявка в Nilov Catering принята',
-            lead_client_mail_text($lead),
+            'Ваша заявка в NILOV CATERING принята',
+            lead_client_mail_text($lead, $attachLabel),
             $notifyEmail !== '' ? $notifyEmail : null,
-            'lead-client'
+            'lead-client',
+            $attachments
         );
+        if ($attachSkipped !== null) {
+            /* Пропуск вложения — НЕ ошибка доставки, но владелец должен
+             * видеть это в журнале (иначе «почему без меню?» — загадка).
+             * c99-fix (критик E1-m1): ok — фактический итог письма (а не
+             * безусловный true): при сбое доставки строка журнала не
+             * должна выглядеть зелёной поверх реальной ошибки. */
+            mail_log_append(['to' => $lead['email'], 'context' => 'lead-client',
+                'subject' => 'Ваша заявка в NILOV CATERING принята',
+                'transport' => (string)($client['transport'] ?? 'none'),
+                'ok' => ($client['ok'] === true), 'attach' => 0,
+                'error' => $client['ok'] === true ? null : mail_error_class($client),
+                'detail' => 'attachSkipped: ' . $attachSkipped]);
+        }
         $status['client'] = ($client['ok'] === true);
+        /* c99-fix (критик E1-m1): бейдж «PDF: …» — только у ДОСТАВЛЕННОГО
+         * письма (иначе красный сбой рядом с бейджем «PDF: Фуршет» читается
+         * как «клиент получил меню», хотя письма нет). Причина видна в
+         * журнале почты (attach/detail). */
+        $status['clientPdf'] = ($client['ok'] === true) ? $attachLabel : null;
         if ($status['client'] !== true) {
             $status['clientErr'] = mail_error_class($client);
         }
@@ -456,6 +501,16 @@ function lead_notify_and_store_status(array $lead, bool $background = false): bo
             if (is_string($status2['mailTransport'] ?? null) && !is_string($status['mailTransport'] ?? null)) {
                 $status['mailTransport'] = $status2['mailTransport'];
             }
+            /* c99-fix (критик crit1-F3): clientPdf/clientErr из РЕТРАЯ тоже
+             * переносим — иначе письмо клиенту спасено ретраем (client=true),
+             * а бейдж «PDF: …»/причина первого провала так и остались от
+             * первой попытки (null) — админка врала бы о вложении. */
+            if (is_string($status2['clientPdf'] ?? null) && !is_string($status['clientPdf'] ?? null)) {
+                $status['clientPdf'] = $status2['clientPdf'];
+            }
+            if (is_string($status2['clientErr'] ?? null) && !is_string($status['clientErr'] ?? null)) {
+                $status['clientErr'] = $status2['clientErr'];
+            }
             $any = ($status['tg'] ?? false) === true || ($status['mail'] ?? false) === true || ($status['client'] ?? null) === true;
         }
     }
@@ -490,6 +545,9 @@ function lead_notify_and_store_status(array $lead, bool $background = false): bo
                         'mail' => (bool)($status['mail'] ?? false),
                         'client' => isset($status['client']) ? (bool)$status['client'] : null,
                         'mailTransport' => is_string($status['mailTransport'] ?? null) ? $status['mailTransport'] : null,
+                        /* c99: имя PDF-меню, прикреплённого к письму клиенту
+                         * (null = без вложения) — бейдж «PDF: …» в «Заявках». */
+                        'clientPdf' => is_string($status['clientPdf'] ?? null) ? $status['clientPdf'] : null,
                     ];
                     return $leads;
                 }
@@ -724,8 +782,10 @@ function lead_mail_text(array $lead): string
 /**
  * c97 — подтверждение КЛИЕНТУ (уходит на email посетителя, если указан).
  * Копия расчёта + контакты; ответ на письмо уходит владельцу (Reply-To).
+ * c99: $pdfLabel — имя прикреплённого PDF-меню (null = без вложения):
+ * строка «во вложении — меню…» стоит ДО контактов, чтобы клиент заметил.
  */
-function lead_client_mail_text(array $lead): string
+function lead_client_mail_text(array $lead, ?string $pdfLabel = null): string
 {
     $p = is_array($lead['payload']) ? $lead['payload'] : [];
     $lines = [
@@ -735,6 +795,11 @@ function lead_client_mail_text(array $lead): string
         'Мы свяжемся с вами по телефону ' . $lead['phone'] . ' в ближайшее время.',
         '',
     ];
+    if ($pdfLabel !== null) {
+        $lines[] = 'ВО ВЛОЖЕНИИ — МЕНЮ ВАШЕГО ФОРМАТА: ' . $pdfLabel . '.';
+        $lines[] = 'Состав и цены — как на сайте; менеджер согласует детали при звонке.';
+        $lines[] = '';
+    }
     $details = [];
     if (!empty($p['pkgName']) && is_string($p['pkgName'])) {
         $details[] = 'Формат: ' . $p['pkgName'];
@@ -768,6 +833,6 @@ function lead_client_mail_text(array $lead): string
     $lines[] = 'Сайт: https://nilovcatering.ru';
     $lines[] = '';
     $lines[] = 'Хорошего дня!';
-    $lines[] = 'Команда Nilov Catering — кейтеринг, в котором чувствуют';
+    $lines[] = 'Команда NILOV CATERING — кейтеринг, в котором чувствуют';
     return implode("\r\n", $lines);
 }

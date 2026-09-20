@@ -12,6 +12,25 @@ Allow: /media/
 Allow: /brand/
 Allow: /_next/static/media/
 
+# c99 (R1 §4.3): ИИ-краулеры ассистентов — ЯВНО разрешены (OAI-SearchBot —
+# поиск ChatGPT; ChatGPT-User — переходы из ChatGPT; GPTBot — OpenAI;
+# PerplexityBot — поиск Perplexity; ClaudeBot — Anthropic; Bingbot — индекс
+# Bing, на который опираются ChatGPT/Copilot/Perplexity). Группа
+# дублирует правила «*» ПОЛНОСТЬЮ: по RFC 9309 специфичная группа
+# ЗАМЕНЯЕТ группу «*» для своего робота — группа только с «Disallow:»
+# (пустым) открыла бы этим ботам /admin и /api/.
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: GPTBot
+User-agent: PerplexityBot
+User-agent: ClaudeBot
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /server-data/
+Disallow: /config/
+
 # Гео-карта сайта для Яндекс.Карт / Справочника
 Sitemap: https://nilovcatering.ru/sitemap.xml
 Sitemap: https://nilovcatering.ru/geo-sitemap.xml

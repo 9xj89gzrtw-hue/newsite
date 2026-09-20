@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { CSSProperties } from "react";
-import { loadMetrika } from "@/lib/analytics";
+import { loadAnalytics } from "@/lib/analytics";
 
 /**
  * EaCookieBanner — Elegant Affairs single-line cookie banner (Cycle 28).
@@ -37,9 +37,13 @@ import { loadMetrika } from "@/lib/analytics";
  *     continues into the page naturally (FIX-5, WCAG 2.1.2 / W1-D F5).
  *     Escape NOT bound. Body scroll NOT locked.
  *   - "Accept all" enables analytics — W3 (cycle-71): Yandex.Metrika now
- *     actually loads via lib/analytics.ts loadMetrika() (env-gated, noop
- *     without NEXT_PUBLIC_YANDEX_METRIKA_ID; the Cycle-28 console.log stub
- *     is retired). Reload with a live accepted-choice also loads it on mount.
+ *     actually loads via lib/analytics.ts (env-gated, noop without
+ *     NEXT_PUBLIC_YANDEX_METRIKA_ID; the Cycle-28 console.log stub is
+ *     retired). Reload with a live accepted-choice also loads it on mount.
+ *     c99-C: точка входа — async loadAnalytics(): сперва свежие настройки
+ *     из админки (GET /api/vars.php — ID Метрики, Вебвизор, GA4, пиксели),
+ *     при недоступности — env-фолбэк деплоя. Контракт 152-ФЗ не меняется:
+ *     до «Принять все» ноль сторонних запросов.
  *
  * 81-F2 (критики A+B CRITICAL, редизайн компакта): полноширинная полоса
  *   внизу перекрывала нижние ~25% hero-CTA и строку футера до accept — и на
@@ -47,7 +51,7 @@ import { loadMetrika } from "@/lib/analytics";
  *   карточка (≤340px) внизу-слева, на мобиле — по центру с меньшей высотой
  *   (замер 390×844: ≤140px, отступ от низа 16px + safe-area). Дизайн — в
  *   стилистике системы: espresso-панель, золотая рамка, скруглённые углы,
- *   мягкая тень. Логика консента, ключи, 14-дневный re-prompt, loadMetrika,
+ *   мягкая тень. Логика консента, ключи, 14-дневный re-prompt, loadAnalytics,
  *   класс cookie-banner-open и замер --cookie-banner-h НЕ тронуты
  *   (globals.css-хуки body padding/FAB-лифта продолжают работать на живой
  *   высоте карточки — замер C75 идёт по этому же элементу).
@@ -99,7 +103,7 @@ import { loadMetrika } from "@/lib/analytics";
  *   - ссылки «Политика»/«Условия»: espresso-текст (18.32:1) с золотой
  *     нитью-подчёркиванием (чистое золото текстом на креме = 2.22:1 FAIL —
  *     поэтому золото только в декоративной нити, hover углубляет её).
- *   Логика НЕ тронута: KEYS/localStorage, loadMetrika, ResizeObserver +
+ *   Логика НЕ тронута: KEYS/localStorage, loadAnalytics, ResizeObserver +
  *   --cookie-banner-h, body.cookie-banner-open, safe-area, role/aria,
  *   decide(). Классы .cookie-cta-solid/.cookie-cta-outline (globals.css)
  *   сохранены: slide-fill espresso + золотой текст на ховере (8.22:1) —
@@ -263,13 +267,14 @@ export function EaCookieBanner() {
 
   // Mount: clear stale (>14 days) choices, then decide whether to show.
   // W3 / K6-CRITICAL: консент на аналитику выдан ранее (не просрочен) →
-  // грузим Метрику сразу, не дожидаясь повторного показа баннера
-  // (баннер при живом выборе не показывается вовсе). Без env-ID и это
-  // loadMetrika — безопасный noop.
+  // грузим аналитику сразу, не дожидаясь повторного показа баннера
+  // (баннер при живом выборе не показывается вовсе). c99-C: loadAnalytics
+  // асинхронно тянет настройки владельца из админки (/api/vars.php);
+  // без ID и там, и в env — безопасный noop.
   useEffect(() => {
     clearStaleChoices();
     setVisible(!hasActiveChoice());
-    if (hasActiveAnalyticsConsent()) loadMetrika();
+    if (hasActiveAnalyticsConsent()) void loadAnalytics();
   }, []);
 
   // Cycle 41 / FIX-5: flag on <body> so fixed elements (phone FAB) can
@@ -348,13 +353,15 @@ export function EaCookieBanner() {
     writeChoice(choice);
     setVisible(false);
     if (choice === "accepted") {
-      // W3 / K6-CRITICAL: реальный загрузчик Яндекс.Метрики вместо
-      // console.log-заглушки (Cycle 28 «TBD»). Скрипт ставится ТОЛЬКО
-      // здесь и при живом консенте на монте (см. выше) — до «Принять
-      // все» ноль сторонних запросов. Без env-ID — noop (см. analytics.ts).
-      loadMetrika();
+      // W3 / K6-CRITICAL: реальный загрузчик аналитики вместо
+      // console.log-заглушки (Cycle 28 «TBD»). c99-C: loadAnalytics() —
+      // настройки владельца из админки (Метрика/Вебвизор/GA4/пиксели),
+      // фолбэк — env-ID деплоя. Скрипты ставятся ТОЛЬКО здесь и при живом
+      // консенте на монте (см. выше) — до «Принять все» ноль сторонних
+      // запросов (152-ФЗ). void: промис не должен держать обработчик.
+      void loadAnalytics();
       console.info(
-        "[ea-cookie-banner] analytics consent granted — Yandex.Metrika loader invoked",
+        "[ea-cookie-banner] analytics consent granted — runtime analytics loader invoked",
       );
     }
   };

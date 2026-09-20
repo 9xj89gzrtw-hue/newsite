@@ -436,6 +436,24 @@ function default_settings(): array
         // 5–7-секундным таймаутом на мёртвой базе. Пишется только сервером
         // (tg_remember_working_base), в UI — read-only.
         'tgWorkingBase' => null,
+        // c99-C: аналитика, редактируемая владельцем в «Настройках» без
+        // передеплоя. Статик-экспорт читает их РАНТАЙМ через /api/vars.php
+        // (src/lib/analytics.ts), поэтому смена счётчика подхватывается ≤5
+        // мин (Cache-Control max-age=300), а не со следующей сборкой.
+        // metrikaId — номер счётчика (только цифры); null = используется
+        // ID из env деплоя (прод-счётчик 112532826).
+        'metrikaId' => null,
+        // Вебвизор (запись сессий) — по умолчанию ВКЛ: явное требование
+        // владельца (c98 подтвердил счётчик с webvisor:true).
+        'metrikaWebvisor' => true,
+        // Клик-карта Метрики — по умолчанию ВКЛ.
+        'metrikaClickmap' => true,
+        // GA4 (G-XXXXXXXXXX); null = GA не грузим.
+        'gaId' => null,
+        // Свободный код пикселей (Roistat, VK pixel, Top100, <script>…),
+        // вставляемый в <head> после cookie-consent. Максимально свободная
+        // форма: владелец копирует готовый сниппет из сервиса.
+        'customHeadHtml' => null,
         // passwordHash перекрывает secrets.password_hash_default после
         // смены пароля владельцем через UI (action=password).
         'passwordHash' => null,
@@ -462,6 +480,35 @@ function load_settings(): array
     if ($merged['smtpPort'] !== null) {
         $p = is_int($merged['smtpPort']) ? $merged['smtpPort'] : (is_numeric($merged['smtpPort']) ? (int)$merged['smtpPort'] : 0);
         $merged['smtpPort'] = ($p >= 1 && $p <= 65535) ? $p : null;
+    }
+    /* c99-C: нормализация аналитики — settings.json мог быть испорчен
+     * вручную/полу-битым. Правило то же, что у admin.php при сохранении:
+     * мусор НЕ окирпичивает сайт (vars.php отдаст null), а не падает. */
+    // metrikaId: только цифры 5–10 (реальные номера счётчиков 6–9); всё
+    // прочее → null (= работает env-фолбэк из деплоя).
+    $mid = $merged['metrikaId'];
+    if ($mid !== null) {
+        $digits = is_int($mid) ? (string)$mid : (is_string($mid) ? preg_replace('/\D+/', '', trim($mid)) : '');
+        $merged['metrikaId'] = (strlen($digits) >= 5 && strlen($digits) <= 10) ? $digits : null;
+    }
+    // флаги Метрики: булевы, всё небулево → дефолт (true), а не ложь —
+    // случайная строка в файле не должна молча выключать Вебвизор владельцу.
+    $merged['metrikaWebvisor'] = is_bool($merged['metrikaWebvisor']) ? $merged['metrikaWebvisor'] : true;
+    $merged['metrikaClickmap'] = is_bool($merged['metrikaClickmap']) ? $merged['metrikaClickmap'] : true;
+    // gaId: G-XXXXXXXXXX (4–12 алфанумерика после префикса); невалидное → null.
+    $ga = $merged['gaId'];
+    if ($ga !== null) {
+        $ga = is_string($ga) ? trim($ga) : '';
+        $merged['gaId'] = preg_match('/^G-[A-Z0-9]{4,12}$/i', $ga) === 1 ? strtoupper($ga) : null;
+    }
+    // customHeadHtml: строка ≤ 8000; длиннее — обрезаем (не дропаем: это
+    // код владельца, обрезанный пиксель хуже полного, но пустой — хуже
+    // обоих; admin.php при сохранении и так отвергает перебор, это
+    // только защита от ручной порчи файла).
+    $ch = $merged['customHeadHtml'];
+    if ($ch !== null) {
+        $ch = is_string($ch) ? str_trunc($ch, 8000) : '';
+        $merged['customHeadHtml'] = $ch === '' ? null : $ch;
     }
     return $merged;
 }
@@ -1072,9 +1119,149 @@ function tg_send(string $token, string $apiBase, string $chatId, string $html): 
 /* ------------------------------- mail ----------------------------------- */
 
 /** Отображаемое имя отправителя для писем сайта. */
-const MAIL_FROM_NAME = 'Nilov Catering';
+const MAIL_FROM_NAME = 'NILOV CATERING';
 /** Домен сайта для Message-ID (RFC 5322: <ts.rand@domain>). */
 const MAIL_DOMAIN = 'nilovcatering.ru';
+
+/* ------------------ c99: PDF-вложения (public/menu-pdf/) ---------------- */
+
+/**
+ * c99 — каталог PDF-меню (сгенерирован scripts/gen-menu-pdfs.ts в build:
+ * 17 per-tariff PDF + полный каталог + manifest.json; лежит в out/ и
+ * деплоится rsync'ом вместе со статикой).
+ */
+function menu_pdf_dir(): string
+{
+    return dirname(__DIR__) . '/menu-pdf';
+}
+
+/** Манифест PDF-вложений: [{typeId,pkgIdx,file,label,fileName,fileNameStar}] или []. */
+function menu_pdf_manifest(): array
+{
+    $path = menu_pdf_dir() . '/manifest.json';
+    if (!is_file($path)) {
+        return [];
+    }
+    $raw = file_get_contents($path);
+    if (!is_string($raw) || $raw === '') {
+        return [];
+    }
+    $m = json_decode($raw, true);
+    $entries = (is_array($m) && isset($m['entries']) && is_array($m['entries'])) ? $m['entries'] : [];
+    return array_values(array_filter($entries, 'is_array'));
+}
+
+/**
+ * c99 — подобрать PDF-меню под ЗАЯВКУ: пакет конкретного тарифа
+ * (typeId+pkgIdx из калькулятора) → иначе тип без пакета (pkgIdx null
+ * не бывает в манифесте тарифов) → полный каталог. Возвращает запись
+ * манифеста или null (каталога нет — письмо уйдёт без вложения).
+ */
+function menu_pdf_for_payload(array $payload): ?array
+{
+    $entries = menu_pdf_manifest();
+    if ($entries === []) {
+        return null;
+    }
+    $typeId = (isset($payload['typeId']) && is_string($payload['typeId'])) ? $payload['typeId'] : '';
+    $pkgIdx = (isset($payload['pkgIdx']) && is_numeric($payload['pkgIdx'])) ? (int)$payload['pkgIdx'] : null;
+
+    if ($typeId !== '') {
+        foreach ($entries as $e) {
+            if (($e['typeId'] ?? '') === $typeId && $pkgIdx !== null && ($e['pkgIdx'] ?? null) === $pkgIdx) {
+                return $e;
+            }
+        }
+        foreach ($entries as $e) {
+            if (($e['typeId'] ?? '') === $typeId) {
+                return $e;
+            }
+        }
+    }
+    foreach ($entries as $e) {
+        if (($e['typeId'] ?? '') === 'all') {
+            return $e;
+        }
+    }
+    return null;
+}
+
+/**
+ * c99 — прочитать файл PDF-вложения. Возвращает null, если файла нет
+ * или он больше 2 МБ (защита от распухших вложений; реальные меню
+ * 130-280 КБ). Ошибка читается в журнале отправки (attachSkipped).
+ */
+function menu_pdf_bytes(array $entry): ?string
+{
+    $file = (isset($entry['file']) && is_string($entry['file'])) ? $entry['file'] : '';
+    // имя файла — из манифеста (наш генератор), НЕ из юзера; всё равно
+    // страховка: только basename без расширений пути
+    $file = basename($file);
+    if ($file === '' || !preg_match('/^[a-z0-9-]+\.pdf$/i', $file)) {
+        return null;
+    }
+    $path = menu_pdf_dir() . '/' . $file;
+    if (!is_file($path) || filesize($path) < 1024 || filesize($path) > 2 * 1024 * 1024) {
+        return null;
+    }
+    $bytes = file_get_contents($path);
+    return is_string($bytes) ? $bytes : null;
+}
+
+/** c99 — Content-Disposition вложения: filename= (ASCII-фолбэк) +
+ *  filename*=UTF-8''<pct-encoded> (RFC 6266) — кириллица читается в
+ *  современных клиентах, ASCII — в старых. Значения из манифеста,
+ *  уже подготовленные генератором (транслит + rawurlencode). */
+function mail_attachment_disposition(array $entry): string
+{
+    $ascii = (isset($entry['fileName']) && is_string($entry['fileName'])) ? $entry['fileName'] : 'menu.pdf';
+    $star = (isset($entry['fileNameStar']) && is_string($entry['fileNameStar'])) ? $entry['fileNameStar'] : '';
+    $d = "attachment; filename=\"" . str_replace(['"', "\\", "\r", "\n"], '', $ascii) . "\"";
+    if ($star !== '') {
+        $d .= "; filename*=UTF-8''" . str_replace(["\r", "\n", ' '], '', $star);
+    }
+    return $d;
+}
+
+/**
+ * c99 — тело письма с MIME-вложениями (multipart/mixed).
+ * Без вложений — прежний плоский text/plain (байт-идентично c97:
+ * старые письма не меняются). С вложениями: part text/plain (UTF-8,
+ * 8bit) + N parts application/pdf (base64, 76 колонок, CRLF).
+ * Возвращает [headers: string[], body: string] — To/Subject SMTP-пути
+ * добавляет smtp_send, mail()-путь — PHP сам.
+ */
+function mail_mime_parts(array $extraHeaders, string $bodyText, array $attachments): array
+{
+    if ($attachments === []) {
+        return [$extraHeaders, mail_body_crlf($bodyText)];
+    }
+    $b = '=nilov-' . bin2hex(random_bytes(12)); // '=' разрешён в boundary (RFC 2046 bcharsnospace) и не встречается в base64-строках тела — случайная коллизия с контентом исключена
+    $headers = $extraHeaders;
+    // Content-Type/CTE из плоских заголовков заменяются multipart-версией
+    $headers = array_values(array_filter($headers, static function (string $h): bool {
+        return stripos($h, 'Content-Type:') !== 0 && stripos($h, 'Content-Transfer-Encoding:') !== 0;
+    }));
+    $headers[] = 'Content-Type: multipart/mixed; boundary="' . $b . '"';
+    $headers[] = 'Content-Transfer-Encoding: 8bit';
+    // для 8bit multipart кодирование базовых частей выполняем сами
+    $parts = [];
+    /* Текстовая часть обязана заканчиваться CRLF: по RFC 2046 разделитель
+     * границы — это CRLF "--{$b}"; без него граница приклеилась бы к
+     * последней строке текста («…чувствуют--=nilov-…») и почтовые клиенты
+     * не распознали бы вложение (поймано тестом c99-A: base64-раундтрип). */
+    $parts[] = "--{$b}\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n" . mail_body_crlf($bodyText) . "\r\n";
+    foreach ($attachments as $att) {
+        $data = chunk_split(base64_encode($att['bytes']), 76, "\r\n");
+        $parts[] = "--{$b}\r\n"
+            . "Content-Type: application/pdf; name=\"" . str_replace(['"', "\r", "\n"], '', (string)$att['name']) . "\"\r\n"
+            . 'Content-Disposition: ' . mail_attachment_disposition($att['entry']) . "\r\n"
+            . "Content-Transfer-Encoding: base64\r\n\r\n"
+            . $data;
+    }
+    $body = implode('', $parts) . "--{$b}--\r\n";
+    return [$headers, $body];
+}
 
 /**
  * c97 — тема письма в encoded-word (=?UTF-8?B?…?=), кусками ≤ 75 байт
@@ -1116,6 +1303,8 @@ function mail_body_crlf(string $bodyText): string
  * c97 — общий набор заголовков (без To/Subject: SMTP добавляет их
  * сам из параметров, а mail() ставит из своих аргументов — дубликаты
  * ломают письмо).
+ * c99: плоские Content-Type/CTE остаются только для писем БЕЗ вложений;
+ * с вложениями mail_mime_parts() заменяет их на multipart/mixed.
  * Date и Message-ID обязательны: их отсутствие — один из главных
  * спам-сигналов у Gmail (в c95 их не было — вероятная причина пропажи).
  */
@@ -1149,8 +1338,14 @@ function mail_headers(string $fromEmail, ?string $replyTo): array
  * письмо физически не может занять больше ~15с. Таймаут чтения помечается
  * отдельным кодом 'smtp_timeout' (было 'bad_greeting'/'ehlo_failed' с
  * пустым текстом) — lead.php различает «мёртвый» канал для ретрая.
+ *
+ * c99: + $attachments (массив ['bytes'=>string,'name'=>string,
+ * 'entry'=>манифест]) — тело собирается через mail_mime_parts
+ * (multipart/mixed). ВАЖНО: письмо с вложением ~250КБ + base64 ≈ 335КБ
+ * — одна fwrite на такой буфер допустима (PHP пишет в сокет блоками);
+ * бюджет 15с остаётся барьером: локальная отдача на SMTP-релей — секунды.
  */
-function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?string $replyTo): array
+function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?string $replyTo, array $attachments = []): array
 {
     $host = $cfg['host'];
     $port = (int)$cfg['port'];
@@ -1227,12 +1422,19 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
         }
         return [$code, trim($text)];
     };
-    /** Пишет команду и читает ответ; false — таймаут/обрыв. */
+    /** Пишет команду и читает ответ; false — таймаут/обрыв.
+     * c99-fix (критик E1-m2): детект ЧАСТИЧНОЙ записи. fwrite на блокирующем
+     * сокете с SO_SNDTIMEO может вернуть МЕНЬШЕ байт (замер: 114271 из
+     * 343040 при застрявшем читателе) — раньше это молча доводило до
+     * таймаута чтения ('smtp_timeout', +5с ожидания); теперь честный
+     * 'write_failed' сразу: письмо быстрее уходит в mail()-фолбэк. */
     $cmd = static function (string $c, string $expect) use ($fp, $readCode, $tuneTimeout): array {
         if (!$tuneTimeout()) {
             return [0, 'timeout_budget'];
         }
-        if (fwrite($fp, $c . "\r\n") === false) {
+        $want = strlen($c) + 2; // команда + CRLF
+        $n = fwrite($fp, $c . "\r\n");
+        if ($n === false || $n !== $want) {
             return [0, 'write_failed'];
         }
         [$code, $text] = $readCode();
@@ -1319,11 +1521,24 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
         $subjectEnc = mail_subject_enc($subject);
         // SMTP-путь: To/Subject в заголовках DATA (в отличие от mail(),
         // которая добавляет их сама из своих аргументов)
+        // c99: тело+заголовки — через mail_mime_parts (multipart при вложениях)
+        [$mimeHeaders, $mimeBody] = mail_mime_parts(
+            mail_headers($cfg['from'], $replyTo),
+            $bodyText,
+            $attachments
+        );
         $headers = array_merge(
             ['To: ' . $to, 'Subject: ' . $subjectEnc],
-            mail_headers($cfg['from'], $replyTo)
+            $mimeHeaders
         );
-        $msg = implode("\r\n", $headers) . "\r\n\r\n" . mail_body_crlf($bodyText) . "\r\n.";
+        /* Терминатор DATA — CRLF «.»: если тело уже заканчивается CRLF
+         * (multipart закрывается «--b--\r\n»), НЕ добавляем второй — пустая
+         * строка перед точкой стала бы лишней строкой письма. */
+        $msg = implode("\r\n", $headers) . "\r\n\r\n" . $mimeBody;
+        if (substr($mimeBody, -2) !== "\r\n") {
+            $msg .= "\r\n";
+        }
+        $msg .= '.';
         [$code, $text] = $cmd($msg, '250');
         if ($code !== 250) {
             return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'message_rejected'), 'detail' => $text];
@@ -1342,6 +1557,10 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
  * больше не узнаёт о нерабочей почте «неожиданно».
  *
  * $context — метка для журнала: 'lead-owner' | 'lead-client' | 'test'.
+ * c99: + $attachments — [['bytes'=>…,'name'=>…,'entry'=>…]] из
+ * menu_pdf_*(); оба транспорта получают одинаковое MIME-тело
+ * (mail_mime_parts). Файл слишком большой/отсутствует — просто не
+ * попадает в массив на уровне lead.php (там же журналируется пропуск).
  * Возвращает ['ok'=>bool, 'transport'=>'smtp'|'mail'|'mail-fallback'|'none',
  * 'error'=>?string, 'detail'=>?string].
  * c98-FIX1 (критик2 E2): + 'smtpError' — исходный код ошибки SMTP
@@ -1349,12 +1568,13 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
  * (даже когда mail()-фолбэк спас письмо) — lead.php классифицирует канал
  * для решения о ретрае (dead/crit/retry).
  */
-function mail_send(string $to, string $subject, string $bodyText, ?string $replyTo = null, string $context = 'test'): array
+function mail_send(string $to, string $subject, string $bodyText, ?string $replyTo = null, string $context = 'test', array $attachments = []): array
 {
     if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
         $r = ['ok' => false, 'transport' => 'none', 'error' => 'invalid_recipient', 'detail' => $to, 'smtpError' => null];
         mail_log_append(['to' => str_trunc($to, 120), 'context' => $context, 'subject' => str_trunc($subject, 100),
-            'transport' => 'none', 'ok' => false, 'error' => 'invalid_recipient']);
+            'transport' => 'none', 'ok' => false, 'error' => 'invalid_recipient',
+            'attach' => count($attachments)]);
         return $r;
     }
 
@@ -1363,25 +1583,28 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
     $smtp = smtp_config($settings);
 
     if ($smtp !== null) {
-        $r = smtp_send($smtp, $to, $subject, $bodyText, $replyTo);
+        $r = smtp_send($smtp, $to, $subject, $bodyText, $replyTo, $attachments);
         if ($r['ok'] === true) {
             mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
-                'transport' => 'smtp', 'ok' => true, 'error' => null]);
+                'transport' => 'smtp', 'ok' => true, 'error' => null, 'attach' => count($attachments)]);
             return ['ok' => true, 'transport' => 'smtp', 'error' => null, 'detail' => null, 'smtpError' => null];
         }
         // SMTP настроен, но не сработал (пароль/сеть) — НЕ теряем письмо:
         // пробуем mail() сервера, обе попытки в журнале.
         mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
             'transport' => 'smtp', 'ok' => false, 'error' => str_trunc((string)$r['error'], 100),
-            'detail' => str_trunc((string)($r['detail'] ?? ''), 200)]);
+            'detail' => str_trunc((string)($r['detail'] ?? ''), 200), 'attach' => count($attachments)]);
     }
 
     /* mail()-путь: sendmail хостинга. c97 — с Date/Message-ID (без них
      * Gmail кладёт в спам или молча отбраковывает — главный подозреваемый
-     * в «почта не работает» у владельца). */
+     * в «почта не работает» у владельца). c99 — с вложениями: mail()
+     * принимает СБОРКУ MIME-заголовков 4-м аргументом (строка с CRLF);
+     * тело — подготовленный mail_mime_parts (multipart при вложениях,
+     * плоский text/plain без). */
     if (!function_exists('mail')) {
         mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
-            'transport' => 'none', 'ok' => false, 'error' => 'mail_disabled', 'detail' => 'mail() отключена на хостинге, SMTP не настроен']);
+            'transport' => 'none', 'ok' => false, 'error' => 'mail_disabled', 'detail' => 'mail() отключена на хостинге, SMTP не настроен', 'attach' => count($attachments)]);
         return ['ok' => false, 'transport' => 'none', 'error' => 'mail_disabled',
             'detail' => 'Функция mail() отключена на хостинге; настройте SMTP в разделе «Почта»',
             'smtpError' => (($smtp !== null && !($r['ok'] ?? true)) ? (string)$r['error'] : null)];
@@ -1392,13 +1615,18 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
         $from = $smtp['from']; // выравнивание From с SMTP-ящиком
     }
     // mail() сама ставит To/Subject из аргументов — в заголовках их НЕ дублируем
-    $headers = mail_headers($from, $replyTo);
-    $ok = @mail($to, mail_subject_enc($subject), mail_body_crlf($bodyText), implode("\r\n", $headers));
+    [$mimeHeaders, $mimeBody] = mail_mime_parts(
+        mail_headers($from, $replyTo),
+        $bodyText,
+        $attachments
+    );
+    $ok = @mail($to, mail_subject_enc($subject), $mimeBody, implode("\r\n", $mimeHeaders));
 
     $transport = ($smtp !== null) ? 'mail-fallback' : 'mail';
     mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
         'transport' => $transport, 'ok' => (bool)$ok,
-        'error' => $ok ? null : 'mail() вернула false (sendmail не принял письмо)']);
+        'error' => $ok ? null : 'mail() вернула false (sendmail не принял письмо)',
+        'attach' => count($attachments)]);
     return [
         'ok' => (bool)$ok,
         'transport' => $transport,

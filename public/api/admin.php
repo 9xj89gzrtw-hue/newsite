@@ -492,13 +492,25 @@ function h_settings(string $method): void
             'smtpFrom' => $s['smtpFrom'],
             'smtpSet' => smtp_config($s) !== null,
             'smtpPassMasked' => mask_secret($s['smtpPass']),
+            // c99-C: аналитика (Метрика/GA4/пиксели) — все значения НЕсекретны
+            // (ID счётчиков публично видны в исходнике страницы), поэтому
+            // отдаются как есть, без масок.
+            'metrikaId' => $s['metrikaId'],
+            'metrikaWebvisor' => $s['metrikaWebvisor'],
+            'metrikaClickmap' => $s['metrikaClickmap'],
+            'gaId' => $s['gaId'],
+            'customHeadHtml' => $s['customHeadHtml'],
         ]]);
     }
     if ($method !== 'POST') {
         json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
     }
     require_admin();
-    $body = read_json_body_or_400(16384);
+    /* c99-fix (критик E1-M7): 16384 байт не вмещали customHeadHtml до 8000
+     * СИМВОЛОВ кириллицы (×3 байта UTF-8 = до 24000 байт + JSON-обвязка) —
+     * валидное значение падало с невнятным too_large. 40000 покрывает
+     * 8000 симв. даже при 4-байтовых кодпоинтах + прочие поля настроек. */
+    $body = read_json_body_or_400(40000);
     $s = load_settings();
     $bad = static function (string $detail): never {
         json_response(400, ['ok' => false, 'error' => 'validation', 'detail' => $detail]);
@@ -610,6 +622,54 @@ function h_settings(string $method): void
     }
     if (!empty($body['clearBotToken'])) {
         $s['tgBotToken'] = null;
+    }
+
+    /* c99-C — аналитика. metrikaId/gaId: мягкая нормализация (мусор → null,
+    // «никогда не сохраняем хлам»), НЕ 400: владелец мог вставить ID со
+    // скобкой/пробелом — молча почистить и работать лучше, чем ругаться.
+    // Флаги — строго bool. customHeadHtml — свободный код: админка
+    // HMAC-авторизована (пишет ТОЛЬКО владелец), поэтому НЕ санитизируем
+    // HTML/JS (Roistat/Top100/VK-пиксели иначе не вставить) — единственный
+    // запрет: подстрока «</textarea» (сломала бы ФОРМУ админки при
+    // обратном рендере значения в <textarea>) и лимит 8000 символов. */
+    if (array_key_exists('metrikaId', $body)) {
+        $v = $body['metrikaId'];
+        if ($v === null || $v === '') {
+            $s['metrikaId'] = null; // пусто = используем env-ID из деплоя
+        } else {
+            $digits = is_int($v) ? (string)$v : (is_string($v) ? preg_replace('/\D+/', '', trim($v)) : '');
+            $s['metrikaId'] = (strlen($digits) >= 5 && strlen($digits) <= 10) ? $digits : null;
+        }
+    }
+    if (array_key_exists('metrikaWebvisor', $body)) {
+        $s['metrikaWebvisor'] = $body['metrikaWebvisor'] === true;
+    }
+    if (array_key_exists('metrikaClickmap', $body)) {
+        $s['metrikaClickmap'] = $body['metrikaClickmap'] === true;
+    }
+    if (array_key_exists('gaId', $body)) {
+        $v = $body['gaId'];
+        if ($v === null || $v === '') {
+            $s['gaId'] = null;
+        } else {
+            $ga = is_string($v) ? trim($v) : '';
+            $s['gaId'] = preg_match('/^G-[A-Z0-9]{4,12}$/i', $ga) === 1 ? strtoupper($ga) : null;
+        }
+    }
+    if (array_key_exists('customHeadHtml', $body)) {
+        $v = $body['customHeadHtml'];
+        if ($v === null || $v === '') {
+            $s['customHeadHtml'] = null;
+        } elseif (is_string($v) && slen($v) <= 8000) {
+            // «</textarea» — единственный отказ: такая строка при рендере
+            // в textarea настроек вырвалась бы из поля и сломала бы форму
+            if (stripos($v, '</textarea') !== false) {
+                $bad('customHeadHtml: не содержит «</textarea» (ломает форму настроек)');
+            }
+            $s['customHeadHtml'] = $v;
+        } else {
+            $bad('customHeadHtml: до 8000 символов');
+        }
     }
     if (!save_settings($s)) {
         json_response(500, ['ok' => false, 'error' => 'storage']);
@@ -799,7 +859,7 @@ function h_mail_test(string $method): void
     $smtp = smtp_config($s);
     $r = mail_send(
         $to,
-        'Тест почты — Nilov Catering',
+        'Тест почты — NILOV CATERING',
         "Тестовое письмо из админ-панели nilovcatering.ru.\n\n"
         . "Если вы читаете это письмо — почта работает.\n"
         . "Отправка шла через транспорт: " . ($smtp !== null ? 'SMTP (' . $smtp['host'] . ')' : 'sendmail хостинга (mail)') . ".\n\n"
@@ -824,7 +884,8 @@ function h_mail_log(string $method): void
         $limit = 10;
     }
     $entries = array_map(static function (array $e): array {
-        // наружу только безопасные поля
+        // наружу только безопасные поля; c99: + attach (кол-во PDF-вложений)
+        // и detail (причина пропуска вложения — «почему без меню?» видна владельцу)
         return [
             'ts' => $e['ts'] ?? null,
             'to' => $e['to'] ?? '',
@@ -833,6 +894,8 @@ function h_mail_log(string $method): void
             'transport' => $e['transport'] ?? '',
             'ok' => (bool)($e['ok'] ?? false),
             'error' => $e['error'] ?? null,
+            'attach' => isset($e['attach']) && is_int($e['attach']) ? $e['attach'] : 0,
+            'detail' => (isset($e['detail']) && is_string($e['detail'])) ? $e['detail'] : null,
         ];
     }, mail_log_read($limit));
     json_response(200, ['ok' => true, 'entries' => $entries]);

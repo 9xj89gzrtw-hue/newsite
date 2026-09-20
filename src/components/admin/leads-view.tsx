@@ -12,6 +12,7 @@ import {
   CheckCheck,
   Copy,
   Download,
+  FileText,
   Inbox,
   Loader2,
   Mail,
@@ -600,6 +601,9 @@ function NotifyBadges({ lead }: { lead: Lead }) {
     });
   }
   const deliveredAny = items.some((i) => i.ok);
+  /* c99: имя PDF-меню, ушедшего клиенту во вложении (бейдж после статусов:
+   * владелец сразу видит, ЧТО получил клиент — тариф или каталог). */
+  const clientPdf = typeof n.clientPdf === "string" && n.clientPdf !== "" ? n.clientPdf : null;
 
   return (
     <div
@@ -623,6 +627,15 @@ function NotifyBadges({ lead }: { lead: Lead }) {
           {i.icon} {i.label}
         </span>
       ))}
+      {clientPdf !== null ? (
+        <span
+          className="inline-flex items-center gap-1 text-gold"
+          title="PDF-меню, прикреплённое к письму клиента"
+        >
+          <FileText className="size-3" />
+          PDF: {clientPdf}
+        </span>
+      ) : null}
       {!deliveredAny ? (
         <span className="text-destructive">— ни одно не доставлено</span>
       ) : null}

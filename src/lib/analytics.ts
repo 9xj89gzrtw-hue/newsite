@@ -1,36 +1,33 @@
 /**
  * W3 / K6-CRITICAL (cycle-71): слой веб-аналитики — Яндекс.Метрика.
+ * c99-C: переведён с build-time env-ID на РАНТАЙМ-настройки из админки.
  *
- * До этого волны: аналитики не было ВООБЩЕ (window.ym = false, cookie-баннер
- * писал console.log-заглушку). Этот модуль — полный каркас с env-гейтом:
+ * КАК ЭТО РАБОТАЕТ (c99-C, «владелец меняет аналитику сам»):
+ *  - cookie-баннер (после «Принять все» / живого консента) вызывает
+ *    loadAnalytics() — ЕДИНСТВЕННУЮ точку входа;
+ *  - loadAnalytics() делает fetch('/api/vars.php') — публичный PHP-эндпоинт
+ *    читает server-data/settings.json (его пишет владелец в «Настройках»
+ *    админки: ID Метрики, Вебвизор, клик-карта, GA4, произвольные пиксели);
+ *  - недоступен API/сеть/зеркало Vercel (там /api закрыт редиректом) —
+ *    тихий фолбэк на env NEXT_PUBLIC_YANDEX_METRIKA_ID из деплоя
+ *    (прод-счётчик 112532826 продолжает работать, если владелец ничего
+ *    не настроил);
+ *  - 152-ФЗ: до «Принять все» — НОЛЬ сторонних запросов (ни Метрики,
+ *    ни GA, ни пикселей; сам vars.php — same-origin, не трекер).
  *
- * ┌─ КАК ВКЛЮЧИТЬ ВЛАДЕЛЬЦУ (5 минут) ───────────────────────────────────────┐
- * │ 1. Зарегистрировать счётчик: https://metrika.yandex.ru → «Добавить      │
- * │    счётчик» → получить числовой ID (например 12345678).                 │
- * │    На вкладке «Цели» один раз создать цели с именами из GOALS ниже      │
- * │    (тип «JavaScript-событие», идентификаторы — те же строки).           │
- * │ 2. Прописать в окружении деплоя:                                        │
- * │        NEXT_PUBLIC_YANDEX_METRIKA_ID=12345678                           │
- * │    (старый ключ NEXT_PUBLIC_YANDEX_METRIKA тоже принят как синоним).    │
- * │    Локально — в .env.local; НЕ коммитить секретов тут нет, но и ID     │
- * │    тестового счётчика в git тащить незачем.                             │
- * │ 3. Всё. Скрипт Метрики грузится ТОЛЬКО после «Принять все» в cookie-    │
- * │    баннере (152-ФЗ: до согласия — ноль сторонних запросов).            │
- * └─────────────────────────────────────────────────────────────────────────┘
- *
- * БЕЗ ID (по умолчанию): каждый вызов — безопасный noop, ни одного сетевого
- * запроса, ни одной ошибки — сайт работает ровно как раньше.
+ * БЕЗ ID вообще (и в vars, и в env): каждый вызов — безопасный noop,
+ * ни одного сетевого запроса, ни одной ошибки — сайт работает как раньше.
  *
  * Технические решения:
- *  - ID читается из ANALYTICS.yandexMetrikaId (lib/config.ts) — ЕДИНЫЙ
- *    источник env-конфигурации сайта, рядом с доменом/хостингом;
+ *  - env-ID читается из ANALYTICS.yandexMetrikaId (lib/config.ts) — единый
+ *    источник env-конфигурации; рантайм-ID — из /api/vars.php;
  *  - инъекция — официальный асинхронный сниппет tag.js (mc.yandex.ru;
- *    mjs-варианта на CDN нет — tag.mjs отвечает 404, проверено curl,
- *    поэтому «официальный сниппет» = tag.js + async-загрузка; инъекция
- *    после парсинга HTML неблокирующая, т.е. defer-семантика);
- *  - инициализация: clickmap/trackLinks/accurateTrackBounce = true,
- *    webvisor = false (запись сессий выключена — минимизация PII);
- *  - все вызовы обёрнуты в typeof/try — метрика не имеет права уронить UI.
+ *    mjs-варианта на CDN нет — проверено curl в cycle-71);
+ *  - инициализация: trackLinks/accurateTrackBounce = true; webvisor и
+ *    clickmap — по флагам владельца из vars (дефолт true);
+ *  - trackGoal шлёт цели в ТОТ же счётчик, что был инициализирован
+ *    (activeMetrikaId), иначе цели улетали бы в env-счётчик мимо нового;
+ *  - все вызовы обёрнуты в typeof/try — аналитика не имеет права уронить UI.
  */
 
 import { ANALYTICS } from "./config";
@@ -65,7 +62,7 @@ export const GOALS = {
 
 export type GoalName = (typeof GOALS)[keyof typeof GOALS];
 
-/* ------------------------------------------------------------------ typеs */
+/* ------------------------------------------------------------------ types */
 
 /** Очередь/интерфейс Яндекс.Метрики (официальный глобальный `ym`). */
 type YmFn = ((...args: unknown[]) => void) & {
@@ -75,16 +72,35 @@ type YmFn = ((...args: unknown[]) => void) & {
   l?: number;
 };
 
-type WindowWithYm = typeof window & { ym?: YmFn };
+type WindowWithAnalytics = typeof window & {
+  ym?: YmFn;
+  /** GA4: очередь событий (официальный сниппет gtag). */
+  dataLayer?: unknown[];
+  /** GA4: функция-шейм, пушащая в dataLayer. */
+  gtag?: (...args: unknown[]) => void;
+};
 
 declare global {
   interface Window {
     /** Яндекс.Метрика: стаб-очередь до загрузки tag.js, инстанс — после. */
     ym?: YmFn;
+    /** Google Analytics 4 (gtag.js): очередь команд. */
+    dataLayer?: unknown[];
+    /** Google Analytics 4 (gtag.js): shim до загрузки скрипта. */
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
 const METRIKA_SRC = "https://mc.yandex.ru/metrika/tag.js";
+
+/** Публичные переменные аналитики из /api/vars.php (после нормализации). */
+interface AnalyticsVars {
+  metrikaId: string | null;
+  webvisor: boolean;
+  clickmap: boolean;
+  gaId: string | null;
+  customHead: string | null;
+}
 
 /** ID валиден, только если это положительное число (env мог прийти битым). */
 function metricaIdNumber(): number {
@@ -99,39 +115,47 @@ export function isMetrikaConfigured(): boolean {
 
 /* ------------------------------------------------------------------ loader */
 
-/** Защита от повторной инъекции (сколько бы ни вызвали loadMetrika). */
+/** Защита от повторной инъекции (сколько бы ни вызвали load/loadAnalytics). */
 let loadStarted = false;
 
 /**
- * Загрузка Яндекс.Метрики — вызывается ТОЛЬКО после аналитического consent
- * (ea-cookie-banner: «Принять все» или уже выданный раннее consent).
- *
- * Идемпотентна: повторные вызовы — noop. Без ID — noop без единого
- * побочного эффекта. Официальный сниппет (docs: yandex.ru/support/metrica),
- * адаптированный под TS-инъекцию:
+ * Счётчик, РЕАЛЬНО инициализированный последним loadAnalytics.
+ * trackGoal обязан слать цели именно в него — иначе после смены ID
+ * владельцем в админке цели уходили бы в старый env-счётчик.
+ */
+let activeMetrikaId: number | null = null;
+
+/**
+ * Стаб-очередь window.ym — дословно из официального сниппета Метрики
+ * (m[i].a.push(arguments)); не трогаем, если ym уже есть.
+ * c99-fix (критик E2-m1): вынесена из initMetrika — trackGoal создаёт её
+ * САМ, если цель пришла до инициализации (async loadAnalytics ещё не
+ * дорезолвился): команда буферизуется и уйдёт сразу после загрузки tag.js,
+ * а не теряется молча (докстринг trackGoal теперь соответствует коду).
+ */
+function ensureYmStub(): void {
+  const w = window as WindowWithAnalytics;
+  if (typeof w.ym === "function") return;
+  const stub: YmFn = (...args: unknown[]) => {
+    stub.a = stub.a ?? [];
+    stub.a.push(args);
+  };
+  stub.l = 1 * Date.now();
+  w.ym = stub;
+}
+
+/**
+ * Инициализация Метрики под выбранным ID (официальный сниппет,
+ * docs: yandex.ru/support/metrica):
  *   1. window.ym = стаб-очередь (команды буферизуются до готовности tag.js);
  *   2. <script async src=tag.js> вставляется перед первым script документа;
  *   3. ym(ID, "init", {…}) — в очередь (исполнится сразу после загрузки).
  */
-export function loadMetrika(): void {
-  if (typeof window === "undefined" || typeof document === "undefined") return;
-  const id = metricaIdNumber();
-  if (!Number.isFinite(id)) return; // env-гейт: без ID сайт живёт как раньше
-  if (loadStarted) return;
-  loadStarted = true;
+function initMetrika(id: number, webvisor: boolean, clickmap: boolean): void {
+  const w = window as WindowWithAnalytics;
 
-  const w = window as WindowWithYm;
-
-  // (1) Стаб-очередь — дословно из официального сниппета
-  //     (m[i].a.push(arguments)); не трогаем, если ym уже есть.
-  if (typeof w.ym !== "function") {
-    const stub: YmFn = (...args: unknown[]) => {
-      stub.a = stub.a ?? [];
-      stub.a.push(args);
-    };
-    stub.l = 1 * Date.now();
-    w.ym = stub;
-  }
+  // (1) Стаб-очередь (общая с trackGoal — буфер команд до загрузки tag.js)
+  ensureYmStub();
 
   // (2) Инъекция скрипта с дедупликацией (официальная проверка document.scripts).
   const alreadyInjected = Array.from(document.scripts).some(
@@ -145,21 +169,151 @@ export function loadMetrika(): void {
     (first?.parentNode ?? document.head).insertBefore(k, first ?? null);
   }
 
-  // (3) init — параметры по конфигу владельца (счётчик 112532826):
-  //     clickmap + trackLinks + accurateTrackBounce + webvisor (запись сессий
-  //     ВКЛЮЧЕНА — явное требование владельца). ecommerce:"dataLayer"
-  //     включает передачу корзины/событий в dataLayer (безопасно при его
-  //     отсутствии — просто активирует канал).
+  // (3) init — webvisor/clickmap решает владелец в админке (c99-C,
+  //     дефолты true: запись сессий — явное требование владельца).
+  //     ecommerce:"dataLayer" передаёт события корзины в dataLayer
+  //     (безопасно и при его отсутствии — просто активирует канал).
+  w.ym?.(id, "init", {
+    clickmap,
+    trackLinks: true,
+    accurateTrackBounce: true,
+    webvisor,
+    ecommerce: "dataLayer",
+  });
+
+  activeMetrikaId = id;
+}
+
+/**
+ * Нормализация ответа vars.php: сервер уже валидирует, но правила
+ * дублируются на клиенте (оборона от битого кеша/зеркала) — в аналитику
+ * с мусорным ID не должен попасть ни один запрос.
+ */
+function parseVars(data: Record<string, unknown>): AnalyticsVars {
+  const metrikaId =
+    typeof data.metrikaId === "string" && /^[0-9]{5,10}$/.test(data.metrikaId)
+      ? data.metrikaId
+      : null;
+  const gaId =
+    typeof data.gaId === "string" && /^G-[A-Z0-9]{4,12}$/i.test(data.gaId)
+      ? data.gaId
+      : null;
+  return {
+    metrikaId,
+    // «не false» = true: отсутствие поля (старый кеш) → дефолты владельца
+    webvisor: data.webvisor !== false,
+    clickmap: data.clickmap !== false,
+    gaId,
+    customHead:
+      typeof data.customHead === "string" && data.customHead.trim() !== ""
+        ? data.customHead
+        : null,
+  };
+}
+
+/**
+ * GA4 (gtag.js) — официальный сниппет Google, адаптированный под TS:
+ * dataLayer-шейм + async-скрипт + config. Двойная инициализация
+ * невозможна: loadAnalytics идемпотентен (loadStarted).
+ */
+function initGtag(gaId: string): void {
+  const w = window as WindowWithAnalytics;
+  w.dataLayer = w.dataLayer ?? [];
+  if (typeof w.gtag !== "function") {
+    w.gtag = function gtag(...args: unknown[]): void {
+      w.dataLayer?.push(args);
+    };
+  }
+  const s = document.createElement("script");
+  s.async = true;
+  s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`;
+  document.head.appendChild(s);
+  w.gtag("js", new Date());
+  w.gtag("config", gaId);
+}
+
+/**
+ * Произвольный код владельца (Roistat, VK-пиксель, Top100, <script>…) —
+ * в <head>. innerHTML в отсоединённом div-парсере НЕ исполняет <script>,
+ * поэтому скрипты пересоздаются вручную (атрибуты копируются, src/text
+ * переносятся) — единственный способ запустить вставленный код.
+ * c99-fix (критик E2-m3): вайт-лист тегов — script/meta/link/noscript/style;
+ * прочие элементы (div/img/base…) в <head> НЕ попадают (мусор для сниппет-
+ * экстракции Яндекса, <base> молча переписал бы относительные URL).
+ * Пишет только HMAC-авторизованный владелец — исполняемый JS тут by design.
+ */
+function initCustomHead(html: string): void {
+  const holder = document.createElement("div");
+  holder.innerHTML = html; // парсинг БЕЗ вставки в документ → без исполнения
+  const HEAD_TAGS = new Set(["META", "LINK", "NOSCRIPT", "STYLE"]);
+  Array.from(holder.childNodes).forEach((node) => {
+    if (node instanceof HTMLScriptElement) {
+      const s = document.createElement("script");
+      Array.from(node.attributes).forEach((a) => s.setAttribute(a.name, a.value));
+      if (!node.src && node.textContent) s.textContent = node.textContent;
+      document.head.appendChild(s);
+    } else if (
+      node instanceof HTMLElement &&
+      HEAD_TAGS.has(node.tagName)
+    ) {
+      // meta/link/noscript/style — как есть (append перемещает узел)
+      document.head.appendChild(node);
+    }
+    // прочие узлы (текст, div, img, base…) — отброшены
+  });
+}
+
+/**
+ * c99-C — единая точка входа аналитики (вызывает ea-cookie-banner
+ * после «Принять все» / при живом консенте). Порядок:
+ *   1. fetch('/api/vars.php') — настройки из админки (кеш 5 мин);
+ *   2. Метрика: ID из vars, иначе env-фолбэк (прод-счётчик деплоя);
+ *   3. GA4 — если gaId задан;
+ *   4. произвольные пиксели — если customHead задан;
+ * Идемпотентна (loadStarted), НИКОГДА не бросает — аналитика не имеет
+ * права уронить сайт. На сервере — noop.
+ */
+export async function loadAnalytics(): Promise<void> {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+  if (loadStarted) return;
+  loadStarted = true;
+
+  // (1) рантайм-настройки; любая ошибка (сеть/битый JSON/зеркало) — фолбэк env
+  let vars: AnalyticsVars | null = null;
   try {
-    w.ym?.(id, "init", {
-      clickmap: true,
-      trackLinks: true,
-      accurateTrackBounce: true,
-      webvisor: true,
-      ecommerce: "dataLayer",
-    });
+    const res = await fetch("/api/vars.php", { credentials: "same-origin" });
+    if (res.ok) {
+      vars = parseVars((await res.json()) as Record<string, unknown>);
+    }
   } catch {
-    // очередь не должна иметь права падать
+    vars = null; // dev-сервер отдаёт PHP исходником → json() бросает → сюда
+  }
+
+  // (2)-(4): try ПО ВЕНДОРУ (c99-fix, критик E2-m2): исключение в Метрике
+  // (битый DOM/инъекция) не должно глушить GA4 и пиксели владельца —
+  // каждый грузится независимо и падает самостоятельно.
+  try {
+    // (2) Метрика: ID владельца из админки > env из деплоя
+    const id = vars?.metrikaId
+      ? Number(vars.metrikaId)
+      : metricaIdNumber();
+    if (Number.isFinite(id) && id > 0) {
+      initMetrika(id, vars?.webvisor ?? true, vars?.clickmap ?? true);
+    }
+  } catch {
+    // сайт важнее аналитики
+  }
+  try {
+    // (3) GA4
+    if (vars?.gaId) initGtag(vars.gaId);
+  } catch {
+    // сайт важнее аналитики
+  }
+  try {
+    // (4) произвольные пиксели владельца
+    if (vars?.customHead) initCustomHead(vars.customHead);
+  } catch {
+    // сайт важнее аналитики
   }
 }
 
@@ -167,19 +321,25 @@ export function loadMetrika(): void {
 
 /**
  * Отправка цели: ym(ID, "reachGoal", name, params).
- * Без ID / до загрузки метрики / на сервере — безопасный noop.
- * Ошибки глотаются: аналитика не ломает UI.
+ * ID — инициализированный счётчик (activeMetrikaId; c99-C: он может
+ * отличаться от env, если владелец сменил счётчик в админке), фолбэк —
+ * env-ID, если метрика ещё не грузилась. c99-fix (критик E2-m1): если
+ * loadAnalytics ещё не дорезолвился (async fetch vars.php) — создаём
+ * стаб-очередь здесь: команда буферизуется и уйдёт сразу после загрузки
+ * tag.js (до фикса цель в этом окне терялась молча). Без ID / на
+ * сервере — безопасный noop. Ошибки глотаются: аналитика не ломает UI.
  */
 export function trackGoal(
   name: string,
   params?: Record<string, unknown>,
 ): void {
   if (typeof window === "undefined") return;
-  const id = metricaIdNumber();
+  const id = activeMetrikaId !== null ? activeMetrikaId : metricaIdNumber();
   if (!Number.isFinite(id)) return;
-  const ym = (window as WindowWithYm).ym;
-  if (typeof ym !== "function") return;
   try {
+    ensureYmStub();
+    const ym = (window as WindowWithAnalytics).ym;
+    if (typeof ym !== "function") return;
     ym(id, "reachGoal", name, params ?? {});
   } catch {
     // noop: даже битый инстанс метрики не должен ронять обработчик клика

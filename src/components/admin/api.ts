@@ -141,6 +141,12 @@ export interface AdminSettings {
   smtpFrom: string;
   smtpSet: boolean;
   smtpPassMasked: string;
+  /** c99-C: аналитика — редактируется владельцем без передеплоя. */
+  metrikaId: string;
+  metrikaWebvisor: boolean;
+  metrikaClickmap: boolean;
+  gaId: string;
+  customHeadHtml: string;
 }
 
 /** c97: статус доставки уведомлений по заявке (lead.php → leads.json). */
@@ -150,6 +156,8 @@ export interface LeadNotify {
   mail: boolean;
   client: boolean | null;
   mailTransport?: string | null;
+  /** c99: имя PDF-меню, прикреплённого к письму клиенту (null = без вложения). */
+  clientPdf?: string | null;
 }
 
 /* 4-F2: 'cancelled' — деплой вытеснен более новой публикацией (конкурирующий
@@ -449,6 +457,12 @@ export async function apiGetSettings(
         smtpFrom: String(s.smtpFrom ?? ""),
         smtpSet: s.smtpSet === true,
         smtpPassMasked: String(s.smtpPassMasked ?? ""),
+        // c99-C: аналитика — публичные значения (ID счётчиков), без масок
+        metrikaId: String(s.metrikaId ?? ""),
+        metrikaWebvisor: s.metrikaWebvisor !== false,
+        metrikaClickmap: s.metrikaClickmap !== false,
+        gaId: String(s.gaId ?? ""),
+        customHeadHtml: String(s.customHeadHtml ?? ""),
       },
     };
   }
@@ -468,6 +482,12 @@ export type SettingsPatch = {
   smtpPass?: string;
   clearSmtpPass?: boolean;
   smtpFrom?: string | null;
+  /** c99-C: аналитика (пустой metrikaId/gaId = вернуться к env деплоя). */
+  metrikaId?: string | null;
+  metrikaWebvisor?: boolean;
+  metrikaClickmap?: boolean;
+  gaId?: string | null;
+  customHeadHtml?: string | null;
 };
 
 export async function apiSaveSettings(
@@ -610,6 +630,10 @@ export interface MailLogEntry {
   transport: string;
   ok: boolean;
   error: string | null;
+  /** c99: кол-во PDF-вложений в письме (0 = без вложения). */
+  attach: number;
+  /** c99: причина пропуска вложения (attachSkipped) или доп. пояснение. */
+  detail: string | null;
 }
 
 export async function apiMailLog(
@@ -914,6 +938,41 @@ async function mockApi(
         mockSettings.smtpSet = Boolean(
           mockSettings.smtpHost && mockSettings.smtpUser && mockSettings.smtpPassMasked,
         );
+        /* c99-C: аналитика — как в проде (мягкая нормализация: мусор → ""). */
+        if (typeof b.metrikaId === "string" || b.metrikaId === null) {
+          const digits = String(b.metrikaId ?? "").replace(/\D+/g, "");
+          mockSettings.metrikaId =
+            /^[0-9]{5,10}$/.test(digits) ? digits : "";
+        }
+        if (typeof b.metrikaWebvisor === "boolean") {
+          mockSettings.metrikaWebvisor = b.metrikaWebvisor;
+        }
+        if (typeof b.metrikaClickmap === "boolean") {
+          mockSettings.metrikaClickmap = b.metrikaClickmap;
+        }
+        if (typeof b.gaId === "string" || b.gaId === null) {
+          const ga = String(b.gaId ?? "").trim();
+          mockSettings.gaId = /^G-[A-Z0-9]{4,12}$/i.test(ga) ? ga.toUpperCase() : "";
+        }
+        if (typeof b.customHeadHtml === "string" || b.customHeadHtml === null) {
+          const ch = String(b.customHeadHtml ?? "");
+          /* c99-fix (критик E2-m7): паритет с продом — мок раньше молча
+           * резал >8000 и пропускал </textarea (прод отдаёт 400) — демо-
+           * режим врал о сохранении, которого не было бы на проде. */
+          if (ch.toLowerCase().includes("</textarea")) {
+            return {
+              status: 400,
+              body: { ok: false, error: "validation" },
+            };
+          }
+          if (ch.length > 8000) {
+            return {
+              status: 400,
+              body: { ok: false, error: "validation" },
+            };
+          }
+          mockSettings.customHeadHtml = ch === "" ? "" : ch;
+        }
         return { status: 200, body: { ok: true } };
       }
       return { status: 200, body: { ok: true, settings: { ...mockSettings } } };
@@ -971,15 +1030,19 @@ async function mockApi(
               transport: mockSettings.smtpSet ? "smtp" : "mail",
               ok: true,
               error: null,
+              attach: 0,
+              detail: null,
             },
             {
               ts: Math.floor(Date.now() / 1000) - 3600,
               to: "anna.s@example.com",
               context: "lead-client",
-              subject: "Ваша заявка в Nilov Catering принята",
+              subject: "Ваша заявка в NILOV CATERING принята",
               transport: "mail",
               ok: false,
               error: "mail() вернула false (sendmail не принял письмо)",
+              attach: 1,
+              detail: null,
             },
           ],
         },
@@ -1009,6 +1072,12 @@ const mockSettings: AdminSettings = {
   smtpFrom: "",
   smtpSet: false,
   smtpPassMasked: "",
+  /* c99-C: аналитика — дефолты как на проде (env-счётчик, Вебвизор вкл). */
+  metrikaId: "",
+  metrikaWebvisor: true,
+  metrikaClickmap: true,
+  gaId: "",
+  customHeadHtml: "",
 };
 
 const now = Date.now();

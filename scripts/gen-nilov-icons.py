@@ -17,7 +17,10 @@ Outputs:
 import os
 from PIL import Image, ImageDraw, ImageFont
 
-SRC = "/home/z/my-project/download/nilov-logo/logo-round-transparent.png"
+# SRC: оригинал 2257px недоступен (вычищен); канонический бейдж
+# 1024px в public/brand — тот же контур (выбран в c69), для 420px og-бейджа
+# и фавиконок ≤512 запас качества достаточен.
+SRC = "/home/z/my-project/newsite/public/brand/logo-round-1024.png"
 BRAND = "/home/z/my-project/newsite/public/brand"
 PUB = "/home/z/my-project/newsite/public"
 PRATA = "/home/z/my-project/newsite/public/fonts/Prata-Regular.ttf"
@@ -154,12 +157,13 @@ def fit_font(path, text, max_w, start):
     return ImageFont.truetype(path, 20)
 
 
-f_brand = fit_font(PRATA, "nilov catering", 560, 120)
-bb = f_brand.getbbox("nilov catering")
+# c99: wordmark КАПСОМ — бренд в выдаче/превью единообразен с title/JSON-LD
+f_brand = fit_font(PRATA, "NILOV CATERING", 560, 120)
+bb = f_brand.getbbox("NILOV CATERING")
 brand_y = 215
-d.text((tx, brand_y), "nilov catering", font=f_brand, fill=(247, 245, 243))
+d.text((tx, brand_y), "NILOV CATERING", font=f_brand, fill=(247, 245, 243))
 
-# gold dot right after the wordmark (brand signature: "nilov catering.")
+# gold dot right after the wordmark (brand signature: "NILOV CATERING.")
 dot_bb = f_brand.getbbox(".")
 d.text((tx + bb[2] + 4, brand_y), ".", font=f_brand, fill=(212, 165, 116))
 

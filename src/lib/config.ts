@@ -124,7 +124,7 @@ export const ANALYTICS = {
   // NEXT_PUBLIC_YANDEX_METRIKA_ID (инструкция «как включить» — в докблоке
   // src/lib/analytics.ts); NEXT_PUBLIC_YANDEX_METRIKA — легаси-синоним,
   // чтобы уже настроенные деплой-конфиги не отвалились. ПУСТО (по
-  // умолчанию) = аналитика выключена: loadMetrika/trackGoal — noop,
+  // умолчанию) = аналитика выключена: trackGoal — noop,
   // ноль сторонних запросов, ноль ошибок.
   yandexMetrikaId:
     process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID ||

@@ -4,21 +4,21 @@ import { SITE_CONFIG, LEGAL_INFO, CONTACTS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Пользовательское соглашение",
   description:
-    "Условия использования сайта nilov catering: правила пользования, интеллектуальная собственность, ответственность. nilov catering, Санкт-Петербург.",
+    "Условия использования сайта NILOV CATERING: правила пользования, интеллектуальная собственность, ответственность. NILOV CATERING, Санкт-Петербург.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/terms" },
   openGraph: {
-    title: "Пользовательское соглашение — nilov catering",
+    title: "Пользовательское соглашение — NILOV CATERING",
     description: "Условия использования сайта и кейтеринговых услуг.",
     type: "website",
     url: "/terms",
     locale: "ru_RU",
-    siteName: "nilov catering",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "nilov catering — выездной кейтеринг в Санкт-Петербурге" }],
+    siteName: "NILOV CATERING",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "NILOV CATERING — выездной кейтеринг в Санкт-Петербурге" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Пользовательское соглашение — nilov catering",
+    title: "Пользовательское соглашение — NILOV CATERING",
     description: "Условия использования сайта и кейтеринговых услуг.",
     images: ["/og-image.jpg"],
   },

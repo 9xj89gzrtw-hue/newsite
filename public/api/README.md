@@ -15,6 +15,7 @@ PHP ≥ 8.1 без фреймворков, живёт в статик-экспо
 | `_lib.php`  | Общий bootstrap (подключается только после `define('NILOV_API', true)`; прямой HTTP-доступ → 404). Секреты, настройки, flock+atomic JSON-хранилище, rate-limit, сессия, curl/TG/GitHub/mail-хелперы. |
 | `lead.php`  | Публичный приём заявок. |
 | `admin.php` | Единый эндпоинт админки, роутер по `?action=`. |
+| `vars.php`  | c99-C: публичные переменные аналитики (Метрика/GA4/пиксели) для рантайм-загрузки статик-экспортом. |
 | `router.php`| Только для локальной разработки (`php -S … router.php`), в проде не используется. |
 
 ## POST /api/lead.php — заявка (без авторизации)
@@ -57,6 +58,23 @@ Bot API (если в настройках есть токен+chat_id; API-base 
 с Date/Message-ID (без них Gmail отбраковывает) и encoded-word-темой
 чанками ≤ 75 байт.
 
+## GET /api/vars.php — переменные аналитики (без авторизации, c99-C)
+
+Рантайм-мост «админка → статик-экспорт»: владелец меняет счётчики в
+«Настройках», сайт подхватывает их без пересборки (fetch из
+src/lib/analytics.ts после cookie-consent; 152-ФЗ: до согласия ноль
+запросов). Ответ собирается ЯВНЫМ списком полей — секреты
+(tgBotToken/smtpPass/passwordHash) физически не попадают в этот
+эндпоинт. В отличие от остальных эндпоинтов: `Cache-Control: public,
+max-age=300` (анонимные данные; смена настроек видна ≤5 мин),
+rate-limit не нужен (чистое чтение settings.json под LOCK_SH).
+
+Ответ: `200 {ok:true, metrikaId:string|null, webvisor:bool,
+clickmap:bool, gaId:string|null, customHead:string|null}` · `405`
+(не GET). metrikaId — только цифры 5–10; gaId — `G-…` (мусор → null
+на уровне load_settings). Пустой metrikaId = сайт использует env-ID
+из деплоя (NEXT_PUBLIC_YANDEX_METRIKA_ID).
+
 ## /api/admin.php?action=… — админка
 
 Аутентификация: пароль → bcrypt-проверка (`settings.passwordHash` или
@@ -74,7 +92,7 @@ Bot API (если в настройках есть токен+chat_id; API-base 
 | `leads`        | GET   | ✓    | `&limit=1..500&offset` | `200 {ok,total,leads[]}` (новые сверху) |
 | `lead-update`  | POST  | ✓    | `{id,read?,archived?}` | `200` \| `404` |
 | `lead-delete`  | POST  | ✓    | `{id}`           | `200` \| `404` |
-| `settings`     | GET/POST | ✓ | GET — чтение; POST `{notifyEmail?,tgChatId?,tgApiBase?,tgBotToken?,clearBotToken?,smtpHost?,smtpPort?,smtpUser?,smtpPass?,clearSmtpPass?,smtpFrom?}` (пустой smtpPass НЕ затирает) | GET: `{notifyEmail,tgChatId,tgApiBase,botTokenSet,botTokenMasked,smtpHost,smtpPort,smtpUser,smtpFrom,smtpSet,smtpPassMasked}` (токен и пароль только маской) · POST: `200 {ok}` \| `400 validation` |
+| `settings`     | GET/POST | ✓ | GET — чтение; POST `{notifyEmail?,tgChatId?,tgApiBase?,tgBotToken?,clearBotToken?,smtpHost?,smtpPort?,smtpUser?,smtpPass?,clearSmtpPass?,smtpFrom?,metrikaId?,metrikaWebvisor?,metrikaClickmap?,gaId?,customHeadHtml?}` (пустой smtpPass НЕ затирает; c99-C: metrikaId/gaId с мягкой нормализацией — мусор → null; customHeadHtml ≤ 8000 и без `</textarea`) | GET: `{notifyEmail,tgChatId,tgApiBase,botTokenSet,botTokenMasked,smtpHost,smtpPort,smtpUser,smtpFrom,smtpSet,smtpPassMasked,metrikaId,metrikaWebvisor,metrikaClickmap,gaId,customHeadHtml}` (токен и пароль только маской; ID аналитики — публичны, без масок) · POST: `200 {ok}` \| `400 validation` |
 | `tg-check`     | POST  | ✓    | `{token?}` (иначе сохранённый) | `200 {ok:true,botName,botUsername}` \| `200 {ok:false,error:unauthorized\|network}` (getMe) |
 | `tg-discover`  | POST  | ✓    | —                | `200 {ok,chats:[{id,name,type}],hint?}` (getUpdates; напишите боту сообщение) |
 | `tg-test`      | POST  | ✓    | `{chatId?,token?}` | `200 {ok:true}` \| `200 {ok:false,error,retryAfterSec?}` (sendMessage) |
