@@ -15,6 +15,26 @@ import { CONTACTS } from "@/lib/media";
 import { Magnetic } from "@/components/motion/magnetic";
 import "./site-header.css"; /* C77: kinetic-header эффекты (см. докблок css) */
 
+/** c102: глиф «MAX» для плитки быстрой связи — текст-SVG наследует font-family
+ * дровера (тот же приём, что MaxGlyph в hacc-booking.tsx). */
+function MaxGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden="true" role="presentation">
+      <text
+        x="16"
+        y="20.5"
+        textAnchor="middle"
+        fontSize={9}
+        fontWeight={800}
+        letterSpacing="0.5"
+        fill="currentColor"
+      >
+        MAX
+      </text>
+    </svg>
+  );
+}
+
 /* c83-F4b: изоморфный layout-effect (паттерн tott-parallax-band.tsx) —
    прямой useLayoutEffect ругается ворнингом в SSR-рендере клиента
    («does nothing on the server»), на сервере берём useEffect (no-op). */
@@ -908,6 +928,9 @@ export function SiteHeader() {
                 damping: 24,
               }}
             >
+              {/* c102: + МАКС (владелец: «очень актуально») — третья плитка
+                  быстрой связи; на телефоне — полная строка под TG/WA
+                  (три узкие плитки не влезали бы в 320px), иконка-глиф MAX. */}
               <div className="grid grid-cols-2 gap-2">
                 <a
                   href={CONTACTS.telegramHref}
@@ -934,6 +957,18 @@ export function SiteHeader() {
                 >
                   <MessageCircle className="size-5 shrink-0" aria-hidden="true" />
                   WhatsApp
+                </a>
+                <a
+                  href={CONTACTS.maxHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-press
+                  className="tott-body col-span-2 flex min-h-[48px] items-center justify-center gap-2 border border-ink/15 bg-cream px-3 py-3 text-sm uppercase tracking-[0.04em] text-ink transition-colors duration-200 hover:border-tott-burgundy hover:bg-tott-burgundy hover:text-white"
+                  style={{ fontWeight: 700 }}
+                  aria-label="Написать в MAX — мессенджер (открывается в новой вкладке)"
+                >
+                  <MaxGlyph className="size-5 shrink-0" aria-hidden="true" />
+                  Макс
                 </a>
               </div>
               {/* Микро-доверие рядом с кнопками связи: золотая точка —

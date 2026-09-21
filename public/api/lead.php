@@ -344,8 +344,9 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
          * владельца → api.telegram.org); api.telegram.org с РФ-хостингов
          * деградирует с 03.2026. maxBases=2 — бюджет таймаутов (лид
          * не должен висеть на мёртвых базах), почта всегда догонит.
-         * c101: + inline-кнопки «Написать в WhatsApp» / «Меню клиента»
-         * (reply_markup; null — без кнопок, старый формат сообщения). */
+         * c101: + inline-кнопки под сообщением; c102: первой идёт
+         * «✈️ Написать в Telegram» (чат с клиентом по номеру — просьба
+         * владельца), рядом «💬 WhatsApp», ниже «📋 Меню клиента». */
         $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId,
             lead_tg_text($lead, $clientPlan), 2, lead_tg_buttons($lead, $pdfUrl));
         $status['tg'] = ($tg['ok'] === true);
@@ -875,12 +876,13 @@ function lead_source_label(string $source): string
     return $labels[$source] ?? $source;
 }
 
-/** c101 — https://wa.me/… по телефону клиента (кнопка «Написать в
- * WhatsApp» прямо из уведомления: владелец тапает — открывается чат).
- * Нормализация: +7/8…11 цифр → 7…; 10 цифр (без кода страны) → 7… —
- * федеральный формат сайта; прочее (короткий/иностранный/мусор) → null,
- * кнопки не будет — молча, без риска открыть чат с чужим номером. */
-function lead_wa_href(string $phone): ?string
+/** c102 — нормализованный федеральный номер клиента (7XXXXXXXXXX) или
+ * null. c101 выделял это из lead_wa_href; теперь ТА ЖЕ нормализация
+ * нужна кнопке Telegram (t.me/+<номер>) — один источник для обоих
+ * мессенджеров: +7/8…11 цифр → 7…; 10 цифр → 7…; прочее (короткий/
+ * иностранный/мусор) → null, кнопки не будет — молча, без риска открыть
+ * чат с чужим номером. */
+function lead_phone_digits(string $phone): ?string
 {
     $d = preg_replace('/\D+/', '', $phone);
     if (!is_string($d) || $d === '') {
@@ -893,31 +895,63 @@ function lead_wa_href(string $phone): ?string
         $d = '7' . $d;
     }
     if (strlen($d) === 11 && $d[0] === '7') {
-        return 'https://wa.me/' . $d;
+        return $d;
     }
     return null;
 }
 
-/** c101 — inline-клавиатура уведомления: [Написать в WhatsApp] [Меню
- * клиента]. Обе кнопки — https (TG принимает только http/https/tg:,
- * tel:/mailto: в кнопках и текстовых ссылках запрещены — проверено по
- * докам Bot API). Меню — публичная ссылка того же PDF, что уехал клиенту
- * (менеджер открывает и сразу видит, что клиент держит перед звонком).
+/** c101 — https://wa.me/… по телефону клиента (кнопка «WhatsApp» в
+ * уведомлении: владелец тапает — открывается чат). c102 — вторая кнопка
+ * после Telegram (запрос владельца: главный чат — в телеграме). */
+function lead_wa_href(string $phone): ?string
+{
+    $d = lead_phone_digits($phone);
+    return $d === null ? null : 'https://wa.me/' . $d;
+}
+
+/** c102 — https://t.me/+<номер> — чат с КЛИЕНТОМ в Telegram по номеру
+ * телефона (запрос владельца: «лучше сделать чат с клиентом в телеграме»).
+ * Telegram ищет пользователя по номеру из контактов владельца; если у
+ * клиента нет TG — откроется экран «пригласить в Telegram», ссылка-приглашение
+ * отправляется там же. Номер невалиден — null, кнопки не будет. */
+function lead_tg_href(string $phone): ?string
+{
+    $d = lead_phone_digits($phone);
+    return $d === null ? null : 'https://t.me/+' . $d;
+}
+
+/** c101/c102 — inline-клавиатура уведомления, две строки:
+ *  1) [✈️ Написать в Telegram] [💬 WhatsApp] — чат с КЛИЕНТОМ; Telegram
+ *     первым (просьба владельца: «лучше сделать чат с клиентом в
+ *     телеграме»), WhatsApp остаётся запасным каналом — у клиента может
+ *     не быть TG, а кнопка wa.me открывает чат тем же тапом;
+ *  2) [📋 Меню клиента] — публичная ссылка того же PDF, что уехал клиенту
+ *     (менеджер открывает и сразу видит, что клиент держит перед звонком).
+ * Все кнопки — https (TG принимает только http/https/tg:, tel:/mailto:
+ * в кнопках и текстовых ссылках запрещены — проверено по докам Bot API).
  * Нет данных — null, уведомление уходит без клавиатуры. */
 function lead_tg_buttons(array $lead, ?string $pdfUrl): ?array
 {
-    $row = [];
+    $rows = [];
+    $row1 = [];
+    $tg = lead_tg_href((string)$lead['phone']);
+    if ($tg !== null) {
+        $row1[] = ['text' => '✈️ Написать в Telegram', 'url' => $tg];
+    }
     $wa = lead_wa_href((string)$lead['phone']);
     if ($wa !== null) {
-        $row[] = ['text' => '💬 Написать в WhatsApp', 'url' => $wa];
+        $row1[] = ['text' => '💬 WhatsApp', 'url' => $wa];
+    }
+    if ($row1 !== []) {
+        $rows[] = $row1;
     }
     if ($pdfUrl !== null) {
-        $row[] = ['text' => '📋 Меню клиента', 'url' => $pdfUrl];
+        $rows[] = [['text' => '📋 Меню клиента', 'url' => $pdfUrl]];
     }
-    if ($row === []) {
+    if ($rows === []) {
         return null;
     }
-    return ['inline_keyboard' => [$row]];
+    return ['inline_keyboard' => $rows];
 }
 
 /**
@@ -1132,8 +1166,13 @@ function lead_client_mail_text(array $lead, ?string $pdfLabel = null, ?string $p
     $L[] = '';
     $L[] = 'НАШИ КОНТАКТЫ';
     $L[] = '─────────────────────────';
-    $L[] = 'Телефон / WhatsApp: +7 (911) 941-72-05';
-    $L[] = 'Telegram: https://t.me/nilov_catering';
+    $L[] = 'Телефон / WhatsApp: ' . OWNER_PHONE_PRETTY;
+    $L[] = 'Telegram: ' . OWNER_TG_CHAT_URL;
+    /* c102: MAX — «очень актуально» (владелец): номер + ссылка-профиль
+     * (клиент без MAX просто не тапает строку; длинный URL — на своей
+     * строке с отступом, чтобы перенос был предсказуемым). */
+    $L[] = 'Макс (мессенджер MAX): ' . OWNER_MAX_PHONE_PRETTY;
+    $L[] = '   написать в MAX: ' . OWNER_MAX_URL;
     $L[] = 'Сайт: https://nilovcatering.ru';
     $L[] = '';
     $L[] = 'Хорошего дня!';

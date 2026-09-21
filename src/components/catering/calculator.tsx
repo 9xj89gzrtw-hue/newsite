@@ -155,14 +155,17 @@ export function Calculator() {
     }
   };
 
-  // Build shareable URLs for Telegram + WhatsApp.
+  // Build shareable URLs for Telegram + WhatsApp + MAX.
   // CRITICAL: compute in state set by useEffect (NOT inline during render) —
   // window.location.origin differs between SSR (undefined → "") and client,
   // which caused a hydration mismatch on the <a href> that broke hydration for
   // the WHOLE page (preventing all client effects, incl. Embla carousels, from
   // running). Server + first client render now both get "" → match → hydrate.
+  // c102: + MAX (max.ru/share?url=…&text=… — формат проверен живым запросом:
+  // max.ru отдаёт страницу «Перейти в чат» с deep-link max://…, параметры
+  // url/text сохраняются; владельцу «очень актуально»).
   const shareText = `Расчёт кейтеринга: ${formatRUB(result.total)} — ${current.label}, ${guestsClamped} гостей. Подробности:`;
-  const [shareUrls, setShareUrls] = useState({ telegram: "", whatsapp: "" });
+  const [shareUrls, setShareUrls] = useState({ telegram: "", whatsapp: "", max: "" });
   useEffect(() => {
     if (typeof window === "undefined") return;
     const enc = encodeURIComponent(
@@ -173,10 +176,12 @@ export function Calculator() {
       whatsapp: `https://wa.me/?text=${encodeURIComponent(
         `${shareText} ${decodeURIComponent(enc)}`,
       )}`,
+      max: `https://max.ru/share?url=${enc}&text=${encodeURIComponent(shareText)}`,
     });
   }, [typeId, guestsClamped, shareText]);
   const telegramShareUrl = shareUrls.telegram;
   const whatsappShareUrl = shareUrls.whatsapp;
+  const maxShareUrl = shareUrls.max;
 
   const toggleAddon = useCallback((id: string) =>
     setAddons((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id])),
@@ -693,7 +698,7 @@ export function Calculator() {
                 )}
               </motion.button>
 
-              {/* Share to messengers — Telegram + WhatsApp */}
+              {/* Share to messengers — Telegram + WhatsApp + MAX (c102) */}
               <div className="mt-2 grid grid-cols-2 gap-2">
                 <a
                   href={telegramShareUrl}
@@ -714,6 +719,23 @@ export function Calculator() {
                 >
                   <MessageCircle className="size-3.5 transition-transform group-hover:scale-110" />
                   WhatsApp
+                </a>
+                {/* c102: MAX — полная строка под двумя кнопками (на узких
+                    экранах третья колонка не влезает). Глиф-текст, как в
+                    hacc-booking (у MAX нет lucide-пиктограммы). */}
+                <a
+                  href={maxShareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Поделиться расчётом в MAX (откроется в новой вкладке)"
+                  className="group col-span-2 flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/70 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
+                >
+                  <svg viewBox="0 0 32 32" className="size-3.5 shrink-0" aria-hidden="true" role="presentation">
+                    <text x="16" y="20.5" textAnchor="middle" fontSize={9} fontWeight={800} letterSpacing="0.5" fill="currentColor">
+                      MAX
+                    </text>
+                  </svg>
+                  Поделиться в MAX
                 </a>
               </div>
 

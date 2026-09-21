@@ -8,6 +8,10 @@
  * (инструкция + код прямо в интерфейсе, кнопка «Скопировать код»),
  * поле для URL зеркала с повторной проверкой токена, отображение
  * активной базы (tgWorkingBase, запоминается сервером).
+ *
+ * c102: карточка «Автоматизация» — сводка/авто-дожим/пинг + секретная
+ * ссылка для планировщика хостинга (cron-token, показ токена один раз)
+ * и read-only состояние последнего запуска (cronState от cron.php).
  */
 "use client";
 
@@ -20,15 +24,18 @@ import {
   Copy,
   ExternalLink,
   LifeBuoy,
+  Link2,
   Loader2,
   Lock,
   MessageCircle,
   Send,
   ShieldCheck,
   Trash2,
+  Zap,
 } from "lucide-react";
 import {
   apiChangePassword,
+  apiCronToken,
   apiMailLog,
   apiMailTest,
   apiSaveSettings,
@@ -47,11 +54,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { METRICA_ID } from "@/lib/analytics";
 import {
   FieldLabel,
   HintText,
+  NumberField,
   SectionHeader,
   TextAreaField,
   TextField,
@@ -74,6 +83,9 @@ export function SettingsView({
       <TelegramCard settings={settings} onSettingsChange={onSettingsChange} />
       <AnalyticsCard settings={settings} onSettingsChange={onSettingsChange} />
       <PasswordCard />
+      {/* c102: автоматизация — ПОСЛЕ существующих карточек (заявки уже
+          настроены, теперь «чтобы руки не отвязывались»). */}
+      <AutomationCard settings={settings} onSettingsChange={onSettingsChange} />
     </section>
   );
 }
@@ -1550,6 +1562,369 @@ function PasswordCard() {
           {busy ? <Loader2 className="size-4 animate-spin" /> : null}
           Изменить пароль
         </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------- automation */
+
+/** c102: unix-секунды из cronState (числом может прийти что угодно). */
+function cronNum(v: unknown): number | null {
+  return typeof v === "number" && Number.isFinite(v) ? v : null;
+}
+
+/** c102: дата cron-состояния — «21 сент., 14:05 по Москве» (секунды!). */
+function formatCronDate(ts: number): string {
+  const d = new Date(ts > 1e12 ? ts : ts * 1000);
+  return d.toLocaleString("ru-RU", {
+    timeZone: "Europe/Moscow",
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/**
+ * c102 — карточка «Автоматизация»: сводка каждое утро, авто-дожим клиента
+ * через 24ч, TG-пинг о зависших заявках + секретная ссылка cron.php для
+ * планировщика хостинга. Токен показывается РОВНО один раз (сервер его
+ * больше не отдаёт) — поэтому живёт в локальном state, а не в settings.
+ */
+function AutomationCard({
+  settings,
+  onSettingsChange,
+}: {
+  settings: AdminSettings;
+  onSettingsChange: (s: AdminSettings) => void;
+}) {
+  const [digest, setDigest] = useState(settings.autoDigest);
+  const [followup, setFollowup] = useState(settings.autoFollowup);
+  const [nudge, setNudge] = useState(settings.autoNudge);
+  const [nudgeHours, setNudgeHours] = useState(settings.autoNudgeHours);
+  const [saving, setSaving] = useState(false);
+
+  /* Показанный единожды токен — только локально (не в settings и не в
+   * патчах: cronEnabled/cronState читаются с сервера, токен не хранится). */
+  const [revealedToken, setRevealedToken] = useState<string | null>(null);
+  const [tokenBusy, setTokenBusy] = useState(false);
+  const [urlCopied, setUrlCopied] = useState(false);
+
+  useEffect(() => setDigest(settings.autoDigest), [settings.autoDigest]);
+  useEffect(() => setFollowup(settings.autoFollowup), [settings.autoFollowup]);
+  useEffect(() => setNudge(settings.autoNudge), [settings.autoNudge]);
+  useEffect(() => setNudgeHours(settings.autoNudgeHours), [settings.autoNudgeHours]);
+
+  const dirty =
+    digest !== settings.autoDigest ||
+    followup !== settings.autoFollowup ||
+    nudge !== settings.autoNudge ||
+    nudgeHours !== settings.autoNudgeHours;
+
+  /* Как в остальных карточках: патч только СВОИХ полей (email-карточка не
+   * трогает автоматизацию и наоборот — ничего не затирается). */
+  const save = async () => {
+    if (!Number.isInteger(nudgeHours) || nudgeHours < 1 || nudgeHours > 24) {
+      toast.error("Часы до напоминания — целое от 1 до 24");
+      return;
+    }
+    setSaving(true);
+    const r = await apiSaveSettings({
+      autoDigest: digest,
+      autoFollowup: followup,
+      autoNudge: nudge,
+      autoNudgeHours: nudgeHours,
+    });
+    setSaving(false);
+    if (r.ok === true) {
+      onSettingsChange({
+        ...settings,
+        autoDigest: digest,
+        autoFollowup: followup,
+        autoNudge: nudge,
+        autoNudgeHours: nudgeHours,
+      });
+      toast.success("Автоматизация сохранена");
+    } else {
+      toast.error(
+        r.error === "validation"
+          ? "Проверьте поля — часы напоминания: целое 1–24"
+          : "Не удалось сохранить — попробуйте ещё раз",
+      );
+    }
+  };
+
+  /* Генерация/перегенерация: старые ссылки перестают работать (сервер
+   * перезаписывает токен), новую показываем один раз. */
+  const generateToken = async () => {
+    setTokenBusy(true);
+    const r = await apiCronToken();
+    setTokenBusy(false);
+    if (r.ok === true && r.token) {
+      setRevealedToken(r.token);
+      onSettingsChange({ ...settings, cronEnabled: true });
+      toast.success("Ссылка создана — скопируйте её сейчас, показывается один раз");
+    } else {
+      toast.error("Не удалось создать ссылку — попробуйте ещё раз");
+    }
+  };
+
+  const revokeToken = async () => {
+    setTokenBusy(true);
+    const r = await apiCronToken(true);
+    setTokenBusy(false);
+    if (r.ok === true) {
+      setRevealedToken(null);
+      onSettingsChange({ ...settings, cronEnabled: false });
+      toast.success("Автоматизация по расписанию отключена");
+    } else {
+      toast.error("Не удалось отключить — попробуйте ещё раз");
+    }
+  };
+
+  const cronUrl = `https://nilovcatering.ru/api/cron.php?token=${revealedToken ?? ""}`;
+
+  const copyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(cronUrl);
+      setUrlCopied(true);
+      toast.success("Ссылка скопирована");
+      setTimeout(() => setUrlCopied(false), 2500);
+    } catch {
+      toast.error("Не удалось скопировать — выделите ссылку вручную");
+    }
+  };
+
+  /* Состояние планировщика (read-only, пишет cron.php). */
+  const cs = settings.cronState ?? null;
+  const stateLines: string[] = [];
+  const lastRun = cronNum(cs?.lastRunTs);
+  const runs = cronNum(cs?.runs);
+  const lastDigest = cronNum(cs?.lastDigestTs);
+  if (lastRun !== null) stateLines.push(`Последний запуск: ${formatCronDate(lastRun)} по Москве`);
+  if (runs !== null) stateLines.push(`Запусков всего: ${Math.round(runs)}`);
+  if (lastDigest !== null) stateLines.push(`Последняя сводка: ${formatCronDate(lastDigest)} по Москве`);
+
+  return (
+    <Card className="rounded-2xl border-border-line/80 shadow-none">
+      <CardContent className="p-5">
+        <div className="flex items-center gap-2.5">
+          <Zap className="size-5 text-gold" />
+          <h3 className="font-serif text-[19px] font-medium text-ink">
+            Автоматизация
+          </h3>
+        </div>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">
+          Система сама следит за заявками: присылает вам сводку каждое утро,
+          напоминает клиентам о себе через сутки и пингует вас о зависших
+          заявках. Настройте один раз — дальше всё работает без ручных действий.
+        </p>
+
+        {/* Три правила — те же строковые переключатели, что у аналитики */}
+        <div className="mt-4 space-y-2">
+          <label className="flex min-h-11 cursor-pointer items-start justify-between gap-3 rounded-lg px-1 py-1">
+            <span className="min-w-0">
+              <span className="block text-[14px] leading-snug font-medium text-ink">
+                Ежедневная сводка
+              </span>
+              <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink-soft">
+                Каждое утро после 09:00: сколько новых заявок за сутки и какие
+                ждут ответа — в Telegram и на почту.
+              </span>
+            </span>
+            <Switch
+              checked={digest}
+              onCheckedChange={(v) => setDigest(v === true)}
+              aria-label="Ежедневная сводка"
+            />
+          </label>
+          <label className="flex min-h-11 cursor-pointer items-start justify-between gap-3 rounded-lg px-1 py-1">
+            <span className="min-w-0">
+              <span className="block text-[14px] leading-snug font-medium text-ink">
+                Авто-дожим клиента
+              </span>
+              <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink-soft">
+                Через 24 часа без статуса клиенту автоматически уходит одно
+                письмо с меню и кнопками связи (Telegram/WhatsApp/MAX).
+              </span>
+            </span>
+            <Switch
+              checked={followup}
+              onCheckedChange={(v) => setFollowup(v === true)}
+              aria-label="Авто-дожим клиента"
+            />
+          </label>
+          <label className="flex min-h-11 cursor-pointer items-start justify-between gap-3 rounded-lg px-1 py-1">
+            <span className="min-w-0">
+              <span className="block text-[14px] leading-snug font-medium text-ink">
+                Напоминания о зависших заявках
+              </span>
+              <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink-soft">
+                Telegram-пинг, если заявка не отмечена обработанной дольше{" "}
+                {nudgeHours} ч.
+              </span>
+            </span>
+            <Switch
+              checked={nudge}
+              onCheckedChange={(v) => setNudge(v === true)}
+              aria-label="Напоминания о зависших заявках"
+            />
+          </label>
+          {nudge ? (
+            <div className="flex flex-wrap items-center gap-3 pl-1">
+              <label
+                htmlFor="auto-nudge-hours"
+                className="text-[13px] font-medium text-ink-soft"
+              >
+                Часов до напоминания
+              </label>
+              <div className="w-28">
+                <NumberField
+                  id="auto-nudge-hours"
+                  value={nudgeHours}
+                  onChange={(v) => setNudgeHours(v)}
+                  suffix="ч"
+                />
+              </div>
+              <span className="text-[12px] text-ink-soft/70">от 1 до 24</span>
+            </div>
+          ) : null}
+        </div>
+
+        <Button
+          type="button"
+          className="mt-3 h-11 rounded-xl px-6 text-[14px]"
+          disabled={saving || !dirty}
+          onClick={save}
+        >
+          {saving ? <Loader2 className="size-4 animate-spin" /> : null}
+          Сохранить
+        </Button>
+
+        {/* Планировщик хостинга: до создания — подсказка, после — управление */}
+        <div className="mt-4 rounded-xl border border-border-line/70 bg-parchment/30 p-4">
+          <div className="flex items-center gap-2">
+            <Link2 className="size-4 text-gold" />
+            <h4 className="text-[14px] font-semibold text-ink">
+              Планировщик хостинга
+            </h4>
+          </div>
+          {!settings.cronEnabled ? (
+            <>
+              <p className="mt-2 text-[12.5px] leading-relaxed text-ink-soft/90">
+                Планировщик ещё не подключён — создайте ссылку и добавьте её в
+                панель хостинга (SpaceWeb → Планировщик задач).
+              </p>
+              <Button
+                type="button"
+                className="mt-3 h-11 rounded-xl px-5 text-[14px]"
+                disabled={tokenBusy}
+                onClick={generateToken}
+              >
+                {tokenBusy ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Zap className="size-4" />
+                )}
+                Создать ссылку для планировщика
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="mt-2 text-[13px] font-medium text-ink">
+                Планировщик подключён ✓
+              </p>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-ink-soft/80">
+                Ссылка создана (скрыта). Создать заново или отключить можно ниже.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 rounded-xl text-[14px]"
+                  disabled={tokenBusy}
+                  onClick={generateToken}
+                >
+                  {tokenBusy ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Link2 className="size-4" />
+                  )}
+                  Создать заново
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-11 rounded-xl text-[13px] text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  disabled={tokenBusy}
+                  onClick={revokeToken}
+                >
+                  Отключить
+                </Button>
+              </div>
+            </>
+          )}
+          {revealedToken ? (
+            <div className="mt-3 rounded-xl border border-gold/40 bg-gold/[0.06] p-3">
+              <p className="text-[12.5px] font-medium text-ink">
+                Секретная ссылка для планировщика:
+              </p>
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                <input
+                  readOnly
+                  value={cronUrl}
+                  onFocus={(e) => e.currentTarget.select()}
+                  aria-label="Ссылка для планировщика"
+                  className="h-11 w-full min-w-0 rounded-xl border border-border-line bg-background px-3 font-mono text-[12px] text-ink [overflow-wrap:anywhere]"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 shrink-0 rounded-xl text-[13px]"
+                  onClick={copyUrl}
+                >
+                  {urlCopied ? (
+                    <Check className="size-4 text-gold" />
+                  ) : (
+                    <Copy className="size-4" />
+                  )}
+                  Скопировать
+                </Button>
+              </div>
+              <p className="mt-2 text-[12px] leading-relaxed text-ink-soft">
+                ⚠️ Ссылка показывается{" "}
+                <strong className="font-medium text-ink">один раз</strong> —
+                скопируйте сейчас. Периодичность: каждые 15–30 минут.
+              </p>
+            </div>
+          ) : null}
+          <details className="mt-3">
+            <summary className="cursor-pointer text-[12.5px] font-medium text-ink-soft">
+              CLI-вариант для cron хостинга
+            </summary>
+            <p className="mt-1.5 font-mono text-[11.5px] leading-relaxed break-all text-ink-soft/80">
+              /usr/bin/php /home/&lt;аккаунт&gt;/site/public/api/cron.php
+              &lt;токен&gt;
+            </p>
+          </details>
+        </div>
+
+        {/* Состояние — read-only журнал планировщика */}
+        <div className="mt-4 border-t border-border-line/60 pt-3">
+          <h4 className="text-[13px] font-semibold text-ink">Состояние</h4>
+          {stateLines.length > 0 ? (
+            <div className="mt-1.5 space-y-0.5 text-[12.5px] leading-relaxed text-ink-soft/90">
+              {stateLines.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft/80">
+              Ещё ни одного запуска
+            </p>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

@@ -3,13 +3,22 @@
  * (дата, имя, телефон tel:, email mailto:, бейдж источника, комментарий,
  * чипы payload с расшифровкой), прочитано/удаление, ручное + автообновление
  * (60с при видимой вкладке).
+ *
+ * c102 — МИНИ-CRM: воронка статусов (новая → связались → договорились →
+ * отказ) прямо в карточке, быстрые кнопки связи (tel/Telegram/WhatsApp,
+ * клик автоматически двигает воронку), заметка владельца, авто-маркеры
+ * дожима/напоминания, архив, фильтры-табы + статистика воронки, статус
+ * и заметка в CSV-экспорте.
  */
 "use client";
 
 import { useEffect, useState } from "react";
 import {
+  Archive,
+  ArchiveRestore,
   Check,
   CheckCheck,
+  ChevronDown,
   Copy,
   Download,
   FileText,
@@ -21,6 +30,7 @@ import {
   RotateCcw,
   Send,
   ShieldAlert,
+  StickyNote,
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -42,7 +52,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { SectionHeader } from "./ui-bits";
+import { SectionHeader, TextAreaField } from "./ui-bits";
 
 /** lead.php пишет ts как UNIX-секунды (time()); на случай строки — парсим и её. */
 export function formatLeadDate(ts: number | string): string {
@@ -70,6 +80,96 @@ const SOURCE_LABELS: Record<string, string> = {
   contact: "контакты",
   footer: "подвал",
 };
+
+/* ------------------------------------------------------- воронка (c102) */
+
+/** Порядок = жизненный цикл заявки; id совпадают с admin.php (status). */
+const LEAD_STATUSES = [
+  { id: "new", label: "Новая" },
+  { id: "contacted", label: "Связались" },
+  { id: "agreed", label: "Договорились" },
+  { id: "lost", label: "Отказ" },
+] as const;
+
+const STATUS_LABELS: Record<string, string> = Object.fromEntries(
+  LEAD_STATUSES.map((s) => [s.id as string, s.label]),
+);
+
+/** Статус лида: «new» — это ОТСУТСТВИЕ поля в leads.json (как в PHP). */
+function leadStatus(l: Lead): string {
+  return l.status ?? "new";
+}
+
+/** Активная кнопка статуса: «Новая» — золото (перекликается с бейджем
+ *  непрочитанной), остальные — фирменные ink/moss/bordeaux, без синего. */
+const STATUS_ACTIVE: Record<string, string> = {
+  new: "bg-gold text-white",
+  contacted: "bg-ink text-parchment",
+  agreed: "bg-moss text-white",
+  lost: "bg-bordeaux text-white",
+};
+
+/** Бейдж статуса в шапке карточки — для беглого сканирования списка. */
+const STATUS_BADGE: Record<string, string> = {
+  contacted: "border-ink/25 bg-ink/5 text-ink",
+  agreed: "border-moss/40 bg-moss/10 text-moss",
+  lost: "border-bordeaux/30 bg-bordeaux/5 text-bordeaux",
+};
+
+/** Табы-фильтры (порядок = воронка; «Архив» — отдельный карман). */
+type LeadsFilter = "all" | "new" | "contacted" | "agreed" | "lost" | "archived";
+
+const FILTERS: { id: LeadsFilter; label: string }[] = [
+  { id: "all", label: "Все" },
+  { id: "new", label: "Новые" },
+  { id: "contacted", label: "В работе" },
+  { id: "agreed", label: "Договорились" },
+  { id: "lost", label: "Отказ" },
+  { id: "archived", label: "Архив" },
+];
+
+/** Пустые состояния под фильтр — подсказывают СЛЕДУЮЩИЙ шаг воронки,
+ *  а не просто «пусто» (владельцу без подсказки непонятно, что делать). */
+const EMPTY_BY_FILTER: Record<LeadsFilter, { title: string; text: string; done?: boolean }> = {
+  all: {
+    title: "Активных заявок нет",
+    text: "Новые заявки с сайта появятся здесь автоматически, а обработанные можно убирать в архив.",
+  },
+  new: {
+    title: "Новых нет — всё обработано",
+    text: "Как только придёт заявка, она подсветится золотом и попадёт в этот фильтр.",
+    done: true,
+  },
+  contacted: {
+    title: "В работе пусто",
+    text: "Отметьте заявку «Связались» после первого звонка — она появится здесь.",
+  },
+  agreed: {
+    title: "Договорившихся пока нет",
+    text: "Статус «Договорились» ставьте, когда клиент подтвердил формат и дату.",
+  },
+  lost: {
+    title: "Отказов нет",
+    text: "Заявки со статусом «Отказ» собираются здесь — иногда стоит вернуться к ним позже.",
+  },
+  archived: {
+    title: "Архив пуст",
+    text: "Убирайте сюда закрытые заявки (кнопка с ящиком) — рабочий список останется коротким.",
+  },
+};
+
+/** c102: телефон → 11 цифр «7…» для t.me/wa.me (зеркало PHP
+ *  lead_phone_digits: 8… → 7…, 10 цифр → 7…, прочее → null — тогда
+ *  кнопки связи не показываем вовсе, чтобы не вести в никуда). */
+function phoneDigits(phone: string): string | null {
+  const raw = phone.replace(/\D+/g, "");
+  if (raw === "") return null;
+  let d = raw;
+  if (d.length === 11 && d[0] === "8") d = "7" + d.slice(1);
+  else if (d.length === 10) d = "7" + d;
+  if (d.length === 11 && d[0] === "7") return d;
+  return null;
+}
 
 /* ---------------------------------------------------------------- payload */
 
@@ -190,7 +290,7 @@ export function LeadsView({
   leads: Lead[];
   total: number;
   menu: MenuData | null;
-  onPatch: (id: string, patch: { read?: boolean }) => void;
+  onPatch: (id: string, patch: { read?: boolean; archived?: boolean; status?: string; note?: string | null }) => void;
   onDelete: (id: string) => void;
   /** c96: пометить все прочитанными (одним запросом на сервер). */
   onReadAll: () => void;
@@ -200,37 +300,66 @@ export function LeadsView({
 }) {
   const unread = leads.filter((l) => !l.read).length;
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "unread">("all");
+  const [filter, setFilter] = useState<LeadsFilter>("all");
   const deleteLead = leads.find((l) => l.id === deleteId);
 
-  /* c96: статистика — сегодня и за 7 дней (владельцу важно не пропустить). */
+  /* c96: статистика — сегодня и за 7 дней (владельцу важно не пропустить).
+   * c102: + живая воронка — «в работе»/«договорились» считаем по НЕархивным
+   * (архив уже закрыт и воронку не должен раздувать). */
+  const tsMs = (l: Lead) =>
+    typeof l.ts === "number" ? (l.ts > 1e12 ? l.ts : l.ts * 1000) : 0;
   const dayStart = new Date();
   dayStart.setHours(0, 0, 0, 0);
-  const todayCount = leads.filter((l) => {
-    const ts = typeof l.ts === "number" ? l.ts * (l.ts > 1e12 ? 1 : 1000) : 0;
-    return ts >= dayStart.getTime();
-  }).length;
+  const todayCount = leads.filter((l) => tsMs(l) >= dayStart.getTime()).length;
+  const weekCount = leads.filter((l) => tsMs(l) >= Date.now() - 7 * 86_400_000).length;
+  const activeLeads = leads.filter((l) => !l.archived);
+  const inWorkCount = activeLeads.filter((l) => leadStatus(l) === "contacted").length;
+  const agreedCount = activeLeads.filter((l) => leadStatus(l) === "agreed").length;
 
-  const visible = filter === "all" ? leads : leads.filter((l) => !l.read);
+  /* c102: табы-фильтры воронки; «Новые» = непрочитанные ИЛИ статус new —
+   * заявка, которую открыли, но ещё не обработали, не теряется из виду. */
+  const filterCounts: Record<LeadsFilter, number> = {
+    all: activeLeads.length,
+    new: activeLeads.filter((l) => !l.read || leadStatus(l) === "new").length,
+    contacted: activeLeads.filter((l) => leadStatus(l) === "contacted").length,
+    agreed: activeLeads.filter((l) => leadStatus(l) === "agreed").length,
+    lost: activeLeads.filter((l) => leadStatus(l) === "lost").length,
+    archived: leads.filter((l) => l.archived === true).length,
+  };
+
+  const visible =
+    filter === "archived"
+      ? leads.filter((l) => l.archived === true)
+      : filter === "all"
+        ? activeLeads
+        : activeLeads.filter((l) =>
+            filter === "new"
+              ? !l.read || leadStatus(l) === "new"
+              : leadStatus(l) === filter,
+          );
 
   /* c96: экспорт CSV — все загруженные заявки, разделитель «;», BOM для Excel.
    * c96-CRIT-A: экранирование по RFC-4180 (кавычки — удвоением) + защита
    * от формул-инъекций (ячейка, начинающаяся с = + - @, префиксуется «'» —
-   * Excel тогда не исполняет её как формулу). */
+   * Excel тогда не исполняет её как формулу).
+   * c102: + колонки «Статус» (русский ярлык воронки) и «Заметка»
+   * (переводы строк → пробел, чтобы не ломать строку CSV). */
   const exportCsv = () => {
     const esc = (v: string) => {
       const safe = /^[=+@\-\t\r]/.test(v) ? `'${v}` : v;
       return `"${safe.replace(/"/g, '""')}"`;
     };
     const rows = [
-      ["Дата", "Имя", "Телефон", "Email", "Источник", "Комментарий", "ID"],
+      ["Дата", "Имя", "Телефон", "Email", "Источник", "Статус", "Комментарий", "Заметка", "ID"],
       ...leads.map((l) => [
         formatLeadDate(l.ts),
         l.name,
         l.phone,
         l.email ?? "",
         SOURCE_LABELS[l.source] ?? l.source,
+        STATUS_LABELS[leadStatus(l)] ?? leadStatus(l),
         (l.comment ?? "").replace(/[\r\n]+/g, " "),
+        (l.note ?? "").replace(/[\r\n]+/g, " "),
         l.id,
       ]),
     ];
@@ -257,7 +386,7 @@ export function LeadsView({
           description={
             total === 0
               ? "Заявки с сайта будут появляться здесь."
-              : `Всего ${total} · сегодня ${todayCount} · непрочитанных ${unread}.`
+              : `Всего ${total} · сегодня ${todayCount} · за 7 дней ${weekCount} · в работе ${inWorkCount} · договорились ${agreedCount}`
           }
         />
         <div className="flex flex-wrap gap-2">
@@ -305,25 +434,24 @@ export function LeadsView({
       </div>
 
       {leads.length > 0 ? (
-        <div className="mb-3 inline-flex rounded-xl border border-border-line/70 bg-parchment/40 p-1">
-          {([
-            ["all", `Все (${leads.length})`],
-            ["unread", `Новые (${unread})`],
-          ] as const).map(([id, label]) => (
+        /* c102: 6 фильтров-воронки; flex-wrap — на мобиле табы складываются
+         * в две строки, а не обрезаются (текст ≤13.5px, стиль прежний). */
+        <div className="mb-3 inline-flex max-w-full flex-wrap gap-1 rounded-xl border border-border-line/70 bg-parchment/40 p-1">
+          {FILTERS.map((f) => (
             <button
-              key={id}
+              key={f.id}
               type="button"
-              onClick={() => setFilter(id)}
-              aria-pressed={filter === id}
+              onClick={() => setFilter(f.id)}
+              aria-pressed={filter === f.id}
               className={cn(
-                "min-h-9 rounded-lg px-3.5 text-[13.5px] font-medium transition-colors",
-                filter === id
+                "min-h-9 rounded-lg px-3 text-[13px] font-medium transition-colors",
+                filter === f.id
                   ? "bg-background text-ink shadow-sm"
                   : "text-ink-soft hover:text-ink",
-                id === "unread" && unread > 0 && filter !== id && "text-gold",
+                f.id === "new" && filterCounts.new > 0 && filter !== f.id && "text-gold",
               )}
             >
-              {label}
+              {f.label} ({filterCounts[f.id]})
             </button>
           ))}
         </div>
@@ -341,11 +469,20 @@ export function LeadsView({
           </CardContent>
         </Card>
       ) : visible.length === 0 ? (
+        /* c102: пустое состояние зависит от фильтра — подсказываем следующий
+         * шаг воронки (см. EMPTY_BY_FILTER). */
         <Card className="rounded-2xl border-border-line/80 shadow-none">
           <CardContent className="py-12 text-center">
-            <CheckCheck className="mx-auto size-10 text-gold" />
+            {EMPTY_BY_FILTER[filter].done ? (
+              <CheckCheck className="mx-auto size-10 text-gold" />
+            ) : (
+              <Inbox className="mx-auto size-10 text-ink-soft/40" />
+            )}
             <p className="mt-3 text-[15px] font-medium text-ink">
-              Непрочитанных нет — всё обработано
+              {EMPTY_BY_FILTER[filter].title}
+            </p>
+            <p className="mx-auto mt-1.5 max-w-sm text-[13px] leading-relaxed text-ink-soft">
+              {EMPTY_BY_FILTER[filter].text}
             </p>
           </CardContent>
         </Card>
@@ -405,11 +542,21 @@ function LeadCard({
 }: {
   lead: Lead;
   menu: MenuData | null;
-  onPatch: (id: string, patch: { read?: boolean }) => void;
+  onPatch: (id: string, patch: { read?: boolean; archived?: boolean; status?: string; note?: string | null }) => void;
   onDelete: () => void;
 }) {
   const { chips, rest } = payloadChips(lead.payload, menu);
   const [copied, setCopied] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
+  /* c102: заметка свернута по умолчанию; noteDraft !== null = режим
+   * правки (null → показываем сохранённый текст + кнопку «Изменить»). */
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState<string | null>(null);
+
+  const st = leadStatus(lead);
+  /* Кнопки Telegram/WhatsApp — только для нормализуемого номера
+   * (зеркало PHP lead_phone_digits), иначе в мессенджер вести нельзя. */
+  const wa = phoneDigits(lead.phone);
 
   /* c96: копирование телефона — звонить из CRM/мессенджера удобнее. */
   const copyPhone = async () => {
@@ -423,6 +570,43 @@ function LeadCard({
     }
   };
 
+  /* c102: копирование email — вставить в CRM/почту одним тапом. */
+  const copyEmail = async () => {
+    if (!lead.email) return;
+    try {
+      await navigator.clipboard.writeText(lead.email);
+      setEmailCopied(true);
+      toast.success("Email скопирован");
+      setTimeout(() => setEmailCopied(false), 2000);
+    } catch {
+      toast.error("Не удалось скопировать");
+    }
+  };
+
+  /* c102: звонок/сообщение клиенту автоматом двигает воронку — «новая» →
+   * «связались» + прочитано; ссылка при этом работает как обычно
+   * (без preventDefault): действие уже состоялось по факту клика. */
+  const markContacted = () => {
+    if (st === "new") onPatch(lead.id, { read: true, status: "contacted" });
+  };
+
+  /* c102: статус ≠ «Новая» заодно помечает прочитанным — после работы
+   * со статусами в «Новых» не остаются «мёртвые» заявки. */
+  const setStatus = (next: string) => {
+    if (next === st) return;
+    onPatch(lead.id, next === "new" ? { status: next } : { status: next, read: true });
+  };
+
+  /* c102: заметка — тем же оптимистичным onPatch (откат при сбое делает
+   * родитель); пустой текст = очистить (сервер превращает "" в null). */
+  const saveNote = () => {
+    if (noteDraft === null) return;
+    onPatch(lead.id, { note: noteDraft });
+    setNoteDraft(null);
+  };
+
+  const savedNote = lead.note ?? "";
+
   return (
     <Card
       className={cn(
@@ -430,6 +614,8 @@ function LeadCard({
         lead.read
           ? "border-border-line/70 bg-background"
           : "border-gold/40 bg-gold/[0.045]",
+        /* c102: архив приглушает карточку целиком — визуально «выбыла». */
+        lead.archived && "opacity-60",
       )}
     >
       <CardContent className="p-4 sm:p-5">
@@ -444,12 +630,52 @@ function LeadCard({
                   новая
                 </Badge>
               ) : null}
+              {/* c102: статус воронки в шапке — беглое сканирование списка */}
+              {st !== "new" ? (
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "rounded-full text-[11px] font-normal",
+                    STATUS_BADGE[st] ?? "border-border-line text-ink-soft",
+                  )}
+                >
+                  {STATUS_LABELS[st] ?? st}
+                </Badge>
+              ) : null}
+              {lead.archived ? (
+                <Badge
+                  variant="outline"
+                  className="rounded-full border-border-line bg-accent/60 text-[11px] font-normal text-ink-soft"
+                >
+                  в архиве
+                </Badge>
+              ) : null}
               <Badge
                 variant="outline"
                 className="rounded-full border-border-line text-[11px] text-ink-soft"
               >
                 {SOURCE_LABELS[lead.source] ?? lead.source}
               </Badge>
+              {/* c102: авто-маркеры — чем система уже помогла по этой заявке
+                  (дожим клиенту / напоминание владельцу). */}
+              {lead.followupTs ? (
+                <Badge
+                  variant="outline"
+                  className="rounded-full border-gold/50 bg-gold/10 text-[11px] font-normal text-ink"
+                  title="Письмо-напоминание ушло клиенту автоматически"
+                >
+                  ✉️ авто-дожим отправлен
+                </Badge>
+              ) : null}
+              {lead.nudgedTs ? (
+                <Badge
+                  variant="outline"
+                  className="rounded-full border-border-line bg-accent/60 text-[11px] font-normal text-ink-soft"
+                  title="Система уже напоминала вам об этой заявке"
+                >
+                  🔔 напоминание было
+                </Badge>
+              ) : null}
               {/* c98-FIX1 (критик2 #6, MINOR): rescuedFrom — заявка записана
                   ПОВЕРХ битого leads.json (старые данные спасены в
                   leads.corrupt-*.json). До фикса поле существовало только в
@@ -493,6 +719,23 @@ function LeadCard({
                 <Check className="size-4" /> Прочитано
               </Button>
             )}
+            {/* c102: архив — рабочий список держим коротким; удаление
+                остаётся отдельным необратимым действием. */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-11 rounded-xl text-ink-soft/70 hover:bg-accent hover:text-ink"
+              onClick={() => onPatch(lead.id, { archived: !lead.archived })}
+              aria-label={lead.archived ? "Вернуть из архива" : "Убрать в архив"}
+              title={lead.archived ? "Вернуть из архива" : "Убрать в архив"}
+            >
+              {lead.archived ? (
+                <ArchiveRestore className="size-4" />
+              ) : (
+                <Archive className="size-4" />
+              )}
+            </Button>
             <Button
               type="button"
               variant="ghost"
@@ -506,10 +749,34 @@ function LeadCard({
           </div>
         </div>
 
+        {/* c102: воронка — 4 статуса одним тапом; активный подсвечен
+            (золото для «Новой», ink/moss/bordeaux для остальных). */}
+        <div
+          role="group"
+          aria-label="Статус заявки"
+          className="mt-3 flex max-w-full flex-wrap gap-1 rounded-xl border border-border-line/70 bg-parchment/30 p-1"
+        >
+          {LEAD_STATUSES.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setStatus(s.id)}
+              aria-pressed={st === s.id}
+              className={cn(
+                "min-h-9 rounded-lg px-3 text-[13px] font-medium transition-colors",
+                st === s.id ? STATUS_ACTIVE[s.id] : "text-ink-soft hover:text-ink",
+              )}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+
         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex max-w-full flex-wrap items-center gap-2">
             <a
               href={`tel:${lead.phone.replace(/[^\d+]/g, "")}`}
+              onClick={markContacted}
               className="inline-flex min-h-11 items-center gap-2.5 rounded-xl border border-border-line bg-background px-3.5 text-[15px] font-medium text-ink transition-colors hover:border-gold/50 hover:text-gold"
             >
               <Phone className="size-4 shrink-0 text-gold" />
@@ -524,23 +791,151 @@ function LeadCard({
             >
               {copied ? <Check className="size-4 text-gold" /> : <Copy className="size-4" />}
             </button>
+            {/* c102: мессенджеры одним тапом — только для нормализуемого
+                номера (7…, 11 цифр); клик также двигает воронку. */}
+            {wa ? (
+              <a
+                href={`https://t.me/+${wa}`}
+                onClick={markContacted}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Написать в Telegram"
+                title="Написать в Telegram"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-border-line bg-background text-ink-soft transition-colors hover:border-gold/50 hover:text-gold"
+              >
+                <Send className="size-4" />
+              </a>
+            ) : null}
+            {wa ? (
+              <a
+                href={`https://wa.me/${wa}`}
+                onClick={markContacted}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Написать в WhatsApp"
+                title="Написать в WhatsApp"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-border-line bg-background text-ink-soft transition-colors hover:border-gold/50 hover:text-gold"
+              >
+                <MessageCircle className="size-4" />
+              </a>
+            ) : null}
             {lead.email ? (
               <a
                 href={`mailto:${lead.email}`}
-                className="inline-flex min-h-11 items-center gap-2.5 rounded-xl border border-border-line bg-background px-3.5 text-[15px] text-ink transition-colors hover:border-gold/50 hover:text-gold"
+                className="inline-flex min-h-11 max-w-full items-center gap-2.5 rounded-xl border border-border-line bg-background px-3.5 text-[15px] text-ink transition-colors hover:border-gold/50 hover:text-gold [overflow-wrap:anywhere]"
               >
                 <Mail className="size-4 shrink-0 text-gold" />
                 {lead.email}
               </a>
             ) : null}
+            {lead.email ? (
+              <button
+                type="button"
+                onClick={copyEmail}
+                aria-label="Скопировать email"
+                title="Скопировать email"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-border-line bg-background text-ink-soft transition-colors hover:border-gold/50 hover:text-gold"
+              >
+                {emailCopied ? (
+                  <Check className="size-4 text-gold" />
+                ) : (
+                  <Copy className="size-4" />
+                )}
+              </button>
+            ) : null}
           </div>
         </div>
 
         {lead.comment ? (
-          <p className="mt-3 rounded-xl bg-accent/50 p-3 text-[14px] leading-relaxed whitespace-pre-wrap text-ink">
+          <p className="mt-3 rounded-xl bg-accent/50 p-3 text-[14px] leading-relaxed break-words whitespace-pre-wrap text-ink">
             {lead.comment}
           </p>
         ) : null}
+
+        {/* c102: заметка владельца — сворачиваемый блок; сохранение тем же
+            оптимистичным onPatch, при сбое сети родитель вернёт старый текст. */}
+        <div className="mt-3 border-t border-border-line/50 pt-2">
+          <button
+            type="button"
+            className="flex min-h-11 w-full items-center justify-between gap-2 text-left text-[13.5px] font-medium text-ink-soft"
+            aria-expanded={noteOpen}
+            onClick={() => {
+              const next = !noteOpen;
+              setNoteOpen(next);
+              if (next && noteDraft === null) setNoteDraft(savedNote);
+            }}
+          >
+            <span className="inline-flex items-center gap-2">
+              <StickyNote className="size-4 shrink-0 text-gold" />
+              Заметка{lead.note ? " · есть" : ""}
+            </span>
+            <ChevronDown
+              className={cn(
+                "size-4 shrink-0 transition-transform",
+                noteOpen && "rotate-180",
+              )}
+            />
+          </button>
+          {noteOpen ? (
+            <div className="min-w-0 pb-1">
+              {noteDraft === null ? (
+                <>
+                  {savedNote ? (
+                    <p className="rounded-xl bg-accent/50 p-3 text-[14px] leading-relaxed break-words whitespace-pre-wrap text-ink">
+                      {savedNote}
+                    </p>
+                  ) : (
+                    <p className="py-1 text-[12.5px] leading-relaxed text-ink-soft/80">
+                      Заметки ещё нет — запишите детали разговора: что важно
+                      клиенту, о чём договорились, когда перезвонить.
+                    </p>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="mt-2 h-11 rounded-xl text-[13px]"
+                    onClick={() => setNoteDraft(savedNote)}
+                  >
+                    {savedNote ? "Изменить" : "Добавить заметку"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <TextAreaField
+                    value={noteDraft}
+                    onChange={setNoteDraft}
+                    rows={3}
+                    className="text-[14px]"
+                    placeholder="Что важно клиенту, о чём договорились, когда перезвонить…"
+                  />
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      className="h-11 rounded-xl px-5 text-[14px]"
+                      disabled={noteDraft === savedNote || noteDraft.length > 1000}
+                      onClick={saveNote}
+                    >
+                      Сохранить
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="h-11 rounded-xl text-[13px] text-ink-soft"
+                      onClick={() => setNoteDraft(null)}
+                    >
+                      Отмена
+                    </Button>
+                    {noteDraft.length > 1000 ? (
+                      <span className="text-[12px] text-destructive">
+                        до 1000 символов (сейчас {noteDraft.length})
+                      </span>
+                    ) : null}
+                  </div>
+                </>
+              )}
+            </div>
+          ) : null}
+        </div>
 
         {/* c97: статусы доставки уведомлений (TG/почта/клиенту) */}
         <NotifyBadges lead={lead} />
@@ -568,7 +963,7 @@ function LeadCard({
         {rest.length > 0 ? (
           <div className="mt-2 space-y-0.5">
             {rest.map((r) => (
-              <p key={r.key} className="text-[11.5px] text-ink-soft/70">
+              <p key={r.key} className="break-all text-[11.5px] text-ink-soft/70">
                 {r.key}: {r.value}
               </p>
             ))}

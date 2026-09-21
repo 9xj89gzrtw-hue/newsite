@@ -37,6 +37,27 @@ import { submitLead, type LeadResult } from "@/lib/submit-lead";
 const STEPS = ["Тип мероприятия", "Гости и дата", "Контакты", "Отправить"];
 const DRAFT_KEY = "catering-lead-draft";
 
+/** c102: типографский глиф «MAX» — у мессенджера MAX нет lucide-пиктограммы;
+ * тот же приём, что MessengerGlyph/MaxGlyph в hacc-booking.tsx (текст
+ * наследует текущий font-family — типографический тон соседних карточек). */
+function MaxGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden="true" role="presentation">
+      <text
+        x="16"
+        y="20.5"
+        textAnchor="middle"
+        fontSize={9}
+        fontWeight={800}
+        letterSpacing="0.5"
+        fill="currentColor"
+      >
+        MAX
+      </text>
+    </svg>
+  );
+}
+
 // Russian phone regex. Matches +7/7/8 prefix + 10 digits, or bare 10/11 digits.
 // The validation in stepValid() strips everything except + and digits first,
 // so this runs against the compact form: "+79991234567" / "89991234567" / "79991234567".
@@ -1006,7 +1027,10 @@ export function Contact() {
                   <p className="mb-3 font-mono text-xs uppercase tracking-wider text-ink/70">
                     Другие способы связи
                   </p>
-                  <div className="grid grid-cols-2 gap-3">
+                  {/* c102: + МАКС (владелец: «очень актуально») — третий канал
+                      рядом с Telegram/WhatsApp; на узких экранах занимает
+                      свою полную строку (col-span-2), на sm+ — третья колонка. */}
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     <ContactCard
                       icon={Telegram}
                       href={CONTACTS.telegramHref}
@@ -1023,6 +1047,16 @@ export function Contact() {
                       sublabel="WhatsApp"
                       external
                     />
+                    <div className="col-span-2 sm:col-span-1">
+                      <ContactCard
+                        icon={MaxGlyph}
+                        href={CONTACTS.maxHref}
+                        label={CONTACTS.maxPhone}
+                        ariaLabel={`Мессенджер MAX: ${CONTACTS.maxPhone}`}
+                        sublabel="Макс"
+                        external
+                      />
+                    </div>
                   </div>
                 </div>
 

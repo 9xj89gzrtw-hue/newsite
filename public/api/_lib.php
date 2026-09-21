@@ -209,6 +209,15 @@ function leads_archive_path(): string
     return server_data_dir() . '/leads-archive.json';
 }
 
+/** c102 — состояние cron-автоматизации (server-data/cron-state.json):
+ *  {lastRunTs, lastDigestDay, lastDigestTs, followupsSent, nudgesSent,
+ *   lastFollowupId, lastNudgeId} — какие письма/напоминания уже ушли,
+ *  чтобы повторные запуски не дублировали их. */
+function cron_state_path(): string
+{
+    return server_data_dir() . '/cron-state.json';
+}
+
 /** c97 — журнал попыток отправки почты (server-data/mail-log.json). */
 function mail_log_path(): string
 {
@@ -454,6 +463,30 @@ function default_settings(): array
         // вставляемый в <head> после cookie-consent. Максимально свободная
         // форма: владелец копирует готовый сниппет из сервиса.
         'customHeadHtml' => null,
+        // c102 — «Автоматизация» (cron.php): ежедневный дайджест, авто-дожим
+        // клиента письмом, напоминание о необработанных заявках. Управление —
+        // карточка «Автоматизация» в настройках админки; состояние —
+        // server-data/cron-state.json (последний запуск/счётчики).
+        // autoDigest: в 09:00–23:59 (первый запуск дня) шлёт владельцу сводку
+        // «за сутки + необработанные» в TG и на почту. По умолчанию ВКЛ.
+        'autoDigest' => true,
+        // autoFollowup: заявка со статусом «новая» и email, старше 24 ч —
+        // клиенту уходит ОДНО письмо-дожим (меню во вложении + кнопки
+        // связи). По умолчанию ВКЛ — это и есть «поиск клиентов без ручных
+        // действий»: система сама возвращается к клиенту.
+        'autoFollowup' => true,
+        // autoNudge: TG-напоминание о необработанной заявке через N часов.
+        // По умолчанию ВЫКЛ — TG уже пингует мгновенно при каждой заявке;
+        // включить может владелец, который часто пропускает уведомления.
+        'autoNudge' => false,
+        // Через сколько часов непрочитанная заявка считается «зависшей»
+        // (1–24; только для autoNudge).
+        'autoNudgeHours' => 3,
+        // Секретный токен cron-запуска (32 hex). null = cron выключен
+        // (403). Генерируется кнопкой в «Автоматизации», вызов:
+        //   GET /api/cron.php?token=…  — для веб-крона SpaceWeb
+        //   php api/cron.php <token>   — для CLI-крона хостинга
+        'cronToken' => null,
         // passwordHash перекрывает secrets.password_hash_default после
         // смены пароля владельцем через UI (action=password).
         'passwordHash' => null,
@@ -510,6 +543,19 @@ function load_settings(): array
         $ch = is_string($ch) ? str_trunc($ch, 8000) : '';
         $merged['customHeadHtml'] = $ch === '' ? null : $ch;
     }
+    /* c102: нормализация «Автоматизации» — правила те же: мусор в
+     * settings.json не должен ни окирпичивать админку, ни молча
+     * выключать включённое владельцем. Флаги — булевы (не-bool → дефолт),
+     * часы — int 1..24, токен — 32 hex или null. */
+    foreach (['autoDigest' => true, 'autoFollowup' => true, 'autoNudge' => false] as $k => $def) {
+        $merged[$k] = is_bool($merged[$k] ?? null) ? $merged[$k] : $def;
+    }
+    $nh = $merged['autoNudgeHours'] ?? null;
+    $nh = is_int($nh) ? $nh : (is_numeric($nh) ? (int)$nh : 0);
+    $merged['autoNudgeHours'] = ($nh >= 1 && $nh <= 24) ? $nh : 3;
+    $ct = $merged['cronToken'] ?? null;
+    $ct = is_string($ct) ? trim($ct) : '';
+    $merged['cronToken'] = preg_match('/^[0-9a-f]{32}$/i', $ct) === 1 ? strtolower($ct) : null;
     return $merged;
 }
 
@@ -1135,6 +1181,22 @@ const MAIL_FROM_NAME = 'NILOV CATERING';
 /** Домен сайта для Message-ID (RFC 5322: <ts.rand@domain>). */
 const MAIL_DOMAIN = 'nilovcatering.ru';
 
+/* ------- c102: контактные каналы компании для писем (единый источник) ----- */
+
+/** Телефон/WhatsApp/Telegram-чат компании (один номер, три канала). */
+const OWNER_PHONE_PRETTY = '+7 (911) 941-72-05';
+const OWNER_PHONE_E164 = '+79119417205';
+const OWNER_PHONE_DIGITS = '79119417205';
+/** Прямой Telegram-ЧАТ с компанией (не канал): клиент пишет — нам. */
+const OWNER_TG_CHAT_URL = 'https://t.me/+79119417205';
+/** WhatsApp-чат по тому же номеру. */
+const OWNER_WA_URL = 'https://wa.me/79119417205';
+/** c102 (владелец: «очень актуально»): профиль в мессенджере MAX
+ *  (max.ru/u/f9LH… — реальный профиль от владельца, c92; тот же URL,
+ *  что CONTACTS.maxHref в src/lib/config.ts). */
+const OWNER_MAX_URL = 'https://max.ru/u/f9LHodD0cOLcnReQpyQHwFiG5c5jpXP58e8Ni38wbQC2lpDWdSCYkXsZ8ak';
+const OWNER_MAX_PHONE_PRETTY = '+7 (911) 826-39-26';
+
 /* ------------- c101: CID-логотип в HTML-письмах (public/brand/) ---------- */
 
 /**
@@ -1360,12 +1422,16 @@ function mail_html_wrap(string $title, string $inner, string $footerNote = ''): 
         . '<tr><td style="padding:28px 32px 4px;font:bold 24px/1.3 Georgia,serif;color:#23201b;">' . $title . '</td></tr>'
         // контент
         . '<tr><td style="padding:14px 32px 8px;font:15px/1.6 Arial,sans-serif;color:#3d3831;">' . $inner . '</td></tr>'
-        // контакты-подвал
+        // контакты-подвал (c102: + MAX; Telegram — прямой ЧАТ t.me/+<номер>,
+        // а не канал: из письма пишут «нам», канал живёт на сайте)
         . '<tr><td style="padding:20px 32px 26px;border-top:1px solid #eee6d8;">'
         . $foot
         . '<p style="margin:0;font:14px/1.7 Arial,sans-serif;color:#3d3831;">'
-        . 'Телефон / WhatsApp: <a href="tel:+79119417205" style="color:#23201b;font-weight:bold;text-decoration:none;">+7 (911) 941-72-05</a><br>'
-        . 'Telegram: <a href="https://t.me/nilov_catering" style="color:#a97f3f;text-decoration:none;">t.me/nilov_catering</a><br>'
+        . 'Телефон: <a href="tel:' . OWNER_PHONE_E164 . '" style="color:#23201b;font-weight:bold;text-decoration:none;">' . OWNER_PHONE_PRETTY . '</a><br>'
+        . 'Написать: <a href="' . OWNER_TG_CHAT_URL . '" style="color:#a97f3f;text-decoration:none;">Telegram</a> · '
+        . '<a href="' . OWNER_WA_URL . '" style="color:#a97f3f;text-decoration:none;">WhatsApp</a> · '
+        . '<a href="' . OWNER_MAX_URL . '" style="color:#a97f3f;text-decoration:none;">MAX</a> '
+        . '<span style="color:#b7ad9e;">(' . OWNER_MAX_PHONE_PRETTY . ')</span><br>'
         . 'Сайт: <a href="https://nilovcatering.ru" style="color:#a97f3f;text-decoration:none;">nilovcatering.ru</a></p>'
         . '<p style="margin:12px 0 0;font:11px/1.5 Arial,sans-serif;color:#b7ad9e;">'
         . 'Это письмо отправлено автоматически с сайта nilovcatering.ru · © ' . $year . ' NILOV CATERING</p>'

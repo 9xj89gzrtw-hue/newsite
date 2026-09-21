@@ -44,6 +44,7 @@ match ($action) {
     'lead-delete' => h_lead_delete($method),
     'leads-read-all' => h_leads_read_all($method),
     'settings' => h_settings($method),
+    'cron-token' => h_cron_token($method),
     'tg-check' => h_tg_check($method),
     'tg-discover' => h_tg_discover($method),
     'tg-test' => h_tg_test($method),
@@ -360,14 +361,16 @@ function h_leads(string $method): void
     ]);
 }
 
-/** action=lead-update (POST, auth, {id, read?, archived?}). */
+/** action=lead-update (POST, auth, {id, read?, archived?, status?, note?}).
+ *  c102: + status (new|contacted|agreed|lost) и note (заметка владельца
+ *  ≤1000 симв.) — воронка заявки прямо в карточке. */
 function h_lead_update(string $method): void
 {
     if ($method !== 'POST') {
         json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
     }
     require_admin();
-    $body = read_json_body_or_400(8192);
+    $body = read_json_body_or_400(16384);
     $id = $body['id'] ?? null;
     if (!is_string($id) || strlen($id) > 40) {
         json_response(400, ['ok' => false, 'error' => 'validation', 'detail' => 'id обязателен']);
@@ -384,6 +387,27 @@ function h_lead_update(string $method): void
             json_response(400, ['ok' => false, 'error' => 'validation', 'detail' => 'archived: bool']);
         }
         $patch['archived'] = $body['archived'];
+    }
+    if (array_key_exists('status', $body)) {
+        $st = $body['status'];
+        if ($st === null || $st === '') {
+            $patch['status'] = 'new';
+        } elseif (is_string($st) && in_array($st, ['new', 'contacted', 'agreed', 'lost'], true)) {
+            $patch['status'] = $st;
+        } else {
+            json_response(400, ['ok' => false, 'error' => 'validation', 'detail' => 'status: new|contacted|agreed|lost']);
+        }
+    }
+    if (array_key_exists('note', $body)) {
+        $note = $body['note'];
+        if ($note === null || $note === '') {
+            $patch['note'] = null;
+        } elseif (is_string($note) && mb_strlen($note) <= 1000) {
+            // нормализуем переводы строк: CRLF/CR -> LF (мобильные редакторы)
+            $patch['note'] = str_replace(["\r\n", "\r"], "\n", rtrim($note));
+        } else {
+            json_response(400, ['ok' => false, 'error' => 'validation', 'detail' => 'note: до 1000 символов']);
+        }
     }
     if ($patch === []) {
         json_response(400, ['ok' => false, 'error' => 'validation', 'detail' => 'нечего обновлять']);
@@ -500,6 +524,15 @@ function h_settings(string $method): void
             'metrikaClickmap' => $s['metrikaClickmap'],
             'gaId' => $s['gaId'],
             'customHeadHtml' => $s['customHeadHtml'],
+            // c102: «Автоматизация» — флаги + read-only состояние последнего
+            // запуска cron (из server-data/cron-state.json; токен НЕ отдаём —
+            // он секретный, админка получает его только в момент генерации).
+            'autoDigest' => $s['autoDigest'],
+            'autoFollowup' => $s['autoFollowup'],
+            'autoNudge' => $s['autoNudge'],
+            'autoNudgeHours' => $s['autoNudgeHours'],
+            'cronEnabled' => is_string($s['cronToken']) && $s['cronToken'] !== '',
+            'cronState' => read_json_file(cron_state_path()) ?? null,
         ]]);
     }
     if ($method !== 'POST') {
@@ -671,10 +704,59 @@ function h_settings(string $method): void
             $bad('customHeadHtml: до 8000 символов');
         }
     }
+
+    /* c102 — «Автоматизация» (cron.php): три булевых флага + окно nudge.
+     * Валидация в духе аналитики: флаги — строго bool, часы — int 1..24
+     * (мусор → 400; поле в UI — number с min/max). */
+    foreach (['autoDigest', 'autoFollowup', 'autoNudge'] as $k) {
+        if (array_key_exists($k, $body)) {
+            $s[$k] = $body[$k] === true;
+        }
+    }
+    if (array_key_exists('autoNudgeHours', $body)) {
+        $v = $body['autoNudgeHours'];
+        if (is_int($v) && $v >= 1 && $v <= 24) {
+            $s['autoNudgeHours'] = $v;
+        } elseif (is_string($v) && ctype_digit($v) && (int)$v >= 1 && (int)$v <= 24) {
+            $s['autoNudgeHours'] = (int)$v;
+        } else {
+            $bad('autoNudgeHours: целое 1–24 (часов до напоминания)');
+        }
+    }
+    if (!empty($body['clearCronToken'])) {
+        $s['cronToken'] = null;
+    }
     if (!save_settings($s)) {
         json_response(500, ['ok' => false, 'error' => 'storage']);
     }
     json_response(200, ['ok' => true]);
+}
+
+/** c102 — action=cron-token (POST, auth): сгенерировать новый секретный
+ *  токен cron-запуска (32 hex, random_bytes) и вернуть его ЕДИНОЖДЫ в
+ *  ответе — дальше владелец копирует готовый URL из карточки «Автоматизация»
+ *  в панель крона хостинга. Повторная генерация заменяет старый токен
+ *  (старые ссылки перестают работать); {revoke:true} — отключить cron. */
+function h_cron_token(string $method): void
+{
+    if ($method !== 'POST') {
+        json_response(405, ['ok' => false, 'error' => 'method_not_allowed']);
+    }
+    require_admin();
+    $body = read_json_body_or_400(2048);
+    $s = load_settings();
+    if (!empty($body['revoke'])) {
+        $s['cronToken'] = null;
+        if (!save_settings($s)) {
+            json_response(500, ['ok' => false, 'error' => 'storage']);
+        }
+        json_response(200, ['ok' => true, 'token' => null]);
+    }
+    $s['cronToken'] = bin2hex(random_bytes(16));
+    if (!save_settings($s)) {
+        json_response(500, ['ok' => false, 'error' => 'storage']);
+    }
+    json_response(200, ['ok' => true, 'token' => $s['cronToken']]);
 }
 
 /** action=tg-check (POST, auth, {token?}): getMe — валиден ли токен. */

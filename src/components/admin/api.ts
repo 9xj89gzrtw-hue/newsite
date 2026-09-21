@@ -124,6 +124,19 @@ export interface Lead {
   rescuedFrom?: string;
   /** c97: доставлены ли уведомления (TG/почта/клиенту) — после отправки. */
   notify?: LeadNotify;
+  /** c102: стадия воронки мини-CRM (нет поля = «новая»); пишется
+   *  lead-update'ом или cron'ом (дожим не меняет статус — только маркер). */
+  status?: "new" | "contacted" | "agreed" | "lost" | string;
+  /** c102: заметка владельца по заявке (≤1000, \n-нормализация на сервере;
+   *  null/пусто — очистить). */
+  note?: string | null;
+  /** c102: когда клиенту ушёл авто-дожим (UNIX-секунды) — письмо-напоминание
+   *  отправлено автоматически, повторных не будет. */
+  followupTs?: number;
+  /** c102: доставлен ли авто-дожим (false = письмо не дошло). */
+  followupOk?: boolean;
+  /** c102: когда пинговали владельца о зависшей заявке. */
+  nudgedTs?: number;
 }
 
 export interface AdminSettings {
@@ -147,6 +160,19 @@ export interface AdminSettings {
   metrikaClickmap: boolean;
   gaId: string;
   customHeadHtml: string;
+  /** c102: автоматизация — утренняя сводка заявок (дефолт вкл, см. _lib.php). */
+  autoDigest: boolean;
+  /** c102: автоматизация — авто-дожим клиента через 24ч без статуса. */
+  autoFollowup: boolean;
+  /** c102: автоматизация — TG-пинг о зависших заявках (дефолт выкл). */
+  autoNudge: boolean;
+  /** c102: порог «зависла» для пинга, часы (1–24, дефолт 3). */
+  autoNudgeHours: number;
+  /** c102: выдан ли секретный cron-токен (read-only: меняется cron-token'ом). */
+  cronEnabled: boolean;
+  /** c102: состояние планировщика — последний запуск/сводка/дожим/пинг
+   *  (read-only, пишет cron.php). null = ни одного запуска. */
+  cronState?: Record<string, unknown> | null;
 }
 
 /** c97: статус доставки уведомлений по заявке (lead.php → leads.json). */
@@ -408,13 +434,22 @@ export async function apiGetLeads(
 
 export async function apiLeadUpdate(
   id: string,
-  patch: { read?: boolean; archived?: boolean },
+  patch: { read?: boolean; archived?: boolean; status?: string; note?: string | null },
 ): Promise<boolean> {
   const r = await adminApi("lead-update", {
     method: "POST",
     body: { id, ...patch },
   });
   return r.status === 200 && r.body?.ok === true;
+}
+
+/** c102 — секретная ссылка для планировщика хостинга (cron.php?token=…).
+ *  Токен возвращается РОВНО ОДИН раз при генерации — сервер его больше
+ *  не показывает (cronEnabled в settings — только факт «выдан»); поэтому
+ *  UI сразу даёт скопировать URL. revoke=true — отключить (токен = null). */
+export async function apiCronToken(revoke = false): Promise<{ ok: boolean; token: string | null }> {
+  const r = await adminApi("cron-token", { method: "POST", body: revoke ? { revoke: true } : {} });
+  return { ok: r.status === 200 && r.body?.ok === true, token: (r.body?.token as string | null) ?? null };
 }
 
 /** c96 — пометить ВСЕ заявки прочитанными одним запросом. */
@@ -463,6 +498,17 @@ export async function apiGetSettings(
         metrikaClickmap: s.metrikaClickmap !== false,
         gaId: String(s.gaId ?? ""),
         customHeadHtml: String(s.customHeadHtml ?? ""),
+        // c102: автоматизация — дефолты зеркалят _lib.php (сводка/дожим вкл,
+        // пинг выкл, 3ч), cronState как есть (null = ещё не запускался)
+        autoDigest: s.autoDigest !== false,
+        autoFollowup: s.autoFollowup !== false,
+        autoNudge: s.autoNudge === true,
+        autoNudgeHours:
+          typeof s.autoNudgeHours === "number" && Number.isFinite(s.autoNudgeHours)
+            ? Math.min(24, Math.max(1, Math.round(s.autoNudgeHours)))
+            : 3,
+        cronEnabled: s.cronEnabled === true,
+        cronState: (s.cronState as Record<string, unknown> | null | undefined) ?? null,
       },
     };
   }
@@ -488,6 +534,14 @@ export type SettingsPatch = {
   metrikaClickmap?: boolean;
   gaId?: string | null;
   customHeadHtml?: string | null;
+  /** c102: автоматизация. cronEnabled/cronState — READ-ONLY (управляются
+   *  только action=cron-token), в патче их не отправляем. */
+  autoDigest?: boolean;
+  autoFollowup?: boolean;
+  autoNudge?: boolean;
+  autoNudgeHours?: number;
+  /** c102: отозвать cron-токен (планировщик выключается). */
+  clearCronToken?: boolean;
 };
 
 export async function apiSaveSettings(
@@ -726,6 +780,13 @@ let mockSavedMenu: MenuData | null = null;
 let mockCancelArmed = false;
 let mockStatusPolls = 0;
 
+/* c102 MOCK-ONLY: секретный cron-токен демо-режима. Живёт в памяти модуля
+ * (как в проде — в secrets.json): после генерации «не показывается» нигде,
+ * кроме одного ответа cron-token; состояние — только cronEnabled=true/false. */
+let mockCronToken: string | null = null;
+const mockRandomToken = () =>
+  Array.from({ length: 32 }, () => "0123456789abcdef"[Math.floor(Math.random() * 16)]).join("");
+
 async function mockApi(
   action: string,
   opts: AdminApiOptions,
@@ -876,6 +937,21 @@ async function mockApi(
       const lead = mockLeads.find((l) => l.id === id);
       if (!lead) return { status: 404, body: { error: "not_found" } };
       if (typeof body.read === "boolean") lead.read = body.read;
+      if (typeof body.archived === "boolean") lead.archived = body.archived;
+      /* c102: мини-CRM — статус воронки и заметка (как admin.php: валидный
+       * статус строкой, note null/"" очищает, \r\n → \n). */
+      if (typeof body.status === "string" &&
+          ["new", "contacted", "agreed", "lost"].includes(body.status)) {
+        lead.status = body.status;
+      }
+      if (body.note !== undefined) {
+        if (body.note === null || body.note === "") lead.note = null;
+        else if (typeof body.note === "string" && body.note.length <= 1000) {
+          lead.note = body.note.replace(/\r\n?/g, "\n");
+        } else {
+          return { status: 400, body: { ok: false, error: "validation" } };
+        }
+      }
       return { status: 200, body: { ok: true } };
     }
     case "lead-delete": {
@@ -973,9 +1049,47 @@ async function mockApi(
           }
           mockSettings.customHeadHtml = ch === "" ? "" : ch;
         }
+        /* c102: автоматизация — === true → boolean (мок проверяет тип так же
+         * строго, как admin.php — «истина» строкой не пройдёт). */
+        if (b.autoDigest === true || b.autoDigest === false) {
+          mockSettings.autoDigest = b.autoDigest;
+        }
+        if (b.autoFollowup === true || b.autoFollowup === false) {
+          mockSettings.autoFollowup = b.autoFollowup;
+        }
+        if (b.autoNudge === true || b.autoNudge === false) {
+          mockSettings.autoNudge = b.autoNudge;
+        }
+        if (typeof b.autoNudgeHours === "number" && b.autoNudgeHours >= 1 && b.autoNudgeHours <= 24) {
+          mockSettings.autoNudgeHours = Math.round(b.autoNudgeHours);
+        } else if (b.autoNudgeHours !== undefined) {
+          return {
+            status: 400,
+            body: { ok: false, error: "validation" },
+          };
+        }
+        /* c102: отзыв токена — планировщик выключается (clearCronToken
+         * отправляется ТОЛЬКО намеренно, из карточки «Автоматизация»). */
+        if (b.clearCronToken === true) {
+          mockCronToken = null;
+          mockSettings.cronEnabled = false;
+        }
         return { status: 200, body: { ok: true } };
       }
       return { status: 200, body: { ok: true, settings: { ...mockSettings } } };
+    }
+    case "cron-token": {
+      /* c102: как admin.php h_cron_token — {revoke:true} гасит токен
+       * (null), иначе генерится новый 32-hex; старые ссылки перестают
+       * работать. Токен в ответе — ЕДИНСТВЕННЫЙ раз. */
+      if (body.revoke === true) {
+        mockCronToken = null;
+        mockSettings.cronEnabled = false;
+        return { status: 200, body: { ok: true, token: null } };
+      }
+      mockCronToken = mockRandomToken();
+      mockSettings.cronEnabled = true;
+      return { status: 200, body: { ok: true, token: mockCronToken } };
     }
     case "tg-check": {
       const token = String(body.token ?? "");
@@ -1078,6 +1192,17 @@ const mockSettings: AdminSettings = {
   metrikaClickmap: true,
   gaId: "",
   customHeadHtml: "",
+  /* c102: автоматизация — дефолты зеркалят _lib.php (сводка/дожим вкл,
+   * пинг выкл, 3ч); cronState «крутится» — демо показывает живой вид. */
+  autoDigest: true,
+  autoFollowup: true,
+  autoNudge: false,
+  autoNudgeHours: 3,
+  cronEnabled: false,
+  cronState: {
+    lastRunTs: Math.floor(Date.now() / 1000) - 900,
+    runs: 42,
+  },
 };
 
 const now = Date.now();
@@ -1115,6 +1240,8 @@ const mockLeads: Lead[] = [
     id: "lead-1003",
     ts: unix(95),
     read: true,
+    status: "contacted",
+    note: "Перезвонить после 18:00, просит смету на бар",
     source: "contact",
     name: "Игорь Ветров",
     phone: "+7 (911) 200-84-51",
@@ -1130,6 +1257,7 @@ const mockLeads: Lead[] = [
     id: "lead-1002",
     ts: unix(60 * 26),
     read: false,
+    status: "agreed",
     source: "calculator",
     name: "Мария Кузнецова",
     phone: "+7 (999) 123-45-67",
@@ -1141,6 +1269,25 @@ const mockLeads: Lead[] = [
       total: 30_000,
       undecided: true,
       addonIds: ["equipment"],
+    },
+  },
+  {
+    /* c102: демо воронки — зависшая заявка: авто-дожим уже ушёл клиенту
+     * (followupTs), владельца пинговали (nudgedTs), статус так и не встал. */
+    id: "lead-1001",
+    ts: unix(60 * 50),
+    read: true,
+    source: "footer",
+    name: "Ольга Руднева",
+    phone: "8 (921) 555-04-88",
+    email: "olga.r@example.com",
+    comment: "Кофе-брейк на конференцию, нужно предложение до пятницы.",
+    followupTs: unix(60 * 26),
+    followupOk: true,
+    nudgedTs: unix(60 * 23),
+    payload: {
+      typeId: "coffee-break",
+      guests: 40,
     },
   },
 ];

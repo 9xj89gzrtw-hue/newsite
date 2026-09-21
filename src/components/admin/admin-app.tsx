@@ -280,7 +280,12 @@ export function AdminApp({
     }
   };
 
-  const patchLead = async (id: string, patch: { read?: boolean }) => {
+  /* c102: мини-CRM — патч лида расширен статусом воронки, заметкой и
+   * архивом; оптимистично + откат при сбое (как было c96 для read). */
+  const patchLead = async (
+    id: string,
+    patch: { read?: boolean; archived?: boolean; status?: string; note?: string | null },
+  ) => {
     const prev = leads;
     setLeads((ls) => ls.map((l) => (l.id === id ? { ...l, ...patch } : l)));
     const ok = await apiLeadUpdate(id, patch);
