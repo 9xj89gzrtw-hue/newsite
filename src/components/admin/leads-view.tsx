@@ -105,8 +105,17 @@ function payloadChips(payload: Record<string, unknown> | undefined, menu: MenuDa
     used.add("pkgName");
   }
   if (typeof payload.eventType === "string" && payload.eventType) {
-    push("Событие", payload.eventType);
+    /* c100: контактная форма шлёт eventType = id типа меню (buffet/…) —
+     * показываем русский ярлык, а не сырой id. */
+    const t = menu?.menuTypes.find((mt) => mt.id === payload.eventType);
+    push("Событие", t ? t.label : payload.eventType);
     used.add("eventType");
+  }
+  if (typeof payload.typeLabel === "string" && payload.typeLabel) {
+    used.add("typeLabel");
+  }
+  if (typeof payload.eventLabel === "string" && payload.eventLabel) {
+    used.add("eventLabel");
   }
   if (typeof payload.guests === "number") {
     push("Гостей", String(payload.guests));

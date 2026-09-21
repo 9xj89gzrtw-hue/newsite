@@ -1152,6 +1152,26 @@ function menu_pdf_manifest(): array
 }
 
 /**
+ * c100 — русский ярлык типа мероприятия по его id (как в src/data/menu.json).
+ * Дубликат ярлыков на бэкенде: письмо собирается из payload, где от старого
+ * кэш-бандла может не быть typeLabel/eventLabel — по одному typeId всегда
+ * восстанавливаем человекочитаемый «Фуршет»/«Банкет» (раньше письма
+ * показывали только «Формат: Премиум» — тип события терялся).
+ */
+function menu_type_label(string $typeId): ?string
+{
+    static $map = [
+        'buffet' => 'Фуршет',
+        'banquet' => 'Банкет',
+        'snack-box' => 'Доставка закусок',
+        'coffee-break' => 'Кофе-брейк',
+        'vegetarian' => 'Вегетарианское',
+        'bbq' => 'Барбекю',
+    ];
+    return $map[$typeId] ?? null;
+}
+
+/**
  * c99 — подобрать PDF-меню под ЗАЯВКУ: пакет конкретного тарифа
  * (typeId+pkgIdx из калькулятора) → иначе тип без пакета (pkgIdx null
  * не бывает в манифесте тарифов) → полный каталог. Возвращает запись
@@ -1224,33 +1244,98 @@ function mail_attachment_disposition(array $entry): string
 }
 
 /**
- * c99 — тело письма с MIME-вложениями (multipart/mixed).
- * Без вложений — прежний плоский text/plain (байт-идентично c97:
- * старые письма не меняются). С вложениями: part text/plain (UTF-8,
- * 8bit) + N parts application/pdf (base64, 76 колонок, CRLF).
+ * c100 — HTML-каркас письма (таблично-инлайновый, почтовые клиенты без
+ * CSS-поддержки читают всё равно). $inner — готовый внутренний HTML
+ * (детали заявки/контакты). Палитра сайта: крем/уголь/золото #D4A373.
+ * Никаких внешних картинок/шрифтов — ноль внешних запросов из письма.
+ */
+function mail_html_wrap(string $title, string $inner, string $footerNote = ''): string
+{
+    $year = date('Y');
+    $foot = $footerNote !== ''
+        ? '<p style="margin:0 0 10px;font:13px/1.5 Arial,sans-serif;color:#8a8175;">' . $footerNote . '</p>'
+        : '';
+    return '<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+        . '<title>' . $title . '</title></head>'
+        . '<body style="margin:0;padding:0;background:#f4efe7;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4efe7;padding:24px 12px;">'
+        . '<tr><td align="center">'
+        . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 14px rgba(35,32,27,.08);">'
+        // шапка бренда
+        . '<tr><td style="padding:26px 32px 22px;background:#23201b;text-align:center;">'
+        . '<div style="font:bold 22px/1 Georgia,serif;color:#d4a373;letter-spacing:3px;">NILOV&nbsp;CATERING</div>'
+        . '<div style="margin-top:6px;font:12px/1.4 Arial,sans-serif;color:#b7ad9e;letter-spacing:1px;">кейтеринг, в&nbsp;котором чувствуют&nbsp;· Санкт-Петербург</div>'
+        . '</td></tr>'
+        // заголовок письма
+        . '<tr><td style="padding:28px 32px 4px;font:bold 24px/1.3 Georgia,serif;color:#23201b;">' . $title . '</td></tr>'
+        // контент
+        . '<tr><td style="padding:14px 32px 8px;font:15px/1.6 Arial,sans-serif;color:#3d3831;">' . $inner . '</td></tr>'
+        // контакты-подвал
+        . '<tr><td style="padding:20px 32px 26px;border-top:1px solid #eee6d8;">'
+        . $foot
+        . '<p style="margin:0;font:14px/1.7 Arial,sans-serif;color:#3d3831;">'
+        . 'Телефон / WhatsApp: <a href="tel:+79119417205" style="color:#23201b;font-weight:bold;text-decoration:none;">+7 (911) 941-72-05</a><br>'
+        . 'Telegram: <a href="https://t.me/nilov_catering" style="color:#a97f3f;text-decoration:none;">t.me/nilov_catering</a><br>'
+        . 'Сайт: <a href="https://nilovcatering.ru" style="color:#a97f3f;text-decoration:none;">nilovcatering.ru</a></p>'
+        . '<p style="margin:12px 0 0;font:11px/1.5 Arial,sans-serif;color:#b7ad9e;">'
+        . 'Это письмо отправлено автоматически с сайта nilovcatering.ru · © ' . $year . ' NILOV CATERING</p>'
+        . '</td></tr>'
+        . '</table></td></tr></table></body></html>';
+}
+
+/**
+ * c99/c100 — тело письма с MIME-частями. Вложений нет и нет HTML — прежний
+ * плоский text/plain (байт-совместим со старыми тестовыми письмами).
+ * Есть HTML — multipart/alternative [text, html] (клиент без HTML-рендера
+ * покажет текст; с вложениями — внешний multipart/mixed
+ * [ alternative [text, html], pdf… ] — RFC 2046).
  * Возвращает [headers: string[], body: string] — To/Subject SMTP-пути
  * добавляет smtp_send, mail()-путь — PHP сам.
  */
-function mail_mime_parts(array $extraHeaders, string $bodyText, array $attachments): array
+function mail_mime_parts(array $extraHeaders, string $bodyText, array $attachments, ?string $html = null): array
 {
-    if ($attachments === []) {
+    $hasHtml = $html !== null && $html !== '';
+    if ($attachments === [] && !$hasHtml) {
         return [$extraHeaders, mail_body_crlf($bodyText)];
     }
-    $b = '=nilov-' . bin2hex(random_bytes(12)); // '=' разрешён в boundary (RFC 2046 bcharsnospace) и не встречается в base64-строках тела — случайная коллизия с контентом исключена
-    $headers = $extraHeaders;
-    // Content-Type/CTE из плоских заголовков заменяются multipart-версией
-    $headers = array_values(array_filter($headers, static function (string $h): bool {
+    $hasAtt = $attachments !== [];
+    $b = '=nilov-' . bin2hex(random_bytes(12)); // '=' разрешён в boundary (RFC 2046 bcharsnospace) и не встречается в base64-строках тела
+    $bAlt = '=nilov-alt-' . bin2hex(random_bytes(10));
+    // базовые заголовки — без плоских Content-Type/CTE (заменяются multipart-версией ниже)
+    $headers = array_values(array_filter($extraHeaders, static function (string $h): bool {
         return stripos($h, 'Content-Type:') !== 0 && stripos($h, 'Content-Transfer-Encoding:') !== 0;
     }));
-    $headers[] = 'Content-Type: multipart/mixed; boundary="' . $b . '"';
-    $headers[] = 'Content-Transfer-Encoding: 8bit';
-    // для 8bit multipart кодирование базовых частей выполняем сами
-    $parts = [];
     /* Текстовая часть обязана заканчиваться CRLF: по RFC 2046 разделитель
-     * границы — это CRLF "--{$b}"; без него граница приклеилась бы к
+     * границы — CRLF "--{boundary}"; без него граница приклеилась бы к
      * последней строке текста («…чувствуют--=nilov-…») и почтовые клиенты
      * не распознали бы вложение (поймано тестом c99-A: base64-раундтрип). */
-    $parts[] = "--{$b}\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n" . mail_body_crlf($bodyText) . "\r\n";
+    $textPart = "Content-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n"
+        . mail_body_crlf($bodyText) . "\r\n";
+    $htmlPart = "Content-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n"
+        . mail_body_crlf($html ?? '') . "\r\n";
+    $parts = [];
+    if ($hasAtt && $hasHtml) {
+        // mixed [ alternative [text, html], attachments… ] — RFC 2046
+        $contentType = 'multipart/mixed; boundary="' . $b . '"';
+        $close = "--{$b}--";
+        $parts[] = "--{$b}\r\n"
+            . "Content-Type: multipart/alternative; boundary=\"{$bAlt}\"\r\n\r\n"
+            . "--{$bAlt}\r\n" . $textPart
+            . "--{$bAlt}\r\n" . $htmlPart
+            . "--{$bAlt}--\r\n";
+    } elseif ($hasHtml) {
+        // alternative [text, html] — без вложений внешний контейнер сам alternative
+        $contentType = 'multipart/alternative; boundary="' . $bAlt . '"';
+        $close = ''; // закрывающая "--{$bAlt}--\r\n" уже в конце parts
+        $parts[] = "--{$bAlt}\r\n" . $textPart
+            . "--{$bAlt}\r\n" . $htmlPart
+            . "--{$bAlt}--\r\n";
+    } else {
+        // c99: mixed [text, attachments…] — без HTML
+        $contentType = 'multipart/mixed; boundary="' . $b . '"';
+        $close = "--{$b}--";
+        $parts[] = "--{$b}\r\n" . $textPart;
+    }
     foreach ($attachments as $att) {
         $data = chunk_split(base64_encode($att['bytes']), 76, "\r\n");
         $parts[] = "--{$b}\r\n"
@@ -1259,7 +1344,9 @@ function mail_mime_parts(array $extraHeaders, string $bodyText, array $attachmen
             . "Content-Transfer-Encoding: base64\r\n\r\n"
             . $data;
     }
-    $body = implode('', $parts) . "--{$b}--\r\n";
+    $body = implode('', $parts) . ($close !== '' ? $close . "\r\n" : '');
+    $headers[] = 'Content-Type: ' . $contentType;
+    $headers[] = 'Content-Transfer-Encoding: 8bit';
     return [$headers, $body];
 }
 
@@ -1341,17 +1428,23 @@ function mail_headers(string $fromEmail, ?string $replyTo): array
  *
  * c99: + $attachments (массив ['bytes'=>string,'name'=>string,
  * 'entry'=>манифест]) — тело собирается через mail_mime_parts
- * (multipart/mixed). ВАЖНО: письмо с вложением ~250КБ + base64 ≈ 335КБ
- * — одна fwrite на такой буфер допустима (PHP пишет в сокет блоками);
- * бюджет 15с остаётся барьером: локальная отдача на SMTP-релей — секунды.
+ * (multipart/mixed).
+ * c100: + $html — письмо с HTML-частью (multipart/alternative). ГЛАВНОЕ:
+ * тело DATA пишем ЧАНКАМИ с дотяжкой частичных fwrite. Раньше один
+ * fwrite на ~335КБ (PDF+base64): под SO_SNDTIMEO fwrite возвращал
+ * ЧАСТЬ (замер c99-критика: 114271 из 343040) → 'write_failed' →
+ * mail()-фолбэк со своими сюрпризами. Теперь: окно 32КБ × цикл до
+ * полного объёма, дедлайн письма проверяется перед каждым окном; бюджет
+ * письма для писем с вложениями поднят 15с → 25с (транзит 335КБ по TLS
+ * легитимно занимает секунды).
  */
-function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?string $replyTo, array $attachments = []): array
+function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?string $replyTo, array $attachments = [], ?string $html = null): array
 {
     $host = $cfg['host'];
     $port = (int)$cfg['port'];
     $errno = 0;
     $errstr = '';
-    $letterBudgetSec = 15.0; // c98-FIX1: общий бюджет письма, сек
+    $letterBudgetSec = ($attachments === []) ? 15.0 : 25.0; // c100: вложение ~335КБ — больше транзита
     $opTimeoutSec = 5.0;      // c98-FIX1: таймаут одной операции (было 15)
     $deadline = microtime(true) + $letterBudgetSec;
     $ctx = stream_context_create(['ssl' => [
@@ -1522,24 +1615,51 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
         // SMTP-путь: To/Subject в заголовках DATA (в отличие от mail(),
         // которая добавляет их сама из своих аргументов)
         // c99: тело+заголовки — через mail_mime_parts (multipart при вложениях)
+        // c100: + HTML-часть
         [$mimeHeaders, $mimeBody] = mail_mime_parts(
             mail_headers($cfg['from'], $replyTo),
             $bodyText,
-            $attachments
+            $attachments,
+            $html
         );
         $headers = array_merge(
             ['To: ' . $to, 'Subject: ' . $subjectEnc],
             $mimeHeaders
         );
-        /* Терминатор DATA — CRLF «.»: если тело уже заканчивается CRLF
+        /* Терминатор DATA — CRLF «.» CRLF: если тело уже заканчивается CRLF
          * (multipart закрывается «--b--\r\n»), НЕ добавляем второй — пустая
          * строка перед точкой стала бы лишней строкой письма. */
         $msg = implode("\r\n", $headers) . "\r\n\r\n" . $mimeBody;
         if (substr($mimeBody, -2) !== "\r\n") {
             $msg .= "\r\n";
         }
-        $msg .= '.';
-        [$code, $text] = $cmd($msg, '250');
+        $msg .= ".\r\n";
+        /* c100: тело DATA — ЧАНКАМИ по 32КБ с дотяжкой частичных fwrite.
+         * Одна fwrite на весь буфер под SO_SNDTIMEO возвращает ЧАСТЬ байт
+         * (замер: 114271 из 343040) — раньше это был 'write_failed' и
+         * mail()-фолбэк; теперь дотягиваем остаток, сверяя дедлайн письма
+         * перед каждым окном. Окно 32КБ > типичного TLS-кадра (16КБ),
+         * fwrite внутренними итерациями заполняет сокет сам. */
+        $writeAll = static function (string $data) use ($fp, $tuneTimeout, $deadline): bool {
+            $len = strlen($data);
+            $off = 0;
+            while ($off < $len) {
+                if (!$tuneTimeout() || microtime(true) >= $deadline) {
+                    return false;
+                }
+                $n = fwrite($fp, substr($data, $off, 32768));
+                if ($n === false || $n <= 0) {
+                    return false;
+                }
+                $off += $n;
+            }
+            return true;
+        };
+        if (!$writeAll($msg)) {
+            return ['ok' => false, 'error' => 'write_failed',
+                'detail' => 'fwrite: не удалось записать тело письма целиком (бюджет исчерпан или сокет закрыт)'];
+        }
+        [$code, $text] = $readCode();
         if ($code !== 250) {
             return ['ok' => false, 'error' => ($code === 0 ? 'smtp_timeout' : 'message_rejected'), 'detail' => $text];
         }
@@ -1561,6 +1681,12 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
  * menu_pdf_*(); оба транспорта получают одинаковое MIME-тело
  * (mail_mime_parts). Файл слишком большой/отсутствует — просто не
  * попадает в массив на уровне lead.php (там же журналируется пропуск).
+ * c100: + $html — HTML-версия письма (multipart/alternative; null/'' —
+ * только текст). В mail()-фолбэке тело переводится в LF и
+ * dot-стаффинг снимается: sendmail сам перекодирует LF→CRLF и сам
+ * стаффит точки при SMTP-транзите; с CRLF+престаффом некоторые MTA
+ * выдавали «\r\r\n» на границе MIME → вложение терялось (наблюдалось
+ * на проде c99: письмо клиенту приходило без PDF).
  * Возвращает ['ok'=>bool, 'transport'=>'smtp'|'mail'|'mail-fallback'|'none',
  * 'error'=>?string, 'detail'=>?string].
  * c98-FIX1 (критик2 E2): + 'smtpError' — исходный код ошибки SMTP
@@ -1568,7 +1694,7 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
  * (даже когда mail()-фолбэк спас письмо) — lead.php классифицирует канал
  * для решения о ретрае (dead/crit/retry).
  */
-function mail_send(string $to, string $subject, string $bodyText, ?string $replyTo = null, string $context = 'test', array $attachments = []): array
+function mail_send(string $to, string $subject, string $bodyText, ?string $replyTo = null, string $context = 'test', array $attachments = [], ?string $html = null): array
 {
     if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
         $r = ['ok' => false, 'transport' => 'none', 'error' => 'invalid_recipient', 'detail' => $to, 'smtpError' => null];
@@ -1583,7 +1709,7 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
     $smtp = smtp_config($settings);
 
     if ($smtp !== null) {
-        $r = smtp_send($smtp, $to, $subject, $bodyText, $replyTo, $attachments);
+        $r = smtp_send($smtp, $to, $subject, $bodyText, $replyTo, $attachments, $html);
         if ($r['ok'] === true) {
             mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
                 'transport' => 'smtp', 'ok' => true, 'error' => null, 'attach' => count($attachments)]);
@@ -1599,9 +1725,13 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
     /* mail()-путь: sendmail хостинга. c97 — с Date/Message-ID (без них
      * Gmail кладёт в спам или молча отбраковывает — главный подозреваемый
      * в «почта не работает» у владельца). c99 — с вложениями: mail()
-     * принимает СБОРКУ MIME-заголовков 4-м аргументом (строка с CRLF);
-     * тело — подготовленный mail_mime_parts (multipart при вложениях,
-     * плоский text/plain без). */
+     * принимает СБОРКУ MIME-заголовков 4-м аргументом; тело — подготовленный
+     * mail_mime_parts (multipart при вложениях, плоский text/plain без).
+     * c100 — LF-нормализация: PHP docs прямо предупреждают — «some Unix
+     * MTAs replace LF by CRLF incorrectly (doubled CR)»; удвоенный CR на
+     * MIME-границе ломает распознавание вложения. sendmail сам ставит CRLF
+     * при SMTP-транзите, и сам делает dot-stuffing — престафф и CRLF из
+     * тела снимаем. SMTP-путь остаётся байт-точным CRLF (RFC 5321). */
     if (!function_exists('mail')) {
         mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
             'transport' => 'none', 'ok' => false, 'error' => 'mail_disabled', 'detail' => 'mail() отключена на хостинге, SMTP не настроен', 'attach' => count($attachments)]);
@@ -1618,9 +1748,19 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
     [$mimeHeaders, $mimeBody] = mail_mime_parts(
         mail_headers($from, $replyTo),
         $bodyText,
-        $attachments
+        $attachments,
+        $html
     );
-    $ok = @mail($to, mail_subject_enc($subject), $mimeBody, implode("\r\n", $mimeHeaders));
+    /* LF-вариант для mail(): заголовки «\n», тело CRLF→LF + снятие
+     * dot-stuffing (сделает MTA). ТЕМА: PHP mail() переписывает переводы
+     * строк в пробел — CRLF-фолдинг дал бы ДВОЙНОЙ пробел между
+     * encoded-words (RFC 2047 сворачивает только один LWSP): «Форм  ат».
+     * Поэтому между encoded-words — один пробел: и RFC-совместимо, и
+     * PHP ничего не портит. */
+    $lfBody = preg_replace('/^\.\./m', '.', str_replace("\r\n", "\n", $mimeBody));
+    $lfHeaders = implode("\n", $mimeHeaders);
+    $lfSubject = str_replace("\r\n ", " ", mail_subject_enc($subject));
+    $ok = @mail($to, $lfSubject, $lfBody, $lfHeaders);
 
     $transport = ($smtp !== null) ? 'mail-fallback' : 'mail';
     mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),

@@ -1253,6 +1253,9 @@ const LeadForm = memo(function LeadForm({
              текстового письма, чтобы сервер собрал то же сообщение). */
           payload: {
             typeId,
+            /* c100: русский ярлык типа — письма/уведомления показывают
+             * «Формат: Фуршет · Премиум», а не только имя пакета. */
+            typeLabel: undecided ? null : menuType.label,
             guests,
             dateIso,
             pkgIdx,

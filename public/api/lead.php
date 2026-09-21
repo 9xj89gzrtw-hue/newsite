@@ -35,6 +35,11 @@ declare(strict_types=1);
 define('NILOV_API', true);
 require __DIR__ . '/_lib.php';
 
+/* c100: NILOV_LEAD_TESTS — CLI-юнит-тесты подключают файл ради ФУНКЦИЙ
+ * (lead_format_label/lead_*_mail_*): константа отключает обработку
+ * HTTP-запроса (в проде/на php -S не определена — работает как раньше). */
+if (!defined('NILOV_LEAD_TESTS')) {
+
 header('X-Robots-Tag: noindex, nofollow'); // для ЛЮБОГО запроса к этому файлу
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -251,6 +256,8 @@ if (!$stored && $notify !== true) {
 
 json_response(200, ['ok' => true, 'id' => $lead['id']]);
 
+} // c100: конец HTTP-обработчика (NILOV_LEAD_TESTS подключает только функции)
+
 /* ============================ функции ================================ */
 
 /** Ответ JSON без exit (нужно для fastcgi_finish_request: ответ уже
@@ -294,6 +301,39 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
         'mail' => false, 'mailAttempted' => false, 'mailErr' => null,
         'client' => null, 'clientErr' => null, 'clientPdf' => null, 'mailTransport' => null];
 
+    /* c100: PDF-меню подбираем ОДИН раз до всех каналов: ярлык меню виден
+     * в TG и письме владельца («клиенту ушло меню …»), публичная ссылка —
+     * фолбэком в письме клиента, байты — вложением. $pdfLabel ≠ null
+     * ТОЛЬКО когда вложение реально поедет (bytes прочитаны) — иначе
+     * баннер «меню во вложении» был бы ложью. */
+    $p = is_array($lead['payload']) ? $lead['payload'] : [];
+    $pdfEntry = menu_pdf_for_payload($p);
+    $pdfBytes = null;
+    $pdfLabel = null;
+    $pdfUrl = null;
+    $attachSkipped = null;
+    if ($pdfEntry !== null) {
+        $bytes = menu_pdf_bytes($pdfEntry);
+        if ($bytes !== null) {
+            $pdfBytes = $bytes;
+            $pdfLabel = (string)($pdfEntry['label'] ?? 'PDF-меню');
+        } else {
+            $attachSkipped = 'pdf_file_missing_or_too_large';
+        }
+        $file = (string)($pdfEntry['file'] ?? '');
+        if ($file !== '') {
+            // публичная ссылка на тот же файл (деплоится со статикой)
+            $pdfUrl = 'https://' . MAIL_DOMAIN . '/menu-pdf/' . rawurlencode($file);
+        }
+    } else {
+        $attachSkipped = 'no_manifest';
+    }
+    /* TG/владелец: что КЛИЕНТ получит (email может не быть указан). */
+    $clientPlan = !is_string($lead['email']) || $lead['email'] === ''
+        ? 'Клиент не оставил email — подтверждение не отправлялось'
+        : ($pdfLabel !== null ? 'Клиенту ушло письмо с меню «' . $pdfLabel . '»'
+            : 'Клиенту ушло письмо-подтверждение (без PDF-меню)');
+
     $chatId = $settings['tgChatId'] ?? null;
     $token = $settings['tgBotToken'] ?? null;
     if (!in_array('tg', $skip, true)
@@ -304,7 +344,7 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
          * владельца → api.telegram.org); api.telegram.org с РФ-хостингов
          * деградирует с 03.2026. maxBases=2 — бюджет таймаутов (лид
          * не должен висеть на мёртвых базах), почта всегда догонит. */
-        $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId, lead_tg_text($lead), 2);
+        $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId, lead_tg_text($lead, $clientPlan), 2);
         $status['tg'] = ($tg['ok'] === true);
         if (!$status['tg']) {
             $status['tgErr'] = tg_error_class($tg);
@@ -317,13 +357,19 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
         /* c97: единый канал mail_send — SMTP (если настроен) → mail() с
          * обязательными Date/Message-ID (без них Gmail отбраковывал
          * письма — вероятная причина «почта не работает»). Клиент в
-         * Reply-To: владелец отвечает посетителю прямо из письма. */
+         * Reply-To: владелец отвечает посетителю прямо из письма.
+         * c100: тема — с форматом («Новая заявка — Мария · Фуршет ·
+         * Премиум»), тело — секциями, + HTML-версия. */
+        $fmt = lead_format_label($p);
+        $subject = 'Новая заявка — ' . $lead['name'] . ($fmt !== null ? ' · ' . $fmt : '');
         $mail = mail_send(
             $notifyEmail,
-            'Новая заявка с сайта — ' . $lead['name'],
-            lead_mail_text($lead),
+            $subject,
+            lead_mail_text($lead, $clientPlan),
             is_string($lead['email']) && $lead['email'] !== '' ? $lead['email'] : null,
-            'lead-owner'
+            'lead-owner',
+            [],
+            lead_owner_mail_html($lead, $clientPlan)
         );
         $status['mail'] = ($mail['ok'] === true);
         $status['mailTransport'] = is_string($mail['transport'] ?? null) ? $mail['transport'] : null;
@@ -338,58 +384,50 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
      * c99: + PDF-меню ЕГО тарифа во вложении (меню = «витрина»
      * конверсии: клиент держит меню перед звонком менеджера).
      * Подбор: typeId+pkgIdx из калькулятора → тип без пакета → полный
-     * каталог. Файл отсутствует/большой 2МБ — письмо уходит БЕЗ вложения
-     * (доставка текста важнее вложения), пропуск журналируется
-     * ('attachSkipped') и виден в mail-log админки. */
+     * каталог. Файл отсутствует/большой 2МБ — письмо уходит БЕЗ вложения,
+     * но с публичной ССЫЛКОЙ на меню (c100) — доставка текста важнее
+     * вложения; пропуск журналируется ('attachSkipped') и виден в
+     * mail-log админки. */
     if (!in_array('client', $skip, true)
         && is_string($lead['email']) && $lead['email'] !== '' && $inBudget()) {
         $attachments = [];
-        $attachLabel = null;
-        $attachSkipped = null;
-        $p = is_array($lead['payload']) ? $lead['payload'] : [];
-        $pdfEntry = menu_pdf_for_payload($p);
-        if ($pdfEntry !== null) {
-            $bytes = menu_pdf_bytes($pdfEntry);
-            if ($bytes !== null) {
-                $attachments[] = [
-                    'bytes' => $bytes,
-                    'name' => (string)($pdfEntry['fileName'] ?? 'menu.pdf'),
-                    'entry' => $pdfEntry,
-                ];
-                $attachLabel = (string)($pdfEntry['label'] ?? 'PDF-меню');
-            } else {
-                $attachSkipped = 'pdf_file_missing_or_too_large';
-            }
-        } else {
-            $attachSkipped = 'no_manifest';
+        if ($pdfBytes !== null) {
+            $attachments[] = [
+                'bytes' => $pdfBytes,
+                'name' => (string)($pdfEntry['fileName'] ?? 'menu.pdf'),
+                'entry' => $pdfEntry,
+            ];
         }
         $client = mail_send(
             $lead['email'],
             'Ваша заявка в NILOV CATERING принята',
-            lead_client_mail_text($lead, $attachLabel),
+            lead_client_mail_text($lead, $pdfLabel, $pdfUrl),
             $notifyEmail !== '' ? $notifyEmail : null,
             'lead-client',
-            $attachments
+            $attachments,
+            lead_client_mail_html($lead, $pdfLabel, $pdfUrl)
         );
         if ($attachSkipped !== null) {
             /* Пропуск вложения — НЕ ошибка доставки, но владелец должен
              * видеть это в журнале (иначе «почему без меню?» — загадка).
              * c99-fix (критик E1-m1): ok — фактический итог письма (а не
              * безусловный true): при сбое доставки строка журнала не
-             * должна выглядеть зелёной поверх реальной ошибки. */
+             * должна выглядеть зелёной поверх реальной ошибки.
+             * c100: detail + публичная ссылка на PDF (клиент получил её
+             * в письме). */
             mail_log_append(['to' => $lead['email'], 'context' => 'lead-client',
                 'subject' => 'Ваша заявка в NILOV CATERING принята',
                 'transport' => (string)($client['transport'] ?? 'none'),
                 'ok' => ($client['ok'] === true), 'attach' => 0,
                 'error' => $client['ok'] === true ? null : mail_error_class($client),
-                'detail' => 'attachSkipped: ' . $attachSkipped]);
+                'detail' => 'attachSkipped: ' . $attachSkipped . ($pdfUrl !== null ? '; ссылка в письме: ' . $pdfUrl : '')]);
         }
         $status['client'] = ($client['ok'] === true);
         /* c99-fix (критик E1-m1): бейдж «PDF: …» — только у ДОСТАВЛЕННОГО
          * письма (иначе красный сбой рядом с бейджем «PDF: Фуршет» читается
          * как «клиент получил меню», хотя письма нет). Причина видна в
          * журнале почты (attach/detail). */
-        $status['clientPdf'] = ($client['ok'] === true) ? $attachLabel : null;
+        $status['clientPdf'] = ($client['ok'] === true) ? $pdfLabel : null;
         if ($status['client'] !== true) {
             $status['clientErr'] = mail_error_class($client);
         }
@@ -695,144 +733,393 @@ function find_lead_by_client_id(string $clientId): ?array
     return null;
 }
 
-/** HTML-сообщение для Telegram (parse_mode=HTML, всё экранировано). */
-function lead_tg_text(array $lead): string
+/* ============ c100: красивые уведомления (TG + письма) ==================
+ * Проблема c99 на проде: «Формат: Премиум» — письмо показывало только имя
+ * пакета, ТИП мероприятия (Фуршет/Банкет/…) терялся (typeId — англ. id).
+ * Теперь: один источник правды lead_format_label() → «Фуршет · Премиум»;
+ * структура «секции» (Клиент / Мероприятие / Расчёт) — и в тексте, и в
+ * HTML (multipart/alternative), и в Telegram. */
+
+/**
+ * c100 — «Фуршет · Премиум» одним ярлыком. Приоритет источников ярлыка
+ * типа: payload.typeLabel (новый бандл) → payload.eventLabel (контактная
+ * форма) → map по payload.typeId / payload.eventType (menu_type_label —
+ * старый кэш-бандл без ярлыков). Пакет: payload.pkgName; если имя пакета
+ * уже СОДЕРЖИТ ярлык типа (snack-box: «Доставка закусок (канапе,…)»),
+ * не дублируем. undecided → «подберём вместе».
+ */
+function lead_format_label(array $p): ?string
 {
-    $e = 'tg_html_escape';
-    $lines = ['<b>Новая заявка</b>'];
-    $lines[] = 'Имя: ' . $e($lead['name']);
-    $lines[] = 'Телефон: ' . $e($lead['phone']); // tel-ссылку не делаем — просто текст
-    if (!empty($lead['email'])) {
-        $lines[] = 'Email: ' . $e($lead['email']);
+    if (($p['undecided'] ?? null) === true) {
+        return 'Ещё не выбран — подберём вместе';
     }
-    $p = is_array($lead['payload']) ? $lead['payload'] : [];
-    if (!empty($p['pkgName']) && is_string($p['pkgName'])) {
-        $lines[] = 'Формат: ' . $e($p['pkgName']);
+    $typeLabel = null;
+    foreach (['typeLabel', 'eventLabel'] as $k) {
+        if (isset($p[$k]) && is_string($p[$k]) && trim($p[$k]) !== '') {
+            $typeLabel = trim($p[$k]);
+            break;
+        }
     }
-    if (!empty($p['typeId']) && is_string($p['typeId'])) {
-        $lines[] = 'Тип: ' . $e($p['typeId']);
+    $tid = '';
+    foreach (['typeId', 'eventType'] as $k) {
+        if (isset($p[$k]) && is_string($p[$k]) && $p[$k] !== '') {
+            $tid = $p[$k];
+            break;
+        }
     }
-    if (isset($p['guests']) && is_numeric($p['guests'])) {
-        $lines[] = 'Гостей: ' . $e((string)$p['guests']);
+    if ($typeLabel === null && $tid !== '') {
+        $typeLabel = menu_type_label($tid);
     }
-    if (!empty($p['dateIso']) && is_string($p['dateIso'])) {
-        $lines[] = 'Дата: ' . $e($p['dateIso']);
+    $pkg = (isset($p['pkgName']) && is_string($p['pkgName'])) ? trim($p['pkgName']) : '';
+    if ($typeLabel !== null && $pkg !== '') {
+        // pkg уже содержит ярлык типа (snack-box: «Доставка закусок (канапе,…)»)
+        // → вернуть pkg целиком (он богаче), иначе склеить «Фуршет · Премиум»
+        return stripos($pkg, $typeLabel) === false ? $typeLabel . ' · ' . $pkg : $pkg;
+    }
+    if ($typeLabel !== null) {
+        return $typeLabel;
+    }
+    return $pkg !== '' ? $pkg : null;
+}
+
+/** c100 — дата заявки по-человечески: «25.09.2026 (пт)»; мусор → как есть. */
+function lead_date_human(?string $iso): ?string
+{
+    if ($iso === null || $iso === '' || strlen($iso) < 10) {
+        return ($iso !== null && $iso !== '') ? $iso : null;
+    }
+    $t = strtotime(substr($iso, 0, 10));
+    if ($t === false) {
+        return $iso;
+    }
+    $wd = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'][(int)date('w', $t)];
+    return date('d.m.Y', $t) . ' (' . $wd . ')';
+}
+
+/** c100 — деньги: «123 456 ₽». */
+function lead_money($n): string
+{
+    return number_format((float)$n, 0, ',', ' ') . ' ₽';
+}
+
+/**
+ * c100 — строки деталей заявки [label => value] в порядке важности для
+ * менеджера; null-значения выкидываются. Один источник для текста и HTML
+ * писем: формат/гости/дата/время/расчёт/допуслуги/комментарий.
+ */
+function lead_detail_rows(array $lead): array
+{
+    $p = is_array($lead['payload'] ?? null) ? $lead['payload'] : [];
+    $rows = [];
+    $fmt = lead_format_label($p);
+    if ($fmt !== null) {
+        $rows['Формат'] = $fmt;
+    }
+    if (isset($p['guests']) && is_numeric($p['guests']) && (int)$p['guests'] > 0) {
+        $rows['Гостей'] = (string)(int)$p['guests'];
+    }
+    $date = isset($p['dateIso']) && is_string($p['dateIso'])
+        ? lead_date_human($p['dateIso'])
+        : (isset($p['date']) && is_string($p['date']) ? lead_date_human($p['date']) : null);
+    if ($date !== null) {
+        $rows['Дата'] = $date;
     }
     if (!empty($p['preferredTime']) && is_string($p['preferredTime'])) {
-        $lines[] = 'Время: ' . $e($p['preferredTime']);
+        $rows['Время звонка'] = $p['preferredTime'];
     }
-    if (isset($p['total']) && is_numeric($p['total'])) {
-        $lines[] = 'Расчёт: ' . $e(number_format((float)$p['total'], 0, ',', ' ')) . ' ₽';
+    $total = null;
+    foreach (['total', 'calcTotal'] as $k) {
+        if (isset($p[$k]) && is_numeric($p[$k])) {
+            $total = (float)$p[$k];
+            break;
+        }
+    }
+    if ($total !== null && $total > 0) {
+        $rows['Расчёт (предварительно)'] = lead_money($total);
+    }
+    /* Допуслуги: калькулятор шлёт addons[] («Аренда мебели (+20% ≈ 88 000 ₽)»),
+     * контактная форма — calcAddons[] (голые названия). */
+    $addons = [];
+    foreach (['addons', 'calcAddons'] as $k) {
+        if (isset($p[$k]) && is_array($p[$k])) {
+            foreach ($p[$k] as $a) {
+                if (is_string($a) && trim($a) !== '') {
+                    $addons[] = trim($a);
+                }
+            }
+        }
+        if ($addons !== []) {
+            break;
+        }
+    }
+    if ($addons !== []) {
+        $rows['Допуслуги'] = implode("\n— ", $addons);
     }
     if (!empty($lead['comment'])) {
-        $lines[] = 'Комментарий: ' . $e(str_trunc($lead['comment'], 500));
+        $rows['Комментарий'] = str_trunc($lead['comment'], 1000);
     }
+    return $rows;
+}
+
+/** c100 — источник лида по-русски. */
+function lead_source_label(string $source): string
+{
     $labels = [
         'calculator' => 'Калькулятор',
         'contact' => 'Страница контактов',
         'footer' => 'Быстрая заявка (подвал)',
     ];
-    $lines[] = 'Источник: ' . $e($labels[$lead['source']] ?? $lead['source']);
+    return $labels[$source] ?? $source;
+}
+
+/** HTML-сообщение для Telegram (parse_mode=HTML, всё экранировано). */
+function lead_tg_text(array $lead, ?string $clientPlan = null): string
+{
+    $e = 'tg_html_escape';
+    $p = is_array($lead['payload']) ? $lead['payload'] : [];
+    $L = '┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄';
+    $lines = ['<b>НОВАЯ ЗАЯВКА · NILOV CATERING</b>', $L];
+    $lines[] = '👤 <b>Имя:</b> ' . $e($lead['name']);
+    $lines[] = '📞 <b>Телефон:</b> ' . $e($lead['phone']);
+    if (!empty($lead['email'])) {
+        $lines[] = '✉️ <b>Email:</b> ' . $e($lead['email']);
+    }
+    $lines[] = $L;
+    $fmt = lead_format_label($p);
+    if ($fmt !== null) {
+        $lines[] = '🍽 <b>Формат:</b> ' . $e($fmt);
+    }
+    if (isset($p['guests']) && is_numeric($p['guests']) && (int)$p['guests'] > 0) {
+        $lines[] = '👥 <b>Гостей:</b> ' . $e((string)(int)$p['guests']);
+    }
+    $date = isset($p['dateIso']) && is_string($p['dateIso'])
+        ? lead_date_human($p['dateIso'])
+        : (isset($p['date']) && is_string($p['date']) ? lead_date_human($p['date']) : null);
+    if ($date !== null) {
+        $lines[] = '📅 <b>Дата:</b> ' . $e($date);
+    }
+    if (!empty($p['preferredTime']) && is_string($p['preferredTime'])) {
+        $lines[] = '🕐 <b>Время звонка:</b> ' . $e($p['preferredTime']);
+    }
+    foreach (['total', 'calcTotal'] as $k) {
+        if (isset($p[$k]) && is_numeric($p[$k]) && (float)$p[$k] > 0) {
+            $lines[] = '💰 <b>Расчёт:</b> ' . $e(lead_money((float)$p[$k]));
+            break;
+        }
+    }
+    $addons = [];
+    foreach (['addons', 'calcAddons'] as $k) {
+        if (isset($p[$k]) && is_array($p[$k])) {
+            foreach ($p[$k] as $a) {
+                if (is_string($a) && trim($a) !== '') {
+                    $addons[] = trim($a);
+                }
+            }
+        }
+        if ($addons !== []) {
+            break;
+        }
+    }
+    if ($addons !== []) {
+        $lines[] = '🧾 <b>Допуслуги:</b> ' . $e(implode('; ', $addons));
+    }
+    if (!empty($lead['comment'])) {
+        $lines[] = '💬 <b>Комментарий:</b> ' . $e(str_trunc($lead['comment'], 500));
+    }
+    $lines[] = $L;
+    if ($clientPlan !== null) {
+        $lines[] = '📎 ' . $e($clientPlan);
+    }
+    $lines[] = '🌐 Источник: ' . $e(lead_source_label($lead['source']));
+    $lines[] = '🆔 ' . $e($lead['id']) . ' · ' . $e(date('d.m.Y H:i', (int)$lead['ts']));
     return implode("\n", $lines);
 }
 
-/** Текст письма (plain text, UTF-8). */
-function lead_mail_text(array $lead): string
+/** Текст письма владельцу (plain-text часть; HTML — lead_owner_mail_html). */
+function lead_mail_text(array $lead, ?string $clientPlan = null): string
 {
-    $p = is_array($lead['payload']) ? $lead['payload'] : [];
-    $lines = [
-        'Новая заявка с сайта nilovcatering.ru',
-        '',
-        'Имя: ' . $lead['name'],
-        'Телефон: ' . $lead['phone'],
-    ];
+    $rows = lead_detail_rows($lead);
+    $rule = '─────────────────────────';
+    $L = [];
+    $L[] = 'НОВАЯ ЗАЯВКА — NILOV CATERING';
+    $L[] = '№ ' . $lead['id'] . ' · ' . date('d.m.Y H:i', (int)$lead['ts']);
+    $L[] = '';
+    $L[] = 'КЛИЕНТ';
+    $L[] = $rule;
+    $L[] = 'Имя: ' . $lead['name'];
+    $L[] = 'Телефон: ' . $lead['phone'];
     if (!empty($lead['email'])) {
-        $lines[] = 'Email: ' . $lead['email'];
+        $L[] = 'Email: ' . $lead['email'];
     }
-    if (!empty($p['pkgName']) && is_string($p['pkgName'])) {
-        $lines[] = 'Формат: ' . $p['pkgName'];
+    $L[] = '';
+    $L[] = 'МЕРОПРИЯТИЕ';
+    $L[] = $rule;
+    foreach ($rows as $k => $v) {
+        if ($k === 'Комментарий') {
+            continue;
+        }
+        $L[] = $k . ': ' . $v;
     }
-    if (isset($p['guests']) && is_numeric($p['guests'])) {
-        $lines[] = 'Гостей: ' . (string)$p['guests'];
+    if (isset($rows['Комментарий'])) {
+        $L[] = '';
+        $L[] = 'КОММЕНТАРИЙ КЛИЕНТА';
+        $L[] = $rule;
+        $L[] = $rows['Комментарий'];
     }
-    if (!empty($p['dateIso']) && is_string($p['dateIso'])) {
-        $lines[] = 'Дата: ' . $p['dateIso'];
+    $L[] = '';
+    $L[] = 'СЛУЖЕБНОЕ';
+    $L[] = $rule;
+    $L[] = 'Источник: ' . lead_source_label($lead['source']);
+    if ($clientPlan !== null) {
+        $L[] = $clientPlan;
     }
-    if (!empty($p['preferredTime']) && is_string($p['preferredTime'])) {
-        $lines[] = 'Время: ' . $p['preferredTime'];
+    $L[] = 'Ответьте на это письмо — ответ уйдёт клиенту напрямую.';
+    return implode("\r\n", $L);
+}
+
+/** c100 — HTML-часть письма владельцу (в каркасе mail_html_wrap). */
+function lead_owner_mail_html(array $lead, ?string $clientPlan = null): string
+{
+    $h = static function ($s): string {
+        return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+    };
+    $rows = lead_detail_rows($lead);
+    $tr = '';
+    foreach ($rows as $k => $v) {
+        if ($k === 'Комментарий') {
+            continue;
+        }
+        $tr .= '<tr>'
+            . '<td style="padding:7px 0;font:13px/1.4 Arial,sans-serif;color:#8a8175;white-space:nowrap;vertical-align:top;width:170px;">' . $h($k) . '</td>'
+            . '<td style="padding:7px 0;font:15px/1.5 Arial,sans-serif;color:#23201b;font-weight:bold;vertical-align:top;">' . nl2br($h($v)) . '</td>'
+            . '</tr>';
     }
-    if (isset($p['total']) && is_numeric($p['total'])) {
-        $lines[] = 'Расчёт: ' . number_format((float)$p['total'], 0, ',', ' ') . ' ₽';
-    }
-    if (!empty($lead['comment'])) {
-        $lines[] = 'Комментарий: ' . str_trunc($lead['comment'], 1000);
-    }
-    $labels = [
-        'calculator' => 'Калькулятор',
-        'contact' => 'Страница контактов',
-        'footer' => 'Быстрая заявка (подвал)',
-    ];
-    $lines[] = 'Источник: ' . ($labels[$lead['source']] ?? $lead['source']);
-    $lines[] = '';
-    $lines[] = 'Дата заявки: ' . date('d.m.Y H:i:s', (int)$lead['ts']);
-    $lines[] = 'ID: ' . $lead['id'];
-    return implode("\r\n", $lines);
+    $commentBlock = isset($rows['Комментарий'])
+        ? '<div style="margin:18px 0 0;padding:14px 18px;background:#faf6ee;border-left:4px solid #d4a373;border-radius:0 8px 8px 0;">'
+            . '<div style="font:12px/1.3 Arial,sans-serif;color:#8a8175;letter-spacing:1px;margin-bottom:6px;">КОММЕНТАРИЙ КЛИЕНТА</div>'
+            . '<div style="font:15px/1.6 Arial,sans-serif;color:#3d3831;">' . nl2br($h($rows['Комментарий'])) . '</div></div>'
+        : '';
+    $phoneDigits = preg_replace('/[^0-9+]/', '', $lead['phone']);
+    $inner = '<p style="margin:0 0 6px;font:13px/1.4 Arial,sans-serif;color:#8a8175;">№ ' . $h($lead['id']) . ' · ' . $h(date('d.m.Y H:i', (int)$lead['ts'])) . '</p>'
+        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;">'
+        . '<tr><td colspan="2" style="padding:14px 0 2px;font:bold 12px/1.3 Arial,sans-serif;color:#d4a373;letter-spacing:2px;">КЛИЕНТ</td></tr>'
+        . '<tr><td style="padding:7px 0;font:13px/1.4 Arial,sans-serif;color:#8a8175;width:170px;vertical-align:top;">Имя</td>'
+        . '<td style="padding:7px 0;font:15px/1.5 Arial,sans-serif;color:#23201b;font-weight:bold;">' . $h($lead['name']) . '</td></tr>'
+        . '<tr><td style="padding:7px 0;font:13px/1.4 Arial,sans-serif;color:#8a8175;vertical-align:top;">Телефон</td>'
+        . '<td style="padding:7px 0;font:15px/1.5 Arial,sans-serif;"><a href="tel:' . $h($phoneDigits) . '" style="color:#23201b;font-weight:bold;text-decoration:none;">' . $h($lead['phone']) . '</a></td></tr>'
+        . (!empty($lead['email'])
+            ? '<tr><td style="padding:7px 0;font:13px/1.4 Arial,sans-serif;color:#8a8175;vertical-align:top;">Email</td>'
+                . '<td style="padding:7px 0;font:15px/1.5 Arial,sans-serif;"><a href="mailto:' . $h($lead['email']) . '" style="color:#a97f3f;text-decoration:none;">' . $h($lead['email']) . '</a></td></tr>'
+            : '')
+        . '<tr><td colspan="2" style="padding:16px 0 2px;font:bold 12px/1.3 Arial,sans-serif;color:#d4a373;letter-spacing:2px;">МЕРОПРИЯТИЕ</td></tr>'
+        . $tr
+        . '</table>'
+        . $commentBlock
+        . '<div style="margin:20px 0 0;padding:12px 16px;background:#f4efe7;border-radius:8px;font:13px/1.5 Arial,sans-serif;color:#3d3831;">'
+        . ($clientPlan !== null ? $h($clientPlan) . '<br>' : '')
+        . 'Источник: ' . $h(lead_source_label($lead['source']))
+        . '</div>'
+        . '<p style="margin:16px 0 0;font:13px/1.5 Arial,sans-serif;color:#8a8175;">Ответьте на это письмо — ответ уйдёт клиенту напрямую (Reply-To).</p>';
+    return mail_html_wrap('Новая заявка — ' . $lead['name'], $inner,
+        'Письмо отправлено роботом сайта сразу после отправки формы.');
 }
 
 /**
  * c97 — подтверждение КЛИЕНТУ (уходит на email посетителя, если указан).
- * Копия расчёта + контакты; ответ на письмо уходит владельцу (Reply-To).
- * c99: $pdfLabel — имя прикреплённого PDF-меню (null = без вложения):
- * строка «во вложении — меню…» стоит ДО контактов, чтобы клиент заметил.
+ * c99: $pdfLabel — имя прикреплённого PDF-меню (null = без вложения).
+ * c100: полная переделка: секции «Что дальше» / копия заявки / контакты;
+ * $pdfUrl — публичная ссылка на тот же PDF (фолбэк, если вложение не
+ * отобразилось или письмо ушло без вложения).
  */
-function lead_client_mail_text(array $lead, ?string $pdfLabel = null): string
+function lead_client_mail_text(array $lead, ?string $pdfLabel = null, ?string $pdfUrl = null): string
 {
-    $p = is_array($lead['payload']) ? $lead['payload'] : [];
-    $lines = [
+    $rows = lead_detail_rows($lead);
+    $L = [
         'Здравствуйте, ' . $lead['name'] . '!',
         '',
-        'Ваша заявка на сайте nilovcatering.ru получена — спасибо!',
-        'Мы свяжемся с вами по телефону ' . $lead['phone'] . ' в ближайшее время.',
+        'Ваша заявка в NILOV CATERING принята — спасибо, что выбрали нас!',
         '',
+        'ЧТО ДАЛЬШЕ',
+        '─────────────────────────',
+        '1. Менеджер перезвонит вам на ' . $lead['phone'],
+        '   в течение 15 минут в рабочее время (09:00–21:00).',
     ];
     if ($pdfLabel !== null) {
-        $lines[] = 'ВО ВЛОЖЕНИИ — МЕНЮ ВАШЕГО ФОРМАТА: ' . $pdfLabel . '.';
-        $lines[] = 'Состав и цены — как на сайте; менеджер согласует детали при звонке.';
-        $lines[] = '';
+        $L[] = '2. Меню вашего формата — во вложении этого письма:';
+        $L[] = '   «' . $pdfLabel . '» (состав и цены — как на сайте).';
+    } elseif ($pdfUrl !== null) {
+        $L[] = '2. Меню вашего формата можно открыть здесь:';
+        $L[] = '   ' . $pdfUrl;
+    } else {
+        $L[] = '2. Все меню и цены — на сайте: https://nilovcatering.ru';
     }
-    $details = [];
-    if (!empty($p['pkgName']) && is_string($p['pkgName'])) {
-        $details[] = 'Формат: ' . $p['pkgName'];
-    }
-    if (isset($p['guests']) && is_numeric($p['guests'])) {
-        $details[] = 'Гостей: ' . (string)$p['guests'];
-    }
-    if (!empty($p['dateIso']) && is_string($p['dateIso'])) {
-        $details[] = 'Дата: ' . $p['dateIso'];
-    }
-    if (!empty($p['preferredTime']) && is_string($p['preferredTime'])) {
-        $details[] = 'Время: ' . $p['preferredTime'];
-    }
-    if (isset($p['total']) && is_numeric($p['total'])) {
-        $details[] = 'Предварительный расчёт: ' . number_format((float)$p['total'], 0, ',', ' ') . ' ₽';
-    }
-    if (!empty($lead['comment'])) {
-        $details[] = 'Ваш комментарий: ' . str_trunc($lead['comment'], 500);
-    }
-    if ($details !== []) {
-        $lines[] = 'КОПИЯ ВАШЕЙ ЗАЯВКИ';
-        foreach ($details as $d) {
-            $lines[] = '— ' . $d;
+    $L[] = '3. Есть вопрос? Просто ответьте на это письмо —';
+    $L[] = '   оно придёт нам напрямую.';
+    if ($rows !== []) {
+        $L[] = '';
+        $L[] = 'ВАША ЗАЯВКА (копия)';
+        $L[] = '─────────────────────────';
+        foreach ($rows as $k => $v) {
+            $L[] = '— ' . $k . ': ' . $v;
         }
-        $lines[] = '';
     }
-    $lines[] = 'Есть вопросы? Просто ответьте на это письмо — оно придёт нам напрямую.';
-    $lines[] = '';
-    $lines[] = 'Телефон / WhatsApp: +7 (911) 941-72-05';
-    $lines[] = 'Telegram: https://t.me/nilov_catering';
-    $lines[] = 'Сайт: https://nilovcatering.ru';
-    $lines[] = '';
-    $lines[] = 'Хорошего дня!';
-    $lines[] = 'Команда NILOV CATERING — кейтеринг, в котором чувствуют';
-    return implode("\r\n", $lines);
+    $L[] = '';
+    $L[] = 'НАШИ КОНТАКТЫ';
+    $L[] = '─────────────────────────';
+    $L[] = 'Телефон / WhatsApp: +7 (911) 941-72-05';
+    $L[] = 'Telegram: https://t.me/nilov_catering';
+    $L[] = 'Сайт: https://nilovcatering.ru';
+    $L[] = '';
+    $L[] = 'Хорошего дня!';
+    $L[] = 'NILOV CATERING — кейтеринг, в котором чувствуют';
+    return implode("\r\n", $L);
 }
+
+/** c100 — HTML-часть письма клиенту: что дальше + копия заявки + контакты. */
+function lead_client_mail_html(array $lead, ?string $pdfLabel = null, ?string $pdfUrl = null): string
+{
+    $h = static function ($s): string {
+        return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+    };
+    $rows = lead_detail_rows($lead);
+    /* Баннер меню: вложение есть — «смотрите во вложении»; нет — кнопка
+     * «Открыть меню» на публичную ссылку того же PDF. */
+    if ($pdfLabel !== null) {
+        $menuBanner = '<div style="margin:18px 0;padding:16px 18px;background:#faf6ee;border:1px solid #e5d9c3;border-radius:10px;">'
+            . '<div style="font:bold 15px/1.4 Arial,sans-serif;color:#23201b;">📎 Меню вашего формата — во вложении этого письма</div>'
+            . '<div style="margin-top:6px;font:14px/1.5 Arial,sans-serif;color:#3d3831;">«' . $h($pdfLabel) . '» — состав и цены как на сайте; менеджер согласует детали при звонке.</div>'
+            . '</div>';
+    } elseif ($pdfUrl !== null) {
+        $menuBanner = '<div style="margin:18px 0;padding:16px 18px;background:#faf6ee;border:1px solid #e5d9c3;border-radius:10px;text-align:center;">'
+            . '<div style="font:bold 15px/1.4 Arial,sans-serif;color:#23201b;margin-bottom:10px;">Меню вашего формата</div>'
+            . '<a href="' . $h($pdfUrl) . '" style="display:inline-block;padding:11px 26px;background:#d4a373;color:#23201b;font:bold 14px/1 Arial,sans-serif;border-radius:8px;text-decoration:none;">Открыть меню (PDF)</a>'
+            . '</div>';
+    } else {
+        $menuBanner = '';
+    }
+    $rowsHtml = '';
+    foreach ($rows as $k => $v) {
+        $rowsHtml .= '<tr>'
+            . '<td style="padding:8px 0;font:13px/1.4 Arial,sans-serif;color:#8a8175;white-space:nowrap;vertical-align:top;width:180px;">' . $h($k) . '</td>'
+            . '<td style="padding:8px 0;font:15px/1.5 Arial,sans-serif;color:#23201b;font-weight:bold;vertical-align:top;">' . nl2br($h($v)) . '</td>'
+            . '</tr>';
+    }
+    $copyBlock = $rowsHtml !== ''
+        ? '<div style="margin:20px 0 0;font:bold 12px/1.3 Arial,sans-serif;color:#d4a373;letter-spacing:2px;">ВАША ЗАЯВКА (КОПИЯ)</div>'
+            . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;">' . $rowsHtml . '</table>'
+        : '';
+    $inner = '<p style="margin:0 0 14px;">Здравствуйте, <b>' . $h($lead['name']) . '</b>!</p>'
+        . '<p style="margin:0 0 4px;">Ваша заявка принята — спасибо, что выбрали нас. Вот что произойдёт дальше:</p>'
+        . '<ol style="margin:12px 0 0;padding-left:22px;font:15px/1.8 Arial,sans-serif;color:#3d3831;">'
+        . '<li><b>Менеджер перезвонит</b> на ' . $h($lead['phone']) . ' в течение 15 минут в рабочее время (09:00–21:00).</li>'
+        . '<li><b>Меню вашего формата</b> — ' . ($pdfLabel !== null ? 'во вложении этого письма.' : ($pdfUrl !== null ? 'по кнопке ниже.' : 'на сайте nilovcatering.ru.')) . '</li>'
+        . '<li><b>Есть вопрос?</b> Просто ответьте на это письмо — оно придёт нам напрямую.</li>'
+        . '</ol>'
+        . $menuBanner
+        . $copyBlock
+        . '<p style="margin:22px 0 0;font:15px/1.6 Arial,sans-serif;color:#3d3831;">Хорошего дня!<br>'
+        . '<span style="font:bold 14px/1.4 Georgia,serif;color:#23201b;">NILOV CATERING</span> — кейтеринг, в котором чувствуют</p>';
+    return mail_html_wrap('Ваша заявка принята', $inner,
+        'Вы получили это письмо, потому что оставили заявку на nilovcatering.ru.');
+}
+

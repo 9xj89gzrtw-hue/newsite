@@ -857,15 +857,27 @@ function h_mail_test(string $method): void
     }
 
     $smtp = smtp_config($s);
+    /* c100: тестовое письмо — в новом бренд-шаблоне (владелец видит, как
+     * выглядят уведомления о заявках) + текстовая часть для старых клиентов. */
+    $transportName = $smtp !== null ? 'SMTP (' . $smtp['host'] . ')' : 'sendmail хостинга (mail)';
+    $text = "Тестовое письмо из админ-панели nilovcatering.ru.\r\n\r\n"
+        . "Если вы читаете это письмо — почта работает.\r\n"
+        . "Отправка шла через транспорт: {$transportName}.\r\n\r\n"
+        . "Уведомления о заявках и подтверждения клиентам уходят этим же каналом.";
+    $inner = '<p style="margin:0 0 10px;">Если вы читаете это письмо — <b>почта работает</b>.</p>'
+        . '<div style="margin:14px 0;padding:12px 16px;background:#f4efe7;border-radius:8px;font:13px/1.5 Arial,sans-serif;color:#3d3831;">'
+        . 'Транспорт отправки: <b>' . htmlspecialchars($transportName, ENT_QUOTES, 'UTF-8') . '</b></div>'
+        . '<p style="margin:14px 0 0;">Уведомления о заявках и подтверждения клиентам уходят этим же каналом — '
+        . 'с HTML-оформлением и PDF-меню во вложении (для клиента).</p>';
     $r = mail_send(
         $to,
         'Тест почты — NILOV CATERING',
-        "Тестовое письмо из админ-панели nilovcatering.ru.\n\n"
-        . "Если вы читаете это письмо — почта работает.\n"
-        . "Отправка шла через транспорт: " . ($smtp !== null ? 'SMTP (' . $smtp['host'] . ')' : 'sendmail хостинга (mail)') . ".\n\n"
-        . "Уведомления о заявках и подтверждения клиентам уходят этим же каналом.",
+        $text,
         null,
-        'test'
+        'test',
+        [],
+        mail_html_wrap('Тест почты', $inner,
+            'Письмо отправлено по кнопке «Отправить тестовое письмо» в админ-панели.')
     );
     $resp = ['ok' => $r['ok'] === true, 'to' => $to,
         'transport' => $r['transport'] ?? null, 'error' => $r['error'] ?? null, 'detail' => $r['detail'] ?? null];
