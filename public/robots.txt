@@ -36,7 +36,7 @@ Sitemap: https://nilovcatering.ru/sitemap.xml
 Sitemap: https://nilovcatering.ru/geo-sitemap.xml
 
 # Канонический хост для Яндекса (склейка зеркал)
-Host: https://nilovcatering.ru
+Host: nilovcatering.ru
 
 # Яндекс: игнорировать UTM/реферальные параметры (чистота индекса)
 Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&fbclid&ref&_ga

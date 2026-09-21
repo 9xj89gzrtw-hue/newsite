@@ -259,8 +259,19 @@ const jsonLd = {
   logo: siteUrl + "/brand/logo-512.png",
   telephone: PHONE_E164,
   email: EMAIL,
-  priceRange: "₽₽₽",
+  priceRange: "1200-4470₽",
   currenciesAccepted: "RUB",
+  /* Заявки круглосуточно (24/7) — подтверждено в llms-full.txt и yandex.txt;
+   * 3-я версия правки устранена: ранее была удалена, оставив LocalBusiness без
+   * часы. Указан круглосуточный приём заявок. */
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      opens: "00:00",
+      closes: "23:59",
+    },
+  ],
   paymentAccepted: "Наличные, Безналичный расчёт, Банковский перевод",
   sameAs: [
     SOCIALS.instagram,
