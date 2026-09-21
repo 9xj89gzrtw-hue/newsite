@@ -24,8 +24,9 @@ RewriteEngine On
 # без слэша на каталоги сайт больше не ссылается.
 DirectorySlash Off
 
-# Чистые URL юрстраниц: /offer, /privacy, /terms (и с хвостовым слэшем)
-RewriteRule ^(offer|privacy|terms|admin)/?$ $1.html [L]
+# Чистые URL юрстраниц: /offer, /privacy, /terms, /about (и с хвостовым слэшем)
+# c101: +about — страница «О компании» (SEO-чеклист, шаг 27)
+RewriteRule ^(offer|privacy|terms|about|admin)/?$ $1.html [L]
 
 # c95: серверные каталоги runtime-данных и секретов — недоступны из веба
 RedirectMatch 404 ^/(server-data|config)(/.*)?$
