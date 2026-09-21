@@ -343,8 +343,11 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
         /* c96: перебор баз Bot API (запомненная рабочая → зеркало
          * владельца → api.telegram.org); api.telegram.org с РФ-хостингов
          * деградирует с 03.2026. maxBases=2 — бюджет таймаутов (лид
-         * не должен висеть на мёртвых базах), почта всегда догонит. */
-        $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId, lead_tg_text($lead, $clientPlan), 2);
+         * не должен висеть на мёртвых базах), почта всегда догонит.
+         * c101: + inline-кнопки «Написать в WhatsApp» / «Меню клиента»
+         * (reply_markup; null — без кнопок, старый формат сообщения). */
+        $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId,
+            lead_tg_text($lead, $clientPlan), 2, lead_tg_buttons($lead, $pdfUrl));
         $status['tg'] = ($tg['ok'] === true);
         if (!$status['tg']) {
             $status['tgErr'] = tg_error_class($tg);
@@ -872,38 +875,96 @@ function lead_source_label(string $source): string
     return $labels[$source] ?? $source;
 }
 
-/** HTML-сообщение для Telegram (parse_mode=HTML, всё экранировано). */
+/** c101 — https://wa.me/… по телефону клиента (кнопка «Написать в
+ * WhatsApp» прямо из уведомления: владелец тапает — открывается чат).
+ * Нормализация: +7/8…11 цифр → 7…; 10 цифр (без кода страны) → 7… —
+ * федеральный формат сайта; прочее (короткий/иностранный/мусор) → null,
+ * кнопки не будет — молча, без риска открыть чат с чужим номером. */
+function lead_wa_href(string $phone): ?string
+{
+    $d = preg_replace('/\D+/', '', $phone);
+    if (!is_string($d) || $d === '') {
+        return null;
+    }
+    $len = strlen($d);
+    if ($len === 11 && $d[0] === '8') {
+        $d = '7' . substr($d, 1);
+    } elseif ($len === 10) {
+        $d = '7' . $d;
+    }
+    if (strlen($d) === 11 && $d[0] === '7') {
+        return 'https://wa.me/' . $d;
+    }
+    return null;
+}
+
+/** c101 — inline-клавиатура уведомления: [Написать в WhatsApp] [Меню
+ * клиента]. Обе кнопки — https (TG принимает только http/https/tg:,
+ * tel:/mailto: в кнопках и текстовых ссылках запрещены — проверено по
+ * докам Bot API). Меню — публичная ссылка того же PDF, что уехал клиенту
+ * (менеджер открывает и сразу видит, что клиент держит перед звонком).
+ * Нет данных — null, уведомление уходит без клавиатуры. */
+function lead_tg_buttons(array $lead, ?string $pdfUrl): ?array
+{
+    $row = [];
+    $wa = lead_wa_href((string)$lead['phone']);
+    if ($wa !== null) {
+        $row[] = ['text' => '💬 Написать в WhatsApp', 'url' => $wa];
+    }
+    if ($pdfUrl !== null) {
+        $row[] = ['text' => '📋 Меню клиента', 'url' => $pdfUrl];
+    }
+    if ($row === []) {
+        return null;
+    }
+    return ['inline_keyboard' => [$row]];
+}
+
+/**
+ * c101 — HTML-сообщение для Telegram (parse_mode=HTML, всё экранировано).
+ * Читаемость: телефон/email в <code> (моноширинно, копируется долгим
+ * тапом — звонить/писать в два касания), ключевые значения полужирным,
+ * связанные поля в одну строку (гости · дата), комментарий клиента —
+ * <blockquote> (визуальная цитата, Bot API 7.0+), номер заявки в <code>
+ * (копируется для поиска в админке).
+ */
 function lead_tg_text(array $lead, ?string $clientPlan = null): string
 {
     $e = 'tg_html_escape';
     $p = is_array($lead['payload']) ? $lead['payload'] : [];
     $L = '┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄';
-    $lines = ['<b>НОВАЯ ЗАЯВКА · NILOV CATERING</b>', $L];
-    $lines[] = '👤 <b>Имя:</b> ' . $e($lead['name']);
-    $lines[] = '📞 <b>Телефон:</b> ' . $e($lead['phone']);
+    $lines = ['<b>НОВАЯ ЗАЯВКА · NILOV CATERING</b>', ''];
+    $lines[] = '👤 <b>' . $e($lead['name']) . '</b>';
+    $lines[] = '📞 <code>' . $e($lead['phone']) . '</code>';
     if (!empty($lead['email'])) {
-        $lines[] = '✉️ <b>Email:</b> ' . $e($lead['email']);
+        $lines[] = '✉️ <code>' . $e($lead['email']) . '</code>';
     }
-    $lines[] = $L;
+    /* Детали мероприятия — в свой блок (пустые поля не оставляют
+     * сдвоенных разделителей: separator ставится только перед непустым блоком). */
+    $details = [];
     $fmt = lead_format_label($p);
     if ($fmt !== null) {
-        $lines[] = '🍽 <b>Формат:</b> ' . $e($fmt);
+        $details[] = '🍽 <b>' . $e($fmt) . '</b>';
     }
+    $meta = [];
     if (isset($p['guests']) && is_numeric($p['guests']) && (int)$p['guests'] > 0) {
-        $lines[] = '👥 <b>Гостей:</b> ' . $e((string)(int)$p['guests']);
+        $meta[] = '👥 ' . $e((string)(int)$p['guests']) . ' гостей';
     }
     $date = isset($p['dateIso']) && is_string($p['dateIso'])
         ? lead_date_human($p['dateIso'])
         : (isset($p['date']) && is_string($p['date']) ? lead_date_human($p['date']) : null);
     if ($date !== null) {
-        $lines[] = '📅 <b>Дата:</b> ' . $e($date);
+        $meta[] = '📅 ' . $e($date);
+    }
+    if ($meta !== []) {
+        $details[] = implode(' · ', $meta);
     }
     if (!empty($p['preferredTime']) && is_string($p['preferredTime'])) {
-        $lines[] = '🕐 <b>Время звонка:</b> ' . $e($p['preferredTime']);
+        $details[] = '🕐 Звонить: ' . $e($p['preferredTime']);
     }
     foreach (['total', 'calcTotal'] as $k) {
         if (isset($p[$k]) && is_numeric($p[$k]) && (float)$p[$k] > 0) {
-            $lines[] = '💰 <b>Расчёт:</b> ' . $e(lead_money((float)$p[$k]));
+            $details[] = '💰 <b>' . $e(lead_money((float)$p[$k])) . '</b> предварительно';
             break;
         }
     }
@@ -921,17 +982,22 @@ function lead_tg_text(array $lead, ?string $clientPlan = null): string
         }
     }
     if ($addons !== []) {
-        $lines[] = '🧾 <b>Допуслуги:</b> ' . $e(implode('; ', $addons));
+        $details[] = '🧾 Допуслуги: ' . $e(implode('; ', $addons));
+    }
+    if ($details !== []) {
+        $lines[] = $L;
+        $lines = array_merge($lines, $details);
     }
     if (!empty($lead['comment'])) {
-        $lines[] = '💬 <b>Комментарий:</b> ' . $e(str_trunc($lead['comment'], 500));
+        $lines[] = $L;
+        $lines[] = '<blockquote>💬 <b>Комментарий:</b> ' . $e(str_trunc($lead['comment'], 500)) . '</blockquote>';
     }
     $lines[] = $L;
     if ($clientPlan !== null) {
         $lines[] = '📎 ' . $e($clientPlan);
     }
     $lines[] = '🌐 Источник: ' . $e(lead_source_label($lead['source']));
-    $lines[] = '🆔 ' . $e($lead['id']) . ' · ' . $e(date('d.m.Y H:i', (int)$lead['ts']));
+    $lines[] = '🆔 <code>' . $e($lead['id']) . '</code> · ' . $e(date('d.m.Y H:i', (int)$lead['ts']));
     return implode("\n", $lines);
 }
 

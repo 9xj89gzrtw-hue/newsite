@@ -49,7 +49,9 @@ const FOOTER_NAV = [
   { label: "Меню и цены", href: "#menu" },
   { label: "Видео событий", href: "#events-video-carousel" },
   { label: "Калькулятор", href: "#calculator" },
-  { label: "О компании", href: "#about" },
+  /* c101: «О компании» теперь СТРАНИЦА /about (машино-читаемые факты для
+   * SEO/ИИ, чек-лист Яндекса шаг 27), а не якорь истории бренда на главной. */
+  { label: "О компании", href: "/about" },
   { label: "Вопросы и ответы", href: "#faq" },
   { label: "Контакты", href: "#contact" },
 ] as const;

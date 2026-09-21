@@ -426,3 +426,26 @@ Stage Summary:
   транспорта; при невозможности вложения — публичная ссылка-кнопка.
 - Все письма: HTML (multipart/alternative) + аккуратный текст; TG структурирован.
 - R1-чеклист виден в репо: docs/SEO-YANDEX-CHECKLIST.md.
+
+---
+Task ID: c101
+Agent: main
+Task: (1) логотип в оформлении отправляемых писём; (2) TG-уведомления читабельнее/удобнее; (3) из docs/SEO-YANDEX-CHECKLIST.md — всё, что делается кодом прямо сейчас
+
+Work Log:
+- ИЗУЧЕНИЕ: чек-лист 29 шагов → кодом реально закрыть шаги 27 (/about) и 28 (IndexNow), 29 — подготовить скрипт аудита (docs/AI-AUDIT.md); шаги 1–3, 7–12, 19–25 — только руками владельца.
+- EMAIL-ЛОГОТИП: scripts/gen-email-logo.py → public/brand/logo-email.png (120×140 из emblem-white-480, 22.7КБ, 2x от показа 60×70). _lib.php: MAIL_LOGO_CID + mail_logo_file/cid/attachment + mail_attach_count; mail_send() при HTML сам добавляет inline-часть (все письма: владелец/клиент/тест-мейл админки); mail_mime_parts() переписана в 3-уровневый билдер: mixed [ related [ alternative [text,html], logo ], pdf ] — RFC 2387 (CID-картинки) + 2046; байт-совместимость c99 (плоские) и c100 (alternative/mixed без лого) сохранена; mail_html_wrap(): <img src="cid:logo@nilovcatering.ru"> в тёмной шапке над NILOV CATERING, alt="" (декоративна, при заблокированных картинках письмо не «звенит»); файла нет → шапка текстовая (деградация). «вложение: N» в журнале — только PDF.
+- TELEGRAM: lead_tg_text() переработан (имя bold; телефон/email <code> — копируются долгим тапом; «гости · дата» одной строкой; «210 000 ₽ предварительно» bold; комментарий <blockquote>; ID <code>; пустые блоки не дают сдвоенных ┄). Кнопки: lead_wa_href() (wa.me: +7/8→7, 10 цифр→7, прочее → null) + lead_tg_buttons() → tg_send_fb/tg_send +параметр replyMarkup (null-safe): «💬 Написать в WhatsApp» + «📋 Меню клиента» (публичная ссылка PDF). TG в ссылках принимает только http/https/tg: — tel:/mailto: невозможны (проверено по докам Bot API), поэтому телефон = копируемый код.
+- SEO (шаг 27): src/app/about/page.tsx — «О компании» с машины-читаемыми фактами: dl-карточки 2007 / 2400+ / 120 000+ / СПб+ЛО (числа из site-config.ts), таблица форматов с ценами «от» из MENU_TYPES (синхрон с калькулятором), реквизиты ИП, AboutPage JSON-LD (mainEntity → #organization из layout — без дублирования сущности), уникальные title/description/OG; футер «О компании» → /about; sitemap.xml +/about (0.8); llms.txt «Основное» + строка; llms-full.txt — секция «О компании» в генераторе gen-static-data.ts (перегенерирован).
+- SEO (шаг 28): IndexNow — ключ 4455bbdfdb43656d43eeae6d6e0241c8 в public/<key>.txt (публичен по дизайну протокола); deploy.yml: шаг «IndexNow ping (non-fatal)» ПОСЛЕ rsync — живость ключа по https ×3 → POST api.indexnow.org {host,key,keyLocation,urlList: 5 URL} — Яндекс+Bing после каждого деплоя; YAML+shell провалидированы.
+- SEO (шаг 29): docs/AI-AUDIT.md — месячный скрипт: 4 запроса × 5 ассистентов, что фиксировать, таблица «пробел → лечение», что уже работает (llms/IndexNow/about).
+- ЧЕК-ЛИСТ: docs/SEO-YANDEX-CHECKLIST.md — 27/28 → ✅ (описания, что именно сделано), 29 → ссылка на AI-AUDIT.md, шапка «сделано кодом» дополнена c101.
+- ТЕСТЫ: research/c101/A-tests.sh 28/28 (G1–G5 лого/MIME/деградации; TG1–TG4 формат/кнопки/wa.me/сигнатура; E1–E2 E2E-заявка: mixed+related+alternative+Content-ID+cid в HTML+base64-раундтрипы PDF и ЭМБЛЕМЫ+LF-чистота+attach 0|1). Регрессии: c100 A 59/59 (T4 под новый TG-формат), c100 SMTP 27/27, c99 A 56/56 (L2 под текст c100), crit3 20/20. php -l ×5, lint, tsc — чисто.
+- ВИЗУАЛЬНО: письма клиенту/владельцу отрендерены в браузере (cid→data URI) — VLM: эмблема видна, не обрезана, гармонична, структура читабельна (email-client.png / email-owner.png); /about desktop+mobile — карточки/таблица/CTA без дефектов (about-desktop.png / about-mobile.png); скриншоты в research/c101/.
+- БРАУЗЕР: /about — title «О компании — NILOV CATERING | Кейтеринг в СПб с 2007 года», h1, 8 dd, 6 строк форматов, JSON-LD [FoodEstablishment/LocalBusiness, BreadcrumbList, AboutPage]; футер главной → «О компании» = /about.
+
+Stage Summary:
+- ЛОГОТИП: все HTML-письма сайта (владелец, клиент, тест админки) теперь с эмблемой-печатью в тёмной шапке — inline-CID (multipart/related), БЕЗ внешних запросов из письма (принцип c100 сохранён), деградация при отсутствии файла.
+- TG: копируемый телефон/email, blockquote-комментарий, метасторока «гости · дата», кнопки «Написать в WhatsApp» + «Меню клиента» прямо в уведомлении.
+- SEO-чеклист: закрыто кодом 27 (/about — каноническая страница фактов) и 28 (IndexNow с автопингом при деплое); 29 — готовый скрипт аудита (docs/AI-AUDIT.md). Остальное (Вебмастер, Бизнес, Bing, внешние карточки) — только руками владельца.
+- ВСЕ ТЕСТЫ ЗЕЛЁНЫЕ; готово к коммиту/деплою (следующий шаг).

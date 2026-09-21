@@ -402,3 +402,50 @@ mb_decode_mimeheader не сворачивает LWSP между encoded-words (
 
 *Файл обновлён c100 (§62). Полные истории циклов:
 `docs/AGENTS-HISTORY.md`, `git log worklog.md`.*
+
+### §63 (c101) — эмблема в письмах (CID/related), TG-кнопки, /about + IndexNow
+
+ЗАПРОС ВЛАДЕЛЬЦА: (1) из docs/SEO-YANDEX-CHECKLIST.md — «что можешь сделать
+прямо сейчас?»; (2) логотип в оформлении писём; (3) Telegram-уведомления
+читабельнее и удобнее. СДЕЛАНО: (а) ЭМБЛЕМА В ПИСЬМАХ: public/brand/
+logo-email.png (120×140, 2x от показа 60×70, из emblem-white-480 —
+scripts/gen-email-logo.py, PIL, детерминирован, коммитится как favicon-набор);
+mail_send() при HTML автоматически добавляет inline-часть (MAIL_LOGO_CID
+logo@nilovcatering.ru); mail_mime_parts() перестроена в 3-уровневый билдер —
+mixed [ related [ alternative [text, html], logo ], pdf ] (RFC 2387/2046);
+mail_html_wrap() печатает <img src="cid:…"> в тёмной шапке над вордмарком
+(alt="" — эмблема декоративна); ФАЛА нет → шапка текстовая как в c100
+(static-кеш mail_logo_cid на процесс, мягкая деградация); «вложение: N»
+в mail-log считает только PDF (mail_attach_count, эмблема служебная).
+(б) TG: lead_tg_text переработан — имя полужирным, телефон/email в <code>
+(моно + копирование долгим тапом), «гости · дата» одной строкой, сумма
+полужирная + «предварительно», комментарий в <blockquote> (Bot API 7+),
+ID заявки в <code>; пустые блоки не оставляют сдвоенных ┄-разделителей;
+кнопки lead_tg_buttons → reply_markup (5-й/6-й параметр tg_send_fb/tg_send,
+null-safe): [💬 Написать в WhatsApp (wa.me, нормализация 8→7/10→7, чужой
+формат → без кнопки)] [📋 Меню клиента (публичный pdfUrl)]. TG принимает
+в ссылках ТОЛЬКО http/https/tg: — tel:/mailto: кнопками запрещены, поэтому
+телефон делается копируемым кодом, а не ссылкой. (в) SEO кодом: страница
+/about «О компании» (шаг 27) — dl-карточки фактов (2007/2400+/120 000+/
+СПб+ЛО), таблица форматов с ценами «от» из MENU_TYPES (синхрон с
+калькулятором), реквизиты, AboutPage JSON-LD с mainEntity → #organization
+(сущность не дублируется); футер «О компании» → /about; sitemap.xml
+(+priority 0.8); llms.txt + llms-full.txt (генератор gen-static-data.ts).
+IndexNow (шаг 28): ключ public/4455bbdf…c8.txt (коммитится — он публичный
+по дизайну протокола), deploy.yml шаг после rsync — проверка ключа по
+https ×3 → POST api.indexnow.org (5 URL: /, /about, /offer, /privacy,
+/terms), non-fatal. docs/AI-AUDIT.md (шаг 29) — месячный скрипт аудита
+ассистентов (таблица «пробел → лечение»). Чек-лист обновлён: 27/28 ✅.
+УРОКИ: static-кеш CID-детекта живёт в рамках php-процесса — тесты
+деградации гоняют СВЕЖИЙ процесс и отдельный каталог (общий родитель
+видит чужой brand/); inline-base64 (эмблема) идёт РАНЬШЕ pdf в mixed —
+тесты извлекают часть по Content-Type, а не «первый base64-блок»;
+boundary-подсчёт mixed+related+alternative = 6 открывающих + 3 закрывающих;
+mail()-LF-тело парсится regex-ами с \r?\n. Тесты: c101 A 28/28
+(структуры/раундтрипы/деградации/кнопки/E2E), c100 A 59/59 + SMTP 27/27,
+c99 A 56/56 + crit3 20/20 (T4/L2 c99-c100 обновлены под новые тексты),
+php -l ×5, lint, tsc, VLM-проверка писём и /about (desktop+mobile),
+браузер: /about (title/h1/JSON-LD/футер-ссылка).
+
+*Файл обновлён c101 (§63). Полные истории циклов:
+`docs/AGENTS-HISTORY.md`, `git log worklog.md`.*

@@ -1038,19 +1038,26 @@ function tg_forget_working_base(): void
  * c96-CRIT-A: $maxBases ограничивает бюджет таймаутов (лид-путь передаёт 2 —
  * мёртвая запомненная база + одна запасная, дальше mail()-фолбэк); при
  * полном сетевом сбое запомненная база сбрасывается (самозалечивание).
+ * c101: + $replyMarkup — массив для sendMessage (inline_keyboard;
+ * {'inline_keyboard':[[{'text':…,'url':…}]]}), null — без клавиатуры
+ * (админ-тест и любые прочие вызовы не меняются).
  */
-function tg_send_fb(string $token, array $bases, string $chatId, string $html, int $maxBases = 0): array
+function tg_send_fb(string $token, array $bases, string $chatId, string $html, int $maxBases = 0, ?array $replyMarkup = null): array
 {
     $html = str_trunc($html, 3800); // лимит TG 4096 после парсинга — берём запас
     if ($maxBases > 0 && count($bases) > $maxBases) {
         $bases = array_slice($bases, 0, $maxBases);
     }
-    $r = tg_api_try($token, $bases, 'sendMessage', [
+    $body = [
         'chat_id' => $chatId,
         'text' => $html,
         'parse_mode' => 'HTML',
         'link_preview_options' => ['is_disabled' => true],
-    ]);
+    ];
+    if ($replyMarkup !== null) {
+        $body['reply_markup'] = $replyMarkup;
+    }
+    $r = tg_api_try($token, $bases, 'sendMessage', $body);
     if ($r['errno'] !== 0 || $r['status'] === 0) {
         tg_forget_working_base();
         return ['ok' => false, 'status' => 0, 'error' => 'network', 'tried' => $r['tried'] ?? []];
@@ -1083,16 +1090,21 @@ function tg_send_fb(string $token, array $bases, string $chatId, string $html, i
  * параметром link_preview_options — disable_web_page_preview удалён).
  * Возвращает ['ok'=>bool, 'status'=>int, 'error'=>?, 'retryAfterSec'=>?].
  * 429 → параметры retry_after пробрасываются наружу.
+ * c101: + $replyMarkup (inline_keyboard; null — без клавиатуры).
  */
-function tg_send(string $token, string $apiBase, string $chatId, string $html): array
+function tg_send(string $token, string $apiBase, string $chatId, string $html, ?array $replyMarkup = null): array
 {
     $html = str_trunc($html, 3800); // лимит TG 4096 после парсинга — берём запас
-    $r = tg_api($token, $apiBase, 'sendMessage', [
+    $body = [
         'chat_id' => $chatId,
         'text' => $html,
         'parse_mode' => 'HTML',
         'link_preview_options' => ['is_disabled' => true],
-    ]);
+    ];
+    if ($replyMarkup !== null) {
+        $body['reply_markup'] = $replyMarkup;
+    }
+    $r = tg_api($token, $apiBase, 'sendMessage', $body);
     if ($r['errno'] !== 0 || $r['status'] === 0) {
         return ['ok' => false, 'status' => 0, 'error' => 'network'];
     }
@@ -1122,6 +1134,72 @@ function tg_send(string $token, string $apiBase, string $chatId, string $html): 
 const MAIL_FROM_NAME = 'NILOV CATERING';
 /** Домен сайта для Message-ID (RFC 5322: <ts.rand@domain>). */
 const MAIL_DOMAIN = 'nilovcatering.ru';
+
+/* ------------- c101: CID-логотип в HTML-письмах (public/brand/) ---------- */
+
+/**
+ * c101 — фиксированный Content-ID эмблемы в шапке HTML-писем. Один и тот же
+ * для всех писем: в сообщении ровно одна inline-картинка, уникальность
+ * внутри сообщения гарантирована самим фактом единственности; Gmail /
+ * Outlook / Apple Mail / Яндекс-почта принимают доменный CID спокойно.
+ * HTML ссылается как <img src="cid:logo@nilovcatering.ru">, MIME-часть
+ * несёт Content-ID: <logo@nilovcatering.ru> внутри multipart/related.
+ */
+const MAIL_LOGO_CID = 'logo@nilovcatering.ru';
+
+/** c101 — файл эмблемы для писем (public/brand/logo-email.png, 120x140,
+ * генерируется scripts/gen-email-logo.py; едет со статикой на хостинг). */
+function mail_logo_file(): string
+{
+    return dirname(__DIR__) . '/brand/logo-email.png';
+}
+
+/**
+ * c101 — CID логотипа, если файл на месте (кеш в static — файловая проверка
+ * один раз на запрос). null → письма уходят с текстовой шапкой как в c100
+ * (мягкая деградация: HTML без картинок, MIME — plain alternative).
+ */
+function mail_logo_cid(): ?string
+{
+    static $ok = null;
+    if ($ok === null) {
+        $ok = is_file(mail_logo_file()) && is_readable(mail_logo_file());
+    }
+    return $ok ? MAIL_LOGO_CID : null;
+}
+
+/**
+ * c101 — inline-вложение логотипа для mail_send(): ['bytes','name','entry',
+ * 'inline'=>true,'cid']. Кап 512КБ — страховка от случайно подложенного
+ * гигантского файла (реальный размер ~23КБ).
+ */
+function mail_logo_attachment(): ?array
+{
+    if (mail_logo_cid() === null) {
+        return null;
+    }
+    $bytes = @file_get_contents(mail_logo_file());
+    if (!is_string($bytes) || $bytes === '' || strlen($bytes) > 524288) {
+        return null;
+    }
+    return ['bytes' => $bytes, 'name' => 'logo-email.png',
+        'entry' => ['fileName' => 'logo-email.png', 'fileNameStar' => ''],
+        'inline' => true, 'cid' => MAIL_LOGO_CID];
+}
+
+/** c101 — число «настоящих» вложений письма (PDF), CID-логотип не считается:
+ * журнал почты в админке показывает «вложение: N» = количество файлов,
+ * которые клиент реально скачивает, а не служебную эмблему шапки. */
+function mail_attach_count(array $attachments): int
+{
+    $n = 0;
+    foreach ($attachments as $att) {
+        if (empty($att['inline'])) {
+            $n++;
+        }
+    }
+    return $n;
+}
 
 /* ------------------ c99: PDF-вложения (public/menu-pdf/) ---------------- */
 
@@ -1247,7 +1325,12 @@ function mail_attachment_disposition(array $entry): string
  * c100 — HTML-каркас письма (таблично-инлайновый, почтовые клиенты без
  * CSS-поддержки читают всё равно). $inner — готовый внутренний HTML
  * (детали заявки/контакты). Палитра сайта: крем/уголь/золото #D4A373.
- * Никаких внешних картинок/шрифтов — ноль внешних запросов из письма.
+ * c101 — в тёмной шапке над вордмарком эмблема компании (CID-картинка из
+ * public/brand/logo-email.png, инлайн-вложение multipart/related — НЕ
+ * внешняя ссылка: ноль внешних запросов из письма сохраняется). Файла нет
+ * — шапка остаётся чисто текстовой, как в c100 (мягкая деградация).
+ * alt="" — эмблема декоративна, бренд уже назван вордмарком ниже (при
+ * заблокированных картинках письмо не «звенит» битым alt).
  */
 function mail_html_wrap(string $title, string $inner, string $footerNote = ''): string
 {
@@ -1255,14 +1338,21 @@ function mail_html_wrap(string $title, string $inner, string $footerNote = ''): 
     $foot = $footerNote !== ''
         ? '<p style="margin:0 0 10px;font:13px/1.5 Arial,sans-serif;color:#8a8175;">' . $footerNote . '</p>'
         : '';
+    $logo = '';
+    $logoCid = mail_logo_cid();
+    if ($logoCid !== null) {
+        $logo = '<img src="cid:' . $logoCid . '" width="60" height="70" alt="" '
+            . 'style="display:block;margin:0 auto 10px;width:60px;height:70px;border:0;outline:none;text-decoration:none;">';
+    }
     return '<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         . '<title>' . $title . '</title></head>'
         . '<body style="margin:0;padding:0;background:#f4efe7;">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4efe7;padding:24px 12px;">'
         . '<tr><td align="center">'
         . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 14px rgba(35,32,27,.08);">'
-        // шапка бренда
+        // шапка бренда (c101: эмблема CID + вордмарк + слоган)
         . '<tr><td style="padding:26px 32px 22px;background:#23201b;text-align:center;">'
+        . $logo
         . '<div style="font:bold 22px/1 Georgia,serif;color:#d4a373;letter-spacing:3px;">NILOV&nbsp;CATERING</div>'
         . '<div style="margin-top:6px;font:12px/1.4 Arial,sans-serif;color:#b7ad9e;letter-spacing:1px;">кейтеринг, в&nbsp;котором чувствуют&nbsp;· Санкт-Петербург</div>'
         . '</td></tr>'
@@ -1284,22 +1374,39 @@ function mail_html_wrap(string $title, string $inner, string $footerNote = ''): 
 }
 
 /**
- * c99/c100 — тело письма с MIME-частями. Вложений нет и нет HTML — прежний
- * плоский text/plain (байт-совместим со старыми тестовыми письмами).
+ * c99/c100/c101 — тело письма с MIME-частями. Вложений нет и нет HTML —
+ * прежний плоский text/plain (байт-совместим со старыми тестовыми письмами).
  * Есть HTML — multipart/alternative [text, html] (клиент без HTML-рендера
- * покажет текст; с вложениями — внешний multipart/mixed
- * [ alternative [text, html], pdf… ] — RFC 2046).
+ * покажет текст). Есть inline-части (CID-логотип шапки, c101) — ядро
+ * оборачивается в multipart/related [ alternative [text, html], image… ]
+ * (RFC 2387 — так CID-картинки находят свой HTML). Обычные вложения —
+ * внешний multipart/mixed [ related|alternative, pdf… ] (RFC 2046).
+ * Полная структура письма клиенту с меню и логотипом:
+ *   mixed [ related [ alternative [text, html], logo.png ], menu.pdf ].
  * Возвращает [headers: string[], body: string] — To/Subject SMTP-пути
  * добавляет smtp_send, mail()-путь — PHP сам.
  */
 function mail_mime_parts(array $extraHeaders, string $bodyText, array $attachments, ?string $html = null): array
 {
     $hasHtml = $html !== null && $html !== '';
-    if ($attachments === [] && !$hasHtml) {
+    /* c101: inline-части имеют смысл только при HTML (cid: живёт в HTML);
+     * без HTML они выбрасываются — писем «картинка в никуда» не бывает. */
+    $inline = [];
+    $regular = [];
+    foreach ($attachments as $att) {
+        if (!empty($att['inline'])) {
+            if ($hasHtml) {
+                $inline[] = $att;
+            }
+        } else {
+            $regular[] = $att;
+        }
+    }
+    if ($regular === [] && !$hasHtml) {
         return [$extraHeaders, mail_body_crlf($bodyText)];
     }
-    $hasAtt = $attachments !== [];
     $b = '=nilov-' . bin2hex(random_bytes(12)); // '=' разрешён в boundary (RFC 2046 bcharsnospace) и не встречается в base64-строках тела
+    $bRel = '=nilov-rel-' . bin2hex(random_bytes(10));
     $bAlt = '=nilov-alt-' . bin2hex(random_bytes(10));
     // базовые заголовки — без плоских Content-Type/CTE (заменяются multipart-версией ниже)
     $headers = array_values(array_filter($extraHeaders, static function (string $h): bool {
@@ -1313,39 +1420,62 @@ function mail_mime_parts(array $extraHeaders, string $bodyText, array $attachmen
         . mail_body_crlf($bodyText) . "\r\n";
     $htmlPart = "Content-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n"
         . mail_body_crlf($html ?? '') . "\r\n";
-    $parts = [];
-    if ($hasAtt && $hasHtml) {
-        // mixed [ alternative [text, html], attachments… ] — RFC 2046
-        $contentType = 'multipart/mixed; boundary="' . $b . '"';
-        $close = "--{$b}--";
-        $parts[] = "--{$b}\r\n"
-            . "Content-Type: multipart/alternative; boundary=\"{$bAlt}\"\r\n\r\n"
-            . "--{$bAlt}\r\n" . $textPart
-            . "--{$bAlt}\r\n" . $htmlPart
-            . "--{$bAlt}--\r\n";
-    } elseif ($hasHtml) {
-        // alternative [text, html] — без вложений внешний контейнер сам alternative
-        $contentType = 'multipart/alternative; boundary="' . $bAlt . '"';
-        $close = ''; // закрывающая "--{$bAlt}--\r\n" уже в конце parts
-        $parts[] = "--{$bAlt}\r\n" . $textPart
+
+    /* Ядро письма (уровень 1): alternative [text, html] — либо одиночный
+     * text/plain без HTML (его заголовки уже внутри $textPart). */
+    if ($hasHtml) {
+        $nodeCT = 'multipart/alternative; boundary="' . $bAlt . '"';
+        $nodeBody = "--{$bAlt}\r\n" . $textPart
             . "--{$bAlt}\r\n" . $htmlPart
             . "--{$bAlt}--\r\n";
     } else {
-        // c99: mixed [text, attachments…] — без HTML
-        $contentType = 'multipart/mixed; boundary="' . $b . '"';
-        $close = "--{$b}--";
-        $parts[] = "--{$b}\r\n" . $textPart;
+        $nodeCT = null;
+        $nodeBody = $textPart;
     }
-    foreach ($attachments as $att) {
-        $data = chunk_split(base64_encode($att['bytes']), 76, "\r\n");
-        $parts[] = "--{$b}\r\n"
-            . "Content-Type: application/pdf; name=\"" . str_replace(['"', "\r", "\n"], '', (string)$att['name']) . "\"\r\n"
-            . 'Content-Disposition: ' . mail_attachment_disposition($att['entry']) . "\r\n"
-            . "Content-Transfer-Encoding: base64\r\n\r\n"
-            . $data;
+
+    /* Уровень 2 (c101): related [ core, inline-картинки ] — RFC 2387. */
+    if ($inline !== []) {
+        $relBody = "--{$bRel}\r\n"
+            . ($nodeCT !== null ? "Content-Type: {$nodeCT}\r\n\r\n" : '')
+            . $nodeBody;
+        foreach ($inline as $img) {
+            $name = str_replace(['"', "\r", "\n"], '', (string)($img['name'] ?? 'image.png'));
+            $cid = str_replace(['<', '>', '"', "\r", "\n", ' '], '', (string)($img['cid'] ?? ''));
+            $data = chunk_split(base64_encode((string)$img['bytes']), 76, "\r\n");
+            $relBody .= "--{$bRel}\r\n"
+                . "Content-Type: image/png; name=\"{$name}\"\r\n"
+                . "Content-Disposition: inline; filename=\"{$name}\"\r\n"
+                . "Content-ID: <{$cid}>\r\n"
+                . "Content-Transfer-Encoding: base64\r\n\r\n"
+                . $data;
+        }
+        $relBody .= "--{$bRel}--\r\n";
+        $nodeCT = 'multipart/related; boundary="' . $bRel . '"';
+        $nodeBody = $relBody;
     }
-    $body = implode('', $parts) . ($close !== '' ? $close . "\r\n" : '');
-    $headers[] = 'Content-Type: ' . $contentType;
+
+    /* Уровень 3: обычные вложения — внешний multipart/mixed (RFC 2046). */
+    if ($regular !== []) {
+        $parts = ["--{$b}\r\n"
+            . ($nodeCT !== null ? "Content-Type: {$nodeCT}\r\n\r\n" : '')
+            . $nodeBody];
+        foreach ($regular as $att) {
+            $data = chunk_split(base64_encode($att['bytes']), 76, "\r\n");
+            $parts[] = "--{$b}\r\n"
+                . "Content-Type: application/pdf; name=\"" . str_replace(['"', "\r", "\n"], '', (string)$att['name']) . "\"\r\n"
+                . 'Content-Disposition: ' . mail_attachment_disposition($att['entry']) . "\r\n"
+                . "Content-Transfer-Encoding: base64\r\n\r\n"
+                . $data;
+        }
+        $body = implode('', $parts) . "--{$b}--\r\n";
+        $headers[] = 'Content-Type: multipart/mixed; boundary="' . $b . '"';
+    } else {
+        /* Верхний контейнер — сам узел (alternative или related); сюда не
+         * попадаем с $nodeCT === null: без HTML и без regular вернулись
+         * плоским письмом выше. */
+        $body = $nodeBody;
+        $headers[] = 'Content-Type: ' . (string)$nodeCT;
+    }
     $headers[] = 'Content-Transfer-Encoding: 8bit';
     return [$headers, $body];
 }
@@ -1693,14 +1823,27 @@ function smtp_send(array $cfg, string $to, string $subject, string $bodyText, ?s
  * ('smtp_timeout'/'auth_failed'/…), если SMTP пробовался и провалился
  * (даже когда mail()-фолбэк спас письмо) — lead.php классифицирует канал
  * для решения о ретрае (dead/crit/retry).
+ * c101: HTML-письмо автоматически получает inline-эмблему шапки
+ * (mail_logo_attachment, multipart/related) — вызвать mail_send с $html
+ * достаточно, CID синхронизирован с mail_html_wrap константой
+ * MAIL_LOGO_CID. В журнале «вложение: N» считает только PDF — эмблема
+ * служебная и в счётчик не попадает (mail_attach_count).
  */
 function mail_send(string $to, string $subject, string $bodyText, ?string $replyTo = null, string $context = 'test', array $attachments = [], ?string $html = null): array
 {
+    /* c101: эмблема шапки для всех HTML-писем (владелец/клиент/тест) —
+     * один и тот же CID для HTML-ссылки и MIME-части. */
+    if ($html !== null && $html !== '') {
+        $logo = mail_logo_attachment();
+        if ($logo !== null) {
+            $attachments[] = $logo;
+        }
+    }
     if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
         $r = ['ok' => false, 'transport' => 'none', 'error' => 'invalid_recipient', 'detail' => $to, 'smtpError' => null];
         mail_log_append(['to' => str_trunc($to, 120), 'context' => $context, 'subject' => str_trunc($subject, 100),
             'transport' => 'none', 'ok' => false, 'error' => 'invalid_recipient',
-            'attach' => count($attachments)]);
+            'attach' => mail_attach_count($attachments)]);
         return $r;
     }
 
@@ -1712,14 +1855,14 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
         $r = smtp_send($smtp, $to, $subject, $bodyText, $replyTo, $attachments, $html);
         if ($r['ok'] === true) {
             mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
-                'transport' => 'smtp', 'ok' => true, 'error' => null, 'attach' => count($attachments)]);
+                'transport' => 'smtp', 'ok' => true, 'error' => null, 'attach' => mail_attach_count($attachments)]);
             return ['ok' => true, 'transport' => 'smtp', 'error' => null, 'detail' => null, 'smtpError' => null];
         }
         // SMTP настроен, но не сработал (пароль/сеть) — НЕ теряем письмо:
         // пробуем mail() сервера, обе попытки в журнале.
         mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
             'transport' => 'smtp', 'ok' => false, 'error' => str_trunc((string)$r['error'], 100),
-            'detail' => str_trunc((string)($r['detail'] ?? ''), 200), 'attach' => count($attachments)]);
+            'detail' => str_trunc((string)($r['detail'] ?? ''), 200), 'attach' => mail_attach_count($attachments)]);
     }
 
     /* mail()-путь: sendmail хостинга. c97 — с Date/Message-ID (без них
@@ -1734,7 +1877,7 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
      * тела снимаем. SMTP-путь остаётся байт-точным CRLF (RFC 5321). */
     if (!function_exists('mail')) {
         mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
-            'transport' => 'none', 'ok' => false, 'error' => 'mail_disabled', 'detail' => 'mail() отключена на хостинге, SMTP не настроен', 'attach' => count($attachments)]);
+            'transport' => 'none', 'ok' => false, 'error' => 'mail_disabled', 'detail' => 'mail() отключена на хостинге, SMTP не настроен', 'attach' => mail_attach_count($attachments)]);
         return ['ok' => false, 'transport' => 'none', 'error' => 'mail_disabled',
             'detail' => 'Функция mail() отключена на хостинге; настройте SMTP в разделе «Почта»',
             'smtpError' => (($smtp !== null && !($r['ok'] ?? true)) ? (string)$r['error'] : null)];
@@ -1766,7 +1909,7 @@ function mail_send(string $to, string $subject, string $bodyText, ?string $reply
     mail_log_append(['to' => $to, 'context' => $context, 'subject' => str_trunc($subject, 100),
         'transport' => $transport, 'ok' => (bool)$ok,
         'error' => $ok ? null : 'mail() вернула false (sendmail не принял письмо)',
-        'attach' => count($attachments)]);
+        'attach' => mail_attach_count($attachments)]);
     return [
         'ok' => (bool)$ok,
         'transport' => $transport,

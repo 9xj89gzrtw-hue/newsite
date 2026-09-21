@@ -167,6 +167,39 @@ jobs:
             echo "::warning::GET https://nilovcatering.ru/api/lead.php → HTTP ${code} (ожидался 405). Проверьте PHP/деплой вручную — деплой НЕ прерван."
           fi
 
+      # c101 (чек-лист SEO-YANDEX, шаг 28): IndexNow — Яндекс и Bing одним
+      # ключом. Ключ-файл public/<key>.txt едет со статикой (rsync из out/),
+      # уже лежит на хостинге к этому шагу. Сначала проверяем его живость
+      # по https, затем пингуем ОБЩИЙ эндпоинт api.indexnow.org — он
+      # раскидывает URL по всем участникам протокола (Яндекс, Bing, Seznam).
+      # Non-fatal: IndexNow лишь ускоряет переобход, деплой он не ломает.
+      - name: IndexNow ping (non-fatal)
+        run: |
+          set -uo pipefail
+          KEY_FILE="public/4455bbdfdb43656d43eeae6d6e0241c8.txt"
+          KEY="$(tr -d '[:space:]' < "$KEY_FILE")"
+          KEY_URL="https://nilovcatering.ru/${KEY_FILE#public/}"
+          live=""
+          for i in 1 2 3; do
+            live="$(curl -sS --max-time 15 "$KEY_URL" 2>/dev/null || true)"
+            if [ "$live" = "$KEY" ]; then break; fi
+            sleep 5
+          done
+          if [ "$live" != "$KEY" ]; then
+            echo "::warning::IndexNow ключ-файл недоступен ($KEY_URL) — пинг пропущен, деплой НЕ прерван"
+            exit 0
+          fi
+          echo "Key file OK: $KEY_URL"
+          body="$(printf '{"host":"nilovcatering.ru","key":"%s","keyLocation":"%s","urlList":["https://nilovcatering.ru/","https://nilovcatering.ru/about","https://nilovcatering.ru/offer","https://nilovcatering.ru/privacy","https://nilovcatering.ru/terms"]}' "$KEY" "$KEY_URL")"
+          code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 \
+            -H 'Content-Type: application/json; charset=utf-8' \
+            --data-binary "$body" \
+            https://api.indexnow.org/IndexNow || echo 000)"
+          case "$code" in
+            200|202) echo "IndexNow OK (HTTP $code): 5 URL отправлены (Яндекс + Bing)";;
+            *) echo "::warning::IndexNow ответил HTTP $code (200/202 ожидались) — не блокирует деплой";;
+          esac
+
       - name: Done
         run: echo "Deployed to ${REMOTE_DIR:-~/nilovcatering.ru/public_html/} on nilovcatering.ru"
 
