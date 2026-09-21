@@ -1567,10 +1567,10 @@ export function Contact() {
             <Image
               src={YANDEX_MAPS.staticSrc}
               alt={YANDEX_MAPS.address}
-              width={1300}
-              height={680}
+              width={650}
+              height={450}
               unoptimized
-              className="h-[260px] w-full object-cover md:h-[440px]"
+              className="h-[260px] w-full object-cover rounded-2xl border border-cream/15 md:h-[320px]"
             />
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">

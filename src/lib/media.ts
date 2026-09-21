@@ -235,9 +235,14 @@ export const INSTAGRAM = {
  * CONTACTS.address/addressHref (config.ts), их читают и футер, и блок заявок.
  */
 export const YANDEX_MAPS = {
-  // Статическая карта-картинка (l=sat): без JS-рекламы Яндекс.Карт
+  // Статическая карта-картинка (l=sat): без JS-рекламы Яндекс.Карт.
+  // ВАЖНО: бесплатный Static Maps API принимает сторону ≤450px
+  // (проверено: 650,450 → HTTP 200 image/jpeg; 1300,680 → HTTP 400
+  // "Wrong image size... must be in range [180, 450]"). Поэтому
+  // 650,450 — наибольший безопасный размер для резкости, а html
+  // width/height заданы в тех же единицах (иначе aspect-ratio врет).
   staticSrc:
-    "https://static-maps.yandex.ru/1.x/?ll=30.275093%2C59.994868&z=17&l=sat&size=1300,680&pt=30.275093,59.994868,pm2rdm",
+    "https://static-maps.yandex.ru/1.x/?ll=30.275093%2C59.994868&z=17&l=sat&size=650,450&pt=30.275093,59.994868,pm2rdm",
   // Embed URL iframe (map-widget) удалён: тянет ads/system/context.js
   // → реклама конкурентов. Оставлено только статическое изображение.
   // Direct link for "open in maps" — короткая ссылка владельца из ТЗ

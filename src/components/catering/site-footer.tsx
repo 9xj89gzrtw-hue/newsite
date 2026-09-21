@@ -869,11 +869,11 @@ export function SiteFooter() {
           <Image
             src={YANDEX_MAPS.staticSrc}
             alt={`${YANDEX_MAPS.address} — карта проезда`}
-            width={1300}
-            height={680}
+            width={650}
+            height={450}
             unoptimized
             loading="lazy"
-            className="h-[260px] w-full rounded-2xl border border-cream/15 object-cover md:h-[320px]"
+            className="h-[260px] w-full object-cover rounded-2xl border border-cream/15 md:h-[320px]"
           />
           {/* c94 (заказчик): просьба звонить до визита — офис не работает
               «на проходную». Ссылка tel: в тон «открыть в Яндекс.Картах»:
