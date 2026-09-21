@@ -25,6 +25,7 @@ import {
   Sparkles,
   MessageSquareText,
 } from "lucide-react";
+import Image from "next/image";
 import { Reveal } from "./reveal";
 import { Magnetic } from "@/components/motion/magnetic";
 import { CONTACTS, YANDEX_MAPS } from "@/lib/media";
@@ -1555,15 +1556,21 @@ export function Contact() {
       {/* Yandex Maps embed */}
       <div className="mx-auto mt-16 max-w-7xl px-5 md:px-8">
         <Reveal>
-          <div className="overflow-hidden rounded-2xl border border-border-line shadow-lg shadow-ink/5">
-            <iframe
-              src={YANDEX_MAPS.embedSrc}
-              title="Interfood Catering на карте — Санкт-Петербург, ул. Большая Морская, 18"
-              className="h-[360px] w-full md:h-[440px]"
-              loading="lazy"
-              sandbox="allow-scripts allow-same-origin allow-presentation"
-              role="img"
-              allowFullScreen
+          <div className="relative overflow-hidden rounded-2xl border border-border-line shadow-lg shadow-ink/5">
+            {/*
+              C103: статическая карта вместо map-widget iframe.
+              map-widget подгружает yandex.ru/ads/system/context.js и показывает
+              рекламный баннер + POI чужих организаций (конкурентов).
+              static-maps + l=sat: только спутник + своя метка (pm2rdm),
+              без JS-рекламы и без иконок организаций конкурентов.
+            */}
+            <Image
+              src={YANDEX_MAPS.staticSrc}
+              alt={YANDEX_MAPS.address}
+              width={1300}
+              height={680}
+              unoptimized
+              className="h-[260px] w-full object-cover md:h-[440px]"
             />
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">

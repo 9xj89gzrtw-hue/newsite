@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   motion,
   useReducedMotion,
@@ -858,13 +859,21 @@ export function SiteFooter() {
               </a>
             </p>
           </div>
-          <iframe
-            src={YANDEX_MAPS.embedSrc}
-            title="Nilov Catering на карте — ул. Полевая Сабировская, 45, к. 1"
+          {/*
+            C103: map-widget iframe убран — он тянет yandex.ru/ads/system/
+            context.js и показывает рекламный баннер + POI чужих организаций.
+            Вместо него статическая карта static-maps (l=sat): спутник +
+            своя метка, без JS-рекламы. Ссылка «открыть в Яндекс.Картах»
+            выше остаётся интерактивной.
+          */}
+          <Image
+            src={YANDEX_MAPS.staticSrc}
+            alt={`${YANDEX_MAPS.address} — карта проезда`}
+            width={1300}
+            height={680}
+            unoptimized
             loading="lazy"
-            sandbox="allow-scripts allow-same-origin allow-presentation"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="h-[260px] w-full rounded-2xl border border-cream/15 md:h-[320px]"
+            className="h-[260px] w-full rounded-2xl border border-cream/15 object-cover md:h-[320px]"
           />
           {/* c94 (заказчик): просьба звонить до визита — офис не работает
               «на проходную». Ссылка tel: в тон «открыть в Яндекс.Картах»:

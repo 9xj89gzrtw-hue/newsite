@@ -235,9 +235,11 @@ export const INSTAGRAM = {
  * CONTACTS.address/addressHref (config.ts), их читают и футер, и блок заявок.
  */
 export const YANDEX_MAPS = {
-  // Embed URL for iframe (Yandex Maps → Share → HTML code)
-  embedSrc:
-    "https://yandex.ru/map-widget/v1/?ll=30.275093%2C59.994868&z=17&pt=30.275093,59.994868,pm2rdm",
+  // Статическая карта-картинка (l=sat): без JS-рекламы Яндекс.Карт
+  staticSrc:
+    "https://static-maps.yandex.ru/1.x/?ll=30.275093%2C59.994868&z=17&l=sat&size=1300,680&pt=30.275093,59.994868,pm2rdm",
+  // Embed URL iframe (map-widget) удалён: тянет ads/system/context.js
+  // → реклама конкурентов. Оставлено только статическое изображение.
   // Direct link for "open in maps" — короткая ссылка владельца из ТЗ
   href: CONTACTS.addressHref,
   // Address (display) — единый источник с футером
