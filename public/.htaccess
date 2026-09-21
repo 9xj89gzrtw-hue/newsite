@@ -7,14 +7,30 @@
 # Per-dir mod_rewrite срабатывает РАНЬШЕ mod_dir fixup — отдаём *.html
 # по чистому URL без редиректа.
 #
-# СОЗНАТЕЛЬНО ЗДЕСЬ НЕТ: редиректа http → https. SSL терминирует
-# nginx-фронт, Apache видит соединение как http (%{HTTPS} всегда off) —
-# правило уведёт сайт в бесконечный редирект. Канонизация обеспечена
-# rel=canonical (все страницы отдают https://nilovcatering.ru/…).
+# c103 (21.09.2026) — ДОБАВЛЕН редирект http → https + security-заголовки.
+# ПРИЧИНА, почему раньше его не было: предыдущая попытка проверяла %{HTTPS},
+# а SSL терминирует nginx → Apache ВСЕГДА видит %{HTTPS}=off → редирект
+# уходил в бесконечный цикл, и файл оставили без редиректа.
+# ЗАМЕР (21.09.2026, probe _probe_proto.php на проде):
+#   http://  → X-Forwarded-Proto=http,  %{HTTPS}=ABSENT, SERVER_PORT=80
+#   https:// → X-Forwarded-Proto=https, %{HTTPS}=ABSENT, SERVER_PORT=80
+# ВЫВОД: nginx ФАКТИЧЕСКИ пробрасывает X-Forwarded-Proto. Проверяем ЕГО,
+# а не %{HTTPS} — цикл невозможен (https-запрос условие не выполняет).
 #
 # РАСШИРЕНИЕ: новая юрстраница /foo → добавить foo в скобки правила ниже.
 
 RewriteEngine On
+
+# ── http → https (c103) ───────────────────────────────────────────────────────
+# X-Forwarded-Proto есть ТОЛЬКО за nginx-фронтом; для https="https" условие
+# ложно → редиректа нет (защита от петли). HTTP_HOST сохраняем, чтобы не
+# ломать www. POST на /api/*.php идёт по https → редирект не задевает.
+RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# c103: канонизация www → apex (второе зеркало отдавало 200, дублируя индекс)
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
 
 # Отключаем DirectorySlash (301 → /offer/): на этом хостинге mod_dir
 # успевает отредиректить ДО per-dir rewrite, причём в Location подставляет
@@ -33,3 +49,15 @@ RedirectMatch 404 ^/(server-data|config)(/.*)?$
 
 # Брендированная 404 из экспорта вместо дефолтной «Object not found!»
 ErrorDocument 404 /404.html
+
+# ── Security-заголовки (c103) ──────────────────────────────────────────────────
+# Причина: ВК выдаёт «Ссылка nilovcatering.ru выглядит подозрительно», сайт
+# отдавал 200 по http и НЕ отдавал ни одного security-заголовка.
+# CSP НЕ добавляем сознательно: он сломал бы встроенную Яндекс.Карту (iframe)
+# и счётчик Метрики. nosniff/referrer/frame/hsts — безопасны для статики.
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
