@@ -873,7 +873,7 @@ export function SiteFooter() {
             height={450}
             unoptimized
             loading="lazy"
-            className="h-[260px] w-full object-cover rounded-2xl border border-cream/15 md:h-[320px]"
+            className="h-auto w-full max-w-[650px] rounded-2xl border border-cream/15"
           />
           {/* c94 (заказчик): просьба звонить до визита — офис не работает
               «на проходную». Ссылка tel: в тон «открыть в Яндекс.Картах»:

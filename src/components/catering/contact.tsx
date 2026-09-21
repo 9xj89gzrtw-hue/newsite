@@ -1570,7 +1570,7 @@ export function Contact() {
               width={650}
               height={450}
               unoptimized
-              className="h-[260px] w-full object-cover rounded-2xl border border-cream/15 md:h-[320px]"
+              className="h-auto w-full max-w-[650px] rounded-2xl border border-cream/15"
             />
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
