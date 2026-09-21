@@ -1556,7 +1556,7 @@ export function Contact() {
       {/* Yandex Maps embed */}
       <div className="mx-auto mt-16 max-w-7xl px-5 md:px-8">
         <Reveal>
-          <div className="relative overflow-hidden rounded-2xl border border-border-line shadow-lg shadow-ink/5">
+          <div className="relative mx-auto w-full max-w-[650px] overflow-hidden rounded-2xl border border-border-line shadow-lg shadow-ink/5">
             {/*
               C103: статическая карта вместо map-widget iframe.
               map-widget подгружает yandex.ru/ads/system/context.js и показывает
@@ -1570,7 +1570,7 @@ export function Contact() {
               width={650}
               height={450}
               unoptimized
-              className="h-auto w-full max-w-[650px] rounded-2xl border border-cream/15"
+              className="mx-auto block h-auto w-full max-w-[650px] rounded-2xl border border-cream/15"
             />
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
