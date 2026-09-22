@@ -1223,11 +1223,17 @@ function mail_logo_file(): string
  */
 function mail_logo_cid(): ?string
 {
-    static $ok = null;
-    if ($ok === null) {
-        $ok = is_file(mail_logo_file()) && is_readable(mail_logo_file());
+    /* W2-FIX (owner complaint): убран static-кеш — проверяем
+     * файл КАЖДЫЙ раз. На проде после деплоя путь может
+     * отличаться (opcache, права, символические ссылки),
+     * и stale-кэч приводил к тому, что logo-email.png
+     * считался "отсутствующим" и CID не возвращался. */
+    $filePath = mail_logo_file();
+    if (!is_file($filePath) || !is_readable($filePath)) {
+        error_log('[W2] logo-email.png missing or unreadable: ' . $filePath);
+        return null;
     }
-    return $ok ? MAIL_LOGO_CID : null;
+    return MAIL_LOGO_CID;
 }
 
 /**
@@ -1237,11 +1243,19 @@ function mail_logo_cid(): ?string
  */
 function mail_logo_attachment(): ?array
 {
-    if (mail_logo_cid() === null) {
+    /* W2-FIX (v2): проверка файла без static-кеша (см. mail_logo_cid). */
+    $cid = mail_logo_cid();
+    if ($cid === null) {
         return null;
     }
-    $bytes = @file_get_contents(mail_logo_file());
-    if (!is_string($bytes) || $bytes === '' || strlen($bytes) > 524288) {
+    $filePath = mail_logo_file();
+    $bytes = @file_get_contents($filePath);
+    if (!is_string($bytes) || $bytes === '') {
+        error_log('[W2] logo-email.png file_get_contents returned empty');
+        return null;
+    }
+    if (strlen($bytes) > 524288) {
+        error_log('[W2] logo-email.png exceeds 512KB');
         return null;
     }
     return ['bytes' => $bytes, 'name' => 'logo-email.png',
@@ -1404,7 +1418,7 @@ function mail_html_wrap(string $title, string $inner, string $footerNote = ''): 
     $logoCid = mail_logo_cid();
     if ($logoCid !== null) {
         $logo = '<img src="cid:' . $logoCid . '" width="60" height="70" alt="" '
-            . 'style="display:block;margin:0 auto 10px;width:60px;height:70px;border:0;outline:none;text-decoration:none;">';
+            . 'style="display:block;margin:0 auto 10px;width:60px;height:70px;border:0;outline:none;text-decoration:none;max-width:100%;height:auto;">';
     }
     return '<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         . '<title>' . $title . '</title></head>'

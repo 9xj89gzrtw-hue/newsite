@@ -909,7 +909,7 @@
   transition: grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .hb-zone[data-open="true"] { grid-template-rows: 1fr; }
-.hb-zone__inner { overflow: hidden; min-height: 0; }
+.hb-zone__inner { overflow-x: clip; overflow-y: hidden; min-height: 0; }
 /* c86 (требование 4, фикс обрезки кружков шагов): узлы нити (кружки с
    цифрами) центрируются на 2px-нити у ЛЕВОГО края формы и выезжают влево
    за пределы формы — overflow:hidden у .hb-zone__inner их резал.
@@ -1034,7 +1034,25 @@
 }
 /* iOS не зумит поля ≥16px (урок Cycle 37/40) — перекрываем text-[15px] на мобиле */
 @media (max-width: 767px) {
-  .hb-form input.hb-input { font-size: 16px; }
+  .hb-form input.hb-input,
+  .hb-form input[type="text"],
+  .hb-form input[type="tel"],
+  .hb-form input[type="email"],
+  .hb-form textarea {
+    font-size: 16px !important;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+/* W2-FIX (v2): убираем горизонтальный padding формы на мобиле —
+   прогресс-нить абсолютно спозиционирована, padding не нужен;
+   на 320px 1.15rem лишнего = ~18px, что толкает поля за экран. */
+@media (max-width: 767.98px) {
+  .hb-form { padding-left: 0; }
+  .hb-zone__body { padding-left: 0; }
+}
+.hbooking {
+  overflow-x: clip;
 }
 .hb-err {
   display: flex;
