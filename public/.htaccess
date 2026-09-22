@@ -64,6 +64,15 @@ ErrorDocument 404 /404.html
 # замер: mc.yandex.ru=0, googletagmanager.com=0 в HTML). Их домены всё равно
 # внесены в разрешения, чтобы счётчик не сломался при подключении.
 <IfModule mod_headers.c>
+  # c124 (22.09.2026) — charset 301-редиректа: iso-8859-1 → UTF-8.
+  # ЗАМЕР (22.09.2026): http://nilovcatering.ru/ отдавал
+  #   Content-Type: text/html; charset=iso-8859-1
+  # Vercel на аналогичном редиректе — text/plain. Предыдущие попытки (c123)
+  # дали HTTP 500: 'Header always edit ... ^.*iso-8859-1.*$ text/html; charset=UTF-8'
+  # — сложный regex + ';' в replacement ломают парсинг .htaccess на shared Apache.
+  # Рабочая форма — простая строковая замена БЕЗ ';' (не задевает MIME .jpg/.js,
+  # где charset отсутствует). always обязателен: 301 — non-2xx ответ.
+  Header always edit Content-Type "iso-8859-1" "UTF-8"
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
