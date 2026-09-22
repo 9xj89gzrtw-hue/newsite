@@ -33,6 +33,19 @@ jobs:
 
       - name: Install deps
         run: bun install --frozen-lockfile || bun install
+        env:
+          # Persist Bun's HTTP cache so next/font/google font fetches
+          # are cached between CI builds, preventing transient network
+          # failures from fonts.googleapis.com.
+          BUN_INSTALL_CACHE_DIR: ${{ runner.temp }}/.bun-cache
+
+      - name: Cache Turbo build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache/turbopack
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
 
       - name: Build static export
         run: bun run build

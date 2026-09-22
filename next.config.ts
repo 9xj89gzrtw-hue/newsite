@@ -23,6 +23,10 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion", "gsap"],
+    // Persist Turbo filesystem cache so next/font/google font CSS and
+    // woff2 files are cached between CI builds, preventing "queries have
+    // exactly one entry" failures when fonts.googleapis.com is slow/unreachable.
+    turbopackFileSystemCacheForBuild: true,
   },
   // Vanity URLs (/calculator, /menu, /events, /contacts) become in-page
   // anchors — handled client-side by VanityUrlScroll; no server rewrites needed
