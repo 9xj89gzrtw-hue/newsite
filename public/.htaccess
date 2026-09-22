@@ -21,27 +21,6 @@
 
 RewriteEngine On
 
-# c123 (22.09.2026) — charset 301-редиректа: iso-8859-1 → UTF-8.
-# ЗАМЕР (22.09.2026, curl --http1.1 http://nilovcatering.ru/):
-#   HTTP/1.1 301 Moved Permanently
-#   Content-Type: text/html; charset=iso-8859-1   ← ВК трактует как подозрительный
-# Vercel на аналогичном редиректе отдаёт Content-Type: text/plain.
-# Apache на редиректе выставляет тип TEXT, а charset берёт из AddDefaultCharset.
-# AddDefaultCharset можно ставить ТОЛЬКО как директиву конфига (не в .htaccess
-# per-dir на shared-хостинге), поэтому правим принудительно — но ТОЛЬКО для
-# HTML-документов: 'Header always set Content-Type' БЕЗ условия сломал бы MIME
-# у .jpg/.js/.ico (mod_headers применяется к ним тоже — проверено замером).
-<IfModule mod_headers.c>
-  # Редирект http→https и www→apex: charset UTF-8 вместо iso-8859-1.
-  # Используем edit (а НЕ set): edit правит СУЩЕСТВУЮЩЕЕ значение по regex и
-  # не сработает там, где charset отсутствует (.jpg/.js/.ico — их MIME цел).
-  # <If "%{REQUEST_STATUS}..."> НЕ используем: на shared-хостинге Apache может
-  # быть 2.2, где <If> не поддерживается → 500-ошибка на весь сайт.
-  # В Apache mod_headers 'edit' заменяет ВСЕ найденные совпадения, поэтому
-  # берём одну группу по всему значению regex-шаблона (без обратных ссылок).
-  Header always edit Content-Type ^.*iso-8859-1.*$ text/html; charset=UTF-8
-</IfModule>
-
 # ── http → https (c103) ───────────────────────────────────────────────────────
 # X-Forwarded-Proto есть ТОЛЬКО за nginx-фронтом; для https="https" условие
 # ложно → редиректа нет (защита от петли). HTTP_HOST сохраняем, чтобы не
