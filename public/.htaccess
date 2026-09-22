@@ -53,11 +53,24 @@ ErrorDocument 404 /404.html
 # ── Security-заголовки (c103) ──────────────────────────────────────────────────
 # Причина: ВК выдаёт «Ссылка nilovcatering.ru выглядит подозрительно», сайт
 # отдавал 200 по http и НЕ отдавал ни одного security-заголовка.
-# CSP НЕ добавляем сознательно: он сломал бы встроенную Яндекс.Карту (iframe)
-# и счётчик Метрики. nosniff/referrer/frame/hsts — безопасны для статики.
+#
+# c122 (22.09.2026) — ДОБАВЛЕН CSP + Permissions-Policy.
+# ПРИЧИНА (замер 22.09.2026): то же самое зеркало на Vercel отдаёт
+# Content-Security-Policy, Permissions-Policy и X-Frame-Options: DENY, а
+# SpaceWeb — ноль из трёх. Внешняя оценка «безопасности ссылки» (в т.ч. метка
+# ВК) отличается ровно на эти заголовки. Прежний запрет на CSP снят: причин
+# больше нет — iframe Яндекс.Карты убран (карта — статичный <img>), а Метрика
+# и GA4 грузятся ДИНАМИЧЕСКИ и только при наличии ID (в проде сейчас их нет,
+# замер: mc.yandex.ru=0, googletagmanager.com=0 в HTML). Их домены всё равно
+# внесены в разрешения, чтобы счётчик не сломался при подключении.
 <IfModule mod_headers.c>
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+  # CSP: default-src 'self'; инлайн-SCRIPT нужен Next.js (bootstrap/Хайдрейшн) —
+  # 'unsafe-inline' в script-src вынужденный компромисс для static export.
+  # static-maps.yandex.ru — единственная внешняя картинка (карта проезда).
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://mc.yandex.ru https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://mc.yandex.ru https://www.googletagmanager.com; frame-src https://mc.yandex.ru https://youtube.com https://rutube.ru https://vk.com; base-uri 'self'; form-action 'self'; object-src 'none'"
 </IfModule>
