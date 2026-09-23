@@ -17,7 +17,7 @@ import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { CONTACTS } from "@/lib/config";
-import { metaPriceFragments } from "@/lib/pricing";
+import { metaPriceFragments, MENU_TYPES } from "@/lib/pricing";
 import {
   SITE_URL,
   PHONE_E164,
@@ -362,6 +362,49 @@ const PAGE_BREADCRUMBS = [
   { name: "Политика конфиденциальности", item: siteUrl + "/privacy", position: 6 },
   { name: "Пользовательское соглашение", item: siteUrl + "/terms", position: 7 },
 ];
+/** c128 (22.09.2026) — Service + Offer JSON-LD (пробел C3.2 у критика).
+ * Цены читаются из menu.json (единый источник, тот же что и калькулятор) —
+ * ХАРДКОДА НЕТ: публикация цен из админки обновляет и разметку.
+ * AggregateRating НЕ добавляем намеренно: нет верифицированных отзывов,
+ * а выдуманный рейтинг = санкции Google + риск по ФЗ «О рекламе» (ФАС). */
+const serviceLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Форматы кейтеринга NILOV CATERING",
+  itemListElement: MENU_TYPES.map((m, i) => {
+    const price = m.perGuest ?? m.calcPerGuest;
+    return {
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Service",
+        name: m.label,
+        description: m.description ?? m.short,
+        serviceType: "Кейтеринг",
+        provider: { "@id": siteUrl + "#organization" },
+        areaServed: [
+          { "@type": "City", name: "Санкт-Петербург" },
+          { "@type": "AdministrativeArea", name: "Ленинградская область" },
+        ],
+        ...(price
+          ? {
+              offers: {
+                "@type": "Offer",
+                price: String(price),
+                priceCurrency: "RUB",
+                // цена ЗА ГОСТЯ — единица обязательна, иначе Google
+                // трактует как цену за весь заказ
+                unitText: "за гостя",
+                availability: "https://schema.org/InStock",
+                url: siteUrl + "/#calculator",
+              },
+            }
+          : {}),
+      },
+    };
+  }),
+};
+
 const breadcrumbLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -468,6 +511,12 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        />
+        {/* c128: Service + Offer — форматы кейтеринга с ценами из menu.json.
+            Отдаёт Google/Yandex цену и доступность прямо в выдаче. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
         />
         {/* Task 1-b (cycle-71): FAQPage JSON-LD перенесён в src/app/page.tsx —
             гайдлайн Google: разметка FAQ допустима только на странице с
