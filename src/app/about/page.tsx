@@ -46,7 +46,12 @@ const aboutLd = {
 };
 
 export const metadata: Metadata = {
-  title: `О компании — NILOV CATERING | Кейтеринг в СПб с ${FOUNDED_YEAR} года`,
+  /* c126 (22.09.2026): убран дубль бренда в title. Layout-шаблон
+   * (layout.tsx:144) добавляет суффикс « | NILOV CATERING», поэтому бренд
+   * внутри своего title давал «... | NILOV CATERING | NILOV CATERING» —
+   * Яндекс обрезает такие title и теряет ключевые слова. Оставляем только
+   * значимую часть; бренд прийдёт из шаблона. */
+  title: `Кейтеринг в СПб с ${FOUNDED_YEAR} года — о компании`,
   description: `NILOV CATERING: работаем с ${FOUNDED_YEAR} года — ${EVENTS_DONE}+ мероприятий и ${GUESTS_SERVED.toLocaleString("ru-RU")}+ гостей. ${LEGAL_INFO.legalForm} ${LEGAL_INFO.legalName}. Фуршеты, банкеты, свадьбы, корпоративы в Санкт-Петербурге и ЛО.`,
   robots: { index: true, follow: true },
   alternates: { canonical: "/about" },

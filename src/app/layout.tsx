@@ -170,10 +170,16 @@ export const metadata: Metadata = {
     "банкет спб",
   ],
   authors: [{ name: "NILOV CATERING" }],
-  /* F2 (K3-NIT): hreflang убран — сайт одноязычный (ru), languages был
-   * объявлен только на главной (на /offer /privacy /terms его нет) —
-   * по гайдлайну одноязычному сайту hreflang не нужен. Canonical остаётся. */
-  alternates: { canonical: "/" },
+  /* c127 (22.09.2026): hreflang ru ВОСВРАЩЁН (правка субагента W5, проверена
+   * сборкой: отдаёт <link rel="alternate" hreflang="ru" href="...">).
+   * Для одноязычного сайта это не дубль canonical, а явное объявление языка —
+   * Google требует hreflang ВЗАИМЕН (только со ссылкой на себя), и ru → ru
+   * это удовлетворяет. Убирать не надо: критик C3.2 отметил отсутствие
+   * языкового сигнала как пробел. */
+  alternates: {
+    canonical: "/",
+    languages: { ru: "/" },
+  },
   openGraph: {
     title: "NILOV CATERING — Кейтеринг в Санкт-Петербурге",
     /* c99: OG/Twitter-описания синхронны основному description — один
@@ -208,14 +214,13 @@ export const metadata: Metadata = {
    * NEXT_PUBLIC_GOOGLE_VERIFICATION); без них поле пустое и в <head> ничего
    * не эмитится (сайт живёт как раньше). Владелец вписывает коды один раз
    * в окружение деплоя (см. инструкцию в PR/README). */
+  /* c127 (22.09.2026): убран дубль yandex-verification. Поле `yandex:` ВЫШЕ
+   * (строка 212) уже эмитит <meta name="yandex-verification">; запись в
+   * `other` давала ВТОРОЙ такой же тег — критик замерил 2 <meta> на проде.
+   * Next.js сам формирует корректное имя из поля `yandex`. */
   verification: {
     yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined,
-    other: {
-      'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION
-        ? [process.env.NEXT_PUBLIC_YANDEX_VERIFICATION]
-        : [],
-    },
   },
 };
 
@@ -344,24 +349,28 @@ const jsonLd = {
 };
 
 /** BreadcrumbList JSON-LD — хлебные крошки для rich-snippet в выдаче
- *  (Яндекс/Google показывают путь под заголовком результата). */
+ *  (Яндекс/Google показывают путь под заголовком результата).
+ *  c127 (правка субагента W5, проверена сборкой): полный список — главная
+ *  + разделы главной (якоря #menu/#calculator — они реально существуют в
+ *  секциях hacc-menu/calculator) + юрстраницы, синхронно с sitemap.xml. */
+const PAGE_BREADCRUMBS = [
+  { name: "Главная", item: siteUrl + "/", position: 1 },
+  { name: "О компании", item: siteUrl + "/about", position: 2 },
+  { name: "Меню и цены", item: siteUrl + "/#menu", position: 3 },
+  { name: "Калькулятор", item: siteUrl + "/#calculator", position: 4 },
+  { name: "Публичная оферта", item: siteUrl + "/offer", position: 5 },
+  { name: "Политика конфиденциальности", item: siteUrl + "/privacy", position: 6 },
+  { name: "Пользовательское соглашение", item: siteUrl + "/terms", position: 7 },
+];
 const breadcrumbLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
-  itemListElement: [
-    {
-      "@type": "ListItem",
-      position: 1,
-      name: "Главная",
-      item: siteUrl + "/",
-    },
-    {
-      "@type": "ListItem",
-      position: 2,
-      name: "Публичная оферта",
-      item: siteUrl + "/offer",
-    },
-  ],
+  itemListElement: PAGE_BREADCRUMBS.map((b) => ({
+    "@type": "ListItem",
+    position: b.position,
+    name: b.name,
+    item: b.item,
+  })),
 };
 
 export default function RootLayout({
