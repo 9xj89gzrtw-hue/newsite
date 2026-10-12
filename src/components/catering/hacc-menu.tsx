@@ -1272,7 +1272,8 @@ function MenuRack({
 
                     {/* табы пакетов */}
                     <div
-                      className="hmenu__tabs"
+                          className="hmenu__tabs"
+                          data-packages={cat.packages.length}
                       role="tablist"
                       aria-label={`Уровень меню — ${cat.label}`}
                     >

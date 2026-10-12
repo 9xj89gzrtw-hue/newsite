@@ -631,11 +631,12 @@ function PackageEditor({
           />
         </div>
         <div>
-          <FieldLabel>Цена за гостя</FieldLabel>
+          <FieldLabel>Цена за персону (руб.)</FieldLabel>
           <NumberField
             value={pkg.pricePerGuest}
             onChange={(pricePerGuest) => onChange({ pricePerGuest })}
             suffix="₽"
+            placeholder="2450"
           />
         </div>
       </div>
@@ -699,7 +700,7 @@ function PackageEditor({
             {pkg.dishes.length}/60
             {grams > 0
               ? ` · ~${formatNum(grams)} г на гостя`
-              : " · вес указывайте в конце названия («35 г»)"}
+              : " · вес порции укажите в отдельном поле: 35 г"}
           </span>
         </div>
         <div className="space-y-2">
@@ -719,8 +720,8 @@ function PackageEditor({
               <Input
                 type="text"
                 value={d.weight ?? ""}
-                placeholder="35 г"
-                aria-label={`Вес блюда ${di + 1}`}
+                placeholder="Вес: 35 г"
+                aria-label={`Вес порции (г) или объём (мл), блюдо ${di + 1}`}
                 onChange={(e) => setDish(di, { weight: e.target.value })}
                 className="h-11 w-full rounded-xl text-[15px] sm:w-24"
               />
@@ -767,14 +768,13 @@ function PackageEditor({
 
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
         {onRemove ? (
-          <Button
-            type="button"
-            variant="ghost"
-            className="h-11 flex-1 rounded-xl text-[14px] text-destructive hover:bg-destructive/10 hover:text-destructive"
+          <DeleteButton
+            label={`Удалить пакет «${pkg.name}»`}
+            className="h-11 w-auto flex-1 rounded-xl text-[14px] text-destructive hover:bg-destructive/10 hover:text-destructive"
             onClick={onRemove}
           >
             Удалить пакет
-          </Button>
+          </DeleteButton>
         ) : (
           <p className="flex-1 text-center text-xs text-ink-soft/70">
             У формата должен остаться хотя бы один пакет

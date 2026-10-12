@@ -42,7 +42,7 @@ jobs:
       - name: Regression checks before deployment
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y php-cli php-curl php-mbstring
+          sudo apt-get install -y php-cli php-curl php-mbstring poppler-utils
           bun run lint
           bun run typecheck
           for file in public/api/*.php public/config/secrets.example.php; do

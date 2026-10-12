@@ -62,6 +62,9 @@ const PAGE = {
 
 /** Верх контента на страницах продолжения (под колонтитулом 13–15.5). */
 const CONTENT_TOP = 23;
+// Per-document density: separate downloads never change each other's layout.
+const PDF_DENSITY = new WeakMap<jsPDF, number>();
+const densityFor = (doc: jsPDF) => PDF_DENSITY.get(doc) ?? 1;
 
 /** Сплошные печатные эквиваленты бренд-палитры c85 (альфа нет — печать). */
 const C = {
@@ -373,9 +376,19 @@ export async function buildMenuCatalogDoc(
       title = `МЕНЮ — ${single.label.toUpperCase()}`;
       subline = `Санкт-Петербург · ${genDate()} · пакет «${pkg.name}» · состав согласуем под событие`;
     }
-    let y = drawTitleBlock(doc, { title, price, subline, logoWhite });
-    y = drawSinglePackage(doc, single, pkg, y);
-    drawClosing(doc, y);
+    // Retry the actual measured layout, not a guessed scale or clipped image.
+    // Only single-tariff documents are fitted; a full catalog remains paginated.
+    for (const density of [1, 0.95, 0.9, 0.85]) {
+      PDF_DENSITY.set(doc, density);
+      let y = drawTitleBlock(doc, { title, price, subline, logoWhite });
+      y = drawSinglePackage(doc, single, pkg, y);
+      drawClosing(doc, y);
+      if (doc.getNumberOfPages() === 1 || density === 0.85) break;
+      // Keep the registered embedded fonts, but discard all trial pages.
+      doc.addPage();
+      while (doc.getNumberOfPages() > 1) doc.deletePage(1);
+      doc.setPage(1);
+    }
   } else if (types.length > 1) {
     /* полный каталог: титул → секции всех типов потоком → CTA */
     let y = drawTitleBlock(doc, {
@@ -384,7 +397,9 @@ export async function buildMenuCatalogDoc(
       logoWhite,
     });
     types.forEach((menu, i) => {
-      y = drawCatalogSection(doc, menu, i === 0 ? y : y + 8);
+      const last = i === types.length - 1;
+      if (last) PDF_DENSITY.set(doc, 0.95);
+      y = drawCatalogSection(doc, menu, i === 0 ? y : y + 8, undefined, last);
     });
     drawClosing(doc, y);
   } else {
@@ -396,7 +411,8 @@ export async function buildMenuCatalogDoc(
       subline: `Санкт-Петербург · ${genDate()}`,
       logoWhite,
     });
-    y = drawCatalogSection(doc, m, y);
+    PDF_DENSITY.set(doc, 0.95);
+    y = drawCatalogSection(doc, m, y, undefined, true);
     drawClosing(doc, y);
   }
 
@@ -692,18 +708,21 @@ const DISH = {
 };
 
 function dishRowH(doc: jsPDF, dish: Dish): number {
+  const density = densityFor(doc);
   doc.setFont("Roboto", "bold");
-  doc.setFontSize(10.5);
+  doc.setFontSize(10.5 * density);
   const lines: string[] = doc.splitTextToSize(dish.name, DISH.nameW);
-  return DISH.base + (lines.length - 1) * DISH.lineH + DISH.gap;
+  const gap = density < 1 ? 1.2 : DISH.gap;
+  return (DISH.base + (lines.length - 1) * DISH.lineH + gap) * density;
 }
 
 function drawDish(doc: jsPDF, dish: Dish, y: number): number {
+  const density = densityFor(doc);
   doc.setFont("Roboto", "bold");
-  doc.setFontSize(10.5);
+  doc.setFontSize(10.5 * density);
   doc.setTextColor(...C.espresso);
   const lines: string[] = doc.splitTextToSize(dish.name, DISH.nameW);
-  const base = y + DISH.base;
+  const base = y + DISH.base * density;
   doc.text(lines, PAGE.mL, base);
 
   if (dish.weight) {
@@ -718,7 +737,8 @@ function drawDish(doc: jsPDF, dish: Dish, y: number): number {
       PAGE.w - PAGE.mR - valW - DISH.lead,
     );
   }
-  return y + DISH.base + (lines.length - 1) * DISH.lineH + DISH.gap;
+  const gap = density < 1 ? 1.2 : DISH.gap;
+  return y + (DISH.base + (lines.length - 1) * DISH.lineH + gap) * density;
 }
 
 /* ───────────────────────────────────────── «Включено в любой пакет» */
@@ -846,7 +866,7 @@ function drawHandCheck(
     заказы форматов) + CTA «Соберите смету за 1 минуту», прижатый к низу. */
 function drawClosing(doc: jsPDF, y0: number) {
   let y = y0 + 2;
-  const ctaH = 24;
+  const ctaH = densityFor(doc) < 1 ? 18 : 24;
   const yCta = PAGE.bottom - ctaH - 3.5;
   doc.setFont("Roboto", "italic");
   doc.setFontSize(7.5);
@@ -867,28 +887,29 @@ function drawClosing(doc: jsPDF, y0: number) {
   lines.forEach((line, i) => {
     doc.text(line, PAGE.mL, y + 4 + i * 3.4);
   });
-  drawCta(doc, yCta);
+  drawCta(doc, yCta, ctaH);
 }
 
-function drawCta(doc: jsPDF, y: number) {
+function drawCta(doc: jsPDF, y: number, height = 24) {
+  const scale = height / 24;
   doc.setFillColor(...C.deep);
-  doc.rect(PAGE.mL, y, PAGE.contentW, 24, "F");
+  doc.rect(PAGE.mL, y, PAGE.contentW, height, "F");
 
   doc.setFont("Prata", "normal");
-  doc.setFontSize(13);
+  doc.setFontSize(height < 24 ? 11.5 : 13);
   doc.setTextColor(...C.cream);
-  doc.text("Соберите смету за 1 минуту", PAGE.mL + 8, y + 10);
+  doc.text("Соберите смету за 1 минуту", PAGE.mL + 8, y + 10 * scale);
 
   doc.setFont("Roboto", "bold");
   doc.setFontSize(12);
   doc.setTextColor(...C.gold);
-  doc.text(CONTACTS.phone, PAGE.w - PAGE.mR - 8, y + 10, { align: "right" });
+  doc.text(CONTACTS.phone, PAGE.w - PAGE.mR - 8, y + 10 * scale, { align: "right" });
 
   doc.setFont("Roboto", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(...C.onDarkMuted);
-  doc.text(CONTACTS.email, PAGE.mL + 8, y + 17.5);
-  doc.text(SITE_DOMAIN, PAGE.w - PAGE.mR - 8, y + 17.5, { align: "right" });
+  doc.text(CONTACTS.email, PAGE.mL + 8, y + 17.5 * scale);
+  doc.text(SITE_DOMAIN, PAGE.w - PAGE.mR - 8, y + 17.5 * scale, { align: "right" });
 }
 
 /* ────────────────────────────────────────────────── секции-потоки */
@@ -904,6 +925,9 @@ function drawSinglePackage(
   const contLabel = `${menu.label} · ${pkg.name}`;
   const ensure = makeEnsure(doc, cur, contLabel);
 
+  // Compact single-tariff pages already identify the format in their title.
+  // Skip only that duplicated marketing lead, never dishes or conditions.
+  if (densityFor(doc) === 1) {
   // лид — описание типа события (контекст для клиента)
   doc.setFont("Roboto", "italic");
   doc.setFontSize(9.5);
@@ -915,6 +939,7 @@ function drawSinglePackage(
   ensure(3.5 + typeLines.length * 4.1 + 4);
   doc.text(typeLines, PAGE.mL, cur.y + 3.5);
   cur.y += 3.5 + typeLines.length * 4.1 + 5.5;
+  }
 
   // капс «состав пакета» + описание пакета под линией
   cur.y = drawCategoryHeader(
@@ -943,6 +968,7 @@ function drawCatalogSection(
   menu: MenuType,
   y0: number,
   onlyPkg?: number,
+  reserveClosing = false,
 ): number {
   const cur = { y: y0 };
   const selPkg = onlyPkg !== undefined ? menu.packages[onlyPkg] : undefined;
@@ -978,7 +1004,7 @@ function drawCatalogSection(
        переносим их ВМЕСТЕ (страница не рвётся на 3 строки + рамка) */
     const isLast = onlyPkg !== undefined || idx === menu.packages.length - 1;
     if (isLast) {
-      const inclH = includedBoxH(doc, menu.included);
+      const inclH = includedBoxH(doc, menu.included) + (reserveClosing ? 50 : 0);
       const needed = hdrH + dishesH + 3.5 + inclH + 4.5;
       if (
         cur.y + needed > PAGE.bottom &&
@@ -993,8 +1019,14 @@ function drawCatalogSection(
     ensure(hdrH + first2);
 
     cur.y = drawPackageIntro(doc, menu, pkg, cur.y);
-    for (const dish of pkg.dishes) {
-      ensure(dishRowH(doc, dish));
+    for (const [di, dish] of pkg.dishes.entries()) {
+      // Keep final rows, included services and conditions together, even when
+      // an exceptionally long future package legitimately spans pages.
+      const tail = isLast && reserveClosing && di >= pkg.dishes.length - 2
+        ? pkg.dishes.slice(di).reduce((sum, row) => sum + dishRowH(doc, row), 0)
+          + includedBoxH(doc, menu.included) + 55
+        : dishRowH(doc, dish);
+      ensure(tail);
       cur.y = drawDish(doc, dish, cur.y);
     }
     cur.y += 3.5;

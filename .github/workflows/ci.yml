@@ -32,7 +32,7 @@ jobs:
         run: bun scripts/validate-menu.ts
 
       - name: Install PHP test runtime
-        run: sudo apt-get update -qq && sudo apt-get install -y php-cli php-curl php-mbstring
+        run: sudo apt-get update -qq && sudo apt-get install -y php-cli php-curl php-mbstring poppler-utils
 
       - name: Validate PHP syntax
         run: |

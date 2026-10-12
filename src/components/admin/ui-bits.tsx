@@ -13,6 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
+  AlertDialogTitle, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogCancel, AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 /* ------------------------------------------------------------------ labels */
 
@@ -238,26 +243,43 @@ export function DeleteButton({
   onClick,
   label,
   className,
+  children,
 }: {
   onClick: () => void;
   label: string;
   className?: string;
+  children?: React.ReactNode;
 }) {
   return (
-    <Button
+    <AlertDialog>
+    <AlertDialogTrigger asChild><Button
       type="button"
       variant="ghost"
-      size="icon"
+      size={children ? "default" : "icon"}
       className={cn(
         "size-11 rounded-xl text-ink-soft/70 hover:bg-destructive/10 hover:text-destructive",
         className,
       )}
-      onClick={onClick}
       aria-label={label}
       title={label}
     >
-      <Trash2 className="size-4" />
-    </Button>
+      <Trash2 className="size-4" />{children}
+    </Button></AlertDialogTrigger>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>{label}?</AlertDialogTitle>
+        <AlertDialogDescription>
+          Позиция будет удалена из текущего черновика. На сайте изменение появится только после публикации.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel className="min-h-11">Отмена</AlertDialogCancel>
+        <AlertDialogAction onClick={onClick} className="min-h-11 bg-destructive text-white hover:bg-destructive/90">
+          Удалить
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -295,13 +317,13 @@ export function StringListEditor({
   return (
     <div className="space-y-2">
       {items.map((item, i) => (
-        <div key={i} className="flex items-center gap-1">
+        <div key={i} className="flex flex-wrap items-center justify-end gap-1 sm:flex-nowrap">
           <Input
             type="text"
             value={item}
             placeholder={placeholder}
             onChange={(e) => setAt(i, e.target.value)}
-            className="h-11 rounded-xl text-[15px]"
+            className="h-11 w-full basis-full rounded-xl text-[15px] sm:basis-auto"
             aria-label={`${itemLabel} ${i + 1}`}
           />
           <MoveButtons

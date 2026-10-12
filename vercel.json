@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "buildCommand": "prisma generate && bun scripts/validate-menu.ts && bun scripts/gen-static-data.ts && bun scripts/gen-menu-pdfs.ts && next build --webpack && bun scripts/check-export.ts",
-  "devCommand": "next dev -p 3000",
+  "devCommand": "next dev -p 3001",
   "installCommand": "bun install",
   "cleanUrls": true,
   "trailingSlash": false,

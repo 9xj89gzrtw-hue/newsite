@@ -3454,6 +3454,14 @@ header[data-scrolled="true"] [data-mega-panel] {
     animation: none !important;
     transform: none !important;
   }
+  /* Reduce motion, not contrast: the fill stays hidden until interaction. */
+  .ea-outline-btn::before {
+    transform: translateY(101%) !important;
+  }
+  .ea-outline-btn:hover::before,
+  .ea-outline-btn:focus-visible::before {
+    transform: translateY(0) !important;
+  }
   .ea-reveal {
     opacity: 1;
   }

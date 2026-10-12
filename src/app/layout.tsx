@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { preload as reactDomPreload } from "react-dom";
 import { Playfair_Display, Barlow_Semi_Condensed, Karla, Prata, Marck_Script } from "next/font/google";
 import "./globals.css";
+import "./print.css";
+import "./menu-layout.css";
+import "./mobile-polish.css";
 import { Toaster } from "@/components/ui/sonner";
 import { LenisProvider } from "@/components/catering/lenis-provider";
 import { CustomCursor } from "@/components/catering/cursor";
@@ -17,6 +20,7 @@ import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
 import { ThemeFlipProvider } from "@/components/providers/theme-flip-provider";
 import { NuqsAdapter } from "nuqs/adapters/next";
 import { CONTACTS } from "@/lib/config";
+import { jsonLdText } from "@/lib/menu-seo";
 import { metaPriceFragments, MENU_TYPES } from "@/lib/pricing";
 import {
   SITE_URL,
@@ -150,7 +154,7 @@ export const metadata: Metadata = {
    * цикла + форматы), далее УТП, цена-минимум и телефон (Яндекс любит
    * конкретику в начале ~160 симв.). Длина 155 симв. при coffeeBreak=900.
    * Цена — из menu.json (мета меняется публикацией из админки). */
-  description: `Кейтеринг полного цикла в Санкт-Петербурге: фуршеты, банкеты, кофе-брейки, барбекю. Повара и официанты на вашей площадке. От ${metaPrices.coffeeBreak} ₽/чел. +7 (911) 941-72-05.`,
+  description: `Кейтеринг СПб: банкеты и фуршеты в Санкт-Петербурге под ключ, кофе-брейки, доставка закусок. Повара и официанты на вашей площадке. От ${metaPrices.coffeeBreak} ₽/чел.`,
   /* c99 (R1): связка с кириллическим запросом «нилов кейтеринг» —
    * домен nilovcatering.ru = транслитерация, добавляем написания
    * в обоих регистрах + гео-ключи форматов. */
@@ -184,7 +188,7 @@ export const metadata: Metadata = {
     title: "NILOV CATERING — Кейтеринг в Санкт-Петербурге",
     /* c99: OG/Twitter-описания синхронны основному description — один
      * источник смысла для соцпревью и сниппетов. */
-    description: `Кейтеринг полного цикла в Санкт-Петербурге: фуршеты, банкеты, кофе-брейки, барбекю. Повара и официанты на вашей площадке. От ${metaPrices.coffeeBreak} ₽/чел. +7 (911) 941-72-05.`,
+    description: `Банкеты и фуршеты в Санкт-Петербурге под ключ, кофе-брейки и доставка закусок. NiloV Catering: кейтеринг от ${metaPrices.coffeeBreak} ₽/чел.`,
     type: "website",
     locale: "ru_RU",
     url: siteUrl,
@@ -194,13 +198,14 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "NILOV CATERING — Кейтеринг в Санкт-Петербурге",
-    description: `Кейтеринг полного цикла в Санкт-Петербурге: фуршеты, банкеты, кофе-брейки, барбекю. Повара и официанты на вашей площадке. От ${metaPrices.coffeeBreak} ₽/чел. +7 (911) 941-72-05.`,
+    description: `Банкеты и фуршеты в Санкт-Петербурге под ключ, кофе-брейки и доставка закусок. NiloV Catering: кейтеринг от ${metaPrices.coffeeBreak} ₽/чел.`,
     images: ["/og-image.jpg"],
   },
   manifest: "/manifest.json",
   robots: {
     index: true,
     follow: true,
+    'max-image-preview': 'large',
     googleBot: {
       index: true,
       follow: true,
@@ -264,7 +269,8 @@ const jsonLd = {
   logo: siteUrl + "/brand/logo-512.png",
   telephone: PHONE_E164,
   email: EMAIL,
-  priceRange: "1200-4470₽",
+  priceRange: `${Math.min(...MENU_TYPES.flatMap((type) => type.packages.map((pkg) => pkg.pricePerGuest)))}-${Math.max(...MENU_TYPES.flatMap((type) => type.packages.map((pkg) => pkg.pricePerGuest)))}₽`,
+  hasMenu: { "@id": siteUrl + "/#catering-menu" },
   currenciesAccepted: "RUB",
   /* Заявки круглосуточно (24/7) — подтверждено в llms-full.txt и yandex.txt;
    * 3-я версия правки устранена: ранее была удалена, оставив LocalBusiness без
@@ -355,12 +361,6 @@ const jsonLd = {
  *  секциях hacc-menu/calculator) + юрстраницы, синхронно с sitemap.xml. */
 const PAGE_BREADCRUMBS = [
   { name: "Главная", item: siteUrl + "/", position: 1 },
-  { name: "О компании", item: siteUrl + "/about", position: 2 },
-  { name: "Меню и цены", item: siteUrl + "/#menu", position: 3 },
-  { name: "Калькулятор", item: siteUrl + "/#calculator", position: 4 },
-  { name: "Публичная оферта", item: siteUrl + "/offer", position: 5 },
-  { name: "Политика конфиденциальности", item: siteUrl + "/privacy", position: 6 },
-  { name: "Пользовательское соглашение", item: siteUrl + "/terms", position: 7 },
 ];
 /** c128 (22.09.2026) — Service + Offer JSON-LD (пробел C3.2 у критика).
  * Цены читаются из menu.json (единый источник, тот же что и калькулятор) —
@@ -394,7 +394,12 @@ const serviceLd = {
                 priceCurrency: "RUB",
                 // цена ЗА ГОСТЯ — единица обязательна, иначе Google
                 // трактует как цену за весь заказ
-                unitText: "за гостя",
+                priceSpecification: {
+                  "@type": "UnitPriceSpecification",
+                  price: String(price),
+                  priceCurrency: "RUB",
+                  unitText: "за гостя",
+                },
                 availability: "https://schema.org/InStock",
                 url: siteUrl + "/#calculator",
               },
@@ -506,17 +511,17 @@ export default function RootLayout({
         </a>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdText(jsonLd) }}
         />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdText(breadcrumbLd) }}
         />
         {/* c128: Service + Offer — форматы кейтеринга с ценами из menu.json.
             Отдаёт Google/Yandex цену и доступность прямо в выдаче. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdText(serviceLd) }}
         />
         {/* Task 1-b (cycle-71): FAQPage JSON-LD перенесён в src/app/page.tsx —
             гайдлайн Google: разметка FAQ допустима только на странице с

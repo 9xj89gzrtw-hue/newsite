@@ -290,6 +290,23 @@ function send_lead_response(int $status, array $body): void
  * ретрая (см. lead_notify_and_store_status). В статус дописываются классы
  * ошибок каналов (tgErr/mailErr/clientErr ∈ 'dead'|'crit'|'retry'|null) —
  * по ним принимается решение о ретрае. */
+/** Each channel is isolated: an exception must not cancel the other channel. */
+function lead_channel_call(callable $send, string $context, string $leadId): array
+{
+    try {
+        return $send();
+    } catch (Throwable $error) {
+        // No tokens, credentials or message bodies in the diagnostic.
+        error_log('[nilov-lead] ' . $context . ' id=' . $leadId . ' exception=' . get_class($error));
+        mail_log_append([
+            'context' => $context, 'ok' => false, 'error' => 'channel_exception',
+            'detail' => 'leadId=' . $leadId . '; ' . get_class($error),
+            'transport' => 'none',
+        ]);
+        return ['ok' => false, 'error' => 'channel_exception', 'transport' => 'none'];
+    }
+}
+
 function lead_notify_all(array $lead, ?float $deadline = null, array $skip = []): array
 {
     $inBudget = static function () use ($deadline): bool {
@@ -333,8 +350,8 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
     /* TG/владелец: что КЛИЕНТ получит (email может не быть указан). */
     $clientPlan = !is_string($lead['email']) || $lead['email'] === ''
         ? 'Клиент не оставил email — подтверждение не отправлялось'
-        : ($pdfLabel !== null ? 'Клиенту ушло письмо с меню «' . $pdfLabel . '»'
-            : 'Клиенту ушло письмо-подтверждение (без PDF-меню)');
+        : ($pdfLabel !== null ? 'Клиенту запланировано письмо с меню «' . $pdfLabel . '»'
+            : 'Клиенту запланировано письмо-подтверждение (без PDF-меню)');
 
     $chatId = $settings['tgChatId'] ?? null;
     $token = $settings['tgBotToken'] ?? null;
@@ -349,8 +366,8 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
          * c101: + inline-кнопки под сообщением; c102: первой идёт
          * «✈️ Написать в Telegram» (чат с клиентом по номеру — просьба
          * владельца), рядом «💬 WhatsApp», ниже «📋 Меню клиента». */
-        $tg = tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId,
-            lead_tg_text($lead, $clientPlan), 2, lead_tg_buttons($lead, $pdfUrl));
+        $tg = lead_channel_call(fn() => tg_send_fb($token, tg_api_bases($settings, $secrets), $chatId,
+            lead_tg_text($lead, $clientPlan), 2, lead_tg_buttons($lead, $pdfUrl)), 'lead-telegram', $lead['id']);
         $status['tg'] = ($tg['ok'] === true);
         if (!$status['tg']) {
             $status['tgErr'] = tg_error_class($tg);
@@ -368,7 +385,7 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
          * Премиум»), тело — секциями, + HTML-версия. */
         $fmt = lead_format_label($p);
         $subject = 'Новая заявка — ' . $lead['name'] . ($fmt !== null ? ' · ' . $fmt : '');
-        $mail = mail_send(
+        $mail = lead_channel_call(fn() => mail_send(
             $notifyEmail,
             $subject,
             lead_mail_text($lead, $clientPlan),
@@ -376,7 +393,7 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
             'lead-owner',
             [],
             lead_owner_mail_html($lead, $clientPlan)
-        );
+        ), 'lead-owner', $lead['id']);
         $status['mail'] = ($mail['ok'] === true);
         $status['mailTransport'] = is_string($mail['transport'] ?? null) ? $mail['transport'] : null;
         if (!$status['mail']) {
@@ -404,7 +421,7 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
                 'entry' => $pdfEntry,
             ];
         }
-        $client = mail_send(
+        $client = lead_channel_call(fn() => mail_send(
             $lead['email'],
             'Ваша заявка в NILOV CATERING принята',
             lead_client_mail_text($lead, $pdfLabel, $pdfUrl),
@@ -412,7 +429,7 @@ function lead_notify_all(array $lead, ?float $deadline = null, array $skip = [])
             'lead-client',
             $attachments,
             lead_client_mail_html($lead, $pdfLabel, $pdfUrl)
-        );
+        ), 'lead-client', $lead['id']);
         if ($attachSkipped !== null) {
             /* Пропуск вложения — НЕ ошибка доставки, но владелец должен
              * видеть это в журнале (иначе «почему без меню?» — загадка).

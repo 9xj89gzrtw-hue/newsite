@@ -12,6 +12,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone, Send, MessageCircle } from "lucide-react";
 import { CONTACTS } from "@/lib/media";
+import { ContactWidget } from "./contact-widget";
 import { Magnetic } from "@/components/motion/magnetic";
 import "./site-header.css"; /* C77: kinetic-header эффекты (см. докблок css) */
 
@@ -1019,14 +1020,7 @@ export function SiteHeader() {
         )}
       </AnimatePresence>
 
-      {/* Mobile FABs — phone (bottom) */}
-      <a
-        href={CONTACTS.phoneHref}
-        aria-label="Позвонить nilov catering"
-        className="fixed bottom-6 right-6 z-[70] flex size-14 items-center justify-center rounded-full bg-tott-burgundy text-white shadow-lg shadow-tott-burgundy/30 transition-transform duration-300 hover:scale-105 active:scale-95 lg:hidden"
-      >
-        <Phone className="size-6" />
-      </a>
+      <ContactWidget hidden={open} />
 
     </>
   );

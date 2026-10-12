@@ -21,10 +21,12 @@ Allow: /_next/static/media/
 # (пустым) открыла бы этим ботам /admin и /api/.
 User-agent: OAI-SearchBot
 User-agent: ChatGPT-User
+User-agent: Google-Extended
 User-agent: GPTBot
 User-agent: PerplexityBot
 User-agent: ClaudeBot
 User-agent: Bingbot
+User-agent: Yandex
 Allow: /
 Disallow: /admin
 Disallow: /api/

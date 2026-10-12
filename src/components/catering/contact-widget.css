@@ -1,0 +1,19 @@
+.contact-widget { position:fixed; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); right:16px; z-index:999; display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
+.contact-widget__toggle { position:relative; width:56px; height:56px; display:grid; place-items:center; border:0; border-radius:50%; background:#691c2e; color:white; cursor:pointer; box-shadow:0 5px 22px #691c2e45; transition:background .2s,transform .2s; }
+.contact-widget__toggle:hover { background:#82263d; }
+.contact-widget__toggle:active { transform:scale(.95); }
+.contact-widget__toggle::before { content:""; position:absolute; inset:-5px; border:2px solid #691c2e55; border-radius:50%; animation:contact-pulse 2.5s ease-out infinite; pointer-events:none; }
+.contact-widget__toggle[aria-expanded="true"]::before { animation:none; opacity:0; }
+.contact-widget__toggle span { display:flex; }
+.contact-widget__panel { width:256px; max-width:calc(100vw - 32px); padding:12px; border:1px solid #d5c5ad; border-radius:18px; color:#261c18; background:#fffaf5f5; backdrop-filter:blur(16px); box-shadow:0 8px 32px #261c1830; }
+.contact-widget__panel p { margin:2px 4px 10px; font-size:13px; line-height:1.4; }
+.contact-widget__panel a { display:flex; align-items:center; gap:12px; min-height:48px; padding:8px 12px; border-radius:10px; font-size:15px; font-weight:600; text-decoration:none; color:inherit; transition:background .2s; }
+.contact-widget__panel a:hover,.contact-widget__panel a:active { background:#eee2d5; }
+.contact-widget__panel a:focus-visible,.contact-widget__toggle:focus-visible { outline:3px solid #b68c45; outline-offset:3px; }
+.contact-widget__panel { max-height:calc(100svh - 100px - var(--cookie-banner-h, 0px) - env(safe-area-inset-bottom, 0px)); overflow-y:auto; }
+.cookie-banner-open .contact-widget { bottom:calc(16px + var(--cookie-banner-h, 0px)); }
+body:has(.hb-bar[data-visible="true"]) .contact-widget { bottom:calc(100px + var(--hbooking-cookie-h, 0px) + env(safe-area-inset-bottom, 0px)); }
+body:has(.hb-bar[data-visible="true"]) .contact-widget__panel { max-height:calc(100svh - 184px - var(--hbooking-cookie-h, 0px) - env(safe-area-inset-bottom, 0px)); }
+@keyframes contact-pulse { 0% { transform:scale(.9); opacity:.7; } 100% { transform:scale(1.25); opacity:0; } }
+@media(min-width:1024px) { .contact-widget { display:none; } }
+@media(prefers-reduced-motion:reduce) { .contact-widget__toggle::before { animation:none; } }

@@ -145,6 +145,11 @@ for (let i = 0; i < lines.length; i++) {
     lines[i] = priceLine;
     replaced++;
   }
+  if (lines[i].startsWith("- [Меню и форматы]")) {
+    const buffet = menu.menuTypes.find((type) => type.id === "buffet");
+    const variants = buffet?.packages.map((pkg) => `«${pkg.name}» ${fmt(pkg.pricePerGuest)} ₽`).join(", ");
+    lines[i] = `- [Меню и форматы](https://nilovcatering.ru/#menu): фуршет: ${variants ?? "варианты в полном меню"} за персону. Составы и граммовки всех форматов приведены в llms-full.txt; цены пакетов не являются ценами отдельных блюд.`;
+  }
 }
 if (replaced !== 1) {
   console.error(

@@ -282,6 +282,7 @@ import type { ComponentProps } from "react";
 import type { Calendar as CalendarType } from "@/components/ui/calendar";
 import { useMounted } from "@/hooks/use-mounted";
 import { CONTACTS } from "@/lib/config";
+import { maskPhoneInput } from "@/lib/phone-mask";
 import { anchorClickGoal, GOALS, trackGoal } from "@/lib/analytics";
 /* c95 (1-d): реальная отправка лида — POST /api/lead.php (same-origin PHP
  * на статик-экспорте), mailto — фоллбэк. */
@@ -948,13 +949,6 @@ const ContactsZone = memo(function ContactsZone({ hideRef }: { hideRef?: Ref<HTM
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
-/** 81-F2 (критик B MINOR): человекочитаемый номер квитанции из времени
- *  приёма заявки — «ДДММ-ЧЧММ» (№ 0409-1532). CUID из API больше НЕ
- *  рендерится (остаётся внутренним leadId — аналитика/дедуп на бэкенде). */
-function formatLeadNo(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getDate())}${pad(d.getMonth() + 1)}-${pad(d.getHours())}${pad(d.getMinutes())}`;
-}
 
 /**
  * Изолированная форма заявки (React.memo): keystroke перерисовывает ТОЛЬКО
@@ -1292,7 +1286,7 @@ const LeadForm = memo(function LeadForm({
         } catch {
           // non-critical
         }
-        toast.success(`Заявка принята! ${toastPromise}.`);
+        toast.success(`Спасибо! Заявка принята, ${toastPromise}.`);
         fireGoldConfetti(formEl);
         trackGoal(GOALS.LEAD_SUBMIT);
         onSuccess(result.id, {
@@ -1371,6 +1365,9 @@ const LeadForm = memo(function LeadForm({
       } else {
         toast.error("Не удалось отправить. Позвоните нам напрямую.");
       }
+    } finally {
+      // Validation and unpersisted-network branches return normally from try;
+      // both must release the button, not only thrown exceptions.
       setStatus("idle");
       submitInFlightRef.current = false;
     }
@@ -1503,7 +1500,18 @@ const LeadForm = memo(function LeadForm({
                     className={field}
                     type="tel"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      let raw = e.target.value;
+                      const event = e.nativeEvent as InputEvent;
+                      // Backspace across a formatting boundary must remove a digit,
+                      // not continually restore a closing parenthesis or separator.
+                      if (event.inputType?.startsWith("delete") &&
+                        raw.length < phone.length &&
+                        raw.replace(/\D/g, "") === phone.replace(/\D/g, "")) {
+                        raw = raw.replace(/\D/g, "").slice(0, -1);
+                      }
+                      setPhone(maskPhoneInput(raw));
+                    }}
                     onBlur={() => {
                       setErrors((er) => ({ ...er, phone: phone ? !phoneValid : false }));
                       /* Wave-4 (product-critic MINOR): маска при blur — display-only
@@ -1785,8 +1793,7 @@ function ConfettiBurst() {
  * Marck Script-строка (динамическое обещание C6), дата события
  * по-человечески (C2), однократное конфетти.
  * Fix5 V6: мета — готовая строка metaLine (у undecided — без цены).
- * 81-F2: № — человекочитаемый «ДДММ-ЧЧММ» из времени приёма (см.
- * formatLeadNo); CUID из API не показываем. */
+ * Номер совпадает с идентификатором, подтверждённым сервером. */
 function SuccessPanel({
   leadNo,
   queued,
@@ -1848,7 +1855,7 @@ function SuccessPanel({
             </>
           ) : (
             <>
-              Номер заявки: <b>№ {leadNo}</b>
+              Номер заявки: <b className="break-all">№ {leadNo}</b>
             </>
           )}
         </p>
@@ -2225,6 +2232,7 @@ const PackageGrid = memo(function PackageGrid({
     <div
       ref={rootRef}
       className="hb-pkgs"
+      data-packages={type.packages.length}
       role="radiogroup"
       aria-label={`Пакет меню — ${type.label}`}
       onKeyDown={handleKeyDown}
@@ -2864,8 +2872,8 @@ export function HaccBooking() {
      оркестратор: подпись успеха), тост/CTA остаются на живом тоне «сразу
      как увидим» — не противоречат, уточняют одна другую. */
   const ctaPromise = "Перезвоним сразу, как увидим заявку";
-  const toastPromise = "Перезвоним сразу, как увидим заявку";
-  const scriptPromise = "Мы перезвоним в течение часа";
+  const toastPromise = "мы свяжемся с вами в течение 15 минут";
+  const scriptPromise = "Мы свяжемся с вами в течение 15 минут";
 
   /* КОНТРАКТ 7 (слушатель): catering:menu-select. menu.tsx шлёт detail=string
      (typeId); спящие компоненты могут прислать {typeId, guests} — понимаем оба.
@@ -3164,17 +3172,12 @@ export function HaccBooking() {
         addonIds: string[];
       },
     ) => {
-      /* CUID остаётся внутренним id (не рендерится), квитанция получает
-       * человекочитаемый № из времени приёма (81-F2). c98-FIX1: без
-       * серверного подтверждения → без номера, режим queued.
-       * c98-FIX2 (критик4 MINOR#3): `!id`, а не `id === undefined` —
-       * postLead возвращает {ok:true,id:""} для 200-ответа без поля id
-       * (документированный инвариант submit-lead.ts: пустой id = принята,
-       * номер НЕ показываем); пустая строка прежде проходила как
-       * «подтверждено с номером» → квитанция с № из клиентских часов. */
+      /* A server-confirmed identifier is also the receipt number.
+       * Without an identifier, keep the separate queued/offline UI. */
       setLeadId(id);
       setLeadQueued(!id);
-      setLeadNo(!id ? "" : formatLeadNo(new Date()));
+      // Match the server's identifier instead of inventing a client-time number.
+      setLeadNo(!id ? "" : String(id));
       setStage("success");
       /* 81-W2F1 (критик F MINOR + № заявки): квитанция после сабмита
        * оказывалась НАД вьюпортом (замер: top −230) — юзер видел только

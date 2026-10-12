@@ -90,8 +90,8 @@ const NAV: { id: SectionId; label: string; shortLabel: string; icon: typeof Inbo
   { id: "addons", label: "Допуслуги", shortLabel: "Допуслуги", icon: Sparkles },
   { id: "minorder", label: "Минимальные заказы", shortLabel: "Мин. заказ", icon: Banknote },
   { id: "panels", label: "Цены на плитках услуг", shortLabel: "Плитки", icon: LayoutGrid },
-  { id: "leads", label: "Заявки", shortLabel: "Заявки", icon: Inbox },
-  { id: "settings", label: "Настройки", shortLabel: "Настройки", icon: SettingsIcon },
+  { id: "leads", label: "Входящие заявки", shortLabel: "Заявки", icon: Inbox },
+  { id: "settings", label: "Контакты и настройки", shortLabel: "Настройки", icon: SettingsIcon },
 ];
 
 const MOBILE_PRIMARY: SectionId[] = ["menu", "addons", "leads", "settings"];
@@ -331,7 +331,7 @@ export function AdminApp({
       /* ignore */
     }
     setPub({ phase: "building", commitSha, htmlUrl, startedAt: Date.now() });
-    toast.success("Изменения отправлены — сайт пересобирается");
+    toast.success("Изменения успешно сохранены! Сайт пересобирается.");
   };
 
   const scrollToFirstError = (errors: string[]) => {
@@ -597,6 +597,11 @@ export function AdminApp({
             <h1 className="flex-1 truncate text-[15px] font-medium text-ink-soft">
               {activeNav?.label}
             </h1>
+            <a href="/" target="_blank" rel="noopener noreferrer"
+              className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-border-line px-2 text-sm text-ink hover:bg-accent"
+              aria-label="Перейти на сайт">
+              <ExternalLink className="size-4" /><span className="hidden sm:inline">Перейти на сайт</span>
+            </a>
             {dirty ? (
               <span className="hidden items-center gap-1.5 text-[12.5px] text-ink-soft sm:inline-flex">
                 <span className="size-2 rounded-full bg-gold" />

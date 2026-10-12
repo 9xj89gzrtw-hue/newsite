@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { menuStructuredData, jsonLdText } from "@/lib/menu-seo";
 import { SiteHeader } from "@/components/catering/site-header";
 import { TottHero } from "@/components/catering/tott-hero";
 import { GgVideoShowcase } from "@/components/catering/gg-video-showcase";
@@ -300,6 +301,8 @@ export default function Home() {
       tabIndex={-1}
       className="flex min-h-screen flex-col bg-cream outline-none"
     >
+      <script type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdText(menuStructuredData()) }} />
       {/* c98-FIX1: ScrollProgress снят отсюда (дубль с layout.tsx — см.
           импорт-блок); полоса живёт в layout и покрывает эту страницу. */}
 

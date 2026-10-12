@@ -110,6 +110,30 @@ describe("PHP API contracts", () => {
     const result = await request("/api/lead.php", { clientId: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee" }, { "X-Requested-With": "" });
     expect(result.body.dedupe).toBe(true);
   });
+  test("honeypot silently accepts spam without adding a real lead", async () => {
+    const before = JSON.parse(readFileSync(join(root, "server-data/leads.json"), "utf8")).length;
+    const result = await request("/api/lead.php", {
+      name: "Local spam fixture", phone: "+79119417205", source: "calculator",
+      consent: true, honeypot: "bot", elapsedMs: 2000,
+    });
+    expect(result.status).toBe(200);
+    expect(result.body.ok).toBe(true);
+    expect(JSON.parse(readFileSync(join(root, "server-data/leads.json"), "utf8"))).toHaveLength(before);
+    expect(JSON.parse(readFileSync(join(root, "server-data/spam-log.json"), "utf8")).at(-1).reason).toBe("honeypot");
+  });
+  test("notification exceptions are isolated and logged without dropping saved leads", () => {
+    const result = php(`define('NILOV_LEAD_TESTS', true); require '${join(root, "api/lead.php")}';
+      $failed = lead_channel_call(fn() => throw new RuntimeException('local fixture'), 'lead-telegram', 'test-id');
+      $fallback = lead_channel_call(fn() => ['ok'=>true], 'lead-owner', 'test-id');
+      echo json_encode([$failed, $fallback]);`);
+    const [failed, fallback] = JSON.parse(result);
+    expect(failed.ok).toBe(false);
+    expect(failed.error).toBe("channel_exception");
+    expect(fallback.ok).toBe(true);
+    const log = JSON.parse(readFileSync(join(root, "server-data/mail-log.json"), "utf8"));
+    expect(log.some((entry: { error?: string }) => entry.error === "channel_exception")).toBe(true);
+    expect(JSON.parse(readFileSync(join(root, "server-data/leads.json"), "utf8"))).toHaveLength(1);
+  });
   test("logout invalidates the session server-side", async () => {
     expect((await request("/api/admin.php?action=logout", {}, { Cookie: cookie })).status).toBe(200);
     expect((await request("/api/admin.php?action=session", undefined, { Cookie: cookie })).status).toBe(401);
