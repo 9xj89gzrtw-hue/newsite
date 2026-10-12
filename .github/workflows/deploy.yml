@@ -24,23 +24,34 @@ jobs:
       NEXT_PUBLIC_GOOGLE_VERIFICATION: "owkuVbBpuvmi6CQ_7cv-0lKXqwfJVeDQWwf228DbYho"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: "1.4.3"
 
       - name: Install deps
-        run: bun install --frozen-lockfile || bun install
+        run: bun install --frozen-lockfile
         env:
           # Persist Bun's HTTP cache so next/font/google font fetches
           # are cached between CI builds, preventing transient network
           # failures from fonts.googleapis.com.
           BUN_INSTALL_CACHE_DIR: ${{ runner.temp }}/.bun-cache
 
+      - name: Regression checks before deployment
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y php-cli php-curl php-mbstring
+          bun run lint
+          bun run typecheck
+          for file in public/api/*.php public/config/secrets.example.php; do
+            php -l "$file" || exit 1
+          done
+          bun run test
+
       - name: Cache Turbo build
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .next/cache/turbopack
           key: turbo-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}
@@ -231,12 +242,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: "1.4.3"
 
       - name: Deploy to Vercel (production)
         env:

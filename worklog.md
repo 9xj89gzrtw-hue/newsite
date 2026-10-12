@@ -597,3 +597,18 @@ Stage Summary:
 - АДМИНКА: мини-CRM (статусы/заметки/быстрые каналы/архив/фильтры/статистика/CSV) + «Автоматизация» с cron-токеном и состоянием.
 - АВТОМАТИЗАЦИЯ: cron.php (дайджест каждое утро + авто-дожим клиента через 24 ч + опциональные напоминания) — владелец настраивает один раз в админке, дальше система работает сама; идемпотентность и анти-шторм заложены.
 - ВСЕ ТЕСТЫ ЗЕЛЁНЫЕ; готово к коммиту/деплою (следующий шаг).
+
+---
+Task: Full site/project functional audit and fixes (2026-10-12)
+
+Work Log:
+- Fixed Apache/Vercel/local PHP vanity routes; blocked localStorage crash, malformed cached outbox entries, concurrent pagehide beacons and older Safari POST timeout compatibility.
+- Lead results now expose whether a retry is really persisted. Calculator/contact do not display saved/delivered receipts for backend validation failures or storage failures, and queued requests do not fire the confirmed LEAD_SUBMIT goal. Queued confirmation no longer promises an immediate callback.
+- Guarded nonfinite calculator input, aligned PHP/TS phone normalization and menu contracts, rejected unsafe/duplicate IDs and missing minimums. Added an admin request timeout.
+- Restored usable dev/start commands for static export, removed automatic DB schema changes from builds and automatic accept-data-loss flags from explicit DB commands.
+- Vercel now generates menu PDFs. Export verification checks pages, PHP endpoints, the actual menu, all 19 PDF files and absence of private credentials.
+- Updated dependencies and Actions, fixed Bun at 1.4.3, require the frozen lockfile, added pre-deploy lint/typecheck/PHP/regression tests. braces 3.0.3 has no upstream fix for GHSA-vfj7-8cjw-p6xm: durable Bun patch limits parser and AST recursion, with regression tests. This advisory remains visible to version-based audit.
+- Mobile menu tabs no longer split normal tariff names into individual letters. Fixed a missing fallback poster in the reserve CEP component and declared the animation sequence before effects/callbacks capturing it.
+- Verification: 77 tests/253 assertions, 0 failures; lint/typecheck/PHP syntax/production export passed. Desktop/mobile page and demo-admin navigation, vanity scroll destinations, blocked storage, mocked successful submission and 400/503/offline error states verified in Playwright.
+- All API fixtures used temporary directories, fake credentials and disabled mail delivery. No real customer messages, settings or leads were changed. Live SMTP/Telegram delivery and live admin-to-GitHub editing remain outside this no-notifications audit.
+- Detailed report: docs/audit-2026-10-12.md. Owner explicitly approved publishing this full fix set to main and both hosting targets.

@@ -10,12 +10,12 @@ jobs:
     name: Lint + Typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: "1.4.3"
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -30,6 +30,21 @@ jobs:
       # что и в npm-скрипте build (до next build).
       - name: Validate menu data
         run: bun scripts/validate-menu.ts
+
+      - name: Install PHP test runtime
+        run: sudo apt-get update -qq && sudo apt-get install -y php-cli php-curl php-mbstring
+
+      - name: Validate PHP syntax
+        run: |
+          for file in public/api/*.php public/config/secrets.example.php; do
+            php -l "$file" || exit 1
+          done
+
+      - name: Regression tests (isolated, notifications disabled)
+        run: bun run test
+
+      - name: Production static export
+        run: bun run build
 
       # c95 (4-W1-D): шаг «Static data freshness (llms.txt)» УДАЛЁН —
       # публикация из админки коммитит ТОЛЬКО src/data/menu.json, а

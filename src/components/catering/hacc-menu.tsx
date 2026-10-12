@@ -240,6 +240,8 @@ function MenuRack({
   const reduceSettled = mounted && reduced;
 
   const rackRef = useRef<HTMLDivElement | null>(null);
+  // Declare the animation sequence before callbacks/effects that capture it.
+  const animSeq = useRef(0);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const spineRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -824,8 +826,6 @@ function MenuRack({
   /* C61/волна-1 (QA): последовательный номер анимации рэка — отменяет
      отложенные done()-колбэки предыдущей анимации (иначе таймер страховки
      прерванного схлопа убивал новое раскрытие на 950-м миллисекунде) */
-  const animSeq = useRef(0);
-
   /* 3-c/A+B+D: смена пакета — плавные переходы вместо прыжков -------------
      Ремоунт списка (key=pkg.name, кроссфейд C59) сбрасывает внутренний
      scrollTop в 0 и мгновенно меняет высоту панели (раскрытый рэк десктопа

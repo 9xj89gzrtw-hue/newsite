@@ -1306,6 +1306,15 @@ const LeadForm = memo(function LeadForm({
         return;
       }
 
+      if (result.queued !== true) {
+        toast.error(
+          result.reason === "validation"
+            ? "Сервер отклонил данные. Проверьте форму и попробуйте ещё раз."
+            : "Заявка не отправлена и не сохранена. Попробуйте ещё раз или свяжитесь с нами по телефону.",
+        );
+        return;
+      }
+
       /* ── ФОЛЛБЭК: эндпоинт недоступен/отверг запрос — деградация к
        * mailto + outbox (c98-A). Один console.warn на страницу —
        * диагностика без toast-спама.
@@ -1323,7 +1332,7 @@ const LeadForm = memo(function LeadForm({
         );
       }
       toast.success(
-        "Заявка сохранена — отправим автоматически. Открылся почтовый клиент? Нажмите «Отправить», и она придёт быстрее.",
+        "Заявка сохранена в этом браузере. Попробуем отправить автоматически при восстановлении связи. Письмо можно отправить вручную.",
       );
       try {
         window.location.assign(mailto);
@@ -1339,9 +1348,7 @@ const LeadForm = memo(function LeadForm({
       /* C71 (Task 1-c2): золотой салют из формы — эмоциональная точка
        * конверсии (reduce-motion → noop внутри утилиты, анти-спам ≤2). */
       fireGoldConfetti(formEl);
-      /* W3 / K6-CRITICAL: LEAD_SUBMIT — терминальная цель воронки (201),
-       * рядом с салютом. Форма после успеха размонтируется — дублей нет. */
-      trackGoal(GOALS.LEAD_SUBMIT);
+      // A queued request is not a confirmed conversion.
       /* КОНТРАКТ 7: снимок расчёта — из пропсов формы (id нет — заявка
          ушла через почту клиента, серверного номера не существует). */
       onSuccess(undefined, {
@@ -1835,9 +1842,9 @@ function SuccessPanel({
         <p className="hb-success__no">
           {queued ? (
             <>
-              Заявка сохранена и <b>отправится автоматически</b> — как только
+              Заявка сохранена в этом браузере. <b>Повторим отправку</b>, когда
               связь восстановится. Если открылся почтовый клиент — нажмите
-              «Отправить», и она придёт мгновенно.
+              «Отправить», чтобы отправить её письмом.
             </>
           ) : (
             <>
@@ -1846,7 +1853,9 @@ function SuccessPanel({
           )}
         </p>
         {/* C6+C7 (task 9-fix2): динамическое обещание, с заглавной. */}
-        <p className="hb-success__script">{promiseLine}</p>
+        <p className="hb-success__script">
+          {queued ? "Для срочного ответа позвоните нам" : promiseLine}
+        </p>
 
         <div className="hb-success__meta">{metaLine}</div>
 

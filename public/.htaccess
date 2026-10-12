@@ -44,6 +44,10 @@ DirectorySlash Off
 # c101: +about — страница «О компании» (SEO-чеклист, шаг 27)
 RewriteRule ^(offer|privacy|terms|about|admin)/?$ $1.html [L]
 
+# Campaign/deep-link paths must reach the home page before the client-side
+# VanityUrlScroll can scroll to their section. Static export has no Next rewrites.
+RewriteRule ^(menu|events|contacts|contact|calculator)/?$ index.html [L]
+
 # c95: серверные каталоги runtime-данных и секретов — недоступны из веба
 RedirectMatch 404 ^/(server-data|config)(/.*)?$
 

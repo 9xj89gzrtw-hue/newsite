@@ -18,6 +18,7 @@ declare(strict_types=1);
 define('NILOV_API', true);
 require __DIR__ . '/_lib.php';
 
+if (!defined('NILOV_ADMIN_TESTS')) {
 header('X-Robots-Tag: noindex, nofollow');
 
 @set_time_limit(90);
@@ -54,6 +55,7 @@ match ($action) {
     'password' => h_password($method),
     default => json_response(404, ['ok' => false, 'error' => 'unknown_action']),
 };
+}
 
 /* ========================= действия роутера ========================== */
 
@@ -1113,6 +1115,12 @@ function validate_menu(array $menu): array
     if (strlen($json) > 400 * 1024) {
         $add('Файл меню слишком большой (больше 400 КБ)');
     }
+    foreach (['version', 'menuTypes', 'addons', 'minOrder', 'servicePanels'] as $required) {
+        if (!array_key_exists($required, $menu)) $add('Отсутствует обязательное поле ' . $required);
+    }
+    if (!is_int($menu['version'] ?? null) || $menu['version'] < 1) {
+        $add('version: ожидается положительное целое число');
+    }
 
     /* --- локальные проверки-замыкания (общие для корня и формата) --- */
     // непустая строка до $cap символов (UTF-8)
@@ -1121,13 +1129,14 @@ function validate_menu(array $menu): array
     };
     // addons: ≤20; РОВНО одно из price (int 100..1000000) | percent (int 1..200)
     $checkAddons = static function (mixed $list, string $where) use ($add): void {
-        if (!is_array($list)) {
+        if (!is_array($list) || !array_is_list($list)) {
             $add($where . ': addons должен быть массивом');
             return;
         }
         if (count($list) > 20) {
             $add($where . ': слишком много допуслуг (максимум 20)');
         }
+        $seen = [];
         foreach ($list as $ai => $a) {
             $an = $where . ', допуслуга №' . ($ai + 1);
             if (!is_array($a)) {
@@ -1135,6 +1144,12 @@ function validate_menu(array $menu): array
                 continue;
             }
             $label = $a['label'] ?? null;
+            $id = $a['id'] ?? null;
+            if (!is_string($id) || slen($id) > 64 || preg_match('/^[a-z0-9][a-z0-9-]*$/', $id) !== 1 || in_array($id, $seen, true)) {
+                $add($an . ': id должен быть непустым и уникальным (до 64 символов)');
+            } else {
+                $seen[] = $id;
+            }
             if (!is_string($label) || trim($label) === '' || slen($label) > 200) {
                 $add($an . ': пустой или слишком длинный label (до 200 символов)');
             }
@@ -1164,14 +1179,14 @@ function validate_menu(array $menu): array
         foreach ($mo as $v) {
             if (!is_int($v)) {
                 $add($where . ': minOrder — цена должна быть целым числом');
-            } elseif ($v < 0 || $v > 10000000) {
-                $add($where . ': minOrder должен быть от 0 до 10 000 000');
+            } elseif ($v < 1 || $v > 10000000) {
+                $add($where . ': minOrder должен быть от 1 до 10 000 000');
             }
         }
     };
 
     $types = $menu['menuTypes'] ?? null;
-    if (!is_array($types) || count($types) < 1 || count($types) > 12) {
+    if (!is_array($types) || !array_is_list($types) || count($types) < 1 || count($types) > 12) {
         $add('menuTypes: должен быть массивом из 1–12 форматов кейтеринга');
     } else {
         $seenIds = [];
@@ -1182,7 +1197,7 @@ function validate_menu(array $menu): array
                 continue;
             }
             $id = $t['id'] ?? null;
-            if (!is_string($id) || trim($id) === '' || strlen($id) > 64) {
+            if (!is_string($id) || strlen($id) > 64 || preg_match('/^[a-z0-9][a-z0-9-]*$/', $id) !== 1) {
                 $add($n . ': пустой или слишком длинный id');
                 $id = null;
             } elseif (in_array($id, $seenIds, true)) {
@@ -1191,6 +1206,9 @@ function validate_menu(array $menu): array
                 $seenIds[] = $id;
             }
             $n = $id !== null ? 'Формат «' . $id . '»' : $n;
+            foreach (['label', 'short', 'description', 'perGuest', 'minGuests', 'included', 'packages'] as $required) {
+                if (!array_key_exists($required, $t)) $add($n . ': отсутствует ' . $required);
+            }
             if (!$str($t['label'] ?? null, 200)) {
                 $add($n . ': пустой или слишком длинный label (до 200 символов)');
             }
@@ -1199,6 +1217,9 @@ function validate_menu(array $menu): array
             }
             if (array_key_exists('description', $t) && !$str($t['description'], 500)) {
                 $add($n . ': пустой или слишком длинный description (до 500 символов)');
+            }
+            if (array_key_exists('priceUnit', $t) && !$str($t['priceUnit'], 200)) {
+                $add($n . ': priceUnit — непустая строка до 200 символов');
             }
             // цены формата (каталог/калькулятор) — положительные целые.
             // c95-W2-E MINOR-4: верхние границы (1e6/1e4) — иначе в scratch
@@ -1219,7 +1240,7 @@ function validate_menu(array $menu): array
             }
             if (array_key_exists('included', $t)) {
                 $inc = $t['included'];
-                if (!is_array($inc)) {
+                if (!is_array($inc) || !array_is_list($inc)) {
                     $add($n . ': included должен быть массивом');
                 } else {
                     if (count($inc) > 20) {
@@ -1234,7 +1255,7 @@ function validate_menu(array $menu): array
                 }
             }
             $pkgs = $t['packages'] ?? null;
-            if (!is_array($pkgs) || count($pkgs) < 1 || count($pkgs) > 6) {
+            if (!is_array($pkgs) || !array_is_list($pkgs) || count($pkgs) < 1 || count($pkgs) > 6) {
                 $add($n . ': packages должен содержать 1–6 пакетов');
                 continue;
             }
@@ -1250,6 +1271,12 @@ function validate_menu(array $menu): array
                     $name = null;
                 }
                 $pnt = $name !== null ? $n . ', пакет «' . $name . '»' : $pn;
+                foreach (['description', 'dishes'] as $required) {
+                    if (!array_key_exists($required, $p)) $add($pnt . ': отсутствует ' . $required);
+                }
+                if (array_key_exists('photo', $p) && !$str($p['photo'], 500)) {
+                    $add($pnt . ': photo — непустая строка до 500 символов');
+                }
                 $ppg = $p['pricePerGuest'] ?? null;
                 if (!is_int($ppg)) {
                     $add($pnt . ': цена должна быть целым числом');
@@ -1261,7 +1288,7 @@ function validate_menu(array $menu): array
                 }
                 if (array_key_exists('dishes', $p)) {
                     $dishes = $p['dishes'];
-                    if (!is_array($dishes) || count($dishes) < 1 || count($dishes) > 60) {
+                    if (!is_array($dishes) || !array_is_list($dishes) || count($dishes) < 1 || count($dishes) > 60) {
                         $add($pnt . ': dishes должен содержать 1–60 позиций');
                     } else {
                         foreach ($dishes as $dish) {
@@ -1269,6 +1296,9 @@ function validate_menu(array $menu): array
                             if (!is_string($dn) || trim($dn) === '' || slen($dn) > 300) {
                                 $add($pnt . ': название блюда — строка 1–300 символов');
                                 break;
+                            }
+                            if (array_key_exists('weight', $dish) && !$str($dish['weight'], 60)) {
+                                $add($pnt . ': weight — непустая строка до 60 символов');
                             }
                         }
                     }
@@ -1288,20 +1318,36 @@ function validate_menu(array $menu): array
     }
     if (array_key_exists('minOrder', $menu)) {
         $checkMinOrder($menu['minOrder'], 'minOrder (корень)');
+        if (is_array($menu['minOrder']) && is_array($types)) {
+            $ids = array_column($types, 'id');
+            foreach ($ids as $id) {
+                if (is_string($id) && !array_key_exists($id, $menu['minOrder'])) $add('Отсутствует minOrder для ' . $id);
+            }
+            foreach (array_keys($menu['minOrder']) as $id) {
+                if (!in_array($id, $ids, true)) $add('Лишний формат minOrder: ' . $id);
+            }
+        }
     }
     if (array_key_exists('servicePanels', $menu)) {
         $panels = $menu['servicePanels'];
-        if (!is_array($panels)) {
+        if (!is_array($panels) || !array_is_list($panels)) {
             $add('servicePanels: должен быть массивом');
         } else {
             if (count($panels) > 12) {
                 $add('Слишком много сервисных панелей (максимум 12)');
             }
+            $seen = [];
             foreach ($panels as $si => $panel) {
                 $sn = 'Плитка услуг №' . ($si + 1);
                 if (!is_array($panel)) {
                     $add($sn . ': должен быть объектом');
                     continue;
+                }
+                $id = $panel['id'] ?? null;
+                if (!$str($id, 64) || preg_match('/^[a-z0-9][a-z0-9-]*$/', $id) !== 1 || in_array($id, $seen, true)) {
+                    $add($sn . ': id должен быть непустым и уникальным (до 64 символов)');
+                } else {
+                    $seen[] = $id;
                 }
                 if (!$str($panel['label'] ?? null, 120)) {
                     $add($sn . ': пустой или слишком длинный label (до 120 символов)');

@@ -152,6 +152,22 @@ function str_trunc(string $s, int $max): string
     return substr($s, 0, $max);
 }
 
+/** Canonical phone format, matching src/lib/phone.ts for direct API clients. */
+function normalize_phone(string $raw): string
+{
+    $raw = trim($raw);
+    if (preg_match('/^[+0-9().\-\s]+$/', $raw) !== 1) {
+        return $raw;
+    }
+    $digits = preg_replace('/\D/', '', $raw) ?? '';
+    $n = strlen($digits);
+    if ($n === 10) return '+7' . $digits;
+    if ($n === 11 && $digits[0] === '8') return '+7' . substr($digits, 1);
+    if ($n === 11 && $digits[0] === '7') return '+' . $digits;
+    if ($n >= 9 && $n <= 15) return '+' . $digits;
+    return $raw;
+}
+
 /* ----------------------------- секреты --------------------------------- */
 
 /** Дефолты секретов (полный файл пишет CI по SSH из GitHub Secrets). */

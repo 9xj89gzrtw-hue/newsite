@@ -226,6 +226,13 @@ export async function adminApi(
   const method = opts.method ?? (opts.body === undefined ? "GET" : "POST");
   const base = opts.base ?? API_BASE;
   const qs = new URLSearchParams({ action, ...(opts.params ?? {}) });
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  if (opts.signal?.aborted) controller.abort();
+  else opts.signal?.addEventListener("abort", abort, { once: true });
+  // PHP permits up to 90 s for upstream retries. A stalled connection must
+  // still release the admin's save/login controls.
+  const timeout = setTimeout(abort, 95_000);
   try {
     const res = await fetch(`${base}/api/admin.php?${qs.toString()}`, {
       method,
@@ -236,7 +243,7 @@ export async function adminApi(
       },
       credentials: "same-origin",
       body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
-      signal: opts.signal,
+      signal: controller.signal,
     });
     let body: Record<string, unknown> | null = null;
     try {
@@ -254,9 +261,12 @@ export async function adminApi(
         : undefined;
     return { status: res.status, body, cookies };
   } catch (e) {
-    if ((e as Error)?.name === "AbortError") throw e;
+    if ((e as Error)?.name === "AbortError" && opts.signal?.aborted) throw e;
     toast.error("Нет связи с сервером — проверьте интернет");
     return { status: 0, body: null };
+  } finally {
+    clearTimeout(timeout);
+    opts.signal?.removeEventListener("abort", abort);
   }
 }
 

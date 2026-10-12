@@ -1,11 +1,18 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "buildCommand": "prisma generate && node scripts/db-push-if-set.js && bun scripts/validate-menu.ts && bun scripts/gen-static-data.ts && next build --webpack",
+  "buildCommand": "prisma generate && bun scripts/validate-menu.ts && bun scripts/gen-static-data.ts && bun scripts/gen-menu-pdfs.ts && next build --webpack && bun scripts/check-export.ts",
   "devCommand": "next dev -p 3000",
   "installCommand": "bun install",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    { "source": "/menu", "destination": "/" },
+    { "source": "/events", "destination": "/" },
+    { "source": "/contacts", "destination": "/" },
+    { "source": "/contact", "destination": "/" },
+    { "source": "/calculator", "destination": "/" }
+  ],
   "redirects": [
     { "source": "/api/:path*", "destination": "/404", "statusCode": 302 },
     { "source": "/server-data/:path*", "destination": "/404", "statusCode": 302 },

@@ -152,10 +152,14 @@ export function calcTotal(
   /* c86: минимумов гостей больше нет — расчёт от фактического числа
      (защита только от мусора: как минимум один гость, максимум —
      верхняя граница шкалы ×2). */
-  const g = Math.min(999, Math.max(1, Math.trunc(guests)));
+  const g = Number.isFinite(guests)
+    ? Math.min(999, Math.max(1, Math.trunc(guests)))
+    : 1;
   /* c89: snack-box в калькуляторе — без выбора пакета, единая цена. */
   const flat = t.calcPerGuest != null;
-  const clampedIdx = Math.max(0, Math.min(Math.trunc(pkgIdx), t.packages.length - 1));
+  const clampedIdx = Number.isFinite(pkgIdx)
+    ? Math.max(0, Math.min(Math.trunc(pkgIdx), t.packages.length - 1))
+    : 0;
   const pkg = flat ? undefined : t.packages[clampedIdx];
   const perGuest = flat ? (t.calcPerGuest as number) : pkg ? pkg.pricePerGuest : t.perGuest;
   const subtotal = perGuest * g;

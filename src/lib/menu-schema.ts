@@ -13,6 +13,7 @@ import { z } from "zod";
 
 const NonEmptyString = z
   .string()
+  .trim()
   .min(1, "строка не может быть пустой");
 
 const PositiveInt = z
@@ -24,6 +25,10 @@ const PositiveInt = z
  *  (иначе в чек уезжают 12-значные числа после опечатки в админке). */
 const PriceInt = PositiveInt.max(1_000_000, "цена недопустимо велика (максимум 1 000 000)");
 const GuestsInt = PositiveInt.max(10_000, "число гостей недопустимо велико (максимум 10 000)");
+const SafeId = NonEmptyString.max(64).regex(
+  /^[a-z0-9][a-z0-9-]*$/,
+  "id: только строчные латинские буквы, цифры и дефис",
+);
 
 /* ----------------------------------------------------------------- shapes */
 
@@ -31,16 +36,16 @@ export const DishSchema = z.object({
   /** Название позиции меню (для каталога, калькулятора и PDF-сметы). */
   name: NonEmptyString.max(300, "название блюда длиннее 300 символов"),
   /** Граммовка/объём подачи («35 г» | «300 мл» | «1 шт»). */
-  weight: NonEmptyString.optional(),
+  weight: NonEmptyString.max(60).optional(),
 });
 
 export const MenuPackageSchema = z.object({
   /** «Базовый» | «Стандарт» | «Премиум» (или название набора для snack-box). */
-  name: NonEmptyString,
-  pricePerGuest: PriceInt,
-  description: NonEmptyString,
+  name: NonEmptyString.max(200),
+  pricePerGuest: PriceInt.min(100).max(100_000),
+  description: NonEmptyString.max(500),
   /** Путь в /media (опционально — не у всех пакетов есть фото). */
-  photo: NonEmptyString.optional(),
+  photo: NonEmptyString.max(500).optional(),
   dishes: z
     .array(DishSchema)
     .min(1, "в пакете должен быть хотя бы один dish")
@@ -48,9 +53,9 @@ export const MenuPackageSchema = z.object({
 });
 
 export const MenuTypeSchema = z.object({
-  id: NonEmptyString,
-  label: NonEmptyString,
-  short: NonEmptyString,
+  id: SafeId,
+  label: NonEmptyString.max(200),
+  short: NonEmptyString.max(200),
   /** Минимальная цена формата в каталоге. */
   perGuest: PriceInt,
   /** Единая цена формата в КАЛЬКУЛЯТОРЕ, если отличается от каталогной
@@ -61,10 +66,10 @@ export const MenuTypeSchema = z.object({
    *  всех типов единица, «могут заказать хоть от одного человека»). */
   minGuests: GuestsInt,
   /** "/чел" (по умолчанию) | "за набор". */
-  priceUnit: NonEmptyString.optional(),
-  description: NonEmptyString,
+  priceUnit: NonEmptyString.max(200).optional(),
+  description: NonEmptyString.max(500),
   /** Что входит во все пакеты формата (обслуживание, посуда, доставка…). */
-  included: z.array(NonEmptyString),
+  included: z.array(NonEmptyString.max(200)).max(20),
   packages: z
     .array(MenuPackageSchema)
     .min(1, "у формата должен быть хотя бы один пакет")
@@ -73,11 +78,11 @@ export const MenuTypeSchema = z.object({
 
 export const AddonSchema = z
   .object({
-    id: NonEmptyString,
-    label: NonEmptyString,
+    id: SafeId,
+    label: NonEmptyString.max(200),
     /** c94: фиксированная МИНИМАЛЬНАЯ цена — везде печатается с предлогом
      *  «от» (финальная зависит от события). */
-    price: PositiveInt.optional(),
+    price: PriceInt.min(100).optional(),
     /** c94: надбавка в ПРОЦЕНТАХ от подытога меню (аренда оборудования/
      *  мебели масштабируется с событием). */
     percent: z
@@ -94,11 +99,11 @@ export const AddonSchema = z
 
 export const ServicePanelSchema = z.object({
   /** id плитки главы «Каталог услуг» (hacc-services) — мэтчинг по id. */
-  id: NonEmptyString,
+  id: SafeId,
   /** Заголовок плитки. */
-  label: NonEmptyString,
+  label: NonEmptyString.max(120),
   /** Цена плитки целиком («от 5 500 ₽», NBSP внутри). */
-  priceLabel: NonEmptyString,
+  priceLabel: NonEmptyString.max(60),
 });
 
 export const MenuDataSchema = z
@@ -109,9 +114,9 @@ export const MenuDataSchema = z
       .array(MenuTypeSchema)
       .min(1, "нужен хотя бы один формат меню")
       .max(12, "форматов меню больше 12"),
-    addons: z.array(AddonSchema),
+    addons: z.array(AddonSchema).max(20),
     /** Минимальные суммы заказа по форматам — ключи = id форматов. */
-    minOrder: z.record(z.string().min(1, "пустой ключ minOrder"), PositiveInt),
+    minOrder: z.record(z.string().min(1, "пустой ключ minOrder"), PositiveInt.max(10_000_000)),
     servicePanels: z
       .array(ServicePanelSchema)
       .max(12, "плиток услуг (servicePanels) больше 12"),
@@ -154,6 +159,14 @@ export const MenuDataSchema = z
         code: "custom",
         message: "id плиток услуг (servicePanels) должны быть уникальными",
         path: ["servicePanels"],
+      });
+    }
+    const addonIds = data.addons.map((a) => a.id);
+    if (new Set(addonIds).size !== addonIds.length) {
+      ctx.addIssue({
+        code: "custom",
+        message: "id допуслуг должны быть уникальными",
+        path: ["addons"],
       });
     }
   });

@@ -24,7 +24,7 @@ import { useMounted } from "@/hooks/use-mounted";
  *   - **0.5× playback speed** set via `<video ref>` + `useEffect` — CEP's
  *     signature slow-mo treatment (`data-config-playback-speed="0.5"` on
  *     the original).
- *   - `poster="/media/cep/cep-divider-image.png"` as graceful fallback if
+ *   - `poster="/media/cep/cep-locations-bg.jpg"` as graceful fallback if
  *     the mp4 fails to load.
  *   - Dark overlay `absolute inset-0 bg-black/50` between video and text
  *     (mirrors CEP's `hsla(0,0%,0%,.5)` image-block overlay).
@@ -94,7 +94,7 @@ export function CepSimpleBrilliant() {
         loop
         playsInline
         preload="metadata"
-        poster="/media/cep/cep-divider-image.png"
+        poster="/media/cep/cep-locations-bg.jpg"
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden="true"
       >

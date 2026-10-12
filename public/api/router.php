@@ -22,6 +22,7 @@ $path = parse_url($uri, PHP_URL_PATH);
 if (!is_string($path) || $path === '') {
     $path = '/';
 }
+$path = rawurldecode($path);
 
 if (preg_match('#^/(server-data|config)(/|$)#', $path)) {
     http_response_code(404);
@@ -46,9 +47,16 @@ if (preg_match('#^/api/([A-Za-z0-9_-]+)\.php$#', $path, $m)) {
 /* c95: чистые URL без расширения (/admin, /offer, /privacy, /terms) —
  * в проде это делает mod_rewrite (.htaccess), локально эмулируем:
  * путь без слэша и точки → пробуем <path>.html из docroot. */
-if ($path !== '/' && !str_contains($path, '.') && !str_ends_with($path, '/')) {
+if (preg_match('#^/(menu|events|contacts|contact|calculator)/?$#', $path)) {
     $docroot = $_SERVER['DOCUMENT_ROOT'] ?? getcwd();
-    $try = $docroot . $path . '.html';
+    header('Content-Type: text/html; charset=utf-8');
+    readfile($docroot . '/index.html');
+    return true;
+}
+
+if (preg_match('#^/(admin|offer|privacy|terms|about)/?$#', $path)) {
+    $docroot = $_SERVER['DOCUMENT_ROOT'] ?? getcwd();
+    $try = $docroot . rtrim($path, '/') . '.html';
     if (is_file($try)) {
         header('Content-Type: text/html; charset=utf-8');
         readfile($try);

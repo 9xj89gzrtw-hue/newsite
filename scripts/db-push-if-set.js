@@ -21,7 +21,7 @@ if (!isPostgres) {
 
 try {
   console.log("[db-push] DATABASE_URL is Postgres — running prisma db push...");
-  execSync("bunx prisma db push --accept-data-loss", { stdio: "inherit" });
+  execSync("bunx prisma db push", { stdio: "inherit" });
   console.log("[db-push] done.");
 } catch (e) {
   console.warn("[db-push] prisma db push failed (non-fatal):", e.message);

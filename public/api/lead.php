@@ -153,12 +153,14 @@ if ($name === '' || slen($name) > 100) {
 }
 
 $phone = isset($body['phone']) && is_string($body['phone']) ? trim($body['phone']) : '';
-if (strlen($phone) < 7 || strlen($phone) > 25 || preg_match('/^[+0-9()\\-\\s]+$/', $phone) !== 1) {
-    $vErr('Телефон: 7–25 символов, только цифры и + ( ) - пробел');
+if (strlen($phone) < 7 || strlen($phone) > 25 || preg_match('/^[+0-9().\\-\\s]+$/', $phone) !== 1) {
+    $vErr('Телефон: 7–25 символов, только цифры и + ( ) . - пробел');
 }
-if (strlen(preg_replace('/\D/', '', $phone) ?? '') < 9) {
-    $vErr('Телефон: слишком мало цифр');
+$phoneDigits = strlen(preg_replace('/\D/', '', $phone) ?? '');
+if ($phoneDigits < 9 || $phoneDigits > 15) {
+    $vErr('Телефон: укажите от 9 до 15 цифр');
 }
+$phone = normalize_phone($phone);
 
 $source = $body['source'] ?? null;
 if (!is_string($source) || !in_array($source, ['calculator', 'contact', 'footer'], true)) {
@@ -1227,4 +1229,3 @@ function lead_client_mail_html(array $lead, ?string $pdfLabel = null, ?string $p
     return mail_html_wrap('Ваша заявка принята', $inner,
         'Вы получили это письмо, потому что оставили заявку на nilovcatering.ru.');
 }
-

@@ -910,6 +910,14 @@ export function Contact() {
         return;
       }
 
+      if (result.queued !== true) {
+        setFormStatus("idle");
+        toast.error(result.reason === "validation"
+          ? "Сервер отклонил данные. Проверьте форму и попробуйте ещё раз."
+          : "Заявка не отправлена и не сохранена. Попробуйте ещё раз или позвоните нам.");
+        return;
+      }
+
       /* ── ФОЛЛБЭК (mailto + outbox): эндпоинт недоступен/отверг запрос.
        * Один console.warn на страницу (диагностика без toast-спама).
        * c98-FIX2 (критик4 MAJOR#2): оверлей — ЧЕСТНЫЙ queued-статус
@@ -928,7 +936,7 @@ export function Contact() {
       setFormQueued(true);
       setFormStatus("success");
       toast.success(
-        "Заявка сохранена — отправим автоматически. Открылся почтовый клиент? Нажмите «Отправить», и она придёт быстрее.",
+        "Заявка сохранена в этом браузере. Попробуем отправить при восстановлении связи. Письмо можно отправить вручную.",
       );
 
       try {
@@ -940,7 +948,7 @@ export function Contact() {
       // Open the user's mail client (best-effort; some mobile browsers
       // block programmatic navigation — the success card still shows the
       // manager's contacts as a fallback).
-      window.location.assign(mailto);
+      try { window.location.assign(mailto); } catch { /* Queued lead is still persisted. */ }
     } catch {
       setFormStatus("error");
       toast.error("Не удалось открыть почту. Позвоните нам напрямую.");
@@ -1143,10 +1151,10 @@ export function Contact() {
                           + ускорение через почтового клиента. */}
                       {formQueued ? (
                         <>
-                          Заявка сохранена и <b>отправится автоматически</b> —
+                          Заявка сохранена в этом браузере. <b>Повторим отправку</b>,
                           как только связь восстановится. Если открылся
                           почтовый клиент — нажмите «Отправить», и она
-                          придёт мгновенно.
+                          будет отправлена письмом.
                         </>
                       ) : (
                         <>

@@ -64,7 +64,7 @@ export type LeadPayload = {
  */
 export type LeadResult =
   | { ok: true; id: string }
-  | { ok: false; reason: "network" | "server" | "validation"; retryAfterSec?: number };
+  | { ok: false; reason: "network" | "server" | "validation"; retryAfterSec?: number; queued?: boolean };
 
 /** Полный аргумент submitLead: данные формы + анти-спам-поля. */
 export type LeadSubmitArgs = LeadPayload & {
@@ -95,9 +95,9 @@ type OutboxEntry = {
   tries: number;
 };
 
-const isBrowser =
-  typeof window !== "undefined" &&
-  typeof window.localStorage !== "undefined";
+// Accessing the localStorage getter can itself throw (blocked storage,
+// private browsing, embedded previews). Storage is optional, the form is not.
+const isBrowser = typeof window !== "undefined";
 
 /** Не админка: на /admin outbox не живёт (не таскаем данные форм по панели). */
 const isPublicPage = (): boolean =>
@@ -131,34 +131,41 @@ function readOutbox(): OutboxEntry[] {
         typeof e === "object" &&
         e !== null &&
         typeof (e as OutboxEntry).clientId === "string" &&
-        typeof (e as OutboxEntry).ts === "number" &&
-        typeof (e as OutboxEntry).tries === "number" &&
+        Number.isFinite((e as OutboxEntry).ts) &&
+        Number.isInteger((e as OutboxEntry).tries) &&
+        (e as OutboxEntry).tries >= 0 &&
         typeof (e as OutboxEntry).payload === "object" &&
-        (e as OutboxEntry).payload !== null,
+        (e as OutboxEntry).payload !== null &&
+        typeof (e as OutboxEntry).payload.phone === "string" &&
+        typeof (e as OutboxEntry).payload.name === "string" &&
+        ["calculator", "contact", "footer"].includes((e as OutboxEntry).payload.source) &&
+        (e as OutboxEntry).payload.consent === true,
     );
   } catch {
     return []; // битый localStorage/квота — outbox не должен ломать отправку
   }
 }
 
-function writeOutbox(entries: OutboxEntry[]): void {
-  if (!isBrowser) return;
+function writeOutbox(entries: OutboxEntry[]): boolean {
+  if (!isBrowser) return false;
   try {
     window.localStorage.setItem(OUTBOX_KEY, JSON.stringify(entries.slice(-OUTBOX_CAP)));
+    return true;
   } catch {
     /* квота/приватный режим — молча: основная отправка важнее */
+    return false;
   }
 }
 
 /** Положить заявку в outbox ДО отправки (даже крэш вкладки не теряет её). */
-function outboxAdd(entry: OutboxEntry): void {
-  if (!isBrowser) return;
+function outboxAdd(entry: OutboxEntry): boolean {
+  if (!isBrowser) return false;
   const entries = readOutbox();
   entries.push(entry);
   // cap + чистка протухших: старейшие вытесняются
   const now = Date.now();
   const fresh = entries.filter((e) => now - e.ts < OUTBOX_TTL_MS);
-  writeOutbox(fresh.slice(-OUTBOX_CAP));
+  return writeOutbox(fresh.slice(-OUTBOX_CAP));
 }
 
 function outboxRemove(clientId: string): void {
@@ -179,7 +186,7 @@ function outboxBumpTries(clientId: string): void {
 /* ------------------------------------------------------ низкоуровневый POST */
 
 /** Признак «сейчас есть in-flight отправка» — для sendBeacon на pagehide. */
-let inFlight = false;
+const inFlight = new Map<string, Record<string, unknown>>();
 
 /**
  * POST /api/lead.php с телом (включая clientId). Возвращает дискриминированный
@@ -195,6 +202,10 @@ async function postLead(bodyObj: Record<string, unknown>): Promise<LeadResult> {
   }
 
   let res: Response;
+  // AbortSignal.timeout is unavailable in older Safari releases. Use the
+  // ubiquitous AbortController rather than silently skipping the POST.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12_000);
   try {
     res = await fetch("/api/lead.php", {
       method: "POST",
@@ -205,13 +216,18 @@ async function postLead(bodyObj: Record<string, unknown>): Promise<LeadResult> {
       body,
       /* K4-F1 (наследие прежнего fetch-кода): мёртвый upstream не вешает
        * форму навсегда; DOMException TimeoutError уходит в общий catch. */
-      signal: AbortSignal.timeout(12_000),
+      signal: controller.signal,
     });
+    return await readLeadResponse(res);
   } catch {
-    /* Сеть/таймаут/DNS/устаревший браузер без AbortSignal.timeout. */
+    /* Сеть/таймаут/DNS. */
     return { ok: false, reason: "network" };
+  } finally {
+    clearTimeout(timeout);
   }
+}
 
+async function readLeadResponse(res: Response): Promise<LeadResult> {
   /* 400 — данные отвергнуты валидацией сервера (не ретраить вслепую). */
   if (res.status === 400) return { ok: false, reason: "validation" };
 
@@ -336,26 +352,18 @@ export function resendPendingLeads(): void {
   window.addEventListener(
     "pagehide",
     () => {
-      if (!inFlight || !isPublicPage()) return;
-      const entries = readOutbox();
-      if (entries.length === 0) return;
-      // in-flight запись — последняя (клали её перед отправкой)
-      const last = entries[entries.length - 1];
-      try {
-        /* c98-FIX3: телефон нормализуем и в beacon (как в outboxFlush) —
-         * beacon с сырым номером сервер отверг бы 400, а ответа beacon
-         * никто не видит: молчаливая потеря при закрытии вкладки. */
-        const body = JSON.stringify({
-          ...last.payload,
-          phone: normalizePhone(last.payload.phone),
-          clientId: last.clientId,
-        });
-        navigator.sendBeacon(
-          "/api/lead.php",
-          new Blob([body], { type: "application/json" }),
-        );
-      } catch {
-        /* старый браузер без sendBeacon — основная отправка ещё может успеть */
+      if (inFlight.size === 0 || !isPublicPage()) return;
+      // Each active request needs its own beacon. Using the last outbox entry
+      // lost concurrent submissions and did not work with blocked storage.
+      for (const bodyObj of inFlight.values()) {
+        try {
+          navigator.sendBeacon(
+            "/api/lead.php",
+            new Blob([JSON.stringify(bodyObj)], { type: "application/json" }),
+          );
+        } catch {
+          /* старый браузер без sendBeacon — основная отправка ещё может успеть */
+        }
       }
     },
     { passive: true },
@@ -397,9 +405,9 @@ export async function submitLead(p: LeadSubmitArgs): Promise<LeadResult> {
 
   /* Заявка сначала «на бумаге» (outbox), потом в сеть — крэш вкладки
    * в момент fetch больше не теряет лида. */
-  outboxAdd({ clientId, payload: p, ts: Date.now(), tries: 0 });
+  const persisted = outboxAdd({ clientId, payload: p, ts: Date.now(), tries: 0 });
 
-  inFlight = true;
+  inFlight.set(clientId, bodyObj);
   try {
     const result = await postLead(bodyObj);
     /* `!== false`, а не `if (result.ok)`: tsconfig проекта strict:false —
@@ -417,8 +425,10 @@ export async function submitLead(p: LeadSubmitArgs): Promise<LeadResult> {
        * при следующей попытке юзера). */
       outboxBumpTries(clientId);
     }
-    return result;
+    return result.ok === false
+      ? { ...result, queued: persisted && result.reason !== "validation" }
+      : result;
   } finally {
-    inFlight = false;
+    inFlight.delete(clientId);
   }
 }
