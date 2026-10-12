@@ -451,6 +451,18 @@ Stage Summary:
 - ВСЕ ТЕСТЫ ЗЕЛЁНЫЕ; готово к коммиту/деплою (следующий шаг).
 
 ---
+Task: Restore four buffet menus from the owner's furshet-pdf.io.pdf (2026-10-12)
+
+Work Log:
+- src/data/menu.json: corrected buffet package index 2 (Премиум) to 3950 RUB, with the 700 g menu from PDF page 4, both dessert choices and explicit hot-dish/garnish choices.
+- Added separate buffet package index 3 (Делюкс), 5350 RUB, with the 750 g menu from PDF page 5: duck, roast beef, scallop, eel, two mini-bruschettas, two salads, three hot-dish choices, two garnish choices, dessert and 250/150/150 ml drinks.
+- Kept the existing first two buffet packages and all other menu formats unchanged. Existing package-index consumers dynamically support the fourth package.
+- Regenerated public/llms-full.txt. Build generators produced four buffet PDFs and the fourth manifest entry, from the same source as the website and calculator.
+- Added scripts/test-buffet-menu.ts: schema, exact four prices/order, distinct names, representative dishes, choice counts and drink-volume regression checks.
+- Verification: menu validation, regression test, lint, typecheck, full static-export production build passed. Playwright checked third/fourth tab selection, keyboard navigation back from fourth to third, fourth calculator option and direct ?type=buffet&pkg=3 selection. At 375 px, document width equals viewport width and all four tabs fit. Desktop/mobile screenshots inspected.
+- Owner explicitly approved pushing main and the resulting production deployment in this session.
+
+---
 Task ID: c101-PROD
 Agent: main
 Task: Прод-верификация деплоя d3ddfa8 + eeffe50 (фикс .htaccess) — CI success, живой сайт, IndexNow 202, живая заявка
