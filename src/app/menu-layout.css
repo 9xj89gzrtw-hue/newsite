@@ -27,7 +27,15 @@
     justify-content: space-between;
     min-height: 64px;
     min-width: 0;
-    height: 100%;
+    /* c104 (жалоба «высота пакет-меню в калькуляторе»): height:100% УДАЛЁН.
+       В flex-варианте (data-packages=3/5) процент по автогибкой высоте
+       контейнера НЕ разрешается → у карточки появляется «своё» значение
+       cross-size → align-items:stretch ОТКЛЮЧАЕТСЯ → выбранная карточка с
+       более коротким описанием (4 строки против 5) оставалась ниже соседей
+       (замер: 169 vs 189px). Без height карточка тянется строкой по умолчанию:
+       flex — align-items:stretch (задан контейнером), grid — дефолтный
+       stretch + grid-auto-rows:1fr. space-between внутри работает как раньше:
+       растянутая высота распределяет name/price/desc. */
   }
   .hb-pkgs[data-packages] > .hb-pkg { gap: 0.3rem; }
   .hmenu__tabs[data-packages] .hmenu__tab-name { overflow-wrap: break-word; word-break: normal; }

@@ -442,12 +442,20 @@ export default function RootLayout({
      РОВНО ОДИН <link> в начале <head> — тот же механизм, что у логотипа
      выше. crossorigin обязателен для шрифтов (CORS-mode fetch, иначе
      двойной запрос). Prata-latin уже preloaded next/font'ом — не дублируем. */
-  reactDomPreload("/_next/static/media/4b23c5ee480ee380-s.046c0c63.woff2", {
+  /* c104 (жалоба «404 на шрифтах в консоли»): хэш-суффиксы имён woff2
+     ПОМЕНЯЛИСЬ при смене генератора сборки — старые захардкоженные URL
+     («046c0c63»/«116c03d8») давали 404 + preload-warnings на проде
+     (замер: nilovcatering.ru/_next/static/media/… → 404, 2 файла).
+     Контентный префикс (4b23c5ee…=Barlow 400 latin, 490cbca7…=Barlow 700
+     latin) стабилен, суффикс — нет. Новые имена сверены с живым CSS :3001
+     (@font-face src). Страховка от повторения — шаг «Verify font preload
+     URLs» в deploy.yml: сборка падает, если файла нет в экспорте. */
+  reactDomPreload("/_next/static/media/4b23c5ee480ee380-s.0qqufx6vw52v_.woff2", {
     as: "font",
     type: "font/woff2",
     crossOrigin: "anonymous",
   });
-  reactDomPreload("/_next/static/media/490cbca7f386131e-s.116c03d8.woff2", {
+  reactDomPreload("/_next/static/media/490cbca7f386131e-s.1zrwl0c4yv3pr.woff2", {
     as: "font",
     type: "font/woff2",
     crossOrigin: "anonymous",

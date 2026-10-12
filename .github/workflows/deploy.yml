@@ -72,6 +72,29 @@ jobs:
           test -f out/index.html || (echo "out/index.html missing"; exit 1)
           echo "Export OK: $(du -sh out | cut -f1)"
 
+      # c104: захардкоженные preload-URL шрифтов в layout.tsx ломаются молча,
+      # когда генератор сборки меняет хэш-суффиксы имён woff2 (прецедент:
+      # 404 двух Barlow-файлов на проде + preload-warnings в консоли юзера).
+      # Гейт: каждый URL из layout.tsx обязан существовать файлом в экспорте.
+      - name: Verify font preload URLs
+        run: |
+          set -euo pipefail
+          urls=$(grep -oE '/_next/static/media/[A-Za-z0-9._-]+\.woff2' src/app/layout.tsx | sort -u)
+          if [ -z "$urls" ]; then
+            echo "No hardcoded font preloads found in layout.tsx — skip"
+            exit 0
+          fi
+          fail=0
+          for url in $urls; do
+            if [ ! -f "out$url" ]; then
+              echo "::error::Font preload $url (layout.tsx) has no file in export — stale hash after toolchain upgrade? Fix layout.tsx."
+              fail=1
+            else
+              echo "OK: $url"
+            fi
+          done
+          exit $fail
+
       - name: Install sshpass
         run: sudo apt-get update -y && sudo apt-get install -y sshpass
 
