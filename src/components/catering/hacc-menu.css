@@ -653,27 +653,8 @@
   to   { transform: scale(1.09) translate(0.7%, -0.5%); }
 }
 
-/* подпись под фото — имя пакета (поверх фото, снизу) */
-.hmenu__media-cap {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  padding: 1.6rem 0.9rem 0.6rem;
-  background: linear-gradient(to top, rgba(20, 16, 12, 0.62), rgba(20, 16, 12, 0));
-  color: rgba(255, 253, 248, 0.94);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.8125rem; /* c84-F1 (M2-№4): 12.5 → 13px — подписи фото читаются на мобиле */
-  line-height: 1.45;
-  pointer-events: none;
-  /* C60 (волна-2): длинные подписи срезались посреди слова — максимум
-     2 строки с многоточием, без жёсткого обреза */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+/* c103: подпись-плашка .hmenu__media-cap (имя тарифа поверх фото)
+   удалена вместе с разметкой — текст на фото еды запрещён. */
 
 /* правая колонка: табы → список → «включено» */
 .hmenu__details {

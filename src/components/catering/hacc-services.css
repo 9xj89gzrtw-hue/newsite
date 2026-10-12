@@ -409,6 +409,11 @@
   font-size: clamp(1.05rem, 1.25vw, 1.35rem);
   line-height: 1.15;
   color: var(--hacc-ink);
+  /* c103-audit: ценовая цифра — табличные выравнивающие цифры, как в
+     hacc-menu (.hmenu__price-num: tabular-nums lining-nums) — единая
+     числовая идиома сайта; серифные пропорциональные цифры «прыгали»
+     шириной между панелями. */
+  font-variant-numeric: tabular-nums lining-nums;
   white-space: nowrap;
   max-width: 100%;
   overflow: hidden;

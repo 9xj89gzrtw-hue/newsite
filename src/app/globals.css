@@ -3376,7 +3376,14 @@ header[data-scrolled="true"] [data-mega-panel] {
    (тач не залипает), prefers-reduced-motion — без масштаба и без
    transform-перехода (состояние opacity остаётся).
    ============================================================================ */
+/* c103-audit: UA-стайлшинт даёт <button> cursor:default — все остальные
+   кнопки сайта (ea-evt-video__play/nav-btn, hacc__spine) несут явный
+   cursor:pointer, пил gg-video-showcase был единственным «стрелка-
+   дефолт» (замер :3001, computed). На fine-pointer ≥768px родной курсор
+   скрыт жидкой линзой (cursor.tsx), но в узком окне/при выключенной
+   линзе аффорданс обязан оставаться. */
 .gg-play-pill {
+  cursor: pointer;
   transition-property: opacity, transform;
   transition-duration: 500ms, 300ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1),

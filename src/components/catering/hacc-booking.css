@@ -150,7 +150,11 @@
 }
 .hb-type {
   position: relative;
-  display: block;
+  /* c103 (Блок 2.1): карточка — flex-колонка, цена прижата к низу
+     (margin-top: auto в __price): в 2-колоночной сетке цены пары
+     стоят на одной горизонтали независимо от длины подписи. */
+  display: flex;
+  flex-direction: column;
   width: 100%;
   min-height: 76px;
   text-align: left;
@@ -190,7 +194,10 @@
 }
 .hb-type__price {
   display: block;
-  margin-top: 0.45rem;
+  /* c103 (Блок 2.1): было margin-top: 0.45rem — теперь прижим к низу
+     карточки (цены пары в ряду на одной горизонтали); зазор — padding. */
+  margin-top: auto;
+  padding-top: 0.45rem;
   /* c89 (жалоба «мелко»): 0.78 → 0.85rem — цена формата несёт контент. */
   font-size: 0.85rem;
   font-weight: 600;

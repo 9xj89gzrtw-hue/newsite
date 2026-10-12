@@ -25,7 +25,7 @@ import {
   Sparkles,
   MessageSquareText,
 } from "lucide-react";
-import Image from "next/image";
+/* c103: next/image больше не используется (внешняя карта удалена). */
 import { Reveal } from "./reveal";
 import { Magnetic } from "@/components/motion/magnetic";
 import { CONTACTS, YANDEX_MAPS } from "@/lib/media";
@@ -1566,20 +1566,11 @@ export function Contact() {
         <Reveal>
           <div className="relative mx-auto w-full max-w-[650px] overflow-hidden rounded-2xl border border-border-line shadow-lg shadow-ink/5">
             {/*
-              C103: статическая карта вместо map-widget iframe.
-              map-widget подгружает yandex.ru/ads/system/context.js и показывает
-              рекламный баннер + POI чужих организаций (конкурентов).
-              static-maps + l=sat: только спутник + своя метка (pm2rdm),
-              без JS-рекламы и без иконок организаций конкурентов.
+              c103: внешняя спутниковая картинка (static-maps.yandex.ru)
+              удалена из проекта — локация рендерится локальной векторной
+              карточкой в site-footer (0 КБ внешних запросов). Здесь, в
+              неиспользуемом legacy-файле, — только текстовая ссылка ниже.
             */}
-            <Image
-              src={YANDEX_MAPS.staticSrc}
-              alt={YANDEX_MAPS.address}
-              width={650}
-              height={450}
-              unoptimized
-              className="mx-auto block h-auto w-full max-w-[650px] rounded-2xl border border-cream/15"
-            />
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <a

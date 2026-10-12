@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
+/* c103: next/image больше не нужен — карта заменена векторной карточкой. */
 import {
   motion,
   useReducedMotion,
@@ -17,13 +17,14 @@ import {
   Send,
   Youtube,
   MonitorPlay,
+  MapPin,
 } from "lucide-react";
 import {
   SOPRANOS_CITIES,
   CONTACTS,
   YANDEX_MAPS,
 } from "@/lib/media";
-import { LEGAL_INFO, SITE_CONFIG } from "@/lib/config";
+import { LEGAL_INFO } from "@/lib/config";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 /* c83-B (Impl-B): VelocitySkew на вордмарке (§3a) + анимационный
    слой соц-иконок y-hop (§3b, site-footer-anim.css). */
@@ -719,84 +720,14 @@ export function SiteFooter() {
           </motion.nav>
         </div>
 
-        {/* ---- Реквизиты ИП + счёта (c89, владелец дал полные банковские
-              реквизиты) — полоса под контактной сеткой, до вордмарка/карты.
-              Все значения — из config (LEGAL_INFO + LEGAL_INFO.bank), ноль
-              дублей: смена реквизитов в одном месте обновляет футер и
-              юр-документы. dl → 2 колонки (sm:grid-cols-2, мобайл — одна),
-              ячейка = метка над значением (длинные адреса переносятся без
-              обрезки). Кегль text-sm (14px ≥ 0.85rem) — читаемость для
-              пожилых; числа — tabular-nums, реквизиты копируют из браузера
-              без рваных разрядов. Название организации собрано из legalName
-              (капс — конвенция банковских реквизитов, как в письме
-              владельца). Reveal — тем же stagger-каскадом, что колонки
-              выше (custom={2}). */}
-        <motion.section
-          {...motionProps}
-          custom={2}
-          variants={columnVariants}
-          aria-labelledby="footer-req-heading"
-          className="mt-12 border-t border-cream/10 pt-8 md:mt-14"
-        >
-          <h2
-            id="footer-req-heading"
-            className="eyebrow-wide text-sm text-gold"
-          >
-            Реквизиты
-          </h2>
-          <dl className="mt-4 grid grid-cols-1 gap-x-10 gap-y-3 text-sm leading-relaxed sm:grid-cols-2">
-            <div className="flex flex-col">
-              <dt className="text-cream/60">Название организации</dt>
-              <dd className="tabular-nums text-cream/85">
-                {`ИНДИВИДУАЛЬНЫЙ ПРЕДПРИНИМАТЕЛЬ ${LEGAL_INFO.legalName.toUpperCase()}`}
-              </dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-cream/60">Юридический адрес</dt>
-              <dd className="text-cream/85">{LEGAL_INFO.legalAddress}</dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-cream/60">ИНН</dt>
-              <dd className="tabular-nums text-cream/85">{LEGAL_INFO.inn}</dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-cream/60">ОГРН/ОГРНИП</dt>
-              <dd className="tabular-nums text-cream/85">{LEGAL_INFO.ogrn}</dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-cream/60">Расчетный счет</dt>
-              <dd className="tabular-nums text-cream/85">
-                {LEGAL_INFO.bank.account}
-              </dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-cream/60">Банк</dt>
-              <dd className="text-cream/85">{LEGAL_INFO.bank.name}</dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-cream/60">ИНН банка</dt>
-              <dd className="tabular-nums text-cream/85">
-                {LEGAL_INFO.bank.inn}
-              </dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-cream/60">БИК банка</dt>
-              <dd className="tabular-nums text-cream/85">
-                {LEGAL_INFO.bank.bik}
-              </dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-cream/60">Корр. счет</dt>
-              <dd className="tabular-nums text-cream/85">
-                {LEGAL_INFO.bank.corrAccount}
-              </dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-cream/60">Адрес банка</dt>
-              <dd className="text-cream/85">{LEGAL_INFO.bank.address}</dd>
-            </div>
-          </dl>
-        </motion.section>
+        {/* c103: полоса «Реквизиты» с банковской таблицей (р/с, корр. счёт,
+              БИК, банк) ПОЛНОСТЬЮ УДАЛЕНА — по ст. 9 ЗоЗПП РФ эти данные
+              обязательны только в тексте оферты; на витрине они перегружали
+              интерфейс. Полные банковские реквизиты перенесены на страницу
+              оферты (src/app/offer/page.tsx, раздел «Реквизиты Исполнителя»);
+              в подвале осталась чистая юридическая строка (© … ИП …
+              ОГРНИП … ИНН …) — см. Section 5 ниже. Значения по-прежнему
+              из config (LEGAL_INFO) — единый источник. */}
       </div>
 
       {/* ============ Section 3 — гигантский кинетический вордмарк ============
@@ -827,67 +758,121 @@ export function SiteFooter() {
         ))}
       </VelocitySkew>
 
-      {/* ============ Section 3M — Яндекс.Карта офиса (c89) ============
-          Владелец: карту из зоны контактов либо убрать, либо перенести
-          «в самый подвал» — выбрали подвал (зона контактов разгружена,
-          3-e снял оттуда LazyMap). Простой lazy-iframe (YANDEX_MAPS.
-          embedSrc из media.ts — единый источник с CONTACTS.address):
-          никакого tap-to-activate — карта сразу интерактивна, loading=
-          "lazy" не тянет виджет до скролла к подвалу. Высота 260/320px,
-          скруглённые углы + тонкая рамка cream/15 — тёмная эстетика
-          футера. Подпись-строка: адрес (YANDEX_MAPS.address) + ссылка
-          «открыть в Яндекс.Картах» (YANDEX_MAPS.href — короткая ссылка
-          владельца). sandbox — минимальный набор для map-виджета
-          (скрипты + same-origin + presentation; попапы виджета не
-          нужны). Заголовок «Как нас найти» — eyebrow-идиома «Контактов»
-          /«Навигации»/«Реквизитов», по центру — как-header районов. */}
+      {/* ============ Section 3M — «Как нас найти» (c89 → c103) ============
+          c103: вместо спутниковой картинки static-maps.yandex.ru (внешний
+          запрос + чужой растр) — полностью локальная векторная карточка
+          локации: inline-SVG-подложка (0 КБ внешнего JS, мгновенная
+          отрисовка на смартфоне), фирменный золотой пин, адрес, пояснение
+          о производстве и две прямые кнопки — Яндекс.Карты и 2ГИС
+          (target=_blank, без рекламных виджетов). Тёмная эстетика футера:
+          тёплый espresso-фон, рамка cream/15, скругление 1rem. Заголовок
+          «Как нас найти» — eyebrow-идиома соседних полос футера. */}
       <div className="border-t border-cream/10">
         <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-12">
           <div className="mb-4 flex flex-col items-center text-center">
             <SplitTextReveal as="h2" className="eyebrow-wide text-sm text-gold">
               Как нас найти
             </SplitTextReveal>
-            <p className="mt-2 text-sm text-cream/70">
-              {YANDEX_MAPS.address} ·{" "}
-              <a
-                href={YANDEX_MAPS.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gold underline-offset-2 transition-colors hover:text-cream hover:underline"
-              >
-                открыть в Яндекс.Картах
-              </a>
-            </p>
           </div>
-          {/*
-            C103: map-widget iframe убран — он тянет yandex.ru/ads/system/
-            context.js и показывает рекламный баннер + POI чужих организаций.
-            Вместо него статическая карта static-maps (l=sat): спутник +
-            своя метка, без JS-рекламы. Ссылка «открыть в Яндекс.Картах»
-            выше остаётся интерактивной.
-          */}
-          <Image
-            src={YANDEX_MAPS.staticSrc}
-            alt={`${YANDEX_MAPS.address} — карта проезда`}
-            width={650}
-            height={450}
-            unoptimized
-            loading="lazy"
-            className="mx-auto block h-auto w-full max-w-[650px] rounded-2xl border border-cream/15"
-          />
-          {/* c94 (заказчик): просьба звонить до визита — офис не работает
-              «на проходную». Ссылка tel: в тон «открыть в Яндекс.Картах»:
-              номер не дублируется текстом — глагол и есть точка контакта. */}
-          <p className="mt-3 text-center text-sm text-cream/60">
-            Просим вас{" "}
-            <a
-              href={CONTACTS.phoneHref}
-              className="text-gold underline-offset-2 transition-colors hover:text-cream hover:underline"
-            >
-              позвонить нам заранее
-            </a>
-            , чтобы договориться о встрече
-          </p>
+
+          {/* Карточка локации: векторная «карта» + адресный блок + кнопки */}
+          <div className="mx-auto w-full max-w-[650px]">
+            <div className="relative overflow-hidden rounded-2xl border border-cream/15 bg-[#1d1813]">
+              {/* Декоративная векторная подложка — абстрактный фрагмент
+                  карты: кварталы, линии улиц, маршрут к пину. aria-hidden:
+                  информация адреса дублируется текстом ниже. */}
+              <svg
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 h-full w-full"
+                viewBox="0 0 650 300"
+                preserveAspectRatio="xMidYMid slice"
+                focusable="false"
+              >
+                {/* базовая сетка кварталов */}
+                <g stroke="rgba(253,246,236,0.06)" strokeWidth="2" fill="none">
+                  <path d="M-20 70 H670" />
+                  <path d="M-20 150 H670" />
+                  <path d="M-20 230 H670" />
+                  <path d="M120 -20 V320" />
+                  <path d="M300 -20 V320" />
+                  <path d="M480 -20 V320" />
+                </g>
+                {/* «здания» кварталов */}
+                <g fill="rgba(253,246,236,0.045)">
+                  <rect x="140" y="24" width="130" height="30" rx="4" />
+                  <rect x="322" y="88" width="60" height="44" rx="4" />
+                  <rect x="140" y="170" width="76" height="44" rx="4" />
+                  <rect x="500" y="170" width="110" height="30" rx="4" />
+                  <rect x="322" y="186" width="130" height="28" rx="4" />
+                </g>
+                {/* главная «улица» — Полевая Сабировская, тянется к пину */}
+                <path
+                  d="M-20 118 C 140 112, 260 128, 400 96 S 560 62, 700 74"
+                  stroke="rgba(212,163,115,0.28)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                {/* поперечная «улица» */}
+                <path
+                  d="M400 -20 C 396 90, 420 200, 402 320"
+                  stroke="rgba(212,163,115,0.14)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                {/* фирменный пин — золотая капля с тёмным сердечником
+                    и двойным кольцом-эхо; стоит на «улице» справа */}
+                <g>
+                  <circle cx="502" cy="118" r="44" fill="none" stroke="rgba(212,163,115,0.20)" strokeWidth="1.5" />
+                  <circle cx="502" cy="118" r="28" fill="none" stroke="rgba(212,163,115,0.30)" strokeWidth="1.5" />
+                  <path
+                    d="M502 84c-13.3 0-24 10.6-24 23.7 0 17.2 24 42.3 24 42.3s24-25.1 24-42.3C526 94.6 515.3 84 502 84Z"
+                    fill="#D4A373"
+                  />
+                  <circle cx="502" cy="107" r="7.5" fill="#1d1813" />
+                </g>
+                {/* мягкое свечение под пином */}
+                <ellipse cx="502" cy="152" rx="26" ry="5" fill="rgba(212,163,115,0.18)" />
+              </svg>
+
+              {/* контент карточки — над подложкой */}
+              <div className="relative flex min-h-[220px] flex-col justify-between gap-6 p-6 md:p-8">
+                <div className="max-w-[62%]">
+                  <p className="flex items-start gap-2.5 font-display text-base leading-snug text-cream md:text-lg">
+                    <MapPin aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-gold" />
+                    <span>
+                      г. Санкт-Петербург,
+                      <br className="hidden sm:block" /> ул. Полевая Сабировская, 45, к. 1
+                    </span>
+                  </p>
+                  <p className="mt-3 max-w-[38ch] text-sm leading-relaxed text-cream/70">
+                    Собственное производство и дегустационный зал.
+                    Просим согласовать время визита заранее
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href={YANDEX_MAPS.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border border-gold/45 bg-gold/10 px-5 py-2.5 text-sm font-medium text-gold transition-colors duration-200 hover:bg-gold hover:text-[#161312] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                  >
+                    Открыть в Яндекс Картах
+                  </a>
+                  <a
+                    href={YANDEX_MAPS.gisHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border border-cream/25 px-5 py-2.5 text-sm font-medium text-cream/85 transition-colors duration-200 hover:border-cream/50 hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                  >
+                    Открыть в 2ГИС
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -960,12 +945,14 @@ export function SiteFooter() {
             легала и так /60; · — декоративный (aria-hidden), не текст. */}
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-6 text-[13px] text-cream/60 md:flex-row md:px-8">
           <div className="flex flex-col items-center gap-2 md:flex-row md:items-center md:gap-4">
-            <p className="text-center md:text-left">
-              {/* FIX-5 (W1-D NIT): SITE_CONFIG.brandName несёт фирменную
-                  хвостовую точку («nilov catering.») — уместную в вордмарке,
-                  но дающую «nilov catering.,» в копирайте. Здесь бренд без
-                  точки; config.ts не трогаем (чужой файл). */}
-              © {year ?? 2025} {SITE_CONFIG.brandName.replace(/\.$/, "")}, Санкт-Петербург · Все права защищены
+            <p className="text-center tabular-nums md:text-left">
+              {/* c103 (ст. 9 ЗоЗПП РФ): банковские счета убраны из витрины,
+                  полные реквизиты — на странице оферты. Здесь — чистая
+                  юридическая строка: © год · ИП (legalNameShort из config,
+                  единый источник) · ОГРНИП · ИНН. Бренд — фирменное
+                  написание Nilov Catering (в КС у пользователя). */}
+              © {year ?? 2025} Nilov Catering · ИП {LEGAL_INFO.legalNameShort}{" "}
+              · ОГРНИП {LEGAL_INFO.ogrn} · ИНН {LEGAL_INFO.inn}
             </p>
             {/* Cycle 39 fix: legal document links — /offer was an orphan page,
                 /terms required by the cookie banner. */}
@@ -975,7 +962,7 @@ export function SiteFooter() {
                 href="/offer"
                 className="py-2 text-cream/60 underline-offset-2 transition-colors hover:text-gold hover:underline"
               >
-                Публичная оферта
+                Публичная оферта и реквизиты
               </a>
               <a
                 href="/terms"

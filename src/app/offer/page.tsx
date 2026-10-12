@@ -150,6 +150,24 @@ export default function OfferPage() {
               <li><strong>Телефон:</strong> {CONTACTS.phone}</li>
               <li><strong>Email:</strong> {LEGAL_INFO.legalEmail}</li>
             </ul>
+            {/* c103 (ст. 9 ЗоЗПП РФ): банковские реквизиты перенесены сюда
+                из подвала сайта — на витрине таблица счетов перегружала
+                интерфейс; в тексте оферты обязательна по закону. Значения —
+                из config (LEGAL_INFO.bank), тот же источник, что раньше
+                читал футер: смена реквизитов в одном месте обновляет
+                и оферту. tabular-nums — реквизиты копируются из браузера
+                без рваных разрядов. */}
+            <h3 className="mt-6 font-display text-lg text-ink">
+              Банковские реквизиты
+            </h3>
+            <ul>
+              <li><strong>Расчётный счёт:</strong> <span className="tabular-nums">{LEGAL_INFO.bank.account}</span></li>
+              <li><strong>Банк:</strong> {LEGAL_INFO.bank.name}</li>
+              <li><strong>ИНН банка:</strong> <span className="tabular-nums">{LEGAL_INFO.bank.inn}</span></li>
+              <li><strong>БИК банка:</strong> <span className="tabular-nums">{LEGAL_INFO.bank.bik}</span></li>
+              <li><strong>Корр. счёт:</strong> <span className="tabular-nums">{LEGAL_INFO.bank.corrAccount}</span></li>
+              <li><strong>Адрес банка:</strong> {LEGAL_INFO.bank.address}</li>
+            </ul>
           </Section>
         </div>
 

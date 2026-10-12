@@ -1256,9 +1256,9 @@ function MenuRack({
                         />
                       </motion.div>
                     </motion.div>
-                    <figcaption className="hmenu__media-cap">
-                      <span className="hmenu__media-cap-name">{pkg.name}</span>
-                    </figcaption>
+                    {/* c103: текстовая плашка с именем тарифа поверх фото
+                        удалена — имя уже в заголовке панели и в табах,
+                        надпись на еде создавала визуальную грязь. */}
                   </figure>
 
                   <div className="hmenu__details">
