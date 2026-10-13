@@ -57,3 +57,5 @@ Work Log:
 
 Stage Summary:
 - Коммит c112: новое Gemini-фото банкета-стандарта (пропорции одобренных фото, поля худшей фазы ≥24 CSS px, шов Δ1), text-wrap balance/pretty глобально, 2170 NBSP-привязок предлогов, 9 max-width cap-ов по замерам. Аудит 5 ширин PASS. Деплой пушем — владельцу проверить живой nilovcatering.ru.
+
+Post-scriptum c112: первый пуш (eb239d7) поймал CI-фейл scripts/test-buffet-menu.ts («0 !== 2») — регрессия банкета сравнивала dish.name.startsWith(«Горячая закуска на выбор:»), а данные стали «на\u00A0выбор». Локальный grep-аудит кириллических сравнений охватил только src/ — scripts/ был исключён ИЗ кодмода И из проверки, а тесты читают menu.json через эту границу. Фикс ad2fad7: тест типографика-агностичен (norm NBSP→пробел). CI + Deploy success, прод проверен (md5 фото, blend-класс, computed text-wrap, 886 NBSP в DOM, VLM-приёмка). Урок в AGENTS §71.
