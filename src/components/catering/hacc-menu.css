@@ -644,6 +644,14 @@
   object-fit: cover;
 }
 
+/* c107: фото с фоном, слитым с тинтом панели (конвейер research/c107):
+   фильтр СНЯТ — saturate/contrast сдвинул бы точный тинт краёв (~Δ3/канал)
+   и прямоугольная граница фото стала бы видимой. Исходная грейд-версия
+   владельца и так финальная; фильтр остаётся только стоковым c60/c61. */
+.hmenu__img--blend {
+  filter: none;
+}
+
 .hmenu__item.is-open .hmenu__img {
   animation: hmenu-drift 34s ease-in-out infinite alternate;
 }

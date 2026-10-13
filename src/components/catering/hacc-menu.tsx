@@ -1252,7 +1252,15 @@ function MenuRack({
                              (тот же паттерн, что hacc-services Task 4). */
                           loading="lazy"
                           fetchPriority="low"
-                          className="hmenu__img"
+                          /* c107: фото конвейера blend (фон = тинт панели) —
+                             без CSS-фильтра: saturate/contrast сдвигает тинт
+                             краёв и раскрывает прямоугольную границу фото
+                             (см. .hmenu__img--blend в hacc-menu.css) */
+                          className={
+                            pkg.photo?.startsWith("/media/c107")
+                              ? "hmenu__img hmenu__img--blend"
+                              : "hmenu__img"
+                          }
                         />
                       </motion.div>
                     </motion.div>
