@@ -463,6 +463,14 @@
   object-fit: cover;
 }
 
+/* c109: фото конвейера blend (фон = тинт панели, research/c109) — фильтр
+   СНЯТ: saturate/contrast сдвигает точный тинт краёв и раскрывает
+   прямоугольную границу фото (урок c107, .hmenu__img--blend). Грейд
+   остаётся только у стоковых фото. */
+.hacc__img--blend {
+  filter: none;
+}
+
 .hacc__item.is-open .hacc__img {
   animation: hacc-drift 34s ease-in-out infinite alternate;
 }

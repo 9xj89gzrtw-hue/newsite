@@ -166,8 +166,10 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "Под ключ",
     tint: "#E6EBDF",
-    media: "/media/c53/svadby.webp",
-    mediaAlt: "Свадебный банкет при свечах с сервировкой столов",
+    /* c109: фото владельца с Диска (R-O1AvPjq8H2mw), конвейер blend —
+       фон перекрашен в тинт панели (research/c109/process.js). */
+    media: "/media/c109/c109-svadby.webp",
+    mediaAlt: "Трёхъярусный свадебный торт с цветами и ягодами на каменной подставке, рядом бокалы с игристым",
     /* c89 (Task 3-b): #contact уезжает на зону контактов компании —
        конверсионные CTA главы ведут в смета-чек (#calculator). */
     ctaLabel: "Обсудить свадьбу",
@@ -182,8 +184,8 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "Для компаний",
     tint: "#F6E9C9",
-    media: "/media/gamma/c49-korporativ-hires.webp",
-    mediaAlt: "Корпоративный гала-ужин с сервировкой",
+    media: "/media/c109/c109-korporativ.webp",
+    mediaAlt: "Многоярусная стойка с фуршетными закусками и мини-бургерами для корпоратива",
     ctaLabel: "Получить смету",
     ctaHref: "#calculator",
   },
@@ -196,8 +198,8 @@ const SERVICES: HaccService[] = [
     priceLabel: "за событие",
     tag: "Живая кухня",
     tint: "#F6E0DB",
-    media: "/media/c57/c57-shou.webp",
-    mediaAlt: "Повар в колпаке и белой форме достаёт щипцами противень с блюдом из теплового шкафа",
+    media: "/media/c109/c109-shou.webp",
+    mediaAlt: "Шоу-станция с грилем: на решётке жарятся креветки, кальмары и гребешки на шпажках",
     ctaLabel: "Обсудить станции",
     ctaHref: "#calculator",
   },
@@ -210,8 +212,8 @@ const SERVICES: HaccService[] = [
     priceLabel: "за событие",
     tag: "Миксология",
     tint: "#F5EEE2",
-    media: "/media/c57/c57-bar.webp",
-    mediaAlt: "Бармен в белой рубашке направляет дым от дымовой пушки на бокал с красным коктейлем — на стойке бутылки, ягоды и цитрусы",
+    media: "/media/c109/c109-bar.webp",
+    mediaAlt: "Выездной бар на колёсах: шейкер, бокалы и ингредиенты для коктейлей",
     ctaLabel: "Обсудить бар",
     ctaHref: "#calculator",
   },
@@ -226,8 +228,8 @@ const SERVICES: HaccService[] = [
     priceLabel: "за гостя",
     tag: "Особые меню",
     tint: "#F4DECD",
-    media: "/media/ridgewells-veg-mosaic.jpg",
-    mediaAlt: "Овощная мозаика вегетарианского меню",
+    media: "/media/c109/c109-veg-halal.webp",
+    mediaAlt: "Круглая доска с хумусом, фалафелем, питой, инжиром и гранатом",
     /* c89: CTA ушёл с #contact в смета-чек; преселект vegetarian держит
        цену панели и калькулятора одинаковой (K6-CRITICAL, см. calcType). */
     ctaLabel: "Получить меню",
@@ -250,8 +252,8 @@ const SERVICES: HaccService[] = [
     /* c89: #E6EBDF → #F3E3E8 — 6 панелей = 6 семейств тинтов без дублей
        (раньше семьи циклились по 12 панелям). */
     tint: "#F3E3E8",
-    media: "/media/c57/c57-boksy.webp",
-    mediaAlt: "Прозрачные коробки с закусками: виноград, сыр, оливки, крекеры и макаруны, перевязанные верёвкой",
+    media: "/media/c109/c109-gastro-boksy.webp",
+    mediaAlt: "Гастро-бокс с канапе и закусками в секциях",
     ctaLabel: "Заказать боксы",
     ctaHref: "#calculator",
     calcType: "snack-box",
@@ -800,7 +802,15 @@ function HaccRack({
                          в приоритетной очереди. */
                       loading="lazy"
                       fetchPriority="low"
-                      className="hacc__img"
+                      /* c109: фото конвейера blend (фон = тинт панели,
+                         research/c109) — без CSS-фильтра: saturate/contrast
+                         сдвигает тинт краёв и раскрывает прямоугольную
+                         границу фото (урок c107, .hacc__img--blend). */
+                      className={
+                        s.media.startsWith("/media/c109")
+                          ? "hacc__img hacc__img--blend"
+                          : "hacc__img"
+                      }
                     />
                   </motion.div>
                 </figure>
