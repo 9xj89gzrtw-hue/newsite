@@ -39,6 +39,12 @@ import { CONTACTS } from "@/lib/config";
  * не остаётся без двух блюд, «включено» не отрывается от последнего пакета
  * (перенос парой). Ничего не режется молча (дефект C60-PDF: блюда терялись).
  *
+ * c106: полный каталог — книжная структура: обложка (титул) → стр. 2
+ * «Содержание» (печатное оглавление, строки кликабельны) → каждый формат
+ * открывает свою страницу шапкой-главой «01 · БАНКЕТ» (номер золотом
+ * Prata 22 + Prata 16) → каждый тариф — с новой страницы (колонтитул
+ * «ФОРМАТ · ПАКЕТ») → PDF-закладки (outline) для вьюверов с панелью.
+ *
  * c84-C: per-tariff PDF — generateMenuPdf(typeId, pkgIdx); кэш fetch шрифтов
  * модульный, addFont — на каждый doc (баг двойной генерации, см. ниже).
  *
@@ -390,20 +396,37 @@ export async function buildMenuCatalogDoc(
       doc.setPage(1);
     }
   } else if (types.length > 1) {
-    /* полный каталог: титул → секции всех типов потоком → CTA */
-    let y = drawTitleBlock(doc, {
+    /* c106: полный каталог — книжная структура (запрос владельца +
+       research/c106): обложка-титул → стр.2 «Содержание» → каждый
+       формат и каждый тариф с новой страницы → CTA. Оглавление
+       рисуется ПОСЛЕ секций (setPage(2)) — номера страниц фактические,
+       без предположений о раскладке. */
+    drawTitleBlock(doc, {
       title: "ПОЛНЫЙ КАТАЛОГ МЕНЮ",
       subline: `Санкт-Петербург · ${genDate()} · ${MENU_TYPES.length} ${catalogsWord(MENU_TYPES.length)} — от канапе до мангала`,
       logoWhite,
     });
+    const tocPage = 2;
+    doc.addPage();
+    paintCream(doc); /* страница оглавления — заполняется после секций */
+    const anchors = newCatalogAnchors();
+    let y = CONTENT_TOP;
     types.forEach((menu, i) => {
       const last = i === types.length - 1;
-      if (last) PDF_DENSITY.set(doc, 0.95);
-      y = drawCatalogSection(doc, menu, i === 0 ? y : y + 8, undefined, last);
+      /* каждый формат — с чистой страницы: глава сама себя называет */
+      const y0 = addContentPage(doc, null);
+      y = drawCatalogSection(doc, menu, y0, undefined, last, {
+        pagePerPackage: true,
+        chapterIdx: i,
+        anchors,
+      });
     });
     drawClosing(doc, y);
+    drawToc(doc, anchors, tocPage);
+    drawOutline(doc, anchors, tocPage);
   } else {
-    /* одиночный тип без пакета (легаси-вызов menu.tsx) */
+    /* одиночный тип без пакета (легаси-вызов menu.tsx) — c106: те же
+       главы и разрывы по тарифам, что и в полном каталоге */
     const m = types[0];
     let y = drawTitleBlock(doc, {
       title: `МЕНЮ — ${m.label.toUpperCase()}`,
@@ -411,8 +434,10 @@ export async function buildMenuCatalogDoc(
       subline: `Санкт-Петербург · ${genDate()}`,
       logoWhite,
     });
-    PDF_DENSITY.set(doc, 0.95);
-    y = drawCatalogSection(doc, m, y, undefined, true);
+    y = drawCatalogSection(doc, m, y, undefined, true, {
+      pagePerPackage: true,
+      chapterIdx: MENU_TYPES.findIndex((t) => t.id === m.id),
+    });
     drawClosing(doc, y);
   }
 
@@ -860,6 +885,225 @@ function drawHandCheck(
   doc.line(...d, ...e);
 }
 
+/* ───────────────────── c106: главы, оглавление и закладки каталога ───── */
+
+/** Якорь фактической страницы пакета (заполняется при раскладке). */
+interface TocPkg {
+  name: string;
+  page: number;
+  /** «от N ₽ за гостя» — цена ПАКЕТА, не формата (verify-D: цена
+   *  формата в строках тарифов оглавления вводила в заблуждение). */
+  from: string;
+}
+/** Якорь секции-формата: страница главы + пакеты. */
+interface TocSection {
+  idx: number;
+  label: string;
+  page: number;
+  from: string;
+  packages: TocPkg[];
+}
+/** Все якоря каталога — источник оглавления (стр. 2) и закладок. */
+interface CatalogAnchors {
+  sections: TocSection[];
+}
+
+function newCatalogAnchors(): CatalogAnchors {
+  return { sections: [] };
+}
+
+const CHAP = {
+  numBase: 8.2, // базовая линия номера/названия главы от y
+  lineAt: 11.8, // золотая линия под шапкой
+  descBase: 16.2, // первая строка описания
+  descLH: 3.8,
+  after: 6.5, // отбивка до первого пакета
+};
+
+function chapterHeaderH(doc: jsPDF, desc: string): number {
+  if (!desc) return CHAP.lineAt + 5;
+  doc.setFont("Roboto", "italic");
+  doc.setFontSize(8.5);
+  const lines: string[] = doc.splitTextToSize(desc, PAGE.contentW);
+  return CHAP.descBase + (lines.length - 1) * CHAP.descLH + CHAP.after;
+}
+
+/** Шапка-глава каталога (c106): номер золотом Prata 22 + название
+ *  Prata 16 + цена «от» справа + золотая линия 0.5 + описание курсивом.
+ *  Каждый формат открывает свою страницу — глава называет её. */
+function drawChapterHeader(
+  doc: jsPDF,
+  y: number,
+  idx: number,
+  menu: MenuType,
+): number {
+  const num = String(idx + 1).padStart(2, "0");
+
+  doc.setFont("Prata", "normal");
+  doc.setFontSize(22);
+  doc.setTextColor(...C.gold);
+  doc.text(num, PAGE.mL, y + CHAP.numBase);
+  const numW = doc.getTextWidth(num);
+
+  doc.setFontSize(16);
+  doc.setTextColor(...C.espresso);
+  doc.text(menu.label.toUpperCase(), PAGE.mL + numW + 4.5, y + CHAP.numBase);
+
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(10.5);
+  doc.setTextColor(...C.espresso);
+  doc.text(
+    `от ${formatRUB(menu.perGuest)} ${unitFor(menu)}`,
+    PAGE.w - PAGE.mR,
+    y + CHAP.numBase,
+    { align: "right" },
+  );
+
+  doc.setDrawColor(...C.gold);
+  doc.setLineWidth(0.5);
+  doc.line(PAGE.mL, y + CHAP.lineAt, PAGE.w - PAGE.mR, y + CHAP.lineAt);
+
+  if (menu.description) {
+    doc.setFont("Roboto", "italic");
+    doc.setFontSize(8.5);
+    doc.setTextColor(...C.soft);
+    const lines: string[] = doc.splitTextToSize(
+      menu.description,
+      PAGE.contentW,
+    );
+    doc.text(lines, PAGE.mL, y + CHAP.descBase);
+  }
+  return y + chapterHeaderH(doc, menu.description);
+}
+
+const TOC = {
+  titleBase: 6.8, // базовая линия «СОДЕРЖАНИЕ» от y
+  lineAt: 9.6, // линия под заголовком
+  firstRow: 17, // первая строка от y
+  secRowH: 7.8, // строка формата
+  pkgRowH: 5.6, // строка тарифа
+  secGap: 2.8, // воздух перед строкой формата
+  indent: 9, // отступ строк тарифа
+  numW: 8, // колонка номера главы
+};
+
+/** Печатное оглавление (стр. 2). Рисуется ПОСЛЕ секций через setPage —
+ *  номера страниц фактические. Строки кликабельны (doc.link) во
+ *  вьюверах с поддержкой ссылок; на печати это обычные номера. */
+function drawToc(
+  doc: jsPDF,
+  anchors: CatalogAnchors,
+  tocPage: number,
+): void {
+  doc.setPage(tocPage);
+  const cur = { y: CONTENT_TOP };
+
+  doc.setFont("Roboto", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(...C.goldText);
+  doc.setCharSpace(1);
+  doc.text("СОДЕРЖАНИЕ", PAGE.mL, cur.y + TOC.titleBase);
+  doc.setCharSpace(0);
+  hairline(doc, PAGE.mL, cur.y + TOC.lineAt, PAGE.w - PAGE.mR, C.line, 0.25);
+  cur.y += TOC.firstRow;
+
+  for (const sec of anchors.sections) {
+    /* строка формата: номер золотом + название Prata + страница */
+    cur.y += TOC.secGap;
+    doc.setFont("Roboto", "bold");
+    doc.setFontSize(9.5);
+    doc.setTextColor(...C.goldText);
+    doc.text(String(sec.idx + 1).padStart(2, "0"), PAGE.mL, cur.y);
+    doc.setFont("Prata", "normal");
+    doc.setFontSize(12);
+    doc.setTextColor(...C.espresso);
+    doc.text(sec.label, PAGE.mL + TOC.numW, cur.y);
+    const labelW = doc.getTextWidth(sec.label);
+    doc.setFont("Roboto", "bold");
+    doc.setFontSize(9.5);
+    const ps = String(sec.page);
+    doc.text(ps, PAGE.w - PAGE.mR, cur.y, { align: "right" });
+    dottedLeader(
+      doc,
+      PAGE.mL + TOC.numW + labelW + 3,
+      cur.y - 0.9,
+      PAGE.w - PAGE.mR - doc.getTextWidth(ps) - 3,
+    );
+    doc.link(PAGE.mL - 1, cur.y - 3.8, PAGE.contentW + 2, 5, {
+      pageNumber: sec.page,
+    });
+    cur.y += TOC.secRowH;
+
+    /* строки тарифов: «Базовый · от 2 450 ₽ за гостя» */
+    for (const pkg of sec.packages) {
+      const label = `${pkg.name} · ${pkg.from}`;
+      doc.setFont("Roboto", "normal");
+      doc.setFontSize(9.5);
+      doc.setTextColor(...C.espresso);
+      doc.text(label, PAGE.mL + TOC.indent, cur.y);
+      const labelW2 = doc.getTextWidth(label);
+      doc.setFont("Roboto", "bold");
+      const ps2 = String(pkg.page);
+      doc.text(ps2, PAGE.w - PAGE.mR, cur.y, { align: "right" });
+      dottedLeader(
+        doc,
+        PAGE.mL + TOC.indent + labelW2 + 3,
+        cur.y - 0.9,
+        PAGE.w - PAGE.mR - doc.getTextWidth(ps2) - 3,
+      );
+      doc.link(
+        PAGE.mL + TOC.indent - 1,
+        cur.y - 3.8,
+        PAGE.contentW - TOC.indent + 2,
+        5,
+        { pageNumber: pkg.page },
+      );
+      cur.y += TOC.pkgRowH;
+    }
+  }
+}
+
+/** PDF-закладки (c106): корень «Содержание» → «01 · Формат» → тарифы.
+ *  jsPDF 4.x: doc.outline.add(parent, title, { pageNumber }) — 1-based,
+ *  кириллица поддерживается (UTF-16BE). Типы jspdf не экспортируют
+ *  outline-ноду — локальная минимальная декларация + cast. Сбой не
+ *  валит генерацию: закладки — навигационный бонус (research/c106). */
+function drawOutline(
+  doc: jsPDF,
+  anchors: CatalogAnchors,
+  tocPage: number,
+): void {
+  try {
+    const outline = (
+      doc as unknown as {
+        outline: {
+          add(
+            parent: unknown,
+            title: string,
+            options: { pageNumber: number },
+          ): unknown;
+        };
+      }
+    ).outline;
+    if (!outline || typeof outline.add !== "function") return;
+    outline.add(null, "Содержание", { pageNumber: tocPage });
+    for (const sec of anchors.sections) {
+      const node = outline.add(
+        null,
+        `${String(sec.idx + 1).padStart(2, "0")} · ${sec.label}`,
+        { pageNumber: sec.page },
+      );
+      for (const pkg of sec.packages) {
+        outline.add(node, `${sec.label} · ${pkg.name}`, {
+          pageNumber: pkg.page,
+        });
+      }
+    }
+  } catch {
+    /* тихо деградируем — меню без закладок валидно */
+  }
+}
+
 /* ─────────────────────────────────────────── финал: приписка + CTA-блок */
 
 /** Приписка условий (цены за гостя, включённые официанты, минимальные
@@ -961,23 +1205,44 @@ function drawSinglePackage(
   return drawIncluded(doc, menu.included, cur.y);
 }
 
-/** Секция каталога: капс-категория → пакеты (Prata-шапки + блюда) → рамка.
- *  onlyPkg — c84-C фильтр одного пакета (per-tariff внутри каталога). */
+/** Секция каталога: шапка-глава (каталог) или капс-категория → пакеты → рамка.
+ *  onlyPkg — c84-C фильтр одного пакета (per-tariff внутри каталога).
+ *  c106 opts: pagePerPackage — каждый пакет с новой страницы; chapterIdx —
+ *  шапка-глава с номером; anchors — запись фактических страниц начала
+ *  секции/пакетов (оглавление + закладки рисуются после раскладки). */
 function drawCatalogSection(
   doc: jsPDF,
   menu: MenuType,
   y0: number,
   onlyPkg?: number,
   reserveClosing = false,
+  opts?: {
+    pagePerPackage?: boolean;
+    chapterIdx?: number;
+    anchors?: CatalogAnchors;
+  },
 ): number {
   const cur = { y: y0 };
   const selPkg = onlyPkg !== undefined ? menu.packages[onlyPkg] : undefined;
   const contLabel = selPkg ? `${menu.label} · ${selPkg.name}` : menu.label;
   const ensure = makeEnsure(doc, cur, contLabel);
 
+  /* c106: якорь секции — фактическая страница начала (для TOC/закладок) */
+  const section: TocSection = {
+    idx: opts?.chapterIdx ?? 0,
+    label: menu.label,
+    page: doc.getNumberOfPages(),
+    from: `от ${formatRUB(menu.perGuest)} ${unitFor(menu)}`,
+    packages: [],
+  };
+  opts?.anchors?.sections.push(section);
+
   /* widow-гвард категории: заголовок + шапка первого пакета + 2 блюда
      держатся вместе — категория не остаётся сиротой внизу страницы */
-  const catH = categoryHeaderH(doc, menu.description);
+  const catH =
+    opts?.chapterIdx !== undefined
+      ? chapterHeaderH(doc, menu.description)
+      : categoryHeaderH(doc, menu.description);
   const first = selPkg ?? menu.packages[0];
   const first2 = first.dishes
     .slice(0, 2)
@@ -986,16 +1251,23 @@ function drawCatalogSection(
     cur.y = addContentPage(doc, null); // чистая страница: категория сама себя называет
   }
 
-  cur.y = drawCategoryHeader(
-    doc,
-    cur.y,
-    menu.label.toUpperCase(),
-    `ОТ ${formatRUB(menu.perGuest)} ${unitFor(menu).toUpperCase()}`,
-    menu.description,
-  );
+  cur.y =
+    opts?.chapterIdx !== undefined
+      ? drawChapterHeader(doc, cur.y, opts.chapterIdx, menu)
+      : drawCategoryHeader(
+          doc,
+          cur.y,
+          menu.label.toUpperCase(),
+          `ОТ ${formatRUB(menu.perGuest)} ${unitFor(menu).toUpperCase()}`,
+          menu.description,
+        );
 
   menu.packages.forEach((pkg, idx) => {
     if (onlyPkg !== undefined && idx !== onlyPkg) return;
+    /* c106: каждый тариф — с новой страницы (запрос владельца) */
+    if (opts?.pagePerPackage && idx > 0) {
+      cur.y = addContentPage(doc, contLabel);
+    }
     const hdrH = packageIntroH(doc, pkg);
     const dishesH = pkg.dishes.reduce((s, d) => s + dishRowH(doc, d), 0);
 
@@ -1017,6 +1289,14 @@ function drawCatalogSection(
 
     // шапка пакета не отрывается от первых двух блюд
     ensure(hdrH + first2);
+
+    /* c106: якорь пакета — после всех возможных переносов, ровно
+       перед шапкой: страница фактического начала тарифа */
+    section.packages.push({
+      name: pkg.name,
+      page: doc.getNumberOfPages(),
+      from: `от ${formatRUB(pkg.pricePerGuest)} ${unitFor(menu)}`,
+    });
 
     cur.y = drawPackageIntro(doc, menu, pkg, cur.y);
     for (const [di, dish] of pkg.dishes.entries()) {

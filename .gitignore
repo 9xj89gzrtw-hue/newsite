@@ -48,6 +48,7 @@ Thumbs.db
 *.log
 dev.log
 server.log
+/logs/
 
 # examples & tests (not for production)
 /examples/
