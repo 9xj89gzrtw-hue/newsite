@@ -598,9 +598,14 @@
     letter-spacing: 0;
     text-transform: none;
     max-height: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* c105 (аудит-В P1: «Вегетарианское и халяль» обрезалось в «…ха» —
+       св 296px против 217px строки @320): длинные заголовки услуг
+       переносятся ЦЕЛИКОМ по словам на вторую строку (рукописный Marck
+       Script легко терпит две строки), а не глушатся многоточием. */
+    white-space: normal;
+    line-height: 1.12;
+    overflow: visible;
+    text-overflow: clip;
     transform-origin: left center;
   }
 

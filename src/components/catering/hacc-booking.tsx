@@ -2352,9 +2352,18 @@ const ReceiptLines = memo(function ReceiptLines({
         className="hb-line"
       >
         <span className="hb-line__label">
-          {pkgName ? `${type.label} · ${pkgName}` : `${type.label} · от ${formatRUB(perGuest)}/чел`}
+          {pkgName ? (
+            `${type.label} · ${pkgName}`
+          ) : (
+            <>
+              {type.label} · от{" "}
+              <span className="hb-money">{formatRUB(perGuest)}/чел</span>
+            </>
+          )}
         </span>
-        <span className="hb-line__value">{formatRUB(perGuest)}/чел</span>
+        <span className="hb-line__value">
+          <span className="hb-money">{formatRUB(perGuest)}/чел</span>
+        </span>
       </PrintLine>
 
       {/* Строка гостей × цена → подытог: печатается на каждом изменении
@@ -2368,9 +2377,11 @@ const ReceiptLines = memo(function ReceiptLines({
         className="hb-line"
       >
         <span className="hb-line__label">
-          {guests} {guestsLabel(guests)} × {formatRUB(perGuest)}
+          {guests} {guestsLabel(guests)} × <span className="hb-money">{formatRUB(perGuest)}</span>
         </span>
-        <span className="hb-line__value">{formatRUB(subtotal)}</span>
+        <span className="hb-line__value">
+          <span className="hb-money">{formatRUB(subtotal)}</span>
+        </span>
       </PrintLine>
 
       {/* c84-B (задача 2): КАЖДАЯ выбранная допуслуга — отдельной строкой
@@ -2397,7 +2408,9 @@ const ReceiptLines = memo(function ReceiptLines({
               {a.percent != null ? `${a.label} · ${a.percent}%` : a.label}
             </span>
             <span className="hb-line__value">
-              {a.percent != null ? `+${formatRUB(amt)}` : `от ${formatRUB(a.price ?? 0)}`}
+              <span className="hb-money">
+                {a.percent != null ? `+${formatRUB(amt)}` : `от ${formatRUB(a.price ?? 0)}`}
+              </span>
             </span>
           </PrintLine>
         );
@@ -2419,7 +2432,9 @@ const ReceiptLines = memo(function ReceiptLines({
           className="hb-line hb-line--min"
         >
           <span className="hb-line__label">Минимальный заказ формата</span>
-          <span className="hb-line__value">+{formatRUB(belowMinBy)}</span>
+          <span className="hb-line__value">
+            <span className="hb-money">+{formatRUB(belowMinBy)}</span>
+          </span>
         </PrintLine>
       )}
 
