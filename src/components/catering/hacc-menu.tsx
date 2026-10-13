@@ -84,9 +84,16 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const HOVER_INTENT_MS = 380;
 const DESKTOP_MQ = "(min-width: 1024px)";
 
-/** Тёплый пергаментный placeholder 8×8 (тот же приём, что в hacc-services). */
-const BLUR_DATA_URL =
-  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNGNUY1RUUyIi8+PC9zdmc+";
+/** c108: blur-placeholder = тинт категории. Фото тарифов (конвейер
+ *  research/c107-c108) красит фон в ТОЧНЫЙ тинт панели — placeholder
+ *  того же цвета делает загрузку бесшовной: панель → фото проявляется
+ *  без вспышки чужого цвета. Грабля c107: здесь был невалидный 7-симв.
+ *  hex #F5F5EE2 — SVG fill падал в ЧЁРНЫЙ (жалоба владельца: «на телефоне
+ *  сначала чёрный квадрат, потом фотка»). */
+function tintBlurDataUrl(tint: string): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="${tint}"/></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
 
 /* ----------------------------------------------------------------- content */
 
@@ -238,6 +245,43 @@ function MenuRack({
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const reduceSettled = mounted && reduced;
+
+  /* c108 (жалоба владельца «на телефоне фото появляется с опозданием»):
+     фоновый прогрев HTTP-кэша ВСЕХ фото тарифов после idle. Фото лёгкие
+     (90–160KB webp), старт после load+idle с fetchPriority=low — LCP
+     (герой) не конкурирует; к моменту, когда юзер доскроллит до меню
+     или переключит таб/панель, фото уже в кэше → lazy <img> отдаётся
+     мгновенно, без placeholder-паузы. Это мягкая альтернатива «удлинить
+     экран загрузки» — сайт не блокируется, прогрев идёт параллельно. */
+  useEffect(() => {
+    if (!mounted) return;
+    let cancelled = false;
+    const warm = () => {
+      if (cancelled) return;
+      for (const c of cats)
+        for (const p of c.packages) {
+          if (!p.photo) continue;
+          const img = new Image();
+          img.fetchPriority = "low";
+          img.decoding = "async";
+          img.src = p.photo;
+        }
+    };
+    const timer = window.setTimeout(
+      () => {
+        if (typeof window.requestIdleCallback === "function") {
+          window.requestIdleCallback(() => !cancelled && warm(), { timeout: 2500 });
+        } else {
+          warm();
+        }
+      },
+      900,
+    );
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [mounted, cats]);
 
   const rackRef = useRef<HTMLDivElement | null>(null);
   // Declare the animation sequence before callbacks/effects that capture it.
@@ -1229,7 +1273,7 @@ function MenuRack({
                           src={pkg.photo ?? FALLBACK_PHOTO}
                           alt={`«${pkg.name}» — ${cat.label}: ${pkg.description}`}
                           fill
-                          blurDataURL={BLUR_DATA_URL}
+                          blurDataURL={tintBlurDataUrl(cat.tint)}
                           /* 81-W2F2 (E MAJOR, критик E волна-2): было
                              100vw/38vw — реальный слот фото ~92vw мобайл
                              (323px фигура + 24px parallax-bleed @390) и
@@ -1248,16 +1292,25 @@ function MenuRack({
                              default-open категория сериализовала
                              loading="eager" в SSR и тянула ниже-фолдное
                              фото в первых ~500ms (конкуренция с LCP, K8).
-                             Теперь всегда lazy + fetchPriority="low"
-                             (тот же паттерн, что hacc-services Task 4). */
+                             lazy остаётся; НО c108 (жалоба владельца
+                             «фотка появляется с опозданием»): приоритет
+                             динамический — закрытым панелям low, открытой
+                             high (атрибут живой: браузер применяет его
+                             к ещё не начавшейся загрузке при входе
+                             панели в вьюпорт). Плюс фоновый прогрев кэша
+                             всех фото после idle (см. эффект ниже) —
+                             к моменту скролла фото уже в кэше. */
                           loading="lazy"
-                          fetchPriority="low"
+                          fetchPriority={isOpen ? "high" : "low"}
                           /* c107: фото конвейера blend (фон = тинт панели) —
                              без CSS-фильтра: saturate/contrast сдвигает тинт
                              краёв и раскрывает прямоугольную границу фото
-                             (см. .hmenu__img--blend в hacc-menu.css) */
+                             (см. .hmenu__img--blend в hacc-menu.css).
+                             c108: конвейер переехал в /media/c108 —
+                             префиксы обоих поколений. */
                           className={
-                            pkg.photo?.startsWith("/media/c107")
+                            pkg.photo?.startsWith("/media/c107") ||
+                              pkg.photo?.startsWith("/media/c108")
                               ? "hmenu__img hmenu__img--blend"
                               : "hmenu__img"
                           }

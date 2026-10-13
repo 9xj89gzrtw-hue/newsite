@@ -76,11 +76,14 @@ const HOVER_INTENT_MS = 380;
 const DESKTOP_MQ = "(min-width: 1024px)";
 
 /**
- * Tiny 8×8 SVG placeholder (base64) — soft parchment wash before the photo
- * loads (SmartImage rule: placeholder="blur" when blurDataURL is provided).
+ * c108: пер-тинт blur-placeholder (как в hacc-menu). Была грабля:
+ * невалидный 7-симв. hex #F5FEEE2 — SVG fill падал в ЧЁРНЫЙ, до загрузки
+ * фото мелькал чёрный квадрат (жалоба владельца с мобайла).
  */
-const BLUR_DATA_URL =
-  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNGNUZFRUUyIi8+PC9zdmc+";
+function tintBlurDataUrl(tint: string): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="${tint}"/></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
 
 /* ----------------------------------------------------------------- content */
 
@@ -765,7 +768,7 @@ function HaccRack({
                       src={s.media}
                       alt={s.mediaAlt}
                       fill
-                      blurDataURL={BLUR_DATA_URL}
+                      blurDataURL={tintBlurDataUrl(s.tint)}
                       /* 81-W2F2b: было 64vw (=921.6px @1440) — занижало
                          реальный бокс фото панели. Замеры (1440 DPR1,
                          research/w2f2b): видимый figure .hacc__media =
