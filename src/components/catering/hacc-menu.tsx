@@ -1307,11 +1307,12 @@ function MenuRack({
                              краёв и раскрывает прямоугольную границу фото
                              (см. .hmenu__img--blend в hacc-menu.css).
                              c108: конвейер переехал в /media/c108 —
-                             префиксы обоих поколений; c109 — +c109. */
+                             префиксы всех поколений; c109/c110 — аналогично. */
                           className={
                             pkg.photo?.startsWith("/media/c107") ||
                               pkg.photo?.startsWith("/media/c108") ||
-                              pkg.photo?.startsWith("/media/c109")
+                              pkg.photo?.startsWith("/media/c109") ||
+                              pkg.photo?.startsWith("/media/c110")
                               ? "hmenu__img hmenu__img--blend"
                               : "hmenu__img"
                           }

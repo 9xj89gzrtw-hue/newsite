@@ -766,6 +766,15 @@ function HaccRack({
                         : { duration: 0.9, ease: EASE }
                     }
                   >
+                    {/* c110 Zero-G Float: слой парения — единственный
+                        transform-свободный узел под параллаксом (framer
+                        пишет инлайн на media-inner: x/y/scale — CSS-анимация
+                        здесь была бы перекрыта каскадом). Обёртке — только
+                        CSS naturalFloat (±6px боб + дыхание), см.
+                        .hacc__media-float в hacc-services.css: задержка 0.7s
+                        после открытия, RM-гейт, поглощение колебания
+                        bleed-подложкой inset:-12px. */}
+                    <div className="hacc__media-float">
                     <SmartImage
                       src={s.media}
                       alt={s.mediaAlt}
@@ -812,6 +821,7 @@ function HaccRack({
                           : "hacc__img"
                       }
                     />
+                    </div>
                   </motion.div>
                 </figure>
 

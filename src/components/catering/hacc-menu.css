@@ -636,6 +636,13 @@
 .hmenu__media-fade {
   position: absolute;
   inset: 0;
+  /* c110 Zero-G Float: базовый композитор-хинт слоя парения — статичный
+     translate3d промотирует слой заранее (identity — рендер тот же);
+     framer здесь трогает ТОЛЬКО opacity (fade при смене тарифа) — transform
+     свободен под CSS-анимацию naturalFloat, конфликта с инлайном нет. */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .hmenu__img {
@@ -659,6 +666,51 @@
 @keyframes hmenu-drift {
   from { transform: scale(1.055) translate(-0.6%, 0.4%); }
   to   { transform: scale(1.09) translate(0.7%, -0.5%); }
+}
+
+/* c110 Zero-G Float — эффект невесомости: открытая панель — фото «парит».
+ *
+ * Запрос владельца: фон фото на 100% слит с тинтом панели (конвейер
+ * c107–c110) — нужно создать иллюзию, что сами ПРЕДМЕТЫ парят в воздухе
+ * при раскрытии аккордеона.
+ *
+ * Архитектура слоёв (три независимых transform-слоя, все на композиторе):
+ *   media-inner  — framer-параллакс x/y (инлайн)
+ *   media-fade   — ЭТА анимация: боб ±6px + дыхание scale (CSS)
+ *   img          — Ken Burns hmenu-drift 34s (CSS)
+ *
+ * Производительность: ТОЛЬКО transform (translate3d/scale) — ноль
+ * reflow/repaint, 60–120 FPS на мобиле; эксклюзивность панелей = в каждый
+ * момент живёт ровно одна анимация. will-change — только на открытой
+ * панели (слой умирает при закрытии, память не течёт).
+ *
+ * Задержка 0.7s: не конкурирует с раскрытием панели (flex-grow 620ms) и
+ * fade-входом фото (0.5s) — парение начинается, когда панель осела.
+ * Переключение тарифа ремаршрутизирует media-fade (key=photo) — цикл
+ * честно перезапускается с той же задержкой.
+ *
+ * Отсутствие обрезки: контейнер .hmenu__media держит overflow:hidden для
+ * параллакс-подложки, но колебание ПОГЛОЩАЕТСЯ bleed'ом — media-inner
+ * inset:-12px больше видимого окна на 12px с каждой стороны, а img несёт
+ * Ken-Burns scale ≥1.055. Худший случай (translate −6px + scale 0.995
+ * обёртки) оставляет край фото за пределами видимого окна — «парит» сам
+ * предмет, рамка никогда не входит в кадр (замер e2e research/c110).
+ * Transform не влияет на layout — горизонтального скролла нет.
+ *
+ * Базовые стили «display:block; margin:auto; max-width:100%» из ТЗ здесь
+ * не нужны: img — fill-моду (absolute inset:0 + object-fit:cover) внутри
+ * позиционированной обёртки — полно-протяжённый адаптивный рендер без
+ * inline-щелей даёт сама архитектура fill; аппаратное ускорение из ТЗ
+ * (will-change/translate3d/backface-visibility) живёт на парящем слое. */
+.hmenu__item.is-open .hmenu__media-fade {
+  will-change: transform;
+  animation: naturalFloat 5.8s ease-in-out 0.7s infinite alternate;
+}
+
+@keyframes naturalFloat {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(0, -6px, 0) scale(1.015); }
+  100% { transform: translate3d(0, 2px, 0) scale(0.995); }
 }
 
 /* c103: подпись-плашка .hmenu__media-cap (имя тарифа поверх фото)
@@ -1862,6 +1914,13 @@
 
   .hmenu__item.is-open .hmenu__img {
     animation: none !important;
+  }
+
+  /* c110 Zero-G Float: парение выключено — фото статично (ТЗ-гейт
+     prefers-reduced-motion; слой парения не анимируется и не промотируется) */
+  .hmenu__item.is-open .hmenu__media-fade {
+    animation: none !important;
+    will-change: auto;
   }
 
   /* C60: счётчик скрытых блюд не подпрыгивает */

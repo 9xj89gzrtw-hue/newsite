@@ -455,6 +455,20 @@
   inset: -12px;
 }
 
+/* c110 Zero-G Float: слой парения (см. naturalFloat ниже и зеркальный
+   комментарий в hacc-menu.css). framer пишет инлайн-transform на
+   media-inner (параллакс x/y + one-shot zoom scale) — каскад CSS-анимации
+   перекрыл бы его, поэтому парение живёт на СВОЕЙ обёртке: три
+   независимых transform-слоя (inner параллакс → float боб → img drift),
+   всё на композиторе, ноль reflow/repaint. */
+.hacc__media-float {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
 .hacc__img {
   /* perpetual slow drift — the open photo never settles; the panel keeps
      breathing (transform-only). Plus a subtle unifying color grade. */
@@ -478,6 +492,27 @@
 @keyframes hacc-drift {
   from { transform: scale(1.055) translate(-0.6%, 0.4%); }
   to   { transform: scale(1.09) translate(0.7%, -0.5%); }
+}
+
+/* c110 Zero-G Float — эффект невесомости (ТЗ владельца): фон фото на 100%
+ * слит с тинтом панели (конвейер c109) — иллюзия, что сами предметы парят.
+ * Характеристики: только transform (GPU, 60–120 FPS); задержка 0.7s после
+ * открытия — не конкурирует с wipe-раскрытием панели и one-shot zoom
+ * (6s easeOut) на media-inner; ±6px + scale-дыхание 0.995–1.015
+ * поглощаются bleed-подложкой (inset −12px + Ken-Burns ≥1.055 у img) —
+ * рамка фото никогда не входит в видимое окно; will-change только на
+ * открытой панели (эксклюзивность — живёт одна анимация). Кейфреймы
+ * байт-идентичны naturalFloat в hacc-menu.css (одноимённые глобальные
+ * @keyframes с одинаковым телом безопасны при любом порядке импорта). */
+.hacc__item.is-open .hacc__media-float {
+  will-change: transform;
+  animation: naturalFloat 5.8s ease-in-out 0.7s infinite alternate;
+}
+
+@keyframes naturalFloat {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(0, -6px, 0) scale(1.015); }
+  100% { transform: translate3d(0, 2px, 0) scale(0.995); }
 }
 
 /* the script title settles onto its baseline when open */
@@ -869,6 +904,13 @@
   .hacc__img {
     transform: none;
     animation: none !important;      /* no perpetual drift */
+  }
+
+  /* c110 Zero-G Float: парение выключено — фото статично (ТЗ-гейт
+     prefers-reduced-motion) */
+  .hacc__media-float {
+    animation: none !important;
+    will-change: auto;
   }
 
   .hacc__title {
