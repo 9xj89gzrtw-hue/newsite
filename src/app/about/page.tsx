@@ -10,36 +10,36 @@ import {
 import { MENU_TYPES } from "@/lib/pricing";
 
 /**
- * c101 (чек-лист SEO-YANDEX, шаг 27) — страница «О компании» с
- * машины-читаемыми фактами: год основания, количество мероприятий и гостей,
- * юридическое лицо, география, форматы с ценами «от». Лучший источник для
- * цитирования ИИ-ассистентами (Perplexity/ChatGPT/Алиса) и Яндекс-сниппетов:
- * факты лежат в чистом HTML (dl/table/ul), а не в анимационных секциях
- * главной. Все числа — из ЕДИНЫХ источников (site-config.ts, pricing.ts,
- * config.ts), синхронно с JSON-LD главной и llms.txt.
+ * c101 (чек-лист SEO-YANDEX, шаг 27) — страница «О компании» с
+ * машины-читаемыми фактами: год основания, количество мероприятий и гостей,
+ * юридическое лицо, география, форматы с ценами «от». Лучший источник для
+ * цитирования ИИ-ассистентами (Perplexity/ChatGPT/Алиса) и Яндекс-сниппетов:
+ * факты лежат в чистом HTML (dl/table/ul), а не в анимационных секциях
+ * главной. Все числа — из ЕДИНЫХ источников (site-config.ts, pricing.ts,
+ * config.ts), синхронно с JSON-LD главной и llms.txt.
  *
- * Число лет опыта считается от FOUNDED_YEAR динамически — не протухает.
- * Цены «от» — из menu.json через MENU_TYPES (та же таблица, что в
+ * Число лет опыта считается от FOUNDED_YEAR динамически — не протухает.
+ * Цены «от» — из menu.json через MENU_TYPES (та же таблица, что в
  * калькуляторе; при изменении меню страница обновится сама).
  */
 
 const YEARS_ACTIVE = new Date().getFullYear() - FOUNDED_YEAR;
 
-/** Форматы с ценами «от» — из меню-каталога (как калькулятор). */
+/** Форматы с ценами «от» — из меню-каталога (как калькулятор). */
 const FORMATS = MENU_TYPES.map((t) => ({
   id: t.id,
   label: t.label,
   minPrice: Math.min(...t.packages.map((p) => p.pricePerGuest)),
 }));
 
-/** c101 — AboutPage JSON-LD: ссылка на организацию, объявленную в
+/** c101 — AboutPage JSON-LD: ссылка на организацию, объявленную в
  *  layout.tsx (@id …#organization) — сущность одна, дублирования нет. */
 const aboutLd = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
   "@id": SITE_URL_BASE + "/about#webpage",
   url: SITE_URL_BASE + "/about",
-  name: "О компании — NILOV CATERING",
+  name: "О компании — NILOV CATERING",
   description: `NILOV CATERING — кейтеринг полного цикла в Санкт-Петербурге с ${FOUNDED_YEAR} года: ${EVENTS_DONE}+ мероприятий, ${GUESTS_SERVED.toLocaleString("ru-RU")}+ гостей. ИП ${LEGAL_INFO.legalName}.`,
   mainEntity: { "@id": SITE_URL_BASE + "#organization" },
   isPartOf: { "@id": SITE_URL_BASE + "#organization" },
@@ -51,18 +51,18 @@ export const metadata: Metadata = {
    * внутри своего title давал «... | NILOV CATERING | NILOV CATERING» —
    * Яндекс обрезает такие title и теряет ключевые слова. Оставляем только
    * значимую часть; бренд прийдёт из шаблона. */
-  title: `Кейтеринг в СПб с ${FOUNDED_YEAR} года — о компании`,
-  description: `NILOV CATERING: работаем с ${FOUNDED_YEAR} года — ${EVENTS_DONE}+ мероприятий и ${GUESTS_SERVED.toLocaleString("ru-RU")}+ гостей. ${LEGAL_INFO.legalForm} ${LEGAL_INFO.legalName}. Фуршеты, банкеты, свадьбы, корпоративы в Санкт-Петербурге и ЛО.`,
+  title: `Кейтеринг в СПб с ${FOUNDED_YEAR} года — о компании`,
+  description: `NILOV CATERING: работаем с ${FOUNDED_YEAR} года — ${EVENTS_DONE}+ мероприятий и ${GUESTS_SERVED.toLocaleString("ru-RU")}+ гостей. ${LEGAL_INFO.legalForm} ${LEGAL_INFO.legalName}. Фуршеты, банкеты, свадьбы, корпоративы в Санкт-Петербурге и ЛО.`,
   robots: { index: true, follow: true },
   alternates: { canonical: "/about" },
   openGraph: {
     title: `О компании — NILOV CATERING, кейтеринг СПб с ${FOUNDED_YEAR} года`,
-    description: `${EVENTS_DONE}+ мероприятий, ${GUESTS_SERVED.toLocaleString("ru-RU")}+ гостей, ${YEARS_ACTIVE} года опыта. Форматы, цены «от», реквизиты и контакты.`,
+    description: `${EVENTS_DONE}+ мероприятий, ${GUESTS_SERVED.toLocaleString("ru-RU")}+ гостей, ${YEARS_ACTIVE} года опыта. Форматы, цены «от», реквизиты и контакты.`,
     type: "website",
     url: "/about",
     locale: "ru_RU",
     siteName: "NILOV CATERING",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "NILOV CATERING — выездной кейтеринг в Санкт-Петербурге" }],
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "NILOV CATERING — выездной кейтеринг в Санкт-Петербурге" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -85,10 +85,10 @@ export default function AboutPage() {
             NILOV CATERING
           </span>
           <h1 className="mt-4 font-display text-3xl text-ink break-words hyphens-auto md:text-5xl">
-            О компании
+            О компании
           </h1>
           <p className="mt-3 font-mono text-sm text-ink-soft">
-            Кейтеринг, в котором чувствуют · Санкт-Петербург · с {FOUNDED_YEAR}{" "}
+            Кейтеринг, в котором чувствуют · Санкт-Петербург · с {FOUNDED_YEAR}{" "}
             года
           </p>
         </header>
@@ -140,15 +140,15 @@ export default function AboutPage() {
                   СПб&nbsp;+&nbsp;ЛО
                 </dd>
                 <p className="mt-1 text-xs text-ink-soft">
-                  Санкт-Петербург и Ленинградская область
+                  Санкт-Петербург и Ленинградская область
                 </p>
               </div>
             </dl>
             <p className="mt-5">
               NILOV CATERING — премиальный кейтеринг полного цикла в
               Санкт-Петербурге. Основатель — Дмитрий Нилов. Мы привозим
-              выездной ресторан на вашу площадку: повара, официанты,
-              сервировка, посуда и текстиль — «еда как искусство» с{" "}
+              выездной ресторан на вашу площадку: повара, официанты,
+              сервировка, посуда и текстиль — «еда как искусство» с{" "}
               {FOUNDED_YEAR} года. Заявки принимаем круглосуточно, заказы — от
               одного гостя.
             </p>
@@ -160,10 +160,10 @@ export default function AboutPage() {
               id="about-formats"
               className="font-display text-2xl text-ink mb-5"
             >
-              Форматы и цены «от»
+              Форматы и цены «от»
             </h2>
             <p className="mb-4">
-              Шесть форматов меню — от доставки закусок до банкета. Полные
+              Шесть форматов меню — от доставки закусок до банкета. Полные
               составы пакетов «Базовый» / «Стандарт» / «Премиум» — в{" "}
               <Link
                 href="/#menu"
@@ -187,7 +187,7 @@ export default function AboutPage() {
                     Формат
                   </th>
                   <th className="py-2 font-mono text-[11px] uppercase tracking-widest text-ink-soft text-right">
-                    Цена за человека
+                    Цена за человека
                   </th>
                 </tr>
               </thead>
@@ -205,12 +205,12 @@ export default function AboutPage() {
               </tbody>
             </table>
             <p className="mt-3 text-sm">
-              В стоимость входит: еда, доставка в пределах КАД, сервировка,
-              посуда и текстиль, повар и официанты на месте, лёгкое цветочное
-              сопровождение. Не входит: аренда площадки, алкоголь, музыка,
-              расширенная флористика — поможем организовать по запросу.
-              Свадьбы, корпоративы, выездной бар, шоу-станции, торты на заказ,
-              вегетарианское/веганское/безглютеновое меню и халяль —
+              В стоимость входит: еда, доставка в пределах КАД, сервировка,
+              посуда и текстиль, повар и официанты на месте, лёгкое цветочное
+              сопровождение. Не входит: аренда площадки, алкоголь, музыка,
+              расширенная флористика — поможем организовать по запросу.
+              Свадьбы, корпоративы, выездной бар, шоу-станции, торты на заказ,
+              вегетарианское/веганское/безглютеновое меню и халяль —
               адаптируем под ваш формат.
             </p>
           </section>
@@ -252,7 +252,7 @@ export default function AboutPage() {
                     rel="noopener noreferrer nofollow"
                     target="_blank"
                   >
-                    на карте
+                    на карте
                   </a>
                 </dd>
               </div>
@@ -266,7 +266,7 @@ export default function AboutPage() {
               </div>
             </dl>
             <p className="mt-4 text-sm">
-              Полные реквизиты и условия — в{" "}
+              Полные реквизиты и условия — в{" "}
               <Link href="/offer" className="underline decoration-gold underline-offset-4">
                 публичной оферте
               </Link>
@@ -305,11 +305,11 @@ export default function AboutPage() {
             </ul>
             <div className="mt-8 rounded-xl bg-ink p-6 not-prose text-center md:p-8">
               <p className="font-display text-xl text-cream">
-                Посчитайте смету за 30 секунд
+                Посчитайте смету за 30 секунд
               </p>
               <p className="mt-2 text-sm text-cream/70">
-                Формат события, число гостей и дата — калькулятор покажет
-                предварительный расчёт с составом меню.
+                Формат события, число гостей и дата — калькулятор покажет
+                предварительный расчёт с составом меню.
               </p>
               <Link
                 href="/#calculator"

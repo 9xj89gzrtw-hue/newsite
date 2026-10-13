@@ -14,20 +14,20 @@ import { z } from "zod";
 const NonEmptyString = z
   .string()
   .trim()
-  .min(1, "строка не может быть пустой");
+  .min(1, "строка не может быть пустой");
 
 const PositiveInt = z
   .number()
   .int("ожидалось целое число")
   .positive("ожидалось число больше нуля");
 
-/** c95-W2-E MINOR-4: верхние границы цен/гостей — паритет с PHP-валидацией
- *  (иначе в чек уезжают 12-значные числа после опечатки в админке). */
+/** c95-W2-E MINOR-4: верхние границы цен/гостей — паритет с PHP-валидацией
+ *  (иначе в чек уезжают 12-значные числа после опечатки в админке). */
 const PriceInt = PositiveInt.max(1_000_000, "цена недопустимо велика (максимум 1 000 000)");
 const GuestsInt = PositiveInt.max(10_000, "число гостей недопустимо велико (максимум 10 000)");
 const SafeId = NonEmptyString.max(64).regex(
   /^[a-z0-9][a-z0-9-]*$/,
-  "id: только строчные латинские буквы, цифры и дефис",
+  "id: только строчные латинские буквы, цифры и дефис",
 );
 
 /* ----------------------------------------------------------------- shapes */
@@ -48,8 +48,8 @@ export const MenuPackageSchema = z.object({
   photo: NonEmptyString.max(500).optional(),
   dishes: z
     .array(DishSchema)
-    .min(1, "в пакете должен быть хотя бы один dish")
-    .max(60, "в пакете больше 60 dishes"),
+    .min(1, "в пакете должен быть хотя бы один dish")
+    .max(60, "в пакете больше 60 dishes"),
 });
 
 export const MenuTypeSchema = z.object({
@@ -65,15 +65,15 @@ export const MenuTypeSchema = z.object({
   /** c86: ограничений по числу гостей нет — поле для совместимости (у
    *  всех типов единица, «могут заказать хоть от одного человека»). */
   minGuests: GuestsInt,
-  /** "/чел" (по умолчанию) | "за набор". */
+  /** "/чел" (по умолчанию) | "за набор". */
   priceUnit: NonEmptyString.max(200).optional(),
   description: NonEmptyString.max(500),
   /** Что входит во все пакеты формата (обслуживание, посуда, доставка…). */
   included: z.array(NonEmptyString.max(200)).max(20),
   packages: z
     .array(MenuPackageSchema)
-    .min(1, "у формата должен быть хотя бы один пакет")
-    .max(6, "у формата больше 6 пакетов"),
+    .min(1, "у формата должен быть хотя бы один пакет")
+    .max(6, "у формата больше 6 пакетов"),
 });
 
 export const AddonSchema = z
@@ -88,13 +88,13 @@ export const AddonSchema = z
     percent: z
       .number()
       .int("процент должен быть целым")
-      .min(1, "процент должен быть не меньше 1")
-      .max(200, "процент должен быть не больше 200")
+      .min(1, "процент должен быть не меньше 1")
+      .max(200, "процент должен быть не больше 200")
       .optional(),
   })
   .refine(
     (a) => (a.price !== undefined) !== (a.percent !== undefined),
-    { message: "у допуслуги должно быть РОВНО одно из полей price | percent" },
+    { message: "у допуслуги должно быть РОВНО одно из полей price | percent" },
   );
 
 export const ServicePanelSchema = z.object({
@@ -112,7 +112,7 @@ export const MenuDataSchema = z
     version: PositiveInt,
     menuTypes: z
       .array(MenuTypeSchema)
-      .min(1, "нужен хотя бы один формат меню")
+      .min(1, "нужен хотя бы один формат меню")
       .max(12, "форматов меню больше 12"),
     addons: z.array(AddonSchema).max(20),
     /** Минимальные суммы заказа по форматам — ключи = id форматов. */
@@ -131,14 +131,14 @@ export const MenuDataSchema = z
         path: ["menuTypes"],
       });
     }
-    /* minOrder ↔ menuTypes: точное соответствие в обе стороны —
-       калькулятор клампит чек по MIN_ORDER[тип]. */
+    /* minOrder ↔ menuTypes: точное соответствие в обе стороны —
+       калькулятор клампит чек по MIN_ORDER[тип]. */
     const idSet = new Set(ids);
     for (const key of Object.keys(data.minOrder)) {
       if (!idSet.has(key)) {
         ctx.addIssue({
           code: "custom",
-          message: `в minOrder есть формат «${key}», отсутствующий в menuTypes`,
+          message: `в minOrder есть формат «${key}», отсутствующий в menuTypes`,
           path: ["minOrder", key],
         });
       }
@@ -147,12 +147,12 @@ export const MenuDataSchema = z
       if (!(id in data.minOrder)) {
         ctx.addIssue({
           code: "custom",
-          message: `формату «${id}» не задан минимальный заказ (minOrder)`,
+          message: `формату «${id}» не задан минимальный заказ (minOrder)`,
           path: ["minOrder", id],
         });
       }
     }
-    /* id плиток услуг — уникальны (цена подставляется по id). */
+    /* id плиток услуг — уникальны (цена подставляется по id). */
     const panelIds = data.servicePanels.map((p) => p.id);
     if (new Set(panelIds).size !== panelIds.length) {
       ctx.addIssue({
@@ -179,8 +179,8 @@ export type Addon = z.infer<typeof AddonSchema>;
 export type ServicePanel = z.infer<typeof ServicePanelSchema>;
 
 /**
- * Валидация menu.json с человекочитаемыми ошибками (RU, максимум 20 строк).
- * Используется и админкой (пред-коммит проверка черновика), и сборочным
+ * Валидация menu.json с человекочитаемыми ошибками (RU, максимум 20 строк).
+ * Используется и админкой (пред-коммит проверка черновика), и сборочным
  * гейтом scripts/validate-menu.ts (билд падает до next build).
  */
 export function validateMenuData(

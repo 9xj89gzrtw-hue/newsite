@@ -4,7 +4,7 @@
  * Hosting-agnostic: works on Vercel, Timeweb (Node.js), or any Node host.
  * Set NEXT_PUBLIC_SITE_URL env var to the production domain.
  *
- * Russian legislation compliance (152-ФЗ, ЗОПП, ФЗ "О рекламе"):
+ * Russian legislation compliance (152-ФЗ, ЗОПП, ФЗ "О рекламе"):
  * - Company legal name + ИНН/ОГРН must be in footer (placeholder until client provides real)
  * - Privacy policy + public offer required
  * - Consent to process personal data required on lead form
@@ -17,7 +17,7 @@ export const SITE_CONFIG = {
   brandName: "nilov catering.",
   brandNameFull: "Интерфуд Кейтеринг (NILOV CATERING)",
   brandShort: "nilov catering",
-  slogan: "Кейтеринг, в котором чувствуют",
+  slogan: "Кейтеринг, в котором чувствуют",
 
   // Domain — set via env (Timeweb/Vercel/any host)
   // c94 (критик A): фоллбек — боевой домен (был Vercel-URL: при сборке без
@@ -117,7 +117,7 @@ export const CONTACTS = {
  * Analytics — Yandex.Metrika (Russian, 152-ФЗ-compliant if data stays in RF).
  * Loaded ONLY after cookie consent (ea-cookie-banner → lib/analytics.ts).
  *
- * W3 / K6-CRITICAL (cycle-71): ЕДИНЫЙ источник ID для всего сайта — эта
+ * W3 / K6-CRITICAL (cycle-71): ЕДИНЫЙ источник ID для всего сайта — эта
  * константа (её читает src/lib/analytics.ts). Ключи: приоритет —
  * NEXT_PUBLIC_YANDEX_METRIKA_ID, легаси-синоним NEXT_PUBLIC_YANDEX_METRIKA.
  */

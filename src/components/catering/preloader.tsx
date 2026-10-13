@@ -5,49 +5,49 @@ import Image from "next/image";
 
 /**
  * Preloader — c98-E: БЕЛЫЙ «МУЗЕЙНЫЙ» ВХОД (прямой запрос владельца:
- * «логотип вращается на белом фоне пока идёт загрузка, индикатор загрузки
- * прямо в логотипе»). Замена дверному таймлайну 81-F1 — философию «CSS
- * первым, JS только чистит» сохраняем, но снятие привязано к РЕАЛЬНОЙ
- * готовности (hero-постер), а не к фиксированному таймлайну:
+ * «логотип вращается на белом фоне пока идёт загрузка, индикатор загрузки
+ * прямо в логотипе»). Замена дверному таймлайну 81-F1 — философию «CSS
+ * первым, JS только чистит» сохраняем, но снятие привязано к РЕАЛЬНОЙ
+ * готовности (hero-постер), а не к фиксированному таймлайну:
  *
  * • Вращение бейджа (.pre-logo-spin → @keyframes pre-logo-spin 9s linear
  *   infinite, globals.css) — compositor-only transform; элемент сидит в
- *   SSR-HTML, анимация стартует от первого пейнта, НЕ ждёт гидрации —
+ *   SSR-HTML, анимация стартует от первого пейнта, НЕ ждёт гидрации —
  *   «логотип уже крутится», пока грузится JS.
  * • Кольцо прогресса — SVG circle pathLength=1 ВОКРУГ бейджа: до гидрации
- *   стоит на статичных 12% (атрибут stroke-dashoffset в SSR-разметке — нет
+ *   стоит на статичных 12% (атрибут stroke-dashoffset в SSR-разметке — нет
  *   прыжков); после гидрации JS пишет style.strokeDashoffset через ref —
- *   БЕЗ ре-рендеров (грабля c85 §2: 259 inline-записей на кадр).
- * • Прогресс честный, с потолком 90% до real-ready: DOM parsed → 35%,
+ *   БЕЗ ре-рендеров (грабля c85 §2: 259 inline-записей на кадр).
+ * • Прогресс честный, с потолком 90% до real-ready: DOM parsed → 35%,
  *   hero-постер complete/load → 60%, window load → 90%, готовность к
- *   снятию → 100% (монотонный max, ниже не опускается).
- * • Снятие = min-show 600мс (от навигации, анти-«вспышка») ∧ (ready ∨
+ *   снятию → 100% (монотонный max, ниже не опускается).
+ * • Снятие = min-show 600мс (от навигации, анти-«вспышка») ∧ (ready ∨
  *   ЖЁСТКИЙ КАП 3.0с) — RM-ветка min-show пропускает (мгновенно по
- *   ready, c98-FIX1: раньше докблок это обещал, а код применял таймер).
+ *   ready, c98-FIX1: раньше докблок это обещал, а код применял таймер).
  *   ready = hero-постер загружен (querySelector
  *   '#hero img' complete/load/error; ФОЛБЭК без #hero — window load).
  *   Выход: класс .pre-done → fade 0.5s + scale 0.98 бейджа, visibility:
- *   hidden с 300мс (тапы сквозь — сразу, pointer-events:none) → DOM-чистка
- *   (unmount) через ~340мс от старта fade — к этому моменту opacity уже
+ *   hidden с 300мс (тапы сквозь — сразу, pointer-events:none) → DOM-чистка
+ *   (unmount) через ~340мс от старта fade — к этому моменту opacity уже
  *   ~5% (easeOutCubic), хвост режется незаметно.
  * • CSS-страховка мёртвого JS: [data-preloader-root] сам гаснет
- *   pre-root-release на 4.2с (globals.css; c98-FIX1: было 3.4с — впритык к
+ *   pre-root-release на 4.2с (globals.css; c98-FIX1: было 3.4с — впритык к
  *   JS-пути 3.0с+340мс, при поздней гидрации замер критика 3.83с входил в
- *   страховку с запасом 0.17с; теперь ≥0.4с запаса при любом взводе) —
+ *   страховку с запасом 0.17с; теперь ≥0.4с запаса при любом взводе) —
  *   JS-путь успевает раньше, анимация реально стреляет только при мёртвой/
  *   зависшей гидрации.
- * • Повторный визит за сессию: инлайн-скрипт в начале <body> (layout.tsx)
+ * • Повторный визит за сессию: инлайн-скрипт в начале <body> (layout.tsx)
  *   ставит [data-no-preloader] на <html> до парсинга → CSS
- *   display:none первым же стайл-резолвом. No-JS: noscript-стиль
+ *   display:none первым же стайл-резолвом. No-JS: noscript-стиль
  *   layout.tsx. sessionStorage «catering-preloaded» — здесь.
  * • prefers-reduced-motion: бейдж СТАТИЧЕН (CSS гасит вращение), кольцо
- *   остаётся (не vestibular-триггер), снятие мгновенно по ready — JS
- *   пропускает min-show (arm с wait=0, c98-FIX1 — теперь честно) и fade
+ *   остаётся (не vestibular-триггер), снятие мгновенно по ready — JS
+ *   пропускает min-show (arm с wait=0, c98-FIX1 — теперь честно) и fade
  *   (setDone напрямую, без .pre-done).
  * • Перф: только transform/opacity/stroke-dashoffset; оверлей непрозрачный
  *   белый поверх, hero <Image priority> грузится ПАРАЛЕЛЬНО под ним —
- *   LCP-путь не блокируется. Логотип — сырой 41KB PNG (unoptimized:
- *   /_next/image-раундтрип пережил бы прелоадер). Никаких шрифтов/GIF/видео.
+ *   LCP-путь не блокируется. Логотип — сырой 41KB PNG (unoptimized:
+ *   /_next/image-раундтрип пережил бы прелоадер). Никаких шрифтов/GIF/видео.
  */
 export function Preloader() {
   const [done, setDone] = useState(false);
@@ -66,8 +66,8 @@ export function Preloader() {
       /* Safari private mode — молча (как в инлайн-гейте layout.tsx). */
     }
 
-    /* RM: снятие мгновенно по ready — без min-show и без fade-класса
-       (CSS RM-блок уже погасил вращение и transition-плавность). */
+    /* RM: снятие мгновенно по ready — без min-show и без fade-класса
+       (CSS RM-блок уже погасил вращение и transition-плавность). */
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     /* ── Прогресс: монотонный max, потолок 0.9 до real-ready ── */
@@ -92,12 +92,12 @@ export function Preloader() {
       cleanups.push(() => target.removeEventListener(type, fn));
     };
 
-    /* DOM parsed → 35% (гидрация всегда после DCL — ветка на всякий случай) */
+    /* DOM parsed → 35% (гидрация всегда после DCL — ветка на всякий случай) */
     if (document.readyState !== "loading") applyProgress(0.35);
     else on(document, "DOMContentLoaded", () => applyProgress(0.35));
 
-    /* ── Снятие: min-show 600мс (ОТ НАВИГАЦИИ — performance.now) ∧ ready ∨
-       кап 3.0с (тоже от навигации: поздняя гидрация не продлевает оверлей). ── */
+    /* ── Снятие: min-show 600мс (ОТ НАВИГАЦИИ — performance.now) ∧ ready ∨
+       кап 3.0с (тоже от навигации: поздняя гидрация не продлевает оверлей). ── */
     const MIN_SHOW = 600;
     const HARD_CAP = 3000;
     let removed = false;
@@ -110,8 +110,8 @@ export function Preloader() {
         return;
       }
       rootRef.current?.classList.add("pre-done");
-      /* DOM-чистка через 340мс от старта fade: visibility:hidden уже
-         сработал (300мс), opacity ~5% — хвост transition не виден. */
+      /* DOM-чистка через 340мс от старта fade: visibility:hidden уже
+         сработал (300мс), opacity ~5% — хвост transition не виден. */
       removeTimer = window.setTimeout(() => setDone(true), 340);
     };
     const arm = () => {
@@ -124,8 +124,8 @@ export function Preloader() {
     };
 
     /* ready = hero-постер загружен; error постера = complete → тоже ready
-       (не виснем на битой картинке). Нет #hero (напр. /admin) — фолбэк
-       window load. Секция #hero сидит в SSR-HTML — img виден сразу. */
+       (не виснем на битой картинке). Нет #hero (напр. /admin) — фолбэк
+       window load. Секция #hero сидит в SSR-HTML — img виден сразу. */
     const heroImg = document.querySelector(
       "#hero img",
     ) as HTMLImageElement | null;
@@ -144,12 +144,12 @@ export function Preloader() {
       else on(window, "load", arm);
     }
 
-    /* window load → 90% (потолок до real-ready: arm() единственный путь к 1) */
+    /* window load → 90% (потолок до real-ready: arm() единственный путь к 1) */
     const onLoad = () => applyProgress(0.9);
     if (document.readyState === "complete") onLoad();
     else on(window, "load", onLoad);
 
-    /* ЖЁСТКИЙ КАП: зависший запрос не вешает белый экран навсегда. */
+    /* ЖЁСТКИЙ КАП: зависший запрос не вешает белый экран навсегда. */
     const capDelay = Math.max(0, HARD_CAP - performance.now());
     const cap = window.setTimeout(remove, capDelay);
 

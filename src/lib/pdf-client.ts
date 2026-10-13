@@ -14,42 +14,42 @@ import { CONTACTS } from "@/lib/config";
  * PDF-меню/каталог — печатная версия блока «Меню» (Cycle 61 → редизайн c85-C).
  * ---------------------------------------------------------------------------
  * Дизайн-язык c85-C = бренд сайта (espresso/крем/золото, Prata + Marck Script):
- *  - крем-бумага #F7F5F1 на каждом листе, чернила espresso #161312,
- *    золото #C9A227 — линии, капс-подписи и акценты, #0A0908 — CTA-блок;
+ *  - крем-бумага #F7F5F1 на каждом листе, чернила espresso #161312,
+ *    золото #C9A227 — линии, капс-подписи и акценты, #0A0908 — CTA-блок;
  *  - первая страница: espresso-полоса 36 мм («nilov catering» Prata 22 pt
  *    крем + золотая линия-отступ + «food as art» Marck Script золотом)
  *    + ЭМБЛЕМА КОМПАНИИ (c93: белая версия колец, правый край полосы),
  *    под ней «МЕНЮ — {ТАРИФ}» Prata 15 pt + «Санкт-Петербург · {дата}»;
- *  - категории: золотая капс-подпись 10 pt с трекингом + волосяная линия
- *    espresso/15; блюда — единая сетка (координаты в DISH): имя Roboto-Bold
- *    10.5 слева, граммовка Roboto-Regular 10.5 по правому краю, между ними
- *    точечный лидер espresso/25 (в данных нет цен за блюдо — правой колонкой
+ *  - категории: золотая капс-подпись 10 pt с трекингом + волосяная линия
+ *    espresso/15; блюда — единая сетка (координаты в DISH): имя Roboto-Bold
+ *    10.5 слева, граммовка Roboto-Regular 10.5 по правому краю, между ними
+ *    точечный лидер espresso/25 (в данных нет цен за блюдо — правой колонкой
  *    служит граммовка; описание-if-any идёт курсивной подстрокой);
- *  - «Включено в любой пакет» — рамка золотом 0.8 pt, пункты в 2 колонки,
- *    рукописная галочка золотом (та же кривая, что HandCheck на сайте);
+ *  - «Включено в любой пакет» — рамка золотом 0.8 pt, пункты в 2 колонки,
+ *    рукописная галочка золотом (та же кривая, что HandCheck на сайте);
  *  - футер каждой страницы: линия espresso/15, слева «nilov catering ·
- *    Санкт-Петербург», справа телефон + домен, по центру «стр. N из M»;
- *    страницы продолжения — малая эмблема (чёрная версия) в правом
+ *    Санкт-Петербург», справа телефон + домен, по центру «стр. N из M»;
+ *    страницы продолжения — малая эмблема (чёрная версия) в правом
  *    верхнем углу (c93); последняя страница — CTA-блок «Соберите смету
- *    за 1 минуту» (espresso #0A0908, телефон золотом), прижатый к низу
+ *    за 1 минуту» (espresso #0A0908, телефон золотом), прижатый к низу
  *    над футером.
  *
  * Поток (flow engine, наследие c61/c84): контент течёт сверху вниз; перед
  * каждым блоком — бюджет страницы; «сироты» запрещены: заголовок категории
- * не остаётся без двух блюд, «включено» не отрывается от последнего пакета
- * (перенос парой). Ничего не режется молча (дефект C60-PDF: блюда терялись).
+ * не остаётся без двух блюд, «включено» не отрывается от последнего пакета
+ * (перенос парой). Ничего не режется молча (дефект C60-PDF: блюда терялись).
  *
  * c106: полный каталог — книжная структура: обложка (титул) → стр. 2
  * «Содержание» (печатное оглавление, строки кликабельны) → каждый формат
  * открывает свою страницу шапкой-главой «01 · БАНКЕТ» (номер золотом
- * Prata 22 + Prata 16) → каждый тариф — с новой страницы (колонтитул
- * «ФОРМАТ · ПАКЕТ») → PDF-закладки (outline) для вьюверов с панелью.
+ * Prata 22 + Prata 16) → каждый тариф — с новой страницы (колонтитул
+ * «ФОРМАТ · ПАКЕТ») → PDF-закладки (outline) для вьюверов с панелью.
  *
  * c84-C: per-tariff PDF — generateMenuPdf(typeId, pkgIdx); кэш fetch шрифтов
- * модульный, addFont — на каждый doc (баг двойной генерации, см. ниже).
+ * модульный, addFont — на каждый doc (баг двойной генерации, см. ниже).
  *
  * Шрифты: Roboto (текст) + Marck Script (рукописные акценты) + Prata
- * (заголовки/бренд) — все с кириллицей, лежат в /public/fonts.
+ * (заголовки/бренд) — все с кириллицей, лежат в /public/fonts.
  */
 
 const PAGE = {
@@ -60,13 +60,13 @@ const PAGE = {
   get contentW() {
     return this.w - this.mL - this.mR; // 180 мм
   },
-  /** Высота бренд-полосы на первой странице (требование: 34–40 мм). */
+  /** Высота бренд-полосы на первой странице (требование: 34–40 мм). */
   bandH: 36,
   /** Нижняя граница контента: ниже — футер (линия 282.5, текст 287). */
   bottom: 277,
 };
 
-/** Верх контента на страницах продолжения (под колонтитулом 13–15.5). */
+/** Верх контента на страницах продолжения (под колонтитулом 13–15.5). */
 const CONTENT_TOP = 23;
 // Per-document density: separate downloads never change each other's layout.
 const PDF_DENSITY = new WeakMap<jsPDF, number>();
@@ -86,19 +86,19 @@ const C = {
   onDarkMuted: [181, 179, 175] as [number, number, number], // крем/70 на espresso
 };
 
-/* Домен для колонтитулов/CTA: CONTACTS (lib/config) хранит телефон и email,
-   но не домен; SITE_URL — временный Vercel-деплой. c94 (заказчик): публичный
-   домен компании — nilovcatering.ru (в колонтитулах PDF оставался прежний
+/* Домен для колонтитулов/CTA: CONTACTS (lib/config) хранит телефон и email,
+   но не домен; SITE_URL — временный Vercel-деплой. c94 (заказчик): публичный
+   домен компании — nilovcatering.ru (в колонтитулах PDF оставался прежний
    interfood-catering.ru — найден владельцем при вычитке). */
 const SITE_DOMAIN = "nilovcatering.ru";
 
-/* c84-C (баг, пойманный bun-верификацией): addFileToVFS пишет в ГЛОБАЛЬНЫЙ
-   VFS jsPDF, но addFont регистрирует шрифт В ЭКЗЕМПЛЯРЕ документа. Прежний
-   флаг fontsLoaded кэшировал «шрифты загружены» на модуль — второй документ
-   того же процесса (повторный клик по «Каталог в PDF», per-tariff PDF после
+/* c84-C (баг, пойманный bun-верификацией): addFileToVFS пишет в ГЛОБАЛЬНЫЙ
+   VFS jsPDF, но addFont регистрирует шрифт В ЭКЗЕМПЛЯРЕ документа. Прежний
+   флаг fontsLoaded кэшировал «шрифты загружены» на модуль — второй документ
+   того же процесса (повторный клик по «Каталог в PDF», per-tariff PDF после
    каталога) оставался БЕЗ кириллических шрифтов (замер: 8KB без шрифтов
    против 139KB). Теперь кэшируется ТОЛЬКО fetch (модульный Promise), а
-   регистрация addFont выполняется на каждый doc. Ошибка сети сбрасывает
+   регистрация addFont выполняется на каждый doc. Ошибка сети сбрасывает
    кэш — повторный клик retry'ит честно. */
 let fontsFetch: Promise<
   [ArrayBuffer, ArrayBuffer, ArrayBuffer, ArrayBuffer, ArrayBuffer]
@@ -137,12 +137,12 @@ async function loadFonts(doc: jsPDF): Promise<void> {
   doc.addFont("Prata-Regular.ttf", "Prata", "normal");
 }
 
-/* c93: эмблема компании в каждом PDF. Обе версии — PNG 480×558 с
+/* c93: эмблема компании в каждом PDF. Обе версии — PNG 480×558 с
    прозрачностью (кольца + «NILOV CATERING · St. Petersburg»): белая —
-   на espresso-полосу 1-й страницы, чёрная — в колонтитул страниц
-   продолжения. Кэш — как у шрифтов (модульный Promise, ошибка сети
+   на espresso-полосу 1-й страницы, чёрная — в колонтитул страниц
+   продолжения. Кэш — как у шрифтов (модульный Promise, ошибка сети
    сбрасывает); jsPDF 4.x дедуплицирует повторные addImage — файл
-   растёт только на одну копию PNG. */
+   растёт только на одну копию PNG. */
 const EMBLEM = {
   srcW: 480,
   srcH: 558,
@@ -211,11 +211,11 @@ function dottedLeader(
   doc.setLineDashPattern([], 0);
 }
 
-/** «от одного гостя»: единица везде — гость (c86: обеды в офис удалены
- *  из каталога, «за порцию» больше не встречается). */
+/** «от одного гостя»: единица везде — гость (c86: обеды в офис удалены
+ *  из каталога, «за порцию» больше не встречается). */
 function unitFor(m: MenuType): string {
   void m;
-  return "за гостя";
+  return "за гостя";
 }
 
 /** «7 позиций» / «21 позиция» / «3 позиции» — счётчик состава. */
@@ -227,7 +227,7 @@ function positionsWord(n: number): string {
   return "позиций";
 }
 
-/** «7 каталогов» / «2 каталога» — счётчик каталогов в титульной подстроке. */
+/** «7 каталогов» / «2 каталога» — счётчик каталогов в титульной подстроке. */
 function catalogsWord(n: number): string {
   const d10 = n % 10;
   const d100 = n % 100;
@@ -247,7 +247,7 @@ function genDate(): string {
   return `${d.getDate()} ${MONTHS_GEN[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-/* ── латинские слаги для имён файлов (nilov-catering-…-menu.pdf) ────────── */
+/* ── латинские слаги для имён файлов (nilov-catering-…-menu.pdf) ────────── */
 
 const TYPE_SLUGS: Record<string, string> = {
   buffet: "buffet",
@@ -316,8 +316,8 @@ export async function buildMenuCatalogDoc(
     typeId === "all" ? MENU_TYPES : MENU_TYPES.filter((m) => m.id === typeId);
   if (types.length === 0) throw new Error("no menus for typeId=" + typeId);
 
-  /* c84-C: один тариф — pkgIdx осмыслен только для одиночного типа
-     ("all" + pkgIdx игнорируется: у каталогов разные наборы пакетов) */
+  /* c84-C: один тариф — pkgIdx осмыслен только для одиночного типа
+     ("all" + pkgIdx игнорируется: у каталогов разные наборы пакетов) */
   const single = types.length === 1 ? types[0] : undefined;
   const pkg =
     single !== undefined &&
@@ -334,7 +334,7 @@ export async function buildMenuCatalogDoc(
 
   const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
   await loadFonts(doc);
-  /* c93: логотип компании — в каждый PDF. Сбой загрузки (сеть) НЕ валит
+  /* c93: логотип компании — в каждый PDF. Сбой загрузки (сеть) НЕ валит
      генерацию: логотип декоративен, меню без него валидно. */
   let logoWhite: string | null = null;
   let logoBlack: string | null = null;
@@ -366,12 +366,12 @@ export async function buildMenuCatalogDoc(
     const price = `от ${formatRUB(pkg.pricePerGuest)} ${unitFor(single)}`;
     let title = `МЕНЮ — ${single.label.toUpperCase()} · ${pkg.name.toUpperCase()}`;
     /* c86: гостевых минимумов нет — подпись без порога, состав согласуем
-       под любое число гостей (владелец: принимаем заказ от одного гостя). */
+       под любое число гостей (владелец: принимаем заказ от одного гостя). */
     let subline =
       `Санкт-Петербург · ${genDate()} · состав согласуем под событие` +
-      ` · принимаем заказ от одного гостя`;
+      ` · принимаем заказ от одного гостя`;
     /* длинные пары («Доставка закусок · Горячее (3 шашлычка)» + цена)
-       не влезают в строку титула — тариф уходит в подстроку */
+       не влезают в строку титула — тариф уходит в подстроку */
     doc.setFont("Prata", "normal");
     doc.setFontSize(15);
     const tw = doc.getTextWidth(title);
@@ -403,7 +403,7 @@ export async function buildMenuCatalogDoc(
        без предположений о раскладке. */
     drawTitleBlock(doc, {
       title: "ПОЛНЫЙ КАТАЛОГ МЕНЮ",
-      subline: `Санкт-Петербург · ${genDate()} · ${MENU_TYPES.length} ${catalogsWord(MENU_TYPES.length)} — от канапе до мангала`,
+      subline: `Санкт-Петербург · ${genDate()} · ${MENU_TYPES.length} ${catalogsWord(MENU_TYPES.length)} — от канапе до мангала`,
       logoWhite,
     });
     const tocPage = 2;
@@ -453,7 +453,7 @@ export async function generateMenuPdf(
     typeId === "all" ? MENU_TYPES : MENU_TYPES.filter((m) => m.id === typeId);
   if (types.length === 0) return;
 
-  /* c84-C: битый индекс — молча не генерируем «не то» (UI клампит,
+  /* c84-C: битый индекс — молча не генерируем «не то» (UI клампит,
      сюда попадаем только при рассинхроне данных) */
   if (
     types.length === 1 &&
@@ -478,7 +478,7 @@ export async function generateMenuPdf(
 
 /* ────────────────────────────────────── страница: фон/полоса/титул/футер */
 
-/** Крем-бумага #F7F5F1 во всю страницу — до любого контента. */
+/** Крем-бумага #F7F5F1 во всю страницу — до любого контента. */
 function paintCream(doc: jsPDF) {
   doc.setFillColor(...C.cream);
   doc.rect(0, 0, PAGE.w, PAGE.h, "F");
@@ -580,9 +580,9 @@ function makeEnsure(doc: jsPDF, cur: { y: number }, contLabel: string) {
   };
 }
 
-/** Футер каждой страницы: линия + бренд/город слева, стр. N из M по центру,
- *  телефон + домен справа. c93: на страницах продолжения (≥2) — малая
- *  эмблема компании в правом верхнем углу (на 1-й — большая в полосе). */
+/** Футер каждой страницы: линия + бренд/город слева, стр. N из M по центру,
+ *  телефон + домен справа. c93: на страницах продолжения (≥2) — малая
+ *  эмблема компании в правом верхнем углу (на 1-й — большая в полосе). */
 function drawPageFooters(doc: jsPDF, logoBlack: string | null) {
   const total = doc.getNumberOfPages();
   for (let i = 1; i <= total; i++) {
@@ -631,7 +631,7 @@ function categoryHeaderH(doc: jsPDF, desc: string): number {
   return CAT.descBase + (lines.length - 1) * CAT.descLH + CAT.after;
 }
 
-/** Золотая капс-подпись 10 pt с трекингом + линия espresso/15 + описание. */
+/** Золотая капс-подпись 10 pt с трекингом + линия espresso/15 + описание. */
 function drawCategoryHeader(
   doc: jsPDF,
   y: number,
@@ -685,7 +685,7 @@ function packageIntroH(doc: jsPDF, pkg: MenuPackage): number {
   return PKG.descBase + (lines.length - 1) * PKG.descLH + PKG.after;
 }
 
-/** Имя пакета (Prata 13) + цена за гостя справа + описание курсивом. */
+/** Имя пакета (Prata 13) + цена за гостя справа + описание курсивом. */
 function drawPackageIntro(
   doc: jsPDF,
   menu: MenuType,
@@ -719,8 +719,8 @@ function drawPackageIntro(
 }
 
 /** Единая сетка блюд (координаты посчитаны один раз, c85-C):
- *  имя Roboto-Bold 10.5 слева (перенос по nameW), граммовка Roboto-Regular
- *  10.5 по правому краю, точечный лидер espresso/25 между ними. */
+ *  имя Roboto-Bold 10.5 слева (перенос по nameW), граммовка Roboto-Regular
+ *  10.5 по правому краю, точечный лидер espresso/25 между ними. */
 const DISH = {
   base: 3.9, // базовая линия первой строки от y
   lineH: 4.5, // межстрочный шаг
@@ -766,7 +766,7 @@ function drawDish(doc: jsPDF, dish: Dish, y: number): number {
   return y + (DISH.base + (lines.length - 1) * DISH.lineH + gap) * density;
 }
 
-/* ───────────────────────────────────────── «Включено в любой пакет» */
+/* ───────────────────────────────────────── «Включено в любой пакет» */
 
 const INCL = {
   pad: 5.5, // внутренний отступ рамки
@@ -782,7 +782,7 @@ const INCL = {
   },
 };
 
-/** Пункты → 2 колонки, жадная балансировка по числу строк. */
+/** Пункты → 2 колонки, жадная балансировка по числу строк. */
 function includedColumns(doc: jsPDF, items: string[]): [string[], string[]] {
   doc.setFont("Roboto", "normal");
   doc.setFontSize(8.5);
@@ -823,7 +823,7 @@ function includedBoxH(doc: jsPDF, items: string[]): number {
   return INCL.itemsBase + Math.max(colH(c1), colH(c2), 0) + INCL.padBottom;
 }
 
-/** Рамка золотом 0.8 pt: заголовок капс + пункты в 2 колонки с галочками. */
+/** Рамка золотом 0.8 pt: заголовок капс + пункты в 2 колонки с галочками. */
 function drawIncluded(doc: jsPDF, items: string[], y: number): number {
   const h = includedBoxH(doc, items);
   doc.setDrawColor(...C.gold);
@@ -834,7 +834,7 @@ function drawIncluded(doc: jsPDF, items: string[], y: number): number {
   doc.setFontSize(9.5);
   doc.setTextColor(...C.goldText);
   doc.setCharSpace(0.9);
-  doc.text("ВКЛЮЧЕНО В ЛЮБОЙ ПАКЕТ", PAGE.mL + INCL.pad, y + INCL.titleBase);
+  doc.text("ВКЛЮЧЕНО В ЛЮБОЙ ПАКЕТ", PAGE.mL + INCL.pad, y + INCL.titleBase);
   doc.setCharSpace(0);
 
   const [c1, c2] = includedColumns(doc, items);
@@ -858,7 +858,7 @@ function drawIncluded(doc: jsPDF, items: string[], y: number): number {
   return y + h + 4.5;
 }
 
-/** Галочка «от руки» — та же кривая, что HandCheck SVG на сайте (16×16). */
+/** Галочка «от руки» — та же кривая, что HandCheck SVG на сайте (16×16). */
 function drawHandCheck(
   doc: jsPDF,
   x: number,
@@ -885,7 +885,7 @@ function drawHandCheck(
   doc.line(...d, ...e);
 }
 
-/* ───────────────────── c106: главы, оглавление и закладки каталога ───── */
+/* ───────────────────── c106: главы, оглавление и закладки каталога ───── */
 
 /** Якорь фактической страницы пакета (заполняется при раскладке). */
 interface TocPkg {
@@ -903,7 +903,7 @@ interface TocSection {
   from: string;
   packages: TocPkg[];
 }
-/** Все якоря каталога — источник оглавления (стр. 2) и закладок. */
+/** Все якоря каталога — источник оглавления (стр. 2) и закладок. */
 interface CatalogAnchors {
   sections: TocSection[];
 }
@@ -989,7 +989,7 @@ const TOC = {
 
 /** Печатное оглавление (стр. 2). Рисуется ПОСЛЕ секций через setPage —
  *  номера страниц фактические. Строки кликабельны (doc.link) во
- *  вьюверах с поддержкой ссылок; на печати это обычные номера. */
+ *  вьюверах с поддержкой ссылок; на печати это обычные номера. */
 function drawToc(
   doc: jsPDF,
   anchors: CatalogAnchors,
@@ -1034,7 +1034,7 @@ function drawToc(
     });
     cur.y += TOC.secRowH;
 
-    /* строки тарифов: «Базовый · от 2 450 ₽ за гостя» */
+    /* строки тарифов: «Базовый · от 2 450 ₽ за гостя» */
     for (const pkg of sec.packages) {
       const label = `${pkg.name} · ${pkg.from}`;
       doc.setFont("Roboto", "normal");
@@ -1065,7 +1065,7 @@ function drawToc(
 
 /** PDF-закладки (c106): корень «Содержание» → «01 · Формат» → тарифы.
  *  jsPDF 4.x: doc.outline.add(parent, title, { pageNumber }) — 1-based,
- *  кириллица поддерживается (UTF-16BE). Типы jspdf не экспортируют
+ *  кириллица поддерживается (UTF-16BE). Типы jspdf не экспортируют
  *  outline-ноду — локальная минимальная декларация + cast. Сбой не
  *  валит генерацию: закладки — навигационный бонус (research/c106). */
 function drawOutline(
@@ -1106,8 +1106,8 @@ function drawOutline(
 
 /* ─────────────────────────────────────────── финал: приписка + CTA-блок */
 
-/** Приписка условий (цены за гостя, включённые официанты, минимальные
-    заказы форматов) + CTA «Соберите смету за 1 минуту», прижатый к низу. */
+/** Приписка условий (цены за гостя, включённые официанты, минимальные
+    заказы форматов) + CTA «Соберите смету за 1 минуту», прижатый к низу. */
 function drawClosing(doc: jsPDF, y0: number) {
   let y = y0 + 2;
   const ctaH = densityFor(doc) < 1 ? 18 : 24;
@@ -1118,8 +1118,8 @@ function drawClosing(doc: jsPDF, y0: number) {
      Шрифт/кегль выставлены ДО splitTextToSize (перенос считается по
      ним); длинная строка минимумов честно бьётся на несколько строк */
   const lines = [
-    "Цены — за одного гостя. Официанты входят в стоимость пакетов.",
-    "Минимальный заказ: фуршет, банкет, вегетарианское и барбекю — 85 000 ₽, кофе-брейк — 50 000 ₽, доставка закусок — 17 400 ₽ (заказ принимается за 48 часов).",
+    "Цены — за одного гостя. Официанты входят в стоимость пакетов.",
+    "Минимальный заказ: фуршет, банкет, вегетарианское и барбекю — 85 000 ₽, кофе-брейк — 50 000 ₽, доставка закусок — 17 400 ₽ (заказ принимается за 48 часов).",
   ].flatMap((t) => doc.splitTextToSize(t, PAGE.contentW));
   const blockH = (lines.length - 1) * 3.4;
   if (y + 4.5 + blockH > yCta - 6) {
@@ -1142,7 +1142,7 @@ function drawCta(doc: jsPDF, y: number, height = 24) {
   doc.setFont("Prata", "normal");
   doc.setFontSize(height < 24 ? 11.5 : 13);
   doc.setTextColor(...C.cream);
-  doc.text("Соберите смету за 1 минуту", PAGE.mL + 8, y + 10 * scale);
+  doc.text("Соберите смету за 1 минуту", PAGE.mL + 8, y + 10 * scale);
 
   doc.setFont("Roboto", "bold");
   doc.setFontSize(12);
@@ -1205,10 +1205,10 @@ function drawSinglePackage(
   return drawIncluded(doc, menu.included, cur.y);
 }
 
-/** Секция каталога: шапка-глава (каталог) или капс-категория → пакеты → рамка.
+/** Секция каталога: шапка-глава (каталог) или капс-категория → пакеты → рамка.
  *  onlyPkg — c84-C фильтр одного пакета (per-tariff внутри каталога).
- *  c106 opts: pagePerPackage — каждый пакет с новой страницы; chapterIdx —
- *  шапка-глава с номером; anchors — запись фактических страниц начала
+ *  c106 opts: pagePerPackage — каждый пакет с новой страницы; chapterIdx —
+ *  шапка-глава с номером; anchors — запись фактических страниц начала
  *  секции/пакетов (оглавление + закладки рисуются после раскладки). */
 function drawCatalogSection(
   doc: jsPDF,
@@ -1227,7 +1227,7 @@ function drawCatalogSection(
   const contLabel = selPkg ? `${menu.label} · ${selPkg.name}` : menu.label;
   const ensure = makeEnsure(doc, cur, contLabel);
 
-  /* c106: якорь секции — фактическая страница начала (для TOC/закладок) */
+  /* c106: якорь секции — фактическая страница начала (для TOC/закладок) */
   const section: TocSection = {
     idx: opts?.chapterIdx ?? 0,
     label: menu.label,
@@ -1238,7 +1238,7 @@ function drawCatalogSection(
   opts?.anchors?.sections.push(section);
 
   /* widow-гвард категории: заголовок + шапка первого пакета + 2 блюда
-     держатся вместе — категория не остаётся сиротой внизу страницы */
+     держатся вместе — категория не остаётся сиротой внизу страницы */
   const catH =
     opts?.chapterIdx !== undefined
       ? chapterHeaderH(doc, menu.description)
@@ -1271,9 +1271,9 @@ function drawCatalogSection(
     const hdrH = packageIntroH(doc, pkg);
     const dishesH = pkg.dishes.reduce((s, d) => s + dishRowH(doc, d), 0);
 
-    /* «включено» не отрывается от последнего пакета: если пакет + рамка
-       не помещаются на остатке, но помещаются на свежей странице —
-       переносим их ВМЕСТЕ (страница не рвётся на 3 строки + рамка) */
+    /* «включено» не отрывается от последнего пакета: если пакет + рамка
+       не помещаются на остатке, но помещаются на свежей странице —
+       переносим их ВМЕСТЕ (страница не рвётся на 3 строки + рамка) */
     const isLast = onlyPkg !== undefined || idx === menu.packages.length - 1;
     if (isLast) {
       const inclH = includedBoxH(doc, menu.included) + (reserveClosing ? 50 : 0);
@@ -1287,7 +1287,7 @@ function drawCatalogSection(
       }
     }
 
-    // шапка пакета не отрывается от первых двух блюд
+    // шапка пакета не отрывается от первых двух блюд
     ensure(hdrH + first2);
 
     /* c106: якорь пакета — после всех возможных переносов, ровно

@@ -25,21 +25,21 @@ import {
   Sparkles,
   MessageSquareText,
 } from "lucide-react";
-/* c103: next/image больше не используется (внешняя карта удалена). */
+/* c103: next/image больше не используется (внешняя карта удалена). */
 import { Reveal } from "./reveal";
 import { Magnetic } from "@/components/motion/magnetic";
 import { CONTACTS, YANDEX_MAPS } from "@/lib/media";
 import { MENU_TYPES } from "@/lib/pricing";
 /* c95 (1-d): реальная отправка лида — POST /api/lead.php (same-origin PHP
- * на статик-экспорте), mailto — фоллбэк. CONTACTS выше — ре-экспорт того же
+ * на статик-экспорте), mailto — фоллбэк. CONTACTS выше — ре-экспорт того же
  * объекта из @/lib/config (единый источник истины). */
 import { submitLead, type LeadResult } from "@/lib/submit-lead";
 
-const STEPS = ["Тип мероприятия", "Гости и дата", "Контакты", "Отправить"];
+const STEPS = ["Тип мероприятия", "Гости и дата", "Контакты", "Отправить"];
 const DRAFT_KEY = "catering-lead-draft";
 
-/** c102: типографский глиф «MAX» — у мессенджера MAX нет lucide-пиктограммы;
- * тот же приём, что MessengerGlyph/MaxGlyph в hacc-booking.tsx (текст
+/** c102: типографский глиф «MAX» — у мессенджера MAX нет lucide-пиктограммы;
+ * тот же приём, что MessengerGlyph/MaxGlyph в hacc-booking.tsx (текст
  * наследует текущий font-family — типографический тон соседних карточек). */
 function MaxGlyph({ className }: { className?: string }) {
   return (
@@ -148,14 +148,14 @@ function useOfficeStatus() {
       let nextLabel = "";
       if (["mon", "tue", "wed", "thu", "fri"].includes(day)) {
         open = time >= 9 * 60 && time < 19 * 60;
-        nextLabel = open ? "до 19:00" : (time < 9 * 60 ? "откроется в 9:00" : "откроется в пн в 9:00");
+        nextLabel = open ? "до 19:00" : (time < 9 * 60 ? "откроется в 9:00" : "откроется в пн в 9:00");
       } else if (day === "sat") {
         open = time >= 10 * 60 && time < 16 * 60;
-        nextLabel = open ? "до 16:00" : (time < 10 * 60 ? "откроется в 10:00" : "откроется в пн в 9:00");
+        nextLabel = open ? "до 16:00" : (time < 10 * 60 ? "откроется в 10:00" : "откроется в пн в 9:00");
       } else {
         // Sun
         open = false;
-        nextLabel = "откроется в пн в 9:00";
+        nextLabel = "откроется в пн в 9:00";
       }
       setStatus({ open, nextLabel });
     };
@@ -621,7 +621,7 @@ function SocialProofBadge() {
         <span className="absolute -right-1 -top-1 size-2 rounded-full bg-sage animate-pulse" />
       </div>
       <span className="text-sm font-medium text-ink/80">
-        Ответим в течение <span className="text-gold font-semibold">15 минут</span>
+        Ответим в течение <span className="text-gold font-semibold">15 минут</span>
       </span>
     </motion.div>
   );
@@ -678,24 +678,24 @@ export function Contact() {
   const [step, setStep] = useState(0);
   const [data, setData] = useState<LeadData>(EMPTY);
   // Cycle 40: estimate snapshot from the calculator — appended to the
-  // outgoing lead so «Отправить заявку с расчётом» keeps its promise.
+  // outgoing lead so «Отправить заявку с расчётом» keeps its promise.
   const [calcSnapshot, setCalcSnapshot] = useState<CalcSnapshot | null>(null);
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
   /* c98-FIX2 (критик4 MAJOR#2): queued-режим успех-оверлея — сервер НЕ
-   * подтвердил приём (сеть/сбой), заявка живёт в localStorage-outbox
+   * подтвердил приём (сеть/сбой), заявка живёт в localStorage-outbox
    * (доотправится автоматически, c98-A) + открылся mailto. Оверлей больше
-   * НЕ врёт «мы получили вашу заявку» — честный текст в тоне
+   * НЕ врёт «мы получили вашу заявку» — честный текст в тоне
    * hacc-booking (c98-FIX1): «сохранена — отправим автоматически». */
   const [formQueued, setFormQueued] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const formRef = useRef<HTMLFormElement>(null);
-  /* c95 (1-d): анти-спам-поля для POST /api/lead.php — honeypot
-   * (невидимое поле: заполняют только боты; читаем по рефу на сабмите)
-   * и elapsedMs — время от маунта формы до отправки. */
+  /* c95 (1-d): анти-спам-поля для POST /api/lead.php — honeypot
+   * (невидимое поле: заполняют только боты; читаем по рефу на сабмите)
+   * и elapsedMs — время от маунта формы до отправки. */
   const honeypotRef = useRef<HTMLInputElement>(null);
   const mountedAtRef = useRef(Date.now());
-  /* c95 (1-d): диагностика фоллбэка — ОДИН console.warn на маунт формы
-   * (без toast-спама). Реф, не module-переменная (React Compiler §37). */
+  /* c95 (1-d): диагностика фоллбэка — ОДИН console.warn на маунт формы
+   * (без toast-спама). Реф, не module-переменная (React Compiler §37). */
   const fallbackWarnedRef = useRef(false);
   const prefersReducedMotion = useReducedMotion();
   // C62 hydration-safety: the step-panel initial prop serializes into SSR —
@@ -733,7 +733,7 @@ export function Contact() {
     }
   }, []);
 
-  // Cycle 38 fix: pre-fill from the calculator ("Отправить заявку с расчётом"
+  // Cycle 38 fix: pre-fill from the calculator ("Отправить заявку с расчётом"
   // dispatches catering:calc-lead with {typeId, guests, date}) — the user's
   // calculation is carried into the form instead of being silently dropped.
   useEffect(() => {
@@ -810,7 +810,7 @@ export function Contact() {
     e.preventDefault();
 
     if (!data.consent) {
-      toast.error("Необходимо согласие на обработку персональных данных");
+      toast.error("Необходимо согласие на обработку персональных данных");
       return;
     }
 
@@ -820,39 +820,39 @@ export function Contact() {
       const menuType = MENU_TYPES.find((m) => m.id === data.eventType);
       // Mailto — ФОЛЛБЭК c95 (1-d): до этого цикла был единственным путём
       // («static-host deployment, no server runtime»); теперь рядом со
-      // статикой живёт same-origin PHP-эндпоинт /api/lead.php, и письмо
+      // статикой живёт same-origin PHP-эндпоинт /api/lead.php, и письмо
       // открывается только если он недоступен.
       const lines = [
         `Имя: ${data.name}`,
         `Телефон: ${normalizePhone(data.phone)}`,
         data.email ? `Email: ${data.email}` : "",
-        menuType ? `Тип мероприятия: ${menuType.label}` : "Тип мероприятия: (не выбран)",
+        menuType ? `Тип мероприятия: ${menuType.label}` : "Тип мероприятия: (не выбран)",
         `Гостей: ${data.guests}`,
         data.date ? `Желаемая дата: ${data.date}` : "",
         data.preferredTime ? `Желаемое время звонка: ${data.preferredTime}` : "",
         calcSnapshot?.total
-          ? `Расчёт с сайта: ~${calcSnapshot.total.toLocaleString("ru-RU")} ₽${
+          ? `Расчёт с сайта: ~${calcSnapshot.total.toLocaleString("ru-RU")} ₽${
               calcSnapshot.addons?.length
                 ? ` (доп. услуги: ${calcSnapshot.addons.join(", ")})`
                 : ""
             }`
           : "",
-        "Согласие на обработку персональных данных: да",
+        "Согласие на обработку персональных данных: да",
       ].filter(Boolean);
 
       const subject = encodeURIComponent(
-        `Заявка с сайта nilovcatering.ru — ${data.name || "без имени"}`,
+        `Заявка с сайта nilovcatering.ru — ${data.name || "без имени"}`,
       );
       const body = encodeURIComponent(lines.join("\n"));
       /* c95 (1-d) FIX CRITICAL: был ХАРДКОД старой почты
        * interfood-catering@yandex.ru (c89 поправил только hacc-booking) —
-       * теперь из конфига, как везде (контакт-карточка выше использует
-       * тот же CONTACTS). */
+       * теперь из конфига, как везде (контакт-карточка выше использует
+       * тот же CONTACTS). */
       const mailto = `mailto:${CONTACTS.email}?subject=${subject}&body=${body}`;
 
       /* c95 (1-d): сначала РЕАЛЬНАЯ отправка — POST /api/lead.php.
        * comment — детали события (тип/гости/дата/время/расчёт) без
-       * дублей name/phone/email (уехали в поля лида). submitLead не
+       * дублей name/phone/email (уехали в поля лида). submitLead не
        * бросает: любой сбой → {ok:false} → ветка mailto-фоллбэка. */
       const result: LeadResult = await submitLead({
         name: data.name.trim(),
@@ -862,12 +862,12 @@ export function Contact() {
           [
             menuType
               ? `Тип мероприятия: ${menuType.label}`
-              : "Тип мероприятия: (не выбран)",
+              : "Тип мероприятия: (не выбран)",
             `Гостей: ${data.guests}`,
             data.date ? `Желаемая дата: ${data.date}` : "",
             data.preferredTime ? `Желаемое время звонка: ${data.preferredTime}` : "",
             calcSnapshot?.total
-              ? `Расчёт с сайта: ~${calcSnapshot.total.toLocaleString("ru-RU")} ₽${
+              ? `Расчёт с сайта: ~${calcSnapshot.total.toLocaleString("ru-RU")} ₽${
                   calcSnapshot.addons?.length
                     ? ` (доп. услуги: ${calcSnapshot.addons.join(", ")})`
                     : ""
@@ -892,15 +892,15 @@ export function Contact() {
         },
       });
 
-      /* ── УСПЕХ (200 {ok:true,id}): заявка уже у владельца — успех-оверлей
-       * и БЕЗ открытия почтового клиента. Проверка `!== false` (а не
-       * truthiness): tsconfig без strictNullChecks не сужает union в
+      /* ── УСПЕХ (200 {ok:true,id}): заявка уже у владельца — успех-оверлей
+       * и БЕЗ открытия почтового клиента. Проверка `!== false` (а не
+       * truthiness): tsconfig без strictNullChecks не сужает union в
        * дополнении — явное сравнение сужает обе ветки (tsc 5.9.3). */
       if (result.ok !== false) {
         setFormQueued(false);
         setFormStatus("success");
         toast.success(
-          "Заявка отправлена! Мы перезвоним в течение 15 минут в рабочее время.",
+          "Заявка отправлена! Мы перезвоним в течение 15 минут в рабочее время.",
         );
         try {
           window.localStorage.removeItem(DRAFT_KEY);
@@ -913,18 +913,18 @@ export function Contact() {
       if (result.queued !== true) {
         setFormStatus("idle");
         toast.error(result.reason === "validation"
-          ? "Сервер отклонил данные. Проверьте форму и попробуйте ещё раз."
-          : "Заявка не отправлена и не сохранена. Попробуйте ещё раз или позвоните нам.");
+          ? "Сервер отклонил данные. Проверьте форму и попробуйте ещё раз."
+          : "Заявка не отправлена и не сохранена. Попробуйте ещё раз или позвоните нам.");
         return;
       }
 
       /* ── ФОЛЛБЭК (mailto + outbox): эндпоинт недоступен/отверг запрос.
-       * Один console.warn на страницу (диагностика без toast-спама).
+       * Один console.warn на страницу (диагностика без toast-спама).
        * c98-FIX2 (критик4 MAJOR#2): оверлей — ЧЕСТНЫЙ queued-статус
-       * («сохранена», НЕ «мы получили»): заявка в outbox (доотправится
+       * («сохранена», НЕ «мы получили»): заявка в outbox (доотправится
        * автоматически при следующем визите, ≤3 попыток) + mailto как
-       * параллельный быстрый канал — тот же тон, что в hacc-booking
-       * c98-FIX1 (раньше оверлей противоречил и тосту, и факту). */
+       * параллельный быстрый канал — тот же тон, что в hacc-booking
+       * c98-FIX1 (раньше оверлей противоречил и тосту, и факту). */
       if (!fallbackWarnedRef.current) {
         fallbackWarnedRef.current = true;
         console.warn(
@@ -936,7 +936,7 @@ export function Contact() {
       setFormQueued(true);
       setFormStatus("success");
       toast.success(
-        "Заявка сохранена в этом браузере. Попробуем отправить при восстановлении связи. Письмо можно отправить вручную.",
+        "Заявка сохранена в этом браузере. Попробуем отправить при восстановлении связи. Письмо можно отправить вручную.",
       );
 
       try {
@@ -951,7 +951,7 @@ export function Contact() {
       try { window.location.assign(mailto); } catch { /* Queued lead is still persisted. */ }
     } catch {
       setFormStatus("error");
-      toast.error("Не удалось открыть почту. Позвоните нам напрямую.");
+      toast.error("Не удалось открыть почту. Позвоните нам напрямую.");
       setTimeout(() => setFormStatus("idle"), 2000);
     }
   };
@@ -990,15 +990,15 @@ export function Contact() {
             <h2
               className="mt-5 font-display text-ink"
               style={{ fontSize: "clamp(1.9rem, 5vw, 3.75rem)", lineHeight: 1.1 }}
-              aria-label="Поговорим о вашем мероприятии"
+              aria-label="Поговорим о вашем мероприятии"
             >
-              Поговорим о вашем{" "}
+              Поговорим о вашем{" "}
               <span className="gradient-text italic">мероприятии</span>
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-ink/70">
-              Позвоните, напишите или оставьте заявку — отвечаем быстро и составим смету под ваш бюджет.
+              Позвоните, напишите или оставьте заявку — отвечаем быстро и составим смету под ваш бюджет.
             </p>
           </Reveal>
         </div>
@@ -1103,7 +1103,7 @@ export function Contact() {
             <form
               ref={formRef}
               onSubmit={submit}
-              aria-label="Многошаговая форма заявки на кейтеринг"
+              aria-label="Многошаговая форма заявки на кейтеринг"
               className="relative overflow-hidden rounded-3xl border border-border-line bg-white p-6 shadow-xl shadow-ink/5 md:p-9"
             >
               {/* c95 (1-d): honeypot — невидимое для людей поле (заполняют
@@ -1151,15 +1151,15 @@ export function Contact() {
                           + ускорение через почтового клиента. */}
                       {formQueued ? (
                         <>
-                          Заявка сохранена в этом браузере. <b>Повторим отправку</b>,
+                          Заявка сохранена в этом браузере. <b>Повторим отправку</b>,
                           как только связь восстановится. Если открылся
-                          почтовый клиент — нажмите «Отправить», и она
+                          почтовый клиент — нажмите «Отправить», и она
                           будет отправлена письмом.
                         </>
                       ) : (
                         <>
-                          Мы получили вашу заявку и перезвоним в течение 15
-                          минут в рабочее время (Пн–Пт 9:00–19:00,
+                          Мы получили вашу заявку и перезвоним в течение 15
+                          минут в рабочее время (Пн–Пт 9:00–19:00,
                           Сб 10:00–16:00).
                         </>
                       )}
@@ -1282,7 +1282,7 @@ export function Contact() {
                                 onClick={() =>
                                   set("guests", Math.max(1, data.guests - 10))
                                 }
-                                aria-label="Уменьшить на 10"
+                                aria-label="Уменьшить на 10"
                                 className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line text-ink/70 transition-all hover:border-gold hover:bg-gold/10 hover:text-gold"
                               >
                                 <ChevronLeft className="size-5" />
@@ -1306,7 +1306,7 @@ export function Contact() {
                                 onClick={() =>
                                   set("guests", data.guests + 10)
                                 }
-                                aria-label="Увеличить на 10"
+                                aria-label="Увеличить на 10"
                                 className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-line text-ink/70 transition-all hover:border-gold hover:bg-gold/10 hover:text-gold"
                               >
                                 <ChevronRight className="size-5" />
@@ -1341,7 +1341,7 @@ export function Contact() {
                               className="mt-2 w-full rounded-xl border border-border-line bg-cream/50 px-4 py-3.5 text-ink outline-none transition-all focus:border-gold focus:bg-white focus:ring-2 focus:ring-gold/20 focus:shadow-[0_0_20px_rgba(196,149,106,0.15)]"
                             />
                             <p className="mt-2 text-xs text-ink/70">
-                              Необязательно — уточним по звонку.
+                              Необязательно — уточним по звонку.
                             </p>
                           </div>
                         </fieldset>
@@ -1417,7 +1417,7 @@ export function Contact() {
                             <SummaryRow
                               icon={Calendar}
                               label="Дата"
-                              value={data.date || "уточним по звонку"}
+                              value={data.date || "уточним по звонку"}
                             />
                             <SummaryRow icon={Phone} label="Телефон" value={data.phone} />
                             <SummaryRow
@@ -1446,7 +1446,7 @@ export function Contact() {
                               required
                             />
                             <span>
-                              Я соглашаюсь на обработку моих персональных данных в соответствии с{" "}
+                              Я соглашаюсь на обработку моих персональных данных в соответствии с{" "}
                               <a
                                 href="/privacy"
                                 target="_blank"
@@ -1546,14 +1546,14 @@ export function Contact() {
                     {step === 0 && "Выберите тип мероприятия, чтобы продолжить"}
                     {step === 2 && !data.name.trim() && "Введите имя, чтобы продолжить"}
                     {step === 2 && data.name.trim() && !PHONE_REGEX.test(data.phone.replace(/[^+0-9]/g, "")) && "Введите корректный телефон"}
-                    {step === 3 && "Подтвердите согласие на обработку данных"}
+                    {step === 3 && "Подтвердите согласие на обработку данных"}
                   </p>
                 )}
 
                 {/* Security notice */}
                 <p className="mt-3 flex items-center justify-center gap-1.5 font-mono text-xs text-ink/70">
                   <ShieldCheck className="size-3.5 text-sage" />
-                  Данные защищены · обрабатываются по 152-ФЗ
+                  Данные защищены · обрабатываются по 152-ФЗ
                 </p>
               </motion.div>
             </form>
@@ -1577,11 +1577,11 @@ export function Contact() {
               href={YANDEX_MAPS.href}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Яндекс.Карты (откроется в новой вкладке)"
+              aria-label="Яндекс.Карты (откроется в новой вкладке)"
               className="flex min-h-[44px] items-center gap-2 text-sm text-ink/70 font-medium hover:text-gold transition-colors group"
             >
               <MapPin className="size-4 transition-transform group-hover:scale-110" />
-              {YANDEX_MAPS.address} — открыть на Яндекс.Картах →
+              {YANDEX_MAPS.address} — открыть на Яндекс.Картах →
             </a>
             <span className="font-mono text-xs text-ink/70">
               {CONTACTS.city} · {CONTACTS.phone}

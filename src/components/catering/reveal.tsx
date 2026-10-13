@@ -11,12 +11,12 @@ type Bezier = [number, number, number, number];
  * Fade + rise on scroll-into-view. Respects reduced-motion.
  *
  * HYDRATION-SAFE (c109, паттерн C62/tott-parallax-band): useReducedMotion()
- * возвращает null на SSR и УЖЕ boolean на первом клиентском рендере —
- * ветвление `if (reduce)` в рендере давало hydration-mismatch у гостей с
- * prefers-reduced-motion (сервер: motion.div с initial-стилями, клиент:
+ * возвращает null на SSR и УЖЕ boolean на первом клиентском рендере —
+ * ветвление `if (reduce)` в рендере давало hydration-mismatch у гостей с
+ * prefers-reduced-motion (сервер: motion.div с initial-стилями, клиент:
  * голый div). Теперь обе стороны первого рендера идентичны (motion-ветка),
  * статика включается ТОЛЬКО после маунта — легальный post-hydration
- * апдейт. reduce-гость видит контент сразу (opacity не анимируется).
+ * апдейт. reduce-гость видит контент сразу (opacity не анимируется).
  */
 export function Reveal({
   children,

@@ -148,40 +148,40 @@ const SERVICES: AtServiceItem[] = [
     id: "coffee-breaks",
     title: "Кофе-брейки",
     category: "corporate",
-    tagline: "Три паузы за день конференции — эспрессо, выпечка и минута тишины.",
-    minOrder: "от 15 человек",
+    tagline: "Три паузы за день конференции — эспрессо, выпечка и минута тишины.",
+    minOrder: "от 15 человек",
     image: "/media/menu-coffee-break.jpg",
-    imageAlt: "Кофе-брейк: кофе, круассаны и мини-десерты на станции",
+    imageAlt: "Кофе-брейк: кофе, круассаны и мини-десерты на станции",
     ui: "#d9a05b",
   },
   {
     id: "conferences",
     title: "Конференции",
     category: "corporate",
-    tagline: "Кейтеринг, который не отвлекает от повестки.",
-    minOrder: "от 30 человек",
+    tagline: "Кейтеринг, который не отвлекает от повестки.",
+    minOrder: "от 30 человек",
     image: "/media/concorde-boardroom.webp",
-    imageAlt: "Сервированный стол переговорной комнаты на конференции",
+    imageAlt: "Сервированный стол переговорной комнаты на конференции",
     ui: "#e3b25c",
   },
   {
     id: "presentations",
     title: "Презентации",
     category: "corporate",
-    tagline: "Сервировка, которая работает на ваш продукт.",
-    minOrder: "от 20 человек",
+    tagline: "Сервировка, которая работает на ваш продукт.",
+    minOrder: "от 20 человек",
     image: "/media/concorde-handhelds.jpg",
-    imageAlt: "Официант с подносом канапе на презентации",
+    imageAlt: "Официант с подносом канапе на презентации",
     ui: "#eac476",
   },
   {
     id: "office-lunch",
-    title: "Обеды в офис",
+    title: "Обеды в офис",
     category: "corporate",
-    tagline: "Горячее в термоупаковке к 12:00. Без полуфабрикатов.",
-    minOrder: "от 10 порций",
+    tagline: "Горячее в термоупаковке к 12:00. Без полуфабрикатов.",
+    minOrder: "от 10 порций",
     image: "/media/menu-office-lunch.jpg",
-    imageAlt: "Корпоративные обеды в индивидуальной упаковке",
+    imageAlt: "Корпоративные обеды в индивидуальной упаковке",
     ui: "#ce8f45",
   },
   {
@@ -189,9 +189,9 @@ const SERVICES: AtServiceItem[] = [
     title: "Новогодний корпоратив",
     category: "corporate",
     tagline: "Ёлка, текстиль, посуда, официанты. Забираем хлопоты — оставляем праздник.",
-    minOrder: "от 30 человек",
+    minOrder: "от 30 человек",
     image: "/media/gamma/gamma-catering-ballroom-chandelier-banquet.jpg",
-    imageAlt: "Банкетный зал с люстрами под новогодний корпоратив",
+    imageAlt: "Банкетный зал с люстрами под новогодний корпоратив",
     ui: "#e05c5c",
   },
   // ── private ─────────────────────────────────────────────────────────
@@ -199,20 +199,20 @@ const SERVICES: AtServiceItem[] = [
     id: "private-events",
     title: "Частные мероприятия",
     category: "private",
-    tagline: "Камерный формат, где каждое блюдо — разговор шефа с вами.",
-    minOrder: "от 20 человек",
+    tagline: "Камерный формат, где каждое блюдо — разговор шефа с вами.",
+    minOrder: "от 20 человек",
     image: "/media/gamma/gamma-catering-erlebnis-privat-events.webp",
-    imageAlt: "Камерное частное мероприятие с авторской сервировкой",
+    imageAlt: "Камерное частное мероприятие с авторской сервировкой",
     ui: "#e5a0a8",
   },
   {
     id: "mobile-banquet",
     title: "Выездной банкет",
     category: "private",
-    tagline: "Ресторанная подача там, где вам удобно — от особняка до шатра в лесу.",
-    minOrder: "от 30 человек",
+    tagline: "Ресторанная подача там, где вам удобно — от особняка до шатра в лесу.",
+    minOrder: "от 30 человек",
     image: "/media/banket-1.jpg",
-    imageAlt: "Выездной банкет: сервированный стол с фарфором и свечами",
+    imageAlt: "Выездной банкет: сервированный стол с фарфором и свечами",
     ui: "#e2725b",
   },
   {
@@ -220,19 +220,19 @@ const SERVICES: AtServiceItem[] = [
     title: "Выездной ресторан",
     category: "private",
     tagline: "Открытая кухня: гости видят, как шеф заканчивает блюдо.",
-    minOrder: "от 40 человек",
+    minOrder: "от 40 человек",
     image: "/media/gamma/showkueche-live-cooking-koeche-gammacatering.jpg",
-    imageAlt: "Шеф-повара за открытой кухней на мероприятии",
+    imageAlt: "Шеф-повара за открытой кухней на мероприятии",
     ui: "#ed6a45",
   },
   {
     id: "custom-cakes",
-    title: "Торты на заказ",
+    title: "Торты на заказ",
     category: "private",
     tagline: "Торт как архитектура: ярусы, текстуры, сезонные ягоды.",
-    minOrder: "от 1.5 кг",
+    minOrder: "от 1.5 кг",
     image: "/media/concorde-dessert.jpg",
-    imageAlt: "Авторский многоярусный десерт с ягодами",
+    imageAlt: "Авторский многоярусный десерт с ягодами",
     ui: "#e9a9be",
   },
   // ── buffet ──────────────────────────────────────────────────────────
@@ -241,39 +241,39 @@ const SERVICES: AtServiceItem[] = [
     title: "Доставка закусок",
     category: "buffet",
     tagline: "Фирменные ланч-боксы: 6–8 видов канапе, упакованных порционно.",
-    minOrder: "от 10 человек",
+    minOrder: "от 10 человек",
     image: "/media/menu-snack-box.jpg",
-    imageAlt: "Ланч-боксы с канапе и мини-закусками",
+    imageAlt: "Ланч-боксы с канапе и мини-закусками",
     ui: "#d4a373",
   },
   {
     id: "bbq",
     title: "Барбекю",
     category: "buffet",
-    tagline: "Гриль на углях. Стейки рибай, овощи с мангала, фирменные маринады.",
-    minOrder: "от 20 человек",
+    tagline: "Гриль на углях. Стейки рибай, овощи с мангала, фирменные маринады.",
+    minOrder: "от 20 человек",
     image: "/media/talkofthetown/talkofthetown-section-paella-station.jpg",
-    imageAlt: "Гриль-станция с открытым огнём на мероприятии",
+    imageAlt: "Гриль-станция с открытым огнём на мероприятии",
     ui: "#e1582f",
   },
   {
     id: "chocolate-fountain",
     title: "Шоколадный фонтан",
     category: "buffet",
-    tagline: "Бельгийский кувертюр и 6 видов дипов. Фокус-точка фуршета.",
-    minOrder: "от 40 человек",
+    tagline: "Бельгийский кувертюр и 6 видов дипов. Фокус-точка фуршета.",
+    minOrder: "от 40 человек",
     image: "/media/talkofthetown/talkofthetown-section-sweet-treats.jpg",
-    imageAlt: "Десертная станция: сладости и угощения на шпажках",
+    imageAlt: "Десертная станция: сладости и угощения на шпажках",
     ui: "#c08552",
   },
   {
     id: "champagne-pyramid",
-    title: "Пирамиды из шампанского",
+    title: "Пирамиды из шампанского",
     category: "buffet",
-    tagline: "Каскад бокалов, по которому льётся игристое.",
-    minOrder: "от 50 бокалов",
+    tagline: "Каскад бокалов, по которому льётся игристое.",
+    minOrder: "от 50 бокалов",
     image: "/media/gamma/sommelier-uniform-weinservice-gammacatering.jpg",
-    imageAlt: "Сомелье наливает игристое в каскад бокалов",
+    imageAlt: "Сомелье наливает игристое в каскад бокалов",
     ui: "#f2d377",
   },
   // ── special ─────────────────────────────────────────────────────────
@@ -281,8 +281,8 @@ const SERVICES: AtServiceItem[] = [
     id: "vegetarian",
     title: "Вегетарианское",
     category: "special",
-    tagline: "Меню без мяса, но не «без». Овощи как главные герои.",
-    minOrder: "от 15 человек",
+    tagline: "Меню без мяса, но не «без». Овощи как главные герои.",
+    minOrder: "от 15 человек",
     image: "/media/cutandtaste-artichoke.webp",
     imageAlt: "Артишок крупным планом — овощ как главный герой подачи",
     ui: "#a3b86c",
@@ -291,8 +291,8 @@ const SERVICES: AtServiceItem[] = [
     id: "halal",
     title: "Халяль",
     category: "special",
-    tagline: "Сертифицированные поставки. Уважение к традиции — без компромиссов по вкусу.",
-    minOrder: "от 20 человек",
+    tagline: "Сертифицированные поставки. Уважение к традиции — без компромиссов по вкусу.",
+    minOrder: "от 20 человек",
     image: "/media/ridgewells-veg-mosaic.jpg",
     imageAlt: "Мозаика овощных закусок премиальной подачи",
     ui: "#7fb069",
@@ -303,7 +303,7 @@ const SERVICES: AtServiceItem[] = [
     title: "Выездная регистрация",
     category: "logistics",
     tagline: "Сервировка церемонии бракосочетания. Тонкий момент — тонкая работа.",
-    minOrder: "от 15 человек",
+    minOrder: "от 15 человек",
     image: "/media/event-wedding-light.jpg",
     imageAlt: "Выездная церемония регистрации при вечернем свете",
     ui: "#e7b7be",
@@ -313,19 +313,19 @@ const SERVICES: AtServiceItem[] = [
     title: "Аренда оборудования",
     category: "logistics",
     tagline: "Посуда, мебель, текстиль, шатры. Привозим — забираем.",
-    minOrder: "от 1 позиции",
+    minOrder: "от 1 позиции",
     image: "/media/gamma/event-service-tischeindeckung-gala-gammacatering.jpg",
-    imageAlt: "Гала-сервировка: фарфор, стекло и текстиль на столе",
+    imageAlt: "Гала-сервировка: фарфор, стекло и текстиль на столе",
     ui: "#bfa07e",
   },
   {
     id: "hall-decoration",
     title: "Оформление зала",
     category: "logistics",
-    tagline: "Флористика, текстиль, свет, декор. При банкете — до 4 композиций в подарок.",
-    minOrder: "от 1 зоны",
+    tagline: "Флористика, текстиль, свет, декор. При банкете — до 4 композиций в подарок.",
+    minOrder: "от 1 зоны",
     image: "/media/gamma/hochzeit-tischdekoration-zitronen-gedeck-gammacatering.jpg",
-    imageAlt: "Оформление зала: флористика и текстиль на столах",
+    imageAlt: "Оформление зала: флористика и текстиль на столах",
     ui: "#e1969e",
   },
 ];
@@ -447,8 +447,8 @@ function Preview({ active, index, total }: { active: AtServiceItem; index: numbe
             />
             <SmartImage
               src={active.image}
-              /* C71 (K3-MINOR): видимое крупное превью было с alt="" — теря
-                 индексации Яндекс/Google Картинок; честный alt из активного
+              /* C71 (K3-MINOR): видимое крупное превью было с alt="" — теря
+                 индексации Яндекс/Google Картинок; честный alt из активного
                  заголовка услуги. */
               alt={`${active.title} — кейтеринг nilov catering`}
               fill
@@ -632,8 +632,8 @@ export function AtServices() {
                 id={askId}
                 type="search"
                 className="at-svc__ask-input"
-                placeholder="СПРОСИТЕ ОБ УСЛУГЕ..."
-                aria-label="Поиск услуги по названию"
+                placeholder="СПРОСИТЕ ОБ УСЛУГЕ..."
+                aria-label="Поиск услуги по названию"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Escape" && setQuery("")}
@@ -733,9 +733,9 @@ export function AtServices() {
                 </span>
                 {cat !== "all" && query.trim() ? (
                   <>
-                    В КАТЕГОРИИ{" "}
+                    В КАТЕГОРИИ{" "}
                     «{CATEGORIES.find((x) => x.id === cat)?.label.toUpperCase()}»{" "}
-                    НИЧЕГО НЕ НАЙДЕНО ПО ЗАПРОСУ «{query.trim().toUpperCase()}» —{" "}
+                    НИЧЕГО НЕ НАЙДЕНО ПО ЗАПРОСУ «{query.trim().toUpperCase()}» —{" "}
                     <button
                       type="button"
                       className="at-svc__empty-link"
@@ -749,7 +749,7 @@ export function AtServices() {
                   </>
                 ) : query.trim() ? (
                   <>
-                    ПО ЗАПРОСУ «{query.trim().toUpperCase()}» НИЧЕГО НЕ НАЙДЕНО —{" "}
+                    ПО ЗАПРОСУ «{query.trim().toUpperCase()}» НИЧЕГО НЕ НАЙДЕНО —{" "}
                     <button
                       type="button"
                       className="at-svc__empty-link"
@@ -760,7 +760,7 @@ export function AtServices() {
                   </>
                 ) : (
                   <>
-                    НИЧЕГО НЕ НАЙДЕНО —{" "}
+                    НИЧЕГО НЕ НАЙДЕНО —{" "}
                     <a href="#contact" className="at-svc__empty-link">
                       НАПИШИТЕ НАМ
                     </a>
@@ -785,7 +785,7 @@ export function AtServices() {
           transition={{ duration: 0.6, ease: EASE_AT }}
         >
           <p className="at-svc__stat">
-            18 УСЛУГ · 5 КАТЕГОРИЙ · САНКТ-ПЕТЕРБУРГ И ОБЛАСТЬ
+            18 УСЛУГ · 5 КАТЕГОРИЙ · САНКТ-ПЕТЕРБУРГ И ОБЛАСТЬ
           </p>
           <Link href="#contact" className="at-svc__pill">
             ОБСУДИТЬ СОБЫТИЕ

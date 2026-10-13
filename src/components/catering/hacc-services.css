@@ -385,6 +385,9 @@
   line-height: 1.08;
   text-align: center;
   color: var(--hacc-ink);
+  /* c112: баланс строк заголовка панели — строки равной длины, без
+     одиночного слова на второй строке (паритет с .hmenu__title) */
+  text-wrap: balance;
   /* settle — the script title drops into place when its panel opens */
   transform: rotate(-6deg) translateY(7px) scale(0.985);
   transform-origin: 50% 100%;         /* swing splits around the baseline */

@@ -108,7 +108,7 @@ export function EaPressStrip() {
     <section
       data-component="ea-press-strip"
       data-header-theme="light"
-      aria-label="СМИ о нас"
+      aria-label="СМИ о нас"
       className="ea-section ea-section--white relative"
       style={{ paddingBlock: "clamp(3rem, 5vw, 4.5rem)" }}
     >
@@ -119,7 +119,7 @@ export function EaPressStrip() {
           style={{ color: "var(--ea-mauve)" }}
           {...eyebrowReveal}
         >
-          О нас пишут
+          О нас пишут
         </motion.p>
 
         {/* Press row — single horizontal row on desktop, wraps on mobile. */}

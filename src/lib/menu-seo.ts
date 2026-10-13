@@ -18,7 +18,7 @@ export function menuStructuredData() {
         "@type": "MenuSection",
         "@id": `${SITE_URL}/#menu-${type.id}-${index}`,
         name: pkg.name,
-        description: `${pkg.description} Цена за персону: ${pkg.pricePerGuest} руб.`,
+        description: `${pkg.description} Цена за персону: ${pkg.pricePerGuest} руб.`,
         hasMenuItem: pkg.dishes.map((dish) => ({
           "@type": "MenuItem",
           name: dish.name,

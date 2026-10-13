@@ -35,18 +35,18 @@ const envBase =
     ? String(process.env.NEXT_PUBLIC_ADMIN_API_BASE)
     : "";
 
-/** База URL API ('' = same-origin, как в проде). */
+/** База URL API ('' = same-origin, как в проде). */
 export const API_BASE = envBase;
 
 export const MOCK_FLAG_KEY = "nilov-admin-mock";
 const MOCK_SESSION_KEY = "nilov-admin-mock-session";
 export const DRAFT_KEY = "nilov-admin-draft-v1";
 
-/** 4-F2 (критик D, MINOR «?mock=1 залипает в localStorage»): демо-режим
- *  разрешён ТОЛЬКО на localhost/127.0.0.1. На любом другом хосте (прод
- *  nilovcatering.ru, зеркало *.vercel.app) флаг не ставится и, если залип
- *  с прошлого визита, стирается при первой же проверке — прод не может
- *  незаметно оказаться в демо. */
+/** 4-F2 (критик D, MINOR «?mock=1 залипает в localStorage»): демо-режим
+ *  разрешён ТОЛЬКО на localhost/127.0.0.1. На любом другом хосте (прод
+ *  nilovcatering.ru, зеркало *.vercel.app) флаг не ставится и, если залип
+ *  с прошлого визита, стирается при первой же проверке — прод не может
+ *  незаметно оказаться в демо. */
 function isLocalHost(): boolean {
   if (typeof window === "undefined") return false;
   const h = window.location.hostname;
@@ -94,9 +94,9 @@ export function disableMockMode(): void {
 }
 
 /** 4-F2: зеркало Vercel (*.vercel.app) — /api/* там закрыты редиректом
- *  302→/404 (vercel.json), PHP не исполняется: логин и публикация
- *  невозможны. Функция (а не модульная константа) — вызывается где нужно
- *  и легко тестируется; host не меняется без полной перезагрузки страницы. */
+ *  302→/404 (vercel.json), PHP не исполняется: логин и публикация
+ *  невозможны. Функция (а не модульная константа) — вызывается где нужно
+ *  и легко тестируется; host не меняется без полной перезагрузки страницы. */
 export function isVercelMirror(): boolean {
   return (
     typeof window !== "undefined" &&
@@ -118,24 +118,24 @@ export interface Lead {
   email?: string;
   comment?: string;
   payload?: Record<string, unknown>;
-  /** c98-A: ключ идемпотентности (UUID от клиента) — дедуп ретраев. */
+  /** c98-A: ключ идемпотентности (UUID от клиента) — дедуп ретраев. */
   clientId?: string | null;
   /** c98-A: имя backup-файла, если лид записан после битого leads.json. */
   rescuedFrom?: string;
-  /** c97: доставлены ли уведомления (TG/почта/клиенту) — после отправки. */
+  /** c97: доставлены ли уведомления (TG/почта/клиенту) — после отправки. */
   notify?: LeadNotify;
   /** c102: стадия воронки мини-CRM (нет поля = «новая»); пишется
-   *  lead-update'ом или cron'ом (дожим не меняет статус — только маркер). */
+   *  lead-update'ом или cron'ом (дожим не меняет статус — только маркер). */
   status?: "new" | "contacted" | "agreed" | "lost" | string;
-  /** c102: заметка владельца по заявке (≤1000, \n-нормализация на сервере;
+  /** c102: заметка владельца по заявке (≤1000, \n-нормализация на сервере;
    *  null/пусто — очистить). */
   note?: string | null;
   /** c102: когда клиенту ушёл авто-дожим (UNIX-секунды) — письмо-напоминание
-   *  отправлено автоматически, повторных не будет. */
+   *  отправлено автоматически, повторных не будет. */
   followupTs?: number;
-  /** c102: доставлен ли авто-дожим (false = письмо не дошло). */
+  /** c102: доставлен ли авто-дожим (false = письмо не дошло). */
   followupOk?: boolean;
-  /** c102: когда пинговали владельца о зависшей заявке. */
+  /** c102: когда пинговали владельца о зависшей заявке. */
   nudgedTs?: number;
 }
 
@@ -175,7 +175,7 @@ export interface AdminSettings {
   cronState?: Record<string, unknown> | null;
 }
 
-/** c97: статус доставки уведомлений по заявке (lead.php → leads.json). */
+/** c97: статус доставки уведомлений по заявке (lead.php → leads.json). */
 export interface LeadNotify {
   ts: number | string;
   tg: boolean;
@@ -199,14 +199,14 @@ export interface AdminApiOptions {
   base?: string;
   /** Дополнительные заголовки (тесты: Cookie). */
   headers?: Record<string, string>;
-  /** 401 — ожидаемый исход (login/session): без события и тоста. */
+  /** 401 — ожидаемый исход (login/session): без события и тоста. */
   expect401?: boolean;
 }
 
 export interface ApiResponse {
   status: number;
   body: Record<string, unknown> | null;
-  /** Set-Cookie из ответа (тесты). */
+  /** Set-Cookie из ответа (тесты). */
   cookies?: string[];
 }
 
@@ -262,7 +262,7 @@ export async function adminApi(
     return { status: res.status, body, cookies };
   } catch (e) {
     if ((e as Error)?.name === "AbortError" && opts.signal?.aborted) throw e;
-    toast.error("Нет связи с сервером — проверьте интернет");
+    toast.error("Нет связи с сервером — проверьте интернет");
     return { status: 0, body: null };
   } finally {
     clearTimeout(timeout);
@@ -453,9 +453,9 @@ export async function apiLeadUpdate(
   return r.status === 200 && r.body?.ok === true;
 }
 
-/** c102 — секретная ссылка для планировщика хостинга (cron.php?token=…).
+/** c102 — секретная ссылка для планировщика хостинга (cron.php?token=…).
  *  Токен возвращается РОВНО ОДИН раз при генерации — сервер его больше
- *  не показывает (cronEnabled в settings — только факт «выдан»); поэтому
+ *  не показывает (cronEnabled в settings — только факт «выдан»); поэтому
  *  UI сразу даёт скопировать URL. revoke=true — отключить (токен = null). */
 export async function apiCronToken(revoke = false): Promise<{ ok: boolean; token: string | null }> {
   const r = await adminApi("cron-token", { method: "POST", body: revoke ? { revoke: true } : {} });
@@ -651,7 +651,7 @@ export async function apiTgTest(
   };
 }
 
-/** c97: результат теста почты (тот же канал, что уведомления о заявках). */
+/** c97: результат теста почты (тот же канал, что уведомления о заявках). */
 export type MailTestResult = {
   ok: boolean;
   to: string;
@@ -685,7 +685,7 @@ export async function apiMailTest(
   };
 }
 
-/** c97: запись журнала почты для UI диагностики. */
+/** c97: запись журнала почты для UI диагностики. */
 export interface MailLogEntry {
   ts: number | null;
   to: string;
@@ -728,7 +728,7 @@ export interface SpamLogEntry {
 }
 
 /** c98-A: журнал спам-ловушек — если туда попал реальный клиент, владелец
- *  видит его имя/телефон и может перезвонить (до c98 лид терялся без следа). */
+ *  видит его имя/телефон и может перезвонить (до c98 лид терялся без следа). */
 export async function apiSpamLog(
   limit = 5,
 ): Promise<{ ok: boolean; entries: SpamLogEntry[] }> {
@@ -780,18 +780,18 @@ let mockSavedAt = 0;
 /** Меню, «закоммиченное» через save (мок-аналог GitHub contents). */
 let mockSavedMenu: MenuData | null = null;
 
-/* MOCK-ONLY (4-F2): debug-аффорданс состояния 'cancelled' для демо-режима.
- * Публикация, чьё сообщение коммита содержит «тест отмены», на ПЕРВОМ
- * опросе статуса отвечает 'building', на ВТОРОМ — 'cancelled' (вместо
- * success): так баннер отмены можно показать и проверить в демо.
- * Существует ТОЛЬКО здесь, в мок-слое — в проде 'cancelled' приходит из
+/* MOCK-ONLY (4-F2): debug-аффорданс состояния 'cancelled' для демо-режима.
+ * Публикация, чьё сообщение коммита содержит «тест отмены», на ПЕРВОМ
+ * опросе статуса отвечает 'building', на ВТОРОМ — 'cancelled' (вместо
+ * success): так баннер отмены можно показать и проверить в демо.
+ * Существует ТОЛЬКО здесь, в мок-слое — в проде 'cancelled' приходит из
  * admin.php, когда деплой вытеснен более новой публикацией. Никаких
- * скрытых триггеров — только явная строка в сообщении коммита. */
+ * скрытых триггеров — только явная строка в сообщении коммита. */
 let mockCancelArmed = false;
 let mockStatusPolls = 0;
 
-/* c102 MOCK-ONLY: секретный cron-токен демо-режима. Живёт в памяти модуля
- * (как в проде — в secrets.json): после генерации «не показывается» нигде,
+/* c102 MOCK-ONLY: секретный cron-токен демо-режима. Живёт в памяти модуля
+ * (как в проде — в secrets.json): после генерации «не показывается» нигде,
  * кроме одного ответа cron-token; состояние — только cronEnabled=true/false. */
 let mockCronToken: string | null = null;
 const mockRandomToken = () =>
@@ -862,14 +862,14 @@ async function mockApi(
           status: 400,
           body: {
             error: "validation",
-            errors: ["menuTypes: нужен хотя бы один формат меню"],
+            errors: ["menuTypes: нужен хотя бы один формат меню"],
           },
         };
       }
       mockSavedAt = Date.now();
       mockSavedMenu = structuredClone(menu);
       /* MOCK-ONLY (4-F2): вооружение debug-аффорданса — см. объявление
-       * mockCancelArmed выше (только «тест отмены» в сообщении коммита). */
+       * mockCancelArmed выше (только «тест отмены» в сообщении коммита). */
       mockCancelArmed =
         typeof body.message === "string" && body.message.includes("тест отмены");
       mockStatusPolls = 0;
@@ -948,7 +948,7 @@ async function mockApi(
       if (!lead) return { status: 404, body: { error: "not_found" } };
       if (typeof body.read === "boolean") lead.read = body.read;
       if (typeof body.archived === "boolean") lead.archived = body.archived;
-      /* c102: мини-CRM — статус воронки и заметка (как admin.php: валидный
+      /* c102: мини-CRM — статус воронки и заметка (как admin.php: валидный
        * статус строкой, note null/"" очищает, \r\n → \n). */
       if (typeof body.status === "string" &&
           ["new", "contacted", "agreed", "lost"].includes(body.status)) {
@@ -1002,7 +1002,7 @@ async function mockApi(
           }
           mockSettings.notifyEmail = b.notifyEmail;
         }
-        /* c97: SMTP — как в проде (пустой пароль не затирает). */
+        /* c97: SMTP — как в проде (пустой пароль не затирает). */
         if (b.clearSmtpPass) {
           mockSettings.smtpPassMasked = "";
           mockSettings.smtpSet = false;
@@ -1024,7 +1024,7 @@ async function mockApi(
         mockSettings.smtpSet = Boolean(
           mockSettings.smtpHost && mockSettings.smtpUser && mockSettings.smtpPassMasked,
         );
-        /* c99-C: аналитика — как в проде (мягкая нормализация: мусор → ""). */
+        /* c99-C: аналитика — как в проде (мягкая нормализация: мусор → ""). */
         if (typeof b.metrikaId === "string" || b.metrikaId === null) {
           const digits = String(b.metrikaId ?? "").replace(/\D+/g, "");
           mockSettings.metrikaId =
@@ -1043,7 +1043,7 @@ async function mockApi(
         if (typeof b.customHeadHtml === "string" || b.customHeadHtml === null) {
           const ch = String(b.customHeadHtml ?? "");
           /* c99-fix (критик E2-m7): паритет с продом — мок раньше молча
-           * резал >8000 и пропускал </textarea (прод отдаёт 400) — демо-
+           * резал >8000 и пропускал </textarea (прод отдаёт 400) — демо-
            * режим врал о сохранении, которого не было бы на проде. */
           if (ch.toLowerCase().includes("</textarea")) {
             return {
@@ -1060,7 +1060,7 @@ async function mockApi(
           mockSettings.customHeadHtml = ch === "" ? "" : ch;
         }
         /* c102: автоматизация — === true → boolean (мок проверяет тип так же
-         * строго, как admin.php — «истина» строкой не пройдёт). */
+         * строго, как admin.php — «истина» строкой не пройдёт). */
         if (b.autoDigest === true || b.autoDigest === false) {
           mockSettings.autoDigest = b.autoDigest;
         }
@@ -1079,7 +1079,7 @@ async function mockApi(
           };
         }
         /* c102: отзыв токена — планировщик выключается (clearCronToken
-         * отправляется ТОЛЬКО намеренно, из карточки «Автоматизация»). */
+         * отправляется ТОЛЬКО намеренно, из карточки «Автоматизация»). */
         if (b.clearCronToken === true) {
           mockCronToken = null;
           mockSettings.cronEnabled = false;
@@ -1091,7 +1091,7 @@ async function mockApi(
     case "cron-token": {
       /* c102: как admin.php h_cron_token — {revoke:true} гасит токен
        * (null), иначе генерится новый 32-hex; старые ссылки перестают
-       * работать. Токен в ответе — ЕДИНСТВЕННЫЙ раз. */
+       * работать. Токен в ответе — ЕДИНСТВЕННЫЙ раз. */
       if (body.revoke === true) {
         mockCronToken = null;
         mockSettings.cronEnabled = false;
@@ -1150,7 +1150,7 @@ async function mockApi(
               ts: Math.floor(Date.now() / 1000) - 600,
               to: mockSettings.notifyEmail,
               context: "lead-owner",
-              subject: "Новая заявка с сайта — Анна Соколова",
+              subject: "Новая заявка с сайта — Анна Соколова",
               transport: mockSettings.smtpSet ? "smtp" : "mail",
               ok: true,
               error: null,
@@ -1161,10 +1161,10 @@ async function mockApi(
               ts: Math.floor(Date.now() / 1000) - 3600,
               to: "anna.s@example.com",
               context: "lead-client",
-              subject: "Ваша заявка в NILOV CATERING принята",
+              subject: "Ваша заявка в NILOV CATERING принята",
               transport: "mail",
               ok: false,
-              error: "mail() вернула false (sendmail не принял письмо)",
+              error: "mail() вернула false (sendmail не принял письмо)",
               attach: 1,
               detail: null,
             },
@@ -1216,7 +1216,7 @@ const mockSettings: AdminSettings = {
 };
 
 const now = Date.now();
-/** ts как в проде — UNIX-секунды (lead.php: time()). */
+/** ts как в проде — UNIX-секунды (lead.php: time()). */
 const unix = (minutesAgo: number) => Math.floor((now - minutesAgo * 60_000) / 1000);
 
 const mockLeads: Lead[] = [
@@ -1229,7 +1229,7 @@ const mockLeads: Lead[] = [
     phone: "+7 (921) 845-12-30",
     email: "anna.s@example.com",
     comment:
-      "Банкет по итогам года. Важно: у двоих гостей аллергия на орехи.",
+      "Банкет по итогам года. Важно: у двоих гостей аллергия на орехи.",
     payload: {
       typeId: "banquet",
       guests: 50,
@@ -1251,12 +1251,12 @@ const mockLeads: Lead[] = [
     ts: unix(95),
     read: true,
     status: "contacted",
-    note: "Перезвонить после 18:00, просит смету на бар",
+    note: "Перезвонить после 18:00, просит смету на бар",
     source: "contact",
     name: "Игорь Ветров",
     phone: "+7 (911) 200-84-51",
     email: "",
-    comment: "Свадьба в июле, площадка — Павловск. Пришлите смету на 80 гостей.",
+    comment: "Свадьба в июле, площадка — Павловск. Пришлите смету на 80 гостей.",
     payload: {
       eventType: "Свадьба",
       guests: 80,
@@ -1291,7 +1291,7 @@ const mockLeads: Lead[] = [
     name: "Ольга Руднева",
     phone: "8 (921) 555-04-88",
     email: "olga.r@example.com",
-    comment: "Кофе-брейк на конференцию, нужно предложение до пятницы.",
+    comment: "Кофе-брейк на конференцию, нужно предложение до пятницы.",
     followupTs: unix(60 * 26),
     followupOk: true,
     nudgedTs: unix(60 * 23),

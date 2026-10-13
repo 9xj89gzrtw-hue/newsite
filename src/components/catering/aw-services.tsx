@@ -22,7 +22,7 @@
  *     leaders show 4–8) + 6 secondary «Ещё услуги» (expandable). New rows:
  *     Свадьбы, Выездной бар. Removed as rows: шоколадный фонтан, пирамиды
  *     шампанского, вег/халяль (→ меню-бейджи), презентации, НГ-корпоратив.
- *     Price anchoring «от X ₽/гость» — RU-market norm (Empire, Яндекс.Услуги).
+ *     Price anchoring «от X ₽/гость» — RU-market norm (Empire, Яндекс.Услуги).
  *
  * LAYOUT (desktop ≥1024px)
  *   ┌ head ─────────────────────────────────────────────┐
@@ -30,11 +30,11 @@
  *   │ Чем мы можем вас удивить   (Inter Tight 300, huge) │
  *   │ subtitle                                          │
  *   ├ rows (cursor-follow 4:5 media floats) ────────────┤
- *   │ 01  Фуршеты и коктейльные приёмы ···· от 1 600 ₽  │
+ *   │ 01  Фуршеты и коктейльные приёмы ···· от 1 600 ₽  │
  *   │ … 7 rows                                          │
  *   ├ marquee (inverted #222): вторые услуги ✳ …        │
  *   ├ [ Ещё услуги · 6 + ] → expandable 3-col mini-grid │
- *   ├ foot: note + magnetic CTA «Получить смету за 30 мин»
+ *   ├ foot: note + magnetic CTA «Получить смету за 30 мин»
  *   └───────────────────────────────────────────────────┘
  *
  * Mobile (≤1023px / coarse pointer): float removed (Dennis's own degradation);
@@ -139,10 +139,10 @@ const PRIMARY: PrimaryService[] = [
   {
     id: "furshety",
     index: "01",
-    title: "Фуршеты и коктейльные приёмы",
-    hook: "Канапе, welcome-коктейли и подача, которая не останавливается ни на минуту.",
+    title: "Фуршеты и коктейльные приёмы",
+    hook: "Канапе, welcome-коктейли и подача, которая не останавливается ни на минуту.",
     price: "от 1\u00A0600\u00A0₽/гость",
-    guests: "от 20 гостей",
+    guests: "от 20 гостей",
     media: "/media/furshet-1.jpg",
     ctaLabel: "Рассчитать фуршет",
     ctaHref: "#calculator",
@@ -151,9 +151,9 @@ const PRIMARY: PrimaryService[] = [
     id: "bankety",
     index: "02",
     title: "Банкеты",
-    hook: "Полная посадка: от аперитива до десерта — официанты, сомелье и тайминг до минуты.",
+    hook: "Полная посадка: от аперитива до десерта — официанты, сомелье и тайминг до минуты.",
     price: "от 3\u00A0500\u00A0₽/гость",
-    guests: "от 30 гостей",
+    guests: "от 30 гостей",
     media: "/media/gamma/gamma-catering-ballroom-chandelier-banquet.jpg",
     ctaLabel: "Рассчитать банкет",
     ctaHref: "#calculator",
@@ -162,9 +162,9 @@ const PRIMARY: PrimaryService[] = [
     id: "svadby",
     index: "03",
     title: "Свадьбы",
-    hook: "Выездная регистрация, банкет и торт — одна команда отвечает за весь день.",
+    hook: "Выездная регистрация, банкет и торт — одна команда отвечает за весь день.",
     price: "от 5\u00A0500\u00A0₽/гость",
-    guests: "от 40 гостей",
+    guests: "от 40 гостей",
     media: "/media/event-wedding-light.jpg",
     ctaLabel: "Обсудить свадьбу",
     ctaHref: "#contact",
@@ -173,9 +173,9 @@ const PRIMARY: PrimaryService[] = [
     id: "korporativ",
     index: "04",
     title: "Корпоративные мероприятия",
-    hook: "Конференции, форумы и гала-ужины: кофе-брейки, фуршеты и полный техтайминг.",
+    hook: "Конференции, форумы и гала-ужины: кофе-брейки, фуршеты и полный техтайминг.",
     price: "от 2\u00A0500\u00A0₽/гость",
-    guests: "от 30 гостей",
+    guests: "от 30 гостей",
     media: "/media/gamma/firmenevent-messe-gala-bankett-gammacatering.jpg",
     ctaLabel: "Запросить смету",
     ctaHref: "#contact",
@@ -183,10 +183,10 @@ const PRIMARY: PrimaryService[] = [
   {
     id: "kofe-breyki",
     index: "05",
-    title: "Кофе-брейки и обеды в офис",
-    hook: "Горячее в термоупаковке к 12:00 — каждый день или к вашей дате.",
+    title: "Кофе-брейки и обеды в офис",
+    hook: "Горячее в термоупаковке к 12:00 — каждый день или к вашей дате.",
     price: "от 450\u00A0₽/гость",
-    guests: "от 15 гостей",
+    guests: "от 15 гостей",
     media: "/media/menu-coffee-break.jpg",
     ctaLabel: "Заказать кофе-брейк",
     ctaHref: "#calculator",
@@ -194,10 +194,10 @@ const PRIMARY: PrimaryService[] = [
   {
     id: "barbekyu",
     index: "06",
-    title: "Барбекю и гриль-станции",
-    hook: "Рибай и овощи с мангала — живой огонь и ароматы, которые собирают гостей.",
+    title: "Барбекю и гриль-станции",
+    hook: "Рибай и овощи с мангала — живой огонь и ароматы, которые собирают гостей.",
     price: "от 2\u00A0000\u00A0₽/гость",
-    guests: "от 20 гостей",
+    guests: "от 20 гостей",
     media: "/media/talkofthetown/talkofthetown-section-paella-station.jpg",
     ctaLabel: "Рассчитать барбекю",
     ctaHref: "#calculator",
@@ -206,9 +206,9 @@ const PRIMARY: PrimaryService[] = [
     id: "bar",
     index: "07",
     title: "Выездной бар",
-    hook: "Коктейли, моктейли и винная подача: бармены, лёд, бокалы и настроение.",
+    hook: "Коктейли, моктейли и винная подача: бармены, лёд, бокалы и настроение.",
     price: "от 900\u00A0₽/гость",
-    guests: "от 25 гостей",
+    guests: "от 25 гостей",
     media: "/media/gamma/sommelier-uniform-weinservice-gammacatering.jpg",
     ctaLabel: "Обсудить бар",
     ctaHref: "#contact",
@@ -227,13 +227,13 @@ const SECONDARY: SecondaryService[] = [
   {
     id: "shou-stancii",
     title: "Шоу-станции шефа",
-    hook: "Поке, паста, карвинг и тако: гости смотрят, как рождается блюдо.",
+    hook: "Поке, паста, карвинг и тако: гости смотрят, как рождается блюдо.",
     media: "/media/gamma/showkueche-live-cooking-koeche-gammacatering.jpg",
   },
   {
     id: "gastro-boksy",
-    title: "Гастро-боксы и доставка закусок",
-    hook: "6–8 видов канапе, упакованных порционно, — к нужному часу.",
+    title: "Гастро-боксы и доставка закусок",
+    hook: "6–8 видов канапе, упакованных порционно, — к нужному часу.",
     media: "/media/menu-snack-box.jpg",
   },
   {
@@ -244,14 +244,14 @@ const SECONDARY: SecondaryService[] = [
   },
   {
     id: "torty",
-    title: "Торты на заказ",
+    title: "Торты на заказ",
     hook: "Ярусы, текстуры, сезонные ягоды: торт как архитектура.",
     media: "/media/concorde-dessert.jpg",
   },
   {
     id: "veg-halal",
-    title: "Вегетарианское и халяль-меню",
-    hook: "Сертифицированные поставки и овощи как главные герои.",
+    title: "Вегетарианское и халяль-меню",
+    hook: "Сертифицированные поставки и овощи как главные герои.",
     media: "/media/ridgewells-veg-mosaic.jpg",
   },
   {
@@ -502,9 +502,9 @@ export function AwServices() {
           </h2>
 
           <p className="aw-svc__sub">
-            {"Семь основных форматов — от офисного "}
+            {"Семь основных форматов — от офисного "}
             <span className="aw-svc__nowrap">кофе-брейка</span>
-            {" до свадьбы на триста гостей — и ещё шесть услуг для особых "}
+            {" до свадьбы на триста гостей — и ещё шесть услуг для особых "}
             {"поводов."}
           </p>
         </motion.header>
@@ -647,16 +647,16 @@ export function AwServices() {
         {/* ------------------------------------------------------- foot -- */}
         <div className="aw-svc__foot">
           <p className="aw-svc__foot-note">
-            {"Все цены — «от». Точная смета — в калькуляторе или после "}
+            {"Все цены — «от». Точная смета — в калькуляторе или после "}
             {"короткого брифа."}
           </p>
           <div className="aw-svc__foot-actions">
             <MagneticLink href="#calculator" enabled={magneticEnabled}>
-              {"Получить смету за 30 минут"}
+              {"Получить смету за 30 минут"}
               <ArrowUpRight strokeWidth={1.75} aria-hidden="true" />
             </MagneticLink>
             <a className="aw-svc__foot-alt" href="#contact">
-              {"или напишите нам"}
+              {"или напишите нам"}
             </a>
           </div>
         </div>

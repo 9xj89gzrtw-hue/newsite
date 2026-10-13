@@ -61,7 +61,7 @@ export const SOCIALS = {
 
 export type Socials = typeof SOCIALS;
 
-/** Абсолютный URL от корня сайта: abs("/offer") → "https://…/offer". */
+/** Абсолютный URL от корня сайта: abs("/offer") → "https://…/offer". */
 export function absUrl(path: string): string {
   const p = path.startsWith("/") ? path : `/${path}`;
   return `${SITE_URL_BASE}${p === "/" ? "" : p}`;

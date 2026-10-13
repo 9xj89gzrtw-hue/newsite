@@ -115,10 +115,10 @@ const SCENES: Scene[] = [
   {
     id: "furshety",
     index: "01",
-    title: "Фуршеты и коктейльные приёмы",
-    hook: "Канапе, welcome-коктейли и подача, которая не останавливается ни на минуту.",
+    title: "Фуршеты и коктейльные приёмы",
+    hook: "Канапе, welcome-коктейли и подача, которая не останавливается ни на минуту.",
     price: "от 1\u00A0600\u00A0₽/гость",
-    guests: "от 20 гостей",
+    guests: "от 20 гостей",
     media: "/media/furshet-1.jpg",
     ctaLabel: "Рассчитать фуршет",
     ctaHref: "#calculator",
@@ -127,9 +127,9 @@ const SCENES: Scene[] = [
     id: "bankety",
     index: "02",
     title: "Банкеты",
-    hook: "Полная посадка: от аперитива до десерта — официанты, сомелье и тайминг до минуты.",
+    hook: "Полная посадка: от аперитива до десерта — официанты, сомелье и тайминг до минуты.",
     price: "от 3\u00A0500\u00A0₽/гость",
-    guests: "от 30 гостей",
+    guests: "от 30 гостей",
     media: "/media/gamma/gamma-catering-ballroom-chandelier-banquet.jpg",
     ctaLabel: "Рассчитать банкет",
     ctaHref: "#calculator",
@@ -138,9 +138,9 @@ const SCENES: Scene[] = [
     id: "svadby",
     index: "03",
     title: "Свадьбы",
-    hook: "Выездная регистрация, банкет и торт — одна команда отвечает за весь день.",
+    hook: "Выездная регистрация, банкет и торт — одна команда отвечает за весь день.",
     price: "от 5\u00A0500\u00A0₽/гость",
-    guests: "от 40 гостей",
+    guests: "от 40 гостей",
     media: "/media/event-wedding-light.jpg",
     ctaLabel: "Обсудить свадьбу",
     ctaHref: "#contact",
@@ -149,9 +149,9 @@ const SCENES: Scene[] = [
     id: "korporativ",
     index: "04",
     title: "Корпоративные мероприятия",
-    hook: "Конференции, форумы и гала-ужины: кофе-брейки, фуршеты и полный техтайминг.",
+    hook: "Конференции, форумы и гала-ужины: кофе-брейки, фуршеты и полный техтайминг.",
     price: "от 2\u00A0500\u00A0₽/гость",
-    guests: "от 30 гостей",
+    guests: "от 30 гостей",
     media: "/media/gamma/firmenevent-messe-gala-bankett-gammacatering.jpg",
     ctaLabel: "Запросить смету",
     ctaHref: "#contact",
@@ -159,12 +159,12 @@ const SCENES: Scene[] = [
   {
     id: "kofe-breyki",
     index: "05",
-    title: "Кофе-брейки и обеды в офис",
-    hook: "Горячее в термоупаковке к 12:00 — каждый день или к вашей дате.",
+    title: "Кофе-брейки и обеды в офис",
+    hook: "Горячее в термоупаковке к 12:00 — каждый день или к вашей дате.",
     /* 650 = office-lunch.perGuest в lib/pricing.ts — низшая цена пары
        «кофе-брейки + обеды»; 450 в прейскуранте не существует (C59/W6) */
     price: "от 650\u00A0₽/гость",
-    guests: "от 15 гостей",
+    guests: "от 15 гостей",
     media: "/media/menu-coffee-break.jpg",
     ctaLabel: "Заказать кофе-брейк",
     ctaHref: "#calculator",
@@ -172,10 +172,10 @@ const SCENES: Scene[] = [
   {
     id: "barbekyu",
     index: "06",
-    title: "Барбекю и гриль-станции",
-    hook: "Рибай и овощи с мангала — живой огонь и ароматы, которые собирают гостей.",
+    title: "Барбекю и гриль-станции",
+    hook: "Рибай и овощи с мангала — живой огонь и ароматы, которые собирают гостей.",
     price: "от 2\u00A0000\u00A0₽/гость",
-    guests: "от 20 гостей",
+    guests: "от 20 гостей",
     media: "/media/talkofthetown/talkofthetown-section-paella-station.jpg",
     ctaLabel: "Рассчитать барбекю",
     ctaHref: "#calculator",
@@ -184,9 +184,9 @@ const SCENES: Scene[] = [
     id: "bar",
     index: "07",
     title: "Выездной бар",
-    hook: "Коктейли, моктейли и винная подача: бармены, лёд, бокалы и настроение.",
+    hook: "Коктейли, моктейли и винная подача: бармены, лёд, бокалы и настроение.",
     price: "от 900\u00A0₽/гость",
-    guests: "от 25 гостей",
+    guests: "от 25 гостей",
     media: "/media/gamma/sommelier-uniform-weinservice-gammacatering.jpg",
     ctaLabel: "Обсудить бар",
     ctaHref: "#contact",
@@ -204,13 +204,13 @@ const EXTRAS: ExtraService[] = [
   {
     id: "shou-stancii",
     title: "Шоу-станции шефа",
-    hook: "Поке, паста, карвинг и тако: гости смотрят, как рождается блюдо.",
+    hook: "Поке, паста, карвинг и тако: гости смотрят, как рождается блюдо.",
     media: "/media/gamma/showkueche-live-cooking-koeche-gammacatering.jpg",
   },
   {
     id: "gastro-boksy",
-    title: "Гастро-боксы и доставка закусок",
-    hook: "6–8 видов канапе, упакованных порционно, — к нужному часу.",
+    title: "Гастро-боксы и доставка закусок",
+    hook: "6–8 видов канапе, упакованных порционно, — к нужному часу.",
     media: "/media/menu-snack-box.jpg",
   },
   {
@@ -221,14 +221,14 @@ const EXTRAS: ExtraService[] = [
   },
   {
     id: "torty",
-    title: "Торты на заказ",
+    title: "Торты на заказ",
     hook: "Ярусы, текстуры, сезонные ягоды: торт как архитектура.",
     media: "/media/concorde-dessert.jpg",
   },
   {
     id: "veg-halal",
-    title: "Вегетарианское и халяль-меню",
-    hook: "Сертифицированные поставки и овощи как главные герои.",
+    title: "Вегетарианское и халяль-меню",
+    hook: "Сертифицированные поставки и овощи как главные герои.",
     media: "/media/ridgewells-veg-mosaic.jpg",
   },
   {
@@ -244,7 +244,7 @@ const EXTRAS: ExtraService[] = [
 const STATS: { value: string; label: string }[] = [
   { value: "07", label: "сцен под ключ" },
   { value: "13", label: "услуг всего" },
-  { value: "17", label: "лет на рынке" },
+  { value: "17", label: "лет на рынке" },
   { value: "120 000", label: "гостей накормлено" },
 ];
 
@@ -806,13 +806,13 @@ export function StageServices() {
           >
             {"Семь "}
             <span className="sv-st__title-accent">сцен</span>
-            {" для вашего события"}
+            {" для вашего события"}
           </motion.h2>
 
           <p className="sv-st__sub">
-            {"От офисного "}
+            {"От офисного "}
             <span className="sv-st__nowrap">кофе-брейка</span>
-            {" до свадьбы на триста гостей — мы выстраиваем сцену под ваш повод: свет, подача, тайминг. Проведите курсором по списку — каждая сцена покажет себя."}
+            {" до свадьбы на триста гостей — мы выстраиваем сцену под ваш повод: свет, подача, тайминг. Проведите курсором по списку — каждая сцена покажет себя."}
           </p>
         </motion.header>
 
@@ -969,11 +969,11 @@ export function StageServices() {
 
           <div className="sv-st__foot-actions">
             <MagneticLink href="#calculator" enabled={magneticEnabled}>
-              {"Получить смету за 30 минут"}
+              {"Получить смету за 30 минут"}
               <ArrowUpRight strokeWidth={1.75} aria-hidden="true" />
             </MagneticLink>
             <a className="sv-st__foot-alt" href="#contact">
-              {"или напишите нам"}
+              {"или напишите нам"}
             </a>
           </div>
         </div>

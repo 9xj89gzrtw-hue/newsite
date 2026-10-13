@@ -80,15 +80,15 @@ import "./hacc-menu.css";
 /* ------------------------------------------------------------------ config */
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-/** Baymard: hover-intent delay — раскрытие при «проживании» на корешке. */
+/** Baymard: hover-intent delay — раскрытие при «проживании» на корешке. */
 const HOVER_INTENT_MS = 380;
 const DESKTOP_MQ = "(min-width: 1024px)";
 
 /** c108: blur-placeholder = тинт категории. Фото тарифов (конвейер
- *  research/c107-c108) красит фон в ТОЧНЫЙ тинт панели — placeholder
- *  того же цвета делает загрузку бесшовной: панель → фото проявляется
+ *  research/c107-c108) красит фон в ТОЧНЫЙ тинт панели — placeholder
+ *  того же цвета делает загрузку бесшовной: панель → фото проявляется
  *  без вспышки чужого цвета. Грабля c107: здесь был невалидный 7-симв.
- *  hex #F5F5EE2 — SVG fill падал в ЧЁРНЫЙ (жалоба владельца: «на телефоне
+ *  hex #F5F5EE2 — SVG fill падал в ЧЁРНЫЙ (жалоба владельца: «на телефоне
  *  сначала чёрный квадрат, потом фотка»). */
 function tintBlurDataUrl(tint: string): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="${tint}"/></svg>`;
@@ -112,7 +112,7 @@ interface MenuCat extends MenuType {
 }
 
 /**
- * Мета по каждому каталогу. Тинты взяты из палитры hacc-services —
+ * Мета по каждому каталогу. Тинты взяты из палитры hacc-services —
  * категория меню наследует цвет «своего» формата услуг (фуршет = фуршет).
  */
 const META: Record<
@@ -137,12 +137,12 @@ const META: Record<
     tint: "#E6EBDF",
     ctaLabel: "Заказать наборы",
     ctaHref: "#calculator",
-    priceLabel: "за гостя",
+    priceLabel: "за гостя",
     cursorLabel: "ЗАКУСКИ",
     /* 3-c (владелец): минимальный заказ и срок — под фотографией/списком,
        красным акцентом (паттерн .hmenu__hook-note, как вег-мост C59) */
     hookNote:
-      "Минимальный заказ 17 400 ₽. Заказ принимается за 48 часов.",
+      "Минимальный заказ 17 400 ₽. Заказ принимается за 48 часов.",
   },
   "coffee-break": { tint: "#F4DECD", ctaLabel: "Заказать кофе-брейк", ctaHref: "#calculator", cursorLabel: "КОФЕ-БРЕЙК" },
   vegetarian: {
@@ -152,7 +152,7 @@ const META: Record<
     cursorLabel: "ВЕГЕ МЕНЮ",
     // симуляция C59 (Анастасия/жюри-W3): мостик «вегетарианцы на общем банкете»
     hookNote:
-      "Включим вегетарианские позиции и в общий банкет: смешанный состав — это норма.",
+      "Включим вегетарианские позиции и в общий банкет: смешанный состав — это норма.",
   },
   bbq: { tint: "#F3E3E8", ctaLabel: "Рассчитать барбекю", ctaHref: "#calculator", cursorLabel: "БАРБЕКЮ" },
 };
@@ -161,17 +161,17 @@ const FALLBACK_META = {
   tint: "#F5EEE2",
   ctaLabel: "Обсудить меню",
   ctaHref: "#contact",
-  priceLabel: "за гостя",
+  priceLabel: "за гостя",
   cursorLabel: "МЕНЮ",
 };
 
-/** Если у пакета нет фото — показываем проверенный фуршетный кадр. */
+/** Если у пакета нет фото — показываем проверенный фуршетный кадр. */
 const FALLBACK_PHOTO = "/media/furshet-1.jpg";
 
 /** Калькулятор читает ?type=… через nuqs (подхватывает history.replaceState).
- *  c84-C: pkg — активная ступень открытой категории (контракт с блоком
- *  расчёта: nuqs-параметр pkg, как type). c86-E: guests больше не пресетим —
- *  ограничений по количеству гостей нет, калькулятор остаётся на своём
+ *  c84-C: pkg — активная ступень открытой категории (контракт с блоком
+ *  расчёта: nuqs-параметр pkg, как type). c86-E: guests больше не пресетим —
+ *  ограничений по количеству гостей нет, калькулятор остаётся на своём
  *  дефолте (30), юзер двигает слайдер сам. */
 function presetCalculator(typeId: string, pkgIdx?: number) {
   if (typeof window === "undefined") return;
@@ -186,15 +186,15 @@ function presetCalculator(typeId: string, pkgIdx?: number) {
 
 const MENUS: MenuCat[] = MENU_TYPES.map((m) => {
   const meta = META[m.id] ?? FALLBACK_META;
-  return { ...m, ...meta, priceLabel: meta.priceLabel ?? "за гостя" };
+  return { ...m, ...meta, priceLabel: meta.priceLabel ?? "за гостя" };
 });
 
-/** Ступень «от» банкетного каталога — для примера бюджета в приписке (из данных). */
+/** Ступень «от» банкетного каталога — для примера бюджета в приписке (из данных). */
 const banquetPerGuest =
   MENU_TYPES.find((m) => m.id === "banquet")?.perGuest ?? 4470;
 
-/** 1 блюдо / 2–4 блюда / 5+ блюд — для подписи «Ещё N …» у списка
-    и счётчика состава пакета. */
+/** 1 блюдо / 2–4 блюда / 5+ блюд — для подписи «Ещё N …» у списка
+    и счётчика состава пакета. */
 function dishesWord(n: number): string {
   const mod10 = n % 10;
   const mod100 = n % 100;
@@ -205,7 +205,7 @@ function dishesWord(n: number): string {
 
 /* ----------------------------------------------------- hand-drawn check ✎ */
 
-/** SVG-«галочка от руки» — приём из gamma service-section grid. */
+/** SVG-«галочка от руки» — приём из gamma service-section grid. */
 function HandCheck() {
   return (
     <svg
@@ -246,13 +246,13 @@ function MenuRack({
   useEffect(() => setMounted(true), []);
   const reduceSettled = mounted && reduced;
 
-  /* c108 (жалоба владельца «на телефоне фото появляется с опозданием»):
+  /* c108 (жалоба владельца «на телефоне фото появляется с опозданием»):
      фоновый прогрев HTTP-кэша ВСЕХ фото тарифов после idle. Фото лёгкие
-     (90–160KB webp), старт после load+idle с fetchPriority=low — LCP
-     (герой) не конкурирует; к моменту, когда юзер доскроллит до меню
-     или переключит таб/панель, фото уже в кэше → lazy <img> отдаётся
+     (90–160KB webp), старт после load+idle с fetchPriority=low — LCP
+     (герой) не конкурирует; к моменту, когда юзер доскроллит до меню
+     или переключит таб/панель, фото уже в кэше → lazy <img> отдаётся
      мгновенно, без placeholder-паузы. Это мягкая альтернатива «удлинить
-     экран загрузки» — сайт не блокируется, прогрев идёт параллельно. */
+     экран загрузки» — сайт не блокируется, прогрев идёт параллельно. */
   useEffect(() => {
     if (!mounted) return;
     let cancelled = false;
@@ -291,30 +291,30 @@ function MenuRack({
 
   const N = cats.length;
 
-  /** Одна панель открыта (SSR: первая — как в услугах). null = все закрыты. */
+  /** Одна панель открыта (SSR: первая — как в услугах). null = все закрыты. */
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  /** Выбранный пакет на категорию — память не сбрасывается при переключении. */
+  /** Выбранный пакет на категорию — память не сбрасывается при переключении. */
   const [pkgs, setPkgs] = useState<Record<string, number>>({});
 
   /** C61 (жалоба клиента): список, раскрытый кнопкой «Ещё N блюд» на
    *  ПОЛНУЮ высоту: рэк отдаёт фиксированную высоту, панель растёт
    *  естественной, чтение идёт скроллом СТРАНИЦЫ — привычным способом;
-   *  в конце списка — пилюля «Свернуть список». */
+   *  в конце списка — пилюля «Свернуть список». */
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   /* 3-c (жалоба «раздел банкет прыгает при переключении»): таб пакета
-     меняет состав списка — ремоунт по key=pkg.name рвёт внутренний
-     scrollTop и высоту (раскрытый рэк десктопа / мобильная колонка).
+     меняет состав списка — ремоунт по key=pkg.name рвёт внутренний
+     scrollTop и высоту (раскрытый рэк десктопа / мобильная колонка).
      selectPkg фиксирует геометрию ДО ре-рендера; эффект после коммита
-     возвращает позицию скролла и проигрывает плавный переход высоты. */
+     возвращает позицию скролла и проигрывает плавный переход высоты. */
   const pkgSwitchRef = useRef<{
     catId: string;
     rackH: number;
     panelH: number;
     scrollTop: number;
   } | null>(null);
-  /* Зеркало pkgs для selectPkg: клик по уже активному табу не оставляет
-     «мёртвый» замер (иначе поздний пресет анимировался бы от него). */
+  /* Зеркало pkgs для selectPkg: клик по уже активному табу не оставляет
+     «мёртвый» замер (иначе поздний пресет анимировался бы от него). */
   const pkgsRef = useRef<Record<string, number>>({});
 
   /** ≥1024px + fine pointer → hover-intent + параллакс разрешены. */
@@ -398,25 +398,25 @@ function MenuRack({
   useEffect(() => () => window.clearTimeout(scrollTimer.current), []);
 
   /* C60: после КАЖДОГО открытия рэк переверстывается — под неподвижный
-     курсор попадает ДРУГОЙ корешок и hover-intent «угоняет» панель
-     (на 1024 поймано живьём: 5 кликов подряд дергались обратно).
-     700ms тишины после открытия гасят перехват на переверстке */
+     курсор попадает ДРУГОЙ корешок и hover-intent «угоняет» панель
+     (на 1024 поймано живьём: 5 кликов подряд дергались обратно).
+     700ms тишины после открытия гасят перехват на переверстке */
   const suppressHoverUntil = useRef(0);
 
-  /* c84-C: тариф из навигации — дровер шапки шлёт ?pkg=N (pushState + событие
-     "menu:pkg-preset", без перезагрузки) и прямая загрузка /?pkg=N#menu
-     (читаем search на монте). Пресет применяется к ОТКРЫТОЙ категории
-     (рэк стартует с первой) — с клампом под её набор пакетов; если рэк
-     закрыт — сохраняется и применяется при первом открытии категории.
-     Ручной клик по табу снимает пресет: юзер взял управление.
-     (объявлен ДО open(): open применяет пресет к свежераскрытой категории) */
+  /* c84-C: тариф из навигации — дровер шапки шлёт ?pkg=N (pushState + событие
+     "menu:pkg-preset", без перезагрузки) и прямая загрузка /?pkg=N#menu
+     (читаем search на монте). Пресет применяется к ОТКРЫТОЙ категории
+     (рэк стартует с первой) — с клампом под её набор пакетов; если рэк
+     закрыт — сохраняется и применяется при первом открытии категории.
+     Ручной клик по табу снимает пресет: юзер взял управление.
+     (объявлен ДО open(): open применяет пресет к свежераскрытой категории) */
   const presetPkgRef = useRef<number | null>(null);
 
   /** Программный скролл страницы: через Lenis, если он жив (гасит колесную
       инерцию), иначе нативно. reduced-motion → мгновенно. Смещение на
-      sticky-шапку (~96px) УЖЕ учтено в y вызывающим кодом. 3-c: поднят
+      sticky-шапку (~96px) УЖЕ учтено в y вызывающим кодом. 3-c: поднят
       выше open() — схлоп раскрытого рэка при смене категории скроллит
-      верх новой панели в кадр (как collapseList). */
+      верх новой панели в кадр (как collapseList). */
   const scrollPageTo = useCallback(
     (y: number) => {
       const target = Math.max(0, y);
@@ -437,11 +437,11 @@ function MenuRack({
     [reduced],
   );
 
-  /** force=true — явное указание уровня (чип дровера / ?pkg в URL):
-   *  перекрывает и ручной выбор таба в ОТКРЫТОЙ категории — это более
-   *  свежий интент юзера. force=false (переключение категории в open()):
-   *  пресет применяется только если юзер ещё не выбирал таб руками —
-   *  ручной выбор в той категории сохраняется. */
+  /** force=true — явное указание уровня (чип дровера / ?pkg в URL):
+   *  перекрывает и ручной выбор таба в ОТКРЫТОЙ категории — это более
+   *  свежий интент юзера. force=false (переключение категории в open()):
+   *  пресет применяется только если юзер ещё не выбирал таб руками —
+   *  ручной выбор в той категории сохраняется. */
   const applyPresetPkg = useCallback(
     (idx: number | null, force = false) => {
       const n = presetPkgRef.current;
@@ -466,7 +466,7 @@ function MenuRack({
          снимались мгновенно — раздел прыгал вверх на ~700px. Теперь схлоп
          анимируется measured-переходом (шаблон collapseList: замер →
          is-animating → inline height); ширины корешков перетекают
-         параллельно и не конфликтуют — высоту рэка ведёт inline */
+         параллельно и не конфликтуют — высоту рэка ведёт inline */
       const rack = rackRef.current;
       if (rack && expandedId !== null) {
         setExpandedId(null);
@@ -492,13 +492,13 @@ function MenuRack({
             finish();
           };
           rack.addEventListener("transitionend", onEnd);
-          // страховка: transitionend может не прийти (вкладка в фоне и т.п.)
+          // страховка: transitionend может не прийти (вкладка в фоне и т.п.)
           window.setTimeout(() => {
             rack.removeEventListener("transitionend", onEnd);
             finish();
           }, 950);
-          /* верх рэка — в кадр (sticky-шапка ≈96px): после схлопа читатель
-             остаётся у шапки новой панели, а не в пустоте под рэком */
+          /* верх рэка — в кадр (sticky-шапка ≈96px): после схлопа читатель
+             остаётся у шапки новой панели, а не в пустоте под рэком */
           scrollPageTo(
             rack.getBoundingClientRect().top + window.scrollY - 96,
           );
@@ -515,11 +515,11 @@ function MenuRack({
         return;
       }
       setOpenIndex(i);
-      /* c84-C: пресет тарифа (из дровера шапки) применяется и к категории,
-         открытой ПОСЛЕ клика по чипу, — пока юзер не выбрал таб руками
-         (селект в applyPresetPkg не перетирает ручной выбор) */
+      /* c84-C: пресет тарифа (из дровера шапки) применяется и к категории,
+         открытой ПОСЛЕ клика по чипу, — пока юзер не выбрал таб руками
+         (селект в applyPresetPkg не перетирает ручной выбор) */
       applyPresetPkg(i);
-      // Мобильный: скроллим к свежераскрытой панели ПОСЛЕ конца анимации.
+      // Мобильный: скроллим к свежераскрытой панели ПОСЛЕ конца анимации.
       if (
         typeof window !== "undefined" &&
         !window.matchMedia(DESKTOP_MQ).matches &&
@@ -555,7 +555,7 @@ function MenuRack({
   }, []);
   useEffect(() => () => window.clearTimeout(hoverTimer.current), []);
 
-  /* параллакс фото от мыши (spring, как в услугах) -------------------------- */
+  /* параллакс фото от мыши (spring, как в услугах) -------------------------- */
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   const parallaxX = useSpring(px, { stiffness: 140, damping: 22, mass: 0.6 });
@@ -585,7 +585,7 @@ function MenuRack({
     [desktopFine, reduced, px, py],
   );
 
-  /* клавиатура: стрелки в пределах рэка, Home/End --------------------------- */
+  /* клавиатура: стрелки в пределах рэка, Home/End --------------------------- */
   const onRackKeyDown = useCallback(
     (e: ReactKeyboardEvent<HTMLDivElement>) => {
       const idx = Number(
@@ -648,11 +648,11 @@ function MenuRack({
   );
 
   /* c84-C: слушатели пресета тарифа (см. applyPresetPkg выше).
-     c84-F1 (критик M1-D4, MINOR): чипы вели на ШАПКУ #menu — табы
-     оставались на 270–300px ниже фолда («выбор не видно»). Теперь
-     скролл ведёт к ПАНЕЛИ открытой категории (табы в её верхней части);
-     если ни одна не открыта — открываем первую (open() сам проскроллит
-     на мобиле к свежераскрытой панели). */
+     c84-F1 (критик M1-D4, MINOR): чипы вели на ШАПКУ #menu — табы
+     оставались на 270–300px ниже фолда («выбор не видно»). Теперь
+     скролл ведёт к ПАНЕЛИ открытой категории (табы в её верхней части);
+     если ни одна не открыта — открываем первую (open() сам проскроллит
+     на мобиле к свежераскрытой панели). */
   useEffect(() => {
     const onPreset = (e: Event) => {
       const n = (e as CustomEvent<number>).detail;
@@ -712,9 +712,9 @@ function MenuRack({
         scrollToDetails();
         /* Такт 2: коррекция после оседания layout (грабля c80-подобная:
            цель устаревает — таймер после завершения). c84-F3 (критик C,
-           MINOR): гвард «юзер уехал сам» — если за 720мс юзер начал
-           скроллить руками (позиция вне ±140px от нашей посадки), доводка
-           НЕ дёргает его обратно (паттерн гварда — hacc-booking такт-2). */
+           MINOR): гвард «юзер уехал сам» — если за 720мс юзер начал
+           скроллить руками (позиция вне ±140px от нашей посадки), доводка
+           НЕ дёргает его обратно (паттерн гварда — hacc-booking такт-2). */
         window.setTimeout(() => {
           const delta = target.getBoundingClientRect().top - 96;
           if (Math.abs(delta) > 24 && Math.abs(delta) < 140) scrollToDetails();
@@ -735,9 +735,9 @@ function MenuRack({
     applyPresetPkg(openIndexRef.current, true);
   }, [applyPresetPkg]);
 
-  /* c84-C: per-tariff PDF — кнопка в панели категории (активный пакет).
-     Паттерн FIX-4/W1-D: dynamic import по клику (jspdf+pako не в бандле),
-     busy «Готовим PDF…» и честный статус ошибки — как у «Каталог в PDF». */
+  /* c84-C: per-tariff PDF — кнопка в панели категории (активный пакет).
+     Паттерн FIX-4/W1-D: dynamic import по клику (jspdf+pako не в бандле),
+     busy «Готовим PDF…» и честный статус ошибки — как у «Каталог в PDF». */
   const [pkgPdfBusy, setPkgPdfBusy] = useState<string | null>(null);
   const [pkgPdfError, setPkgPdfError] = useState<string | null>(null);
 
@@ -760,8 +760,8 @@ function MenuRack({
   );
 
   /* M1: fade-индикатор «список продолжается» — живой замер скролла открытой
-     панели (перепроверяется при смене пакета/категории и на resize).
-     C60 (жалоба клиента): fade+тонкий скроллбар НЕ читаются на десктопе —
+     панели (перепроверяется при смене пакета/категории и на resize).
+     C60 (жалоба клиента): fade+тонкий скроллбар НЕ читаются на десктопе —
      добавлен явный счётчик скрытых блюд (кнопка «Ещё N блюд»),
      пересчитывается live при скролле/resize/смене пакета ------------------- */
   const listRefs = useRef<(HTMLUListElement | null)[]>([]);
@@ -780,10 +780,10 @@ function MenuRack({
       setScrollable((prev) =>
         prev[cat.id] === can ? prev : { ...prev, [cat.id]: can },
       );
-      /* сколько блюд ещё НЕ ПРОЧИТАНО целиком: строка считается скрытой,
+      /* сколько блюд ещё НЕ ПРОЧИТАНО целиком: строка считается скрытой,
          пока её низ ниже нижней кромки списка. Такое правило сходится
-         ровно в ноль В МОМЕНТ доскролла до дна (паддинг гарантирует,
-         что у дна последняя строка видна целиком) — кнопка не может
+         ровно в ноль В МОМЕНТ доскролла до дна (паддинг гарантирует,
+         что у дна последняя строка видна целиком) — кнопка не может
          погаснуть, пока что-то срезано (волна-2, аудитор-блокер) */
       const bottom = el.getBoundingClientRect().bottom;
       let n = 0;
@@ -793,12 +793,12 @@ function MenuRack({
       setHiddenCount((prev) =>
         prev[cat.id] === n ? prev : { ...prev, [cat.id]: n },
       );
-      /* C60 (аудитор-блокер): на первом визите куки-баннер (fixed, низ,
-         ~77px) ложится НА кнопку-счётчик и перехватывает её клики.
-         Если позиция покоя кнопки пересекает полосу баннера И кнопка ещё
+      /* C60 (аудитор-блокер): на первом визите куки-баннер (fixed, низ,
+         ~77px) ложится НА кнопку-счётчик и перехватывает её клики.
+         Если позиция покоя кнопки пересекает полосу баннера И кнопка ещё
          видима — прижимаем её ПОВЕРХ верхней кромки баннера (sticky- effect),
-         с клампом внутрь обёртки списка. Волна-3: условие «низ списка на
-         экране» оставляло мёртвую зону, когда низ списка уже уехал за сгиб */
+         с клампом внутрь обёртки списка. Волна-3: условие «низ списка на
+         экране» оставляло мёртвую зону, когда низ списка уже уехал за сгиб */
       const wrap = el.closest(".hmenu__listwrap");
       if (wrap instanceof HTMLElement) {
         const banner = document.querySelector('[data-component="ea-cookie-banner"]');
@@ -821,8 +821,8 @@ function MenuRack({
     };
     check();
     /* C61/волна-1 (QA): после смены пакета список ремоунтится (key=pkg.name):
-       ul приобретает финальный размер сразу, а ОБЁРТКА (listwrap) дозжимается
-       позже — ResizeObserver на ul больше НЕ срабатывает, и check() мог
+       ul приобретает финальный размер сразу, а ОБЁРТКА (listwrap) дозжимается
+       позже — ResizeObserver на ul больше НЕ срабатывает, и check() мог
        зафиксировать устаревший scrollHeight>clientHeight → пилюля «Ещё N»
        врёт (видна при полностью видимом списке). Лечится наблюдением за
        обёрткой + контрольными перепроверками после кадра — состояние
@@ -837,14 +837,14 @@ function MenuRack({
     el.addEventListener("scroll", onScroll, { passive: true });
     /* C60/волна-3 (аудитор): скролл СТРАНИЦЫ тоже меняет положение кнопки
        относительно куки-баннера — без этого слушателя lift был бы
-       устаревшим и кнопка могла бы лечь ПОД баннер (видима, некликабельна) */
+       устаревшим и кнопка могла бы лечь ПОД баннер (видима, некликабельна) */
     window.addEventListener("scroll", onScroll, { passive: true });
     const ro = new ResizeObserver(check);
     ro.observe(el);
     window.addEventListener("resize", check);
-    /* C61: куки-баннер закрыли — events нет (скролла не было), а lift уже
+    /* C61: куки-баннер закрыли — events нет (скролла не было), а lift уже
        выставлен: без MutationObserver кнопка остаётся поднятой над обёрткой
-       и уходит под overflow:clip (невидима и некликабельна навсегда) */
+       и уходит под overflow:clip (невидима и некликабельна навсегда) */
     const mo = new MutationObserver(() => {
       if (!raf) raf = window.requestAnimationFrame(check);
     });
@@ -861,23 +861,23 @@ function MenuRack({
     };
   }, [openIndex, pkgs, cats, expandedId]);
 
-  /* клик по «Ещё N блюд»: C61 (жалоба клиента) — список раскрывается на
+  /* клик по «Ещё N блюд»: C61 (жалоба клиента) — список раскрывается на
      ПОЛНУЮ высоту: рэк отдаёт clamp-высоту, панель растёт естественной,
-     и дочитывать меню можно СКРОЛЛОМ СТРАНИЦЫ (привычным способом),
-     а не невидимым скроллом внутри окна. Ровно это чинит «непонятно
+     и дочитывать меню можно СКРОЛЛОМ СТРАНИЦЫ (привычным способом),
+     а не невидимым скроллом внутри окна. Ровно это чинит «непонятно
      как скроллить после этого вверх, чтобы прочитать целиком»:
-     вверх скроллит сама страница. В конце списка — пилюля «Свернуть». */
+     вверх скроллит сама страница. В конце списка — пилюля «Свернуть». */
   /* C61/волна-1 (QA): последовательный номер анимации рэка — отменяет
      отложенные done()-колбэки предыдущей анимации (иначе таймер страховки
-     прерванного схлопа убивал новое раскрытие на 950-м миллисекунде) */
+     прерванного схлопа убивал новое раскрытие на 950-м миллисекунде) */
   /* 3-c/A+B+D: смена пакета — плавные переходы вместо прыжков -------------
      Ремоунт списка (key=pkg.name, кроссфейд C59) сбрасывает внутренний
-     scrollTop в 0 и мгновенно меняет высоту панели (раскрытый рэк десктопа
-     и мобильная колонка держат списки разной длины). selectPkg зафиксировал
-     геометрию ДО ре-рендера; здесь возвращаем позицию скролла и уводим её
-     наверх (A), а высоту ведём measured-переходом по шаблону expandList
-     (B — рэк, D — grid-строка панели на мобильном, где inline на рэке
-     переполнился бы за его границы). */
+     scrollTop в 0 и мгновенно меняет высоту панели (раскрытый рэк десктопа
+     и мобильная колонка держат списки разной длины). selectPkg зафиксировал
+     геометрию ДО ре-рендера; здесь возвращаем позицию скролла и уводим её
+     наверх (A), а высоту ведём measured-переходом по шаблону expandList
+     (B — рэк, D — grid-строка панели на мобильном, где inline на рэке
+     переполнился бы за его границы). */
   useEffect(() => {
     pkgsRef.current = pkgs;
     const cap = pkgSwitchRef.current;
@@ -969,9 +969,9 @@ function MenuRack({
         rack.style.height = "";
       }
       /* ВАЖНО: все замеры — ДО смены классов, иначе clientHeight/scrollHeight
-         уже пересчитаны под auto-высоту и deficit == 0. Паддинг-компенсацию
-         (3.2rem под кнопку-счётчик) вычитаем: вместе с is-scrollable она
-         снимется, и без вычета рэк получит лишние ~51px воздуха в конце */
+         уже пересчитаны под auto-высоту и deficit == 0. Паддинг-компенсацию
+         (3.2rem под кнопку-счётчик) вычитаем: вместе с is-scrollable она
+         снимется, и без вычета рэк получит лишние ~51px воздуха в конце */
       const fromH = rack.clientHeight;
       const preListClient = list.clientHeight;
       const padBottom =
@@ -995,8 +995,8 @@ function MenuRack({
         return;
       }
 
-      /* жюри-волна-1: после раскрытия читатель должен оказаться на ПЕРВОЙ
-         из скрытых строк — скроллим страницу к линии прежнего сгиба */
+      /* жюри-волна-1: после раскрытия читатель должен оказаться на ПЕРВОЙ
+         из скрытых строк — скроллим страницу к линии прежнего сгиба */
       scrollPageTo(
         list.getBoundingClientRect().top + window.scrollY + preListClient - 96,
       );
@@ -1007,7 +1007,7 @@ function MenuRack({
       rack.style.height = `${fromH + deficit}px`;
       const done = () => finish();
       rack.addEventListener("transitionend", done, { once: true });
-      // страховка: transitionend может не прийти (вкладка в фоне и т.п.)
+      // страховка: transitionend может не прийти (вкладка в фоне и т.п.)
       window.setTimeout(done, 950);
     },
     [reduced, scrollPageTo],
@@ -1019,7 +1019,7 @@ function MenuRack({
       if (!rack) return;
       const item = itemRefs.current[k];
       /* QA-волна-1: если пилюля в фокусе, после размонтирования фокус упадёт
-         в <body> (Tab начнёт со страницы). Заранее переводим фокус на
+         в <body> (Tab начнёт со страницы). Заранее переводим фокус на
          корешок открытой панели — стабильная точка возврата */
       const pillFocused =
         document.activeElement?.closest(".hmenu__collapse") != null;
@@ -1043,18 +1043,18 @@ function MenuRack({
         return;
       }
 
-      /* порядок критичен: curH — при снятой inline-высоте и ЖИВОМ
+      /* порядок критичен: curH — при снятой inline-высоте и ЖИВОМ
          is-expanded; targetH — после снятия is-expanded (clamp из
-         стилей), но ещё БЕЗ inline px (иначе замер вернёт inline) */
+         стилей), но ещё БЕЗ inline px (иначе замер вернёт inline) */
       const curH = rack.getBoundingClientRect().height;
       rack.classList.add("is-animating");
       rack.classList.remove("is-expanded");
-      const targetH = rack.clientHeight; // clamp из стилей
+      const targetH = rack.clientHeight; // clamp из стилей
       rack.style.height = `${curH}px`; // визуально без change (rendered = curH)
       void rack.offsetHeight;
       rack.style.height = `${targetH}px`;
-      // верх панели — в кадр (sticky header ≈ 96px); позиция панели в
-      // документе при схлопе не меняется — контент выше неё статичен
+      // верх панели — в кадр (sticky header ≈ 96px); позиция панели в
+      // документе при схлопе не меняется — контент выше неё статичен
       scrollPageTo(item.getBoundingClientRect().top + window.scrollY - 96);
       const done = () => finish();
       rack.addEventListener("transitionend", done, { once: true });
@@ -1084,10 +1084,10 @@ function MenuRack({
   const panelId = (i: number) => `${baseId}-panel-${cats[i].id}`;
   const spineId = (i: number) => `${baseId}-spine-${cats[i].id}`;
 
-  /* entrance-каскад корешков (как в услугах) -------------------------------- */
+  /* entrance-каскад корешков (как в услугах) -------------------------------- */
   /* c83-F2 (V1b RM): под reduce варианты остаются ОПРЕДЕЛЁННЫМИ (нулевая
      длительность) + рэк получает animate="show" — прежде снятие
-     whileInView оставляло залитый в SSR initial opacity:0 навсегда
+     whileInView оставляло залитый в SSR initial opacity:0 навсегда
      (замер: каталоги/корешки невидимы под prefers-reduced-motion). */
   const rackVariants = reduceSettled
     ? { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0 } } }
@@ -1118,7 +1118,7 @@ function MenuRack({
       aria-label="Каталоги меню — направления кейтеринга"
       initial={reduceSettled ? false : "hidden"}
       whileInView={reduceSettled ? undefined : "show"}
-      /* c83-F2: под reduce финал через animate (duration 0), а не через
+      /* c83-F2: под reduce финал через animate (duration 0), а не через
          снятие whileInView — иначе залипание SSR-initial. */
       animate={reduceSettled ? "show" : undefined}
       viewport={{ once: true, margin: "-60px" }}
@@ -1174,12 +1174,12 @@ function MenuRack({
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights);
                     transition корешка — width (transform свободен). */
                 data-press
-                /* W2-FIX (ВАУ-фича курсора): на каждом корешке каталога —
-                   превью-фото выбранного пакета (120px карточка у курсора,
-                   cursor.tsx читает data-cursor-image с ближайшего
-                   интерактива; атрибут на самой кнопке = closest(button)).
+                /* W2-FIX (ВАУ-фича курсора): на каждом корешке каталога —
+                   превью-фото выбранного пакета (120px карточка у курсора,
+                   cursor.tsx читает data-cursor-image с ближайшего
+                   интерактива; атрибут на самой кнопке = closest(button)).
                    Бейдж-лейбл — data-cursor (1–2 слова капсом). Пока панель
-                   закрыта — превью фото пакета; открытая панель и так
+                   закрыта — превью фото пакета; открытая панель и так
                    показывает это фото крупно (undefined → без превью). */
                 data-cursor={cat.cursorLabel}
                 data-cursor-image={
@@ -1207,11 +1207,11 @@ function MenuRack({
                     (сигнатурный момент жюри C59; ноль сдвигов layout) */}
                 {!isOpen && cat.packages[pkgIdx]?.photo ? (
                   <span className="hmenu__spine-peek" aria-hidden="true">
-                    {/* сырой <img>: next/image с sizes=64px отдавал вариант
-                        64px шириной, который растягивался в полосу 54×648
-                        (10–15× апскейл — «каша» на самой кликаемой рейке).
-                        Декоративный слой за hover — оригинал даёт резкость,
-                        файлы панели и так загружены */}
+                    {/* сырой <img>: next/image с sizes=64px отдавал вариант
+                        64px шириной, который растягивался в полосу 54×648
+                        (10–15× апскейл — «каша» на самой кликаемой рейке).
+                        Декоративный слой за hover — оригинал даёт резкость,
+                        файлы панели и так загружены */}
                     <img
                       src={cat.packages[pkgIdx].photo as string}
                       alt=""
@@ -1278,42 +1278,43 @@ function MenuRack({
                              100vw/38vw — реальный слот фото ~92vw мобайл
                              (323px фигура + 24px parallax-bleed @390) и
                              ~32vw десктоп (427px + bleed @1440); 38vw
-                             пере-декларировал → лишние байты, а на узких
+                             пере-декларировал → лишние байты, а на узких
                              десктопах 100vw-мобайл недобирал. Теперь
-                             браузер на DPR2 просит w=750 (как в ТЗ) /
-                             w=1080; лимит — ширина ИСХОДНИКА (у c60/c61
+                             браузер на DPR2 просит w=750 (как в ТЗ) /
+                             w=1080; лимит — ширина ИСХОДНИКА (у c60/c61
                              1200–1920px всё покрыто; furshet-1.jpg
                              524×700 — оптимизатор честно капает до 524,
                              retina-запас 0.81× — ограничение источника,
-                             не sizes). */
+                             не sizes). */
                           sizes="(max-width: 1023px) 92vw, 32vw"
                           /* C71-P1 (K8 MAJOR, Task 4): было
                              loading={isOpen ? "eager" : "lazy"} —
                              default-open категория сериализовала
-                             loading="eager" в SSR и тянула ниже-фолдное
-                             фото в первых ~500ms (конкуренция с LCP, K8).
-                             lazy остаётся; НО c108 (жалоба владельца
-                             «фотка появляется с опозданием»): приоритет
+                             loading="eager" в SSR и тянула ниже-фолдное
+                             фото в первых ~500ms (конкуренция с LCP, K8).
+                             lazy остаётся; НО c108 (жалоба владельца
+                             «фотка появляется с опозданием»): приоритет
                              динамический — закрытым панелям low, открытой
                              high (атрибут живой: браузер применяет его
-                             к ещё не начавшейся загрузке при входе
-                             панели в вьюпорт). Плюс фоновый прогрев кэша
+                             к ещё не начавшейся загрузке при входе
+                             панели в вьюпорт). Плюс фоновый прогрев кэша
                              всех фото после idle (см. эффект ниже) —
-                             к моменту скролла фото уже в кэше. */
+                             к моменту скролла фото уже в кэше. */
                           loading="lazy"
                           fetchPriority={isOpen ? "high" : "low"}
                           /* c107: фото конвейера blend (фон = тинт панели) —
                              без CSS-фильтра: saturate/contrast сдвигает тинт
-                             краёв и раскрывает прямоугольную границу фото
-                             (см. .hmenu__img--blend в hacc-menu.css).
-                             c108–c111: конвейер переехал в /media/c108 →
-                             c111 — префиксы всех поколений. */
+                             краёв и раскрывает прямоугольную границу фото
+                             (см. .hmenu__img--blend в hacc-menu.css).
+                             c108–c112: конвейер переехал в /media/c108 →
+                             c112 — префиксы всех поколений. */
                           className={
                             pkg.photo?.startsWith("/media/c107") ||
                               pkg.photo?.startsWith("/media/c108") ||
                               pkg.photo?.startsWith("/media/c109") ||
                               pkg.photo?.startsWith("/media/c110") ||
-                              pkg.photo?.startsWith("/media/c111")
+                              pkg.photo?.startsWith("/media/c111") ||
+                              pkg.photo?.startsWith("/media/c112")
                               ? "hmenu__img hmenu__img--blend"
                               : "hmenu__img"
                           }
@@ -1331,7 +1332,7 @@ function MenuRack({
                         «цена за гостя» рядом с именами пакетов — числа
                         в табах читаются без вопросов */}
                     <p className="hmenu__tabs-label">
-                      Уровень меню — цена за гостя:
+                      Уровень меню — цена за гостя:
                     </p>
 
                     {/* табы пакетов */}
@@ -1347,7 +1348,7 @@ function MenuRack({
                           type="button"
                           role="tab"
                           id={`${baseId}-pkg-${cat.id}-${pi}`}
-                          /* W2-FIX: строка меню с фото — превью пакета у
+                          /* W2-FIX: строка меню с фото — превью пакета у
                              курсора (см. spine выше), бейдж = имя ступени
                              (скобочные уточнения срезаем — бейдж 1–2 слова) */
                           data-cursor={p.name.split(" (")[0].toUpperCase()}
@@ -1404,7 +1405,7 @@ function MenuRack({
                           role="status"
                           aria-live="polite"
                         >
-                          Не удалось собрать PDF — попробуйте ещё раз.
+                          Не удалось собрать PDF — попробуйте ещё раз.
                         </span>
                       ) : null}
                     </div>
@@ -1467,15 +1468,15 @@ function MenuRack({
                                 },
                               }}
                               /* c83-C: hover-глисс — строка блюда при hover
-                                 мягко съезжает вправо на 6px (паттерн
+                                 мягко съезжает вправо на 6px (паттерн
                                  ea-faq-accordion, transform-only,
-                                 [0.22,1,0.36,1], снимается на leave).
-                                 Гейты: reduced-motion и coarse-pointer
-                                 (desktopFine = ≥1024px + fine) — на таче
-                                 и скролле жеста нет. Золотая hairline снизу
-                                 — чистый CSS ::after в hacc-menu.css.
-                                 Кроссфейд-remount списка и стаггер
-                                 вариантов не затронуты. */
+                                 [0.22,1,0.36,1], снимается на leave).
+                                 Гейты: reduced-motion и coarse-pointer
+                                 (desktopFine = ≥1024px + fine) — на таче
+                                 и скролле жеста нет. Золотая hairline снизу
+                                 — чистый CSS ::after в hacc-menu.css.
+                                 Кроссфейд-remount списка и стаггер
+                                 вариантов не затронуты. */
                               whileHover={
                                 reduced || !desktopFine
                                   ? undefined
@@ -1506,7 +1507,7 @@ function MenuRack({
                             className="hmenu__scrollcue"
                             data-testid={`hmenu-scrollcue-${cat.id}`}
                             onClick={() => expandList(cat.id, k)}
-                            aria-label={`Раскрыть весь список — ещё ${hiddenCount[cat.id]} ${dishesWord(hiddenCount[cat.id])} из пакета «${pkg.name}»`}
+                            aria-label={`Раскрыть весь список — ещё ${hiddenCount[cat.id]} ${dishesWord(hiddenCount[cat.id])} из пакета «${pkg.name}»`}
                           >
                             <span aria-hidden="true">
                               Ещё {hiddenCount[cat.id]} {dishesWord(hiddenCount[cat.id])}
@@ -1524,7 +1525,7 @@ function MenuRack({
                           className="hmenu__collapse"
                           data-testid={`hmenu-collapse-${cat.id}`}
                           onClick={() => collapseList(k)}
-                          aria-label="Свернуть список — вернуться к компактному виду"
+                          aria-label="Свернуть список — вернуться к компактному виду"
                         >
                           <ChevronUp aria-hidden="true" />
                           <span>Свернуть список</span>
@@ -1534,7 +1535,7 @@ function MenuRack({
 
                     {/* «включено» — галочки от руки, gamma-style */}
                     <div className="hmenu__incl">
-                      <p className="hmenu__incl-label">В любой пакет входит</p>
+                      <p className="hmenu__incl-label">В любой пакет входит</p>
                       <ul className="hmenu__incl-grid">
                         {cat.included.map((inc) => (
                           <li key={inc} className="hmenu__incl-item">
@@ -1592,11 +1593,11 @@ export function HaccMenu() {
   const [headMounted, setHeadMounted] = useState(false);
   useEffect(() => setHeadMounted(true), []);
   const headReduceSettled = headMounted && prefersReduced;
-  /** Скачивание PDF-каталога — единственная ссылка, в шапке секции. */
+  /** Скачивание PDF-каталога — единственная ссылка, в шапке секции. */
   const [pdfBusy, setPdfBusy] = useState(false);
   /** m3: честный статус ошибки — молча падать нельзя (проверка критика). */
   const [pdfError, setPdfError] = useState(false);
-  /** Открытая категория — ведёт ambient wash (как focus-модель в услугах). */
+  /** Открытая категория — ведёт ambient wash (как focus-модель в услугах). */
   const [activeIdx, setActiveIdx] = useState<number | null>(0);
   const handleOpenChange = useCallback((i: number | null) => setActiveIdx(i), []);
 
@@ -1682,8 +1683,8 @@ export function HaccMenu() {
               </i>
             </h2>
             <p className="hmenu__lede">
-              От канапе до мангала. Раскройте каталог: пакеты, состав блюд
-              и цена за гостя.
+              От канапе до мангала. Раскройте каталог: пакеты, состав блюд
+              и цена за гостя.
             </p>
           </div>
           <div className="hmenu__meta">
@@ -1693,7 +1694,7 @@ export function HaccMenu() {
               role="status"
             >
               {pdfError
-                ? "Не удалось собрать PDF — попробуйте ещё раз."
+                ? "Не удалось собрать PDF — попробуйте ещё раз."
                 : ""}
             </span>
             <button
@@ -1703,11 +1704,11 @@ export function HaccMenu() {
               disabled={pdfBusy}
             >
               <Download aria-hidden="true" />
-              {pdfBusy ? "Готовим PDF…" : "Каталог в PDF"}
+              {pdfBusy ? "Готовим PDF…" : "Каталог в PDF"}
             </button>
             <span className="hmenu__hint" aria-hidden="true">
               <MousePointer2 aria-hidden="true" />
-              Наведите на каталог — он развернётся
+              Наведите на каталог — он развернётся
             </span>
           </div>
         </motion.div>
@@ -1718,7 +1719,7 @@ export function HaccMenu() {
           буквы, как сургучная печать на краю каталога) */}
       <div className="ea-container ea-container--wide">
         <p className="hmenu__rack-label">
-          <span>Каталоги — от канапе до мангала</span>
+          <span>Каталоги — от канапе до мангала</span>
           <img
             src="/brand/emblem-black-480.png"
             alt=""
@@ -1744,7 +1745,7 @@ export function HaccMenu() {
       <div className="ea-container ea-container--wide">
         <p className="hmenu__morecue" data-testid="hmenu-morecue">
           <ChevronDown aria-hidden="true" />
-          <span>Ниже — ещё форматы и смета-калькулятор</span>
+          <span>Ниже — ещё форматы и смета-калькулятор</span>
         </p>
       </div>
 
@@ -1759,11 +1760,11 @@ export function HaccMenu() {
           {/* c105 (аудит-В P2): «от» связано с суммой неразрывным
               пробелом — на узких экранах предлог не повисает строкой
               над ценой. */}
-          Цены — за одного гостя. Ориентир: банкет на 40 гостей —
+          Цены — за одного гостя. Ориентир: банкет на 40 гостей —
           от&nbsp;{formatRUB(40 * banquetPerGuest)}.
-          Алкоголь, аренда площадки и музыка — отдельными строками по
+          Алкоголь, аренда площадки и музыка — отдельными строками по
           запросу. Состав любого пакета пересобираем под ваше событие:
-          заменить блюдо или смешать уровни — нормальная практика.
+          заменить блюдо или смешать уровни — нормальная практика.
         </p>
       </div>
 
@@ -1788,7 +1789,7 @@ export function HaccMenu() {
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
             <div>
               <h3 className="tott-script-ru origin-left -rotate-3 text-[length:clamp(1.8rem,2.6vw,2.75rem)] leading-[1.08] text-[color:var(--hmenu-ink)]">
-                Не нашли нужное?
+                Не нашли нужное?
               </h3>
               <span
                 className="mt-2 block h-[3px] w-14 rounded-full bg-gold"
@@ -1796,7 +1797,7 @@ export function HaccMenu() {
               />
               <p className="hmenu__lede">
                 Составим меню специально под ваше событие — под бюджет, кухню
-                и повод.
+                и повод.
               </p>
             </div>
             <Magnetic className="hmenu__cta-wrap" strength={0.17}>

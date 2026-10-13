@@ -39,7 +39,7 @@ export type MenuType = {
   // c86: ограничений по числу гостей нет — поле остаётся для совместимости,
   // у всех типов единица (владелец: «могут заказать хоть от одного человека»)
   minGuests: number;
-  priceUnit?: string; // "/чел" (default) | "за набор"
+  priceUnit?: string; // "/чел" (default) | "за набор"
   description: string;
   packages: MenuPackage[];
   included: string[]; // what's included in all packages
@@ -61,7 +61,7 @@ export type Addon = {
 };
 
 /** c95: плитка услуги главы «Каталог услуг» (hacc-services) — цена берётся
- *  из menu.json по id плитки (компонент больше не хардкодит строки цен). */
+ *  из menu.json по id плитки (компонент больше не хардкодит строки цен). */
 export type ServicePanel = {
   id: string;
   /** Заголовок плитки («Свадьбы», «Корпоратив», …). */
@@ -70,29 +70,29 @@ export type ServicePanel = {
   priceLabel: string;
 };
 
-/** c95: форматы меню из src/data/menu.json (порядок = порядок JSON —
- *  pkgIdx калькулятора адресует packages по индексу). */
+/** c95: форматы меню из src/data/menu.json (порядок = порядок JSON —
+ *  pkgIdx калькулятора адресует packages по индексу). */
 export const MENU_TYPES = menuData.menuTypes as MenuType[];
 
-/** c95: допуслуги из menu.json — equipment/furniture процентом от подытога
+/** c95: допуслуги из menu.json — equipment/furniture процентом от подытога
  *  меню, chef/show/bar/floristics фикс-минимумом «от» (см. addonAmount). */
 export const ADDONS = menuData.addons as Addon[];
 
 /**
- * c89: минимальные суммы заказа по форматам (владелец):
+ * c89: минимальные суммы заказа по форматам (владелец):
  * фуршет/банкет/вегетарианское/барбекю — 85 000 ₽, кофе-брейк — 50 000 ₽,
- * доставка закусок — 17 400 ₽ (заказ минимум за 48 часов). В калькуляторе
- * чек не может опуститься ниже минимума формата (см. calcTotal).
+ * доставка закусок — 17 400 ₽ (заказ минимум за 48 часов). В калькуляторе
+ * чек не может опуститься ниже минимума формата (см. calcTotal).
  */
 export const MIN_ORDER = menuData.minOrder as Record<string, number>;
 
-/** c95: цены плиток «Каталога услуг» — из menu.json (servicePanels),
- *  мэтчинг по id плитки; единая точка правды с калькулятором и каталогом. */
+/** c95: цены плиток «Каталога услуг» — из menu.json (servicePanels),
+ *  мэтчинг по id плитки; единая точка правды с калькулятором и каталогом. */
 export const SERVICE_PANELS = menuData.servicePanels as ServicePanel[];
 
-/** c94: сумма допуслуги для текущего подытога меню. Процентные (аренда)
- *  считаются от подытога и растут вместе с событием, фиксированные — их
- *  минимум «от». ЕДИНАЯ точка правды для карточек, чека, лида и calcTotal
+/** c94: сумма допуслуги для текущего подытога меню. Процентные (аренда)
+ *  считаются от подытога и растут вместе с событием, фиксированные — их
+ *  минимум «от». ЕДИНАЯ точка правды для карточек, чека, лида и calcTotal
  *  (split-brain цен запрещён — урок c89 W1). */
 export function addonAmount(a: Addon, menuSubtotal: number): number {
   return a.percent != null
@@ -100,9 +100,9 @@ export function addonAmount(a: Addon, menuSubtotal: number): number {
     : (a.price ?? 0);
 }
 
-/** c94: допуслуга одной строкой для лида/сводки шага 2 —
- *  «Аренда мебели (+20% ≈ 88 000 ₽)» / «Выезд шеф-повара (от 28 000 ₽)»:
- *  менеджер видит базу расчёта, а не голый список названий. */
+/** c94: допуслуга одной строкой для лида/сводки шага 2 —
+ *  «Аренда мебели (+20% ≈ 88 000 ₽)» / «Выезд шеф-повара (от 28 000 ₽)»:
+ *  менеджер видит базу расчёта, а не голый список названий. */
 export function addonNote(a: Addon, menuSubtotal: number): string {
   return a.percent != null
     ? `${a.label} (+${a.percent}% ≈ ${formatRUB(addonAmount(a, menuSubtotal))})`
@@ -110,9 +110,9 @@ export function addonNote(a: Addon, menuSubtotal: number): string {
 }
 
 /**
- * c89: сезонный коэффициент ×1,15 УДАЛЁН по указанию владельца
+ * c89: сезонный коэффициент ×1,15 УДАЛЁН по указанию владельца
  * («Сезонный коэффициент вообще убрать»). seasonMultiplier оставлен как
- * no-op-заглушка, чтобы старые импорты не роняли сборку; calcTotal всегда
+ * no-op-заглушка, чтобы старые импорты не роняли сборку; calcTotal всегда
  * считает без надбавки.
  */
 export function seasonMultiplier(_dateStr: string): number {
@@ -120,16 +120,16 @@ export function seasonMultiplier(_dateStr: string): number {
 }
 
 /**
- * c84-B (задача 1): pkgIdx — 0-based индекс пакета в packages выбранного
+ * c84-B (задача 1): pkgIdx — 0-based индекс пакета в packages выбранного
  * типа. Опционален: без него (все прежние вызовы) = min-пакет (packages[0]
- * == t.perGuest во всех данных). Индекс клампится в валидный диапазон —
- * URL-мусор (?pkg=-3, ?pkg=99) не роняет расчёт. perGuest в ответе — цена
+ * == t.perGuest во всех данных). Индекс клампится в валидный диапазон —
+ * URL-мусор (?pkg=-3, ?pkg=99) не роняет расчёт. perGuest в ответе — цена
  * ВЫБРАННОГО пакета (чек/строка «N гостей × X ₽» печатает её же);
- * pkgName — для чека и текста лида (null быть не может — packages всегда
- * непустые, но тип поля честный optional для будущих типов без пакетов).
- * c89: для snack-box калькулятор игнорирует пакеты (единая цена
- * t.calcPerGuest) и применяет MIN_ORDER — total не ниже минимума формата,
- * ниже минимума чек печатает строку «Минимальный заказ» с недостающей
+ * pkgName — для чека и текста лида (null быть не может — packages всегда
+ * непустые, но тип поля честный optional для будущих типов без пакетов).
+ * c89: для snack-box калькулятор игнорирует пакеты (единая цена
+ * t.calcPerGuest) и применяет MIN_ORDER — total не ниже минимума формата,
+ * ниже минимума чек печатает строку «Минимальный заказ» с недостающей
  * суммой (доставка закусок — честный «докрут» до 17 400 ₽).
  */
 export function calcTotal(
@@ -149,13 +149,13 @@ export function calcTotal(
   belowMinBy: number;
 } {
   const t = MENU_TYPES.find((m) => m.id === typeId) ?? MENU_TYPES[0];
-  /* c86: минимумов гостей больше нет — расчёт от фактического числа
-     (защита только от мусора: как минимум один гость, максимум —
+  /* c86: минимумов гостей больше нет — расчёт от фактического числа
+     (защита только от мусора: как минимум один гость, максимум —
      верхняя граница шкалы ×2). */
   const g = Number.isFinite(guests)
     ? Math.min(999, Math.max(1, Math.trunc(guests)))
     : 1;
-  /* c89: snack-box в калькуляторе — без выбора пакета, единая цена. */
+  /* c89: snack-box в калькуляторе — без выбора пакета, единая цена. */
   const flat = t.calcPerGuest != null;
   const clampedIdx = Number.isFinite(pkgIdx)
     ? Math.max(0, Math.min(Math.trunc(pkgIdx), t.packages.length - 1))
@@ -163,7 +163,7 @@ export function calcTotal(
   const pkg = flat ? undefined : t.packages[clampedIdx];
   const perGuest = flat ? (t.calcPerGuest as number) : pkg ? pkg.pricePerGuest : t.perGuest;
   const subtotal = perGuest * g;
-  /* c94: аренда — процент от подытога меню (addonAmount), фикс-услуги —
+  /* c94: аренда — процент от подытога меню (addonAmount), фикс-услуги —
      минимум «от»; итог по-прежнему клампится снизу MIN_ORDER. */
   const addonsTotal = ADDONS.filter((a) => addonIds.includes(a.id)).reduce(
     (s, a) => s + addonAmount(a, subtotal),
@@ -171,7 +171,7 @@ export function calcTotal(
   );
   const season = seasonMultiplier(dateStr);
   const raw = subtotal + addonsTotal;
-  /* c89: минимальный заказ формата — чек не ниже минимума (доставка
+  /* c89: минимальный заказ формата — чек не ниже минимума (доставка
      закусок 17 400 ₽; банкетные форматы 85 000 ₽; кофе-брейк 50 000 ₽). */
   const minOrder = MIN_ORDER[t.id] ?? 0;
   const total = Math.max(Math.round(raw), minOrder);
@@ -197,11 +197,11 @@ export function formatRUB(n: number): string {
 }
 
 /**
- * c95 (Task 1-a): ценовые фрагменты для меты layout.tsx — «от 1 200 ₽ /
- * 900 ₽ / 2 450 ₽ / 4 470 ₽» в description и JSON-LD собираются из menu.json
- * (те же поля, что печатает калькулятор: snack-box — calcPerGuest,
- * остальные — perGuest). НЕ formatRUB: историческая мета набрана
- * ОБЫЧНЫМИ пробелами (не NBSP) — байт-идентичный вывод обязательный
+ * c95 (Task 1-a): ценовые фрагменты для меты layout.tsx — «от 1 200 ₽ /
+ * 900 ₽ / 2 450 ₽ / 4 470 ₽» в description и JSON-LD собираются из menu.json
+ * (те же поля, что печатает калькулятор: snack-box — calcPerGuest,
+ * остальные — perGuest). НЕ formatRUB: историческая мета набрана
+ * ОБЫЧНЫМИ пробелами (не NBSP) — байт-идентичный вывод обязательный
  * гейт этой задачи. Источник значений — ЕДИНЫЙ menu.json.
  */
 export function metaPriceFragments(): {
@@ -216,7 +216,7 @@ export function metaPriceFragments(): {
   const byId = (id: string): MenuType => {
     const t = MENU_TYPES.find((m) => m.id === id);
     if (!t) {
-      throw new Error(`metaPriceFragments: формат «${id}» не найден в menu.json`);
+      throw new Error(`metaPriceFragments: формат «${id}» не найден в menu.json`);
     }
     return t;
   };

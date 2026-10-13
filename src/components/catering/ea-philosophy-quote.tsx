@@ -121,12 +121,12 @@ export function EaPhilosophyQuote() {
               color: "color-mix(in oklab, var(--ea-cream) 95%, transparent)",
             }}
           >
-            Еда — это не логистика. Это{" "}
+            Еда — это не логистика. Это{" "}
             <i className="italic" style={{ color: "var(--ea-red)" }}>
               ритуал
             </i>
-            . От первого ножа до последнего бокала — каждый момент служит
-            одному: чтобы гости запомнили этот вечер на всю жизнь.
+            . От первого ножа до последнего бокала — каждый момент служит
+            одному: чтобы гости запомнили этот вечер на всю жизнь.
           </blockquote>
 
           {/* Red 2px × 64px horizontal divider — EA's signature closing

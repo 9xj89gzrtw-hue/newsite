@@ -83,7 +83,7 @@ export function CepSimpleBrilliant() {
   return (
     <section
       data-header-theme="dark"
-      aria-label="Просто и блестяще"
+      aria-label="Просто и блестяще"
       className="cep-section-black relative flex min-h-[70vh] w-full items-center justify-center overflow-hidden md:min-h-[80vh]"
     >
       {/* Background b-roll video — CEP's signature 0.5× slow-mo. */}

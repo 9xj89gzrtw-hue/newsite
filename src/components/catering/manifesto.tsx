@@ -41,12 +41,12 @@ const MANIFESTO_IMG_ALT = "Праздничная сервировка банк�
 const MANIFESTO_DISHES = [
   { src: "/media/concorde-handhelds.jpg", alt: "Фуршетная линия — Interfood Catering" },
   { src: "/media/concorde-boardroom.webp", alt: "Сервировка банкетного стола — Interfood Catering" },
-  { src: "/media/event-06.jpg", alt: "Барбекю на природе — Interfood Catering" },
+  { src: "/media/event-06.jpg", alt: "Барбекю на природе — Interfood Catering" },
 ] as const;
 
 // Single poetic line, split into words for scroll-colorize + underline draw-in.
 const MANIFESTO_WORDS =
-  "Кулинарное новаторство и безупречный сервис — краеугольный камень Interfood Catering. Мы стремимся строить долгосрочные отношения на основе личного сервиса и исключительного качества.".split(
+  "Кулинарное новаторство и безупречный сервис — краеугольный камень Interfood Catering. Мы стремимся строить долгосрочные отношения на основе личного сервиса и исключительного качества.".split(
     " ",
   );
 
@@ -182,7 +182,7 @@ export function Manifesto() {
           </motion.span>
 
           {/* sr-only heading for document outline / screen readers */}
-          <h2 className="sr-only">Сделано с любовью — Манифест Interfood Catering</h2>
+          <h2 className="sr-only">Сделано с любовью — Манифест Interfood Catering</h2>
 
           {/* The word-as-window: «LOVE» as SVG with multi-dish crossfade layers (Task 2-b §4). */}
           <motion.div

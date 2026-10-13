@@ -86,12 +86,12 @@ export type SectionId =
   | "settings";
 
 const NAV: { id: SectionId; label: string; shortLabel: string; icon: typeof Inbox }[] = [
-  { id: "menu", label: "Меню и цены", shortLabel: "Меню", icon: UtensilsCrossed },
+  { id: "menu", label: "Меню и цены", shortLabel: "Меню", icon: UtensilsCrossed },
   { id: "addons", label: "Допуслуги", shortLabel: "Допуслуги", icon: Sparkles },
   { id: "minorder", label: "Минимальные заказы", shortLabel: "Мин. заказ", icon: Banknote },
-  { id: "panels", label: "Цены на плитках услуг", shortLabel: "Плитки", icon: LayoutGrid },
+  { id: "panels", label: "Цены на плитках услуг", shortLabel: "Плитки", icon: LayoutGrid },
   { id: "leads", label: "Входящие заявки", shortLabel: "Заявки", icon: Inbox },
-  { id: "settings", label: "Контакты и настройки", shortLabel: "Настройки", icon: SettingsIcon },
+  { id: "settings", label: "Контакты и настройки", shortLabel: "Настройки", icon: SettingsIcon },
 ];
 
 const MOBILE_PRIMARY: SectionId[] = ["menu", "addons", "leads", "settings"];
@@ -108,7 +108,7 @@ type PubState =
   | { phase: "success"; htmlUrl?: string }
   | { phase: "failure"; htmlUrl?: string }
   /* 4-F2: публикация вытеснена более новой (конкурирующий publish отменил
-   * идущий деплой) — терминальное состояние для этого sha. */
+   * идущий деплой) — терминальное состояние для этого sha. */
   | { phase: "cancelled"; htmlUrl?: string }
   | { phase: "unknown" };
 
@@ -140,7 +140,7 @@ export function AdminApp({
 }) {
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
   const [menu, setMenu] = useState<MenuData | null>(null);
-  /** Снимок меню с сервера — dirty = текущий объект отличен по ссылке. */
+  /** Снимок меню с сервера — dirty = текущий объект отличен по ссылке. */
   const [serverMenu, setServerMenu] = useState<MenuData | null>(null);
   const [sha, setSha] = useState("");
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -150,7 +150,7 @@ export function AdminApp({
   const [refreshingLeads, setRefreshingLeads] = useState(false);
   /** c96: массовая отметка «прочитано». */
   const [readingAll, setReadingAll] = useState(false);
-  /** c96: подтверждение публикации со сводкой изменений. */
+  /** c96: подтверждение публикации со сводкой изменений. */
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [draftOffer, setDraftOffer] = useState<Draft | null>(null);
@@ -160,8 +160,8 @@ export function AdminApp({
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
 
-  /* Dirty — сравнение по СОДЕРЖИМОМУ (не по ссылке): правка, возвращённая
-   * вручную к серверному значению, честно гасит «несохранённые изменения».
+  /* Dirty — сравнение по СОДЕРЖИМОМУ (не по ссылке): правка, возвращённая
+   * вручную к серверному значению, честно гасит «несохранённые изменения».
    * Мемоизация — stringify только при смене объекта (~1мс на ~50КБ меню). */
   const menuJson = useMemo(() => (menu ? JSON.stringify(menu) : ""), [menu]);
   const serverJson = useMemo(
@@ -188,7 +188,7 @@ export function AdminApp({
       toast.error(
         dataR.reason === "github"
           ? "GitHub недоступен — попробуйте обновить через минуту"
-          : "Не удалось загрузить данные — попробуйте ещё раз",
+          : "Не удалось загрузить данные — попробуйте ещё раз",
       );
       return;
     }
@@ -242,7 +242,7 @@ export function AdminApp({
     return () => clearTimeout(t);
   }, [menu, dirty, loadState, draftOffer]);
 
-  /* c96: гарда закрытия вкладки с несохранёнными правками — как в почте:
+  /* c96: гарда закрытия вкладки с несохранёнными правками — как в почте:
    * браузер спросит подтверждение, черновик при этом уже автосохранён. */
   useEffect(() => {
     if (!dirty) return;
@@ -281,7 +281,7 @@ export function AdminApp({
   };
 
   /* c102: мини-CRM — патч лида расширен статусом воронки, заметкой и
-   * архивом; оптимистично + откат при сбое (как было c96 для read). */
+   * архивом; оптимистично + откат при сбое (как было c96 для read). */
   const patchLead = async (
     id: string,
     patch: { read?: boolean; archived?: boolean; status?: string; note?: string | null },
@@ -291,7 +291,7 @@ export function AdminApp({
     const ok = await apiLeadUpdate(id, patch);
     if (!ok) {
       setLeads(prev);
-      toast.error("Не удалось сохранить — попробуйте ещё раз");
+      toast.error("Не удалось сохранить — попробуйте ещё раз");
     }
   };
 
@@ -302,7 +302,7 @@ export function AdminApp({
       setLeadsTotal((t) => Math.max(0, t - 1));
       toast.success("Заявка удалена");
     } else {
-      toast.error("Не удалось удалить — попробуйте ещё раз");
+      toast.error("Не удалось удалить — попробуйте ещё раз");
     }
   };
 
@@ -314,10 +314,10 @@ export function AdminApp({
     if (r.ok === true) {
       setLeads((ls) => ls.map((l) => ({ ...l, read: true })));
       toast.success(
-        r.updated ? `Отмечено прочитанными: ${r.updated}` : "Непрочитанных не было",
+        r.updated ? `Отмечено прочитанными: ${r.updated}` : "Непрочитанных не было",
       );
     } else {
-      toast.error("Не удалось — попробуйте ещё раз");
+      toast.error("Не удалось — попробуйте ещё раз");
     }
   };
 
@@ -368,13 +368,13 @@ export function AdminApp({
     if (v.ok !== true) {
       setValidErrors(v.errors);
       toast.error(
-        `Проверьте поля — ${v.errors.length} ${plural(v.errors.length, "ошибка", "ошибки", "ошибок")} в меню`,
+        `Проверьте поля — ${v.errors.length} ${plural(v.errors.length, "ошибка", "ошибки", "ошибок")} в меню`,
       );
       scrollToFirstError(v.errors);
       return;
     }
     setValidErrors(null);
-    /* c96: перед публикацией — сводка изменений (что именно уйдёт на сайт). */
+    /* c96: перед публикацией — сводка изменений (что именно уйдёт на сайт). */
     setConfirmOpen(true);
   };
 
@@ -385,7 +385,7 @@ export function AdminApp({
     const r = await apiSaveMenu(
       menu,
       sha || undefined,
-      "Обновление меню из админ-панели",
+      "Обновление меню из админ-панели",
     );
     if (r.ok === true) {
       setSha(r.commitSha);
@@ -398,16 +398,16 @@ export function AdminApp({
       return;
     }
     if (r.reason === "validation") {
-      const errors = r.errors ?? ["Меню не прошло проверку на сервере"];
+      const errors = r.errors ?? ["Меню не прошло проверку на сервере"];
       setValidErrors(errors);
       scrollToFirstError(errors);
-      toast.error("Меню не прошло проверку — см. список ошибок");
+      toast.error("Меню не прошло проверку — см. список ошибок");
       return;
     }
     toast.error(
       r.reason === "github"
         ? "GitHub недоступен — попробуйте через минуту"
-        : "Не удалось сохранить — проверьте интернет",
+        : "Не удалось сохранить — проверьте интернет",
     );
   };
 
@@ -415,7 +415,7 @@ export function AdminApp({
     setConflictOpen(false);
     const d = await apiGetData();
     if (d.ok !== true) {
-      toast.error("Не удалось загрузить свежие данные — попробуйте ещё раз");
+      toast.error("Не удалось загрузить свежие данные — попробуйте ещё раз");
       return;
     }
     setMenu(d.data.menu);
@@ -426,7 +426,7 @@ export function AdminApp({
     } catch {
       /* ignore */
     }
-    toast.success("Загружена версия с сервера");
+    toast.success("Загружена версия с сервера");
   };
 
   const conflictKeepMine = async () => {
@@ -436,11 +436,11 @@ export function AdminApp({
     const d = await apiGetData();
     if (d.ok !== true) {
       setPub({ phase: "idle" });
-      toast.error("Не удалось загрузить свежую версию — попробуйте ещё раз");
+      toast.error("Не удалось загрузить свежую версию — попробуйте ещё раз");
       return;
     }
     setSha(d.data.sha);
-    const r = await apiSaveMenu(menu, d.data.sha, "Обновление меню из админ-панели");
+    const r = await apiSaveMenu(menu, d.data.sha, "Обновление меню из админ-панели");
     if (r.ok === true) {
       setSha(r.commitSha);
       onSavedOk(r.commitSha, r.htmlUrl);
@@ -449,12 +449,12 @@ export function AdminApp({
       toast.error("Кто-то снова опубликовал правки — обновите страницу");
     } else {
       setPub({ phase: "idle" });
-      toast.error("Не удалось сохранить — попробуйте ещё раз");
+      toast.error("Не удалось сохранить — попробуйте ещё раз");
     }
   };
 
   /* поллинг статуса сборки (шаг 5с). 4-F2: потолок поднят 6 → 10 минут —
-   * реальный деплой c95 замерен в 6м23с: старого потолка не хватало,
+   * реальный деплой c95 замерен в 6м23с: старого потолка не хватало,
    * поллинг сдавался раньше сборки. */
   useEffect(() => {
     if (pub.phase !== "building") return;
@@ -471,7 +471,7 @@ export function AdminApp({
         setPub({ phase: "success", htmlUrl: r.data.htmlUrl ?? pub.htmlUrl });
         const d = await apiGetData();
         if (cancelled || d.ok !== true) return;
-        /* владелец мог продолжить правки, пока шла сборка — не затираем их:
+        /* владелец мог продолжить правки, пока шла сборка — не затираем их:
          * обновляем только sha; снимок сервера заменяем лишь при чистом стейте */
         setSha(d.data.sha);
         if (!dirty) {
@@ -486,8 +486,8 @@ export function AdminApp({
       }
       /* 4-F2: 'cancelled' — эту публикацию вытеснила более новая
        * (конкурирующий publish отменил идущий деплой). Терминально
-       * для ЭТОГО sha: эффект выше не перезапустится (phase больше
-       * не «building»), ничего не дозапрашиваем — новая публикация
+       * для ЭТОГО sha: эффект выше не перезапустится (phase больше
+       * не «building»), ничего не дозапрашиваем — новая публикация
        * пойдёт собственным циклом. */
       if (r.ok === true && r.data.state === "cancelled") {
         setPub({ phase: "cancelled", htmlUrl: r.data.htmlUrl ?? pub.htmlUrl });
@@ -518,12 +518,12 @@ export function AdminApp({
   const unread = leads.filter((l) => !l.read).length;
   const activeNav = NAV.find((n) => n.id === section);
 
-  /* 4-F2: зеркало Vercel (*.vercel.app) — вместо панели карточка со ссылкой
-   * на основной домен: /api/* там закрыты редиректом, логин и публикация
-   * невозможны (раньше владелец видел бесконечный экран входа с «нет
+  /* 4-F2: зеркало Vercel (*.vercel.app) — вместо панели карточка со ссылкой
+   * на основной домен: /api/* там закрыты редиректом, логин и публикация
+   * невозможны (раньше владелец видел бесконечный экран входа с «нет
    * связи»). Возврат стоит ПОСЛЕ всех хуков — хуки всегда вызываются в
-   * одном порядке; эффекты выше погашены isVercelMirror — ни одного
-   * API-вызова (apiSession на зеркале тоже не ходит в сеть, см. api.ts). */
+   * одном порядке; эффекты выше погашены isVercelMirror — ни одного
+   * API-вызова (apiSession на зеркале тоже не ходит в сеть, см. api.ts). */
   if (isVercelMirror()) {
     return <VercelMirrorNotice />;
   }
@@ -552,7 +552,7 @@ export function AdminApp({
                 }}
                 className="text-[11px] text-ink-soft/80 underline decoration-dotted underline-offset-2 hover:text-ink"
               >
-                выйти из демо
+                выйти из демо
               </button>
             </div>
           ) : null}
@@ -599,8 +599,8 @@ export function AdminApp({
             </h1>
             <a href="/" target="_blank" rel="noopener noreferrer"
               className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-border-line px-2 text-sm text-ink hover:bg-accent"
-              aria-label="Перейти на сайт">
-              <ExternalLink className="size-4" /><span className="hidden sm:inline">Перейти на сайт</span>
+              aria-label="Перейти на сайт">
+              <ExternalLink className="size-4" /><span className="hidden sm:inline">Перейти на сайт</span>
             </a>
             {dirty ? (
               <span className="hidden items-center gap-1.5 text-[12.5px] text-ink-soft sm:inline-flex">
@@ -682,7 +682,7 @@ export function AdminApp({
               <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
                 <AlertTriangle className="size-10 text-ink-soft/40" />
                 <p className="text-[15px] font-medium text-ink">
-                  Не удалось загрузить данные
+                  Не удалось загрузить данные
                 </p>
                 <Button
                   type="button"
@@ -722,7 +722,7 @@ export function AdminApp({
               ) : null}
               {section === "settings" && !settings ? (
                 <p className="text-sm text-ink-soft">
-                  Настройки не загрузились — обновите страницу.
+                  Настройки не загрузились — обновите страницу.
                 </p>
               ) : null}
             </>
@@ -859,10 +859,10 @@ export function AdminApp({
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-serif">
-              Данные на сервере изменились
+              Данные на сервере изменились
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Публикация была с другого устройства. Обновить и перезалить ваши
+              Публикация была с другого устройства. Обновить и перезалить ваши
               правки?
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -874,7 +874,7 @@ export function AdminApp({
                 void conflictReload();
               }}
             >
-              Перезагрузить с сервера
+              Перезагрузить с сервера
             </AlertDialogAction>
             <AlertDialogAction
               className="h-11 rounded-xl bg-gradient-to-r from-gold to-terracotta font-semibold text-white shadow-md shadow-gold/25 hover:opacity-95 sm:mr-0"
@@ -896,11 +896,11 @@ export function AdminApp({
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-serif">
-              Выйти из панели?
+              Выйти из панели?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Есть несохранённые изменения — они останутся в черновике на этом
-              устройстве и будут предложены при следующем входе.
+              Есть несохранённые изменения — они останутся в черновике на этом
+              устройстве и будут предложены при следующем входе.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
@@ -1071,7 +1071,7 @@ function PublishBanner({
       <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-[14px] text-ink">
         <XCircle className="size-5 shrink-0 text-destructive" />
         <span className="min-w-0 flex-1">
-          Сборка не удалась —{" "}
+          Сборка не удалась —{" "}
           {pub.htmlUrl ? (
             <a
               href={pub.htmlUrl}
@@ -1158,7 +1158,7 @@ function ValidationErrors({
         <AlertTriangle className="mt-0.5 size-5 shrink-0 text-destructive" />
         <div className="min-w-0 flex-1">
           <p className="text-[14px] font-semibold text-ink">
-            Меню не прошло проверку — исправьте:
+            Меню не прошло проверку — исправьте:
           </p>
           <ul className="mt-1.5 space-y-1">
             {errors.map((e, i) => (
@@ -1183,9 +1183,9 @@ function ValidationErrors({
 
 /* --------------------------------------------------- 4-F2: mirror notice */
 
-/** Карточка вместо панели на зеркале Vercel (*.vercel.app): /api/* там
- *  закрыты редиректом 302→/404 (PHP не исполняется) — вход и публикация
- *  невозможны, ведём на основной домен. Центрирована, в стиле LoginScreen. */
+/** Карточка вместо панели на зеркале Vercel (*.vercel.app): /api/* там
+ *  закрыты редиректом 302→/404 (PHP не исполняется) — вход и публикация
+ *  невозможны, ведём на основной домен. Центрирована, в стиле LoginScreen. */
 function VercelMirrorNotice() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-background px-4 py-10">
@@ -1201,7 +1201,7 @@ function VercelMirrorNotice() {
         <Card className="rounded-2xl border-border-line/80 shadow-sm">
           <CardContent className="p-6 text-center">
             <p className="text-[15px] leading-relaxed text-ink">
-              Админ-панель работает только на основном домене — откройте{" "}
+              Админ-панель работает только на основном домене — откройте{" "}
               <a
                 href="https://nilovcatering.ru/admin"
                 className="font-medium text-gold underline decoration-gold/40 underline-offset-2"
@@ -1233,10 +1233,10 @@ function AppSkeleton() {
 /* ------------------------------------------------- c96: сводка изменений */
 
 /**
- * Diff «сервер → черновик» простыми словами для владельца: что уйдёт на
+ * Diff «сервер → черновик» простыми словами для владельца: что уйдёт на
  * сайт после публикации. Возвращает список строк (цены, составы,
- * добавления/удаления). Фиксирует только значимое для сайта — цены,
- * названия, составы; правки описаний схлопываются в одну строку.
+ * добавления/удаления). Фиксирует только значимое для сайта — цены,
+ * названия, составы; правки описаний схлопываются в одну строку.
  */
 export function computeMenuDiff(server: MenuData, draft: MenuData): string[] {
   const out: string[] = [];
@@ -1324,10 +1324,10 @@ export function computeMenuDiff(server: MenuData, draft: MenuData): string[] {
     }
   }
 
-  /* всё, что не попало в явные категории (описания, «что входит», фото) */
+  /* всё, что не попало в явные категории (описания, «что входит», фото) */
   if (S === D) return out;
   if (out.length === 0) {
-    out.push("Правки в описаниях и прочих полях (цены не менялись)");
+    out.push("Правки в описаниях и прочих полях (цены не менялись)");
   }
   return out;
 }
@@ -1354,7 +1354,7 @@ function PublishConfirmDialog({
             Опубликовать изменения?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            После публикации сайт, калькулятор и PDF обновятся автоматически —
+            После публикации сайт, калькулятор и PDF обновятся автоматически —
             обычно это занимает 3–7 минут.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -1364,7 +1364,7 @@ function PublishConfirmDialog({
           className="max-h-64 overflow-y-auto rounded-xl border border-border-line/70 bg-parchment/40 p-3"
         >
           {diff.length === 0 ? (
-            <p className="text-[13.5px] text-ink-soft">Правки в описаниях и прочих полях</p>
+            <p className="text-[13.5px] text-ink-soft">Правки в описаниях и прочих полях</p>
           ) : (
             <ul className="space-y-1">
               {diff.slice(0, MAX).map((line, i) => (

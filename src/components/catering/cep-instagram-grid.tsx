@@ -13,7 +13,7 @@ import { ImageTrail } from "@/components/motion/image-trail";
 /**
  * CepInstagramGrid — Creative Edge Parties §6.12 "FOLLOW ALONG" grid.
  *
- * Cream section with a header row ("СЛЕДИТЕ ЗА НАМИ" + @nilov_catering handle
+ * Cream section with a header row ("СЛЕДИТЕ ЗА НАМИ" + @nilov_catering handle
  * link) and a 3×3 grid of 9 square Instagram thumbnails. 3 of the 9 (indices
  * 2, 5, 8 — the right column of each row) get a permanent but subtle Play
  * icon overlay to mimic CEP's Reel-play treatment on their actual Instagram
@@ -37,56 +37,56 @@ import { ImageTrail } from "@/components/motion/image-trail";
  * photos, not video.
  *
  * c86-D (RF legal): каждое ВИДИМОЕ упоминание Instagram несёт маркер «*»
- * (ссылка-хэндл в шапке секции — «Instagram* · @nilov_catering»); внизу
- * секции — обязательная в РФ сноска про Meta (тем же экраном, что и
+ * (ссылка-хэндл в шапке секции — «Instagram* · @nilov_catering»); внизу
+ * секции — обязательная в РФ сноска про Meta (тем же экраном, что и
  * упоминание). aria-label/alt остаются без звёздочки — скринридеру
  * чистое имя читается лучше.
  *
  * c89: (а) глава перенумерована 08 → 07 (глава 04 «Как мы работаем»
- * удалена другой задачей волны); (б) в шапке появился компактный ряд
+ * удалена другой задачей волны); (б) в шапке появился компактный ряд
  * остальных соцсетей (VK · Телеграм канал · YouTube · Rutube) — все
- * профили доступны с каждой секции-витрины; Instagram остаётся
+ * профили доступны с каждой секции-витрины; Instagram остаётся
  * ПЕРВИЧНОЙ ссылкой секции (это инстаграм-сетка); (в) сноска Meta
- * 12 → 13px (читаемость для пожилых).
+ * 12 → 13px (читаемость для пожилых).
  *
  * @see creativeedge-analysis.md §6.12 (Instagram grid)
  */
 const IG_TILES = [
   {
     src: "/media/ig/ig-real-01.jpg",
-    alt: "Мини-канапе с кремом, ягодами и фруктовым пюре на хрустящей основе, выложены в ряд на чёрной зеркальной поверхности",
+    alt: "Мини-канапе с кремом, ягодами и фруктовым пюре на хрустящей основе, выложены в ряд на чёрной зеркальной поверхности",
   },
   {
     src: "/media/ig/ig-real-02.jpg",
-    alt: "Канапе с копчёным лососем, сливочным сыром и красной икрой на декоративных шпажках на чёрном фоне",
+    alt: "Канапе с копчёным лососем, сливочным сыром и красной икрой на декоративных шпажках на чёрном фоне",
   },
   {
     src: "/media/ig/ig-real-03.jpg",
-    alt: "Канапе на шпажках с сыром, прошутто, клубникой и манго на чёрной отражающей поверхности",
+    alt: "Канапе на шпажках с сыром, прошутто, клубникой и манго на чёрной отражающей поверхности",
   },
   {
     src: "/media/ig/ig-real-04.jpg",
-    alt: "Порционные квадратные стаканчики с капрезе: помидоры черри на шпажках, шарики моцареллы и зелень",
+    alt: "Порционные квадратные стаканчики с капрезе: помидоры черри на шпажках, шарики моцареллы и зелень",
   },
   {
     src: "/media/ig/ig-real-05.jpg",
-    alt: "Ассорти фингер-фуда для фуршета: закуски с лососем, ветчиной и морепродуктами, выложенные рядами на чёрном фоне",
+    alt: "Ассорти фингер-фуда для фуршета: закуски с лососем, ветчиной и морепродуктами, выложенные рядами на чёрном фоне",
   },
   {
     src: "/media/ig/ig-real-06.jpg",
-    alt: "Брускетты на хрустящем багете с кремовым сыром, запечёнными креветками и вялеными томатами",
+    alt: "Брускетты на хрустящем багете с кремовым сыром, запечёнными креветками и вялеными томатами",
   },
   {
     src: "/media/ig/ig-real-07.jpg",
-    alt: "Открытые сэндвичи на багете со слабосолёным лососем, сливочным сыром, каперсами и лаймом",
+    alt: "Открытые сэндвичи на багете со слабосолёным лососем, сливочным сыром, каперсами и лаймом",
   },
   {
     src: "/media/ig/ig-real-08.jpg",
-    alt: "Три порционных стакана с салатами из морепродуктов, украшенными зеленью и дольками лимона, на зеркальной поверхности",
+    alt: "Три порционных стакана с салатами из морепродуктов, украшенными зеленью и дольками лимона, на зеркальной поверхности",
   },
   {
     src: "/media/ig/ig-real-09.jpg",
-    alt: "Жареные креветки, томаты черри и грибы на деревянных шпажках, поданные на чёрной каменной тарелке с розмарином",
+    alt: "Жареные креветки, томаты черри и грибы на деревянных шпажках, поданные на чёрной каменной тарелке с розмарином",
   },
 ] as const;
 
@@ -131,7 +131,7 @@ export function CepInstagramGrid() {
 
   return (
     <section
-      aria-label="Мы в Instagram"
+      aria-label="Мы в Instagram"
       data-header-theme="light"
       className="cep-section-cream w-full px-8 py-24 md:px-14 md:py-36"
     >
@@ -148,7 +148,7 @@ export function CepInstagramGrid() {
         </div>
         {/*
           Cycle 34 WOW graft — sondaven.com split-line word stagger. The H2
-          "СЛЕДИТЕ ЗА НАМИ" reveals word-by-word (mask + translateY 110%→0%
+          "СЛЕДИТЕ ЗА НАМИ" reveals word-by-word (mask + translateY 110%→0%
           per word, 60ms stagger) instead of fading in as a block. Plain text —
           no italic-fragment design device here, so SplitTextReveal is safe.
           The cep-section-h2 + text-black styling is preserved via className.
@@ -158,7 +158,7 @@ export function CepInstagramGrid() {
           mode="words"
           className="cep-section-h2 text-black"
         >
-          СЛЕДИТЕ ЗА НАМИ
+          СЛЕДИТЕ ЗА НАМИ
         </SplitTextReveal>
         <a
           href={IG_PROFILE_URL}
@@ -182,7 +182,7 @@ export function CepInstagramGrid() {
             Rutube-канала нет — ссылка на поиск по бренду (config.ts);
             порядок — как в письме владельца (без Instagram). */}
         <nav
-          aria-label="Мы в соцсетях"
+          aria-label="Мы в соцсетях"
           className="flex min-w-full flex-wrap items-center gap-2"
         >
           <a
@@ -239,7 +239,7 @@ export function CepInstagramGrid() {
               href={IG_PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Instagram nilov catering — фото ${i + 1} из ленты (открывает профиль)`}
+              aria-label={`Instagram nilov catering — фото ${i + 1} из ленты (открывает профиль)`}
               /* C78: двойной тап — золотые искры (MicroDelights);
                   лейбл линзы курсора — аффорданс перехода. */
               data-spark
@@ -288,9 +288,9 @@ export function CepInstagramGrid() {
                     fill
                     /* 81-W2F2 (E MAJOR, критик E волна-2): было 33vw/22vw —
                        сетка 3×3 реально рендерит тайл (100vw − паддинги −
-                       гэпы)/3 = 434.7px @1440 (замер), а sizes декларировал
+                       гэпы)/3 = 434.7px @1440 (замер), а sizes декларировал
                        316.8px → браузер брал вариант 384 → апскейл 0.88×
-                       даже на DPR1 и 0.74× на retina. calc() из реального
+                       даже на DPR1 и 0.74× на retina. calc() из реального
                        лэйаута: <768 — px-8(32×2)+gap-2(8×2); ≥768 —
                        px-14(56×2)+md:gap-3(12×2). Теперь: DPR1 1440 →
                        кандидат 640 (1.47×), DPR2 → 1080 (файл 1024 =
@@ -358,10 +358,10 @@ export function CepInstagramGrid() {
           на 390px. */}
       <p
         data-ig-note
-        className="cep-text mt-10 max-w-xl text-[13px] leading-relaxed text-cep-black/60"
+        className="cep-text mt-10 max-w-[62ch] text-[13px] leading-relaxed text-cep-black/60"
       >
         *Instagram принадлежит компании Meta, признанной экстремистской
-        организацией; её деятельность запрещена на территории Российской
+        организацией; её деятельность запрещена на территории Российской
         Федерации.
       </p>
 

@@ -64,13 +64,13 @@ export function AddonsEditor({ menu, update }: { menu: MenuData; update: UpdateM
     <section>
       <SectionHeader
         title="Допуслуги"
-        description="Аренда оборудования, мебели, выезд шефа — всё, что добавляется к смете в калькуляторе."
+        description="Аренда оборудования, мебели, выезд шефа — всё, что добавляется к смете в калькуляторе."
       />
       <Card className="rounded-2xl border-border-line/80 shadow-none">
         <CardContent className="divide-y divide-border-line/60 p-0">
           {menu.addons.length === 0 ? (
             <p className="p-6 text-center text-sm text-ink-soft">
-              Допуслуг нет — смета будет состоять только из меню.
+              Допуслуг нет — смета будет состоять только из меню.
             </p>
           ) : (
             menu.addons.map((a, i) => (
@@ -125,7 +125,7 @@ export function AddonsEditor({ menu, update }: { menu: MenuData; update: UpdateM
                         })
                       }
                     >
-                      % от сметы
+                      % от сметы
                     </button>
                   </div>
                 </div>
@@ -184,9 +184,9 @@ export function AddonsEditor({ menu, update }: { menu: MenuData; update: UpdateM
         {menu.addons.length >= MAX_ADDONS ? ` (максимум ${MAX_ADDONS})` : ""}
       </Button>
       <HintText>
-        Процент считается от подытога меню и растёт с числом гостей — так
-        стоимость аренды масштабируется с событием. Фиксированная цена везде
-        печатается с предлогом «от».
+        Процент считается от подытога меню и растёт с числом гостей — так
+        стоимость аренды масштабируется с событием. Фиксированная цена везде
+        печатается с предлогом «от».
       </HintText>
     </section>
   );
@@ -199,7 +199,7 @@ export function MinOrderEditor({ menu, update }: { menu: MenuData; update: Updat
     <section>
       <SectionHeader
         title="Минимальные заказы"
-        description="Смета в калькуляторе не может быть меньше этой суммы для выбранного формата."
+        description="Смета в калькуляторе не может быть меньше этой суммы для выбранного формата."
       />
       <Card className="rounded-2xl border-border-line/80 shadow-none">
         <CardContent className="divide-y divide-border-line/60 p-0">
@@ -232,7 +232,7 @@ export function MinOrderEditor({ menu, update }: { menu: MenuData; update: Updat
         </CardContent>
       </Card>
       <HintText>
-        Форматы берутся из раздела «Меню и цены» — новый формат появится здесь
+        Форматы берутся из раздела «Меню и цены» — новый формат появится здесь
         автоматически.
       </HintText>
     </section>
@@ -271,8 +271,8 @@ export function ServicePanelsEditor({ menu, update }: { menu: MenuData; update: 
   return (
     <section>
       <SectionHeader
-        title="Цены на плитках услуг"
-        description="Каталог услуг на главной («Свадьбы», «Корпоративы»…): заголовок и цена плитки."
+        title="Цены на плитках услуг"
+        description="Каталог услуг на главной («Свадьбы», «Корпоративы»…): заголовок и цена плитки."
       />
       <Card className="rounded-2xl border-border-line/80 shadow-none">
         <CardContent className="divide-y divide-border-line/60 p-0">
@@ -290,7 +290,7 @@ export function ServicePanelsEditor({ menu, update }: { menu: MenuData; update: 
               <div className="min-w-44 flex-1">
                 <FieldLabel
                   htmlFor={`panel-${i}-price`}
-                  hint="формат «от 5 500 ₽»"
+                  hint="формат «от 5 500 ₽»"
                 >
                   Цена (текст)
                 </FieldLabel>
@@ -302,7 +302,7 @@ export function ServicePanelsEditor({ menu, update }: { menu: MenuData; update: 
                     id={`panel-${i}-price`}
                     type="text"
                     value={p.priceLabel}
-                    placeholder="от 5 500 ₽"
+                    placeholder="от 5 500 ₽"
                     className="h-11 rounded-xl text-[15px]"
                     onChange={(e) => setPanel(i, { priceLabel: e.target.value })}
                   />
@@ -311,7 +311,7 @@ export function ServicePanelsEditor({ menu, update }: { menu: MenuData; update: 
                     variant="outline"
                     className="h-11 shrink-0 rounded-xl px-3 text-[13px] tabular-nums"
                     onClick={() => insertRub(i)}
-                    title="Вставить неразрывный пробел и ₽ в позицию курсора"
+                    title="Вставить неразрывный пробел и ₽ в позицию курсора"
                   >
                     ₽&nbsp;␣
                   </Button>
@@ -361,7 +361,7 @@ export function ServicePanelsEditor({ menu, update }: { menu: MenuData; update: 
           ))}
           {menu.servicePanels.length === 0 ? (
             <p className="p-6 text-center text-sm text-ink-soft">
-              Плиток нет — цены в «Каталоге услуг» на главной не подставятся.
+              Плиток нет — цены в «Каталоге услуг» на главной не подставятся.
             </p>
           ) : null}
         </CardContent>
@@ -382,7 +382,7 @@ export function ServicePanelsEditor({ menu, update }: { menu: MenuData; update: 
                     {
                       id: `panel-${Date.now().toString(36)}`,
                       label: "Новая услуга",
-                      priceLabel: "от 5 500\u00A0₽",
+                      priceLabel: "от 5 500\u00A0₽",
                     },
                   ],
                 },
@@ -393,9 +393,9 @@ export function ServicePanelsEditor({ menu, update }: { menu: MenuData; update: 
         {menu.servicePanels.length >= MAX_PANELS ? ` (максимум ${MAX_PANELS})` : ""}
       </Button>
       <HintText>
-        Кнопка «₽␣» вставляет рубль с неразрывным пробелом — цена не разрывается
-        при переносе строки. <Badge variant="outline" className="mx-0.5 align-baseline">от 5&thinsp;500&nbsp;₽</Badge>
-        — так это выглядит на сайте.
+        Кнопка «₽␣» вставляет рубль с неразрывным пробелом — цена не разрывается
+        при переносе строки. <Badge variant="outline" className="mx-0.5 align-baseline">от 5&thinsp;500&nbsp;₽</Badge>
+        — так это выглядит на сайте.
       </HintText>
     </section>
   );

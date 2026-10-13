@@ -82,8 +82,8 @@ export function TextField({
 
 /**
  * Числовой ввод как text (inputMode=decimal): владелец может печатать
- * «2 500,50» — на blur округляем до целого ≥ 0 и отдаём наверх число.
- * Некорректный ввод откатывается к последнему валидному значению.
+ * «2 500,50» — на blur округляем до целого ≥ 0 и отдаём наверх число.
+ * Некорректный ввод откатывается к последнему валидному значению.
  */
 export function NumberField({
   value,
@@ -96,7 +96,7 @@ export function NumberField({
 }: {
   value: number | undefined;
   onChange: (v: number) => void;
-  /** Присутствует → пустое поле на blur легально (опциональное поле). */
+  /** Присутствует → пустое поле на blur легально (опциональное поле). */
   onClear?: () => void;
   placeholder?: string;
   className?: string;
@@ -121,7 +121,7 @@ export function NumberField({
         onClear();
         return;
       }
-      // пустое поле = откат к последнему валидному
+      // пустое поле = откат к последнему валидному
       setText(lastValid.current === undefined ? "" : String(lastValid.current));
       return;
     }
@@ -197,7 +197,7 @@ export function TextAreaField({
 
 /* --------------------------------------------------------------- icon row */
 
-/** Кнопки «вверх/вниз» для переупорядочивания — без dnd, как в ТЗ. */
+/** Кнопки «вверх/вниз» для переупорядочивания — без dnd, как в ТЗ. */
 export function MoveButtons({
   onUp,
   onDown,
@@ -269,7 +269,7 @@ export function DeleteButton({
       <AlertDialogHeader>
         <AlertDialogTitle>{label}?</AlertDialogTitle>
         <AlertDialogDescription>
-          Позиция будет удалена из текущего черновика. На сайте изменение появится только после публикации.
+          Позиция будет удалена из текущего черновика. На сайте изменение появится только после публикации.
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>

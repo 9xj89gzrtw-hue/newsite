@@ -15,20 +15,20 @@ import { GammaSeparator } from "@/components/catering/gamma-separator";
 import { EaFaqAccordion } from "@/components/catering/ea-faq-accordion";
 import { CepInstagramGrid } from "@/components/catering/cep-instagram-grid";
 import { SiteFooter } from "@/components/catering/site-footer";
-/* c89 (3-g): BackToTop ВОЗВРАЩЁН в рендер — владелец: «нет кнопки
+/* c89 (3-g): BackToTop ВОЗВРАЩЁН в рендер — владелец: «нет кнопки
    (стрелочки наверх)... приходится все заново наверх пролистывать».
    Fixed bottom-LEFT (телефон-FAB — bottom-right), z-50 над мобильным
    sticky-баром (z-40, hacc-booking.css); скрытие <1024px снято в
    globals.css. Сам компонент не менялся (золотое кольцо прогресса). */
 import { BackToTop } from "@/components/catering/back-to-top";
 /* c98-FIX1 (критик 3 MINOR): дубль ScrollProgress — компонент рендерился
-   ОДНОВРЕМЕННО в layout.tsx (C74, все страницы) и здесь (c84-A) — два
-   идентичных fixed-дива с идеальным перекрытием. Снята копия ЗДЕСЬ:
-   layout-версия покрывает и главную, и /offer /privacy /terms (текстовые
-   страницы с длинной прокруткой — там полоса полезнее всего). */
+   ОДНОВРЕМЕННО в layout.tsx (C74, все страницы) и здесь (c84-A) — два
+   идентичных fixed-дива с идеальным перекрытием. Снята копия ЗДЕСЬ:
+   layout-версия покрывает и главную, и /offer /privacy /terms (текстовые
+   страницы с длинной прокруткой — там полоса полезнее всего). */
 /* 81-F2b: vanity-URL /menu /events /contacts /calculator приезжают на
-   главную через next.config-rewritы с scrollY=0 (hash до браузера не
-   доходит) — клиентский скроллер ведёт к целевой секции (см. докстринг
+   главную через next.config-rewritы с scrollY=0 (hash до браузера не
+   доходит) — клиентский скроллер ведёт к целевой секции (см. докстринг
    компонента). Рендерит null, ноль DOM, ноль layout-влияния. */
 import { VanityUrlScroll } from "@/components/vanity-scroll";
 
@@ -42,12 +42,12 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 // founder story → parallax band → events video carousel → calculator+form →
 // FAQ → instagram → footer. Two parallax photo bands (GammaSeparator,
 // TottParallaxBand) bridge the major acts for cinematic pacing. c89 (3-g):
-// CepProcess («Как мы работаем») снят с рендера; founder story перенесён
-// сразу под меню («Не нашли нужное?»).
+// CepProcess («Как мы работаем») снят с рендера; founder story перенесён
+// сразу под меню («Не нашли нужное?»).
 //
-// SECTION ORDER (c89/3-g: приведён к ФАКТИЧЕСКОМУ рендеру — CepProcess
-// «Как мы работаем» СНЯТ с рендера по указанию владельца, EaFounderStory
-// перенесён из акта IV сразу под финальный блок меню «Не нашли нужное?»;
+// SECTION ORDER (c89/3-g: приведён к ФАКТИЧЕСКОМУ рендеру — CepProcess
+// «Как мы работаем» СНЯТ с рендера по указанию владельца, EaFounderStory
+// перенесён из акта IV сразу под финальный блок меню «Не нашли нужное?»;
 // прежние правки списка: c83-D, Task 2-a):
 //
 //   ── ACT I: BRAND PROMISE (hero → header → video → marquee) ──
@@ -67,13 +67,13 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //    6. HaccServices          — gamma-style horizontal accordion «Каталог
 //                               услуг» (6 форматов + цены, c89/3-b; Ken
 //                               Burns exhale).
-//    7. HaccMenu              — меню-каталог в той же hacc-идиоме (корешки,
+//    7. HaccMenu              — меню-каталог в той же hacc-идиоме (корешки,
 //                               тинты, Marck Script, табы пакетов); финальный
-//                               блок секции — «Не нашли нужное?».
+//                               блок секции — «Не нашли нужное?».
 //    8. EaFounderStory        — founder-forward 2-col About: история кухни
 //                              + цитата основателя + CTA (c86-C: числа убраны).
-//                              c89/3-g: ПЕРЕНЕСЁН сюда из акта IV — «Главу 6
-//                              перенести сразу под "не нашли нужное?"»
+//                              c89/3-g: ПЕРЕНЕСЁН сюда из акта IV — «Главу 6
+//                              перенести сразу под "не нашли нужное?"»
 //                              (владелец); глава перенумерована 06 → 04.
 //
 //   ── ACT III: GALLERY (parallax band → events video carousel) ──
@@ -82,7 +82,7 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //                               pause before the events gallery (c89: сидит за
 //                               founder story, который теперь замыкает акт II).
 //   10. EventsVideoCarousel   — карусель 4 видео-тизеров (сток-b-roll «Кухня
-//                               в движении», c36; c87 ошибочно сняла с рендера
+//                               в движении», c36; c87 ошибочно сняла с рендера
 //                               — c88 вернула). Модалка полного видео, снап,
 //                               автопрокрутка 5с, паузы hover/focus.
 //
@@ -99,13 +99,13 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //                              proof). Глава 07 (c89).
 //   14. BackToTop             — floating ↑ button (fixed bottom-left, gold
 //                              progress ring). c89/3-g: ВОЗВРАЩЁН — Task 2-a
-//                              снимал его за компанию с FAB/рельсом глав;
+//                              снимал его за компанию с FAB/рельсом глав;
 //                              владелец попросил стрелку наверх обратно.
 //   15. SiteFooter            — dark navy footer with newsletter + 3-col +
 //                              cities marquee.
 //
 // PARALLAX BAND PLACEMENT (per user: "между некоторыми блоками можно оставить
-// классные фотки с параллакс эффектом, которые уже есть"):
+// классные фотки с параллакс эффектом, которые уже есть"):
 //   - GammaSeparator       between #4 photo marquee and #6 services — visual
 //                          breather (Task 2-a: moved from the founder→FAQ gap,
 //                          replacing CepEditorialDivider in this slot)
@@ -113,7 +113,7 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //                          carousel — cinematic pause (c89: сдвинута за
 //                          founder story, который теперь сидит под меню)
 //
-// REMOVED (per user: "остальное убрать с сайта") — these 30+ components remain
+// REMOVED (per user: "остальное убрать с сайта") — these 30+ components remain
 // on disk for reference but are no longer rendered:
 //   CepEggHero, CepClientMarquee, CepRedStats, CepWhyUs, CepSimpleBrilliant,
 //   CepTestimonialsHeader, CepTestimonialsCarousel, EditorialIntro, Manifesto,
@@ -122,8 +122,8 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //   GammaAccordion, GammaHaccordion, EaVenueNetwork, EaNamedTestimonials,
 //   EaCapabilityStrip, CepLocationsStrip (subsumed by EaVenuesSpotlight),
 //   EaPressStrip, EaCareersBlock, EaPhilosophyQuote, EaFinalCta,
-//   TottBestCatering, DeliveryBlock (компонент и якорные ссылки — на диске,
-//   в рендере его нет; конверсию ведут HaccBooking и хедер/футер CTAs).
+//   TottBestCatering, DeliveryBlock (компонент и якорные ссылки — на диске,
+//   в рендере его нет; конверсию ведут HaccBooking и хедер/футер CTAs).
 //
 // REMOVED in Task 2-a (user cleanup, files stay on disk per repo convention):
 //   CepEditorialDivider — the parallax band below the photo carousel was
@@ -135,19 +135,19 @@ import { VanityUrlScroll } from "@/components/vanity-scroll";
 //
 // REMOVED in c89/3-g (files stay on disk per repo convention):
 //   CepProcess — «КАК МЫ РАБОТАЕМ» compact 4-step strip (бывш. №10) снят
-//   с рендера по указанию владельца; главы перенумерованы: 01 услуги,
-//   02 меню, 03 история основателя (под «Не нашли нужное?»), 04 видео-
+//   с рендера по указанию владельца; главы перенумерованы: 01 услуги,
+//   02 меню, 03 история основателя (под «Не нашли нужное?»), 04 видео-
 //   карусель, 05 смета-чек,
 //   06 FAQ, 07 инстаграм.
 //
 // F2 (cycle-71, K4-MAJOR): `export const dynamic = "force-dynamic"` УДАЛЁН.
 // Витрина полностью статична: все компоненты — клиентские, серверных
-// запросов/Prisma в дереве страницы нет, nuqs-стейта хватает Suspense.
-// force-dynamic глушил HTML-кэш на проде (no-store) — каждый запрос
-// обходился полным SSR. Теперь страница пререндерится и кэшируется.
+// запросов/Prisma в дереве страницы нет, nuqs-стейта хватает Suspense.
+// force-dynamic глушил HTML-кэш на проде (no-store) — каждый запрос
+// обходился полным SSR. Теперь страница пререндерится и кэшируется.
 
-/* Task 1-b (cycle-71): FAQPage JSON-LD перенесён ИЗ layout.tsx — гайдлайн
- * Google: схема FAQ должна жить на странице с ВИДИМЫМ FAQ-контентом
+/* Task 1-b (cycle-71): FAQPage JSON-LD перенесён ИЗ layout.tsx — гайдлайн
+ * Google: схема FAQ должна жить на странице с ВИДИМЫМ FAQ-контентом
  * (EaFaqAccordion — секция 12 этой страницы; на /offer /privacy /terms
  * видимого FAQ нет). Тексты 1-в-1 зеркалят FAQ_ITEMS из
  * ea-faq-accordion.tsx (Cycle 39). */
@@ -157,34 +157,34 @@ const faqJsonLd = {
   mainEntity: [
     {
       "@type": "Question",
-      name: "От скольких гостей вы принимаете заказ?",
+      name: "От скольких гостей вы принимаете заказ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "От одного. Ужин на двоих, семейное торжество, банкет на пятьсот человек — обсудим формат, соберём меню под повод и площадку.",
+        text: "От одного. Ужин на двоих, семейное торжество, банкет на пятьсот человек — обсудим формат, соберём меню под повод и площадку.",
       },
     },
     {
       "@type": "Question",
-      name: "За сколько дней нужно бронировать?",
+      name: "За сколько дней нужно бронировать?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Свадьбы и большие банкеты лучше бронировать за несколько недель — успеем собрать меню, смету и команду. Корпоративные и семейные форматы — за несколько дней. А если срочно — просто позвоните, постараемся выручить.",
+        text: "Свадьбы и большие банкеты лучше бронировать за несколько недель — успеем собрать меню, смету и команду. Корпоративные и семейные форматы — за несколько дней. А если срочно — просто позвоните, постараемся выручить.",
       },
     },
     {
       "@type": "Question",
-      name: "Что входит в стоимость?",
+      name: "Что входит в стоимость?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Еда, доставка по городу в пределах КАД (загородные форматы — по области, зону подтвердим при заказе), сервировка, посуда и текстиль, повар и официанты на площадке, лёгкое цветочное сопровождение столов. Не входит аренда площадки, алкоголь и музыка — с ними поможем организовать.",
+        text: "Еда, доставка по городу в пределах КАД (загородные форматы — по области, зону подтвердим при заказе), сервировка, посуда и текстиль, повар и официанты на площадке, лёгкое цветочное сопровождение столов. Не входит аренда площадки, алкоголь и музыка — с ними поможем организовать.",
       },
     },
     {
       "@type": "Question",
-      name: "Учтёте аллергии и особые диеты?",
+      name: "Учтёте аллергии и особые диеты?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Да. Вегетарианское, веганское, безглютеновое, халяль, кошер — адаптируем меню. Аллергии просим сообщить при заказе, кухня учтёт их в каждом блюде.",
+        text: "Да. Вегетарианское, веганское, безглютеновое, халяль, кошер — адаптируем меню. Аллергии просим сообщить при заказе, кухня учтёт их в каждом блюде.",
       },
     },
     {
@@ -192,45 +192,45 @@ const faqJsonLd = {
       name: "Как проходит оплата?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Предоплата при подтверждении заказа, финальный расчёт — до события. Для юридических лиц работаем по безналичному расчёту. Точные условия фиксируем в договоре.",
+        text: "Предоплата при подтверждении заказа, финальный расчёт — до события. Для юридических лиц работаем по безналичному расчёту. Точные условия фиксируем в договоре.",
       },
     },
     {
       "@type": "Question",
-      name: "С чего начать?",
+      name: "С чего начать?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Оставьте заявку или позвоните. Обсудим повод и формат, предложим меню, пришлём смету. Дальше — договор, и в день события на вашей площадке работает наша команда.",
+        text: "Оставьте заявку или позвоните. Обсудим повод и формат, предложим меню, пришлём смету. Дальше — договор, и в день события на вашей площадке работает наша команда.",
       },
     },
   ],
 };
 
 /* 81-F3 (S1, критик C — MAJOR): SSR-shell конверс-блока. HaccBooking обязан
- * жить в Suspense (nuqs useQueryState) — при СТАТИЧЕСКОМ пререндере проде
- * fallback={null} оставлял в SSR-HTML пустоту: якоря #calculator/#contact
- * (шапка/футер/privacy/offer/llms.txt) и H2 секции отсутствовали в сыром
+ * жить в Suspense (nuqs useQueryState) — при СТАТИЧЕСКОМ пререндере проде
+ * fallback={null} оставлял в SSR-HTML пустоту: якоря #calculator/#contact
+ * (шапка/футер/privacy/offer/llms.txt) и H2 секции отсутствовали в сыром
  * HTML. Фикс — паттерн Next.js Streaming-гайда (81-R1/P4): серверный
- * статичный фоллбэк-шелл с НОСИТЕЛЯМИ ЯКОРЕЙ + реальным заголовком (1:1
+ * статичный фоллбэк-шелл с НОСИТЕЛЯМИ ЯКОРЕЙ + реальным заголовком (1:1
  * разметка живого виджета — TiltedAccent + H2 + лид) + скелет-плашки
  * размерами ≈ виджет (замеры :3001: hb-grid 926px @1280, contacts ~750px;
  * десктоп-стрейч правой колонки — грид-стрейч).
  *
- * Ключевое решение (координация с 81-F2, хозяином hacc-booking.tsx):
- * якоря живут В ФОЛЛБЭКЕ, а не в постоянной обёртке ВНЕ Suspense —
- * hacc-booking.tsx рендерит СОБСТВЕННУЮ <section id="calculator"> (не мой
- * файл, «рендерится как раньше»); постоянная внешняя обёртка с id давала бы
- * ДУБЛЬ id после гидрации. React заменяет фоллбэк на виджет одним коммитом
- * — якорь #calculator/#contact существует и в SSR-HTML (фоллбэк), и после
- * гидрации (живой виджет), ни в один момент двух экземпляров нет. Нюанс
- * верификации: dev :3001 рендерит динамически (Suspense не срабатывает,
- * виджет в SSR-HTML всегда); фоллбэк проверялся временным прямым рендером
- * (research/f3/) — прод-проверка сырого HTML за оркестратором (ребилд :3002
- * в этой сессии запрещён).
+ * Ключевое решение (координация с 81-F2, хозяином hacc-booking.tsx):
+ * якоря живут В ФОЛЛБЭКЕ, а не в постоянной обёртке ВНЕ Suspense —
+ * hacc-booking.tsx рендерит СОБСТВЕННУЮ <section id="calculator"> (не мой
+ * файл, «рендерится как раньше»); постоянная внешняя обёртка с id давала бы
+ * ДУБЛЬ id после гидрации. React заменяет фоллбэк на виджет одним коммитом
+ * — якорь #calculator/#contact существует и в SSR-HTML (фоллбэк), и после
+ * гидрации (живой виджет), ни в один момент двух экземпляров нет. Нюанс
+ * верификации: dev :3001 рендерит динамически (Suspense не срабатывает,
+ * виджет в SSR-HTML всегда); фоллбэк проверялся временным прямым рендером
+ * (research/f3/) — прод-проверка сырого HTML за оркестратором (ребилд :3002
+ * в этой сессии запрещён).
  *
- * c89 (3-g): #contact переехал на зону КОНТАКТОВ ВНИЗУ секции (ContactsZone
+ * c89 (3-g): #contact переехал на зону КОНТАКТОВ ВНИЗУ секции (ContactsZone
  * виджета; зона формы теперь #lead-form, открывается CTA калькулятора) —
- * якорь-держатель в шелле сидит у нижних плашек, 1:1 с новой геометрией
+ * якорь-держатель в шелле сидит у нижних плашек, 1:1 с новой геометрией
  * виджета.
  */
 function HaccBookingShell() {
@@ -244,7 +244,7 @@ function HaccBookingShell() {
     >
       <div className="ea-container ea-container--wide">
         {/* Шапка — 1:1 с живым виджетом (hacc-booking.tsx: hb-head):
-            одинаковая разметка/классы => свап фоллбэка не двигает
+            одинаковая разметка/классы => свап фоллбэка не двигает
             заголовок (зона текста — CLS=0), SSR-HTML получает H2+лид.
             c85: глава 05 — зеркалит живой виджет (единая нумерация). */}
         <div className="hb-head">
@@ -257,8 +257,8 @@ function HaccBookingShell() {
             <i className="ea-italic-fragment hb-h2-line">Чек напечатается сразу.</i>
           </h2>
           <p className="hb-lede">
-            Выберите формат и гостей — смета-чек напечатается рядом.
-            Ещё выбираете формат? Оставьте заявку — подберём и посчитаем вместе.
+            Выберите формат и гостей — смета-чек напечатается рядом.
+            Ещё выбираете формат? Оставьте заявку — подберём и посчитаем вместе.
           </p>
         </div>
 
@@ -454,7 +454,7 @@ export default function Home() {
               Глава 07 → 06 (c89). */}
       <EaFaqAccordion />
 
-      {/* 13. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play icons.
+      {/* 13. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play icons.
               Follow-along social proof. Глава 08 → 07 (c89, 3-f). */}
       <CepInstagramGrid />
 

@@ -10,7 +10,7 @@ import { useMounted } from "@/hooks/use-mounted";
  * explicitly called out as a must-have.
  *
  * Source: docs/advanced-technical/site_21_gamma.html §4567-4603
- *   .marquee-slider > .marquee-track > .marquee-item[] (у gamma — 14
+ *   .marquee-slider > .marquee-track > .marquee-item[] (у gamma — 14
  *   портретных food/event фото). Gamma uses Splide (loop + AutoScroll +
  *   free drag) — we reproduce the same VISUAL result with a pure CSS
  *   keyframes loop (`@keyframes gamma-marquee-scroll` in globals.css:
@@ -21,47 +21,47 @@ import { useMounted } from "@/hooks/use-mounted";
  *   first started, so the animation loops without a visible jump.
  *
  * CYCLE 88 — контент ленты: РЕАЛЬНЫЕ фото владельца (Яндекс.Диск,
- * папка «Итоговые фото… на главную страницу»; конвейер c87: webp q82,
- * честные alt только по видимому, лого-кропы волн критиков) вместо 14
- * стоковых gamma-кадров — по указанию владельца «наши фотки» именно в
- * эту ленту (сразу за «Кейтеринг как искусство»). c89: по просьбе
- * владельца 8 кадров удалены → в ленте 36 фото. «Правда фото» (урок
- * c60): кадр НЕ режем под форму — тайлы единой ВЫСОТЫ (373px мобайл /
+ * папка «Итоговые фото… на главную страницу»; конвейер c87: webp q82,
+ * честные alt только по видимому, лого-кропы волн критиков) вместо 14
+ * стоковых gamma-кадров — по указанию владельца «наши фотки» именно в
+ * эту ленту (сразу за «Кейтеринг как искусство»). c89: по просьбе
+ * владельца 8 кадров удалены → в ленте 36 фото. «Правда фото» (урок
+ * c60): кадр НЕ режем под форму — тайлы единой ВЫСОТЫ (373px мобайл /
  * 400px md+), ширина тайла = высота × пропорция кадра (портрет 3/4 ·
  * квадрат 1/1 · альбом 4/3 · панорама 16/9) — редакционный ритм
  * смешанных ширин журнальной ленты; верх/низ ленты выровнены
- * пиксель-в-пиксель (то же требование VLM-critique #1).
+ * пиксель-в-пиксель (то же требование VLM-critique #1).
  *
  * ANIMATION PIPELINE (Cycle 41 PERF FIX + Task 5-C; GSAP удалён —
  * stale-докблок пойман аудитом c83-2, фикс c83-D):
  *   1. Loop — CSS keyframes `.gamma-marquee__track--anim` (transform-only
  *      → композитор; прежний GSAP-твин писал inline transform каждый кадр
- *      из JS и вместе с grain-репейнтом валил main thread в фризы).
+ *      из JS и вместе с grain-репейнтом валил main thread в фризы).
  *   2. Drag (Cycle 31.1) — pointer-обработчики ставят animation:none и
- *      ведут track инлайн-transform'ом; на release кейфреймы
- *      перезапускаются с отрицательным animation-delay (-resumeAt) —
- *      бесшовно с места броска.
+ *      ведут track инлайн-transform'ом; на release кейфреймы
+ *      перезапускаются с отрицательным animation-delay (-resumeAt) —
+ *      бесшовно с места броска.
  *   3. Scroll-velocity (Task 5-C) — Web Animations API: playbackRate
- *      (0.6…2.2) на существующей CSSAnimation (track.getAnimations()),
- *      rate никогда не возвращает анимацию в main thread.
+ *      (0.6…2.2) на существующей CSSAnimation (track.getAnimations()),
+ *      rate никогда не возвращает анимацию в main thread.
  *
- * Photos (c88/c89): 36 реальных кадров из /media/c87/ — та же подборка,
- * что прошла три волны слепых критиков в c87 (порядок, подписи, кропы
- * чужих логотипов); c89: из 44 кадров 8 удалены по просьбе владельца.
- * Файлы: real-event-*.webp, исходники 614–1956px по ширине. Тайл:
+ * Photos (c88/c89): 36 реальных кадров из /media/c87/ — та же подборка,
+ * что прошла три волны слепых критиков в c87 (порядок, подписи, кропы
+ * чужих логотипов); c89: из 44 кадров 8 удалены по просьбе владельца.
+ * Файлы: real-event-*.webp, исходники 614–1956px по ширине. Тайл:
  * единая высота + aspect-ratio самого кадра (object-cover при
  * совпадающей пропорции источника = кропа нет), 32px (mr-8) правый
  * отступ — редакционное дыхание. Дюрация цикла 40с → 170с → 137с
- * (c89): сет из 36 кадров ≈ 15.75к px (было 19.5к при 44) — 137с
+ * (c89): сет из 36 кадров ≈ 15.75к px (было 19.5к при 44) — 137с
  * держит прежнюю скорость ленты ~110–115 px/s (двелл кадра ~3.8с).
- * (c83: НЕ писать утилити-подобные токены «aspect + [N:N]» в комментариях —
- * Tailwind v4 сканирует комментарии как кандидаты классов и генерит
- * невалидный aspect-ratio N:N, от которого падает next build.)
+ * (c83: НЕ писать утилити-подобные токены «aspect + [N:N]» в комментариях —
+ * Tailwind v4 сканирует комментарии как кандидаты классов и генерит
+ * невалидный aspect-ratio N:N, от которого падает next build.)
  *
  * Section: full-bleed (NO horizontal padding), `overflow: hidden`,
  * `bg-cream` — sits in the natural page flow, default z-index. Edge-fade
- * mask REMOVED (Cycle 31.1, по прямому запросу владельца «убери плавное
- * затухание») — фото входят/выходят с чёткими краями (см. JSX-комментарий
+ * mask REMOVED (Cycle 31.1, по прямому запросу владельца «убери плавное
+ * затухание») — фото входят/выходят с чёткими краями (см. JSX-комментарий
  * секции ниже). Pure photo
  * scroll: NO text overlay, NO eyebrow — per gamma's lead, the marquee is
  * just photos. A 1px hairline top + bottom border in
@@ -74,7 +74,7 @@ import { useMounted } from "@/hooks/use-mounted";
  * section so there is no harsh cut.
  *
  * Reduced-motion: if the user prefers reduced motion, the keyframes
- * animation is NOT created (класс --anim не вешается) and the track falls
+ * animation is NOT created (класс --anim не вешается) and the track falls
  * back to a native horizontal
  * `overflow-x-auto` scroll with `scroll-snap-x mandatory` so users can
  * still browse the photos by scrolling, just without auto-motion. This
@@ -86,10 +86,10 @@ import { useMounted } from "@/hooks/use-mounted";
  * (the duplicate-set markup, БЕЗ анимации), so the server and client
  * agree on initial HTML and there is no hydration mismatch. After mount,
  * эффект добавляет треку класс `.gamma-marquee__track--anim` —
- * CSS-кейфреймы берут transform (тот же SSR-гейт-паттерн, что
+ * CSS-кейфреймы берут transform (тот же SSR-гейт-паттерн, что
  * рекомендует `use-mounted.ts` §14 грабли #8).
  *
- * First wow photo moment after the hero: в page.tsx лента идёт за
+ * First wow photo moment after the hero: в page.tsx лента идёт за
  * GgVideoShowcase (hero → header → video → marquee), mirroring gamma's
  * structure (hero → marquee → content).
  *
@@ -97,11 +97,11 @@ import { useMounted } from "@/hooks/use-mounted";
  *      §4567-4603 (image marquee), §4611-4619 (text marquee — -50% seam)
  */
 
-/** Пропорция кадра (классификация c87 по нативным пропорциям файлов):
+/** Пропорция кадра (классификация c87 по нативным пропорциям файлов):
  *  p — портрет 3/4, s — квадрат 1/1, l — альбом 4/3, xl — панорама 16/9. */
 type MarqueeRatio = "p" | "s" | "l" | "xl";
 
-/** Пропорция как CSS-строка для инлайн aspect-ratio тайла. */
+/** Пропорция как CSS-строка для инлайн aspect-ratio тайла. */
 const RATIO_CSS: Record<MarqueeRatio, string> = {
   p: "3 / 4",
   s: "1 / 1",
@@ -109,9 +109,9 @@ const RATIO_CSS: Record<MarqueeRatio, string> = {
   xl: "16 / 9",
 };
 
-/** sizes-подсказка next/image — точная ширина слота по пропорции кадра
- *  (высота тайла 373px мобайл / 400px md+, умноженная на пропорцию).
- *  Retina просит слот×2 и капается шириной исходника. */
+/** sizes-подсказка next/image — точная ширина слота по пропорции кадра
+ *  (высота тайла 373px мобайл / 400px md+, умноженная на пропорцию).
+ *  Retina просит слот×2 и капается шириной исходника. */
 const SIZES: Record<MarqueeRatio, string> = {
   /* c88-F2 (критик волны-1): граница 767, а не 768 — Tailwind md:
      срабатывает УЖЕ на 768px, и при vw=768 (iPad portrait) мобильная
@@ -122,69 +122,69 @@ const SIZES: Record<MarqueeRatio, string> = {
   xl: "(max-width: 767px) 663px, 711px",
 };
 
-/** 36 реальных фото событий (c88; конвейер и alt — c87, три волны слепых
- *  критиков; c89: −8 кадров по просьбе владельца — 07, 10, 11, 22, 25,
+/** 36 реальных фото событий (c88; конвейер и alt — c87, три волны слепых
+ *  критиков; c89: −8 кадров по просьбе владельца — 07, 10, 11, 22, 25,
  *  28, 41, 44). Порядок — финальная редакционная раскладка c87 (ритм
- *  «сцена↔еда», сильные открытие и финал). alt описывает только видимое
- *  на кадре — без выдуманных площадок и числа гостей. */
+ *  «сцена↔еда», сильные открытие и финал). alt описывает только видимое
+ *  на кадре — без выдуманных площадок и числа гостей. */
 const MARQUEE_PHOTOS: ReadonlyArray<{
   src: string;
   ratio: MarqueeRatio;
   alt: string;
 }> = [
-  { src: "/media/c87/real-event-01.webp", ratio: "p", alt: "Длинный банкетный стол в светлом зале с сервировкой на каждого гостя" },
-  { src: "/media/c87/real-event-02.webp", ratio: "l", alt: "Индивидуальная порционная сервировка из трёх блюд на белом столе" },
-  { src: "/media/c87/real-event-03.webp", ratio: "p", alt: "Двухъярусный ресторанный зал с цветочным декором и люстрами" },
-  { src: "/media/c87/real-event-04.webp", ratio: "p", alt: "Фуршетный стол крупным планом — закуски и морепродукты" },
-  { src: "/media/c87/real-event-05.webp", ratio: "l", alt: "Банкетный зал с жёлтыми креслами и панорамными окнами" },
-  { src: "/media/c87/real-event-06.webp", ratio: "p", alt: "Брускетты с лососем и сыром на деревянной доске" },
-  { src: "/media/c87/real-event-08.webp", ratio: "s", alt: "Канапе с красной икрой на шпажках крупным планом" },
-  { src: "/media/c87/real-event-09.webp", ratio: "xl", alt: "Широкая панорама фуршетного стола с закусками и высокими столиками" },
-  { src: "/media/c87/real-event-12.webp", ratio: "s", alt: "Десерты на шпажках с ягодами крупным планом" },
-  { src: "/media/c87/real-event-13.webp", ratio: "p", alt: "Длинный банкетный стол под белым шатром с белыми стульями" },
-  { src: "/media/c87/real-event-14.webp", ratio: "l", alt: "Банкетный стол с белой скатертью и закусками на золотистых подставках" },
-  { src: "/media/c87/real-event-15.webp", ratio: "p", alt: "Интерьер судна с панорамными окнами и прозрачной крышей, за окнами река и набережная" },
-  { src: "/media/c87/real-event-16.webp", ratio: "s", alt: "Канапе с лососем на шпажках крупным планом" },
-  { src: "/media/c87/real-event-17.webp", ratio: "l", alt: "Банкет на террасе с видом на воду, столы с чёрными скатертями" },
-  { src: "/media/c87/real-event-18.webp", ratio: "p", alt: "Длинный банкетный стол с цветочными композициями и свечами" },
-  { src: "/media/c87/real-event-19.webp", ratio: "s", alt: "Прозрачные стаканчики с мясными салатами крупным планом" },
-  { src: "/media/c87/real-event-20.webp", ratio: "xl", alt: "Длинный стол с едой и мармитами у кирпичной стены, официанты на линии" },
-  { src: "/media/c87/real-event-21.webp", ratio: "p", alt: "Длинный банкетный стол с закусками, посудой и бокалами в светлом салоне" },
-  { src: "/media/c87/real-event-23.webp", ratio: "l", alt: "Круглый банкетный стол у окна с белой скатертью" },
-  { src: "/media/c87/real-event-24.webp", ratio: "s", alt: "Канапе с ветчиной и сыром на шпажках крупным планом" },
-  { src: "/media/c87/real-event-26.webp", ratio: "p", alt: "Официант у стола с десертами в богато украшенном зале" },
-  { src: "/media/c87/real-event-27.webp", ratio: "s", alt: "Канапе с рыбой на шпажках крупным планом" },
-  { src: "/media/c87/real-event-29.webp", ratio: "l", alt: "Банкетный стол с зелёной скатертью и сервировкой" },
-  { src: "/media/c87/real-event-30.webp", ratio: "p", alt: "Круглый стол с золотистыми тарелками и цветами" },
-  { src: "/media/c87/real-event-31.webp", ratio: "s", alt: "Канапе с ветчиной и огурцами на шпажках крупным планом" },
-  { src: "/media/c87/real-event-32.webp", ratio: "p", alt: "Длинный стол с закусками, десертами и цветами" },
-  { src: "/media/c87/real-event-33.webp", ratio: "p", alt: "Длинный банкетный стол с обильной цветочной композицией по центру" },
-  { src: "/media/c87/real-event-34.webp", ratio: "l", alt: "Чёрный фуршетный стол с бокалами, цветами и бутылками в стиле лофт" },
-  { src: "/media/c87/real-event-35.webp", ratio: "p", alt: "Фуршетный стол с канапе и цветами" },
-  { src: "/media/c87/real-event-36.webp", ratio: "p", alt: "Стол с цветочными композициями в стеклянных вазах" },
-  { src: "/media/c87/real-event-37.webp", ratio: "l", alt: "Площадка под тентом с высокими столиками для мероприятия" },
-  { src: "/media/c87/real-event-38.webp", ratio: "p", alt: "Длинный фуршетный стол с закусками и цветами" },
-  { src: "/media/c87/real-event-39.webp", ratio: "p", alt: "Терраса с гирляндами и длинными столами в белых скатертях, вид сверху" },
-  { src: "/media/c87/real-event-40.webp", ratio: "xl", alt: "Длинные банкетные столы с красными скатертями, блюдами и напитками" },
-  { src: "/media/c87/real-event-42.webp", ratio: "p", alt: "Фуршетный стол с закусками и цветами" },
-  { src: "/media/c87/real-event-43.webp", ratio: "p", alt: "Длинный фуршетный стол с подсветкой и декором" },
+  { src: "/media/c87/real-event-01.webp", ratio: "p", alt: "Длинный банкетный стол в светлом зале с сервировкой на каждого гостя" },
+  { src: "/media/c87/real-event-02.webp", ratio: "l", alt: "Индивидуальная порционная сервировка из трёх блюд на белом столе" },
+  { src: "/media/c87/real-event-03.webp", ratio: "p", alt: "Двухъярусный ресторанный зал с цветочным декором и люстрами" },
+  { src: "/media/c87/real-event-04.webp", ratio: "p", alt: "Фуршетный стол крупным планом — закуски и морепродукты" },
+  { src: "/media/c87/real-event-05.webp", ratio: "l", alt: "Банкетный зал с жёлтыми креслами и панорамными окнами" },
+  { src: "/media/c87/real-event-06.webp", ratio: "p", alt: "Брускетты с лососем и сыром на деревянной доске" },
+  { src: "/media/c87/real-event-08.webp", ratio: "s", alt: "Канапе с красной икрой на шпажках крупным планом" },
+  { src: "/media/c87/real-event-09.webp", ratio: "xl", alt: "Широкая панорама фуршетного стола с закусками и высокими столиками" },
+  { src: "/media/c87/real-event-12.webp", ratio: "s", alt: "Десерты на шпажках с ягодами крупным планом" },
+  { src: "/media/c87/real-event-13.webp", ratio: "p", alt: "Длинный банкетный стол под белым шатром с белыми стульями" },
+  { src: "/media/c87/real-event-14.webp", ratio: "l", alt: "Банкетный стол с белой скатертью и закусками на золотистых подставках" },
+  { src: "/media/c87/real-event-15.webp", ratio: "p", alt: "Интерьер судна с панорамными окнами и прозрачной крышей, за окнами река и набережная" },
+  { src: "/media/c87/real-event-16.webp", ratio: "s", alt: "Канапе с лососем на шпажках крупным планом" },
+  { src: "/media/c87/real-event-17.webp", ratio: "l", alt: "Банкет на террасе с видом на воду, столы с чёрными скатертями" },
+  { src: "/media/c87/real-event-18.webp", ratio: "p", alt: "Длинный банкетный стол с цветочными композициями и свечами" },
+  { src: "/media/c87/real-event-19.webp", ratio: "s", alt: "Прозрачные стаканчики с мясными салатами крупным планом" },
+  { src: "/media/c87/real-event-20.webp", ratio: "xl", alt: "Длинный стол с едой и мармитами у кирпичной стены, официанты на линии" },
+  { src: "/media/c87/real-event-21.webp", ratio: "p", alt: "Длинный банкетный стол с закусками, посудой и бокалами в светлом салоне" },
+  { src: "/media/c87/real-event-23.webp", ratio: "l", alt: "Круглый банкетный стол у окна с белой скатертью" },
+  { src: "/media/c87/real-event-24.webp", ratio: "s", alt: "Канапе с ветчиной и сыром на шпажках крупным планом" },
+  { src: "/media/c87/real-event-26.webp", ratio: "p", alt: "Официант у стола с десертами в богато украшенном зале" },
+  { src: "/media/c87/real-event-27.webp", ratio: "s", alt: "Канапе с рыбой на шпажках крупным планом" },
+  { src: "/media/c87/real-event-29.webp", ratio: "l", alt: "Банкетный стол с зелёной скатертью и сервировкой" },
+  { src: "/media/c87/real-event-30.webp", ratio: "p", alt: "Круглый стол с золотистыми тарелками и цветами" },
+  { src: "/media/c87/real-event-31.webp", ratio: "s", alt: "Канапе с ветчиной и огурцами на шпажках крупным планом" },
+  { src: "/media/c87/real-event-32.webp", ratio: "p", alt: "Длинный стол с закусками, десертами и цветами" },
+  { src: "/media/c87/real-event-33.webp", ratio: "p", alt: "Длинный банкетный стол с обильной цветочной композицией по центру" },
+  { src: "/media/c87/real-event-34.webp", ratio: "l", alt: "Чёрный фуршетный стол с бокалами, цветами и бутылками в стиле лофт" },
+  { src: "/media/c87/real-event-35.webp", ratio: "p", alt: "Фуршетный стол с канапе и цветами" },
+  { src: "/media/c87/real-event-36.webp", ratio: "p", alt: "Стол с цветочными композициями в стеклянных вазах" },
+  { src: "/media/c87/real-event-37.webp", ratio: "l", alt: "Площадка под тентом с высокими столиками для мероприятия" },
+  { src: "/media/c87/real-event-38.webp", ratio: "p", alt: "Длинный фуршетный стол с закусками и цветами" },
+  { src: "/media/c87/real-event-39.webp", ratio: "p", alt: "Терраса с гирляндами и длинными столами в белых скатертях, вид сверху" },
+  { src: "/media/c87/real-event-40.webp", ratio: "xl", alt: "Длинные банкетные столы с красными скатертями, блюдами и напитками" },
+  { src: "/media/c87/real-event-42.webp", ratio: "p", alt: "Фуршетный стол с закусками и цветами" },
+  { src: "/media/c87/real-event-43.webp", ratio: "p", alt: "Длинный фуршетный стол с подсветкой и декором" },
 ];
 
 /** Photo tile — единая ВЫСОТА (373px мобайл / 400px md+), ширина
- *  выводится из aspect-ratio САМОГО КАДРА (инлайн-стиль — пропорция у
+ *  выводится из aspect-ratio САМОГО КАДРА (инлайн-стиль — пропорция у
  *  каждого фото своя: портрет, квадрат, альбом, панорама). «Правда
- *  фото» (c60/c88): кадр не режем под форму — форму подстраиваем под
+ *  фото» (c60/c88): кадр не режем под форму — форму подстраиваем под
  *  кадр; object-cover при совпадающей пропорции источника = кропа нет,
- *  а верх и низ ленты выровнены пиксель-в-пиксель (то же требование,
+ *  а верх и низ ленты выровнены пиксель-в-пиксель (то же требование,
  *  что закрывал VLM-critique #1 про рваные края). Тайл-обёртка (не
  *  картинка) владеет боксом — fill + object-cover.
  *
- *  sizes — точная ширина слота по пропорции кадра; retina просит
- *  слот×2 и капается исходником (замер c88: 41 из 44 источников
- *  покрывает full-retina — после c89-сокращения 35 из 36;
- *  перекропанный в c87 кадр 20 отдаёт ~0.7–0.85× на retina-десктопе —
- *  те же файлы критики c87 уже одобрили при ещё более крупной
- *  карточке, апскейл на движущейся ленте неразличим).
+ *  sizes — точная ширина слота по пропорции кадра; retina просит
+ *  слот×2 и капается исходником (замер c88: 41 из 44 источников
+ *  покрывает full-retina — после c89-сокращения 35 из 36;
+ *  перекропанный в c87 кадр 20 отдаёт ~0.7–0.85× на retina-десктопе —
+ *  те же файлы критики c87 уже одобрили при ещё более крупной
+ *  карточке, апскейл на движущейся ленте неразличим).
  *
  *  Rendered twice per set (see `<PhotoSet />`) for the seamless -50%
  *  loop. mr-8 (32px) right margin for editorial breathing room —
@@ -207,7 +207,7 @@ function PhotoTile({
       className="gamma-marquee__item relative mr-8 inline-block h-[373px] shrink-0 snap-start overflow-hidden md:h-[400px]"
       style={{ aspectRatio: RATIO_CSS[ratio] }}
       aria-hidden={ariaHidden || undefined}
-      /* C78: двойной тап по фото — золотой всплеск искр (MicroDelights). */
+      /* C78: двойной тап по фото — золотой всплеск искр (MicroDelights). */
       data-spark
     >
       <Image
@@ -217,15 +217,15 @@ function PhotoTile({
         /* c88: слот = высота 373/400 × пропорция кадра (см. SIZES выше);
            исходники c87 614–1956px — большинство покрывает retina-запрос
            слот×2, оптимизатор капает до ширины исходника (детали и
-           история замеров — в докблоке PhotoTile). */
+           история замеров — в докблоке PhotoTile). */
         sizes={SIZES[ratio]}
         className="gamma-marquee__img absolute inset-0 h-full w-full object-cover"
         // FIX-4 [F3, W1-D]: было loading="eager" — React 19 SSR
-        // автоэмитит preload-линк для каждого img без loading="lazy" —
-        // marquee-фото ниже фолда уходили в head как preload-и. Оставляем
-        // дефолт next/image (lazy): preload-линки не плодятся, фото
-        // грузятся по мере захода в вьюпорт — горизонтальный скролл ленты
-        // подводит их в зону IO сам (72 тайла — особенно важно).
+        // автоэмитит preload-линк для каждого img без loading="lazy" —
+        // marquee-фото ниже фолда уходили в head как preload-и. Оставляем
+        // дефолт next/image (lazy): preload-линки не плодятся, фото
+        // грузятся по мере захода в вьюпорт — горизонтальный скролл ленты
+        // подводит их в зону IO сам (72 тайла — особенно важно).
         // draggable=false so the user can't accidentally trigger the
         // browser's native image-drag gesture over the marquee (which
         // would otherwise interfere with the keyframes-driven motion).
@@ -238,8 +238,8 @@ function PhotoTile({
 /** One full set of 36 photos — rendered TWICE inside the track so the CSS
  *  keyframes loop translate3d(-50%) is seamless (when set 1 has fully
  *  exited left, set 2 is exactly where set 1 started). Ширины тайлов
- *  детерминированы (явная высота + aspect-ratio — не зависят от загрузки
- *  картинок), поэтому шов -50% не плывёт при lazy-загрузке. */
+ *  детерминированы (явная высота + aspect-ratio — не зависят от загрузки
+ *  картинок), поэтому шов -50% не плывёт при lazy-загрузке. */
 function PhotoSet({ ariaHidden = false }: { ariaHidden?: boolean }) {
   return (
     <span className="gamma-marquee__set flex shrink-0 items-center">
@@ -264,7 +264,7 @@ export function GammaMarquee() {
 
   // ── Marquee timing ──────────────────────────────────────────────────
   /** One full loop (0 → -50% of the track) in seconds. Must match the
-   * CSS keyframes duration. c89: 137с — сет из 36 кадров ≈ 15.75к px
+   * CSS keyframes duration. c89: 137с — сет из 36 кадров ≈ 15.75к px
    * (c88: 44 кадра ≈ 19.5к px при 170с): скорость ленты осталась
    * ~110–115 px/s, как была при 40с. */
   const MARQUEE_DURATION_S = 137;
@@ -376,13 +376,13 @@ export function GammaMarquee() {
     const progress = w > 0 ? -currentX / w : 0; // 0..1
     const resumeAt = progress * MARQUEE_DURATION_S;
     /* c88-F1 (критик волны-1, покадровый замер): прежний порядок —
-       transform="" сразу после pointerup — ставил трек в x=0 на ~2 кадра
-       до перезапуска кейфреймов (вспышка ленты в начало координат).
+       transform="" сразу после pointerup — ставил трек в x=0 на ~2 кадра
+       до перезапуска кейфреймов (вспышка ленты в начало координат).
        Фикс: замороженный инлайн-transform живёт, пока кейфреймы снова
-       не завладеют трансформом — сначала возвращаем анимацию с
-       отрицательной задержкой, и лишь потом снимаем инлайн-transform
-       (CSS-анимация в каскаде сильнее инлайн-стиля — ни в одном кадре
-       скачка не видно). */
+       не завладеют трансформом — сначала возвращаем анимацию с
+       отрицательной задержкой, и лишь потом снимаем инлайн-transform
+       (CSS-анимация в каскаде сильнее инлайн-стиля — ни в одном кадре
+       скачка не видно). */
     track.style.animation = "none";
     // Force a style flush so the animation restarts from scratch with
     // the negative delay (double rAF is the standard trick).
@@ -429,7 +429,7 @@ export function GammaMarquee() {
   // software-rendered browsers. The drag interaction still works: pointer
   // handlers kill the keyframes with an INLINE `animation: none`
   // (c83-F1: никакого `.gamma-marquee__track--drag`-класса /
-  // animation-play-state не существует) and translate the track inline;
+  // animation-play-state не существует) and translate the track inline;
   // on release the animation is dropped and restarted from a matched
   // offset via a negative animation-delay.
   React.useEffect(() => {
@@ -459,15 +459,15 @@ export function GammaMarquee() {
   //
   // PERF (§43): слушатель scroll (passive) существует ТОЛЬКО пока секция в
   // зоне видимости ±20% (IntersectionObserver снимает его вне зоны);
-  // внутри — ≤1 rAF на событие скролла. В покое — ноль слушателей, ноль rAF.
+  // внутри — ≤1 rAF на событие скролла. В покое — ноль слушателей, ноль rAF.
   //
-  // c85-PERF (замер CPU-профиля: GammaMarquee.loop 1471ms self на прокрутку
+  // c85-PERF (замер CPU-профиля: GammaMarquee.loop 1471ms self на прокрутку
   // страницы — 6.6% всего CPU): (1) track.getAnimations() вызывался КАЖДЫЙ
   // кадр лупа — аллокация+обход всех анимаций поддерева; теперь CSSAnimation
-  // КЭШИРУЕТСЯ при первом apply и пере-резолвится только если кэш умер
+  // КЭШИРУЕТСЯ при первом apply и пере-резолвится только если кэш умер
   // (drag-режим ставит animation:none inline). (2) Луп + scroll-слушатель
-  // живут ТОЛЬКО пока секция в кадре ±20% — вне экрана velocity-эффект
-  // всё равно не виден; IO снимает всё хозяйство (паттерн SdZoomFallback).
+  // живут ТОЛЬКО пока секция в кадре ±20% — вне экрана velocity-эффект
+  // всё равно не виден; IO снимает всё хозяйство (паттерн SdZoomFallback).
   React.useEffect(() => {
     if (!mounted || reducedMotion) return;
     const track = trackRef.current;
@@ -493,8 +493,8 @@ export function GammaMarquee() {
     let lastScrollAt = 0;
     /* c85: кэш CSSAnimation — getAnimations() ДОРОГОЙ (замер: 202ms на
        прокрутку при вызове каждый кадр). Живёт пока жива keyframes-анимация
-       (class --anim не снимается; drag ставит animation:none inline —
-       тогда кэш пуст и apply() молча no-op до конца drag). */
+       (class --anim не снимается; drag ставит animation:none inline —
+       тогда кэш пуст и apply() молча no-op до конца drag). */
     let cachedAnim: CSSAnimation | null = null;
 
     const resolveAnim = (): CSSAnimation | null => {
@@ -553,8 +553,8 @@ export function GammaMarquee() {
     };
 
     /* c85-PERF: всё хозяйство (scroll-слушатель + луп) монтируется ТОЛЬКО
-       когда секция в кадре ±20% — вне экрана эффект невидим, слушателей
-       ноль (грабля §52: анимация вне экрана бесплатно не бывает). */
+       когда секция в кадре ±20% — вне экрана эффект невидим, слушателей
+       ноль (грабля §52: анимация вне экрана бесплатно не бывает). */
     let listenersOn = false;
     const setListeners = (on: boolean) => {
       if (on === listenersOn) return;
@@ -570,7 +570,7 @@ export function GammaMarquee() {
         running = false;
         rate = 1;
         vel = 0;
-        apply(); // вернуть естественную скорость на выходе из кадра
+        apply(); // вернуть естественную скорость на выходе из кадра
       }
     };
 
@@ -598,7 +598,7 @@ export function GammaMarquee() {
   return (
     <section
       ref={sectionRef}
-      aria-label="Фотогалерея — кадры с наших мероприятий"
+      aria-label="Фотогалерея — кадры с наших мероприятий"
       className="gamma-marquee relative w-full overflow-hidden bg-cream py-5"
       style={{
         // Cycle 31.1: edge-fade mask REMOVED per user request: "убери
@@ -638,7 +638,7 @@ export function GammaMarquee() {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         /* C78: лейбл кастомного курсора над лентой — аффорданс «можно
-            тянуть» (CustomCursor: [data-cursor] входит в INTERACTIVE). */
+            тянуть» (CustomCursor: [data-cursor] входит в INTERACTIVE). */
         data-cursor="Тяните"
         className={
           reducedMotion
@@ -668,7 +668,7 @@ export function GammaMarquee() {
  * Defensive identity-transform reset for the track element. Clears the
  * inline `transform` style directly (drag/release handlers may have left
  * a stale translate3d on it). Имя — реликвия GSAP-эпохи Cycle 31, оставлено
- * чтобы не менять код вызова (функция — только el.style.transform = "").
+ * чтобы не менять код вызова (функция — только el.style.transform = "").
  * Keeps the cleanup branch SSR-safe (никаких внешних импортов).
  */
 function gsapSetTransformIdentity(el: HTMLElement) {

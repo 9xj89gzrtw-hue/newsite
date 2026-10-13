@@ -76,9 +76,9 @@ const HOVER_INTENT_MS = 380;
 const DESKTOP_MQ = "(min-width: 1024px)";
 
 /**
- * c108: пер-тинт blur-placeholder (как в hacc-menu). Была грабля:
- * невалидный 7-симв. hex #F5FEEE2 — SVG fill падал в ЧЁРНЫЙ, до загрузки
- * фото мелькал чёрный квадрат (жалоба владельца с мобайла).
+ * c108: пер-тинт blur-placeholder (как в hacc-menu). Была грабля:
+ * невалидный 7-симв. hex #F5FEEE2 — SVG fill падал в ЧЁРНЫЙ, до загрузки
+ * фото мелькал чёрный квадрат (жалоба владельца с мобайла).
  */
 function tintBlurDataUrl(tint: string): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="${tint}"/></svg>`;
@@ -113,31 +113,31 @@ interface HaccService {
  * фуршеты/банкеты/кофе-брейки/барбекю/торты/логистика остались в
  * меню-каталоге hacc-menu и /offer). Validated copy carried over from
  * Cycle 45 SpiralServices; 2048px media (cycle-49).
- * 4-F2: ЗАГОЛОВКИ плиток (title) — из menu.json (servicePanels[].label,
- * см. panelTitle ниже): их правит админ-панель c95 («Цены на плитках
+ * 4-F2: ЗАГОЛОВКИ плиток (title) — из menu.json (servicePanels[].label,
+ * см. panelTitle ниже): их правит админ-панель c95 («Цены на плитках
  * услуг» → поле «Заголовок»). Остальной копирайт (hook/tag/cta/mediaAlt)
- * валидирован и живёт здесь.
+ * валидирован и живёт здесь.
  */
 /** Калькулятор читает ?type=… через nuqs (подхватывает history.replaceState) —
- *  тот же контракт, что presetCalculator в hacc-menu.tsx: CTA услуг ставит
+ *  тот же контракт, что presetCalculator в hacc-menu.tsx: CTA услуг ставит
  *  ?type= (K6-CRITICAL: без преселекта «Рассчитать фуршет» открывал
- *  дефолт-банкет — ценовой шок). c86-E: guests не пресетим — ограничения
- *  по гостям сняты, калькулятор держит свой дефолт. */
+ *  дефолт-банкет — ценовой шок). c86-E: guests не пресетим — ограничения
+ *  по гостям сняты, калькулятор держит свой дефолт. */
 function presetCalculator(typeId: string) {
   if (typeof window === "undefined") return;
   window.history.replaceState(null, "", `/?type=${typeId}#calculator`);
 }
 
-/* c95 (Task 1-a): данные плиток — из src/data/menu.json (servicePanels),
- * через SERVICE_PANELS в lib/pricing.ts: та же точка правды, что у
- * калькулятора и каталога. Мэтчинг по id плитки; отсутствие записи —
- * ошибка сборки (fail fast, статику с битой плиткой не собираем).
+/* c95 (Task 1-a): данные плиток — из src/data/menu.json (servicePanels),
+ * через SERVICE_PANELS в lib/pricing.ts: та же точка правды, что у
+ * калькулятора и каталога. Мэтчинг по id плитки; отсутствие записи —
+ * ошибка сборки (fail fast, статику с битой плиткой не собираем).
  *
- * 4-F2 (критик C, M1 — «мёртвое поле админки»): отсюда же берём и
- * ЗАГОЛОВКИ плиток — servicePanels[].label редактируется в админ-панели
- * c95, до фикса эта правка не влияла на сайт (title был захардкожен).
- * Описания, юниты (priceLabel «за гостя»/«за событие»), тинты и медиа
- * остаются захардкоженными — этих полей в JSON нет. */
+ * 4-F2 (критик C, M1 — «мёртвое поле админки»): отсюда же берём и
+ * ЗАГОЛОВКИ плиток — servicePanels[].label редактируется в админ-панели
+ * c95, до фикса эта правка не влияла на сайт (title был захардкожен).
+ * Описания, юниты (priceLabel «за гостя»/«за событие»), тинты и медиа
+ * остаются захардкоженными — этих полей в JSON нет. */
 const PANEL: Record<string, ServicePanel> = Object.fromEntries(
   SERVICE_PANELS.map((p) => [p.id, p]),
 );
@@ -161,15 +161,15 @@ const SERVICES: HaccService[] = [
     id: "svadby",
     index: "01",
     title: panelTitle("svadby"),
-    hook: "От утреннего кофе до ночного торта — весь день ведёт одна команда.",
+    hook: "От утреннего кофе до ночного торта — весь день ведёт одна команда.",
     price: panelPrice("svadby"),
-    priceLabel: "за гостя",
+    priceLabel: "за гостя",
     tag: "Под ключ",
     tint: "#E6EBDF",
     /* c109: фото владельца с Диска (R-O1AvPjq8H2mw), конвейер blend —
        фон перекрашен в тинт панели (research/c109/process.js). */
     media: "/media/c109/c109-svadby.webp",
-    mediaAlt: "Трёхъярусный свадебный торт с цветами и ягодами на каменной подставке, рядом бокалы с игристым",
+    mediaAlt: "Трёхъярусный свадебный торт с цветами и ягодами на каменной подставке, рядом бокалы с игристым",
     /* c89 (Task 3-b): #contact уезжает на зону контактов компании —
        конверсионные CTA главы ведут в смета-чек (#calculator). */
     ctaLabel: "Обсудить свадьбу",
@@ -179,13 +179,13 @@ const SERVICES: HaccService[] = [
     id: "korporativ",
     index: "02",
     title: panelTitle("korporativ"),
-    hook: "Кофе — к первому перерыву, гала-ужин — к финалу: всё подано вовремя.",
+    hook: "Кофе — к первому перерыву, гала-ужин — к финалу: всё подано вовремя.",
     price: panelPrice("korporativ"),
-    priceLabel: "за гостя",
-    tag: "Для компаний",
+    priceLabel: "за гостя",
+    tag: "Для компаний",
     tint: "#F6E9C9",
     media: "/media/c109/c109-korporativ.webp",
-    mediaAlt: "Многоярусная стойка с фуршетными закусками и мини-бургерами для корпоратива",
+    mediaAlt: "Многоярусная стойка с фуршетными закусками и мини-бургерами для корпоратива",
     ctaLabel: "Получить смету",
     ctaHref: "#calculator",
   },
@@ -193,13 +193,13 @@ const SERVICES: HaccService[] = [
     id: "shou-stancii",
     index: "03",
     title: panelTitle("shou-stancii"),
-    hook: "Кухня выходит к столу: паста в облаке пара, карвинг под ножом шефа.",
+    hook: "Кухня выходит к столу: паста в облаке пара, карвинг под ножом шефа.",
     price: panelPrice("shou-stancii"),
-    priceLabel: "за событие",
+    priceLabel: "за событие",
     tag: "Живая кухня",
     tint: "#F6E0DB",
     media: "/media/c109/c109-shou.webp",
-    mediaAlt: "Шоу-станция с грилем: на решётке жарятся креветки, кальмары и гребешки на шпажках",
+    mediaAlt: "Шоу-станция с грилем: на решётке жарятся креветки, кальмары и гребешки на шпажках",
     ctaLabel: "Обсудить станции",
     ctaHref: "#calculator",
   },
@@ -209,11 +209,11 @@ const SERVICES: HaccService[] = [
     title: panelTitle("bar"),
     hook: "Шейкер звенит, бокалы ледяные — бар живёт до последнего тоста.",
     price: panelPrice("bar"),
-    priceLabel: "за событие",
+    priceLabel: "за событие",
     tag: "Миксология",
     tint: "#F5EEE2",
     media: "/media/c109/c109-bar.webp",
-    mediaAlt: "Выездной бар на колёсах: шейкер, бокалы и ингредиенты для коктейлей",
+    mediaAlt: "Выездной бар на колёсах: шейкер, бокалы и ингредиенты для коктейлей",
     ctaLabel: "Обсудить бар",
     ctaHref: "#calculator",
   },
@@ -221,15 +221,15 @@ const SERVICES: HaccService[] = [
     id: "veg-halal",
     index: "05",
     title: panelTitle("veg-halal"),
-    hook: "Сертификат — на халяль, сезонные овощи — в главной роли.",
+    hook: "Сертификат — на халяль, сезонные овощи — в главной роли.",
     /* 3 200 = vegetarian.perGuest (menu.json, c89): то же слово
        «вегетарианское» обязано стоить одинаково во всех блоках (C59/W7) */
     price: panelPrice("veg-halal"),
-    priceLabel: "за гостя",
+    priceLabel: "за гостя",
     tag: "Особые меню",
     tint: "#F4DECD",
     media: "/media/c109/c109-veg-halal.webp",
-    mediaAlt: "Круглая доска с хумусом, фалафелем, питой, инжиром и гранатом",
+    mediaAlt: "Круглая доска с хумусом, фалафелем, питой, инжиром и гранатом",
     /* c89: CTA ушёл с #contact в смета-чек; преселект vegetarian держит
        цену панели и калькулятора одинаковой (K6-CRITICAL, см. calcType). */
     ctaLabel: "Получить меню",
@@ -240,29 +240,29 @@ const SERVICES: HaccService[] = [
     id: "gastro-boksy",
     index: "06",
     title: panelTitle("gastro-boksy"),
-    hook: "Банкет, который помещается в коробке, — каждому гостю лично.",
+    hook: "Банкет, который помещается в коробке, — каждому гостю лично.",
     /* c89/W1-код-критик (MAJOR): цена панели = цена КАЛЬКУЛЯТОРА формата
        (snack-box.calcPerGuest = 1 200 ₽, menu.json) — CTA плитки пресетит
        калькулятор, расхождение цен на одном экране недопустимо (K6-CRITICAL).
        Каталожные пакеты à la carte (от 660 ₽) остаются в меню-каталоге
        (hacc-menu). */
     price: panelPrice("gastro-boksy"),
-    priceLabel: "за гостя",
+    priceLabel: "за гостя",
     tag: "Доставка",
     /* c89: #E6EBDF → #F3E3E8 — 6 панелей = 6 семейств тинтов без дублей
        (раньше семьи циклились по 12 панелям). */
     tint: "#F3E3E8",
     media: "/media/c109/c109-gastro-boksy.webp",
-    mediaAlt: "Гастро-бокс с канапе и закусками в секциях",
+    mediaAlt: "Гастро-бокс с канапе и закусками в секциях",
     ctaLabel: "Заказать боксы",
     ctaHref: "#calculator",
     calcType: "snack-box",
   },
 ];
 
-/** c89 (Task 3-b): «в главе 1 всего один аккордеон» — единая группа из
- *  шести форматов; второй рэк («К любому формату») и модель фокус-переключения
- *  между рэками удалены вместе с его панелями. */
+/** c89 (Task 3-b): «в главе 1 всего один аккордеон» — единая группа из
+ *  шести форматов; второй рэк («К любому формату») и модель фокус-переключения
+ *  между рэками удалены вместе с его панелями. */
 const RACK_LABEL = "Форматы события";
 
 /* ----------------------------------------------------------- rack (6 items) */
@@ -563,7 +563,7 @@ function HaccRack({
   /* choreographed entrance — this rack's spines cascade (40ms stagger) --
      c83-F2 (V1b RM): под reduce варианты остаются ОПРЕДЕЛЁННЫМИ (нулевая
      длительность) + рэк получает animate="show" — прежде снятие
-     whileInView оставляло залитый в SSR initial opacity:0 навсегда
+     whileInView оставляло залитый в SSR initial opacity:0 навсегда
      (замер: рэк/корешки невидимы под prefers-reduced-motion). */
   const rackVariants = reduceSettled
     ? { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0 } } }
@@ -598,7 +598,7 @@ function HaccRack({
       initial={reduceSettled ? false : "hidden"}
       whileInView={reduceSettled ? undefined : "show"}
       /* c83-F2: под reduce финал приходит через animate (duration 0),
-         а не через снятие whileInView — иначе залипание SSR-initial. */
+         а не через снятие whileInView — иначе залипание SSR-initial. */
       animate={reduceSettled ? "show" : undefined}
       viewport={{ once: true, margin: "-60px" }}
       variants={rackVariants}
@@ -708,9 +708,9 @@ function HaccRack({
                       0.16s подсаживается в существующий staggered entrance
                       .hacc__body>* (140/220/300ms) — поп виден ровно с
                       появлением head-row. initial={false}: ничего не
-                      сериализуется в SSR-анимацией (C62); reduceSettled —
-                      identity-таргет с duration 0 (статика, без transform-
-                      остатка на открытой панели). Transform-only: flex-grow /
+                      сериализуется в SSR-анимацией (C62); reduceSettled —
+                      identity-таргет с duration 0 (статика, без transform-
+                      остатка на открытой панели). Transform-only: flex-grow /
                       autoplay / progress-line / Ken Burns / параллакс не
                       затронуты. */}
                   <motion.span
@@ -783,17 +783,17 @@ function HaccRack({
                       /* 81-W2F2b: было 64vw (=921.6px @1440) — занижало
                          реальный бокс фото панели. Замеры (1440 DPR1,
                          research/w2f2b): видимый figure .hacc__media =
-                         920px, но layout-бокс img = figure+24px bleed =
-                         944px, в макс. Ken-Burns-дрейфе (scale 1.09) —
+                         920px, но layout-бокс img = figure+24px bleed =
+                         944px, в макс. Ken-Burns-дрейфе (scale 1.09) —
                          до 1057px. Ширина панели растёт БЫСТРЕЕ vw
                          (корешки фикс-пиксельные): img-бокс 68.6vw@1280,
                          69.5vw@1440, 71.6vw@1600, 77.3vw@1920. 75vw по
                          лестнице кандидатов (828→1080→1200→1920) даёт
-                         828@1024-1279 (как и раньше), 1080@1280-1439
-                         (было 828@1280 = 0.94 на дрейф), 1200@1440-1600
+                         828@1024-1279 (как и раньше), 1080@1280-1439
+                         (было 828@1280 = 0.94 на дрейф), 1200@1440-1600
                          (было 1080@1600 = 0.89), 1920@≥1698 (без изм.).
-                         Retina-десктоп — тот же выбор ×2. Примечание:
-                         img.naturalWidth в Chromium для srcset+w-дескрипторов
+                         Retina-десктоп — тот же выбор ×2. Примечание:
+                         img.naturalWidth в Chromium для srcset+w-дескрипторов
                          возвращает density-corrected размер (intrinsic×
                          sizes/candidate) — «natural 921» критика E =
                          артефакт, реальный файл 1080 (замер
@@ -801,19 +801,19 @@ function HaccRack({
                       sizes="(max-width: 1023px) 100vw, 75vw"
                       /* C71-P1 (K8 MAJOR, Task 4): было loading={isOpen ?
                          "eager" : "lazy"} — дефолт-раскрытая строка
-                         сериализовала loading="eager" в SSR, и три
+                         сериализовала loading="eager" в SSR, и три
                          ниже-фолдных фото (c49-furshet 87KB + furshet-1
-                         26KB + c57-bar 78KB) качались на t≈512ms, конкурируя
-                         с hero-LCP (замер K8/DO). Теперь всегда lazy —
-                         фото панели грузится по мере входа аккордеона во
+                         26KB + c57-bar 78KB) качались на t≈512ms, конкурируя
+                         с hero-LCP (замер K8/DO). Теперь всегда lazy —
+                         фото панели грузится по мере входа аккордеона во
                          вьюпорт/раскрытия (приемлемый трейдофф ТЗ), а
                          fetchPriority="low" дополнительно опускает их
-                         в приоритетной очереди. */
+                         в приоритетной очереди. */
                       loading="lazy"
                       fetchPriority="low"
                       /* c109: фото конвейера blend (фон = тинт панели,
                          research/c109) — без CSS-фильтра: saturate/contrast
-                         сдвигает тинт краёв и раскрывает прямоугольную
+                         сдвигает тинт краёв и раскрывает прямоугольную
                          границу фото (урок c107, .hacc__img--blend). */
                       className={
                         s.media.startsWith("/media/c109")
@@ -882,7 +882,7 @@ export function HaccServices() {
 
   /* stable handlers ------------------------------------------------------- */
   /** Click / keyboard engagement — autoplay stops for good (WCAG 2.2.2).
-   *  c89: без второго рэка фокус-переключение не нужно — engage только
+   *  c89: без второго рэка фокус-переключение не нужно — engage только
    *  гасит автоплей. */
   const handleEngage = useCallback(() => setPlaying(false), []);
 
@@ -936,7 +936,7 @@ export function HaccServices() {
                 носителя + aria-hidden скрамбл-узел — aria-label на generic-
                 ролях запрещён (Lighthouse aria-prohibited-attr). */}
             <ScrambleText className="ea-eyebrow--script" delayMs={150}>
-              Форматы и сервисы
+              Форматы и сервисы
             </ScrambleText>
             {/* C71: H2 — слова поднимаются каскадом (SplitTextReveal, дефолты
                 SPEC: words / stagger 0.06 / 0.7s / [0.22,1,0.36,1]). Визуальный
@@ -960,8 +960,8 @@ export function HaccServices() {
             <p className="hacc__lede">
               {/* c89 (Task 3-b): кофе-брейк покинул главу — диапазон «от … до …»
                   теперь между гастро-боксами (самый доступный формат) и свадьбой. */}
-              От гастро-боксов на двадцать персон до свадьбы на пятьсот гостей:
-              формат определяет меню, команду и цену за гостя.
+              От гастро-боксов на двадцать персон до свадьбы на пятьсот гостей:
+              формат определяет меню, команду и цену за гостя.
             </p>
           </div>
           {/* cycle-54: the big 01/12 counter is GONE — it ticked far from

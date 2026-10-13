@@ -100,8 +100,8 @@ export function MenuEditor({ menu, update }: { menu: MenuData; update: UpdateMen
         short: "Короткое описание",
         perGuest: 1000,
         minGuests: 1,
-        description: "Опишите формат: для каких событий, что на столах.",
-        included: ["Официанты", "Посуда и приборы"],
+        description: "Опишите формат: для каких событий, что на столах.",
+        included: ["Официанты", "Посуда и приборы"],
         packages: [
           {
             name: "Базовый",
@@ -118,7 +118,7 @@ export function MenuEditor({ menu, update }: { menu: MenuData; update: UpdateMen
       };
     });
 
-  /* --- поиск: формат подходит, если совпал он, пакет или блюдо ---------- */
+  /* --- поиск: формат подходит, если совпал он, пакет или блюдо ---------- */
   const q = query.trim().toLowerCase();
   const matches = useMemo(() => {
     const res: Record<string, boolean> = {};
@@ -161,8 +161,8 @@ export function MenuEditor({ menu, update }: { menu: MenuData; update: UpdateMen
   return (
     <section>
       <SectionHeader
-        title="Меню и цены"
-        description="Форматы меню, пакеты и цены за человека. Изменения публикуются на сайт после нажатия «Опубликовать изменения»."
+        title="Меню и цены"
+        description="Форматы меню, пакеты и цены за человека. Изменения публикуются на сайт после нажатия «Опубликовать изменения»."
       />
 
       {/* c96: панель инструментов — поиск, свёртка, массовые цены */}
@@ -174,8 +174,8 @@ export function MenuEditor({ menu, update }: { menu: MenuData; update: UpdateMen
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Поиск: формат, пакет или блюдо…"
-              aria-label="Поиск по меню"
+              placeholder="Поиск: формат, пакет или блюдо…"
+              aria-label="Поиск по меню"
               className="h-11 rounded-xl pl-9 text-[15px]"
             />
             {searching ? (
@@ -247,7 +247,7 @@ export function MenuEditor({ menu, update }: { menu: MenuData; update: UpdateMen
           <Card className="rounded-2xl border-border-line/80 shadow-none">
             <CardContent className="py-10 text-center">
               <p className="text-[14px] text-ink-soft">
-                По запросу «{query.trim()}» ничего не найдено
+                По запросу «{query.trim()}» ничего не найдено
               </p>
               <Button
                 type="button"
@@ -369,7 +369,7 @@ function MenuTypeCard({
             <div>
               <FieldLabel
                 htmlFor={`mt-${index}-short`}
-                hint="подпись в каталоге"
+                hint="подпись в каталоге"
               >
                 Короткое описание
               </FieldLabel>
@@ -377,7 +377,7 @@ function MenuTypeCard({
                 id={`mt-${index}-short`}
                 value={type.short}
                 onChange={(v) => onChange({ short: v })}
-                placeholder="Канапе и брускетты"
+                placeholder="Канапе и брускетты"
               />
             </div>
           </div>
@@ -388,7 +388,7 @@ function MenuTypeCard({
               id={`mt-${index}-desc`}
               value={type.description}
               onChange={(v) => onChange({ description: v })}
-              placeholder="Для каких событий подходит формат…"
+              placeholder="Для каких событий подходит формат…"
             />
           </div>
 
@@ -401,7 +401,7 @@ function MenuTypeCard({
                 onChange={(v) => onChange({ perGuest: v })}
                 suffix="₽"
               />
-              <HintText>Показывается в каталоге «от … ₽/чел».</HintText>
+              <HintText>Показывается в каталоге «от … ₽/чел».</HintText>
             </div>
             <div>
               <FieldLabel
@@ -418,7 +418,7 @@ function MenuTypeCard({
                   onChange({ calcPerGuest: undefined } as Partial<MenuType>)
                 }
                 suffix="₽"
-                placeholder="как в каталоге"
+                placeholder="как в каталоге"
               />
               <HintText>Единая цена калькулятора, если отличается.</HintText>
             </div>
@@ -434,7 +434,7 @@ function MenuTypeCard({
             <div>
               <FieldLabel
                 htmlFor={`mt-${index}-unit`}
-                hint="«/чел» или «за набор»"
+                hint="«/чел» или «за набор»"
               >
                 Единица цены
               </FieldLabel>
@@ -448,7 +448,7 @@ function MenuTypeCard({
           </div>
 
           <div className="mt-5">
-            <FieldLabel>Что входит во все пакеты</FieldLabel>
+            <FieldLabel>Что входит во все пакеты</FieldLabel>
             <StringListEditor
               items={type.included}
               onChange={(included) => onChange({ included })}
@@ -522,7 +522,7 @@ function PackagesEditor({
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <h3 className="text-[15px] font-semibold text-ink">Пакеты</h3>
         <span className="text-xs text-ink-soft/80">
-          1–6 пакетов · цена за гостя
+          1–6 пакетов · цена за гостя
         </span>
       </div>
       <Tabs value={active} onValueChange={setActive}>
@@ -565,12 +565,12 @@ function PackagesEditor({
   );
 }
 
-/** Числовой формат без валюты (для граммов). */
+/** Числовой формат без валюты (для граммов). */
 function formatNum(n: number): string {
   return new Intl.NumberFormat("ru-RU").format(n);
 }
 
-/** Суммарный вес порций на гостя: складываем числа с «г» в поле weight. */
+/** Суммарный вес порций на гостя: складываем числа с «г» в поле weight. */
 function packageWeightGrams(pkg: MenuPackage): number {
   let total = 0;
   for (const d of pkg.dishes) {
@@ -631,7 +631,7 @@ function PackageEditor({
           />
         </div>
         <div>
-          <FieldLabel>Цена за персону (руб.)</FieldLabel>
+          <FieldLabel>Цена за персону (руб.)</FieldLabel>
           <NumberField
             value={pkg.pricePerGuest}
             onChange={(pricePerGuest) => onChange({ pricePerGuest })}
@@ -687,7 +687,7 @@ function PackageEditor({
               className="h-11 rounded-xl text-[14px]"
               onClick={() => setGalleryOpen(true)}
             >
-              <Search className="size-4" /> Выбрать из галереи
+              <Search className="size-4" /> Выбрать из галереи
             </Button>
           </div>
         </div>
@@ -699,8 +699,8 @@ function PackageEditor({
           <span className="text-xs text-ink-soft/80">
             {pkg.dishes.length}/60
             {grams > 0
-              ? ` · ~${formatNum(grams)} г на гостя`
-              : " · вес порции укажите в отдельном поле: 35 г"}
+              ? ` · ~${formatNum(grams)} г на гостя`
+              : " · вес порции укажите в отдельном поле: 35 г"}
           </span>
         </div>
         <div className="space-y-2">
@@ -777,7 +777,7 @@ function PackageEditor({
           </DeleteButton>
         ) : (
           <p className="flex-1 text-center text-xs text-ink-soft/70">
-            У формата должен остаться хотя бы один пакет
+            У формата должен остаться хотя бы один пакет
           </p>
         )}
         <Button
@@ -804,7 +804,7 @@ function PackageEditor({
 /* --------------------------------------------------- c96: массовые цены */
 
 /**
- * Диалог массового изменения цен: «все форматы или один» ± % с округлением.
+ * Диалог массового изменения цен: «все форматы или один» ± % с округлением.
  * Превью показывает старую → новую цену каждой позиции до применения.
  * Ограничения zod-гейта соблюдаются: цены 100..100000, целые.
  */
@@ -831,8 +831,8 @@ function BulkPriceDialog({
     }
   }, [open]);
 
-  /* c96: расчёт лёгкий (десятки строк), мемоизация не нужна.
-   * c96-CRIT-A: превью и применение считают ОДИНАКОВО — с клампом zod
+  /* c96: расчёт лёгкий (десятки строк), мемоизация не нужна.
+   * c96-CRIT-A: превью и применение считают ОДИНАКОВО — с клампом zod
    * (100..100 000), чтобы «что показали» == «что применилось». */
   const clampPrice = (v: number) => Math.min(100000, Math.max(100, Math.round(v)));
   const applyRound = (v: number) => {
@@ -896,8 +896,8 @@ function BulkPriceDialog({
             Массовое изменение цен
           </DialogTitle>
           <DialogDescription className="text-[13px]">
-            Поднимите или опустите цены сразу по формату или всему меню —
-            например, «+10% на всё» к новому сезону.
+            Поднимите или опустите цены сразу по формату или всему меню —
+            например, «+10% на всё» к новому сезону.
           </DialogDescription>
         </DialogHeader>
         <div className="max-h-[55vh] space-y-4 overflow-y-auto px-5 py-4">
@@ -982,7 +982,7 @@ function BulkPriceDialog({
               </table>
             </div>
             <HintText>
-              Минимальные заказы и допуслуги не меняются — только цены за
+              Минимальные заказы и допуслуги не меняются — только цены за
               гостя. Кнопка «Опубликовать изменения» — как обычно, сверху.
             </HintText>
           </div>
@@ -1089,7 +1089,7 @@ function MediaPickerDialog({
             Галерея фото
           </DialogTitle>
           <DialogDescription className="text-[13px]">
-            Поиск по имени файла — нажмите на фото, чтобы выбрать
+            Поиск по имени файла — нажмите на фото, чтобы выбрать
           </DialogDescription>
           <div className="relative pt-1">
             <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-soft/60" />
@@ -1106,7 +1106,7 @@ function MediaPickerDialog({
         <div className="max-h-[55vh] overflow-y-auto p-3">
           {error ? (
             <p className="p-6 text-center text-sm text-ink-soft">
-              Галерея недоступна. Проверьте подключение и попробуйте ещё раз.
+              Галерея недоступна. Проверьте подключение и попробуйте ещё раз.
             </p>
           ) : !files ? (
             <div className="grid grid-cols-3 gap-2 p-1 sm:grid-cols-5">
@@ -1119,7 +1119,7 @@ function MediaPickerDialog({
             </div>
           ) : filtered.length === 0 ? (
             <p className="p-6 text-center text-sm text-ink-soft">
-              Ничего не найдено
+              Ничего не найдено
             </p>
           ) : (
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">

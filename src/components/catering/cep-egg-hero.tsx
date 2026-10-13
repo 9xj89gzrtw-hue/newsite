@@ -137,7 +137,7 @@ export function CepEggHero() {
           variants={supportingVariants}
           className="cep-text mt-3 max-w-md text-[17px] leading-[1.2] text-white/80"
         >
-          Переосмысляем еду как искусство с 2014 года.
+          Переосмысляем еду как искусство с 2014 года.
         </motion.p>
       </motion.div>
 

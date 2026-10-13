@@ -81,7 +81,7 @@ export function SdZoomFallback({
           }
         }
       },
-      { rootMargin: "20% 0px" }, // включаемся чуть заранее — вход не пропускаем
+      { rootMargin: "20% 0px" }, // включаемся чуть заранее — вход не пропускаем
     );
     io.observe(wrap);
 

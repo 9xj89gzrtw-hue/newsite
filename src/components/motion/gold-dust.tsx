@@ -8,10 +8,10 @@ import "./wow.css";
  * GoldDust — «золотая пыль» над видео-секцией gg-video-showcase.
  *
  * Canvas absolute inset-0 внутри relative-контейнера секции: над
- * видео-скримом (позже в DOM), под редакционным текстом (контент z-10).
- * pointer-events:none — не мешает CTA и Play-кнопке.
+ * видео-скримом (позже в DOM), под редакционным текстом (контент z-10).
+ * pointer-events:none — не мешает CTA и Play-кнопке.
  *
- * - 40–60 частиц на coarse/узких экранах (<768px), иначе 60–100;
+ * - 40–60 частиц на coarse/узких экранах (<768px), иначе 60–100;
  *   радиус 0.5–2px, золото #C9A227/#E5C76B/#8A6D1F, alpha 0.15–0.4
  *   (с мягким мерцанием в пределах ±15%).
  * - Движение: медленный дрейф вверх + синус-шатание по горизонтали;
@@ -67,12 +67,12 @@ const PALETTE: ReadonlyArray<readonly [number, number, number]> = [
 ];
 
 /* K4 (cycle-71, F3): micro-perf. Раньше `rgba(...)` + toFixed(3) собирались
-   на каждую частицу на каждый кадр (~4.3k строк/с при 72 частицах — чистый
-   мусор для GC). Теперь: строки прекэшированы по (палитра × alpha-ступени),
-   в кадре — только числовой lookup FILL_STYLES[ci][step], ноль аллокаций.
-   65 ступеней на диапазон [0, ALPHA_MAX=0.5] → шаг ~0.0078: мерцание
-   (амплитуда ≤±15% от базовой 0.15–0.4) проходит через ~7 ступеней —
-   визуально неотличимо от прежнего toFixed(3). */
+   на каждую частицу на каждый кадр (~4.3k строк/с при 72 частицах — чистый
+   мусор для GC). Теперь: строки прекэшированы по (палитра × alpha-ступени),
+   в кадре — только числовой lookup FILL_STYLES[ci][step], ноль аллокаций.
+   65 ступеней на диапазон [0, ALPHA_MAX=0.5] → шаг ~0.0078: мерцание
+   (амплитуда ≤±15% от базовой 0.15–0.4) проходит через ~7 ступеней —
+   визуально неотличимо от прежнего toFixed(3). */
 const ALPHA_MAX = 0.5; // потолок реальных альф: 0.4 × 1.0 = 0.4 (+запас)
 const ALPHA_STEPS = 64;
 const FILL_STYLES: string[][] = PALETTE.map(([cr, cg, cb]) => {
@@ -105,9 +105,9 @@ const makeDust = (x: number, y: number): Dust => {
 
 export function GoldDust() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  // Канвас рендерится только после mount, без reduce-motion и НЕ в
-  // lite-режиме: сервер и первый клиентский рендер дают null →
-  // гидрация стабильна (lite поднимается post-mount — как и reduce)
+  // Канвас рендерится только после mount, без reduce-motion и НЕ в
+  // lite-режиме: сервер и первый клиентский рендер дают null →
+  // гидрация стабильна (lite поднимается post-mount — как и reduce)
   const [enabled, setEnabled] = useState(false);
   const lite = useLiteDevice();
 
@@ -155,7 +155,7 @@ export function GoldDust() {
       dust.push(makeDust(Math.random() * w, Math.random() * h));
     }
 
-    // --- параллакс от указателя (только fine pointer, амплитуда ≤6px) ---
+    // --- параллакс от указателя (только fine pointer, амплитуда ≤6px) ---
     let px = 0;
     let py = 0;
     let targetX = 0;
@@ -179,7 +179,7 @@ export function GoldDust() {
       host.addEventListener("pointerleave", onPointerLeave, { passive: true });
     }
 
-    // --- rAF-цикл с паузами (вьюпорт + видимость вкладки) ---
+    // --- rAF-цикл с паузами (вьюпорт + видимость вкладки) ---
     let raf = 0;
     let running = false;
     let inView = false;
@@ -199,8 +199,8 @@ export function GoldDust() {
         const x =
           p.x + Math.sin(t * p.swaySpeed + p.swayPhase) * p.swayAmp + px * p.depth;
         const y = p.y + py * p.depth;
-        // мерцание в пределах 0.85–1.0 от базовой альфы (±15%), затем —
-        // квантование в прекэшированную rgba-строку (K4, F3: ноль аллокаций)
+        // мерцание в пределах 0.85–1.0 от базовой альфы (±15%), затем —
+        // квантование в прекэшированную rgba-строку (K4, F3: ноль аллокаций)
         const a = p.a * (0.85 + 0.15 * Math.sin(t * 0.0012 + p.twinkle));
         const step = Math.min(
           ALPHA_STEPS,
@@ -240,7 +240,7 @@ export function GoldDust() {
     };
     document.addEventListener("visibilitychange", onVisibility);
 
-    // --- resize с debounce, частицы масштабируются пропорционально ---
+    // --- resize с debounce, частицы масштабируются пропорционально ---
     let resizeTimer: ReturnType<typeof setTimeout> | undefined;
     const ro = new ResizeObserver(() => {
       clearTimeout(resizeTimer);
@@ -260,7 +260,7 @@ export function GoldDust() {
     });
     ro.observe(host);
 
-    // старт: IO сразу стрелянет стартом, если секция уже в вьюпорте
+    // старт: IO сразу стрелянет стартом, если секция уже в вьюпорте
     start();
 
     return () => {

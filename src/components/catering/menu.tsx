@@ -69,84 +69,84 @@ const SIGNATURE_DISHES: Record<string, Array<{
   buffet: [
     {
       name: "Ассорти морских канапе",
-      chefNote: "Краб, лосось и сливочный сыр — маленькие укусы холодного моря.",
-      price: "от 2450 ₽ / чел",
+      chefNote: "Краб, лосось и сливочный сыр — маленькие укусы холодного моря.",
+      price: "от 2450 ₽ / чел",
       image: "/media/concorde-handhelds.jpg",
     },
     {
-      name: "Скаллоп с цветной капустой",
-      chefNote: "Три скаллопа, фиолетовая цветная капуста и микрогрин — текстура в каждом кусочке.",
-      price: "от 2450 ₽ / чел",
+      name: "Скаллоп с цветной капустой",
+      chefNote: "Три скаллопа, фиолетовая цветная капуста и микрогрин — текстура в каждом кусочке.",
+      price: "от 2450 ₽ / чел",
       image: "/media/ridgewells-scallops.jpg",
     },
   ],
   banquet: [
     {
-      name: "Мясное ассорти и паштеты",
-      chefNote: "Паштеты, домашние сыровяленные деликатесы и фирменные закуски — для праздничного банкета.",
-      price: "от 4470 ₽ / чел",
+      name: "Мясное ассорти и паштеты",
+      chefNote: "Паштеты, домашние сыровяленные деликатесы и фирменные закуски — для праздничного банкета.",
+      price: "от 4470 ₽ / чел",
       image: "/media/concorde-boardroom.webp",
     },
     {
-      name: "Свинина, запечённая с грибами",
-      chefNote: "Шампиньоны, томат и сыр — горячее блюдо, которое держит тепло весь вечер.",
-      price: "от 4470 ₽ / чел",
+      name: "Свинина, запечённая с грибами",
+      chefNote: "Шампиньоны, томат и сыр — горячее блюдо, которое держит тепло весь вечер.",
+      price: "от 4470 ₽ / чел",
       image: "/media/ridgewells-gala.jpg",
     },
   ],
   "snack-box": [
     {
-      name: "Канапе с сёмгой и сливочным сыром",
-      chefNote: "Кусочек, в котором помещается весь праздник.",
-      price: "от 660 ₽ / чел",
+      name: "Канапе с сёмгой и сливочным сыром",
+      chefNote: "Кусочек, в котором помещается весь праздник.",
+      price: "от 660 ₽ / чел",
       image: "/media/menu-snack-box.jpg",
     },
     {
       name: "Ассорти мини-сэндвичей",
-      chefNote: "Копчёная курица, сыр и овощи в мягких бриошах — удобно держать в руке.",
-      price: "от 660 ₽ / чел",
+      chefNote: "Копчёная курица, сыр и овощи в мягких бриошах — удобно держать в руке.",
+      price: "от 660 ₽ / чел",
       image: "/media/concorde-handhelds.jpg",
     },
   ],
   "coffee-break": [
     {
       name: "Капучино 100% арабика",
-      chefNote: "Бразильские зёрна, молоко взбито до 65°C — бариста-станция прямо на площадке.",
-      price: "от 900 ₽ / чел",
+      chefNote: "Бразильские зёрна, молоко взбито до 65°C — бариста-станция прямо на площадке.",
+      price: "от 900 ₽ / чел",
       image: "/media/menu-coffee-break.jpg",
     },
     {
       name: "Сырная доска",
-      chefNote: "Бри, пармезан, голубой сыр и мёд — медленная пауза между сессиями.",
-      price: "от 900 ₽ / чел",
+      chefNote: "Бри, пармезан, голубой сыр и мёд — медленная пауза между сессиями.",
+      price: "от 900 ₽ / чел",
       image: "/media/menu-coffee-break.jpg",
     },
   ],
   vegetarian: [
     {
-      name: "Овощное рагу в тыкве",
-      chefNote: "Нут, карри и сезонные овощи — сытное блюдо для медленного наслаждения.",
-      price: "от 2450 ₽ / чел",
+      name: "Овощное рагу в тыкве",
+      chefNote: "Нут, карри и сезонные овощи — сытное блюдо для медленного наслаждения.",
+      price: "от 2450 ₽ / чел",
       image: "/media/ridgewells-veg-mosaic.jpg",
     },
     {
       name: "Веганский шоколадный мусс",
-      chefNote: "Бельгийский шоколад и ягоды — десерт без продуктов животного происхождения.",
-      price: "от 2450 ₽ / чел",
+      chefNote: "Бельгийский шоколад и ягоды — десерт без продуктов животного происхождения.",
+      price: "от 2450 ₽ / чел",
       image: "/media/concorde-dessert.jpg",
     },
   ],
   bbq: [
     {
-      name: "Адана-кебаб на углях",
-      chefNote: "Баранина с кмином и кориандром — дым и специи на открытом огне.",
-      price: "от 2200 ₽ / чел",
+      name: "Адана-кебаб на углях",
+      chefNote: "Баранина с кмином и кориандром — дым и специи на открытом огне.",
+      price: "от 2200 ₽ / чел",
       image: "/media/event-08.jpg",
     },
     {
-      name: "Авторские колбаски на гриле",
-      chefNote: "Классические колбаски на углях — простой и настоящий рецепт для барбекю на природе.",
-      price: "от 2200 ₽ / чел",
+      name: "Авторские колбаски на гриле",
+      chefNote: "Классические колбаски на углях — простой и настоящий рецепт для барбекю на природе.",
+      price: "от 2200 ₽ / чел",
       image: "/media/event-08.jpg",
     },
   ],
@@ -154,13 +154,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
     {
       name: "Домашний чили кон карне",
       chefNote: "Томёный, домашний — обед, после которого вторая половина дня идёт легче.",
-      price: "от 650 ₽ / порция",
+      price: "от 650 ₽ / порция",
       image: "/media/menu-office-lunch.jpg",
     },
     {
       name: "Куриный киев",
-      chefNote: "Сочное куриное бедро с травяным маслом внутри — классика не зря стала классикой.",
-      price: "от 650 ₽ / порция",
+      chefNote: "Сочное куриное бедро с травяным маслом внутри — классика не зря стала классикой.",
+      price: "от 650 ₽ / порция",
       image: "/media/menu-office-lunch.jpg",
     },
   ],
@@ -170,13 +170,13 @@ const SIGNATURE_DISHES: Record<string, Array<{
  * Map menu type IDs to their thumbnail images + descriptive alt
  */
 const MENU_TYPE_IMAGES: Record<string, { src: string; alt: string }> = {
-  buffet: { src: "/media/concorde-handhelds.jpg", alt: "Фуршетные канапе и закуски в руках официанта" },
-  banquet: { src: "/media/concorde-boardroom.webp", alt: "Банкетная сервировка стола с закусками" },
-  "snack-box": { src: "/media/menu-snack-box.jpg", alt: "Снек-боксы с закусками в индивидуальной упаковке" },
-  "coffee-break": { src: "/media/concorde-avo-toast.jpg", alt: "Кофе-брейк: тосты с авокадо и кофе" },
+  buffet: { src: "/media/concorde-handhelds.jpg", alt: "Фуршетные канапе и закуски в руках официанта" },
+  banquet: { src: "/media/concorde-boardroom.webp", alt: "Банкетная сервировка стола с закусками" },
+  "snack-box": { src: "/media/menu-snack-box.jpg", alt: "Снек-боксы с закусками в индивидуальной упаковке" },
+  "coffee-break": { src: "/media/concorde-avo-toast.jpg", alt: "Кофе-брейк: тосты с авокадо и кофе" },
   vegetarian: { src: "/media/ridgewells-veg-mosaic.jpg", alt: "Вегетарианские блюда — овощная мозаика" },
-  bbq: { src: "/media/event-06.jpg", alt: "Барбекю на открытом воздухе — гриль и овощи" },
-  "office-lunch": { src: "/media/concept-banquet-table.jpg", alt: "Обеды в офис — сервировка обеденного стола" },
+  bbq: { src: "/media/event-06.jpg", alt: "Барбекю на открытом воздухе — гриль и овощи" },
+  "office-lunch": { src: "/media/concept-banquet-table.jpg", alt: "Обеды в офис — сервировка обеденного стола" },
 };
 
 /**
@@ -392,7 +392,7 @@ export function Menu() {
       toast.success(isCatalog ? "Каталог скачан" : `Меню «${t?.label}» скачано`);
     } catch (e) {
       // Silently fail - user sees toast error above
-      toast.error("Не удалось сгенерировать PDF. Попробуйте ещё раз.");
+      toast.error("Не удалось сгенерировать PDF. Попробуйте ещё раз.");
     } finally {
       setDownloading(null);
     }
@@ -426,7 +426,7 @@ export function Menu() {
             </Reveal>
             <Reveal delay={0.2}>
               <p className="mt-3 font-display italic text-lg text-ink/70 max-w-xl">
-                Пакеты с реальными блюдами и реальными ценами. Скачайте PDF, чтобы поделиться с командой.
+                Пакеты с реальными блюдами и реальными ценами. Скачайте PDF, чтобы поделиться с командой.
               </p>
             </Reveal>
           </div>
@@ -449,7 +449,7 @@ export function Menu() {
                   aria-selected={isActive}
                   tabIndex={isActive ? 0 : -1}
                   aria-controls="menu-panel"
-                  aria-label={`${m.label}, от ${formatRUB(m.perGuest)} за человека`}
+                  aria-label={`${m.label}, от ${formatRUB(m.perGuest)} за человека`}
                   onClick={() => select(m.id)}
                   onKeyDown={(e) => {
                     // Cycle 39: ARIA tabs pattern — roving tabindex + arrows.
@@ -560,7 +560,7 @@ export function Menu() {
         <Reveal delay={0.1}>
           <div
             role="toolbar"
-            aria-label="Фильтр по пищевым предпочтениям"
+            aria-label="Фильтр по пищевым предпочтениям"
             className="mt-10 flex flex-wrap items-center justify-center gap-2 md:gap-3"
           >
             <span className="mr-2 font-mono text-[12px] uppercase tracking-[0.25em] text-ink/70">
@@ -659,7 +659,7 @@ export function Menu() {
               <div className="mt-8 rounded-2xl border border-border-line bg-white p-5 md:p-6 shadow-sm">
                 <h4 className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-gold font-medium">
                   <Check className="size-4" />
-                  Входит во все пакеты
+                  Входит во все пакеты
                 </h4>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {current.included.map((item) => (
@@ -678,7 +678,7 @@ export function Menu() {
                 onClick={() => downloadPdf(current.id)}
                 disabled={downloading !== null}
                 aria-busy={downloading === current.id}
-                aria-label={`Скачать меню «${current.label}» в формате PDF`}
+                aria-label={`Скачать меню «${current.label}» в формате PDF`}
                 whileHover={!prefersReducedMotion ? { scale: 1.03, y: -2 } : undefined}
                 whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                 className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-gold to-terracotta px-6 py-3 text-xs font-semibold text-white shadow-lg shadow-gold/25 transition-all disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm min-h-[48px]"
@@ -701,7 +701,7 @@ export function Menu() {
                 onClick={() => downloadPdf("all")}
                 disabled={downloading !== null}
                 aria-busy={downloading === "all"}
-                aria-label="Скачать полный каталог всех меню в формате PDF"
+                aria-label="Скачать полный каталог всех меню в формате PDF"
                 whileHover={!prefersReducedMotion ? { scale: 1.03, y: -2 } : undefined}
                 whileTap={!prefersReducedMotion ? { scale: 0.98 } : undefined}
                 className="group flex items-center gap-2 rounded-full border-2 border-border-line bg-white px-6 py-3 text-xs font-medium text-ink/70 transition-all hover:border-gold hover:bg-gold/5 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm min-h-[48px]"
@@ -723,11 +723,11 @@ export function Menu() {
 /**
  * Tilt card wrapper component for 3D hover effect
  *
- * K4 (cycle-71, F3): mounted-гейт по образцу motion/tilt-card.tsx (§34).
- * `prefersReducedMotion` приходит из useReducedMotion() родителя: на SSR он
- * false, а на первом рендере reduce-клиента true — прямое ветвление дерева
+ * K4 (cycle-71, F3): mounted-гейт по образцу motion/tilt-card.tsx (§34).
+ * `prefersReducedMotion` приходит из useReducedMotion() родителя: на SSR он
+ * false, а на первом рендере reduce-клиента true — прямое ветвление дерева
  * давало hydration mismatch (React перегенерировал поддерево). Первый
- * клиентский рендер ОБЯЗАН совпадать с серверным (motion.div-ветка с
+ * клиентский рендер ОБЯЗАН совпадать с серверным (motion.div-ветка с
  * rotateX/rotateY — значения 0 = тождественный transform); статичная ветка
  * поднимается только после mount (пост-гидрационный апдейт — легален).
  */
@@ -1095,7 +1095,7 @@ function PackageCarousel({
                       className="rounded-xl border border-dashed border-border-line bg-cream/40 px-4 py-6 text-center text-xs text-ink/70"
                       role="status"
                     >
-                      В этом пакете нет блюд, соответствующих выбранным фильтрам.
+                      В этом пакете нет блюд, соответствующих выбранным фильтрам.
                     </li>
                   )}
                 </ul>

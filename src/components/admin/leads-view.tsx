@@ -54,7 +54,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { SectionHeader, TextAreaField } from "./ui-bits";
 
-/** lead.php пишет ts как UNIX-секунды (time()); на случай строки — парсим и её. */
+/** lead.php пишет ts как UNIX-секунды (time()); на случай строки — парсим и её. */
 export function formatLeadDate(ts: number | string): string {
   let d: Date;
   if (typeof ts === "number") {
@@ -83,7 +83,7 @@ const SOURCE_LABELS: Record<string, string> = {
 
 /* ------------------------------------------------------- воронка (c102) */
 
-/** Порядок = жизненный цикл заявки; id совпадают с admin.php (status). */
+/** Порядок = жизненный цикл заявки; id совпадают с admin.php (status). */
 const LEAD_STATUSES = [
   { id: "new", label: "Новая" },
   { id: "contacted", label: "Связались" },
@@ -95,12 +95,12 @@ const STATUS_LABELS: Record<string, string> = Object.fromEntries(
   LEAD_STATUSES.map((s) => [s.id as string, s.label]),
 );
 
-/** Статус лида: «new» — это ОТСУТСТВИЕ поля в leads.json (как в PHP). */
+/** Статус лида: «new» — это ОТСУТСТВИЕ поля в leads.json (как в PHP). */
 function leadStatus(l: Lead): string {
   return l.status ?? "new";
 }
 
-/** Активная кнопка статуса: «Новая» — золото (перекликается с бейджем
+/** Активная кнопка статуса: «Новая» — золото (перекликается с бейджем
  *  непрочитанной), остальные — фирменные ink/moss/bordeaux, без синего. */
 const STATUS_ACTIVE: Record<string, string> = {
   new: "bg-gold text-white",
@@ -109,7 +109,7 @@ const STATUS_ACTIVE: Record<string, string> = {
   lost: "bg-bordeaux text-white",
 };
 
-/** Бейдж статуса в шапке карточки — для беглого сканирования списка. */
+/** Бейдж статуса в шапке карточки — для беглого сканирования списка. */
 const STATUS_BADGE: Record<string, string> = {
   contacted: "border-ink/25 bg-ink/5 text-ink",
   agreed: "border-moss/40 bg-moss/10 text-moss",
@@ -122,45 +122,45 @@ type LeadsFilter = "all" | "new" | "contacted" | "agreed" | "lost" | "archived";
 const FILTERS: { id: LeadsFilter; label: string }[] = [
   { id: "all", label: "Все" },
   { id: "new", label: "Новые" },
-  { id: "contacted", label: "В работе" },
+  { id: "contacted", label: "В работе" },
   { id: "agreed", label: "Договорились" },
   { id: "lost", label: "Отказ" },
   { id: "archived", label: "Архив" },
 ];
 
 /** Пустые состояния под фильтр — подсказывают СЛЕДУЮЩИЙ шаг воронки,
- *  а не просто «пусто» (владельцу без подсказки непонятно, что делать). */
+ *  а не просто «пусто» (владельцу без подсказки непонятно, что делать). */
 const EMPTY_BY_FILTER: Record<LeadsFilter, { title: string; text: string; done?: boolean }> = {
   all: {
     title: "Активных заявок нет",
-    text: "Новые заявки с сайта появятся здесь автоматически, а обработанные можно убирать в архив.",
+    text: "Новые заявки с сайта появятся здесь автоматически, а обработанные можно убирать в архив.",
   },
   new: {
     title: "Новых нет — всё обработано",
-    text: "Как только придёт заявка, она подсветится золотом и попадёт в этот фильтр.",
+    text: "Как только придёт заявка, она подсветится золотом и попадёт в этот фильтр.",
     done: true,
   },
   contacted: {
-    title: "В работе пусто",
+    title: "В работе пусто",
     text: "Отметьте заявку «Связались» после первого звонка — она появится здесь.",
   },
   agreed: {
     title: "Договорившихся пока нет",
-    text: "Статус «Договорились» ставьте, когда клиент подтвердил формат и дату.",
+    text: "Статус «Договорились» ставьте, когда клиент подтвердил формат и дату.",
   },
   lost: {
     title: "Отказов нет",
-    text: "Заявки со статусом «Отказ» собираются здесь — иногда стоит вернуться к ним позже.",
+    text: "Заявки со статусом «Отказ» собираются здесь — иногда стоит вернуться к ним позже.",
   },
   archived: {
     title: "Архив пуст",
-    text: "Убирайте сюда закрытые заявки (кнопка с ящиком) — рабочий список останется коротким.",
+    text: "Убирайте сюда закрытые заявки (кнопка с ящиком) — рабочий список останется коротким.",
   },
 };
 
-/** c102: телефон → 11 цифр «7…» для t.me/wa.me (зеркало PHP
+/** c102: телефон → 11 цифр «7…» для t.me/wa.me (зеркало PHP
  *  lead_phone_digits: 8… → 7…, 10 цифр → 7…, прочее → null — тогда
- *  кнопки связи не показываем вовсе, чтобы не вести в никуда). */
+ *  кнопки связи не показываем вовсе, чтобы не вести в никуда). */
 function phoneDigits(phone: string): string | null {
   const raw = phone.replace(/\D+/g, "");
   if (raw === "") return null;
@@ -192,7 +192,7 @@ function payloadChips(payload: Record<string, unknown> | undefined, menu: MenuDa
     chips.push({ label, value, accent });
 
   if (payload.undecided === true) {
-    push("Подбор", "нужна помощь с подбором", true);
+    push("Подбор", "нужна помощь с подбором", true);
     used.add("undecided");
   }
   if (typeof payload.typeId === "string" && payload.typeId) {
@@ -292,7 +292,7 @@ export function LeadsView({
   menu: MenuData | null;
   onPatch: (id: string, patch: { read?: boolean; archived?: boolean; status?: string; note?: string | null }) => void;
   onDelete: (id: string) => void;
-  /** c96: пометить все прочитанными (одним запросом на сервер). */
+  /** c96: пометить все прочитанными (одним запросом на сервер). */
   onReadAll: () => void;
   readingAll: boolean;
   onRefresh: () => void;
@@ -303,9 +303,9 @@ export function LeadsView({
   const [filter, setFilter] = useState<LeadsFilter>("all");
   const deleteLead = leads.find((l) => l.id === deleteId);
 
-  /* c96: статистика — сегодня и за 7 дней (владельцу важно не пропустить).
-   * c102: + живая воронка — «в работе»/«договорились» считаем по НЕархивным
-   * (архив уже закрыт и воронку не должен раздувать). */
+  /* c96: статистика — сегодня и за 7 дней (владельцу важно не пропустить).
+   * c102: + живая воронка — «в работе»/«договорились» считаем по НЕархивным
+   * (архив уже закрыт и воронку не должен раздувать). */
   const tsMs = (l: Lead) =>
     typeof l.ts === "number" ? (l.ts > 1e12 ? l.ts : l.ts * 1000) : 0;
   const dayStart = new Date();
@@ -316,8 +316,8 @@ export function LeadsView({
   const inWorkCount = activeLeads.filter((l) => leadStatus(l) === "contacted").length;
   const agreedCount = activeLeads.filter((l) => leadStatus(l) === "agreed").length;
 
-  /* c102: табы-фильтры воронки; «Новые» = непрочитанные ИЛИ статус new —
-   * заявка, которую открыли, но ещё не обработали, не теряется из виду. */
+  /* c102: табы-фильтры воронки; «Новые» = непрочитанные ИЛИ статус new —
+   * заявка, которую открыли, но ещё не обработали, не теряется из виду. */
   const filterCounts: Record<LeadsFilter, number> = {
     all: activeLeads.length,
     new: activeLeads.filter((l) => !l.read || leadStatus(l) === "new").length,
@@ -338,12 +338,12 @@ export function LeadsView({
               : leadStatus(l) === filter,
           );
 
-  /* c96: экспорт CSV — все загруженные заявки, разделитель «;», BOM для Excel.
-   * c96-CRIT-A: экранирование по RFC-4180 (кавычки — удвоением) + защита
-   * от формул-инъекций (ячейка, начинающаяся с = + - @, префиксуется «'» —
-   * Excel тогда не исполняет её как формулу).
-   * c102: + колонки «Статус» (русский ярлык воронки) и «Заметка»
-   * (переводы строк → пробел, чтобы не ломать строку CSV). */
+  /* c96: экспорт CSV — все загруженные заявки, разделитель «;», BOM для Excel.
+   * c96-CRIT-A: экранирование по RFC-4180 (кавычки — удвоением) + защита
+   * от формул-инъекций (ячейка, начинающаяся с = + - @, префиксуется «'» —
+   * Excel тогда не исполняет её как формулу).
+   * c102: + колонки «Статус» (русский ярлык воронки) и «Заметка»
+   * (переводы строк → пробел, чтобы не ломать строку CSV). */
   const exportCsv = () => {
     const esc = (v: string) => {
       const safe = /^[=+@\-\t\r]/.test(v) ? `'${v}` : v;
@@ -374,7 +374,7 @@ export function LeadsView({
       setTimeout(() => URL.revokeObjectURL(url), 4000);
       toast.success(`Экспортировано заявок: ${leads.length}`);
     } catch {
-      toast.error("Не удалось сформировать CSV — попробуйте ещё раз");
+      toast.error("Не удалось сформировать CSV — попробуйте ещё раз");
     }
   };
 
@@ -385,8 +385,8 @@ export function LeadsView({
           title="Заявки"
           description={
             total === 0
-              ? "Заявки с сайта будут появляться здесь."
-              : `Всего ${total} · сегодня ${todayCount} · за 7 дней ${weekCount} · в работе ${inWorkCount} · договорились ${agreedCount}`
+              ? "Заявки с сайта будут появляться здесь."
+              : `Всего ${total} · сегодня ${todayCount} · за 7 дней ${weekCount} · в работе ${inWorkCount} · договорились ${agreedCount}`
           }
         />
         <div className="flex flex-wrap gap-2">
@@ -434,8 +434,8 @@ export function LeadsView({
       </div>
 
       {leads.length > 0 ? (
-        /* c102: 6 фильтров-воронки; flex-wrap — на мобиле табы складываются
-         * в две строки, а не обрезаются (текст ≤13.5px, стиль прежний). */
+        /* c102: 6 фильтров-воронки; flex-wrap — на мобиле табы складываются
+         * в две строки, а не обрезаются (текст ≤13.5px, стиль прежний). */
         <div className="mb-3 inline-flex max-w-full flex-wrap gap-1 rounded-xl border border-border-line/70 bg-parchment/40 p-1">
           {FILTERS.map((f) => (
             <button
@@ -463,13 +463,13 @@ export function LeadsView({
             <Inbox className="size-10 text-ink-soft/40" />
             <p className="text-[15px] font-medium text-ink">Заявок пока нет</p>
             <p className="max-w-sm text-[13px] text-ink-soft">
-              Как только посетитель оставит заявку на сайте, она появится здесь
+              Как только посетитель оставит заявку на сайте, она появится здесь
               автоматически.
             </p>
           </CardContent>
         </Card>
       ) : visible.length === 0 ? (
-        /* c102: пустое состояние зависит от фильтра — подсказываем следующий
+        /* c102: пустое состояние зависит от фильтра — подсказываем следующий
          * шаг воронки (см. EMPTY_BY_FILTER). */
         <Card className="rounded-2xl border-border-line/80 shadow-none">
           <CardContent className="py-12 text-center">
@@ -511,7 +511,7 @@ export function LeadsView({
               Удалить заявку от {deleteLead?.name || "посетителя"}?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Заявка будет удалена навсегда — восстановить её не получится.
+              Заявка будет удалена навсегда — восстановить её не получится.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
@@ -548,17 +548,17 @@ function LeadCard({
   const { chips, rest } = payloadChips(lead.payload, menu);
   const [copied, setCopied] = useState(false);
   const [emailCopied, setEmailCopied] = useState(false);
-  /* c102: заметка свернута по умолчанию; noteDraft !== null = режим
+  /* c102: заметка свернута по умолчанию; noteDraft !== null = режим
    * правки (null → показываем сохранённый текст + кнопку «Изменить»). */
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteDraft, setNoteDraft] = useState<string | null>(null);
 
   const st = leadStatus(lead);
-  /* Кнопки Telegram/WhatsApp — только для нормализуемого номера
-   * (зеркало PHP lead_phone_digits), иначе в мессенджер вести нельзя. */
+  /* Кнопки Telegram/WhatsApp — только для нормализуемого номера
+   * (зеркало PHP lead_phone_digits), иначе в мессенджер вести нельзя. */
   const wa = phoneDigits(lead.phone);
 
-  /* c96: копирование телефона — звонить из CRM/мессенджера удобнее. */
+  /* c96: копирование телефона — звонить из CRM/мессенджера удобнее. */
   const copyPhone = async () => {
     try {
       await navigator.clipboard.writeText(lead.phone);
@@ -566,11 +566,11 @@ function LeadCard({
       toast.success("Телефон скопирован");
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("Не удалось скопировать");
+      toast.error("Не удалось скопировать");
     }
   };
 
-  /* c102: копирование email — вставить в CRM/почту одним тапом. */
+  /* c102: копирование email — вставить в CRM/почту одним тапом. */
   const copyEmail = async () => {
     if (!lead.email) return;
     try {
@@ -579,26 +579,26 @@ function LeadCard({
       toast.success("Email скопирован");
       setTimeout(() => setEmailCopied(false), 2000);
     } catch {
-      toast.error("Не удалось скопировать");
+      toast.error("Не удалось скопировать");
     }
   };
 
   /* c102: звонок/сообщение клиенту автоматом двигает воронку — «новая» →
    * «связались» + прочитано; ссылка при этом работает как обычно
-   * (без preventDefault): действие уже состоялось по факту клика. */
+   * (без preventDefault): действие уже состоялось по факту клика. */
   const markContacted = () => {
     if (st === "new") onPatch(lead.id, { read: true, status: "contacted" });
   };
 
   /* c102: статус ≠ «Новая» заодно помечает прочитанным — после работы
-   * со статусами в «Новых» не остаются «мёртвые» заявки. */
+   * со статусами в «Новых» не остаются «мёртвые» заявки. */
   const setStatus = (next: string) => {
     if (next === st) return;
     onPatch(lead.id, next === "new" ? { status: next } : { status: next, read: true });
   };
 
-  /* c102: заметка — тем же оптимистичным onPatch (откат при сбое делает
-   * родитель); пустой текст = очистить (сервер превращает "" в null). */
+  /* c102: заметка — тем же оптимистичным onPatch (откат при сбое делает
+   * родитель); пустой текст = очистить (сервер превращает "" в null). */
   const saveNote = () => {
     if (noteDraft === null) return;
     onPatch(lead.id, { note: noteDraft });
@@ -647,7 +647,7 @@ function LeadCard({
                   variant="outline"
                   className="rounded-full border-border-line bg-accent/60 text-[11px] font-normal text-ink-soft"
                 >
-                  в архиве
+                  в архиве
                 </Badge>
               ) : null}
               <Badge
@@ -671,7 +671,7 @@ function LeadCard({
                 <Badge
                   variant="outline"
                   className="rounded-full border-border-line bg-accent/60 text-[11px] font-normal text-ink-soft"
-                  title="Система уже напоминала вам об этой заявке"
+                  title="Система уже напоминала вам об этой заявке"
                 >
                   🔔 напоминание было
                 </Badge>
@@ -686,7 +686,7 @@ function LeadCard({
                 <Badge
                   variant="outline"
                   className="rounded-full border-destructive/40 text-[11px] font-normal text-destructive"
-                  title={`Данные восстановлены после сбоя хранилища (${lead.rescuedFrom}) — проверьте заявки из бэкапа вручную`}
+                  title={`Данные восстановлены после сбоя хранилища (${lead.rescuedFrom}) — проверьте заявки из бэкапа вручную`}
                 >
                   восстановлено после сбоя хранилища
                 </Badge>
@@ -706,8 +706,8 @@ function LeadCard({
                 onClick={() => onPatch(lead.id, { read: false })}
               >
                 <RotateCcw className="size-4" />
-                <span className="hidden sm:inline">Вернуть в новые</span>
-                <span className="sm:hidden">В новые</span>
+                <span className="hidden sm:inline">Вернуть в новые</span>
+                <span className="sm:hidden">В новые</span>
               </Button>
             ) : (
               <Button
@@ -727,8 +727,8 @@ function LeadCard({
               size="icon"
               className="size-11 rounded-xl text-ink-soft/70 hover:bg-accent hover:text-ink"
               onClick={() => onPatch(lead.id, { archived: !lead.archived })}
-              aria-label={lead.archived ? "Вернуть из архива" : "Убрать в архив"}
-              title={lead.archived ? "Вернуть из архива" : "Убрать в архив"}
+              aria-label={lead.archived ? "Вернуть из архива" : "Убрать в архив"}
+              title={lead.archived ? "Вернуть из архива" : "Убрать в архив"}
             >
               {lead.archived ? (
                 <ArchiveRestore className="size-4" />
@@ -799,8 +799,8 @@ function LeadCard({
                 onClick={markContacted}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Написать в Telegram"
-                title="Написать в Telegram"
+                aria-label="Написать в Telegram"
+                title="Написать в Telegram"
                 className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-border-line bg-background text-ink-soft transition-colors hover:border-gold/50 hover:text-gold"
               >
                 <Send className="size-4" />
@@ -812,8 +812,8 @@ function LeadCard({
                 onClick={markContacted}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Написать в WhatsApp"
-                title="Написать в WhatsApp"
+                aria-label="Написать в WhatsApp"
+                title="Написать в WhatsApp"
                 className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-border-line bg-background text-ink-soft transition-colors hover:border-gold/50 hover:text-gold"
               >
                 <MessageCircle className="size-4" />
@@ -887,7 +887,7 @@ function LeadCard({
                   ) : (
                     <p className="py-1 text-[12.5px] leading-relaxed text-ink-soft/80">
                       Заметки ещё нет — запишите детали разговора: что важно
-                      клиенту, о чём договорились, когда перезвонить.
+                      клиенту, о чём договорились, когда перезвонить.
                     </p>
                   )}
                   <Button
@@ -906,7 +906,7 @@ function LeadCard({
                     onChange={setNoteDraft}
                     rows={3}
                     className="text-[14px]"
-                    placeholder="Что важно клиенту, о чём договорились, когда перезвонить…"
+                    placeholder="Что важно клиенту, о чём договорились, когда перезвонить…"
                   />
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Button
@@ -975,9 +975,9 @@ function LeadCard({
 }
 
 /**
- * c97 — компактные статусы доставки уведомлений по заявке:
+ * c97 — компактные статусы доставки уведомлений по заявке:
  * Telegram / почта владельцу / подтверждение клиенту. Показываются после
- * первой отправки (поле notify появляется в записи лида после уведомлений).
+ * первой отправки (поле notify появляется в записи лида после уведомлений).
  */
 function NotifyBadges({ lead }: { lead: Lead }) {
   const n = lead.notify;
@@ -1005,8 +1005,8 @@ function NotifyBadges({ lead }: { lead: Lead }) {
     });
   }
   const deliveredAny = items.some((i) => i.ok);
-  /* c99: имя PDF-меню, ушедшего клиенту во вложении (бейдж после статусов:
-   * владелец сразу видит, ЧТО получил клиент — тариф или каталог). */
+  /* c99: имя PDF-меню, ушедшего клиенту во вложении (бейдж после статусов:
+   * владелец сразу видит, ЧТО получил клиент — тариф или каталог). */
   const clientPdf = typeof n.clientPdf === "string" && n.clientPdf !== "" ? n.clientPdf : null;
 
   return (
@@ -1034,14 +1034,14 @@ function NotifyBadges({ lead }: { lead: Lead }) {
       {clientPdf !== null ? (
         <span
           className="inline-flex items-center gap-1 text-gold"
-          title="PDF-меню, прикреплённое к письму клиента"
+          title="PDF-меню, прикреплённое к письму клиента"
         >
           <FileText className="size-3" />
           PDF: {clientPdf}
         </span>
       ) : null}
       {!deliveredAny ? (
-        <span className="text-destructive">— ни одно не доставлено</span>
+        <span className="text-destructive">— ни одно не доставлено</span>
       ) : null}
     </div>
   );
@@ -1058,7 +1058,7 @@ const SPAM_REASON_LABELS: Record<string, string> = {
  * c98-A — «Ловушка спама»: сабмиты, пойманные honeypot/elapsed-ловушками.
  * Показывается ТОЛЬКО если записи есть: сюда мог попасть реальный клиент
  * (например, старый кэш-бандл без elapsedMs) — владелец проверяет и
- * перезванивает. Данные те же, что у бейджей доставки: мини-таблица.
+ * перезванивает. Данные те же, что у бейджей доставки: мини-таблица.
  */
 function SpamTrapCard() {
   const [entries, setEntries] = useState<SpamLogEntry[]>([]);
@@ -1066,7 +1066,7 @@ function SpamTrapCard() {
   const [loading, setLoading] = useState(false);
 
   /* Последние 5 — тихая загрузка при появлении раздела «Заявки»;
-   * пустой журнал не занимает место (секция не рендерится). */
+   * пустой журнал не занимает место (секция не рендерится). */
   useEffect(() => {
     let alive = true;
     setLoading(true);
@@ -1102,7 +1102,7 @@ function SpamTrapCard() {
         </div>
         <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft/80">
           Сюда попадают подозрительные отправки форм. Реальный клиент мог
-          попасть по ошибке — проверьте: если это заказчик, просто
+          попасть по ошибке — проверьте: если это заказчик, просто
           перезвоните ему.
         </p>
         <div className="mt-3 space-y-1.5">

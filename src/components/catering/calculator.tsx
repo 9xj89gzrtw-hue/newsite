@@ -162,7 +162,7 @@ export function Calculator() {
   // the WHOLE page (preventing all client effects, incl. Embla carousels, from
   // running). Server + first client render now both get "" → match → hydrate.
   // c102: + MAX (max.ru/share?url=…&text=… — формат проверен живым запросом:
-  // max.ru отдаёт страницу «Перейти в чат» с deep-link max://…, параметры
+  // max.ru отдаёт страницу «Перейти в чат» с deep-link max://…, параметры
   // url/text сохраняются; владельцу «очень актуально»).
   const shareText = `Расчёт кейтеринга: ${formatRUB(result.total)} — ${current.label}, ${guestsClamped} гостей. Подробности:`;
   const [shareUrls, setShareUrls] = useState({ telegram: "", whatsapp: "", max: "" });
@@ -212,7 +212,7 @@ export function Calculator() {
             >
               Рассчитайте стоимость{" "}
               <br className="hidden sm:block" />
-              <span className="gradient-text italic">за 30 секунд</span>
+              <span className="gradient-text italic">за 30 секунд</span>
             </h2>
           </Reveal>
           <Reveal delay={0.2}>
@@ -326,7 +326,7 @@ export function Calculator() {
                   className="mt-2 flex items-center gap-1.5 font-mono text-xs text-terracotta bg-terracotta/10 px-3 py-1.5 rounded-full w-fit"
                 >
                   <Sparkles className="size-3" />
-                  Минимум для этого типа: {current.minGuests} гостей
+                  Минимум для этого типа: {current.minGuests} гостей
                 </motion.p>
               )}
 
@@ -624,7 +624,7 @@ export function Calculator() {
                 >
                   <Check className="size-4 text-sage shrink-0" />
                   <span>
-                    Включено: сервис, посуда, флористика, доставка в пределах КАД
+                    Включено: сервис, посуда, флористика, доставка в пределах КАД
                   </span>
                 </motion.div>
               </div>
@@ -656,7 +656,7 @@ export function Calculator() {
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
-                  Отправить заявку с расчётом
+                  Отправить заявку с расчётом
                   <Share2 className="size-4 transition-transform group-hover:translate-x-0.5" />
                 </motion.a>
               </Magnetic>
@@ -673,7 +673,7 @@ export function Calculator() {
                   <Gift className="size-3.5" />
                   Сезонная надбавка +{Math.round((result.season - 1) * 100)}%
                   <span className="text-gold/60">·</span>
-                  <span className="text-gold/70">спросите о весенних акциях</span>
+                  <span className="text-gold/70">спросите о весенних акциях</span>
                 </motion.div>
               )}
 
@@ -704,7 +704,7 @@ export function Calculator() {
                   href={telegramShareUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Поделиться расчётом в Telegram (откроется в новой вкладке)"
+                  aria-label="Поделиться расчётом в Telegram (откроется в новой вкладке)"
                   className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/70 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
                 >
                   <TelegramIcon className="size-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -714,7 +714,7 @@ export function Calculator() {
                   href={whatsappShareUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Поделиться расчётом в WhatsApp (откроется в новой вкладке)"
+                  aria-label="Поделиться расчётом в WhatsApp (откроется в новой вкладке)"
                   className="group flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/70 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
                 >
                   <MessageCircle className="size-3.5 transition-transform group-hover:scale-110" />
@@ -727,7 +727,7 @@ export function Calculator() {
                   href={maxShareUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Поделиться расчётом в MAX (откроется в новой вкладке)"
+                  aria-label="Поделиться расчётом в MAX (откроется в новой вкладке)"
                   className="group col-span-2 flex items-center justify-center gap-2 rounded-full border border-border-line px-4 py-3 text-xs font-medium text-ink/70 hover:border-gold hover:text-gold transition-colors min-h-[44px]"
                 >
                   <svg viewBox="0 0 32 32" className="size-3.5 shrink-0" aria-hidden="true" role="presentation">
@@ -735,7 +735,7 @@ export function Calculator() {
                       MAX
                     </text>
                   </svg>
-                  Поделиться в MAX
+                  Поделиться в MAX
                 </a>
               </div>
 

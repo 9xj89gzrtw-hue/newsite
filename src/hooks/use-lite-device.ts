@@ -6,13 +6,13 @@ import { isDataSaverLite, isLiteDevice, subscribeLiteDevice } from "@/lib/lite-d
 /**
  * c84: useLiteDevice — React-хук поверх lib/lite-device.
  *
- * Гидро-паритет: SSR и первый рендер всегда видят false (полная версия),
+ * Гидро-паритет: SSR и первый рендер всегда видят false (полная версия),
  * реальный lite-детект применяется ПОСЛЕ монтирования через setState —
  * разметка до/после отличается только поведением (видео/канвас/Lenis),
- * текст и структура DOM не меняются → hydration mismatch исключён.
+ * текст и структура DOM не меняются → hydration mismatch исключён.
  *
- * Подписка: если на старте не lite, слушаем connection.change — включение
- * Data Saver по ходу сессии дёргает setLite(true) (односторонний
+ * Подписка: если на старте не lite, слушаем connection.change — включение
+ * Data Saver по ходу сессии дёргает setLite(true) (односторонний
  * даунгрейд, см. lib/lite-device.ts).
  */
 export function useLiteDevice(): boolean {
@@ -31,13 +31,13 @@ export function useLiteDevice(): boolean {
 
 /**
  * c98-FIX1 (критик1 #3, MINOR): useDataSaverLite — реактивная трафик-ветка
- * детектора для tott-hero. Проблема: isDataSaverLite() живой (без кэша),
- * но БЕЗ состояния — deps эффекта hero [reduce, lite] не видят флип Data
+ * детектора для tott-hero. Проблема: isDataSaverLite() живой (без кэша),
+ * но БЕЗ состояния — deps эффекта hero [reduce, lite] не видят флип Data
  * Saver ПОСЛЕ уже установленного lite: useLiteDevice при lite===true
- * молчит (setLite(true) на том же значении — React bailout), ререндера и
- * перезапуска эффекта нет → уже играющее видео не гасится в постер.
- * Хук: значение после маунта + подписка на subscribeLiteDevice (тот
- * уведомляет и при дельте dataSaver-фактора на уже-lite-девайсе,
+ * молчит (setLite(true) на том же значении — React bailout), ререндера и
+ * перезапуска эффекта нет → уже играющее видео не гасится в постер.
+ * Хук: значение после маунта + подписка на subscribeLiteDevice (тот
+ * уведомляет и при дельте dataSaver-фактора на уже-lite-девайсе,
  * см. becomeLite). Гидро-паритет: SSR/первый рендер — false.
  */
 export function useDataSaverLite(): boolean {

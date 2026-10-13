@@ -36,12 +36,12 @@ export const MCU_PHOTO_SLIDES: PhotoSlide[] = [
   },
   {
     src: `${BASE}/DSC_0040-scaled.jpg`,
-    alt: "Фуршет на крупном корпоративном событии — Interfood Catering",
+    alt: "Фуршет на крупном корпоративном событии — Interfood Catering",
     width: 460,
   },
   {
     src: `${BASE}/257-GoDaddy2023-206747-scaled.jpg`,
-    alt: "Официант сервирует стол для банкета — Interfood Catering",
+    alt: "Официант сервирует стол для банкета — Interfood Catering",
     width: 340,
   },
   {
@@ -81,7 +81,7 @@ export const MCU_PHOTO_SLIDES: PhotoSlide[] = [
   },
   {
     src: `${BASE}/256-GoDaddy2019-03950-scaled.jpg`,
-    alt: "Банкет на корпоративном мероприятии — Interfood Catering",
+    alt: "Банкет на корпоративном мероприятии — Interfood Catering",
     width: 460,
   },
   {
@@ -101,7 +101,7 @@ export const MCU_PHOTO_SLIDES: PhotoSlide[] = [
   },
   {
     src: `${BASE}/57503196_2359979034032538_3157273932948570112_n-2.jpg`,
-    alt: "Свадебный фуршет на природе — Interfood Catering",
+    alt: "Свадебный фуршет на природе — Interfood Catering",
     width: 460,
   },
   {
@@ -111,7 +111,7 @@ export const MCU_PHOTO_SLIDES: PhotoSlide[] = [
   },
   {
     src: `${BASE}/DSC_0057-scaled.jpg`,
-    alt: "Частный приём в загородном доме — Interfood Catering",
+    alt: "Частный приём в загородном доме — Interfood Catering",
     width: 520,
   },
   {
@@ -132,20 +132,20 @@ export interface ServiceCard {
 export const MCU_SERVICES: ServiceCard[] = [
   {
     src: `${BASE}/offthegreen_16-copy.jpg`,
-    title: "Спортивные и масштабные события",
-    subtitle: "Кейтеринг на стадионах и аренах",
+    title: "Спортивные и масштабные события",
+    subtitle: "Кейтеринг на стадионах и аренах",
     href: "#calculator",
   },
   {
     src: `${BASE}/IMG_9275.jpg`,
     title: "Свадебный кейтеринг",
-    subtitle: "Авторская подача и оформление",
+    subtitle: "Авторская подача и оформление",
     href: "#calculator",
   },
   {
     src: `${BASE}/Buisness_Dining-1.jpg`,
     title: "Корпоративный банкет",
-    subtitle: "Деловые ужины и приёмы",
+    subtitle: "Деловые ужины и приёмы",
     href: "#calculator",
   },
   {
@@ -157,18 +157,18 @@ export const MCU_SERVICES: ServiceCard[] = [
   {
     src: `${BASE}/esop-2.webp`,
     title: "Офисное питание",
-    subtitle: "Ежедневные обеды для команд",
+    subtitle: "Ежедневные обеды для команд",
     href: "#calculator",
   },
   {
     src: `${BASE}/2024-0324-MCulinary-Nibblers12430.jpg`,
     title: "Доставка снек-боксов",
-    subtitle: "Фуршетные наборы на выезд",
+    subtitle: "Фуршетные наборы на выезд",
     href: "#calculator",
   },
   {
     src: `${BASE}/041-Kosher-74104992-1.jpg`,
-    title: "Кошерный и диетический",
+    title: "Кошерный и диетический",
     subtitle: "Меню под пищевые ограничения",
     href: "#calculator",
   },
@@ -185,16 +185,16 @@ export const MCU_VENUES: VenueCard[] = [
   {
     src: `${BASE}/EQINCKX3-copy.jpg`,
     title: "Конференц-площадки",
-    subtitle: "Кейтеринг в конференц-залах",
+    subtitle: "Кейтеринг в конференц-залах",
   },
   {
     src: `${BASE}/Cardinals-NFL-Party-9.jpg`,
     title: "Спортивные арены",
-    subtitle: "Масштабные события на стадионах",
+    subtitle: "Масштабные события на стадионах",
   },
   {
     src: `${BASE}/14-DesignMode-74103244.jpg`,
-    title: "Лофты и галереи",
+    title: "Лофты и галереи",
     subtitle: "Авторские пространства под событие",
   },
 ];
@@ -225,13 +225,13 @@ export const MCU_VIDEO_SLIDES: VideoSlide[] = [
   {
     src: MCU_HERO_VIDEO,
     poster: `${BASE}/Tasting-19-scaled.jpg`,
-    caption: "Дегустация и подача",
+    caption: "Дегустация и подача",
     start: 3,
   },
   {
     src: MCU_HERO_VIDEO,
     poster: `${BASE}/219-GoDaddy2019-03863-scaled.jpg`,
-    caption: "Банкет на масштабе",
+    caption: "Банкет на масштабе",
     start: 6,
   },
   {

@@ -351,7 +351,13 @@ ${faqLines}
 Краткая карта сайта — [llms.txt](https://nilovcatering.ru/llms.txt). Файл генерируется сборкой из единого источника данных меню (src/data/menu.json); цены соответствуют калькулятору на сайте.
 `;
 
-writeFileSync(join(PUBLIC_DIR, "llms-full.txt"), llmsFull);
+/* c112: NBSP (типографика сайта — предлоги не висят в конце строк) в
+   машинной LLM-форме нормализуется в обычный пробел: токенизаторы
+   читают его как пробел, а файл остаётся байт-чистым для диффов. */
+writeFileSync(
+  join(PUBLIC_DIR, "llms-full.txt"),
+  llmsFull.replace(/\u00A0/g, " "),
+);
 
 console.log(
   `✓ public/data/menu.json + media-manifest.json (${mediaFiles.length} файлов) сгенерированы; строка цен llms.txt обновлена (${parts.length} форматов); llms-full.txt сгенерирован (${fullMenu.menuTypes.length} форматов меню, ${FAQ_FULL.length} вопросов).`,

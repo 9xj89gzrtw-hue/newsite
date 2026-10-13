@@ -21,7 +21,7 @@ const SECTIONS = [
   { id: "services", label: "Услуги" },
   { id: "menu", label: "Меню" },
   { id: "calculator", label: "Калькулятор" },
-  { id: "about", label: "О нас" },
+  { id: "about", label: "О нас" },
   { id: "faq", label: "Вопросы" },
   { id: "contact", label: "Контакты" },
 ];
@@ -67,7 +67,7 @@ export function ChapterNav() {
     if (!racks.length) return;
     /* C60: IO отдаёт только ИЗМЕНИВШИЕся entries — брать entries.some()
        неверно (уход одного таргета гасил индикатор, пока второй ещё
-       в кадре). Держим состояние по каждому таргету отдельно */
+       в кадре). Держим состояние по каждому таргету отдельно */
     const state: Record<string, boolean> = {};
     const io = new IntersectionObserver(
       (entries) => {
@@ -88,7 +88,7 @@ export function ChapterNav() {
 
   return (
     <nav
-      aria-label="Быстрая навигация по разделам"
+      aria-label="Быстрая навигация по разделам"
       className={`pointer-events-none fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 transition-opacity duration-300 lg:block ${
         overRack ? "invisible opacity-0" : "visible opacity-100"
       }`}

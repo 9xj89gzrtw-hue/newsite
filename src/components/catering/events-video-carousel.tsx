@@ -26,17 +26,17 @@
  *  - ggcatering-style play-pill CTA overlay on each tile (1px solid white,
  *    radius 9999px, padding 8px/16px) — clicking opens the modal.
  *
- * Source strategy (c89, 3-d — владелец: «замени на эти видео»): 6
- * вертикальных смартфейн-клипов владельца с Яндекс.Диска
+ * Source strategy (c89, 3-d — владелец: «замени на эти видео»): 6
+ * вертикальных смартфейн-клипов владельца с Яндекс.Диска
  * (car-1..6.mov, 1080×1920) перекодированы в
  * /media/c89/c89-event-1..6.mp4 (720×1280) + постеры
  * c89-event-N-poster.webp (640×1138, 9:16). Подписи — ЧЕСТНЫЕ,
- * сверены по фактическим кадрам (VLM): без выдуманных сюжетов.
- * Все ролики со звуком; hover-тизеры mute, модалка — controls.
+ * сверены по фактическим кадрам (VLM): без выдуманных сюжетов.
+ * Все ролики со звуком; hover-тизеры mute, модалка — controls.
  *
  * Motion:
- *  - Auto-advances every 5000ms — c83-F3: на следующую snap-точку трека
- *    (не cardWidth+gap), wrap на 0 только с последней точки.
+ *  - Auto-advances every 5000ms — c83-F3: на следующую snap-точку трека
+ *    (не cardWidth+gap), wrap на 0 только с последней точки.
  *  - Pauses on mouseenter, resumes on mouseleave.
  *  - Respects `useReducedMotion` — when reduced, no auto-advance.
  *  - Subtle motion.div fade-up on header (respects reduced-motion).
@@ -53,11 +53,11 @@
  * the static poster; prefers-reduced-motion disables hover videos entirely.
  * The modal (unmuted + controls) and the «Смотреть видео» pill are unchanged.
  *
- * c84 (Impl-D, lite-режим): useLiteDevice() → тизер-видео не играют ВООБЩЕ
- * — тайлы живут статичными постерами (mp4 не грузится и не фейлится молча
- * в экономном режиме, а осознанно заменён постером; preload="none" и так
- * держал байты вне сети до первого play() — теперь и play() не случается).
- * Клик/тап по play-pill НЕ гейчим: модалка — видео по требованию юзера
+ * c84 (Impl-D, lite-режим): useLiteDevice() → тизер-видео не играют ВООБЩЕ
+ * — тайлы живут статичными постерами (mp4 не грузится и не фейлится молча
+ * в экономном режиме, а осознанно заменён постером; preload="none" и так
+ * держал байты вне сети до первого play() — теперь и play() не случается).
+ * Клик/тап по play-pill НЕ гейчим: модалка — видео по требованию юзера
  * (жест есть → play() разрешён), функциональность сохранена целиком.
  *
  * Mobile: STILL horizontal scroll — no grid collapse. This is the magazine
@@ -103,11 +103,11 @@ type EventTile = {
 };
 
 /**
- * 6 tiles — реальные видео с мероприятий владельца (c89, 3-d: заменили
- * стоковые 4 тайла с b-roll). Каждый тайл открывает СВОЙ клип в фуллскрин-
- * модалке (вертикальный 9:16 кадр): сервировка на яхте / канапе / бар с
- * живыми цветами / диспенсеры с лимонадами / фуршет у высоких столов /
- * стол с канделябрами. Подписи VLM-сверены по фактическим кадрам —
+ * 6 tiles — реальные видео с мероприятий владельца (c89, 3-d: заменили
+ * стоковые 4 тайла с b-roll). Каждый тайл открывает СВОЙ клип в фуллскрин-
+ * модалке (вертикальный 9:16 кадр): сервировка на яхте / канапе / бар с
+ * живыми цветами / диспенсеры с лимонадами / фуршет у высоких столов /
+ * стол с канделябрами. Подписи VLM-сверены по фактическим кадрам —
  * без выдуманных сюжетов (продолжение линии честности Cycle 39).
  * Постеры c89-event-N-poster.webp 640×1138 (9:16) — плитки 4:5
  * object-cover, кроп предсказуем.
@@ -117,49 +117,49 @@ const TILES: EventTile[] = [
     video: "/media/c89/c89-event-1.mp4",
     poster: "/media/c89/c89-event-1-poster.webp",
     category: "Банкеты",
-    title: "Сервировка на яхте",
-    meta: "Длинный стол · белая скатерть · вода и напитки",
-    videoAlt: "Банкетный зал на яхте: длинные столы с белыми скатертями и сервировкой",
+    title: "Сервировка на яхте",
+    meta: "Длинный стол · белая скатерть · вода и напитки",
+    videoAlt: "Банкетный зал на яхте: длинные столы с белыми скатертями и сервировкой",
   },
   {
     video: "/media/c89/c89-event-2.mp4",
     poster: "/media/c89/c89-event-2-poster.webp",
     category: "Закуски",
-    title: "Канапе с лососем",
-    meta: "Фуршетная подача · ассорти на блюде",
-    videoAlt: "Блюдо с канапе из хлеба, лосося, ветчины, оливок и лимона",
+    title: "Канапе с лососем",
+    meta: "Фуршетная подача · ассорти на блюде",
+    videoAlt: "Блюдо с канапе из хлеба, лосося, ветчины, оливок и лимона",
   },
   {
     video: "/media/c89/c89-event-3.mp4",
     poster: "/media/c89/c89-event-3-poster.webp",
     category: "Выездной бар",
-    title: "Бар с живыми цветами",
-    meta: "Оформление стойки · ромашки и гвоздики",
+    title: "Бар с живыми цветами",
+    meta: "Оформление стойки · ромашки и гвоздики",
     videoAlt: "Барная стойка, украшенная букетами свежих цветов",
   },
   {
     video: "/media/c89/c89-event-4.mp4",
     poster: "/media/c89/c89-event-4-poster.webp",
     category: "Напитки",
-    title: "Диспенсеры и сервировка",
+    title: "Диспенсеры и сервировка",
     meta: "Лимонады · бокалы · розовая скатерть",
-    videoAlt: "Стеклянные диспенсеры с напитками и сервированный круглый стол",
+    videoAlt: "Стеклянные диспенсеры с напитками и сервированный круглый стол",
   },
   {
     video: "/media/c89/c89-event-5.mp4",
     poster: "/media/c89/c89-event-5-poster.webp",
     category: "Фуршеты",
-    title: "Фуршет у высоких столов",
-    meta: "Зал с колоннами · гости общаются",
-    videoAlt: "Гости у высоких столов на фуршете в зале с колоннами",
+    title: "Фуршет у высоких столов",
+    meta: "Зал с колоннами · гости общаются",
+    videoAlt: "Гости у высоких столов на фуршете в зале с колоннами",
   },
   {
     video: "/media/c89/c89-event-6.mp4",
     poster: "/media/c89/c89-event-6-poster.webp",
     category: "Банкеты",
-    title: "Стол с канделябрами",
+    title: "Стол с канделябрами",
     meta: "Свечи · осенний букет · зелёные стулья",
-    videoAlt: "Банкетный стол со свечами в канделябрах и осенним букетом",
+    videoAlt: "Банкетный стол со свечами в канделябрах и осенним букетом",
   },
 ];
 
@@ -185,14 +185,14 @@ export function EventsVideoCarousel() {
 
   /* ── 81-W2F1 (критик F MEDIUM, модалка без Play-аффорданса) ────────
    *
-   * Модальное видео открывается со звуком (unmuted autoplay) — браузеры
-   * без жеста пользователя отвергают его: видео стоит НА ПАУЗЕ, а
+   * Модальное видео открывается со звуком (unmuted autoplay) — браузеры
+   * без жеста пользователя отвергают его: видео стоит НА ПАУЗЕ, а
    * единственным намёком оставался крестик (замер критика F). Теперь
    * поверх видео — центр-оверлей Play-кнопка (lucide Play, 64px ≥ 44px
    * тач-таргет, aria-label «Смотреть видео»): клик = video.play()
    * (клик — жест, звук разрешён). onPlay прячет оверлей навсегда — и
-   * если autoplay всё же сработал (жест клика по плитке), и если юзер
-   * нажал нативный Play в controls. Повторной паузе оверлей НЕ
+   * если autoplay всё же сработал (жест клика по плитке), и если юзер
+   * нажал нативный Play в controls. Повторной паузе оверлей НЕ
    * возвращается — нативные controls уже дают resume. */
   const modalVideoRef = useRef<HTMLVideoElement | null>(null);
   const [modalPlayed, setModalPlayed] = useState(false);
@@ -223,8 +223,8 @@ export function EventsVideoCarousel() {
     });
   }, []);
 
-  /** IO-гейт: вне вьюпорта тизеры не играют ВООБЩЕ — при выходе гасим все
-   *  (в т.ч. случайно оставшийся играющим) и запрещаем новый hover-play. */
+  /** IO-гейт: вне вьюпорта тизеры не играют ВООБЩЕ — при выходе гасим все
+   *  (в т.ч. случайно оставшийся играющим) и запрещаем новый hover-play. */
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -244,10 +244,10 @@ export function EventsVideoCarousel() {
     return () => io.disconnect();
   }, []);
 
-  /** Hover = ровно ОДНО играющее видео: вход в карточку ставит её и глушит
-   *  остальных; выход — пауза этой. Гейты: fine pointer, не reduced-motion,
-   *  не lite (c84-D: слабый девайс/экономный режим — тизеры не играют),
-   *  секция в вьюпорте, модалка закрыта. */
+  /** Hover = ровно ОДНО играющее видео: вход в карточку ставит её и глушит
+   *  остальных; выход — пауза этой. Гейты: fine pointer, не reduced-motion,
+   *  не lite (c84-D: слабый девайс/экономный режим — тизеры не играют),
+   *  секция в вьюпорте, модалка закрыта. */
   const playHoverVideo = (i: number) => {
     if (!canHoverVideo || reduce || lite || activeIndex !== null) return;
     if (!inViewRef.current) return;
@@ -270,7 +270,7 @@ export function EventsVideoCarousel() {
     if (v && !v.paused) v.pause();
   };
 
-  /** Модалка открыта — её видео (со звуком) должно играть одно: глушим
+  /** Модалка открыта — её видео (со звуком) должно играть одно: глушим
    *  hover-тизеры. */
   const pauseHoverVideos = useCallback(() => {
     hoverVideosRef.current.forEach((v) => {
@@ -280,22 +280,22 @@ export function EventsVideoCarousel() {
 
   /* ── c83-F3 (MAJOR, «клик стрелки сбрасывается») ────────────────────────
    *
-   * Root cause: обе прокрутки — стрелки и 5s-auto-advance — целились в
-   * арифметику `scrollLeft ± (cardWidth + gap)`, а wrap-эвристика
-   * `scrollLeft + delta >= max - 4` считала «конец» из ЛЮБОЙ позиции,
+   * Root cause: обе прокрутки — стрелки и 5s-auto-advance — целились в
+   * арифметику `scrollLeft ± (cardWidth + gap)`, а wrap-эвристика
+   * `scrollLeft + delta >= max - 4` считала «конец» из ЛЮБОЙ позиции,
    * когда остаток трека меньше ширины карты (десктоп: 4×320+3×24=1352
    * при clientWidth 1272 → max=80; 0+344 ≥ 76 → «конец»). Каждый тик
-   * таймер заворачивал scrollTo(0) поверх позиции пользователя, а клик
-   * стрелки отсчёт НЕ сбрасывал — тик попадал в середину smooth-полёта
-   * (rAF-лог критика: 0→80→0, возврат за 0.7–2с).
+   * таймер заворачивал scrollTo(0) поверх позиции пользователя, а клик
+   * стрелки отсчёт НЕ сбрасывал — тик попадал в середину smooth-полёта
+   * (rAF-лог критика: 0→80→0, возврат за 0.7–2с).
    *
-   * Фикс: обе прокрутки идут ТОЛЬКО на реальные snap-точки — старты
+   * Фикс: обе прокрутки идут ТОЛЬКО на реальные snap-точки — старты
    * карточек, клампнутые в [0..max] (клампнутый старт последней карты
    * == max; Chromium держит его валидной snap-позицией, замер
    * research/c83-f3/carousel-isolate.js). Wrap — только когда следующей
    * точки нет. Клик стрелки перезапускает 5s-отсчёт (таймер больше не
-   * стреляет в полёт). Геометрия читается по факту — работает при любом
-   * вьюпорте/ресайзе, IO-edge-состояния стрелок не тронуты. */
+   * стреляет в полёт). Геометрия читается по факту — работает при любом
+   * вьюпорте/ресайзе, IO-edge-состояния стрелок не тронуты. */
   const snapPoints = useCallback((): number[] => {
     const scroller = scrollerRef.current;
     if (!scroller) return [];
@@ -337,18 +337,18 @@ export function EventsVideoCarousel() {
     }
   }, []);
 
-  /* c83-F4b (критик-P2): свежий startAuto для скролл-листенера ниже — его
-     эффект подписки живёт с deps [] (переподписка на каждый флип
-     activeIndex не нужна), поэтому берём через ref (паттерн closeModalRef).
-     Без него замыкание застяло бы на старом activeIndex. */
+  /* c83-F4b (критик-P2): свежий startAuto для скролл-листенера ниже — его
+     эффект подписки живёт с deps [] (переподписка на каждый флип
+     activeIndex не нужна), поэтому берём через ref (паттерн closeModalRef).
+     Без него замыкание застяло бы на старом activeIndex. */
   const startAutoRef = useRef(startAuto);
   useEffect(() => {
     startAutoRef.current = startAuto;
   }, [startAuto]);
 
-  /* c83-F3: snap-aware arrow navigation — prev/next на соседнюю snap-точку
-   * (не scrollBy ± cardWidth). Перезапускает 5s-отсчёт (только если
-   * авто-прокрутка сейчас активна — паузы IO/mouseEnter не нарушаем). */
+  /* c83-F3: snap-aware arrow navigation — prev/next на соседнюю snap-точку
+   * (не scrollBy ± cardWidth). Перезапускает 5s-отсчёт (только если
+   * авто-прокрутка сейчас активна — паузы IO/mouseEnter не нарушаем). */
   const goTo = useCallback(
     (dir: 1 | -1) => {
       const scroller = scrollerRef.current;
@@ -401,15 +401,15 @@ export function EventsVideoCarousel() {
   }, [reduce, activeIndex, startAuto, stopAuto]);
 
   // Scroll-progress bar — rAF-throttled to keep scroll perf clean.
-  // 81-F2 (критик B, стрелки на краях): тот же скролл-поток считает
+  // 81-F2 (критик B, стрелки на краях): тот же скролл-поток считает
   // atStart/atEnd — стрелки гаснут (opacity 40% + pointer-events none),
-  // когда скроллить в эту сторону больше нечего (трек упирается в край:
+  // когда скроллить в эту сторону больше нечего (трек упирается в край:
   // scrollLeft ≤ 4 / scrollLeft+clientWidth ≥ scrollWidth-4). Автопрокрутка
-  // с wrap-around обновляет состояния через те же события. ResizeObserver
+  // с wrap-around обновляет состояния через те же события. ResizeObserver
   // пересчитывает после ресайза/поворота.
   // c83-F4b (критик-P2): ручной свайп сбрасывает 5s-отсчёт — как клик
-  // стрелки (goTo). Порог 30px за rAF-тик отличает жест пользователя
-  // (колесо/флик дают ≥50px за кадр) от хвостовых дрейфов инерции (<10px);
+  // стрелки (goTo). Порог 30px за rAF-тик отличает жест пользователя
+  // (колесо/флик дают ≥50px за кадр) от хвостовых дрейфов инерции (<10px);
   // перезапуск ТОЛЬКО при живом intervalRef — паузы IO/hover/модалки не
   // трогаем (там interval=null и стартовать нельзя). Отсчёт 5с пойдёт от
   // последнего крупного кадра свайпа — тик не попадёт в разгар инерции.
@@ -484,9 +484,9 @@ export function EventsVideoCarousel() {
       }
     };
     document.addEventListener("keydown", onKey);
-    /* c91: скролл-лок теперь и на <html> — iOS Safari игнорирует
-       overflow:hidden на body (страница под модалкой прокручивалась,
-       «карусель ездила» под открытым видео). Оба элемента, с cleanup. */
+    /* c91: скролл-лок теперь и на <html> — iOS Safari игнорирует
+       overflow:hidden на body (страница под модалкой прокручивалась,
+       «карусель ездила» под открытым видео). Оба элемента, с cleanup. */
     const prevBodyOverflow = document.body.style.overflow;
     const prevHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
@@ -528,11 +528,11 @@ export function EventsVideoCarousel() {
   // Cycle 40 a11y: remember which tile opened the modal so focus returns
   // there on close (previously focus fell to <body> — keyboard users lost
   // their place on the page).
-  // K7-FIX (P2 / 2.4.3): замер критика — Esc закрывает, но фокус всё равно
-  // в BODY. Причина №1: openerRef брался из document.activeElement — а это
-  // не работает для JS-кликов (element.click() не фокусирует) и в Safari
-  // (кнопки не получают фокус от мыши) → ref пуст → возврат молча пропадал.
-  // Лечение: открывашка передаётся ЯВНО из onClick (event.currentTarget).
+  // K7-FIX (P2 / 2.4.3): замер критика — Esc закрывает, но фокус всё равно
+  // в BODY. Причина №1: openerRef брался из document.activeElement — а это
+  // не работает для JS-кликов (element.click() не фокусирует) и в Safari
+  // (кнопки не получают фокус от мыши) → ref пуст → возврат молча пропадал.
+  // Лечение: открывашка передаётся ЯВНО из onClick (event.currentTarget).
   const openerRef = useRef<HTMLButtonElement | null>(null);
   const openModal = useCallback(
     (i: number, opener?: HTMLButtonElement | null) => {
@@ -542,12 +542,12 @@ export function EventsVideoCarousel() {
     },
     [pauseHoverVideos],
   );
-  // K7-FIX (P2): возврат фокуса — двойной rAF. Первый rAF в React 18 может
+  // K7-FIX (P2): возврат фокуса — двойной rAF. Первый rAF в React 18 может
   // успеть ДО коммита снятия модалки (concurrent-планировщик): фокус ставился
-  // ещё при живой модалке, а затем фокусный узел размонтировался → браузер
-  // снова ронял фокус в BODY. Второй rAF всегда ПОСЛЕ коммита — модалки в
-  // DOM нет, фокус падает на живую кнопку-открывашку. Анимация закрытия —
-  // чистая fade-размонтировка (240ms), фокус не конкурирует с ней.
+  // ещё при живой модалке, а затем фокусный узел размонтировался → браузер
+  // снова ронял фокус в BODY. Второй rAF всегда ПОСЛЕ коммита — модалки в
+  // DOM нет, фокус падает на живую кнопку-открывашку. Анимация закрытия —
+  // чистая fade-размонтировка (240ms), фокус не конкурирует с ней.
   const closeModal = useCallback(() => {
     setActiveIndex(null);
     requestAnimationFrame(() => {
@@ -561,20 +561,20 @@ export function EventsVideoCarousel() {
   }, [closeModal]);
 
   /* 81-F2 (критик B, a11y модалки): фон под диалогом глохнет. Паттерн
-   * site-header.tsx:419 (inert={open} aria-hidden={open} на хедере при
-   * открытом бургере) — но шапка владеет СВОИМ элементом, а модалка здесь
+   * site-header.tsx:419 (inert={open} aria-hidden={open} на хедере при
+   * открытом бургере) — но шапка владеет СВОИМ элементом, а модалка здесь
    * должна заглушить ЧУЖИЕ корневые слои: <main> и <header>. Отсюда два
    * решения:
    *  (1) модалка рендерится ЧЕРЕЗ createPortal(document.body) — иначе
-   *      inert на <main> погасил бы и её саму (она живёт внутри секции
-   *      внутри main); fixed-позиция от портала не меняется (предки без
+   *      inert на <main> погасил бы и её саму (она живёт внутри секции
+   *      внутри main); fixed-позиция от портала не меняется (предки без
    *      transform);
-   *  (2) атрибуты ставятся императивно с cleanup: React не перепишет
-   *      их, пока его собственные пропсы не меняются (inert у хедера
-   *      React-управляемый только из состояния бургера).
-   * Заодно гасится и cookie-баннер (живёт в layout ВНЕ main — фокус-лапа
-   * модалки его иначе достигала бы поверх бэкдропа). Escape/фокус-трап/
-   * возврат фокуса на открывашку — как было (K7-FIX двойной rAF). */
+   *  (2) атрибуты ставятся императивно с cleanup: React не перепишет
+   *      их, пока его собственные пропсы не меняются (inert у хедера
+   *      React-управляемый только из состояния бургера).
+   * Заодно гасится и cookie-баннер (живёт в layout ВНЕ main — фокус-лапа
+   * модалки его иначе достигала бы поверх бэкдропа). Escape/фокус-трап/
+   * возврат фокуса на открывашку — как было (K7-FIX двойной rAF). */
   useEffect(() => {
     if (activeIndex === null) return;
     const roots = [
@@ -603,7 +603,7 @@ export function EventsVideoCarousel() {
     <section
       ref={sectionRef}
       id="events-video-carousel"
-      aria-label="Видео кухни и подачи"
+      aria-label="Видео кухни и подачи"
       className="ea-evt-video ea-section ea-section--cream"
     >
       <div className="ea-container ea-container--wide">
@@ -629,15 +629,15 @@ export function EventsVideoCarousel() {
             {/* c85 (понятность): глава 03 — единая нумерация главных глав
                 страницы (см. .ea-chapter в globals.css). Decorative. */}
             <span className="ea-chapter" aria-hidden="true">Глава 04</span>
-            <span className="ea-eyebrow--script">Кухня в движении</span>
+            <span className="ea-eyebrow--script">Кухня в движении</span>
             <h2 className="ea-section-h2 ea-evt-video__h2">
-              {"Не только блюда. "}
+              {"Не только блюда. "}
               <i className="ea-italic-fragment">Всё событие</i>
               {"."}
             </h2>
             <p className="ea-evt-video__subtitle">
-              Крупные планы подачи, зала и команды — как выглядит
-              сервис в деталях и в движении.
+              Крупные планы подачи, зала и команды — как выглядит
+              сервис в деталях и в движении.
             </p>
           </div>
         </motion.div>
@@ -646,7 +646,7 @@ export function EventsVideoCarousel() {
         <ul
           ref={scrollerRef}
           className="ea-evt-video__scroller"
-          aria-label="Видео кухни и подачи — горизонтальная прокрутка"
+          aria-label="Видео кухни и подачи — горизонтальная прокрутка"
           aria-roledescription="carousel"
           onMouseEnter={stopAuto}
           onMouseLeave={startAuto}
@@ -661,7 +661,7 @@ export function EventsVideoCarousel() {
               aria-label={`Видео ${i + 1} из ${TILES.length}: ${tile.title}`}
               onMouseEnter={() => playHoverVideo(i)}
               onMouseLeave={() => pauseHoverVideo(i)}
-              /* C78: 3D-tilt к курсору + глянец-блик (MicroDelights;
+              /* C78: 3D-tilt к курсору + глянец-блик (MicroDelights;
                   у <li> своего transform нет — hover-масштаб живёт на
                   __video-потомке, конфликт исключён; fine-pointer only). */
               data-tilt
@@ -672,8 +672,8 @@ export function EventsVideoCarousel() {
                   постеры качались сразу (~640КБ, карусель ниже фолда) +
                   React 19 SSR автоэмитил <link rel=preload as=image> для
                   каждого eager-<img>. Теперь next/image (fill + lazy по
-                  умолчанию): постеры оптимизируются в webp и грузятся
-                  только при заходе карусели во вьюпорт. */}
+                  умолчанию): постеры оптимизируются в webp и грузятся
+                  только при заходе карусели во вьюпорт. */}
               <ClipPathReveal
                 direction="alternate"
                 index={i}
@@ -693,10 +693,10 @@ export function EventsVideoCarousel() {
                   poster (same .ea-evt-video__video class → same absolute
                   fill + hover scale). preload="none" + без poster-атрибута
                   (FIX-4: poster-атрибут браузер качает сразу при вставке
-                  элемента, даже с preload="none" — это держало ~640КБ
-                  сырых постеров в начальной загрузке; визуальную базу
+                  элемента, даже с preload="none" — это держало ~640КБ
+                  сырых постеров в начальной загрузке; визуальную базу
                   плитки несёт next/image ниже, видео прозрачно до
-                  первого play) — браузер не запрашивает НИЧЕГО до
+                  первого play) — браузер не запрашивает НИЧЕГО до
                   первого hover-play. Plays only on hover (fine pointer,
                   section in view, one at a time) — see playHoverVideo
                   above. Decorative: aria-hidden, the img alt carries the
@@ -731,8 +731,8 @@ export function EventsVideoCarousel() {
                 data-press
                 onClick={(e) => openModal(i, e.currentTarget)}
                 /* 81-W2F1 (критик G MAJOR, WCAG 2.5.3 Label in Name):
-                   aria-label начинается с ВИДИМОГО текста «Смотреть видео»
-                   (было «Открыть видео: …» — не совпадало с надписью). */
+                   aria-label начинается с ВИДИМОГО текста «Смотреть видео»
+                   (было «Открыть видео: …» — не совпадало с надписью). */
                 aria-label={`Смотреть видео: ${tile.title}`}
               >
                 <span className="ea-evt-video__play-sheen">

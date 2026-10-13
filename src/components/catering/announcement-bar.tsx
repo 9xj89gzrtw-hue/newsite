@@ -32,10 +32,10 @@ const DISMISS_DAYS = 14;
 const DISMISS_MS = DISMISS_DAYS * 24 * 60 * 60 * 1000;
 
 // Future-dated scarcity copy (per Task 6-B spec):
-//   prefix  = "Бронирование на сезон 2026–2027 уже открыто"
+//   prefix  = "Бронирование на сезон 2026–2027 уже открыто"
 //   cta     = "посмотреть калькулятор →"
 // Click target: #calculator (verified present on page.tsx via calculator.tsx).
-const COPY_PREFIX = "Бронирование на сезон 2026–2027 уже открыто";
+const COPY_PREFIX = "Бронирование на сезон 2026–2027 уже открыто";
 const COPY_CTA = "посмотреть калькулятор →";
 const CTA_HREF = "#calculator";
 

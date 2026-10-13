@@ -77,7 +77,7 @@ export function SettingsView({
     <section className="space-y-6">
       <SectionHeader
         title="Настройки"
-        description="Куда приходят уведомления о заявках и безопасность панели."
+        description="Куда приходят уведомления о заявках и безопасность панели."
       />
       <EmailCard settings={settings} onSettingsChange={onSettingsChange} />
       <TelegramCard settings={settings} onSettingsChange={onSettingsChange} />
@@ -95,8 +95,8 @@ export function SettingsView({
 const TRANSPORT_LABELS: Record<string, string> = {
   smtp: "SMTP",
   mail: "почта хостинга",
-  "mail-fallback": "почта хостинга (SMTP не сработал)",
-  none: "не отправлено",
+  "mail-fallback": "почта хостинга (SMTP не сработал)",
+  none: "не отправлено",
 };
 
 function transportLabel(t: string | null | undefined): string {
@@ -143,12 +143,12 @@ function EmailCard({
     setSaving(false);
     if (r.ok === true) {
       onSettingsChange({ ...settings, notifyEmail: email.trim() });
-      toast.success("Email для уведомлений сохранён");
+      toast.success("Email для уведомлений сохранён");
     } else {
       toast.error(
         r.error === "validation"
-          ? "Похоже, это не email — проверьте адрес"
-          : "Не удалось сохранить — попробуйте ещё раз",
+          ? "Похоже, это не email — проверьте адрес"
+          : "Не удалось сохранить — попробуйте ещё раз",
       );
     }
   };
@@ -191,7 +191,7 @@ function EmailCard({
         onSettingsChange({ ...settings, smtpHost: "", smtpUser: "", smtpSet: false, smtpPassMasked: "" });
         toast.success("SMTP отключён — письма идут через почту хостинга");
       } else {
-        toast.error("Не удалось сохранить — попробуйте ещё раз");
+        toast.error("Не удалось сохранить — попробуйте ещё раз");
       }
       return;
     }
@@ -200,11 +200,11 @@ function EmailCard({
       return;
     }
     if (user && !host) {
-      toast.error("Укажите сервер SMTP (для SpaceWeb — smtp.spaceweb.ru)");
+      toast.error("Укажите сервер SMTP (для SpaceWeb — smtp.spaceweb.ru)");
       return;
     }
     if (port !== null && (!Number.isInteger(port) || port < 1 || port > 65535)) {
-      toast.error("Порт — число от 1 до 65535 (обычно 465)");
+      toast.error("Порт — число от 1 до 65535 (обычно 465)");
       return;
     }
     setSmtpSaving(true);
@@ -229,7 +229,7 @@ function EmailCard({
       toast.success("SMTP-настройки сохранены — отправьте тестовое письмо");
     } else {
       toast.error(
-        r.error === "validation" ? "Проверьте поля — похоже, в них опечатка" : "Не удалось сохранить — попробуйте ещё раз",
+        r.error === "validation" ? "Проверьте поля — похоже, в них опечатка" : "Не удалось сохранить — попробуйте ещё раз",
       );
     }
   };
@@ -240,13 +240,13 @@ function EmailCard({
         <div className="flex items-center gap-2.5">
           <AtSign className="size-5 text-gold" />
           <h3 className="font-serif text-[19px] font-medium text-ink">
-            Email для уведомлений
+            Email для уведомлений
           </h3>
         </div>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-          На этот адрес приходят письма о каждой новой заявке с сайта. Клиенту,
+          На этот адрес приходят письма о каждой новой заявке с сайта. Клиенту,
           оставившему свой email, автоматически отправляется подтверждение
-          с копией расчёта.
+          с копией расчёта.
         </p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
           <div className="flex-1">
@@ -279,8 +279,8 @@ function EmailCard({
             <h4 className="text-[14px] font-semibold text-ink">Проверка почты</h4>
           </div>
           <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-            Отправим тестовое письмо тем же каналом, что и уведомления о
-            заявках. Оставьте поле пустым — отправим на email уведомлений.
+            Отправим тестовое письмо тем же каналом, что и уведомления о
+            заявках. Оставьте поле пустым — отправим на email уведомлений.
           </p>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <div className="flex-1">
@@ -318,12 +318,12 @@ function EmailCard({
                     <Check className="size-4 text-gold" />
                     Письмо передано сервером ({transportLabel(testResult.transport)}) на {testResult.to}.
                   </span>{" "}
-                  Проверьте ящик — если письма нет, загляните в папку «Спам»
-                  и отметьте его «не спам»; если и там нет — настройте SMTP ниже.
+                  Проверьте ящик — если письма нет, загляните в папку «Спам»
+                  и отметьте его «не спам»; если и там нет — настройте SMTP ниже.
                 </>
               ) : (
                 <>
-                  <span className="font-medium">Отправка не удалась.</span>{" "}
+                  <span className="font-medium">Отправка не удалась.</span>{" "}
                   {testResult.detail || errorText(testResult.error)}
                 </>
               )}
@@ -352,7 +352,7 @@ function EmailCard({
                 </p>
               ) : logEntries.length === 0 ? (
                 <p className="py-2 text-[12.5px] text-ink-soft/80">
-                  Пока ничего не отправлялось — отправьте тестовое письмо.
+                  Пока ничего не отправлялось — отправьте тестовое письмо.
                 </p>
               ) : (
                 <div className="max-h-72 overflow-y-auto">
@@ -398,8 +398,8 @@ function EmailCard({
                 </div>
               )}
               <p className="mt-2 text-[12px] text-ink-soft/70">
-                «ок» = сервер принял письмо к доставке. Если письмо не пришло,
-                проверьте папку «Спам» или настройте SMTP ниже.
+                «ок» = сервер принял письмо к доставке. Если письмо не пришло,
+                проверьте папку «Спам» или настройте SMTP ниже.
               </p>
             </div>
           ) : null}
@@ -424,12 +424,12 @@ function EmailCard({
                 <p className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-gold/10 px-2.5 py-1.5 text-[12.5px] font-medium text-ink">
                   <ShieldCheck className="size-4 text-gold" />
                   Письма подписаны вашим ящиком {settings.smtpUser || settings.smtpHost} —
-                  надёжная доставка, не спам
+                  надёжная доставка, не спам
                 </p>
               ) : (
                 <p className="mt-1 text-[12.5px] leading-relaxed text-ink-soft/80">
-                  Без SMTP письма отправляет сам хостинг — Gmail и Mail.ru
-                  иногда кладут их в спам. Настроив SMTP-ящик, вы получаете
+                  Без SMTP письма отправляет сам хостинг — Gmail и Mail.ru
+                  иногда кладут их в спам. Настроив SMTP-ящик, вы получаете
                   подписанные письма, которые доходят надёжно (5 минут
                   один раз).
                 </p>
@@ -477,7 +477,7 @@ function EmailCard({
                     id="smtp-pass"
                     value={smtpPass}
                     onChange={setSmtpPass}
-                    placeholder={settings.smtpPassMasked ? "оставьте пустым, чтобы не менять" : "пароль ящика"}
+                    placeholder={settings.smtpPassMasked ? "оставьте пустым, чтобы не менять" : "пароль ящика"}
                     type="password"
                     autoComplete="new-password"
                   />
@@ -496,44 +496,44 @@ function EmailCard({
                 <p className="text-[12.5px] leading-relaxed text-ink-soft/80">
                   Как создать ящик: панель SpaceWeb → «Почта» → «Ящики» →
                   «Создать» (например, <code>noreply@nilovcatering.ru</code>)
-                  → пароль из панели вставьте сюда. Отправитель писем станет
-                  этим ящиком — письма подписаны DKIM и не попадают в спам.
+                  → пароль из панели вставьте сюда. Отправитель писем станет
+                  этим ящиком — письма подписаны DKIM и не попадают в спам.
                 </p>
               </div>
 
               {/* c98-A: письма на Gmail/Яндекс — пароль приложения */}
               <div className="mt-4 rounded-xl border border-border-line/70 bg-parchment/30 p-4">
                 <h4 className="text-[13.5px] font-semibold text-ink">
-                  Хотите отправлять с Gmail или Яндекс-почты?
+                  Хотите отправлять с Gmail или Яндекс-почты?
                 </h4>
                 <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft/90">
-                  Обычный пароль не подойдёт — нужен «пароль приложения»
-                  (специальный для программ). Настраивается один раз:
+                  Обычный пароль не подойдёт — нужен «пароль приложения»
+                  (специальный для программ). Настраивается один раз:
                 </p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <div className="rounded-lg border border-border-line/70 bg-background p-3">
                     <p className="text-[12.5px] font-semibold text-ink">Gmail</p>
                     <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[12px] leading-relaxed text-ink-soft">
                       <li>Аккаунт Google → Безопасность → включите 2-шаговую проверку.</li>
-                      <li>Там же → «Пароли приложений» → создайте (для «Почта»).</li>
+                      <li>Там же → «Пароли приложений» → создайте (для «Почта»).</li>
                       <li>Сюда: сервер <code>smtp.gmail.com</code>, порт <code>465</code>,
-                        ящик — ваш Gmail, пароль — 16 символов из пароля приложения.</li>
+                        ящик — ваш Gmail, пароль — 16 символов из пароля приложения.</li>
                     </ol>
                   </div>
                   <div className="rounded-lg border border-border-line/70 bg-background p-3">
                     <p className="text-[12.5px] font-semibold text-ink">Яндекс</p>
                     <ol className="mt-1.5 list-decimal space-y-1 pl-4 text-[12px] leading-relaxed text-ink-soft">
                       <li>Яндекс ID → Безопасность → включите «Пароли приложений».</li>
-                      <li>Создайте пароль приложения (для «почты»).</li>
+                      <li>Создайте пароль приложения (для «почты»).</li>
                       <li>Сюда: сервер <code>smtp.yandex.ru</code>, порт <code>465</code>,
                         ящик — ваш Яндекс-логин, пароль приложения. Отправитель
-                        (From) должен совпадать с логином.</li>
+                        (From) должен совпадать с логином.</li>
                     </ol>
                   </div>
                 </div>
                 <p className="mt-2.5 text-[12px] leading-relaxed text-ink-soft/80">
                   Текущий канал (через хостинг) уже работает — если письмо
-                  «не пришло», проверьте папку «Спам». SMTP добавит к письмам
+                  «не пришло», проверьте папку «Спам». SMTP добавит к письмам
                   DKIM-подпись выбранного провайдера.
                 </p>
               </div>
@@ -549,19 +549,19 @@ function EmailCard({
 function errorText(error: string | null): string {
   switch (error) {
     case "no_recipient":
-      return "Укажите адрес получателя или заполните «Email для уведомлений» выше.";
+      return "Укажите адрес получателя или заполните «Email для уведомлений» выше.";
     case "mail_disabled":
       return "Хостинг запретил отправку писем — настройте SMTP ниже, это решит проблему.";
     case "mail_failed":
-      return "Хостинг не принял письмо (sendmail). Настройка SMTP ниже обычно решает это.";
+      return "Хостинг не принял письмо (sendmail). Настройка SMTP ниже обычно решает это.";
     case "rate":
-      return "Слишком много тестов — подождите немного и попробуйте снова.";
+      return "Слишком много тестов — подождите немного и попробуйте снова.";
     default:
-      return "Сервер не смог отправить письмо. Настройка SMTP ниже обычно решает это.";
+      return "Сервер не смог отправить письмо. Настройка SMTP ниже обычно решает это.";
   }
 }
 
-/** c97: подпись контекста в журнале почты. */
+/** c97: подпись контекста в журнале почты. */
 function contextLabel(ctx: string): string {
   switch (ctx) {
     case "lead-owner":
@@ -575,7 +575,7 @@ function contextLabel(ctx: string): string {
   }
 }
 
-/** c97: дата для журнала почты (UNIX-секунды → ru-RU). */
+/** c97: дата для журнала почты (UNIX-секунды → ru-RU). */
 function formatMailDate(ts: number): string {
   const d = new Date(ts > 1e12 ? ts : ts * 1000);
   return d.toLocaleString("ru-RU", {
@@ -595,9 +595,9 @@ const CHAT_TYPE_LABELS: Record<string, string> = {
   channel: "канал",
 };
 
-/** Код зеркала для Cloudflare Worker (research/c96/tg-api-worker.js). */
-const WORKER_CODE = `// tg-api-proxy — зеркало Telegram Bot API для вашего сайта.
-// Вставьте этот код целиком в Cloudflare Worker (см. шаги ниже).
+/** Код зеркала для Cloudflare Worker (research/c96/tg-api-worker.js). */
+const WORKER_CODE = `// tg-api-proxy — зеркало Telegram Bot API для вашего сайта.
+// Вставьте этот код целиком в Cloudflare Worker (см. шаги ниже).
 
 const BOT_PREFIX = ''; // можно вписать начало своего токена: '/bot123456789:AA'
 
@@ -621,7 +621,7 @@ export default {
       return Response.json({ ok: false, error_code: 404, description: 'Not Found' }, { status: 404 });
     }
 
-    // Пересылаем запрос на api.telegram.org как есть
+    // Пересылаем запрос на api.telegram.org как есть
     url.hostname = 'api.telegram.org';
     url.protocol = 'https:';
     url.port = '';
@@ -661,7 +661,7 @@ function TelegramCard({
   const [tokenBusy, setTokenBusy] = useState(false);
   const [botInfo, setBotInfo] = useState<{ name: string; username: string } | null>(null);
   const [tokenError, setTokenError] = useState("");
-  /** c96: сетевой сбой — показываем блок «что делать» с инструкцией. */
+  /** c96: сетевой сбой — показываем блок «что делать» с инструкцией. */
   const [networkFail, setNetworkFail] = useState(false);
   const [triedInfo, setTriedInfo] = useState("");
 
@@ -677,7 +677,7 @@ function TelegramCard({
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [apiBaseBusy, setApiBaseBusy] = useState(false);
 
-  /** c96: поле «вставьте адрес зеркала» в блоке сетевой ошибки. */
+  /** c96: поле «вставьте адрес зеркала» в блоке сетевой ошибки. */
   const [mirrorUrl, setMirrorUrl] = useState(settings.tgApiBase);
   const [mirrorBusy, setMirrorBusy] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
@@ -698,17 +698,17 @@ function TelegramCard({
     if (r.ok !== true) {
       if (r.error === "unauthorized") {
         setTokenError(
-          "Telegram не принял токен — проверьте, что скопировали его целиком.",
+          "Telegram не принял токен — проверьте, что скопировали его целиком.",
         );
         return;
       }
-      /* c96-CRIT-A: нет токена вообще (ввели пусто и в настройках пусто) —
-       * не выдаём «сетевой сбой», а просим ввести токен. */
+      /* c96-CRIT-A: нет токена вообще (ввели пусто и в настройках пусто) —
+       * не выдаём «сетевой сбой», а просим ввести токен. */
       if (r.error === "no_token") {
-        setTokenError("Сначала вставьте токен бота — он от BotFather.");
+        setTokenError("Сначала вставьте токен бота — он от BotFather.");
         return;
       }
-      /* network (или иная транспортная ошибка всех баз) — объясняем. */
+      /* network (или иная транспортная ошибка всех баз) — объясняем. */
       setNetworkFail(true);
       setTriedInfo(describeTried(r.tried));
       return;
@@ -728,24 +728,24 @@ function TelegramCard({
       });
       toast.success("Токен сохранён — бот подключён");
     } else {
-      toast.error("Токен проверен, но не сохранился — попробуйте ещё раз");
+      toast.error("Токен проверен, но не сохранился — попробуйте ещё раз");
     }
   };
 
   const checkToken = () => void runCheck(token);
 
-  /** c96: сохранить адрес зеркала и сразу перепроверить токен. */
+  /** c96: сохранить адрес зеркала и сразу перепроверить токен. */
   const saveMirrorAndRecheck = async () => {
     const url = mirrorUrl.trim().replace(/\/+$/, "");
     if (url !== "" && !url.startsWith("https://")) {
-      toast.error("Адрес должен начинаться с https://");
+      toast.error("Адрес должен начинаться с https://");
       return;
     }
     setMirrorBusy(true);
     const r = await apiSaveSettings({ tgApiBase: url });
     if (!r.ok) {
       setMirrorBusy(false);
-      toast.error("Не удалось сохранить адрес — попробуйте ещё раз");
+      toast.error("Не удалось сохранить адрес — попробуйте ещё раз");
       return;
     }
     onSettingsChange({ ...settings, tgApiBase: url });
@@ -766,8 +766,8 @@ function TelegramCard({
     if (r.ok !== true) {
       toast.error(
         r.error === "network"
-          ? "Хостинг по-прежнему не может связаться с Telegram — настройте зеркало в шаге 1"
-          : "Не удалось получить список чатов — попробуйте ещё раз",
+          ? "Хостинг по-прежнему не может связаться с Telegram — настройте зеркало в шаге 1"
+          : "Не удалось получить список чатов — попробуйте ещё раз",
       );
       return;
     }
@@ -775,7 +775,7 @@ function TelegramCard({
     if (r.chats.length === 0) {
       setChatHint(
         r.hint ??
-          "Бот ещё не получал сообщений. Напишите ему любое сообщение (например, «Привет») и нажмите «Найти чат» ещё раз.",
+          "Бот ещё не получал сообщений. Напишите ему любое сообщение (например, «Привет») и нажмите «Найти чат» ещё раз.",
       );
     }
   };
@@ -787,7 +787,7 @@ function TelegramCard({
       onSettingsChange({ ...settings, tgChatId: chat.id });
       toast.success(`Чат выбран: ${chat.name}`);
     } else {
-      toast.error("Не удалось сохранить чат — попробуйте ещё раз");
+      toast.error("Не удалось сохранить чат — попробуйте ещё раз");
     }
   };
 
@@ -803,12 +803,12 @@ function TelegramCard({
     } else {
       toast.error(
         r.retryAfterSec
-          ? `Слишком часто — подождите ${r.retryAfterSec} c и повторите`
+          ? `Слишком часто — подождите ${r.retryAfterSec} c и повторите`
           : r.error === "unauthorized"
-            ? "Токен не принят — проверьте его в шаге 1"
+            ? "Токен не принят — проверьте его в шаге 1"
             : r.error === "network"
-              ? "Хостинг не смог отправить — настройте зеркало в шаге 1"
-              : "Не удалось отправить — проверьте токен и чат",
+              ? "Хостинг не смог отправить — настройте зеркало в шаге 1"
+              : "Не удалось отправить — проверьте токен и чат",
       );
     }
   };
@@ -838,7 +838,7 @@ function TelegramCard({
       onSettingsChange({ ...settings, tgApiBase: apiBase.trim() });
       toast.success("Адрес API-сервера сохранён");
     } else {
-      toast.error("Не удалось сохранить — попробуйте ещё раз");
+      toast.error("Не удалось сохранить — попробуйте ещё раз");
     }
   };
 
@@ -846,10 +846,10 @@ function TelegramCard({
     try {
       await navigator.clipboard.writeText(WORKER_CODE);
       setCopied(true);
-      toast.success("Код скопирован — вставьте его в редактор воркера");
+      toast.success("Код скопирован — вставьте его в редактор воркера");
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      toast.error("Не удалось скопировать — выделите код вручную");
+      toast.error("Не удалось скопировать — выделите код вручную");
     }
   };
 
@@ -860,7 +860,7 @@ function TelegramCard({
           <div className="flex items-center gap-2.5">
             <MessageCircle className="size-5 text-gold" />
             <h3 className="font-serif text-[19px] font-medium text-ink">
-              Уведомления в Telegram
+              Уведомления в Telegram
             </h3>
           </div>
           {settings.botTokenSet ? (
@@ -872,20 +872,20 @@ function TelegramCard({
               variant="outline"
               className="rounded-full border-border-line text-[11.5px] text-ink-soft"
             >
-              не настроено
+              не настроено
             </Badge>
           )}
         </div>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-          Заявки будут приходить сообщением от вашего бота — быстрее и надёжнее
-          почты. Настройка занимает пару минут, шаг за шагом.
+          Заявки будут приходить сообщением от вашего бота — быстрее и надёжнее
+          почты. Настройка занимает пару минут, шаг за шагом.
         </p>
 
         {/* шаг 1 */}
-        <Step n={1} title="Создайте бота и подключите токен" done={settings.botTokenSet}>
+        <Step n={1} title="Создайте бота и подключите токен" done={settings.botTokenSet}>
           <ol className="list-decimal space-y-1 pl-5 text-[13.5px] leading-relaxed text-ink-soft">
             <li>
-              Откройте в Telegram{" "}
+              Откройте в Telegram{" "}
               <a
                 href="https://t.me/BotFather"
                 target="_blank"
@@ -935,13 +935,13 @@ function TelegramCard({
           {networkFail ? (
             <div className="mt-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4">
               <p className="text-[14px] leading-relaxed font-medium text-ink">
-                Хостинг не смог связаться с Telegram
+                Хостинг не смог связаться с Telegram
               </p>
               <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">
-                Это не проблема вашего интернета или токена: с марта 2026
-                api.telegram.org блокируется для серверов в России, а сайт
-                размещён на российском хостинге. Лечится своим «зеркалом» —
-                бесплатно, за 5–10 минут, без сервера и карты.
+                Это не проблема вашего интернета или токена: с марта 2026
+                api.telegram.org блокируется для серверов в России, а сайт
+                размещён на российском хостинге. Лечится своим «зеркалом» —
+                бесплатно, за 5–10 минут, без сервера и карты.
               </p>
               {triedInfo ? (
                 <p className="mt-2 rounded-lg bg-background/70 p-2 font-mono text-[11px] leading-relaxed break-words text-ink-soft/80">
@@ -968,7 +968,7 @@ function TelegramCard({
                   ) : (
                     <ShieldCheck className="size-4" />
                   )}
-                  Сохранить и проверить
+                  Сохранить и проверить
                 </Button>
               </div>
               <button
@@ -999,10 +999,10 @@ function TelegramCard({
                       >
                         dash.cloudflare.com <ExternalLink className="size-3" />
                       </a>{" "}
-                      и зарегистрируйтесь (email и пароль; бесплатно)
+                      и зарегистрируйтесь (email и пароль; бесплатно)
                     </li>
                     <li>
-                      В меню слева — <strong>Workers &amp; Pages</strong> →{" "}
+                      В меню слева — <strong>Workers &amp; Pages</strong> →{" "}
                       <strong>Create</strong> → <strong>Create Worker</strong>
                     </li>
                     <li>
@@ -1011,17 +1011,17 @@ function TelegramCard({
                     </li>
                     <li>
                       Нажмите <strong>Edit code</strong>, удалите содержимое
-                      редактора и вставьте код ниже (кнопка «Скопировать код»)
+                      редактора и вставьте код ниже (кнопка «Скопировать код»)
                       → снова <strong>Deploy</strong>
                     </li>
                     <li>
                       Скопируйте адрес воркера вида{" "}
                       <code>https://nilov-tg.ваm.subdomain.workers.dev</code> —
-                      откройте его в браузере: должно быть{" "}
+                      откройте его в браузере: должно быть{" "}
                       <code>{`{"ok":true…}`}</code>
                     </li>
                     <li>
-                      Вставьте адрес в поле выше и нажмите «Сохранить и
+                      Вставьте адрес в поле выше и нажмите «Сохранить и
                       проверить» — проверка токена пойдёт через зеркало
                     </li>
                   </ol>
@@ -1054,11 +1054,11 @@ function TelegramCard({
                   </div>
                   <p className="text-[12.5px] text-ink-soft/80">
                     Воркер — это крошечная бесплатная программа Cloudflare:
-                    сайт отправляет ему запрос, а он пересылает его в Telegram
-                    и возвращает ответ. Токен видите только вы. 100 000
-                    запросов в сутки бесплатно — для заявок хватит на
-                    десятилетия. Если Cloudflare недоступен, тот же код можно
-                    развернуть на Deno Deploy — сообщите разработчику.
+                    сайт отправляет ему запрос, а он пересылает его в Telegram
+                    и возвращает ответ. Токен видите только вы. 100 000
+                    запросов в сутки бесплатно — для заявок хватит на
+                    десятилетия. Если Cloudflare недоступен, тот же код можно
+                    развернуть на Deno Deploy — сообщите разработчику.
                   </p>
                 </div>
               ) : null}
@@ -1069,7 +1069,7 @@ function TelegramCard({
         {/* шаг 2 */}
         <Step
           n={2}
-          title="Выберите чат для уведомлений"
+          title="Выберите чат для уведомлений"
           done={Boolean(settings.tgChatId)}
           disabled={!settings.botTokenSet}
         >
@@ -1132,8 +1132,8 @@ function TelegramCard({
           disabled={!settings.tgChatId}
         >
           <p className="text-[13.5px] leading-relaxed text-ink-soft">
-            Отправим тестовое сообщение в выбранный чат — убедитесь, что оно
-            пришло в ваш Telegram.
+            Отправим тестовое сообщение в выбранный чат — убедитесь, что оно
+            пришло в ваш Telegram.
           </p>
           <Button
             type="button"
@@ -1188,7 +1188,7 @@ function TelegramCard({
           {advancedOpen ? (
             <div className="pb-2">
               <p className="mt-1 text-[12.5px] leading-relaxed text-ink-soft/80">
-                Основной api.telegram.org иногда недоступен с хостинга — укажите
+                Основной api.telegram.org иногда недоступен с хостинга — укажите
                 адрес своего зеркала (Cloudflare Worker, см. шаг 1). Пустое
                 поле = только основной сервер.
               </p>
@@ -1267,11 +1267,11 @@ function Step({
 /* ------------------------------------------------------------- analytics */
 
 /**
- * c99-C — карточка «Аналитика»: счётчики и пиксели меняет владелец сам,
+ * c99-C — карточка «Аналитика»: счётчики и пиксели меняет владелец сам,
  * без передеплоя. Сайт читает значения РАНТАЙМ через /api/vars.php
  * (кеш 5 мин) после cookie-consent — 152-ФЗ соблюдён: до согласия
- * ноль сторонних запросов. Все значения публичны (ID счётчиков и так
- * видны в исходнике страницы) — секретов нет, отдаются без масок.
+ * ноль сторонних запросов. Все значения публичны (ID счётчиков и так
+ * видны в исходнике страницы) — секретов нет, отдаются без масок.
  */
 function AnalyticsCard({
   settings,
@@ -1294,10 +1294,10 @@ function AnalyticsCard({
   useEffect(() => setCustomHead(settings.customHeadHtml), [settings.customHeadHtml]);
 
   // локальная нормализация = серверная (admin.php): UI никогда не
-  // показывает как «сохранённое» то, что сервер обратит в null
-  // c99-fix (критик E2-m6): «мусор с цифрами» (abc / 12) — красная рамка,
-  // а не молчаливая серая кнопка (раньше metrikaOk был true при пустых
-  // digits — владельец не понимал, почему сохранить нельзя)
+  // показывает как «сохранённое» то, что сервер обратит в null
+  // c99-fix (критик E2-m6): «мусор с цифрами» (abc / 12) — красная рамка,
+  // а не молчаливая серая кнопка (раньше metrikaOk был true при пустых
+  // digits — владельец не понимал, почему сохранить нельзя)
   const metrikaRaw = metrikaId.trim();
   const metrikaDigits = metrikaId.replace(/\D+/g, "");
   const metrikaOk = metrikaRaw === "" || /^[0-9]{5,10}$/.test(metrikaDigits);
@@ -1320,7 +1320,7 @@ function AnalyticsCard({
       return;
     }
     if (!gaOk) {
-      toast.error("Google Analytics ID выглядит не так — формат G-XXXXXXXXXX");
+      toast.error("Google Analytics ID выглядит не так — формат G-XXXXXXXXXX");
       return;
     }
     if (customHead.length > 8000) {
@@ -1347,21 +1347,21 @@ function AnalyticsCard({
         customHeadHtml: customHead,
       });
       toast.success(
-        "Аналитика сохранена — сайт подхватит новые настройки в течение 5 минут",
+        "Аналитика сохранена — сайт подхватит новые настройки в течение 5 минут",
       );
     } else {
       toast.error(
         r.error === "validation"
-          ? "Проверьте поля — например, код без «</textarea» и до 8000 символов"
-          : "Не удалось сохранить — попробуйте ещё раз",
+          ? "Проверьте поля — например, код без «</textarea» и до 8000 символов"
+          : "Не удалось сохранить — попробуйте ещё раз",
       );
     }
   };
 
   const envHint =
     METRICA_ID === ""
-      ? "сейчас ID из деплоя не задан — без своего номера счётчик не работает"
-      : `сейчас используется ID из деплоя: ${METRICA_ID}`;
+      ? "сейчас ID из деплоя не задан — без своего номера счётчик не работает"
+      : `сейчас используется ID из деплоя: ${METRICA_ID}`;
 
   return (
     <Card className="rounded-2xl border-border-line/80 shadow-none">
@@ -1373,9 +1373,9 @@ function AnalyticsCard({
           </h3>
         </div>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-          Счётчики посещаемости и рекламные пиксели. Сайт применяет их сам,
-          без пересборки — изменения подхватываются в течение 5 минут,
-          только после согласия посетителя на cookies (152-ФЗ).
+          Счётчики посещаемости и рекламные пиксели. Сайт применяет их сам,
+          без пересборки — изменения подхватываются в течение 5 минут,
+          только после согласия посетителя на cookies (152-ФЗ).
         </p>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -1405,7 +1405,7 @@ function AnalyticsCard({
               className={cn(!gaOk && "border-destructive")}
             />
             <HintText>
-              Пусто — Google Analytics не подключается. Создаётся в GA4:
+              Пусто — Google Analytics не подключается. Создаётся в GA4:
               «Администратор → Потоки данных».
             </HintText>
           </div>
@@ -1429,7 +1429,7 @@ function AnalyticsCard({
               aria-label="Клик-карта"
             />
             <span className="text-[14px] leading-snug text-ink">
-              Клик-карта — карта кликов по страницам
+              Клик-карта — карта кликов по страницам
             </span>
           </label>
         </div>
@@ -1442,14 +1442,14 @@ function AnalyticsCard({
             id="an-custom"
             value={customHead}
             onChange={setCustomHead}
-            placeholder="<script>… код пикселя из рекламного кабинета …</script>"
+            placeholder="<script>… код пикселя из рекламного кабинета …</script>"
             rows={5}
             className="font-mono text-[13px]"
           />
           <HintText>
             Вставьте код целиком — он добавляется в &lt;head&gt; сайта и
-            запускается после согласия посетителя на cookies. Яндекс.Метрика
-            и GA4 настраиваются выше, сюда — всё остальное.
+            запускается после согласия посетителя на cookies. Яндекс.Метрика
+            и GA4 настраиваются выше, сюда — всё остальное.
           </HintText>
         </div>
 
@@ -1483,7 +1483,7 @@ function PasswordCard() {
       return;
     }
     if (next !== confirm) {
-      setError("Пароли не совпадают — проверьте ещё раз");
+      setError("Пароли не совпадают — проверьте ещё раз");
       return;
     }
     setBusy(true);
@@ -1500,7 +1500,7 @@ function PasswordCard() {
     else if (r.reason === "validation") setError("Новый пароль — минимум 8 символов");
     else if (r.reason === "locked")
       setError(`Слишком много попыток — подождите ${Math.ceil((r.retryAfterSec ?? 3600) / 60)} мин`);
-    else setError("Не удалось изменить пароль — попробуйте ещё раз");
+    else setError("Не удалось изменить пароль — попробуйте ещё раз");
   };
 
   return (
@@ -1513,7 +1513,7 @@ function PasswordCard() {
           </h3>
         </div>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-          Пароль от панели. Минимум 8 символов.
+          Пароль от панели. Минимум 8 символов.
         </p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <div>
@@ -1569,12 +1569,12 @@ function PasswordCard() {
 
 /* ------------------------------------------------------------- automation */
 
-/** c102: unix-секунды из cronState (числом может прийти что угодно). */
+/** c102: unix-секунды из cronState (числом может прийти что угодно). */
 function cronNum(v: unknown): number | null {
   return typeof v === "number" && Number.isFinite(v) ? v : null;
 }
 
-/** c102: дата cron-состояния — «21 сент., 14:05 по Москве» (секунды!). */
+/** c102: дата cron-состояния — «21 сент., 14:05 по Москве» (секунды!). */
 function formatCronDate(ts: number): string {
   const d = new Date(ts > 1e12 ? ts : ts * 1000);
   return d.toLocaleString("ru-RU", {
@@ -1588,9 +1588,9 @@ function formatCronDate(ts: number): string {
 
 /**
  * c102 — карточка «Автоматизация»: сводка каждое утро, авто-дожим клиента
- * через 24ч, TG-пинг о зависших заявках + секретная ссылка cron.php для
+ * через 24ч, TG-пинг о зависших заявках + секретная ссылка cron.php для
  * планировщика хостинга. Токен показывается РОВНО один раз (сервер его
- * больше не отдаёт) — поэтому живёт в локальном state, а не в settings.
+ * больше не отдаёт) — поэтому живёт в локальном state, а не в settings.
  */
 function AutomationCard({
   settings,
@@ -1622,11 +1622,11 @@ function AutomationCard({
     nudge !== settings.autoNudge ||
     nudgeHours !== settings.autoNudgeHours;
 
-  /* Как в остальных карточках: патч только СВОИХ полей (email-карточка не
-   * трогает автоматизацию и наоборот — ничего не затирается). */
+  /* Как в остальных карточках: патч только СВОИХ полей (email-карточка не
+   * трогает автоматизацию и наоборот — ничего не затирается). */
   const save = async () => {
     if (!Number.isInteger(nudgeHours) || nudgeHours < 1 || nudgeHours > 24) {
-      toast.error("Часы до напоминания — целое от 1 до 24");
+      toast.error("Часы до напоминания — целое от 1 до 24");
       return;
     }
     setSaving(true);
@@ -1650,7 +1650,7 @@ function AutomationCard({
       toast.error(
         r.error === "validation"
           ? "Проверьте поля — часы напоминания: целое 1–24"
-          : "Не удалось сохранить — попробуйте ещё раз",
+          : "Не удалось сохранить — попробуйте ещё раз",
       );
     }
   };
@@ -1666,7 +1666,7 @@ function AutomationCard({
       onSettingsChange({ ...settings, cronEnabled: true });
       toast.success("Ссылка создана — скопируйте её сейчас, показывается один раз");
     } else {
-      toast.error("Не удалось создать ссылку — попробуйте ещё раз");
+      toast.error("Не удалось создать ссылку — попробуйте ещё раз");
     }
   };
 
@@ -1677,9 +1677,9 @@ function AutomationCard({
     if (r.ok === true) {
       setRevealedToken(null);
       onSettingsChange({ ...settings, cronEnabled: false });
-      toast.success("Автоматизация по расписанию отключена");
+      toast.success("Автоматизация по расписанию отключена");
     } else {
-      toast.error("Не удалось отключить — попробуйте ещё раз");
+      toast.error("Не удалось отключить — попробуйте ещё раз");
     }
   };
 
@@ -1692,7 +1692,7 @@ function AutomationCard({
       toast.success("Ссылка скопирована");
       setTimeout(() => setUrlCopied(false), 2500);
     } catch {
-      toast.error("Не удалось скопировать — выделите ссылку вручную");
+      toast.error("Не удалось скопировать — выделите ссылку вручную");
     }
   };
 
@@ -1702,9 +1702,9 @@ function AutomationCard({
   const lastRun = cronNum(cs?.lastRunTs);
   const runs = cronNum(cs?.runs);
   const lastDigest = cronNum(cs?.lastDigestTs);
-  if (lastRun !== null) stateLines.push(`Последний запуск: ${formatCronDate(lastRun)} по Москве`);
+  if (lastRun !== null) stateLines.push(`Последний запуск: ${formatCronDate(lastRun)} по Москве`);
   if (runs !== null) stateLines.push(`Запусков всего: ${Math.round(runs)}`);
-  if (lastDigest !== null) stateLines.push(`Последняя сводка: ${formatCronDate(lastDigest)} по Москве`);
+  if (lastDigest !== null) stateLines.push(`Последняя сводка: ${formatCronDate(lastDigest)} по Москве`);
 
   return (
     <Card className="rounded-2xl border-border-line/80 shadow-none">
@@ -1716,8 +1716,8 @@ function AutomationCard({
           </h3>
         </div>
         <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">
-          Система сама следит за заявками: присылает вам сводку каждое утро,
-          напоминает клиентам о себе через сутки и пингует вас о зависших
+          Система сама следит за заявками: присылает вам сводку каждое утро,
+          напоминает клиентам о себе через сутки и пингует вас о зависших
           заявках. Настройте один раз — дальше всё работает без ручных действий.
         </p>
 
@@ -1729,8 +1729,8 @@ function AutomationCard({
                 Ежедневная сводка
               </span>
               <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink-soft">
-                Каждое утро после 09:00: сколько новых заявок за сутки и какие
-                ждут ответа — в Telegram и на почту.
+                Каждое утро после 09:00: сколько новых заявок за сутки и какие
+                ждут ответа — в Telegram и на почту.
               </span>
             </span>
             <Switch
@@ -1746,7 +1746,7 @@ function AutomationCard({
               </span>
               <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink-soft">
                 Через 24 часа без статуса клиенту автоматически уходит одно
-                письмо с меню и кнопками связи (Telegram/WhatsApp/MAX).
+                письмо с меню и кнопками связи (Telegram/WhatsApp/MAX).
               </span>
             </span>
             <Switch
@@ -1758,17 +1758,17 @@ function AutomationCard({
           <label className="flex min-h-11 cursor-pointer items-start justify-between gap-3 rounded-lg px-1 py-1">
             <span className="min-w-0">
               <span className="block text-[14px] leading-snug font-medium text-ink">
-                Напоминания о зависших заявках
+                Напоминания о зависших заявках
               </span>
               <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink-soft">
-                Telegram-пинг, если заявка не отмечена обработанной дольше{" "}
+                Telegram-пинг, если заявка не отмечена обработанной дольше{" "}
                 {nudgeHours} ч.
               </span>
             </span>
             <Switch
               checked={nudge}
               onCheckedChange={(v) => setNudge(v === true)}
-              aria-label="Напоминания о зависших заявках"
+              aria-label="Напоминания о зависших заявках"
             />
           </label>
           {nudge ? (
@@ -1787,7 +1787,7 @@ function AutomationCard({
                   suffix="ч"
                 />
               </div>
-              <span className="text-[12px] text-ink-soft/70">от 1 до 24</span>
+              <span className="text-[12px] text-ink-soft/70">от 1 до 24</span>
             </div>
           ) : null}
         </div>
@@ -1813,7 +1813,7 @@ function AutomationCard({
           {!settings.cronEnabled ? (
             <>
               <p className="mt-2 text-[12.5px] leading-relaxed text-ink-soft/90">
-                Планировщик ещё не подключён — создайте ссылку и добавьте её в
+                Планировщик ещё не подключён — создайте ссылку и добавьте её в
                 панель хостинга (SpaceWeb → Планировщик задач).
               </p>
               <Button
@@ -1827,7 +1827,7 @@ function AutomationCard({
                 ) : (
                   <Zap className="size-4" />
                 )}
-                Создать ссылку для планировщика
+                Создать ссылку для планировщика
               </Button>
             </>
           ) : (
@@ -1836,7 +1836,7 @@ function AutomationCard({
                 Планировщик подключён ✓
               </p>
               <p className="mt-1 text-[12.5px] leading-relaxed text-ink-soft/80">
-                Ссылка создана (скрыта). Создать заново или отключить можно ниже.
+                Ссылка создана (скрыта). Создать заново или отключить можно ниже.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button
@@ -1868,14 +1868,14 @@ function AutomationCard({
           {revealedToken ? (
             <div className="mt-3 rounded-xl border border-gold/40 bg-gold/[0.06] p-3">
               <p className="text-[12.5px] font-medium text-ink">
-                Секретная ссылка для планировщика:
+                Секретная ссылка для планировщика:
               </p>
               <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input
                   readOnly
                   value={cronUrl}
                   onFocus={(e) => e.currentTarget.select()}
-                  aria-label="Ссылка для планировщика"
+                  aria-label="Ссылка для планировщика"
                   className="h-11 w-full min-w-0 rounded-xl border border-border-line bg-background px-3 font-mono text-[12px] text-ink [overflow-wrap:anywhere]"
                 />
                 <Button
@@ -1901,7 +1901,7 @@ function AutomationCard({
           ) : null}
           <details className="mt-3">
             <summary className="cursor-pointer text-[12.5px] font-medium text-ink-soft">
-              CLI-вариант для cron хостинга
+              CLI-вариант для cron хостинга
             </summary>
             <p className="mt-1.5 font-mono text-[11.5px] leading-relaxed break-all text-ink-soft/80">
               /usr/bin/php /home/&lt;аккаунт&gt;/site/public/api/cron.php
@@ -1921,7 +1921,7 @@ function AutomationCard({
             </div>
           ) : (
             <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft/80">
-              Ещё ни одного запуска
+              Ещё ни одного запуска
             </p>
           )}
         </div>

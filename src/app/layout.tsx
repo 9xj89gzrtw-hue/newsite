@@ -12,8 +12,8 @@ import { Preloader } from "@/components/catering/preloader";
 import { EaCookieBanner } from "@/components/catering/ea-cookie-banner";
 import { GrainOverlay } from "@/components/catering/grain";
 import { ScrollProgress } from "@/components/catering/scroll-progress";
-/* c98-FIX2 (критик5 MINOR-5): авто-резенд outbox заявок — на ВСЕХ страницах
- * (прежде side-effect импорта submit-lead.ts работал только на главной). */
+/* c98-FIX2 (критик5 MINOR-5): авто-резенд outbox заявок — на ВСЕХ страницах
+ * (прежде side-effect импорта submit-lead.ts работал только на главной). */
 import { LeadOutboxResender } from "@/components/lead-outbox-resender";
 import { MicroDelights } from "@/components/motion/micro-delights";
 import { VerticalBrandLabel } from "@/components/catering/vertical-brand-label";
@@ -32,38 +32,38 @@ import {
 
 /*
  * F2 (cycle-71, K1-CRITICAL + K3-MAJOR): консолидация шрифтов 12 → 5 семейств.
- * next/font-загрузка осталась ТОЛЬКО у пятёрки:
+ * next/font-загрузка осталась ТОЛЬКО у пятёрки:
  *   Prata, Playfair Display, Barlow Semi Condensed, Karla, Marck Script.
- * Убраны из загрузки: Oswald, Montserrat, Lato, Great Vibes,
+ * Убраны из загрузки: Oswald, Montserrat, Lato, Great Vibes,
  * Nothing You Could Do, Neutra2Display-Light, Neutra2Text_book
- * (−90 @font-face из отдаваемого CSS, было 159 с учётом fallback-фейсов).
+ * (−90 @font-face из отдаваемого CSS, было 159 с учётом fallback-фейсов).
  *
- * Их CSS-переменные остаются живыми через АЛИАСЫ на <html> в globals.css
+ * Их CSS-переменные остаются живыми через АЛИАСЫ на <html> в globals.css
  * (блок «F2 FONT CONSOLIDATION») — дюжины компонентов продолжают ссылаться
- * на прежние переменные, не требуя правок в самих компонентах:
+ * на прежние переменные, не требуя правок в самих компонентах:
  *   --font-display (Oswald)          → Barlow Semi Condensed (condensed caps)
  *   --font-poppins (Montserrat)       → Barlow Semi Condensed
  *   --font-lato (Lato)                → Karla (humanist body)
  *   --font-script (Great Vibes)       → Marck Script (кириллический скрипт)
  *   --font-nothing (Nothing You Could Do) → Marck Script
  *   --font-neutra-display (Neutra2Display) → Playfair Display (крупные лейблы
- *                                          «СЛЕДИТЕ ЗА НАМИ» и др.)
+ *                                          «СЛЕДИТЕ ЗА НАМИ» и др.)
  *   --font-neutra-text (Neutra2Text)  → Karla
- * Скриптовые замены: «food as art» и «Сделано с любовью» — Marck Script.
+ * Скриптовые замены: «food as art» и «Сделано с любовью» — Marck Script.
  *
- * Preload остаётся ТОЛЬКО у Prata — wordmark hero (LCP-текст). Прежние
- * preload-ы Nothing You Could Do и Lato ушли вместе с их загрузкой.
+ * Preload остаётся ТОЛЬКО у Prata — wordmark hero (LCP-текст). Прежние
+ * preload-ы Nothing You Could Do и Lato ушли вместе с их загрузкой.
  */
 
-// — Playfair Display: editorial display-serif с полной кириллицей (H2/H3,
-//   «СЛЕДИТЕ ЗА НАМИ», ex-Neutra2Display-слоты).
+// — Playfair Display: editorial display-serif с полной кириллицей (H2/H3,
+//   «СЛЕДИТЕ ЗА НАМИ», ex-Neutra2Display-слоты).
 //   C74 (E2, kinetic typography): weight "variable" вместо массива статиков.
-//   ЗАМЕР (research/c74-mobile.mjs, §43): Google и для статик-запросов
+//   ЗАМЕР (research/c74-mobile.mjs, §43): Google и для статик-запросов
 //   отдавал VF-файлы — сеть до/после ИДЕНТИЧНА (18 файлов, 331 856 Б);
-//   переключение схлопывает 33 @font-face-декларации в 9 (8 VF-сабсетов
-//   roman+italic + fallback) и объявляет ось weight 400 900 → чистая
+//   переключение схлопывает 33 @font-face-декларации в 9 (8 VF-сабсетов
+//   roman+italic + fallback) и объявляет ось weight 400 900 → чистая
 //   интерполяция font-variation-settings 'wght' (.kinetic-h2,
-//   c74-kinetic.css). Вид по умолчанию не меняется: VF wght 400 ==
+//   c74-kinetic.css). Вид по умолчанию не меняется: VF wght 400 ==
 //   прежняя статика 400.
 const playfair = Playfair_Display({
   variable: "--font-serif",
@@ -85,7 +85,7 @@ const barlow = Barlow_Semi_Condensed({
 });
 
 // — Karla: humanist body-sans (латиница; кириллица — через metric-fallback
-//   в системный sans, как и было до консолидации).
+//   в системный sans, как и было до консолидации).
 const karla = Karla({
   variable: "--font-sans",
   subsets: ["latin", "latin-ext"],
@@ -103,7 +103,7 @@ const prata = Prata({
   /* hero wordmark — preload ОСТАВЛЕН (LCP-критичный). */
 });
 
-// — Marck Script: рукописный скрипт с ПОЛНОЙ кириллицей — единственный
+// — Marck Script: рукописный скрипт с ПОЛНОЙ кириллицей — единственный
 //   скрипт сайта (ex-Great Vibes / ex-Nothing You Could Do).
 const marck = Marck_Script({
   variable: "--font-marck",
@@ -113,13 +113,13 @@ const marck = Marck_Script({
   preload: false,
 });
 
-// Task 1-b (cycle-71): домен — из единого источника фактов site-config.ts
-// (при переезде на свой домен правится одна строка там / env NEXT_PUBLIC_SITE_URL).
+// Task 1-b (cycle-71): домен — из единого источника фактов site-config.ts
+// (при переезде на свой домен правится одна строка там / env NEXT_PUBLIC_SITE_URL).
 const siteUrl = SITE_URL;
 
-/* c95 (Task 1-a): ценовые фрагменты меты — из единого menu.json через
-   lib/pricing.ts (те же значения, что в калькуляторе/каталоге/llms.txt).
-   Разделитель тысяч — обычный пробел, как в исторической мете: вывод
+/* c95 (Task 1-a): ценовые фрагменты меты — из единого menu.json через
+   lib/pricing.ts (те же значения, что в калькуляторе/каталоге/llms.txt).
+   Разделитель тысяч — обычный пробел, как в исторической мете: вывод
    байт-идентичен прежним захардкоженным строкам. */
 const metaPrices = metaPriceFragments();
 
@@ -149,15 +149,15 @@ export const metadata: Metadata = {
   },
   /* c99: новый description против мусорного сниппета Яндекса (было:
    * «Листайте» + пункты меню + задвоенное «искусствоискусство» — Яндекс
-   * брал текст из DOM, т.к. старое описание не отвечало брендовому
-   * запросу). Теперь смысл — в первом предложении (кейтеринг полного
-   * цикла + форматы), далее УТП, цена-минимум и телефон (Яндекс любит
-   * конкретику в начале ~160 симв.). Длина 155 симв. при coffeeBreak=900.
-   * Цена — из menu.json (мета меняется публикацией из админки). */
-  description: `Кейтеринг СПб: банкеты и фуршеты в Санкт-Петербурге под ключ, кофе-брейки, доставка закусок. Повара и официанты на вашей площадке. От ${metaPrices.coffeeBreak} ₽/чел.`,
-  /* c99 (R1): связка с кириллическим запросом «нилов кейтеринг» —
+   * брал текст из DOM, т.к. старое описание не отвечало брендовому
+   * запросу). Теперь смысл — в первом предложении (кейтеринг полного
+   * цикла + форматы), далее УТП, цена-минимум и телефон (Яндекс любит
+   * конкретику в начале ~160 симв.). Длина 155 симв. при coffeeBreak=900.
+   * Цена — из menu.json (мета меняется публикацией из админки). */
+  description: `Кейтеринг СПб: банкеты и фуршеты в Санкт-Петербурге под ключ, кофе-брейки, доставка закусок. Повара и официанты на вашей площадке. От ${metaPrices.coffeeBreak} ₽/чел.`,
+  /* c99 (R1): связка с кириллическим запросом «нилов кейтеринг» —
    * домен nilovcatering.ru = транслитерация, добавляем написания
-   * в обоих регистрах + гео-ключи форматов. */
+   * в обоих регистрах + гео-ключи форматов. */
   keywords: [
     "кейтеринг",
     "кейтеринг СПб",
@@ -169,23 +169,23 @@ export const metadata: Metadata = {
     "нилов кейтеринг",
     "Нилов кейтеринг",
     "nilov catering спб",
-    "кейтеринг на мероприятие спб",
+    "кейтеринг на мероприятие спб",
     "фуршет спб",
     "банкет спб",
   ],
   authors: [{ name: "NILOV CATERING" }],
   /* c127 (22.09.2026): hreflang ru ВОСВРАЩЁН (правка субагента W5, проверена
    * сборкой: отдаёт <link rel="alternate" hreflang="ru" href="...">).
-   * Для одноязычного сайта это не дубль canonical, а явное объявление языка —
-   * Google требует hreflang ВЗАИМЕН (только со ссылкой на себя), и ru → ru
-   * это удовлетворяет. Убирать не надо: критик C3.2 отметил отсутствие
+   * Для одноязычного сайта это не дубль canonical, а явное объявление языка —
+   * Google требует hreflang ВЗАИМЕН (только со ссылкой на себя), и ru → ru
+   * это удовлетворяет. Убирать не надо: критик C3.2 отметил отсутствие
    * языкового сигнала как пробел. */
   alternates: {
     canonical: "/",
     languages: { ru: "/" },
   },
   openGraph: {
-    title: "NILOV CATERING — Кейтеринг в Санкт-Петербурге",
+    title: "NILOV CATERING — Кейтеринг в Санкт-Петербурге",
     /* c99: OG/Twitter-описания синхронны основному description — один
      * источник смысла для соцпревью и сниппетов. */
     description: `Банкеты и фуршеты в Санкт-Петербурге под ключ, кофе-брейки и доставка закусок. NiloV Catering: кейтеринг от ${metaPrices.coffeeBreak} ₽/чел.`,
@@ -197,7 +197,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NILOV CATERING — Кейтеринг в Санкт-Петербурге",
+    title: "NILOV CATERING — Кейтеринг в Санкт-Петербурге",
     description: `Банкеты и фуршеты в Санкт-Петербурге под ключ, кофе-брейки и доставка закусок. NiloV Catering: кейтеринг от ${metaPrices.coffeeBreak} ₽/чел.`,
     images: ["/og-image.jpg"],
   },
@@ -214,15 +214,15 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  /* SEO-верификация владения доменом для Яндекс.Вебмастер и Google Search
-   * Console. Коды — из env (NEXT_PUBLIC_YANDEX_VERIFICATION /
-   * NEXT_PUBLIC_GOOGLE_VERIFICATION); без них поле пустое и в <head> ничего
-   * не эмитится (сайт живёт как раньше). Владелец вписывает коды один раз
-   * в окружение деплоя (см. инструкцию в PR/README). */
+  /* SEO-верификация владения доменом для Яндекс.Вебмастер и Google Search
+   * Console. Коды — из env (NEXT_PUBLIC_YANDEX_VERIFICATION /
+   * NEXT_PUBLIC_GOOGLE_VERIFICATION); без них поле пустое и в <head> ничего
+   * не эмитится (сайт живёт как раньше). Владелец вписывает коды один раз
+   * в окружение деплоя (см. инструкцию в PR/README). */
   /* c127 (22.09.2026): убран дубль yandex-verification. Поле `yandex:` ВЫШЕ
    * (строка 212) уже эмитит <meta name="yandex-verification">; запись в
-   * `other` давала ВТОРОЙ такой же тег — критик замерил 2 <meta> на проде.
-   * Next.js сам формирует корректное имя из поля `yandex`. */
+   * `other` давала ВТОРОЙ такой же тег — критик замерил 2 <meta> на проде.
+   * Next.js сам формирует корректное имя из поля `yandex`. */
   verification: {
     yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined,
@@ -244,15 +244,15 @@ export const viewport: Viewport = {
 };
 
 /** JSON-LD structured data for Yandex/Google (LocalBusiness + FoodEstablishment).
- * FIX-3 (история): "CateringService" не существует в schema.org — валидаторы
+ * FIX-3 (история): "CateringService" не существует в schema.org — валидаторы
  * Google/Yandex отвергают тип.
- * Task 1-b (cycle-71): тип из ТЗ "CateringBusiness" ТОЖЕ не существует —
- * живая проверка https://schema.org/CateringBusiness → 404 (как и у
+ * Task 1-b (cycle-71): тип из ТЗ "CateringBusiness" ТОЖЕ не существует —
+ * живая проверка https://schema.org/CateringBusiness → 404 (как и у
  * несуществующих терминов; контроль: FoodEstablishment/LocalBusiness → 200).
- * Валидный максимум специфичности для кейтеринга — пара
+ * Валидный максимум специфичности для кейтеринга — пара
  * ["FoodEstablishment", "LocalBusiness"]: FoodEstablishment уточняет
  * LocalBusiness, LocalBusiness даёт локальные поля (geo, openingHours).
- * Телефон приведён к E.164 (+79119417205), домен/соцсети/год — из site-config.ts. */
+ * Телефон приведён к E.164 (+79119417205), домен/соцсети/год — из site-config.ts. */
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": ["FoodEstablishment", "LocalBusiness"],
@@ -263,7 +263,7 @@ const jsonLd = {
    * для распознавания сущности в карточках/агрегаторах). */
   name: "NILOV CATERING",
   alternateName: ["Нилов Кейтеринг", "nilov catering", "ИП Нилова А.Д."],
-  description: `«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Доставка закусок от ${metaPrices.snackBox} ₽, кофе-брейк от ${metaPrices.coffeeBreak} ₽, фуршет от ${metaPrices.buffet} ₽, банкет от ${metaPrices.banquet} ₽ за человека; заказы — от одного гостя.`,
+  description: `«Еда как искусство» — выездной кейтеринг полного цикла в Санкт-Петербурге. Доставка закусок от ${metaPrices.snackBox} ₽, кофе-брейк от ${metaPrices.coffeeBreak} ₽, фуршет от ${metaPrices.buffet} ₽, банкет от ${metaPrices.banquet} ₽ за человека; заказы — от одного гостя.`,
   url: siteUrl,
   image: siteUrl + "/og-image.jpg",
   logo: siteUrl + "/brand/logo-512.png",
@@ -272,7 +272,7 @@ const jsonLd = {
   priceRange: `${Math.min(...MENU_TYPES.flatMap((type) => type.packages.map((pkg) => pkg.pricePerGuest)))}-${Math.max(...MENU_TYPES.flatMap((type) => type.packages.map((pkg) => pkg.pricePerGuest)))}₽`,
   hasMenu: { "@id": siteUrl + "/#catering-menu" },
   currenciesAccepted: "RUB",
-  /* Заявки круглосуточно (24/7) — подтверждено в llms-full.txt и yandex.txt;
+  /* Заявки круглосуточно (24/7) — подтверждено в llms-full.txt и yandex.txt;
    * 3-я версия правки устранена: ранее была удалена, оставив LocalBusiness без
    * часы. Указан круглосуточный приём заявок. */
   openingHoursSpecification: [
@@ -290,19 +290,19 @@ const jsonLd = {
     SOCIALS.telegramChannel,
     SOCIALS.youtube,
     /* c89/c92: sameAs — публичные профили (телеграм-канал @nilov_catering —
-     * от владельца, YouTube @nilovcatering). Личные чаты t.me/+7911…,
-     * wa.me и MAX-профиль (c92: max.ru/u/f9LHodD0…) — контактные каналы
-     * «Напишите нам», не соцсети-профили, в sameAs не дублируются.
-     * Rutube НЕ в sameAs: канала не найдено, поиск-ссылка = анти-сигнал
-     * валидаторам (F2/K3-прецедент) — ждём настоящий URL от владельца. */
+     * от владельца, YouTube @nilovcatering). Личные чаты t.me/+7911…,
+     * wa.me и MAX-профиль (c92: max.ru/u/f9LHodD0…) — контактные каналы
+     * «Напишите нам», не соцсети-профили, в sameAs не дублируются.
+     * Rutube НЕ в sameAs: канала не найдено, поиск-ссылка = анти-сигнал
+     * валидаторам (F2/K3-прецедент) — ждём настоящий URL от владельца. */
   ],
-  /* Task 1-b: только форматы, реально представленные на сайте. c89 (3-b):
-   * список больше НЕ трекает панели hacc-services (глава 01 показывает
+  /* Task 1-b: только форматы, реально представленные на сайте. c89 (3-b):
+   * список больше НЕ трекает панели hacc-services (глава 01 показывает
    * только 6 ключевых форматов) — он отражает меню-каталог (hacc-menu:
    * фуршеты/банкеты/кофе-брейки/барбекю/вегетарианское/доставка закусок)
-   * + услуги из /offer (торты на заказ, шоколадные фонтаны, выездная
+   * + услуги из /offer (торты на заказ, шоколадные фонтаны, выездная
    * регистрация) + форматы главы 01 (свадьбы, корпоративы, шоу-станции,
-   * выездной бар, халяль). Ничего не выдумано (c86: офисные обеды сняты). */
+   * выездной бар, халяль). Ничего не выдумано (c86: офисные обеды сняты). */
   knowsAbout: [
     "Фуршеты",
     "Банкеты",
@@ -313,13 +313,13 @@ const jsonLd = {
     "Доставка закусок (гастро-боксы)",
     "Выездной бар",
     "Шоу-станции",
-    "Торты на заказ",
+    "Торты на заказ",
     "Вегетарианское меню",
     "Халяль",
     "Шоколадные фонтаны",
     "Выездная регистрация",
   ],
-  /* Кухня — по фактическому меню: оливье/борщ/винегрет/буженина (русская),
+  /* Кухня — по фактическому меню: оливье/борщ/винегрет/буженина (русская),
    * брускетты/нисуаз/песто/пармская ветчина/дорада (европейская). */
   servesCuisine: ["Русская", "Европейская"],
   address: {
@@ -334,18 +334,18 @@ const jsonLd = {
     streetAddress: "ул. Полевая Сабировская, 45, к. 1",
   },
   geo: { "@type": "GeoCoordinates", latitude: 59.994868, longitude: 30.275093 },
-  /* F2 (K3-MINOR): openingHoursSpecification УДАЛЁН — на сайте видимых
-   * часов нет («Отвечаем в любое время», заявки круглосуточно), контакт-часы
-   * удалены владельцем ещё в cycle 65. Оставалась 3-я версия правды
+  /* F2 (K3-MINOR): openingHoursSpecification УДАЛЁН — на сайте видимых
+   * часов нет («Отвечаем в любое время», заявки круглосуточно), контакт-часы
+   * удалены владельцем ещё в cycle 65. Оставалась 3-я версия правды
    * (schema Пн–Пт 09–19 / страница / llms.txt «заявки круглосуточно)» —
-   * единственный честный источник: llms.txt. postalCode в PostalAddress
-   * НЕ добавлен: индекс 191186 в коде относится к юр-адресу (Б. Морская 18,
-   * LEGAL_INFO.legalAddress в lib/config.ts), а публичный офис —
+   * единственный честный источник: llms.txt. postalCode в PostalAddress
+   * НЕ добавлен: индекс 191186 в коде относится к юр-адресу (Б. Морская 18,
+   * LEGAL_INFO.legalAddress в lib/config.ts), а публичный офис —
    * Полевая-Сабировская 45к1; подставлять чужой индекс = врать. */
-  /* c89/W3-гейт: бренд-основатель — «Дмитрий Нилов» (как в видимой истории
-   и llms.txt). Юрлицо сменилось (ИП Нилова А.Д. — LEGAL_INFO); полное
-   старое ФИО из разметки убрано (владелец не утверждал его как
-   публичного основателя в новом цикле). */
+  /* c89/W3-гейт: бренд-основатель — «Дмитрий Нилов» (как в видимой истории
+   и llms.txt). Юрлицо сменилось (ИП Нилова А.Д. — LEGAL_INFO); полное
+   старое ФИО из разметки убрано (владелец не утверждал его как
+   публичного основателя в новом цикле). */
   founder: { "@type": "Person", name: "Дмитрий Нилов" },
   foundingDate: `${FOUNDED_YEAR}`,
   areaServed: [
@@ -354,19 +354,19 @@ const jsonLd = {
   ],
 };
 
-/** BreadcrumbList JSON-LD — хлебные крошки для rich-snippet в выдаче
+/** BreadcrumbList JSON-LD — хлебные крошки для rich-snippet в выдаче
  *  (Яндекс/Google показывают путь под заголовком результата).
  *  c127 (правка субагента W5, проверена сборкой): полный список — главная
  *  + разделы главной (якоря #menu/#calculator — они реально существуют в
- *  секциях hacc-menu/calculator) + юрстраницы, синхронно с sitemap.xml. */
+ *  секциях hacc-menu/calculator) + юрстраницы, синхронно с sitemap.xml. */
 const PAGE_BREADCRUMBS = [
   { name: "Главная", item: siteUrl + "/", position: 1 },
 ];
-/** c128 (22.09.2026) — Service + Offer JSON-LD (пробел C3.2 у критика).
- * Цены читаются из menu.json (единый источник, тот же что и калькулятор) —
- * ХАРДКОДА НЕТ: публикация цен из админки обновляет и разметку.
- * AggregateRating НЕ добавляем намеренно: нет верифицированных отзывов,
- * а выдуманный рейтинг = санкции Google + риск по ФЗ «О рекламе» (ФАС). */
+/** c128 (22.09.2026) — Service + Offer JSON-LD (пробел C3.2 у критика).
+ * Цены читаются из menu.json (единый источник, тот же что и калькулятор) —
+ * ХАРДКОДА НЕТ: публикация цен из админки обновляет и разметку.
+ * AggregateRating НЕ добавляем намеренно: нет верифицированных отзывов,
+ * а выдуманный рейтинг = санкции Google + риск по ФЗ «О рекламе» (ФАС). */
 const serviceLd = {
   "@context": "https://schema.org",
   "@type": "ItemList",
@@ -398,7 +398,7 @@ const serviceLd = {
                   "@type": "UnitPriceSpecification",
                   price: String(price),
                   priceCurrency: "RUB",
-                  unitText: "за гостя",
+                  unitText: "за гостя",
                 },
                 availability: "https://schema.org/InStock",
                 url: siteUrl + "/#calculator",
@@ -426,30 +426,30 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   /* 81-F1 (критик D + код-критик W1-c: «дубль preload логотипа»): preload
      бейджа прелоадера через Float API ReactDOM.preload — в HTML остаётся
-     РОВНО ОДИН <link> (поднимается в самое начало <head>). Ручной <link>
-     в head-JSX давал ДВЕ ссылки (Float-копия + in-place-копия — проверено
-     curl'ом на :3001); дедуп Float-ресурсов здесь же схлопывает и preload
-     из <Image priority> прелоадера в ту же единственную ссылку (в dev-SSR
-     он не эмитится вовсе, в prod — дедупится в этот же хинт). 41KB PNG
-     нужен в первые 0.45с (CSS-таймлайн дверей) — грузим до медиа-hero. */
+     РОВНО ОДИН <link> (поднимается в самое начало <head>). Ручной <link>
+     в head-JSX давал ДВЕ ссылки (Float-копия + in-place-копия — проверено
+     curl'ом на :3001); дедуп Float-ресурсов здесь же схлопывает и preload
+     из <Image priority> прелоадера в ту же единственную ссылку (в dev-SSR
+     он не эмитится вовсе, в prod — дедупится в этот же хинт). 41KB PNG
+     нужен в первые 0.45с (CSS-таймлайн дверей) — грузим до медиа-hero. */
   reactDomPreload("/brand/logo-256.png", { as: "image" });
   /* 81-W2F3 [G MINOR #8 «дубли preload шрифтов»]: preload Barlow Semi
      Condensed 400 + 700 latin (LCP-критичные woff2 тела — 81-F1) переведён
-     с ручных <link> в head-JSX на Float API ReactDOM.preload. Ручные теги
-     НЕ участвуют в Float-дедупликации и в прод-HTML дублировались с
-     авто-preload'ами (по 2 <link> на файл — критик G: 4b23c5ee@546+@3356,
-     490cbca7@680+@3490). Float-ресурс с тем же href/attrs дедупится в
-     РОВНО ОДИН <link> в начале <head> — тот же механизм, что у логотипа
-     выше. crossorigin обязателен для шрифтов (CORS-mode fetch, иначе
-     двойной запрос). Prata-latin уже preloaded next/font'ом — не дублируем. */
-  /* c104 (жалоба «404 на шрифтах в консоли»): хэш-суффиксы имён woff2
+     с ручных <link> в head-JSX на Float API ReactDOM.preload. Ручные теги
+     НЕ участвуют в Float-дедупликации и в прод-HTML дублировались с
+     авто-preload'ами (по 2 <link> на файл — критик G: 4b23c5ee@546+@3356,
+     490cbca7@680+@3490). Float-ресурс с тем же href/attrs дедупится в
+     РОВНО ОДИН <link> в начале <head> — тот же механизм, что у логотипа
+     выше. crossorigin обязателен для шрифтов (CORS-mode fetch, иначе
+     двойной запрос). Prata-latin уже preloaded next/font'ом — не дублируем. */
+  /* c104 (жалоба «404 на шрифтах в консоли»): хэш-суффиксы имён woff2
      ПОМЕНЯЛИСЬ при смене генератора сборки — старые захардкоженные URL
-     («046c0c63»/«116c03d8») давали 404 + preload-warnings на проде
+     («046c0c63»/«116c03d8») давали 404 + preload-warnings на проде
      (замер: nilovcatering.ru/_next/static/media/… → 404, 2 файла).
      Контентный префикс (4b23c5ee…=Barlow 400 latin, 490cbca7…=Barlow 700
-     latin) стабилен, суффикс — нет. Новые имена сверены с живым CSS :3001
-     (@font-face src). Страховка от повторения — шаг «Verify font preload
-     URLs» в deploy.yml: сборка падает, если файла нет в экспорте. */
+     latin) стабилен, суффикс — нет. Новые имена сверены с живым CSS :3001
+     (@font-face src). Страховка от повторения — шаг «Verify font preload
+     URLs» в deploy.yml: сборка падает, если файла нет в экспорте. */
   reactDomPreload("/_next/static/media/4b23c5ee480ee380-s.0qqufx6vw52v_.woff2", {
     as: "font",
     type: "font/woff2",
@@ -474,10 +474,10 @@ export default function RootLayout({
       <head>
         {/* F2 (K4-MAJOR .js-gate): САМЫЙ РАННИЙ инлайн-скрипт — синхронно,
             до отрисовки body, ставит класс `js` на <html>. Без JS класс не
-            ставится и CSS-правило `html:not(.js) [style*="opacity:0"]` в
+            ставится и CSS-правило `html:not(.js) [style*="opacity:0"]` в
             globals.css раскрывает framer-инициализации (161 инлайн
-            opacity:0 в SSR-HTML — иначе no-JS посетитель видит пустую
-            страницу). С JS правило не срабатывает — ноль влияния на обычных
+            opacity:0 в SSR-HTML — иначе no-JS посетитель видит пустую
+            страницу). С JS правило не срабатывает — ноль влияния на обычных
             юзеров. CSP разрешает 'unsafe-inline'; расхождение className
             при гидрации глушит suppressHydrationWarning на <html>. */}
         <script
@@ -495,19 +495,19 @@ export default function RootLayout({
             системном фоллбэке; latin покрывает «nilov/catering/NILOV
             CATERING» и англ. копирайт). Имена файлов = контент-хэши
             next/font — идентичны dev и prod-сборкам (сверено по CSS :3001
-            и :3002). Сами <link> — 81-W2F3 см. reactDomPreload в начале
-            RootLayout (дубль с авто-preload'ами Next устранён через
+            и :3002). Сами <link> — 81-W2F3 см. reactDomPreload в начале
+            RootLayout (дубль с авто-preload'ами Next устранён через
             Float-дедуп). */}
       </head>
       <body className="antialiased bg-background text-foreground">
         {/* 81-F1: СЕССИОННЫЙ ГЕЙТ ПРЕЛОАДЕРА — самый ранний инлайн-скрипт
-            в <body> (до контента): при повторном визите за сессию ставит
+            в <body> (до контента): при повторном визите за сессию ставит
             [data-no-preloader] на <html> ДО парсинга SSR-дверей → CSS-правило
             [data-no-preloader] [data-preloader-root]{display:none} гасит их
-            первым же стайл-резолвом (двери не красятся вовсе, гидрация не
-            нужна). try/catch — Safari private mode бросает на sessionStorage.
-            Ключ «catering-preloaded» согласован с preloader.tsx; расхождение
-            атрибута глушит suppressHydrationWarning на <html> (как у js-гейта). */}
+            первым же стайл-резолвом (двери не красятся вовсе, гидрация не
+            нужна). try/catch — Safari private mode бросает на sessionStorage.
+            Ключ «catering-preloaded» согласован с preloader.tsx; расхождение
+            атрибута глушит suppressHydrationWarning на <html> (как у js-гейта). */}
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -515,7 +515,7 @@ export default function RootLayout({
           }}
         />
         <a href="#main-content" className="skip-link">
-          Перейти к содержанию
+          Перейти к содержанию
         </a>
         <script
           type="application/ld+json"
@@ -579,10 +579,10 @@ export default function RootLayout({
         <noscript>
           <div style={{ padding: '2rem', fontFamily: 'sans-serif', textAlign: 'center' }}>
             {/* F2 (K3-MAJOR): было <h1>nilov catering.</h1> — дубль H1 на
-                КАЖДОЙ странице (wordmark в hero — первый H1). <strong> даёт
-                тот же визуальный вес без второй H1 в семантике. */}
+                КАЖДОЙ странице (wordmark в hero — первый H1). <strong> даёт
+                тот же визуальный вес без второй H1 в семантике. */}
             <strong>nilov catering.</strong>
-            <p>Для работы сайта необходимо включить JavaScript.</p>
+            <p>Для работы сайта необходимо включить JavaScript.</p>
             <p style={{ marginTop: '1rem' }}>Позвоните: <a href={CONTACTS.phoneHref}>{CONTACTS.phone}</a></p>
           </div>
         </noscript>

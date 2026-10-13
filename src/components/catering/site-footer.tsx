@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-/* c103: next/image больше не нужен — карта заменена векторной карточкой. */
+/* c103: next/image больше не нужен — карта заменена векторной карточкой. */
 import {
   motion,
   useReducedMotion,
@@ -26,7 +26,7 @@ import {
 } from "@/lib/media";
 import { LEGAL_INFO } from "@/lib/config";
 import { SplitTextReveal } from "@/components/motion/split-text-reveal";
-/* c83-B (Impl-B): VelocitySkew на вордмарке (§3a) + анимационный
+/* c83-B (Impl-B): VelocitySkew на вордмарке (§3a) + анимационный
    слой соц-иконок y-hop (§3b, site-footer-anim.css). */
 import { VelocitySkew } from "@/components/motion/velocity-skew";
 import "./site-footer-anim.css";
@@ -48,13 +48,13 @@ function useCurrentYear() {
 const FOOTER_NAV = [
   { label: "Главная", href: "#main-content" },
   { label: "Услуги", href: "#services" },
-  { label: "Меню и цены", href: "#menu" },
+  { label: "Меню и цены", href: "#menu" },
   { label: "Видео событий", href: "#events-video-carousel" },
   { label: "Калькулятор", href: "#calculator" },
-  /* c101: «О компании» теперь СТРАНИЦА /about (машино-читаемые факты для
-   * SEO/ИИ, чек-лист Яндекса шаг 27), а не якорь истории бренда на главной. */
-  { label: "О компании", href: "/about" },
-  { label: "Вопросы и ответы", href: "#faq" },
+  /* c101: «О компании» теперь СТРАНИЦА /about (машино-читаемые факты для
+   * SEO/ИИ, чек-лист Яндекса шаг 27), а не якорь истории бренда на главной. */
+  { label: "О компании", href: "/about" },
+  { label: "Вопросы и ответы", href: "#faq" },
   { label: "Контакты", href: "#contact" },
 ] as const;
 
@@ -97,49 +97,49 @@ function CitiesTrack({ trackId = '' }: { trackId?: string }) {
 /* ══════════════ Task 2-c — WOW-слой футера ══════════════
    1) Гигантский кинетический вордмарк «NILOV CATERING.» (две строки
       «NILOV» / «CATERING.») — визуальный якорь
-      на месте удалённой полосы подписки (newsletter удалён по запросу
+      на месте удалённой полосы подписки (newsletter удалён по запросу
       владельца). Посимвольный подъём из-под маски (whileInView stagger,
-      лёгкий rotate), непрерывный золотой shimmer-сweep по буквам.
-   2) Курсорный gold-spotlight — radial-gradient на MotionValues +
+      лёгкий rotate), непрерывный золотой shimmer-сweep по буквам.
+   2) Курсорный gold-spotlight — radial-gradient на MotionValues +
       rAF-spring (framer useSpring), только background/opacity,
-      pointer-events-none; рендерится ТОЛЬКО на fine-pointer
-      (hover:hover + pointer:fine) и вне prefers-reduced-motion.
+      pointer-events-none; рендерится ТОЛЬКО на fine-pointer
+      (hover:hover + pointer:fine) и вне prefers-reduced-motion.
    §34/§35 дисциплина:
-   - mounted-гейт: SSR и первый клиентский рендер = полностью статичный
-     футер (в SSR-разметке нет opacity:0 — no-JS видит весь контент);
+   - mounted-гейт: SSR и первый клиентский рендер = полностью статичный
+     футер (в SSR-разметке нет opacity:0 — no-JS видит весь контент);
    - settled = mounted && !reduce — ветвление анимационных пропсов только
      через settled; key-ремонт контейнера вордмарка при флипе settled
      («initial»
-     framer-motion не перевооружается пост-монтом, §35);
-   - spotlight и shimmer не рендерятся/не вешаются до mount;
+     framer-motion не перевооружается пост-монтом, §35);
+   - spotlight и shimmer не рендерятся/не вешаются до mount;
    - измерения букв (shimmer-тайл) — разовые layout-reads post-mount +
-     resize/fonts.ready, запись напрямую в DOM (classList/custom props),
-     ноль setState на кадр; анимации: transform/opacity/background-position. */
+     resize/fonts.ready, запись напрямую в DOM (classList/custom props),
+     ноль setState на кадр; анимации: transform/opacity/background-position. */
 
 /* Латиница «NILOV CATERING.» — чистый Oswald latin-субсет (§35: кириллический
-   фоллбек не задействован). Точка — фирменный золотой акцент бренда.
+   фоллбек не задействован). Точка — фирменный золотой акцент бренда.
    Ребрендинг 3-A (Interfood → nilov catering): ДВЕ строки «NILOV» /
-   «CATERING.» — одна строка из 15 глифов Oswald при исходном
+   «CATERING.» — одна строка из 15 глифов Oswald при исходном
    clamp(3.4rem, 16.5vw, 17rem) из .fw-line давала бы ~130vw (горизонтальное
-   переполнение), а ужимание font-size убивало бы «гигантскость» вордмарка;
+   переполнение), а ужимание font-size убивало бы «гигантскость» вордмарка;
    две строки сохраняют исходный масштаб без правок globals.css (файл —
    владение другого агента). Широкая строка «CATERING.» ≈ 5em × 16.5vw ≈
-   82vw ≤ 100vw на всех брейкпоинтах. */
+   82vw ≤ 100vw на всех брейкпоинтах. */
 const WORDMARK_LINES = [
   ["N", "I", "L", "O", "V"],
   ["C", "A", "T", "E", "R", "I", "N", "G", "."],
 ] as const;
 
 /* Варианты вордмарка (per-line). Триггер анимации — КОНТЕЙНЕР .fw-line: whileInView
-   на самих буквах не работает в принципе — буква в hidden сдвинута на
-   118% вниз и полностью клипается маской (overflow: clip), visible-бокс
+   на самих буквах не работает в принципе — буква в hidden сдвинута на
+   118% вниз и полностью клипается маской (overflow: clip), visible-бокс
    пуст → IntersectionObserver всегда isIntersecting=false («курица и
-   яйцо»; замер live). Бокс .fw-line не клипается → IO стреляет на нём;
+   яйцо»; замер live). Бокс .fw-line не клипается → IO стреляет на нём;
    лейблы variants-пропагацией доходят до букв сквозь немоушн .fw-mask
-   (контекст React, DOM-вложенность не рвёт цепочку), staggerChildren
-   0.055s/буква — тот же каскад, что бывший delay: i * 0.055. Вторая
+   (контекст React, DOM-вложенность не рвёт цепочку), staggerChildren
+   0.055s/буква — тот же каскад, что бывший delay: i * 0.055. Вторая
    строка получает delayChildren = lineIndex × 0.26s — каскад идёт
-   «волной» сверху вниз, а не двумя одновременными параллелями. */
+   «волной» сверху вниз, а не двумя одновременными параллелями. */
 const wordmarkLineVariants = (lineIndex: number) => ({
   hidden: {},
   visible: { transition: { staggerChildren: 0.055, delayChildren: lineIndex * 0.26 } },
@@ -156,23 +156,23 @@ const WORDMARK_LETTER_VARIANTS = {
 
 /**
  * KineticWordmark — ОДНА строка кинетического вордмарка (3-A: строк две —
- * «NILOV» и «CATERING.», рендерятся двумя экземплярами компонента).
+ * «NILOV» и «CATERING.», рендерятся двумя экземплярами компонента).
  * Декоративный (aria-hidden; бренд-имя «nilov catering.»
- * остаётся видимым текстом в колонке «Контакты», дублирующего landmark
- * нет). Буквы поднимаются из-под clip-маски с лёгким rotate. Триггер —
+ * остаётся видимым текстом в колонке «Контакты», дублирующего landmark
+ * нет). Буквы поднимаются из-под clip-маски с лёгким rotate. Триггер —
  * контейнер .fw-line (initial="hidden" + whileInView="visible" +
  * staggerChildren), буквы наследуют лейблы через variants-пропагацию:
- * буква в hidden полностью клипается маской, её visible-бокс пуст и
- * СОБСТВЕННЫЙ whileInView не стреляет никогда. Settled-гейт (§34/§35):
+ * буква в hidden полностью клипается маской, её visible-бокс пуст и
+ * СОБСТВЕННЫЙ whileInView не стреляет никогда. Settled-гейт (§34/§35):
  * до settled — ноль анимационных пропсов (SSR/no-JS/reduce видят
- * вордмарк целиком); на флипе settled контейнер ремоунтится key-ремонтом
+ * вордмарк целиком); на флипе settled контейнер ремоунтится key-ремонтом
  * (initial перевооружается только remount'ом), ключи букв стабильны.
- * Золотой shimmer — один общий градиент-тайл шириной в строку,
- * выровненный по всем буквам через измеренные --fw-sx/--fw-w,
- * анимируется CSS keyframes по background-position (гвард
- * prefers-reduced-motion: no-preference в globals.css). Ховер-подъём
- * буквы — CSS на .fw-mask (fine-pointer гвард в CSS, transform двигает
- * букву вместе с её градиентом).
+ * Золотой shimmer — один общий градиент-тайл шириной в строку,
+ * выровненный по всем буквам через измеренные --fw-sx/--fw-w,
+ * анимируется CSS keyframes по background-position (гвард
+ * prefers-reduced-motion: no-preference в globals.css). Ховер-подъём
+ * буквы — CSS на .fw-mask (fine-pointer гвард в CSS, transform двигает
+ * букву вместе с её градиентом).
  */
 function KineticWordmark({
   settled,
@@ -187,8 +187,8 @@ function KineticWordmark({
   const maskRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   /* Shimmer-paint: разовое измерение строки + оффсетов букв (маски —
-     layout-позиции, transform ховера на offsetLeft не влияет), запись
-     custom-props в буквы напрямую. Повтор — на resize (clamp vw) и
+     layout-позиции, transform ховера на offsetLeft не влияет), запись
+     custom-props в буквы напрямую. Повтор — на resize (clamp vw) и
      document.fonts.ready (swap Oswald меняет метрики). Ноль ререндеров. */
   useEffect(() => {
     if (!settled) return;
@@ -227,11 +227,11 @@ function KineticWordmark({
   }, [settled]);
 
   return (
-    /* key-ремонт (§35) на КОНТЕЙНЕРЕ: флип settled ремоунтит весь сабтри,
+    /* key-ремонт (§35) на КОНТЕЙНЕРЕ: флип settled ремоунтит весь сабтри,
        initial="hidden" перевооружается. Контейнер — motion-родитель:
-       initial/whileInView/viewport живут на нём (его бокс не клипается),
-       лейблы «hidden»/«visible» спускаются в буквы пропагацией. Ключ —
-       уникальный per-line (два экземпляра в 3-A). */
+       initial/whileInView/viewport живут на нём (его бокс не клипается),
+       лейблы «hidden»/«visible» спускаются в буквы пропагацией. Ключ —
+       уникальный per-line (два экземпляра в 3-A). */
     <motion.div
       key={`fw-line-${lineIndex}-${settled ? "a" : "s"}`}
       ref={lineRef}
@@ -277,26 +277,26 @@ function KineticWordmark({
 }
 
 /**
- * FooterWatermark — ГИГАНТСКИЙ фоновый логотип-водяной знак «во весь
- * футер» (задача владельца, C76; C77 — замена на НАСТОЯЩИЙ логотип
- * компании по указанию владельца: растр /brand/logo-round-1024.png —
- * тот же кругляж, что в шапке/фавиконе; «векторный двойник» C76
- * монограммой НЕ был логотипом компании). Масштаб
- * ~min(115vmin, 1060px), ghost ~5.5% opacity на тёплом espresso #161312: белые буквы
+ * FooterWatermark — ГИГАНТСКИЙ фоновый логотип-водяной знак «во весь
+ * футер» (задача владельца, C76; C77 — замена на НАСТОЯЩИЙ логотип
+ * компании по указанию владельца: растр /brand/logo-round-1024.png —
+ * тот же кругляж, что в шапке/фавиконе; «векторный двойник» C76
+ * монограммой НЕ был логотипом компании). Масштаб
+ * ~min(115vmin, 1060px), ghost ~5.5% opacity на тёплом espresso #161312: белые буквы
  * дают крем-призрак, золотые кольца — тёплый ореол.
  *
  * Слои: z-index:-1 внутри isolate-футера (как .fw-spotlight) — над
- * фоном, ПОД контентом; в DOM стоит РАНЬШЕ spotlight → свечение
+ * фоном, ПОД контентом; в DOM стоит РАНЬШЕ spotlight → свечение
  * курсора красится ПОВЕРХ водяного знака (золотая подсветка мягко
  * «проявляет» эмблему при движении).
  *
  * Кинетика (тренд 09.2026, продолжение C74): нативный CSS scroll-driven
- * дрейф — translateY ±4% + rotate ∓2.5° по animation-timeline: view()
- * (эмблема въезжает с лёгким наклоном и оседает по мере проскролла
+ * дрейф — translateY ±4% + rotate ∓2.5° по animation-timeline: view()
+ * (эмблема въезжает с лёгким наклоном и оседает по мере проскролла
  * футера). Ноль JS-кадров. Деградации: @supports not → статика по
- * центру; prefers-reduced-motion → статика; печать — не печатается
- * (print-медиа). SSR-статичен (чистый CSS, §34 — не гейтится).
- * loading="lazy": футер — самый низ страницы, грузим по мере надобности.
+ * центру; prefers-reduced-motion → статика; печать — не печатается
+ * (print-медиа). SSR-статичен (чистый CSS, §34 — не гейтится).
+ * loading="lazy": футер — самый низ страницы, грузим по мере надобности.
  */
 function FooterWatermark() {
   return (
@@ -315,11 +315,11 @@ function FooterWatermark() {
 }
 
 /**
- * FooterSpotlight — мягкое золотое свечение, следующее за курсором.
- * Монтируется только после mount на fine-pointer вне reduce (гейт в
- * SiteFooter) — SSR-разметка не содержит этот слой. Позиция —
+ * FooterSpotlight — мягкое золотое свечение, следующее за курсором.
+ * Монтируется только после mount на fine-pointer вне reduce (гейт в
+ * SiteFooter) — SSR-разметка не содержит этот слой. Позиция —
  * MotionValues + useSpring (rAF-цикл framer), фон собирается
- * useMotionTemplate: ноль setState на кадр. pointer-events-none.
+ * useMotionTemplate: ноль setState на кадр. pointer-events-none.
  */
 function FooterSpotlight() {
   const ref = useRef<HTMLDivElement>(null);
@@ -334,8 +334,8 @@ function FooterSpotlight() {
     const el = ref.current;
     const host = el?.parentElement; // <footer>
     if (!el || !host) return;
-    /* rect кэшируется на enter/scroll/resize — pointermove читает только
-       clientX/Y (ноль layout-reads на движение). */
+    /* rect кэшируется на enter/scroll/resize — pointermove читает только
+       clientX/Y (ноль layout-reads на движение). */
     let rect: DOMRect | null = null;
     const cache = () => {
       rect = host.getBoundingClientRect();
@@ -381,30 +381,30 @@ function FooterSpotlight() {
  * SiteFooter — тёмный тёплый espresso-футер nilov catering.
  *
  * 81-W2F2 (критик E MAJOR): было bg-ink #1F2937 — холодный slate/Tailwind
- * gray-800, диссонанс с тёплыми тёмными секциями сайта (#161312 — фон
- * ea-founder-story, gg-конвейер; шапка в тёмном варианте — #161312/85).
- * Фон переведён на тот же тёплый эспрессо #161312; производные
+ * gray-800, диссонанс с тёплыми тёмными секциями сайта (#161312 — фон
+ * ea-founder-story, gg-конвейер; шапка в тёмном варианте — #161312/85).
+ * Фон переведён на тот же тёплый эспрессо #161312; производные
  * (bg-ink/60 банд, from-ink фейды) — следом. Текст остаётся светлым
  * (cream/gold — контрасты только выросли, см. K2-комментарий ниже).
  *
  * Layout (Task 2-c; c89 — полоса реквизитов + карта):
- * 1. «Накрыто с любовью» (intro band, Marck Script + подзаголовок;
- *    c86-D: было «Сделано с любовью» — фраза переписана под суть
- *    кейтеринга — накрыть на стол)
+ * 1. «Накрыто с любовью» (intro band, Marck Script + подзаголовок;
+ *    c86-D: было «Сделано с любовью» — фраза переписана под суть
+ *    кейтеринга — накрыть на стол)
  * 2. Двухколоночный контент: Контакты (расширенная) / Навигация
- *    — колонка «Нам доверяют» и полоса подписки удалены по запросу
- *    владельца; c86-D: стат «2 400+ мероприятий с 2007 года» снят
- *    (de-numbering — владелец уводит сайт от чисел).
- *    c89 в контактах: строка «Макс» (+7 911 826-39-26) под основным
+ *    — колонка «Нам доверяют» и полоса подписки удалены по запросу
+ *    владельца; c86-D: стат «2 400+ мероприятий с 2007 года» снят
+ *    (de-numbering — владелец уводит сайт от чисел).
+ *    c89 в контактах: строка «Макс» (+7 911 826-39-26) под основным
  *    телефоном; соц-ряд = 5 профилей (Instagram* · VK · Телеграм
- *    канал · YouTube · Rutube, мессенджеры убраны в «Напишите нам»).
+ *    канал · YouTube · Rutube, мессенджеры убраны в «Напишите нам»).
  * 2R. Реквизиты (c89): dl ИП + счёта ТБанка (LEGAL_INFO + .bank).
  * 3. Гигантский кинетический вордмарк «NILOV CATERING.» (wow-якорь,
  *    две строки «NILOV» / «CATERING.» — ребрендинг 3-A)
- * 3M. Яндекс.Карта офиса (c89: перенесена из зоны контактов в подвал).
- * 4. «Накрываем столы по всему городу» — маркие районов СПб
- * 5. Копирайт + RF-сноска Instagram* (c86-D: маркер — на кнопке
- *    Instagram* в соц-строке, сноска Meta — последней строкой футера)
+ * 3M. Яндекс.Карта офиса (c89: перенесена из зоны контактов в подвал).
+ * 4. «Накрываем столы по всему городу» — маркие районов СПб
+ * 5. Копирайт + RF-сноска Instagram* (c86-D: маркер — на кнопке
+ *    Instagram* в соц-строке, сноска Meta — последней строкой футера)
  */
 export function SiteFooter() {
   const year = useCurrentYear();
@@ -424,7 +424,7 @@ export function SiteFooter() {
     return () => mq.removeEventListener("change", sync);
   }, []);
   const reduceSettled = mounted && reduce;
-  // §34: settled-ветка (анимации включены) — только post-mount и вне reduce.
+  // §34: settled-ветка (анимации включены) — только post-mount и вне reduce.
   const settled = mounted && !reduce;
   const motionProps = reduceSettled
     ? { initial: false, animate: { opacity: 1, y: 0 } }
@@ -471,7 +471,7 @@ export function SiteFooter() {
               className="font-script text-gold"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)" }}
             >
-              Накрыто с любовью
+              Накрыто с любовью
             </span>
             <Heart
               className="size-7 fill-gold text-gold"
@@ -479,9 +479,9 @@ export function SiteFooter() {
               style={{ marginBottom: "0.4rem" }}
             />
           </motion.div>
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-cream/80 md:text-base">
-            Семейное торжество или большой праздник — мы накроем,
-            сервируем и подадим, а вы наслаждайтесь днём в кругу близких.
+          <p className="mx-auto mt-5 max-w-[62ch] text-sm leading-relaxed text-cream/80 md:text-base">
+            Семейное торжество или большой праздник — мы накроем,
+            сервируем и подадим, а вы наслаждайтесь днём в кругу близких.
             Мы позаботимся обо всём.
           </p>
         </motion.div>
@@ -532,7 +532,7 @@ export function SiteFooter() {
                 (FAQ/услуги дегустации) — легенда не трогает.
                 c89 (читаемость для пожилых): text-sm (14px) + cream/60 —
                 бывший 13px-кегль поднят до шкалы 0.875rem+. */}
-            <p className="text-sm leading-relaxed text-cream/60">
+            <p className="text-sm leading-relaxed text-cream/60 max-w-[62ch]">
               Юридический адрес: {LEGAL_INFO.legalAddress} — реквизиты в{" "}
               <a
                 href="/offer"
@@ -611,7 +611,7 @@ export function SiteFooter() {
                 href={CONTACTS.instagramHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="nilov catering в Instagram (открывается в новой вкладке)"
+                aria-label="nilov catering в Instagram (открывается в новой вкладке)"
                 className="fw-soc flex h-10 items-center justify-center rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
                     reduce → none). c83-B: wiggle → y-hop (см. докблок ряда). */
@@ -625,7 +625,7 @@ export function SiteFooter() {
                 href={CONTACTS.vkHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="nilov catering в ВКонтакте (открывается в новой вкладке)"
+                aria-label="nilov catering в ВКонтакте (открывается в новой вкладке)"
                 className="fw-soc flex h-10 items-center justify-center rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
                     reduce → none). */
@@ -639,7 +639,7 @@ export function SiteFooter() {
                 href={CONTACTS.telegramChannelHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Телеграм-канал nilov catering (открывается в новой вкладке)"
+                aria-label="Телеграм-канал nilov catering (открывается в новой вкладке)"
                 className="fw-soc flex h-10 items-center justify-center gap-2 rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
                     reduce → none). c83-B: wiggle → y-hop (см. докблок ряда). */
@@ -655,7 +655,7 @@ export function SiteFooter() {
                 href={CONTACTS.youtubeHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="YouTube-канал nilov catering (открывается в новой вкладке)"
+                aria-label="YouTube-канал nilov catering (открывается в новой вкладке)"
                 className="fw-soc flex h-10 items-center justify-center gap-2 rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
                     reduce → none). c83-B: wiggle → y-hop (см. докблок ряда). */
@@ -670,7 +670,7 @@ export function SiteFooter() {
                 href={CONTACTS.rutubeHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Rutube — видео nilov catering (открывается в новой вкладке)"
+                aria-label="Rutube — видео nilov catering (открывается в новой вкладке)"
                 className="fw-soc flex h-10 items-center justify-center gap-2 rounded-full border border-cream/20 px-3.5 transition-colors hover:border-gold hover:bg-gold/10 min-h-[44px]"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights,
                     reduce → none). c83-B: wiggle → y-hop (см. докблок ряда). */
@@ -847,7 +847,7 @@ export function SiteFooter() {
                     </span>
                   </p>
                   <p className="mt-3 max-w-[38ch] text-sm leading-relaxed text-cream/70">
-                    Собственное производство и дегустационный зал.
+                    Собственное производство и дегустационный зал.
                     Просим согласовать время визита заранее
                   </p>
                 </div>
@@ -859,7 +859,7 @@ export function SiteFooter() {
                     rel="noopener noreferrer"
                     className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border border-gold/45 bg-gold/10 px-5 py-2.5 text-sm font-medium text-gold transition-colors duration-200 hover:bg-gold hover:text-[#161312] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
                   >
-                    Открыть в Яндекс Картах
+                    Открыть в Яндекс Картах
                   </a>
                   <a
                     href={YANDEX_MAPS.gisHref}
@@ -867,7 +867,7 @@ export function SiteFooter() {
                     rel="noopener noreferrer"
                     className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border border-cream/25 px-5 py-2.5 text-sm font-medium text-cream/85 transition-colors duration-200 hover:border-cream/50 hover:text-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
                   >
-                    Открыть в 2ГИС
+                    Открыть в 2ГИС
                   </a>
                 </div>
               </div>
@@ -882,10 +882,10 @@ export function SiteFooter() {
         <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
           <div className="mb-4 flex flex-col items-center text-center">
             <SplitTextReveal as="h2" className="eyebrow-wide text-sm text-gold">
-              Накрываем столы по всему городу
+              Накрываем столы по всему городу
             </SplitTextReveal>
             <p className="mt-2 text-sm text-cream/70">
-              Санкт-Петербург и пригороды · Ленинградская область — выезд по договорённости
+              Санкт-Петербург и пригороды · Ленинградская область — выезд по договорённости
             </p>
           </div>
 
@@ -962,7 +962,7 @@ export function SiteFooter() {
                 href="/offer"
                 className="py-2 text-cream/60 underline-offset-2 transition-colors hover:text-gold hover:underline"
               >
-                Публичная оферта и реквизиты
+                Публичная оферта и реквизиты
               </a>
               <a
                 href="/terms"
@@ -994,10 +994,10 @@ export function SiteFooter() {
             вьюпортах; max-w-2xl — читаемая мера, перенос по пробелам. */}
         <p
           data-ig-note
-          className="mx-auto max-w-2xl px-5 pb-6 text-center text-[13px] leading-relaxed text-cream/60"
+          className="mx-auto max-w-[62ch] px-5 pb-6 text-center text-[13px] leading-relaxed text-cream/60"
         >
           *Instagram принадлежит компании Meta, признанной экстремистской
-          организацией; её деятельность запрещена на территории Российской
+          организацией; её деятельность запрещена на территории Российской
           Федерации.
         </p>
       </div>

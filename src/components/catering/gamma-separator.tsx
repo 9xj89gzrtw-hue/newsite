@@ -30,17 +30,17 @@ import { SdZoomFallback } from "@/components/motion/sd-zoom-fallback";
  * Cycle 71 WOW-typo graft (velocity-«живой материал» + scroll-driven zoom):
  *  - Контентный врапер полосы (фото + оверлей + вордмарк) обёрнут VelocitySkew:
  *    при быстрой прокрутке вся полоса чуть «запинается» (skewY, кламп ±4°/±3°)
- *    и упруго возвращается — transform-only, MotionValue-цепочка без ререндеров.
- *    Обёртка ВНУТРИ ClipPathReveal (не предок фото — fixed-attachment тут нет,
- *    грабля §34 не применима, next/image — absolute).
- *  - На самом <img> — data-sd-zoom: нативный CSS scroll-driven zoom
- *    (scale 1.08→1.0 по entry-диапазону, @supports-гейт в globals.css,
- *    браузеры без поддержки и reduce-юзеры видят статичное фото). Фото —
+ *    и упруго возвращается — transform-only, MotionValue-цепочка без ререндеров.
+ *    Обёртка ВНУТРИ ClipPathReveal (не предок фото — fixed-attachment тут нет,
+ *    грабля §34 не применима, next/image — absolute).
+ *  - На самом <img> — data-sd-zoom: нативный CSS scroll-driven zoom
+ *    (scale 1.08→1.0 по entry-диапазону, @supports-гейт в globals.css,
+ *    браузеры без поддержки и reduce-юзеры видят статичное фото). Фото —
  *    чистый CSS-слой (framer анимирует только предка-обёртку), конфликтов
  *    WAAPI/JS нет.
- *  - C79: iOS Safari ≤18 / Firefox не умеют animation-timeline: view() —
- *    для них zoom ведёт SdZoomFallback (клиентский остров вокруг <Image>,
- *    те же 1.08→1.0 entry, rAF+IO; поддерживающие браузеры уходят на
+ *  - C79: iOS Safari ≤18 / Firefox не умеют animation-timeline: view() —
+ *    для них zoom ведёт SdZoomFallback (клиентский остров вокруг <Image>,
+ *    те же 1.08→1.0 entry, rAF+IO; поддерживающие браузеры уходят на
  *    CSS.supports-гейте — двойной анимации нет).
  *
  * Cycle 34 WOW graft (sondaven.com):
@@ -55,7 +55,7 @@ import { SdZoomFallback } from "@/components/motion/sd-zoom-fallback";
  *  - The "nilov catering" watermark text now drops in per-char via SplitTextReveal
  *    mode="chars" stagger={0.04} — each letter lifts in from below with a
  *    40ms stagger (split-type сохраняет пробел между словами как обычный
- *    текст-узел, поэтому двухсловный вордмарк рендерится с нормальным
+ *    текст-узел, поэтому двухсловный вордмарк рендерится с нормальным
  *    интервалом). The -6° tilt, Marck Script face, and 70% opacity white
  *    color are preserved (they're on the outer `.gamma-separator__watermark`
  *    span, which now wraps the SplitTextReveal instance).
@@ -103,7 +103,7 @@ export function GammaSeparator() {
           style={{ height: SEPARATOR_HEIGHT }}
         >
           {/* C79: SdZoomFallback — размерная обёртка (absolute inset-0)
-              для fill-<Image> + JS-zoom для браузеров без view(). */}
+              для fill-<Image> + JS-zoom для браузеров без view(). */}
           <SdZoomFallback>
             <Image
               src="/media/gamma/gamma-catering-separator.jpg"
@@ -121,7 +121,7 @@ export function GammaSeparator() {
               className="gamma-separator__img object-cover"
               /* C71: CSS scroll-driven zoom (entry-диапазон), @supports-гейт в
                  globals.css; статика без поддержки/reduce. C79: без поддержки —
-                 JS-фоллбек в SdZoomFallback пишет тот же transform. */
+                 JS-фоллбек в SdZoomFallback пишет тот же transform. */
               data-sd-zoom
             />
           </SdZoomFallback>

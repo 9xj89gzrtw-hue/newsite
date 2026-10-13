@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion"; /* 81-F4 [P7,
-  бандл-дедуп]: раньше импорт шёл из второго пакета motion (re-export
-  того же API при установленном framer-motion@12) — это второй экземпляр
-  того же рантайма анимации в бандле (дубль чанков). Экспорты,
-  используемые здесь (motion, useReducedMotion), идентичны в обоих. */
+  бандл-дедуп]: раньше импорт шёл из второго пакета motion (re-export
+  того же API при установленном framer-motion@12) — это второй экземпляр
+  того же рантайма анимации в бандле (дубль чанков). Экспорты,
+  используемые здесь (motion, useReducedMotion), идентичны в обоих. */
 import * as React from "react";
 
 type RevealProps = {

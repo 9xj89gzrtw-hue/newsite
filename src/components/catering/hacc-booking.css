@@ -1533,6 +1533,8 @@
   /* c89 (жалоба «мелко»): 0.74 → 0.85rem. */
   font-size: 0.85rem;
   line-height: 1.55;
+  /* c112 (владелец): комфортная ширина чтения (было 634px ≈ 93 симв.) */
+  max-width: 62ch;
   /* D5 (task 9-fix2): 58% ≈ 4.1:1 — ниже AA для мелкого кегля; 63% ≥ 4.5:1. */
   color: color-mix(in srgb, var(--hb-ink) 63%, transparent);
 }

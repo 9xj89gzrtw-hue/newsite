@@ -50,7 +50,7 @@
  *  - Each step slices the shared progress (SPEC windows [i/N·0.75, +0.25])
  *    with per-step useTransform overlays: red ink-fill opacity on the
  *    numeral (two stacked spans: -webkit-text-stroke outline under a filled
- *    cep-red copy; 81-F3: контур — СПЛОШНОЙ cep-black, не полупрозрачный —
+ *    cep-red copy; 81-F3: контур — СПЛОШНОЙ cep-black, не полупрозрачный —
  *    Lighthouse color-contrast 2.4:1 → ≥4.5:1, дизайн «контурных цифр»
  *    сохранён: заливка прозрачная, только stroke), verb/body opacity
  *    0.8→1 (wave-1 H: the old 0.45 floor failed WCAG contrast on cream),
@@ -62,12 +62,12 @@
  * step verbs only. Numerals are capped at 32px so the read is H2 ≫ numeral >
  * verb > body.
  *
- * C83 (Impl-E, Task 2): first-reveal cascade — на первом входе секции
+ * C83 (Impl-E, Task 2): first-reveal cascade — на первом входе секции
  * бокс цифры шага (контур + красная заливка) падает каскадом
  * rotate -6°→0 + y 12→0 + opacity, stagger 0.06, 0.5s, once — добавка
- * К scrub-рейлу (окна fill/ink/dot НЕ тронуты: это только первый вход).
+ * К scrub-рейлу (окна fill/ink/dot НЕ тронуты: это только первый вход).
  *
- * Semantics/a11y: <ol>/<li> with sr-only «Шаг N из 4» per item (wave-1 I),
+ * Semantics/a11y: <ol>/<li> with sr-only «Шаг N из 4» per item (wave-1 I),
  * section aria-label, rails + numerals aria-hidden. No sticky/pin, no extra
  * scroll height. Reduced-motion OR pre-mount: static fully-activated state —
  * all hooks run unconditionally before any branching (useMounted gate; no
@@ -95,12 +95,12 @@ import { SplitTextReveal } from "@/components/motion/split-text-reveal";
 type Step = { num: string; verb: string; body: string };
 
 /**
- * SPEC c63 copy + wave-1 pass + wave-2 G (step-02: W1-FIX — «в рабочее
- * время» убрано: Contact/FAQ-блоки теперь обещают «отвечаем в любое время»,
- * формулировка «перезвоним сразу, как увидим заявку» не противоречит им).
+ * SPEC c63 copy + wave-1 pass + wave-2 G (step-02: W1-FIX — «в рабочее
+ * время» убрано: Contact/FAQ-блоки теперь обещают «отвечаем в любое время»,
+ * формулировка «перезвоним сразу, как увидим заявку» не противоречит им).
  * \u00A0 (NBSP) binds the orphan pairs measured by the wave-2 critics
  * (D): without them the last rendered line strands a lone word —
- * «предлагаем.» (02 @1024/1920), «и не было.» (04 @1920), «полночь.»
+ * «предлагаем.» (02 @1024/1920), «и не было.» (04 @1920), «полночь.»
  * (01 @320), «празднике.» (03 @320).
  */
 const STEPS: Step[] = [
@@ -257,7 +257,7 @@ export function CepProcess() {
               the H2 on narrow screens, which is fine. Mobile 13px = body
               size (wave-2 height pass); desktop keeps the SPEC 15px. */}
           <p className="cep-text text-[13px] leading-normal text-cep-black/65 md:text-[15px]">
-            от заявки до чистой кухни — 4 шага
+            от заявки до чистой кухни — 4 шага
           </p>
         </div>
       </motion.div>

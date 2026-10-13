@@ -134,8 +134,8 @@ export function EaFinalCta() {
             color: "color-mix(in oklab, var(--ea-cream) 75%, transparent)",
           }}
         >
-          Расскажите о дате, площадке и количестве гостей — пришлём расчёт
-          в течение рабочего дня. Без обязательств.
+          Расскажите о дате, площадке и количестве гостей — пришлём расчёт
+          в течение рабочего дня. Без обязательств.
         </motion.p>
 
         {/* CTA row — primary solid red + secondary outline red, centered. */}
@@ -184,7 +184,7 @@ export function EaFinalCta() {
             {CONTACTS.email}
           </ContactLine>
           <RedBullet />
-          <ContactLine>Санкт-Петербург и пригороды</ContactLine>
+          <ContactLine>Санкт-Петербург и пригороды</ContactLine>
         </motion.div>
       </div>
     </section>
@@ -193,7 +193,7 @@ export function EaFinalCta() {
 
 /** Contact line — Montserrat 0.875rem, cream/60, letter-spacing 0.05em,
  * uppercase. c105: опциональный href (телефон/почта — кликабельны) и
- * nowrap (номера/адреса почты неделимы — не рвутся по дефисам). */
+ * nowrap (номера/адреса почты неделимы — не рвутся по дефисам). */
 function ContactLine({
   children,
   href,

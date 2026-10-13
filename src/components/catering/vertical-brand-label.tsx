@@ -7,10 +7,10 @@ import { usePathname } from "next/navigation";
  * VerticalBrandLabel — gamma-style LEFT sidebar with the brand name.
  *
  * Cycle 31.3 (2026-08-22): per user request —
- *   "убрать белую полоску с херо, она должна начинаться сразу после него.
- *    NILOV CATERING сделать в одну строку.
- *    сделать чтобы когда кликаю на него перебрасывало на главный экран.
- *    NILOV с хедера убрать на декстопной версии"
+ *   "убрать белую полоску с херо, она должна начинаться сразу после него.
+ *    NILOV CATERING сделать в одну строку.
+ *    сделать чтобы когда кликаю на него перебрасывало на главный экран.
+ *    NILOV с хедера убрать на декстопной версии"
  *
  * Changes from 31.2:
  *   - The sidebar now STARTS AFTER THE HERO. On the hero screen, body
@@ -139,8 +139,8 @@ export function VerticalBrandLabel() {
       href={railHref}
       aria-label={
         pathname === "/"
-          ? "Вернуться в начало — главный экран"
-          : "На главную — nilov catering"
+          ? "Вернуться в начало — главный экран"
+          : "На главную — nilov catering"
       }
       className={`vertical-brand-label${visible ? " is-visible" : ""}`}
       data-scheme={scheme}

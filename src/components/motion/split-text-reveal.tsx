@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import SplitType from "split-type";
-import { animate, useInView, useReducedMotion } from "framer-motion"; /* C71-P1 (K8, Task 6): было "motion/react" — унификация на единый пакет. */
+import { animate, useInView, useReducedMotion } from "framer-motion"; /* C71-P1 (K8, Task 6): было "motion/react" — унификация на единый пакет. */
 import { cn } from "@/lib/utils";
 
 type As = "h1" | "h2" | "h3" | "h4" | "p" | "span";
@@ -152,13 +152,13 @@ export function SplitTextReveal({
   // (and backgroundSize 0% for gradient) to y:0%/opacity:1 (and 100%). Imperative
   // `animate()` works on plain DOM nodes — no extra motion components needed.
   //
-  // K4 (cycle-71, F3): deps — скаляры `gradient?.from/?.to`, НЕ объект
+  // K4 (cycle-71, F3): deps — скаляры `gradient?.from/?.to`, НЕ объект
   // `gradient`. Родитель может передавать литерал (новая идентичность на
-  // каждый рендер) — объект в deps рестартовал анимацию на каждый ререндер
-  // родителя; от/до-строки стабильны и меняются только при реальной смене
-  // градиента (тот же паттерн, что у setup-эффекта выше). Ключевые кадры
-  // внутри читают `gradient` из замыкания — при равных from/to значения
-  // эквивалентны, рестарт не нужен.
+  // каждый рендер) — объект в deps рестартовал анимацию на каждый ререндер
+  // родителя; от/до-строки стабильны и меняются только при реальной смене
+  // градиента (тот же паттерн, что у setup-эффекта выше). Ключевые кадры
+  // внутри читают `gradient` из замыкания — при равных from/to значения
+  // эквивалентны, рестарт не нужен.
   useEffect(() => {
     if (!inView || reduce) {
       return;

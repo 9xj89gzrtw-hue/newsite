@@ -70,11 +70,11 @@ import { useMounted } from "@/hooks/use-mounted";
  *
  * Cycle 71 WOW graft («живой материал»): контентный стек (z-10) обёрнут
  * VelocitySkew — при быстрой прокрутке вся цитата-полоса чуть «запинается»
- * (skewY, кламп ±4°/±3°) и упруго возвращается. Фото-слой НА ДЕСКТОПЕ не
- * тронут (любой transform в цепочке предков убил бы background-attachment:
- * fixed — §34, гравля C62): скос фото вплетён в УЖЕ существующий drift-
- * transform и включён только на coarse (там fixed-attachment выключен
- * CSS-фоллбэком, y±7% + skewY — один составной transform того же элемента).
+ * (skewY, кламп ±4°/±3°) и упруго возвращается. Фото-слой НА ДЕСКТОПЕ не
+ * тронут (любой transform в цепочке предков убил бы background-attachment:
+ * fixed — §34, гравля C62): скос фото вплетён в УЖЕ существующий drift-
+ * transform и включён только на coarse (там fixed-attachment выключен
+ * CSS-фоллбэком, y±7% + skewY — один составной transform того же элемента).
  *
  * @see docs/talkofthetown-MINED-EXTRACTION.md (parallax sections)
  * @see research/c62/parallax-verify.mjs (proof harness — must report
@@ -83,39 +83,39 @@ import { useMounted } from "@/hooks/use-mounted";
  */
 
 const BAND_BG = "/media/c62/nilov-olive-trees-1920.webp";
-/* C71-P1 / K8-MAJOR (Task 3): 828w-вариант для coarse/narrow — 114KB
+/* C71-P1 / K8-MAJOR (Task 3): 828w-вариант для coarse/narrow — 114KB
    (sharp q80, public/media/c62/nilov-olive-trees-828.webp) вместо
    513KB 1920w, который мобильные экраны (390px) скачивали целиком. */
 const BAND_BG_COARSE = "/media/c62/nilov-olive-trees-828.webp";
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 /* C83 (Impl-E, Task 4) — reading-highlight лейда: слова подписи полосы
-   подсвечиваются по мере прокрутки (opacity 0.25→1 scrub, stagger по
+   подсвечиваются по мере прокрутки (opacity 0.25→1 scrub, stagger по
    словам — паттерн «reading highlight» GSAP Vault). H2 уже занят
-   SplitTextReveal (chars, once) — highlight уходит на лейд, как
-   предписывает план. Текст — один источник: из него сплит и sr-only-твин.
-   c86-F (перегруженность): снято вступление «Не меню, не список калорий,
-   не логистика.» — тройное отрицание дублировало антитезу H2 «Еда — это
-   ритуал.» и тянуло лишние ~1.5 строки на мобиле; лейда теперь одно
+   SplitTextReveal (chars, once) — highlight уходит на лейд, как
+   предписывает план. Текст — один источник: из него сплит и sr-only-твин.
+   c86-F (перегруженность): снято вступление «Не меню, не список калорий,
+   не логистика.» — тройное отрицание дублировало антитезу H2 «Еда — это
+   ритуал.» и тянуло лишние ~1.5 строки на мобиле; лейда теперь одно
    предложение, продолжает H2 напрямую. */
 const BAND_LEDE =
-  "Ритуал, в котором каждая деталь — от первого ножа до последнего бокала — служит одному: моменту, который гости запомнят на всю жизнь.";
+  "Ритуал, в котором каждая деталь — от первого ножа до последнего бокала — служит одному: моменту, который гости запомнят на всю жизнь.";
 const BAND_LEDE_WORDS = BAND_LEDE.split(" ");
-/** Полоса чтения на прогрессе прохождения секции: первое слово
- *  загорается на 0.10, последнее — на 0.60 (рамп 0.12 на слово —
+/** Полоса чтения на прогрессе прохождения секции: первое слово
+ *  загорается на 0.10, последнее — на 0.60 (рамп 0.12 на слово —
  *  слова завершают подсветку к ~0.72, пока центрированный текст ещё
- *  уверенно на экране). ManifestoWord-подобные окна (manifesto.tsx). */
+ *  уверенно на экране). ManifestoWord-подобные окна (manifesto.tsx). */
 const WORD_START = 0.1;
 const WORD_SPAN = 0.5;
 const WORD_RAMP = 0.12;
 
 /* c83-F1 (критик-P1 NIT): изоморфный layout-effect. Прямой useLayoutEffect
-   в SSR-рендере клиента ругается ворнингом React («does nothing on the
-   server» — сыпался в серверную консоль). На сервере берём useEffect
-   (SSR-строгий no-op), на клиенте — useLayoutEffect: прыжок спринга к
+   в SSR-рендере клиента ругается ворнингом React («does nothing on the
+   server» — сыпался в серверную консоль). На сервере берём useEffect
+   (SSR-строгий no-op), на клиенте — useLayoutEffect: прыжок спринга к
    текущему прогрессу обязан случиться до первой краски (см. эффект ниже,
-   паттерн cep-process.tsx wave-1 D). Порядок эффектов не критичен — это
-   разовый замер после layout, не хореография. */
+   паттерн cep-process.tsx wave-1 D). Порядок эффектов не критичен — это
+   разовый замер после layout, не хореография. */
 const useIsoLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -142,25 +142,25 @@ export function TottParallaxBand() {
 
   /* ═══ C71-P1 (K8 MAJOR, Task 3): выбор разрешения фонового webp ═══
    *
-   * Трейдофф (задокументирован по ТЗ): сервер не знает ни pointer, ни ширину
+   * Трейдофф (задокументирован по ТЗ): сервер не знает ни pointer, ни ширину
    * экрана. Замер ДО-фикса подтвердил: Chromium скачивает inline CSS-фон
-   * В МОМЕНТ РАЗБОРА HTML, а не «при подходе к вьюпорту» (nilov-olive-trees-
-   * 1920.webp 513KB стартовал на t=1415ms при скролле 0px — секция на
-   * ~8500px). Поэтому «SSR-1920 + подмена на 828 при монте» НЕ сработала бы:
-   * к моменту гидрации 513KB уже в полёте. Решение — инверсия дефолта:
+   * В МОМЕНТ РАЗБОРА HTML, а не «при подходе к вьюпорту» (nilov-olive-trees-
+   * 1920.webp 513KB стартовал на t=1415ms при скролле 0px — секция на
+   * ~8500px). Поэтому «SSR-1920 + подмена на 828 при монте» НЕ сработала бы:
+   * к моменту гидрации 513KB уже в полёте. Решение — инверсия дефолта:
    *
    *   SSR рендерит 828w (BAND_BG_COARSE) — худший кейс трансфера закрыт
-   *   по умолчанию (телефоны = главный K8-сценарий, −399KB на мобиле);
-   *   fine-pointer + широкий экран поднимает до 1920w ПРЯМО НА МОНТЕ
-   *   (эффект ниже) — секция ниже фолда на ~8500px, гидрация на 0px,
+   *   по умолчанию (телефоны = главный K8-сценарий, −399KB на мобиле);
+   *   fine-pointer + широкий экран поднимает до 1920w ПРЯМО НА МОНТЕ
+   *   (эффект ниже) — секция ниже фолда на ~8500px, гидрация на 0px,
    *   запас до первого просмотра огромен, подмена без заметного моргания.
    *
    * Цена компромисса: десктоп скачивает ОБА файла (828 при разборе + 1920
-   * после монт-апгрейда, ~+114KB к прежнему одиночному 513KB) — сознательный
+   * после монт-апгрейда, ~+114KB к прежнему одиночному 513KB) — сознательный
    * размен «мобильный −399KB / десктоп +114KB». Альтернатива «пустой SSR-фон
-   * + URL только с монта» дешевле на десктопе, но оставляет no-JS без фона
-   * вовсе — отвергнута. isCoarse-гейт трансформа (drift) не тронут — фон
-   * выбирается независимо от reduce (статичному фото тоже нужен правильный
+   * + URL только с монта» дешевле на десктопе, но оставляет no-JS без фона
+   * вовсе — отвергнута. isCoarse-гейт трансформа (drift) не тронут — фон
+   * выбирается независимо от reduce (статичному фото тоже нужен правильный
    * вес). */
   const [bgHiRes, setBgHiRes] = useState(false);
   useEffect(() => {
@@ -181,11 +181,11 @@ export function TottParallaxBand() {
   const driftRaw = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
   const drift = useSpring(driftRaw, { stiffness: 90, damping: 26, mass: 0.4 });
 
-  /* C83 (Impl-E, Task 4): reading-highlight — тот же прогресс прохождения
-   * секции, отдельный спринг (drift — строковый MV, не переиспользуется).
+  /* C83 (Impl-E, Task 4): reading-highlight — тот же прогресс прохождения
+   * секции, отдельный спринг (drift — строковый MV, не переиспользуется).
    * Слова — useTransform-срезы (ManifestoWord-паттерн: чистые MotionValue,
    * ноль ре-рендеров при скролле). iOS-безопасно: MotionValue, фото-слой и
-   * его fixed-attachment не затронуты (слова — в контентном стеке z-10). */
+   * его fixed-attachment не затронуты (слова — в контентном стеке z-10). */
   const readProgress = useSpring(scrollYProgress, {
     stiffness: 90,
     damping: 26,
@@ -193,14 +193,14 @@ export function TottParallaxBand() {
   });
   const wordsMounted = useMounted();
   /* C62 hydration-safety: MotionValue-стили слов цепляются только после
-   * монта — SSR и reduce рендерят слова с полной opacity (статика), первая
-   * клиент-отрисовка совпадает с SSR; пост-мон-флип — легален. */
+   * монта — SSR и reduce рендерят слова с полной opacity (статика), первая
+   * клиент-отрисовка совпадает с SSR; пост-мон-флип — легален. */
   const wordsActive = wordsMounted && !reduce;
 
   const interactedRef = useRef(false);
-  /* SSR-flash fix (cep-process wave-1 D): на перезагрузке, уже заскролленной
-   * в полосу, спринг не должен разгоняться с 0 — прыжок к текущему прогрессу
-   * в layout-effect, после коммита стилей, до первой анимированной краски.
+  /* SSR-flash fix (cep-process wave-1 D): на перезагрузке, уже заскролленной
+   * в полосу, спринг не должен разгоняться с 0 — прыжок к текущему прогрессу
+   * в layout-effect, после коммита стилей, до первой анимированной краски.
    * c83-F1: useIsoLayoutEffect (см. выше) — без SSR-ворнинга. */
   useIsoLayoutEffect(() => {
     if (wordsActive) readProgress.jump(scrollYProgress.get());
@@ -209,7 +209,7 @@ export function TottParallaxBand() {
   /* Passive-restoration re-anchor (cep-process wave-2 A): браузер может
    * восстановить позицию скролла ПОСЛЕ гидрации — до первого реального
    * взаимодействия каждый window-scroll считается пассивным восстановлением,
-   * и спринг прыгает к живому прогрессу (иначе слова «прочерчиваются» на
+   * и спринг прыгает к живому прогрессу (иначе слова «прочерчиваются» на
    * стоячей странице). После первого взаимодействия — обычный плавный scrub. */
   useEffect(() => {
     const mark = () => {
@@ -235,10 +235,10 @@ export function TottParallaxBand() {
 
   const driftActive = isCoarse && !reduce;
 
-  /** C71: velocity-skew фото-слоя — ТОЛЬКО на coarse (driftActive), тем же
-   * transform-узлом, что и drift; десктоп остаётся чистым (fixed §34).
+  /** C71: velocity-skew фото-слоя — ТОЛЬКО на coarse (driftActive), тем же
+   * transform-узлом, что и drift; десктоп остаётся чистым (fixed §34).
    * F3-рекомендация: enabled-гейт закрыл пустой rAF-трафик цепочки
-   * velocity→spring на десктопе, где результат не прикреплён к стилям. */
+   * velocity→spring на десктопе, где результат не прикреплён к стилям. */
   const photoSkew = useVelocitySkewDeg(4, 3, { enabled: driftActive });
 
   return (
@@ -349,8 +349,8 @@ export function TottParallaxBand() {
           delay={0.15}
           /* C71 (K1-MINOR): заголовок полосы наследовал 16px контейнера —
              слом иерархии H2. Крупный кинематографичный кегль, clamp по
-             вьюпортам (K2: на 390px не должен рвать строку — проверено
-             переносом по словам, не посимвольно). */
+             вьюпортам (K2: на 390px не должен рвать строку — проверено
+             переносом по словам, не посимвольно). */
           className="font-serif text-white text-3xl sm:text-4xl md:text-5xl leading-tight"
         >
           Еда — это ритуал.
@@ -389,7 +389,7 @@ export function TottParallaxBand() {
           className="tott-eyebrow mt-10 justify-center text-white/70"
           text={undefined}
         >
-          <span style={{ color: "var(--tott-olive)" }}>nilov catering · с 2007 года</span>
+          <span style={{ color: "var(--tott-olive)" }}>nilov catering · с 2007 года</span>
         </TottReveal>
       </VelocitySkew>
     </section>
@@ -397,11 +397,11 @@ export function TottParallaxBand() {
 }
 
 /**
- * BandWord — одно слово лейды: подсвечивается 0.25→1 на собственном срезе
+ * BandWord — одно слово лейды: подсвечивается 0.25→1 на собственном срезе
  * прогресса прохождения полосы (ManifestoWord-паттерн: per-word
  * useTransform → чистые MotionValue, ноль ре-рендеров при scrub).
  * active=false (SSR / pre-mount / reduced-motion) — статичная полная
- * opacity (reveal.tsx:32-35 swap-паттерн). Инлайн-слова со «внутренним»
+ * opacity (reveal.tsx:32-35 swap-паттерн). Инлайн-слова со «внутренним»
  * пробелом — перенос строк работает нативно, без inline-block-обёрток.
  */
 function BandWord({

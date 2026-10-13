@@ -97,12 +97,12 @@ export function EditorialIntro() {
           className="display-headline-xl mt-7 tinted-headline"
           style={{ textShadow: "0 2px 12px rgba(0,0,0,0.35)" }}
         >
-          У каждого события своя
+          У каждого события своя
           <br />
           <span className="italic" style={{ color: "#E8B889" }}>
             история
           </span>{" "}
-          за столом.
+          за столом.
         </motion.h2>
 
         {/* Lead paragraph — Ridgewells uses 18px Gotham Book, lh 1.4 */}
@@ -114,8 +114,8 @@ export function EditorialIntro() {
           className="mx-auto mt-9 max-w-xl text-[1.05rem] leading-[1.6] text-cream/90 md:text-[1.15rem]"
         >
           Interfood Catering — петербургская команда, которая превращает каждое
-          событие в празднование за столом. Отобранные сезонные продукты, руки наших
-          шеф-поваров и магия кейтеринга — от фуршета на 20 гостей до банкета на 500.
+          событие в празднование за столом. Отобранные сезонные продукты, руки наших
+          шеф-поваров и магия кейтеринга — от фуршета на 20 гостей до банкета на 500.
         </motion.p>
 
         {/* Dual CTA — Ridgewells uses two outline buttons (INQUIRE + ORDER).

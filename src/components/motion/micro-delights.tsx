@@ -7,113 +7,113 @@ import "./micro-delights.css";
 
 /**
  * MicroDelights — C78 «скрытые вау-сюрпризы»: микровзаимодействия, которых
- * НЕ видно при первом взгляде — они раскрываются только в контакте.
+ * НЕ видно при первом взгляде — они раскрываются только в контакте.
  *
  * ==========================================================================
- * ЧТО ДЕЛАЕТ (всё — декларативные data-атрибуты на существующих элементах,
- * сама логика — ДОКУМЕНТ-ДЕЛЕГИРОВАНИЕ, ноль слушателей на элемент):
+ * ЧТО ДЕЛАЕТ (всё — декларативные data-атрибуты на существующих элементах,
+ * сама логика — ДОКУМЕНТ-ДЕЛЕГИРОВАНИЕ, ноль слушателей на элемент):
  *
  *   [data-spark]        двойной тап/клик ≤350мс ≤48px → золотой всплеск
  *                       «искр» (8–14 частиц, WAAPI, transform/opacity only,
- *                       авто-удаление ≤950мс). Мышь И палец. Марquee-фото,
+ *                       авто-удаление ≤950мс). Мышь И палец. Марquee-фото,
  *                       плитки Instagram, портрет основателя.
  *                       reduce-motion → noop.
  *
  *   [data-egg="confetti"] 3 тапа ≤1600мс → fireGoldConfetti(элемент) +
  *                       sonner-тост «секретный ингредиент» (id = анти-стек).
- *                       Логотип в шапке: 3 клика = салют + признание.
+ *                       Логотип в шапке: 3 клика = салют + признание.
  *
- *   [data-tilt]         3D-наклон к курсору (≤5°, perspective 700px) +
- *                       блик-глянец, следующий за указателем (луч 120px,
- *                       opacity-only). fine-pointer И не reduce-motion.
+ *   [data-tilt]         3D-наклон к курсору (≤5°, perspective 700px) +
+ *                       блик-глянец, следующий за указателем (луч 120px,
+ *                       opacity-only). fine-pointer И не reduce-motion.
  *                       Плитки карусели видео. Уход — WAAPI-возврат 380мс.
  *                       (c83-F1: a[data-wiggle] — удалён: соцкнопки
- *                       футера перешли на y-hop в site-footer-anim.css,
+ *                       футера перешли на y-hop в site-footer-anim.css,
  *                       CSS осиротел — см. micro-delights.css.)
  *
  * C79 «Mobile Motion» — touch-эквиваленты всего hover-выше (задача
- * владельца: «в мобильной версии очень мало анимации»):
+ * владельца: «в мобильной версии очень мало анимации»):
  *
  *   [data-press] и      touch-pointerdown → WAAPI-нажатие scale(0.94)
- *   [data-spark]        за 150мс (fill forwards); pointerup → пружина
- *                       0.94→1.03→1 (340мс, без fill — возврат к нативу).
+ *   [data-spark]        за 150мс (fill forwards); pointerup → пружина
+ *                       0.94→1.03→1 (340мс, без fill — возврат к нативу).
  *                       Скольжение пальца >12px (скролл/драг марке) —
  *                       мгновенная отмена (возврат 200мс). Анимируется
- *                       ИНДИВИДУАЛЬНОЕ свойство `scale`, НЕ transform
+ *                       ИНДИВИДУАЛЬНОЕ свойство `scale`, НЕ transform
  *                       (81-F1: transform-кейфреймы — даже composite:'add'
- *                       — конфликтуют с позиционирующим translate кнопок,
+ *                       — конфликтуют с позиционирующим translate кнопок,
  *                       критик B CRITICAL; см. animateScale ниже).
  *   [data-spark]+
  *   лонг-пресс 430мс    «золотой выдох»: усиленный всплеск искр ×1.6 +
  *                       расширяющееся кольцо 56px + пульс фото
  *                       scale 1→1.045→1 + navigator.vibrate(12) (Android).
  *                       Клик ПОСЛЕ выдоха гасится (capture, once, 600мс
- *                       страховка) — палец ушёл с ссылки без перехода.
+ *                       страховка) — палец ушёл с ссылки без перехода.
  *
  * ==========================================================================
- * PERF (§43, числа — по построению, проверено dev.log/agent-browser):
+ * PERF (§43, числа — по построению, проверено dev.log/agent-browser):
  *   - 3 пассивных document-слушателя (pointerdown + pointerover +
  *     pointerout) ПОСТОЯННО; pointermove/pointerup/pointercancel — ТОЛЬКО
- *     пока активен tilt ИЛИ нажатие (снимаются первым же освобождением);
- *     ноль rAF-циклов в покое.
- *   - getBoundingClientRect: ≤1/кадр и только во время tilt (паттерн
- *     CustomCursor); на spark/egg — ≤1 на событие.
+ *     пока активен tilt ИЛИ нажатие (снимаются первым же освобождением);
+ *     ноль rAF-циклов в покое.
+ *   - getBoundingClientRect: ≤1/кадр и только во время tilt (паттерн
+ *     CustomCursor); на spark/egg — ≤1 на событие.
  *   - Частицы: ≤14 DOM-узлов, WAAPI transform/opacity (композитор),
  *     авто-удаление; canvas конфетти — утилита gold-confetti (DPR-cap 1.5).
  *   - Делегирование: annotated-элементов может быть сколь угодно много —
- *     слушателей от этого НЕ прибавляется.
+ *     слушателей от этого НЕ прибавляется.
  *
  * A11Y:
  *   - Всё декоративное — pointer-events:none, aria-hidden.
  *   - prefers-reduced-motion: spark/tilt → noop (CSS-гейт отдельно),
  *     тост — информативный UI, остаётся; конфетти сам-noop.
- *   - touch-action: manipulation на [data-spark] (в CSS) — убирает
+ *   - touch-action: manipulation на [data-spark] (в CSS) — убирает
  *     iOS double-tap-zoom, тапы остаются честными.
  */
 
-/** Двойной тап: окно времени и радиус (px) между тапами. */
+/** Двойной тап: окно времени и радиус (px) между тапами. */
 const SPARK_WINDOW_MS = 350;
 const SPARK_RADIUS_PX = 48;
-/** Яйцо: число тапов и окно. */
+/** Яйцо: число тапов и окно. */
 const EGG_TAPS = 3;
 const EGG_WINDOW_MS = 1600;
 /** Максимальный наклон tilt, градусы. */
 const TILT_MAX_DEG = 5;
 
 /* ══ C79: touch-нажатие / лонг-пресс ═══════════════════════════════════ */
-/** Нажатие: время прижатия и масштаб. */
+/** Нажатие: время прижатия и масштаб. */
 const PRESS_DOWN_MS = 150;
 const PRESS_SCALE = 0.94;
-/** Освобождение: пружина возврата с лёгким overshoot. */
+/** Освобождение: пружина возврата с лёгким overshoot. */
 const PRESS_UP_MS = 340;
 /** Отмена (скролл/драг): быстрый возврат. */
 const PRESS_CANCEL_MS = 200;
-/** Лонг-пресс: порог удержания и радиус срыва пальцем. */
+/** Лонг-пресс: порог удержания и радиус срыва пальцем. */
 const HOLD_MS = 430;
 const HOLD_MOVE_PX = 12;
 /** Усиление искр лонг-пресса (×1.6 — частицы/радиус/длительность). */
 const HOLD_SPARK_BOOST = 1.6;
 
 /** 81-F1 (критик B, CRITICAL): все press/возврат/пульс-анимации — кейфреймы
- *  через ИНДИВИДУАЛЬНОЕ CSS-свойство `scale`, НЕ через `transform`.
- *  Причина: WAAPI-слой с transform-кейфреймами (даже с composite:'add' —
- *  см. 81-F1b ниже) конфликтует с позиционирующим translate(-50%,-50%)
- *  кнопок (.ea-evt-video__play в карусели): replace-кейфреймы сносили
- *  transform на ~80px и тап уходил мимо модалки (критик B CRITICAL).
- *  Свойство `scale` не трогает transform ВООБЩЕ — ноль интеракции с
- *  CSS-transition на transform у тех же кнопок.
+ *  через ИНДИВИДУАЛЬНОЕ CSS-свойство `scale`, НЕ через `transform`.
+ *  Причина: WAAPI-слой с transform-кейфреймами (даже с composite:'add' —
+ *  см. 81-F1b ниже) конфликтует с позиционирующим translate(-50%,-50%)
+ *  кнопок (.ea-evt-video__play в карусели): replace-кейфреймы сносили
+ *  transform на ~80px и тап уходил мимо модалки (критик B CRITICAL).
+ *  Свойство `scale` не трогает transform ВООБЩЕ — ноль интеракции с
+ *  CSS-transition на transform у тех же кнопок.
  *  81-F1b ЗАМЕРЫ (390×844, playwright, research/f81-f1b/): scale-ветка
  *  держит кнопку под пальцем (клик доходит, модалка открывается ✓);
- *  центро-сдвиг S·T-композиции у кнопок с translate-центрированием
- *  ≈3.75px лечится НЕ здесь, а transform-origin на самой кнопке
+ *  центро-сдвиг S·T-композиции у кнопок с translate-центрированием
+ *  ≈3.75px лечится НЕ здесь, а transform-origin на самой кнопке
  *  (events-video-carousel.css: origin 0 0 = визуальный центр —
- *  т.к. translate(-50%,-50%) приводит центр бокса в его же левый-верхний
- *  угол; с таким origin ЛЮБАЯ scale-композиция центро-инвариантна).
- *  Побочный замер 81-F1b: transform+composite:'add' в Chromium 1234
- *  при одновременном CSS-transition на transform (hover 0.1s) ТЕРЯЕТ
- *  translate в computed matrix на ~340мс пружины → кнопка телепортируется
- *  на +75px и клик после тапа уходит в video — РЕГРЕССИЯ критика B.
- *  Поэтому composite-ветка — только фоллбек для старых WebKit без
+ *  т.к. translate(-50%,-50%) приводит центр бокса в его же левый-верхний
+ *  угол; с таким origin ЛЮБАЯ scale-композиция центро-инвариантна).
+ *  Побочный замер 81-F1b: transform+composite:'add' в Chromium 1234
+ *  при одновременном CSS-transition на transform (hover 0.1s) ТЕРЯЕТ
+ *  translate в computed matrix на ~340мс пружины → кнопка телепортируется
+ *  на +75px и клик после тапа уходит в video — РЕГРЕССИЯ критика B.
+ *  Поэтому composite-ветка — только фоллбек для старых WebKit без
  *  индивидуальных свойств (Safari <14.1), где нет и нашего transition-
  *  бага (движок другой).
  *  Фиче-детект: старый WebKit молча выкидывает незнакомое свойство из
@@ -225,7 +225,7 @@ export function MicroDelights() {
       window.setTimeout(() => holder.remove(), 950 * Math.min(boost, 1.25));
     };
 
-    /* ── egg: счётчик тапов на элемент (WeakMap — не течёт) ────────── */
+    /* ── egg: счётчик тапов на элемент (WeakMap — не течёт) ────────── */
     const eggState = new WeakMap<HTMLElement, { n: number; t: number }>();
 
     const eggTap = (el: HTMLElement) => {
@@ -239,14 +239,14 @@ export function MicroDelights() {
       if (next.n >= EGG_TAPS) {
         eggState.set(el, { n: 0, t: 0 });
         fireGoldConfetti(el);
-        toast("Секретный ингредиент — любовь. С 2007 года.", {
+        toast("Секретный ингредиент — любовь. С 2007 года.", {
           duration: 2600,
           id: "micro-egg", // повторные яйца обновляют один тост, не стек
         });
       }
     };
 
-    /* ── tilt: 3D-наклон + глянец (fine pointer, не reduce) ────────── */
+    /* ── tilt: 3D-наклон + глянец (fine pointer, не reduce) ────────── */
     let tiltEl: HTMLElement | null = null;
     let glare: HTMLElement | null = null;
     let tiltRaf = 0;
@@ -305,7 +305,7 @@ export function MicroDelights() {
         finish();
         return;
       }
-      // WAAPI-возврат в ноль (transform-only, комппозитор); после — сброс.
+      // WAAPI-возврат в ноль (transform-only, комппозитор); после — сброс.
       const back = el.animate(
         [
           { transform: el.style.transform },
@@ -315,7 +315,7 @@ export function MicroDelights() {
       );
       back.onfinish = finish;
       back.oncancel = finish;
-      // страховка: анимации WAAPI в фоновой вкладке стоят — чистим таймером
+      // страховка: анимации WAAPI в фоновой вкладке стоят — чистим таймером
       window.setTimeout(() => {
         if (back.playState !== "finished") back.cancel();
       }, 620);
@@ -323,9 +323,9 @@ export function MicroDelights() {
 
     /* ── C79: touch-нажатие + лонг-пресс ─────────────────────────────────
      * Слушатели pointermove/up/cancel живут ТОЛЬКО пока палец прижат
-     * (паттерн tilt: снятие первым же освобождением). В покое — их нет.
-     * pressAnim без fill на возврате: после завершения элемент возвращается
-     * к нативному inline/каскадному transform — WAAPI-слой исчезает сам. */
+     * (паттерн tilt: снятие первым же освобождением). В покое — их нет.
+     * pressAnim без fill на возврате: после завершения элемент возвращается
+     * к нативному inline/каскадному transform — WAAPI-слой исчезает сам. */
     let pressEl: HTMLElement | null = null;
     let pressAnim: Animation | null = null;
     let pressStartX = 0;
@@ -346,9 +346,9 @@ export function MicroDelights() {
       }
     };
 
-    /** Клик после выдоха: палец держали 430мс+ и отпустили на ссылке —
-     * переход был бы случайным. Гасим capture-фазой (once) + страховка
-     * 600мс на случай, когда клика вовсе не последовало. */
+    /** Клик после выдоха: палец держали 430мс+ и отпустили на ссылке —
+     * переход был бы случайным. Гасим capture-фазой (once) + страховка
+     * 600мс на случай, когда клика вовсе не последовало. */
     const suppressClickAfterHold = (el: HTMLElement) => {
       const onClick = (ev: MouseEvent) => {
         const t = ev.target as Node | null;
@@ -381,14 +381,14 @@ export function MicroDelights() {
       );
       document.body.appendChild(ring);
       window.setTimeout(() => ring.remove(), 700);
-      // Пульс самого фото — свойство `scale` (не transform): даже если у
+      // Пульс самого фото — свойство `scale` (не transform): даже если у
       // [data-spark]-элемента окажется позиционирующий CSS-transform,
-      // WAAPI его не снесёт (81-F1, см. animateScale).
+      // WAAPI его не снесёт (81-F1, см. animateScale).
       animateScale(el, [{ scale: 1 }, { scale: 1.045, offset: 0.4 }, { scale: 1 }], {
         duration: 620,
         easing: "cubic-bezier(0.22, 1, 0.36, 1)",
       });
-      // Тактильный отклик — только Android (iOS Safari API не имеет).
+      // Тактильный отклик — только Android (iOS Safari API не имеет).
       try {
         navigator.vibrate?.(12);
       } catch {
@@ -476,7 +476,7 @@ export function MicroDelights() {
       }
 
       /* C79: touch-нажатие — [data-press] (кнопки/ссылки) и [data-spark]
-       * (фото: нажатие + кандидат на лонг-пресс-выдох). */
+       * (фото: нажатие + кандидат на лонг-пресс-выдох). */
       if (e.pointerType === "touch" && !reduceMq.matches) {
         const pressTarget = target.closest<HTMLElement>("[data-press], [data-spark]");
         if (pressTarget) {

@@ -25,8 +25,8 @@ import { useMounted } from "@/hooks/use-mounted";
  *     </div>
  *   </div>
  *
- * Per task v4: "после этого я тебя просил что-то добавлять? не просил, только
- * эта надпись как у них". So this section is ONLY that one H2 line — nothing
+ * Per task v4: "после этого я тебя просил что-то добавлять? не просил, только
+ * эта надпись как у них". So this section is ONLY that one H2 line — nothing
  * else (no eyebrow, no h1, no body, no CTA button). The previous v3 added a
  * whole headline stack which was NOT asked for; v4 strips it back to the
  * exact reference.

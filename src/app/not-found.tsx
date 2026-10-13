@@ -3,34 +3,34 @@ import Link from "next/link";
 import { Phone, Home, UtensilsCrossed } from "lucide-react";
 import { CONTACTS } from "@/lib/config";
 
-/* Task 1-b (cycle-71): собственный OG для 404 — раньше страница наследовала
- * og:title/og:description/og:url главной (портят превью в соцсетях при
- * переходе по битой ссылке). Next 16: not-found.tsx поддерживает export
+/* Task 1-b (cycle-71): собственный OG для 404 — раньше страница наследовала
+ * og:title/og:description/og:url главной (портят превью в соцсетях при
+ * переходе по битой ссылке). Next 16: not-found.tsx поддерживает export
  * metadata (title/description уже работали) — openGraph/twitter тоже
- * рендерятся, проверено curl-ом /nonexistent в верификации Task 1-b.
+ * рендерятся, проверено curl-ом /nonexistent в верификации Task 1-b.
  *
- * 81-F2 (критик A, дубль robots + canonical на 404) + 81-F2b (доделка):
- *   - robots: null — ГАСИТ унаследованный из layout.tsx robots
- *     («index, follow, max-*»). Next.js на 404-статусе сам ставит
+ * 81-F2 (критик A, дубль robots + canonical на 404) + 81-F2b (доделка):
+ *   - robots: null — ГАСИТ унаследованный из layout.tsx robots
+ *     («index, follow, max-*»). Next.js на 404-статусе сам ставит
  *     <meta name="robots" content="noindex"> (app-render.js: NonIndex —
- *     безусловно для statusCode>400) — с живым layout-robots на 404
+ *     безусловно для statusCode>400) — с живым layout-robots на 404
  *     рендерились ДВА противоречащих robots-мета (замер curl: «noindex» +
- *     «index, follow»). null (официальный способ сброса поля в Next,
+ *     «index, follow»). null (официальный способ сброса поля в Next,
  *     metadata-interface.d.ts: robots?: null | string | Robots) оставляет
- *     РОВНО ОДНУ директиву — авто-noindex; follow — дефолт по спецификации
- *     robots-meta, ссылки не страдают.
- *   - alternates: null — canonical «/» из layout.tsx НЕ консолидирует вес
- *     на главную (дубль канонического сигнала на noindex-странице
- *     бессмысленен), og:url убран по той же причине — og:title/description/
- *     images остаются для корректного соцпревью по битой ссылке. */
+ *     РОВНО ОДНУ директиву — авто-noindex; follow — дефолт по спецификации
+ *     robots-meta, ссылки не страдают.
+ *   - alternates: null — canonical «/» из layout.tsx НЕ консолидирует вес
+ *     на главную (дубль канонического сигнала на noindex-странице
+ *     бессмысленен), og:url убран по той же причине — og:title/description/
+ *     images остаются для корректного соцпревью по битой ссылке. */
 export const metadata: Metadata = {
-  title: "Страница не найдена",
-  description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с NILOV CATERING.",
+  title: "Страница не найдена",
+  description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с NILOV CATERING.",
   robots: null,
   alternates: null,
   openGraph: {
-    title: "Страница не найдена | NILOV CATERING",
-    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с NILOV CATERING.",
+    title: "Страница не найдена | NILOV CATERING",
+    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с NILOV CATERING.",
     type: "website",
     locale: "ru_RU",
     siteName: "NILOV CATERING",
@@ -38,8 +38,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Страница не найдена | NILOV CATERING",
-    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с NILOV CATERING.",
+    title: "Страница не найдена | NILOV CATERING",
+    description: "Запрашиваемая страница не существует. Вернитесь на главную или свяжитесь с NILOV CATERING.",
     images: ["/og-image.jpg"],
   },
 };
@@ -83,11 +83,11 @@ export default function NotFound() {
           404
         </p>
         <h1 className="mt-2 font-display text-2xl text-cream md:text-3xl">
-          Страница не найдена
+          Страница не найдена
         </h1>
         <p className="mt-4 text-base text-cream/75">
-          Возможно, страница была перемещена или удалена. Вернитесь на главную
-          или свяжитесь с нами — поможем организовать ваше мероприятие.
+          Возможно, страница была перемещена или удалена. Вернитесь на главную
+          или свяжитесь с нами — поможем организовать ваше мероприятие.
         </p>
       </div>
 
@@ -98,7 +98,7 @@ export default function NotFound() {
           className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[#C9A227] px-7 py-3 text-sm font-medium text-[#0A0908] transition-colors hover:bg-[#B08D22] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A227]"
         >
           <Home className="size-4" aria-hidden="true" />
-          На главную
+          На главную
         </Link>
         <Link
           href="/#menu"

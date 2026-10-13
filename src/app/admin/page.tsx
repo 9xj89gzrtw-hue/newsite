@@ -71,7 +71,7 @@ body:has(.admin-root) > div[class*="z-[100]"] { display: none !important; }
 .admin-root a { cursor: pointer; }
 .admin-root button, .admin-root [role="button"], .admin-root label { cursor: pointer; }
 .admin-root input, .admin-root textarea { cursor: text; }
-/* c96: страховка скролла — классы остановленного Lenis не должны гасить
+/* c96: страховка скролла — классы остановленного Lenis не должны гасить
    прокрутку админки, даже если залетели на <html> до гидрации. */
 html[data-admin-page].lenis-stopped,
 html[data-admin-page].lenis-locked,
@@ -97,10 +97,10 @@ export default function AdminPage() {
     });
     const onUnauth = () => setPhase("login");
     window.addEventListener("nilov-admin-unauth", onUnauth);
-    /* c96: Lenis здесь больше не останавливаем (stop() глушил скролл
-     *  наглухо) — провайдер просто не создаёт его на /admin. Если на
+    /* c96: Lenis здесь больше не останавливаем (stop() глушил скролл
+     *  наглухо) — провайдер просто не создаёт его на /admin. Если на
      *  странице почему-то остался живой инстанс (устаревший кэш бандла),
-     *  разрушаем целиком: destroy() снимает listeners и lenis-классы. */
+     *  разрушаем целиком: destroy() снимает listeners и lenis-классы. */
     const w = window as unknown as { __lenis?: { destroy: () => void } };
     if (w.__lenis) {
       try {
@@ -120,7 +120,7 @@ export default function AdminPage() {
     <>
       <style dangerouslySetInnerHTML={{ __html: ADMIN_NEUTRALIZE_CSS }} />
       {/* Синхронный инлайн-скрипт: флаг на <html> до гидрации — глобальные
-          слои (прелоадер и др.) гаснут CSS'ом с первого кадра. */}
+          слои (прелоадер и др.) гаснут CSS'ом с первого кадра. */}
       <script
         dangerouslySetInnerHTML={{
           __html: 'document.documentElement.dataset.adminPage="1"',
@@ -178,7 +178,7 @@ function LoginScreen({ mock, onLogin }: { mock: boolean; onLogin: () => void }) 
       setError(
         `Слишком много попыток, подождите ${r.retryAfterSec ?? 60} сек`,
       );
-    else setError("Нет связи с сервером — проверьте интернет");
+    else setError("Нет связи с сервером — проверьте интернет");
   };
 
   return (
@@ -229,8 +229,8 @@ function LoginScreen({ mock, onLogin }: { mock: boolean; onLogin: () => void }) 
 
         <p className="mt-5 text-center text-[13px] leading-relaxed text-ink-soft/80">
           {mock
-            ? "Демо-режим: пароль admin, данные не изменяются."
-            : "Панель для изменения меню, цен и чтения заявок."}
+            ? "Демо-режим: пароль admin, данные не изменяются."
+            : "Панель для изменения меню, цен и чтения заявок."}
         </p>
       </div>
     </div>

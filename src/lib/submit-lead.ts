@@ -1,12 +1,12 @@
 import { normalizePhone } from "@/lib/phone";
 
 /**
- * c95 (1-d): клиентский сабмит лида на РЕАЛЬНЫЙ бэкенд.
+ * c95 (1-d): клиентский сабмит лида на РЕАЛЬНЫЙ бэкенд.
  *
- * Сайт — статический экспорт на PHP-хостинге (SpaceWeb): до c95 все формы
+ * Сайт — статический экспорт на PHP-хостинге (SpaceWeb): до c95 все формы
  * «отправлялись» через mailto (открытие почтового клиента). Теперь рядом со
  * статикой живёт same-origin PHP-эндпоинт POST /api/lead.php (public/api —
- * в проде отдаётся Apache напрямую, мимо Next), который складывает заявку в
+ * в проде отдаётся Apache напрямую, мимо Next), который складывает заявку в
  * server-data/leads.json + уведомляет владельца (Telegram/mail).
  *
  * Контракт эндпоинта (фиксирован, см. public/api/lead.php):
@@ -14,8 +14,8 @@ import { normalizePhone } from "@/lib/phone";
  *   Content-Type: application/json
  *   X-Requested-With: XMLHttpRequest   ← нестандартный заголовок как
  *     CSRF-щит (кросс-доменный fetch потребует preflight, который наш
- *     сервер не разрешает; дублирует проверку Origin на сервере).
- *     c98-A: сервер принимает и БЕЗ XRW, если Origin ∈ allowlist —
+ *     сервер не разрешает; дублирует проверку Origin на сервере).
+ *     c98-A: сервер принимает и БЕЗ XRW, если Origin ∈ allowlist —
  *     это открывает дорогу sendBeacon при закрытии вкладки.
  *   body: { name: 1..100, phone, email?, comment? ≤2000,
  *           source: "calculator"|"contact"|"footer", consent: true,
@@ -26,12 +26,12 @@ import { normalizePhone } from "@/lib/phone";
  *   500 {ok:false,error:"delivery"} | сеть/таймаут.
  *
  * c98-A — Outbox (гарантия доставки при сбое сети/закрытии вкладки/деплое
- * в момент отправки; паттерн transactional-outbox/localStorage-queue):
- *  - до отправки заявка кладётся в localStorage 'catering-lead-outbox';
- *  - успех (ok:true или dedupe:true) → запись удаляется;
+ * в момент отправки; паттерн transactional-outbox/localStorage-queue):
+ *  - до отправки заявка кладётся в localStorage 'catering-lead-outbox';
+ *  - успех (ok:true или dedupe:true) → запись удаляется;
  *  - провал (сеть/таймаут/5xx) → запись остаётся, tries++;
- *  - при следующей загрузке сайта (не админка) через 1.5с записи старше
- *    20с с tries<3 переотправляются — С ТЕМ ЖЕ clientId, сервер дедупит;
+ *  - при следующей загрузке сайта (не админка) через 1.5с записи старше
+ *    20с с tries<3 переотправляются — С ТЕМ ЖЕ clientId, сервер дедупит;
  *    c98-FIX2: инициализацию вызывает LeadOutboxResender из КОРНЕВОГО
  *    layout — на любой странице, не только на главной (см. ниже);
  *  - при pagehide во время in-flight отправки — дублирующий sendBeacon
@@ -59,8 +59,8 @@ export type LeadPayload = {
 
 /**
  * Результат сабмита. `network` — нет связи/таймаут/не-JSON/неожиданный
- * статус (всё, что не 200/400/429); `server` — 429 (сервер жив, просит
- * подождать — с retryAfterSec); `validation` — 400 (данные отвергнуты).
+ * статус (всё, что не 200/400/429); `server` — 429 (сервер жив, просит
+ * подождать — с retryAfterSec); `validation` — 400 (данные отвергнуты).
  */
 export type LeadResult =
   | { ok: true; id: string }
@@ -82,7 +82,7 @@ const OUTBOX_KEY = "catering-lead-outbox";
 const OUTBOX_CAP = 10;
 /** Максимум авто-резендов одной записи; дальше — ждём нового действия юзера. */
 const OUTBOX_MAX_TRIES = 3;
-/** Запись моложе 20с не резендим: возможно, отправка ещё идёт в этой вкладке. */
+/** Запись моложе 20с не резендим: возможно, отправка ещё идёт в этой вкладке. */
 const OUTBOX_MIN_AGE_MS = 20_000;
 /** Записи старше 7 дней считаются безнадёжными — чистим. */
 const OUTBOX_TTL_MS = 7 * 24 * 3600 * 1000;
@@ -99,11 +99,11 @@ type OutboxEntry = {
 // private browsing, embedded previews). Storage is optional, the form is not.
 const isBrowser = typeof window !== "undefined";
 
-/** Не админка: на /admin outbox не живёт (не таскаем данные форм по панели). */
+/** Не админка: на /admin outbox не живёт (не таскаем данные форм по панели). */
 const isPublicPage = (): boolean =>
   isBrowser && !window.location.pathname.startsWith("/admin");
 
-/** crypto.randomUUID с фолбэком для старых браузеров (8-64 hex, валиден сервером). */
+/** crypto.randomUUID с фолбэком для старых браузеров (8-64 hex, валиден сервером). */
 function makeClientId(): string {
   if (isBrowser && typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     try {
@@ -157,7 +157,7 @@ function writeOutbox(entries: OutboxEntry[]): boolean {
   }
 }
 
-/** Положить заявку в outbox ДО отправки (даже крэш вкладки не теряет её). */
+/** Положить заявку в outbox ДО отправки (даже крэш вкладки не теряет её). */
 function outboxAdd(entry: OutboxEntry): boolean {
   if (!isBrowser) return false;
   const entries = readOutbox();
@@ -185,13 +185,13 @@ function outboxBumpTries(clientId: string): void {
 
 /* ------------------------------------------------------ низкоуровневый POST */
 
-/** Признак «сейчас есть in-flight отправка» — для sendBeacon на pagehide. */
+/** Признак «сейчас есть in-flight отправка» — для sendBeacon на pagehide. */
 const inFlight = new Map<string, Record<string, unknown>>();
 
 /**
- * POST /api/lead.php с телом (включая clientId). Возвращает дискриминированный
- * LeadResult; не бросает исключений. Используется и формами (submitLead),
- * и авто-резендом outbox — одна сеть, один контракт.
+ * POST /api/lead.php с телом (включая clientId). Возвращает дискриминированный
+ * LeadResult; не бросает исключений. Используется и формами (submitLead),
+ * и авто-резендом outbox — одна сеть, один контракт.
  */
 async function postLead(bodyObj: Record<string, unknown>): Promise<LeadResult> {
   let body: string;
@@ -214,8 +214,8 @@ async function postLead(bodyObj: Record<string, unknown>): Promise<LeadResult> {
         "X-Requested-With": "XMLHttpRequest",
       },
       body,
-      /* K4-F1 (наследие прежнего fetch-кода): мёртвый upstream не вешает
-       * форму навсегда; DOMException TimeoutError уходит в общий catch. */
+      /* K4-F1 (наследие прежнего fetch-кода): мёртвый upstream не вешает
+       * форму навсегда; DOMException TimeoutError уходит в общий catch. */
       signal: controller.signal,
     });
     return await readLeadResponse(res);
@@ -231,8 +231,8 @@ async function readLeadResponse(res: Response): Promise<LeadResult> {
   /* 400 — данные отвергнуты валидацией сервера (не ретраить вслепую). */
   if (res.status === 400) return { ok: false, reason: "validation" };
 
-  /* 429 — rate limit: сервер жив, но просит подождать. retryAfterSec
-   * берём из JSON-тела, фолбэк — заголовок Retry-After (сек). */
+  /* 429 — rate limit: сервер жив, но просит подождать. retryAfterSec
+   * берём из JSON-тела, фолбэк — заголовок Retry-After (сек). */
   if (res.status === 429) {
     let retryAfterSec: number | undefined;
     try {
@@ -252,8 +252,8 @@ async function readLeadResponse(res: Response): Promise<LeadResult> {
       : { ok: false, reason: "server", retryAfterSec };
   }
 
-  /* Всё прочее (включая 500 delivery и не-JSON 200) → network:
-   * вызывающая форма уходит в mailto-фолбэк, лид не теряется. */
+  /* Всё прочее (включая 500 delivery и не-JSON 200) → network:
+   * вызывающая форма уходит в mailto-фолбэк, лид не теряется. */
   if (res.status !== 200) return { ok: false, reason: "network" };
   try {
     const data = (await res.json()) as { ok?: unknown; id?: unknown };
@@ -304,7 +304,7 @@ async function outboxFlush(): Promise<void> {
       phone: normalizePhone(e.payload.phone),
       clientId: e.clientId,
     });
-    /* `!== false`-паттерн (tsconfig strict:false — truthiness не сужает
+    /* `!== false`-паттерн (tsconfig strict:false — truthiness не сужает
      * union, см. submitLead/postLead). */
     if (result.ok !== false) {
       outboxRemove(e.clientId); // доставлена (в т.ч. dedupe) — чистим
@@ -319,16 +319,16 @@ async function outboxFlush(): Promise<void> {
 
 /**
  * c98-FIX2 (критик5 MINOR-5 + NIT-8): авто-резенд outbox + pagehide-beacon —
- * теперь ЯВНАЯ идемпотентная инициализация, а НЕ side-effect импорта модуля.
- * Прежде таймер/листенер вешались при ЗАГРУЗКЕ модуля, а грузился он только
- * на страницах с формами (главная: hacc-booking) — «резенд при следующем
- * визите» означал «при следующем визите НА ГЛАВНУЮ»: заявка, застрявшая в
- * outbox у пользователя, пришедшего с поиска прямо на /offer, не доезжала.
+ * теперь ЯВНАЯ идемпотентная инициализация, а НЕ side-effect импорта модуля.
+ * Прежде таймер/листенер вешались при ЗАГРУЗКЕ модуля, а грузился он только
+ * на страницах с формами (главная: hacc-booking) — «резенд при следующем
+ * визите» означал «при следующем визите НА ГЛАВНУЮ»: заявка, застрявшая в
+ * outbox у пользователя, пришедшего с поиска прямо на /offer, не доезжала.
  * Инициализацию теперь вызывает микро-компонент LeadOutboxResender из
  * КОРНЕВОГО layout (все публичные страницы + /admin — там outboxFlush/
- * beacon сами уходят по isPublicPage()-гейту). Guard-флаг на window (не в
- * модуле): дублирование модуля в двух чанках (будущие dynamic import'ы)
- * не даст двух таймеров и двух beacon'ов (tries++ не задваивается).
+ * beacon сами уходят по isPublicPage()-гейту). Guard-флаг на window (не в
+ * модуле): дублирование модуля в двух чанках (будущие dynamic import'ы)
+ * не даст двух таймеров и двух beacon'ов (tries++ не задваивается).
  * Повторные вызовы — no-op.
  */
 export function resendPendingLeads(): void {
@@ -337,8 +337,8 @@ export function resendPendingLeads(): void {
   if (w.__nilovLeadOutboxInit) return;
   w.__nilovLeadOutboxInit = true;
 
-  /* Авто-резенд при загрузке: записи старше 20с (с прошлой сессии/вкладки)
-   * догоняем. setTimeout, а не сразу — не спорим с загрузкой страницы. */
+  /* Авто-резенд при загрузке: записи старше 20с (с прошлой сессии/вкладки)
+   * догоняем. setTimeout, а не сразу — не спорим с загрузкой страницы. */
   try {
     window.setTimeout(() => void outboxFlush(), 1500);
   } catch {
@@ -346,8 +346,8 @@ export function resendPendingLeads(): void {
   }
 
   /* sendBeacon при закрытии вкладки: если отправка ещё in-flight, шлём
-   * дублирующий beacon (сервер дедупит по clientId — дубля не будет).
-   * Beacon не умеет кастомных заголовков — сервер c98-A принимает
+   * дублирующий beacon (сервер дедупит по clientId — дубля не будет).
+   * Beacon не умеет кастомных заголовков — сервер c98-A принимает
    * same-origin Origin без X-Requested-With. */
   window.addEventListener(
     "pagehide",
@@ -373,14 +373,14 @@ export function resendPendingLeads(): void {
 /* --------------------------------------------------------------- публичное API */
 
 /**
- * Отправить лид на /api/lead.php. Никогда не бросает исключений —
- * любой сбой (включая отсутствие AbortSignal.timeout в старом браузере)
+ * Отправить лид на /api/lead.php. Никогда не бросает исключений —
+ * любой сбой (включая отсутствие AbortSignal.timeout в старом браузере)
  * схлопывается в {ok:false, reason:"network"}.
  *
- * c98-A: перед отправкой заявка регистрируется в localStorage-outbox с
+ * c98-A: перед отправкой заявка регистрируется в localStorage-outbox с
  * уникальным clientId; успех вычищает запись, провал оставляет её для
  * авто-резенда при следующей загрузке. Внешний контракт (типы аргумента
- * и результата) не изменился — формы не требуют правок.
+ * и результата) не изменился — формы не требуют правок.
  */
 export async function submitLead(p: LeadSubmitArgs): Promise<LeadResult> {
   /* Тело запроса собираем заранее (JSON.stringify не бросает на нашем
@@ -403,8 +403,8 @@ export async function submitLead(p: LeadSubmitArgs): Promise<LeadResult> {
     payload: p.payload ?? {},
   };
 
-  /* Заявка сначала «на бумаге» (outbox), потом в сеть — крэш вкладки
-   * в момент fetch больше не теряет лида. */
+  /* Заявка сначала «на бумаге» (outbox), потом в сеть — крэш вкладки
+   * в момент fetch больше не теряет лида. */
   const persisted = outboxAdd({ clientId, payload: p, ts: Date.now(), tries: 0 });
 
   inFlight.set(clientId, bodyObj);

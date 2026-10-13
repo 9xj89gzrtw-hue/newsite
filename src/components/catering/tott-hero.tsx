@@ -12,7 +12,7 @@ import { useDataSaverLite, useLiteDevice } from "@/hooks/use-lite-device";
  * Reproduces their Slider-Revolution full-bleed hero composition:
  *   - Full-viewport background VIDEO (their site uses a static photo — we
  *     upgrade to cinematic motion per the task brief: "вместо их фотки хедера
- *     вставить скопированную фотку с другого сайта в классном качестве или
+ *     вставить скопированную фотку с другого сайта в классном качестве или
  *     видео". Source: /media/mculinary/mculinary-hero.mp4 — already in-repo,
  *     1280×720 28s loop of real plated food (crostini with cream cheese,
  *     chutney, microgreens). Poster fallback: /media/hero-premium/hero-premium-6.jpg
@@ -25,80 +25,80 @@ import { useDataSaverLite, useLiteDevice } from "@/hooks/use-lite-device";
  *     "food as art" — the nilov catering brand tagline in their script font.
  *   - Centered stack: wordmark "nilov / catering." (Prata, two lines,
  *     gold dot) + subtitle
- *     «Кейтеринг полного цикла в Санкт-Петербурге» (Lato, tracked uppercase;
- *     c86-CRIT3: суперлатив «лучший» снят — ст. 5 ФЗ «О рекламе»).
+ *     «Кейтеринг полного цикла в Санкт-Петербурге» (Lato, tracked uppercase;
+ *     c86-CRIT3: суперлатив «лучший» снят — ст. 5 ФЗ «О рекламе»).
  *   - Scroll cue bottom-center (animated line + "SCROLL" eyebrow).
  *   - NO cities strip, NO long subhead (per task v2: лишняя информация
- *     и города там не нужны).
+ *     и города там не нужны).
  *
  * Animation — 81-F1 (performance fixer, критик 81-W1-D): вход текста
  *   ЧИСТЫМ CSS (.hero-stagger / .hero-cue — keyframes hero-rise /
- *   hero-fade-in в globals.css), БЕЗ framer-вариантов и БЕЗ useMounted-гейта:
- *   прежде initial="hidden" шипил в SSR инлайн `opacity:0` на h1 (LCP-элемент)
- *   и красился только после полной гидрации (mobile LCP 10.5s → цель ~3s).
+ *   hero-fade-in в globals.css), БЕЗ framer-вариантов и БЕЗ useMounted-гейта:
+ *   прежде initial="hidden" шипил в SSR инлайн `opacity:0` на h1 (LCP-элемент)
+ *   и красился только после полной гидрации (mobile LCP 10.5s → цель ~3s).
  *   Паттерн Shopify/DebugBear (ресёрч 81-R1/P1): LCP-текст виден в
  *   SSR-разметке, анимируется только transform (opacity вордмарка НЕ
- *   трогаем). Тайминги 1:1 с прежней хореографией: стаггер 0.14с от
+ *   трогаем). Тайминги 1:1 с прежней хореографией: стаггер 0.14с от
  *   delayChildren 0.15 (nth-child 0.15/0.29/0.43), rise 0.85s easeOut,
  *   eyebrow fade 0.7s, scroll-cue fade 0.8s delay 1.3s. ВАЖНО: scroll-cue
  *   — обёртка (позиционирование -translate-x-1/2) + внутренний
- *   анимируемый узел: CSS-transform в keyframes ЗАМЕНЯЕТ computed transform
- *   (грабля §44 — позиционирующий translate живёт на обёртке).
- *   useReducedMotion остался ТОЛЬКО для видео-гейта (IO-эффект ниже);
- *   reduced-motion для hero-входа гейтится в CSS (animation: none).
+ *   анимируемый узел: CSS-transform в keyframes ЗАМЕНЯЕТ computed transform
+ *   (грабля §44 — позиционирующий translate живёт на обёртке).
+ *   useReducedMotion остался ТОЛЬКО для видео-гейта (IO-эффект ниже);
+ *   reduced-motion для hero-входа гейтится в CSS (animation: none).
  * The SiteHeader sits in normal flow AFTER this hero and is sticky top-0 —
  * see site-header.tsx. Hero height lives in globals.css (#hero, c85: полный
- * экран 100dvh/100svh/100vh — прямое указание владельца «во весь экран»)
- * — не в утилите-классе здесь.
+ * экран 100dvh/100svh/100vh — прямое указание владельца «во весь экран»)
+ * — не в утилите-классе здесь.
  *
  * @see docs/talkofthetown-MINED-EXTRACTION.md (hero section)
  */
 const HERO_VIDEO = "/media/mculinary/mculinary-hero-720.mp4";
-/* 81-W2F3 → c82 [владелец: «качество видео на hero на мобильной версии
+/* 81-W2F3 → c82 [владелец: «качество видео на hero на мобильной версии
    стало прям очень плохим» — правка владельца отменяет byte-оптимизацию
    волны-2, §1.6]: мобильная копия была 480×270 / 88kbps / 315KB — на
    390×844 (DPR 2-3) object-cover апскейлит её ×3.5, виден центр ~26%
-   полосы → фактическая резкость ~125px на ширину экрана + макроблоки.
+   полосы → фактическая резкость ~125px на ширину экрана + макроблоки.
    Замена: mculinary-hero-portrait-720.mp4 — вертикальный кроп 480×720
-   ЦЕНТРА исходника (x=400..880), закодирован из ОРИГИНАЛА 1.45Mbps
-   (не из пережатой -720) в h264 High, crf21/preset-fast, 751kbps,
+   ЦЕНТРА исходника (x=400..880), закодирован из ОРИГИНАЛА 1.45Mbps
+   (не из пережатой -720) в h264 High, crf21/preset-fast, 751kbps,
    2.67MB, faststart, без звука. Кроп = ровно та полоса, которую
-   object-cover и так показывает на смартфонах (видимая доля 26-32%
-   ширины при aspect 0.39-0.56) — композиция 1:1 с текущей, но весь
-   битрейт сконцентрирован в видимой зоне: ~4.5× битов на видимый
+   object-cover и так показывает на смартфонах (видимая доля 26-32%
+   ширины при aspect 0.39-0.56) — композиция 1:1 с текущей, но весь
+   битрейт сконцентрирован в видимой зоне: ~4.5× битов на видимый
    пиксель против десктоп-720, ×30 против старого -480. Планшет
-   (aspect ≥0.67) — cover скейлит по ширине, режет высоту: без боксов.
-   Подмена источника — в IO-эффекте ДО первого play() (см. там). */
+   (aspect ≥0.67) — cover скейлит по ширине, режет высоту: без боксов.
+   Подмена источника — в IO-эффекте ДО первого play() (см. там). */
 const HERO_VIDEO_MOBILE =
   "/media/mculinary/mculinary-hero-portrait-720.mp4";
-/* c98-C (задача B — владелец: «у заказчика на старом компьютере не
+/* c98-C (задача B — владелец: «у заказчика на старом компьютере не
    загружается видео херо, только фото, он хочет чтобы видео
-   загружалось»): 480p-копии для слабых девайсов (детектируются
+   загружалось»): 480p-копии для слабых девайсов (детектируются
    lib/lite-device.ts: cores≤4 не-WebKit / deviceMemory≤2 / FPS-зонд
-   p80>40ms). Перекодированы оркестратором из ОРИГИНАЛА в h264:
+   p80>40ms). Перекодированы оркестратором из ОРИГИНАЛА в h264:
    десктоп-лайт 640×360 — 711KB, мобайл-лайт 360×640 — 736KB
-   (c98-FIX1: фактические размеры; в докблоках было «~300KB» —
+   (c98-FIX1: фактические размеры; в докблоках было «~300KB» —
    экономия против 720p вдвое меньше расчётной). ПОЛИТИКА c98-C
-   двухуровневая: lite (слабое железо) → видео ИГРАЕТ, но 480p;
+   двухуровневая: lite (слабое железо) → видео ИГРАЕТ, но 480p;
    dataSaver/2g (isDataSaverLite) → постер (байты дороже вау);
-   reduce → постер. Подключение источника — в IO-эффекте ниже. */
+   reduce → постер. Подключение источника — в IO-эффекте ниже. */
 const HERO_VIDEO_LITE = "/media/mculinary/mculinary-hero-480-lite.mp4";
 const HERO_VIDEO_MOBILE_LITE =
   "/media/mculinary/mculinary-hero-portrait-480-lite.mp4";
-/* c98-D (задача владельца: «не нравится фото под видео — поставь
-   красивое, чтобы первый экран смотрелся как картина в рамке»):
-   замена hero-premium-6 (круглый стол с гигантским цветочным центром,
-   еда не видна, статично) на hero-c98 — драматичный фуршетный стол
-   (паста с икрой, тартар, канапе, лобстер-роллы, десерты, коктейли,
-   сухой лёд-дым), тёмный moody-стоп-кадр той же кинематографической
+/* c98-D (задача владельца: «не нравится фото под видео — поставь
+   красивое, чтобы первый экран смотрелся как картина в рамке»):
+   замена hero-premium-6 (круглый стол с гигантским цветочным центром,
+   еда не видна, статично) на hero-c98 — драматичный фуршетный стол
+   (паста с икрой, тартар, канапе, лобстер-роллы, десерты, коктейли,
+   сухой лёд-дым), тёмный moody-стоп-кадр той же кинематографической
    лиги, что hero-видео. 2400×1350 JPEG q80 327KB (меньше 595KB
-   прежнего), воздух в кадре — вордмарк «nilov catering.» читается.
+   прежнего), воздух в кадре — вордмарк «nilov catering.» читается.
    Конвейер §4: image-search → VLM-гейт запретов (текст/вотермарки —
    чисто) → sharp. Новое имя файла = cache-bust (§2). */
 const HERO_POSTER = "/media/hero-premium/hero-c98.jpg";
 /* c98-D: постер видео — 828px WebP-копия нового hero-c98 (57KB, q82).
-   Дедупликация с LCP-<Image> прежнего цикла сохранена: тот же визуал,
-   один оптимизированный файл в poster-атрибуте. */
+   Дедупликация с LCP-<Image> прежнего цикла сохранена: тот же визуал,
+   один оптимизированный файл в poster-атрибуте. */
 const HERO_VIDEO_POSTER = "/media/hero-premium/hero-c98-828.webp";
 
 /* ════════════ Cycle-72 — hero «чистый как картина» (прямое указание
@@ -109,9 +109,9 @@ const HERO_VIDEO_POSTER = "/media/hero-premium/hero-c98-828.webp";
    - ценовой якорь «фуршеты от … · банкеты от … · 2 400+ мероприятий…»;
    - CTA-пара «Смотреть меню» / «Рассчитать стоимость».
    Hero остаётся чистой кинематографичной «картиной»: вордмарк +
-   script-подпись + eyebrow + scroll-cue. Цены по-прежнему на первом
-   экране скролла НЕ ниже (первые ценники — сервис-секция/калькулятор),
-   CTA живут в бургер-меню, хедере (после докинга) и теле страницы.
+   script-подпись + eyebrow + scroll-cue. Цены по-прежнему на первом
+   экране скролла НЕ ниже (первые ценники — сервис-секция/калькулятор),
+   CTA живут в бургер-меню, хедере (после докинга) и теле страницы.
    Возврат eyebrow marginTop 2.5rem (F4 сжимал до 2rem под CTA-пару). */
 
 export function TottHero() {
@@ -133,12 +133,12 @@ export function TottHero() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   /* FIX-4 [F2, W1-D] §39 «живое видео без фриза: IO + preload="none"» —
-   * preload="none": байты видео не запрашиваются, пока play() не вызван
+   * preload="none": байты видео не запрашиваются, пока play() не вызван
    * IO-гейтом (rootMargin 100px — старт при появлении секции, pause при
-   * уходе из вьюпорта — экономия трафика ниже фолда). poster-кадр
-   * дедуплицирован с LCP-<Image> и gg-video-showcase.
+   * уходе из вьюпорта — экономия трафика ниже фолда). poster-кадр
+   * дедуплицирован с LCP-<Image> и gg-video-showcase.
    *
-   * C72-FIX-2 (прямая просьба владельца: «на мобильном hero перестало
+   * C72-FIX-2 (прямая просьба владельца: «на мобильном hero перестало
    * проигрываться видео, исправь»): C71-гейт «coarse-указатель ИЛИ
    * <768px → IO не создаётся, видео выкл навсегда» СНЯТ. Основание:
    * видео уже не 5.16MB, а 1.49MB (C71-P1 re-encode 720p/440kbps crf31
@@ -150,10 +150,10 @@ export function TottHero() {
    *   не гасит видео — играет 480p-копия (711KB/736KB, c98-FIX1: факт
    *   вместо прежней оценки «~300KB»), выбор в эффекте ниже;
    * - мобильный старт ждёт декода LCP-<img> (кап 2.5s) — видео не
-   *   конкурирует с первым кадром страницы за канал;
-   * - ретрай play() на первом касании — iOS Low Power Mode отклоняет
+   *   конкурирует с первым кадром страницы за канал;
+   * - ретрай play() на первом касании — iOS Low Power Mode отклоняет
    *   autoplay, касание легализует старт;
-   * - prefers-reduced-motion: IO не создаём — статичный постер (§39).
+   * - prefers-reduced-motion: IO не создаём — статичный постер (§39).
    */
   useEffect(() => {
     /* c98-C (задача B): гейт ПЕРЕПИСАН — было `reduce || lite` (lite =
@@ -203,15 +203,15 @@ export function TottHero() {
     const playingWithData = !video.paused && video.readyState >= 2;
 
     /* 81-W2F3 / c82 / c98-C: источник ставится video.src ПРЯМО на <video>
-     * (НЕ <source>.src): по HTML-спецификации установка src-атрибута
+     * (НЕ <source>.src): по HTML-спецификации установка src-атрибута
      * media-элемента гарантированно перезапускает алгоритм загрузки, а
-     * дочерний <source> (720, SSR-разметка не меняется) игнорируется.
+     * дочерний <source> (720, SSR-разметка не меняется) игнорируется.
      * preload="none" держит байты всех файлов до первого play() — грузится
-     * ровно один mp4. ГАРД ПО ТЕКУЩЕМУ АТРИБУТУ (паттерн gg-video-showcase,
+     * ровно один mp4. ГАРД ПО ТЕКУЩЕМУ АТРИБУТУ (паттерн gg-video-showcase,
      * c98-C): эффект перезапускается (deps reduce/lite/dataSaver) — уже
-     * стоящий правильный источник не переприсваиваем (перезапись src
-     * перезапустила бы загрузку играющего видео). Десктоп НЕ-lite — прежний
-     * <source>-ребёнок 720 (атрибут не трогаем); десктоп-lite — тот же
+     * стоящий правильный источник не переприсваиваем (перезапись src
+     * перезапустила бы загрузку играющего видео). Десктоп НЕ-lite — прежний
+     * <source>-ребёнок 720 (атрибут не трогаем); десктоп-lite — тот же
      * прямой-src паттерн. */
     if (isMobile) {
       if (
@@ -232,7 +232,7 @@ export function TottHero() {
 
     let cancelled = false;
     /* c98-FIX1 (критик1 #12): незакрытые ожидания LCP-кадра — снимаются в
-     * cleanup (листенер + кап-таймер), а не живут до своей сработки. */
+     * cleanup (листенер + кап-таймер), а не живут до своей сработки. */
     let pendingImg: HTMLImageElement | null = null;
     let pendingTimer: number | undefined;
     const tryPlay = () => {
@@ -266,23 +266,23 @@ export function TottHero() {
         tryPlay();
         return;
       }
-      /* Ждём LCP-кадр: видео не встаёт в очередь раньше первого экрана.
-       * c98-FIX1 (критик1 #12): и load-листенер, и кап-таймер снимаются в
-       * cleanup эффекта ниже — листенер не переживает компонент/эффект
+      /* Ждём LCP-кадр: видео не встаёт в очередь раньше первого экрана.
+       * c98-FIX1 (критик1 #12): и load-листенер, и кап-таймер снимаются в
+       * cleanup эффекта ниже — листенер не переживает компонент/эффект
        * (прежде защищал только cancelled-флаг: tryPlay становился no-op,
-       * но листенер и таймер жили до собственной сработки). */
+       * но листенер и таймер жили до собственной сработки). */
       pendingImg = img;
       img.addEventListener("load", tryPlay, { once: true });
-      pendingTimer = window.setTimeout(tryPlay, 2500); /* кап: load может не прийти */
+      pendingTimer = window.setTimeout(tryPlay, 2500); /* кап: load может не прийти */
     };
 
     /* iOS Low Power Mode: первый тап легализует muted-play.
-     * c98-FIX2 (критик4 MINOR#4): гард вьюпорта — тап стреляет в ЛЮБОМ
+     * c98-FIX2 (критик4 MINOR#4): гард вьюпорта — тап стреляет в ЛЮБОМ
      * месте страницы (юзер доехал до калькулятора momentum-скроллом без
-     * касаний), а IO паузит только на ИЗМЕНЕНИЕ пересечения: играющий
+     * касаний), а IO паузит только на ИЗМЕНЕНИЕ пересечения: играющий
      * вне кадра hero жёг декод/байты до конца сессии. section.bottom > 0
-     * = секция ещё видна (хоть пиксель ниже верха вьюпорта). Не в кадре —
-     * листенеры всё равно снимаются (одноразовый ретрай не копится). */
+     * = секция ещё видна (хоть пиксель ниже верха вьюпорта). Не в кадре —
+     * листенеры всё равно снимаются (одноразовый ретрай не копится). */
     const retryOnTouch = () => {
       if (section.getBoundingClientRect().bottom > 0) {
         tryPlay();
@@ -321,21 +321,21 @@ export function TottHero() {
     };
   }, [reduce, lite, dataSaver]);
 
-  /** FIX-4: React не сериализует атрибут `muted` в SSR-HTML (known
-   *  React #10389) — пиним DOM-свойство на монте, чтобы muted-autoplay
-   *  из IO-гейта никогда не отклонялся (как в gg-video-showcase). */
+  /** FIX-4: React не сериализует атрибут `muted` в SSR-HTML (known
+   *  React #10389) — пиним DOM-свойство на монте, чтобы muted-autoplay
+   *  из IO-гейта никогда не отклонялся (как в gg-video-showcase). */
   useEffect(() => {
     const video = videoRef.current;
     if (video) video.muted = true;
   }, []);
 
-  /* c98-C (задача B): страховка «видео не грузится / не декодируется» на
-   *  совсем древних браузерах — hero не должен оставаться ПУСТЫМ, если
+  /* c98-C (задача B): страховка «видео не грузится / не декодируется» на
+   *  совсем древних браузерах — hero не должен оставаться ПУСТЫМ, если
    *  видео погибло: гасим <video>, приоритетный LCP-постер-<Image> (z-0,
    *  всегда отрендерен) остаётся hero-картиной. Два одноразовых триггера
    *  (hide идемпотентен):
-   *   1) error на <video> — В ФАЗЕ CAPTURE: error от <source>-ребёнка НЕ
-   *      всплывает, но ловится родителем в capture-фазе (десктоп без
+   *   1) error на <video> — В ФАЗЕ CAPTURE: error от <source>-ребёнка НЕ
+   *      всплывает, но ловится родителем в capture-фазе (десктоп без
    *      src-подмены грузит именно через <source>);
    *   2) watchdog «старт был, кадра нет»: через 8с после события play
    *      readyState < 2 (HAVE_CURRENT_DATA — ни одного кадра) → декодер
@@ -344,8 +344,8 @@ export function TottHero() {
    *  Работает независимо от lite-политики — слабый ПК должен ВИДЕТЬ видео
    *  (задача владельца), фолбэк — только на реальный сбой. Хирургию
    *  src/load() намеренно НЕ делаем: load() без src-атрибута
-   *  ПЕРЕВЫБИРАЕТ <source>-ребёнка и ПЕРЕЗАПУСКАЕТ загрузку 720p —
-   *  обратный эффект; display:none + pause() достаточно (на error-пути
+   *  ПЕРЕВЫБИРАЕТ <source>-ребёнка и ПЕРЕЗАПУСКАЕТ загрузку 720p —
+   *  обратный эффект; display:none + pause() достаточно (на error-пути
    *  браузер уже оборвал сам запрос). */
   useEffect(() => {
     const video = videoRef.current;
@@ -379,9 +379,9 @@ export function TottHero() {
       ref={sectionRef}
       id="hero"
       data-header-theme="transparent"
-      aria-label="nilov catering — кейтеринг полного цикла в Санкт-Петербурге"
-      /* c85 (указание владельца: «херо надо чтобы было во весь экран»):
-         высота живёт в globals.css (#hero — id-специфичность бьёт
+      aria-label="nilov catering — кейтеринг полного цикла в Санкт-Петербурге"
+      /* c85 (указание владельца: «херо надо чтобы было во весь экран»):
+         высота живёт в globals.css (#hero — id-специфичность бьёт
          утилиту): 100vh → 100svh → 100dvh (динамический вьюпорт —
          ровно видимая высота при любом состоянии адресной строки
          iOS/Android). Прежний 92svh-peek снят; сигнал «можно листать» —
@@ -391,8 +391,8 @@ export function TottHero() {
          (globals.css). */
       className="relative w-full overflow-hidden bg-black"
       /* F4 / задача 2 (K1 MAJOR «first-paint крем-вспышка»): инлайновый
-         SSR-гейт — тёмный espresso-фон секции сериализуется прямо в HTML,
-         первый кадр под (ещё не загрузившимся) постером гарантированно
+         SSR-гейт — тёмный espresso-фон секции сериализуется прямо в HTML,
+         первый кадр под (ещё не загрузившимся) постером гарантированно
          тёмный = итоговому виду. Инлайн-стиль сильнее Tailwind-класса
          bg-black, поэтому класс оставлен как дублирующий фолбэк.
          САМА вспышка — двери прелоадера (preloader.tsx, крем-градиент
@@ -461,11 +461,11 @@ export function TottHero() {
           1440×900 eyebrow «ЛУЧШИЙ КЕЙТЕРИНГ…» пересекался со scroll-cue
           «ЛИСТАЙТЕ»; +40 + bottom-12 (было bottom-28) дают зазор ≥8px), "food
           as art" made larger, and the eyebrow label wraps cleanly on mobile
-          ("Кейтеринг полного цикла" / "в Санкт-Петербурге") via an explicit <br> that
+          ("Кейтеринг полного цикла" / "в Санкт-Петербурге") via an explicit <br> that
           only shows on small screens (hidden sm:inline).
           Composition:
             1. "nilov" / "catering." — massive high-contrast serif (Prata),
-               two explicit lines (block spans — никогда не рвётся посреди
+               two explicit lines (block spans — никогда не рвётся посреди
                слова, §1.5), gold dot after "catering"
             2. "food as art" — handwritten script (Nothing You Could Do),
                nestled tight below the wordmark (negative margin, signature)
@@ -489,7 +489,7 @@ export function TottHero() {
           /* Cycle 40 SEO fix: the visible wordmark alone carries no keywords;
              aria-label gives search engines «кейтеринг полного цикла
              Санкт-Петербурга» without changing the visual design. */
-          aria-label="nilov catering — кейтеринг полного цикла в Санкт-Петербурге"
+          aria-label="nilov catering — кейтеринг полного цикла в Санкт-Петербурге"
           className="tott-display text-white"
           style={{
             fontSize: "clamp(3.5rem, 15vw, 10rem)",
@@ -507,7 +507,7 @@ export function TottHero() {
               H1 (Tailwind sr-only = clip-паттерн, см. stage-services.tsx).
               aria-label H1 уже несёт «кейтеринг полного цикла Санкт-Петербурга» —
               видимая часть «nilov catering» вложена в него (WCAG 2.5.3). */}
-          <span className="sr-only"> — кейтеринг в Санкт-Петербурге</span>
+          <span className="sr-only"> — кейтеринг в Санкт-Петербурге</span>
         </h1>
 
         {/* Script tagline — Nothing You Could Do (Latin script font). Nestles tight
@@ -552,8 +552,8 @@ export function TottHero() {
             so the label renders as one line. Generous editorial whitespace
             below the script pair (mt-10). padding-left optically centers
             the tracked label.
-            c84-A (задача 3, читаемость): clamp 11px → 12.5px на мобиле —
-            владелец: «некоторым слишком мелко, но должно остаться
+            c84-A (задача 3, читаемость): clamp 11px → 12.5px на мобиле —
+            владелец: «некоторым слишком мелко, но должно остаться
             красиво» (капс-лидер, трекинг/кегель-пропорции сохранены). */}
         <p
           className="tott-body text-white/85"
@@ -572,7 +572,7 @@ export function TottHero() {
         >
           Кейтеринг полного цикла
           <br className="sm:hidden" />
-          {" "}в Санкт-Петербурге
+          {" "}в Санкт-Петербурге
         </p>
       </div>
 

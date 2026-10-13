@@ -27,22 +27,22 @@
  * CYCLE 87-F (волна-1 слепых критиков, 3×REJECT → фиксы):
  *  - F1 [WCAG 2.2.2 + c83-F4b]: автопрокрутку можно поставить на паузу —
  *    pointerenter/focusin гасят тик, pointerleave/focusout возобновляют;
- *    ручной скролл (>30px за rAF-тик при живом интервале, троттлинг 150мс)
+ *    ручной скролл (>30px за rAF-тик при живом интервале, троттлинг 150мс)
  *    перезапускает отсчёт. Дом-listeners напрямую — React-synthetic
- *    mouseenter в headless-прогонах не покрыл карточки-потомки.
+ *    mouseenter в headless-прогонах не покрыл карточки-потомки.
  *  - F2 [C2/M1]: стрелки prev/next (паттерн сиблинга events-video-carousel:
- *    44px, data-edge гасит на краях) + End/Home на ленте (раньше уводили
- *    страницу в футер). Колёсная мышь больше не заперта.
+ *    44px, data-edge гасит на краях) + End/Home на ленте (раньше уводили
+ *    страницу в футер). Колёсная мышь больше не заперта.
  *  - F3 [CRIT3 C1]: reduce-motion ветка заголовка — animate-финал (урок
- *    c83 «FAQ под RM в opacity:0»: initial=false + whileInView=undefined
+ *    c83 «FAQ под RM в opacity:0»: initial=false + whileInView=undefined
  *    оставляет inline-стили первого рендера навсегда).
- *  - F4 [CRIT3 M4]: прогресс-бар — прямой DOM-ref (ноль setState на кадр
- *    прокрутки; 44-карточное поддерево больше не ре-рендерится).
- *  - F5: advance доезжает до конца ленты, wrap на 0 — следующим тиком.
- *  - F6 [CRIT2]: «44 кадра» (грамматика), подписи #11/#15/#25/#39 по факту
+ *  - F4 [CRIT3 M4]: прогресс-бар — прямой DOM-ref (ноль setState на кадр
+ *    прокрутки; 44-карточное поддерево больше не ре-рендерится).
+ *  - F5: advance доезжает до конца ленты, wrap на 0 — следующим тиком.
+ *  - F6 [CRIT2]: «44 кадра» (грамматика), подписи #11/#15/#25/#39 по факту
  *    (автосалон/салон судна/сцена/веранда — VLM-верификация), кропы #35/#44
  *    убирают чужие надписи (Cool'n'Art / экран «logistics»), порядок без
- *    монотонных серий (было 7 портретов подряд в хвосте).
+ *    монотонных серий (было 7 портретов подряд в хвосте).
  *
  * EA design language grafted (per docs/EA-ANALYSIS.md §3.11 + §11):
  *  - Cream section bg (var(--ea-cream)) — same as EA's image-shadow tint.
@@ -55,7 +55,7 @@
  *
  * Motion:
  *  - Auto-advances every 4500ms to the next card's snap edge (конец ленты →
- *    следующий тик wraps на старт).
+ *    следующий тик wraps на старт).
  *  - Pauses on pointerenter/focusin, resumes on pointerleave/focusout,
  *    manual scroll resets the countdown (c83-F4b).
  *  - Respects `useReducedMotion` — when reduced, no auto-advance.
@@ -63,7 +63,7 @@
  *
  * Mobile: STILL horizontal scroll — no grid collapse. This is the magazine
  * horizontal-read signature (per EA + Ridgewells editorial layer brief).
- * Широкие карточки капятся по 84vw — панорама остаётся панорамой, но не
+ * Широкие карточки капятся по 84vw — панорама остаётся панорамой, но не
  * шире экрана.
  *
  * Self-contained: scoped CSS in `./ea-events-portfolio.css`. No edits to
@@ -95,7 +95,7 @@ type EventCard = {
   alt: string;
 };
 
-/** Пропорция как CSS-числo (unitless) — для calc() и aspect-ratio. */
+/** Пропорция как CSS-числo (unitless) — для calc() и aspect-ratio. */
 const RATIO_NUM: Record<EventCard["ratio"], number> = {
   p: 0.75,
   s: 1,
@@ -103,7 +103,7 @@ const RATIO_NUM: Record<EventCard["ratio"], number> = {
   xl: 16 / 9,
 };
 
-/** sizes-подсказка next/image по пропорции (мобайл — кап 84vw). */
+/** sizes-подсказка next/image по пропорции (мобайл — кап 84vw). */
 const SIZES: Record<EventCard["ratio"], string> = {
   p: "(max-width: 768px) 66vw, 356px",
   s: "(max-width: 768px) 84vw, 475px",
@@ -112,56 +112,56 @@ const SIZES: Record<EventCard["ratio"], string> = {
 };
 
 /**
- * 44 реальных события (Cycle 87) — фото владельца с Яндекс.Диска,
+ * 44 реальных события (Cycle 87) — фото владельца с Яндекс.Диска,
  * /public/media/c87/real-event-{01..44}.webp (webp q82, без апскейла,
  * новые имена — cache-bust §2). Подписи описывают только видимое
  * (VLM-верификация каждой карточки + прицельные прогоны спорных).
  */
 const EVENTS: EventCard[] = [
-  { src: "/media/c87/real-event-01.webp", ratio: "p", category: "Банкеты", title: "Длинный стол в светлом зале", meta: "рассадка · стекло и свет", alt: "Длинный банкетный стол в светлом зале с сервировкой на каждого гостя" },
-  { src: "/media/c87/real-event-02.webp", ratio: "l", category: "Подача", title: "Три подачи на персону", meta: "порционная сервировка", alt: "Индивидуальная порционная сервировка из трёх блюд на белом столе" },
-  { src: "/media/c87/real-event-03.webp", ratio: "p", category: "Банкеты", title: "Два яруса, люстры, цветы", meta: "ресторанный зал · ужин всем домом", alt: "Двухъярусный ресторанный зал с цветочным декором и люстрами" },
-  { src: "/media/c87/real-event-04.webp", ratio: "p", category: "Фуршеты", title: "Морское на фуршетной линии", meta: "закуски и дары моря", alt: "Фуршетный стол крупным планом — закуски и морепродукты" },
-  { src: "/media/c87/real-event-05.webp", ratio: "l", category: "Площадки", title: "Зал с панорамными окнами", meta: "свет со всех сторон", alt: "Банкетный зал с жёлтыми креслами и панорамными окнами" },
-  { src: "/media/c87/real-event-06.webp", ratio: "p", category: "Подача", title: "Брускетты с лососем", meta: "хрустящий хлеб · свежая рыба", alt: "Брускетты с лососем и сыром на деревянной доске" },
-  { src: "/media/c87/real-event-07.webp", ratio: "p", category: "Банкеты", title: "Зал с высоким потолком", meta: "простор и длинный стол", alt: "Просторный зал с высоким потолком и длинным банкетным столом" },
-  { src: "/media/c87/real-event-08.webp", ratio: "s", category: "Подача", title: "Канапе с красной икрой", meta: "праздник на шпажке", alt: "Канапе с красной икрой на шпажках крупным планом" },
-  { src: "/media/c87/real-event-09.webp", ratio: "xl", category: "Фуршеты", title: "Панорама фуршета", meta: "линия закусок · высокие столы", alt: "Широкая панорама фуршетного стола с закусками и высокими столиками" },
-  { src: "/media/c87/real-event-10.webp", ratio: "p", category: "Банкеты", title: "Сервировка в светлом зале", meta: "банкет накрыт до прихода гостей", alt: "Сервированный банкетный стол с блюдами в светлом зале" },
-  { src: "/media/c87/real-event-11.webp", ratio: "l", category: "Площадки", title: "Фуршет в автосалоне", meta: "автомобиль в центре зала", alt: "Фуршетный стол в автосалоне вокруг красного автомобиля, за окнами парковка" },
-  { src: "/media/c87/real-event-12.webp", ratio: "s", category: "Подача", title: "Десерты с ягодами", meta: "финал трапезы", alt: "Десерты на шпажках с ягодами крупным планом" },
-  { src: "/media/c87/real-event-13.webp", ratio: "p", category: "Площадки", title: "Стол под белым шатром", meta: "приём на природе", alt: "Длинный банкетный стол под белым шатром с белыми стульями" },
-  { src: "/media/c87/real-event-14.webp", ratio: "l", category: "Банкеты", title: "Закуски на золотых подставках", meta: "белая скатерть · ярусная подача", alt: "Банкетный стол с белой скатертью и закусками на золотистых подставках" },
-  { src: "/media/c87/real-event-15.webp", ratio: "p", category: "Площадки", title: "Салон судна", meta: "панорамные окна · река", alt: "Интерьер судна с панорамными окнами и прозрачной крышей, за окнами река и набережная" },
-  { src: "/media/c87/real-event-16.webp", ratio: "s", category: "Подача", title: "Канапе с лососем", meta: "рыба и свежесть", alt: "Канапе с лососем на шпажках крупным планом" },
-  { src: "/media/c87/real-event-17.webp", ratio: "l", category: "Площадки", title: "Терраса над водой", meta: "чёрная скатерть · отражения", alt: "Банкет на террасе с видом на воду, столы с чёрными скатертями" },
-  { src: "/media/c87/real-event-18.webp", ratio: "p", category: "Банкеты", title: "Цветы и свечи", meta: "тёплый свет вдоль стола", alt: "Длинный банкетный стол с цветочными композициями и свечами" },
-  { src: "/media/c87/real-event-19.webp", ratio: "s", category: "Подача", title: "Салаты в стаканах", meta: "прозрачная подача", alt: "Прозрачные стаканчики с мясными салатами крупным планом" },
-  { src: "/media/c87/real-event-20.webp", ratio: "xl", category: "Фуршеты", title: "Станция у кирпичной стены", meta: "мармиты · официанты на линии", alt: "Длинный стол с едой и мармитами у кирпичной стены, официанты на линии" },
-  { src: "/media/c87/real-event-21.webp", ratio: "p", category: "Банкеты", title: "Длинный стол в салоне", meta: "закуски, посуда, бокалы", alt: "Длинный банкетный стол с закусками, посудой и бокалами в светлом салоне" },
-  { src: "/media/c87/real-event-22.webp", ratio: "p", category: "Подача", title: "Тарталетки на подносе", meta: "чёрно-белый кадр", alt: "Чёрно-белое фото тарталеток на подносе" },
-  { src: "/media/c87/real-event-23.webp", ratio: "l", category: "Банкеты", title: "Круглый стол у окна", meta: "белая скатерть · дневной свет", alt: "Круглый банкетный стол у окна с белой скатертью" },
-  { src: "/media/c87/real-event-24.webp", ratio: "s", category: "Подача", title: "Канапе с ветчиной и сыром", meta: "плотная классика фуршета", alt: "Канапе с ветчиной и сыром на шпажках крупным планом" },
-  { src: "/media/c87/real-event-25.webp", ratio: "l", category: "Банкеты", title: "Белая скатерть, золотые тарелки", meta: "банкетная сервировка", alt: "Накрытый банкетный стол с белой скатертью, золотистыми тарелками и бокалами" },
-  { src: "/media/c87/real-event-26.webp", ratio: "p", category: "Банкеты", title: "Официант у десертного стола", meta: "финальная подача вечера", alt: "Официант у стола с десертами в богато украшенном зале" },
-  { src: "/media/c87/real-event-27.webp", ratio: "s", category: "Подача", title: "Канапе на шпажках", meta: "линия закусок", alt: "Канапе с рыбой на шпажках крупным планом" },
-  { src: "/media/c87/real-event-28.webp", ratio: "l", category: "Площадки", title: "Белые шатры", meta: "чёрно-белый кадр · геометрия", alt: "Белые шатры на открытом воздухе — художественная чёрно-белая фотография" },
-  { src: "/media/c87/real-event-29.webp", ratio: "l", category: "Банкеты", title: "Зелёная скатерть", meta: "приборы выровнены в линейку", alt: "Банкетный стол с зелёной скатертью и сервировкой" },
-  { src: "/media/c87/real-event-30.webp", ratio: "p", category: "Банкеты", title: "Золотые тарелки", meta: "круглый стол · тёплый металл", alt: "Круглый стол с золотистыми тарелками и цветами" },
-  { src: "/media/c87/real-event-31.webp", ratio: "s", category: "Подача", title: "Канапе с ветчиной и огурцом", meta: "свежий хруст", alt: "Канапе с ветчиной и огурцами на шпажках крупным планом" },
-  { src: "/media/c87/real-event-32.webp", ratio: "p", category: "Фуршеты", title: "Закуски и десерты на линии", meta: "длинный фуршетный стол", alt: "Длинный стол с закусками, десертами и цветами" },
-  { src: "/media/c87/real-event-33.webp", ratio: "p", category: "Банкеты", title: "Цветочная композиция", meta: "центр во весь стол", alt: "Длинный банкетный стол с обильной цветочной композицией по центру" },
-  { src: "/media/c87/real-event-34.webp", ratio: "l", category: "Фуршеты", title: "Лофт-бар", meta: "бокалы, цветы, бутылки", alt: "Чёрный фуршетный стол с бокалами, цветами и бутылками в стиле лофт" },
-  { src: "/media/c87/real-event-35.webp", ratio: "p", category: "Фуршеты", title: "Канапе и цветы", meta: "фуршетная линия", alt: "Фуршетный стол с канапе и цветами" },
-  { src: "/media/c87/real-event-36.webp", ratio: "p", category: "Банкеты", title: "Цветы в стеклянных вазах", meta: "декор, который дышит", alt: "Стол с цветочными композициями в стеклянных вазах" },
-  { src: "/media/c87/real-event-37.webp", ratio: "l", category: "Площадки", title: "Площадка под навесом", meta: "фуршет готов к приезду гостей", alt: "Площадка под тентом с высокими столиками для мероприятия" },
-  { src: "/media/c87/real-event-38.webp", ratio: "p", category: "Фуршеты", title: "Длинная фуршетная линия", meta: "закуски и цветы в ритме", alt: "Длинный фуршетный стол с закусками и цветами" },
-  { src: "/media/c87/real-event-39.webp", ratio: "p", category: "Банкеты", title: "Веранда сверху", meta: "гирлянды · белые скатерти", alt: "Терраса с гирляндами и длинными столами в белых скатертях, вид сверху" },
-  { src: "/media/c87/real-event-40.webp", ratio: "xl", category: "Банкеты", title: "Красные скатерти", meta: "блюда и напитки вдоль столов", alt: "Длинные банкетные столы с красными скатертями, блюдами и напитками" },
-  { src: "/media/c87/real-event-41.webp", ratio: "p", category: "Фуршеты", title: "Вечер в полумраке", meta: "гости у столов · тёмный кадр", alt: "Вечернее мероприятие — гости у фуршетных столов в полутёмном зале" },
-  { src: "/media/c87/real-event-42.webp", ratio: "p", category: "Фуршеты", title: "Цветы вдоль линии", meta: "мягкий фон · тёплый свет", alt: "Фуршетный стол с закусками и цветами" },
-  { src: "/media/c87/real-event-43.webp", ratio: "p", category: "Фуршеты", title: "Стол с подсветкой", meta: "декор и свет линии", alt: "Длинный фуршетный стол с подсветкой и декором" },
-  { src: "/media/c87/real-event-44.webp", ratio: "xl", category: "Банкеты", title: "Круглый стол в зелёном свете", meta: "вечерний кадр", alt: "Накрытый круглый стол с посудой и зелёной подсветкой — вечерний кадр" },
+  { src: "/media/c87/real-event-01.webp", ratio: "p", category: "Банкеты", title: "Длинный стол в светлом зале", meta: "рассадка · стекло и свет", alt: "Длинный банкетный стол в светлом зале с сервировкой на каждого гостя" },
+  { src: "/media/c87/real-event-02.webp", ratio: "l", category: "Подача", title: "Три подачи на персону", meta: "порционная сервировка", alt: "Индивидуальная порционная сервировка из трёх блюд на белом столе" },
+  { src: "/media/c87/real-event-03.webp", ratio: "p", category: "Банкеты", title: "Два яруса, люстры, цветы", meta: "ресторанный зал · ужин всем домом", alt: "Двухъярусный ресторанный зал с цветочным декором и люстрами" },
+  { src: "/media/c87/real-event-04.webp", ratio: "p", category: "Фуршеты", title: "Морское на фуршетной линии", meta: "закуски и дары моря", alt: "Фуршетный стол крупным планом — закуски и морепродукты" },
+  { src: "/media/c87/real-event-05.webp", ratio: "l", category: "Площадки", title: "Зал с панорамными окнами", meta: "свет со всех сторон", alt: "Банкетный зал с жёлтыми креслами и панорамными окнами" },
+  { src: "/media/c87/real-event-06.webp", ratio: "p", category: "Подача", title: "Брускетты с лососем", meta: "хрустящий хлеб · свежая рыба", alt: "Брускетты с лососем и сыром на деревянной доске" },
+  { src: "/media/c87/real-event-07.webp", ratio: "p", category: "Банкеты", title: "Зал с высоким потолком", meta: "простор и длинный стол", alt: "Просторный зал с высоким потолком и длинным банкетным столом" },
+  { src: "/media/c87/real-event-08.webp", ratio: "s", category: "Подача", title: "Канапе с красной икрой", meta: "праздник на шпажке", alt: "Канапе с красной икрой на шпажках крупным планом" },
+  { src: "/media/c87/real-event-09.webp", ratio: "xl", category: "Фуршеты", title: "Панорама фуршета", meta: "линия закусок · высокие столы", alt: "Широкая панорама фуршетного стола с закусками и высокими столиками" },
+  { src: "/media/c87/real-event-10.webp", ratio: "p", category: "Банкеты", title: "Сервировка в светлом зале", meta: "банкет накрыт до прихода гостей", alt: "Сервированный банкетный стол с блюдами в светлом зале" },
+  { src: "/media/c87/real-event-11.webp", ratio: "l", category: "Площадки", title: "Фуршет в автосалоне", meta: "автомобиль в центре зала", alt: "Фуршетный стол в автосалоне вокруг красного автомобиля, за окнами парковка" },
+  { src: "/media/c87/real-event-12.webp", ratio: "s", category: "Подача", title: "Десерты с ягодами", meta: "финал трапезы", alt: "Десерты на шпажках с ягодами крупным планом" },
+  { src: "/media/c87/real-event-13.webp", ratio: "p", category: "Площадки", title: "Стол под белым шатром", meta: "приём на природе", alt: "Длинный банкетный стол под белым шатром с белыми стульями" },
+  { src: "/media/c87/real-event-14.webp", ratio: "l", category: "Банкеты", title: "Закуски на золотых подставках", meta: "белая скатерть · ярусная подача", alt: "Банкетный стол с белой скатертью и закусками на золотистых подставках" },
+  { src: "/media/c87/real-event-15.webp", ratio: "p", category: "Площадки", title: "Салон судна", meta: "панорамные окна · река", alt: "Интерьер судна с панорамными окнами и прозрачной крышей, за окнами река и набережная" },
+  { src: "/media/c87/real-event-16.webp", ratio: "s", category: "Подача", title: "Канапе с лососем", meta: "рыба и свежесть", alt: "Канапе с лососем на шпажках крупным планом" },
+  { src: "/media/c87/real-event-17.webp", ratio: "l", category: "Площадки", title: "Терраса над водой", meta: "чёрная скатерть · отражения", alt: "Банкет на террасе с видом на воду, столы с чёрными скатертями" },
+  { src: "/media/c87/real-event-18.webp", ratio: "p", category: "Банкеты", title: "Цветы и свечи", meta: "тёплый свет вдоль стола", alt: "Длинный банкетный стол с цветочными композициями и свечами" },
+  { src: "/media/c87/real-event-19.webp", ratio: "s", category: "Подача", title: "Салаты в стаканах", meta: "прозрачная подача", alt: "Прозрачные стаканчики с мясными салатами крупным планом" },
+  { src: "/media/c87/real-event-20.webp", ratio: "xl", category: "Фуршеты", title: "Станция у кирпичной стены", meta: "мармиты · официанты на линии", alt: "Длинный стол с едой и мармитами у кирпичной стены, официанты на линии" },
+  { src: "/media/c87/real-event-21.webp", ratio: "p", category: "Банкеты", title: "Длинный стол в салоне", meta: "закуски, посуда, бокалы", alt: "Длинный банкетный стол с закусками, посудой и бокалами в светлом салоне" },
+  { src: "/media/c87/real-event-22.webp", ratio: "p", category: "Подача", title: "Тарталетки на подносе", meta: "чёрно-белый кадр", alt: "Чёрно-белое фото тарталеток на подносе" },
+  { src: "/media/c87/real-event-23.webp", ratio: "l", category: "Банкеты", title: "Круглый стол у окна", meta: "белая скатерть · дневной свет", alt: "Круглый банкетный стол у окна с белой скатертью" },
+  { src: "/media/c87/real-event-24.webp", ratio: "s", category: "Подача", title: "Канапе с ветчиной и сыром", meta: "плотная классика фуршета", alt: "Канапе с ветчиной и сыром на шпажках крупным планом" },
+  { src: "/media/c87/real-event-25.webp", ratio: "l", category: "Банкеты", title: "Белая скатерть, золотые тарелки", meta: "банкетная сервировка", alt: "Накрытый банкетный стол с белой скатертью, золотистыми тарелками и бокалами" },
+  { src: "/media/c87/real-event-26.webp", ratio: "p", category: "Банкеты", title: "Официант у десертного стола", meta: "финальная подача вечера", alt: "Официант у стола с десертами в богато украшенном зале" },
+  { src: "/media/c87/real-event-27.webp", ratio: "s", category: "Подача", title: "Канапе на шпажках", meta: "линия закусок", alt: "Канапе с рыбой на шпажках крупным планом" },
+  { src: "/media/c87/real-event-28.webp", ratio: "l", category: "Площадки", title: "Белые шатры", meta: "чёрно-белый кадр · геометрия", alt: "Белые шатры на открытом воздухе — художественная чёрно-белая фотография" },
+  { src: "/media/c87/real-event-29.webp", ratio: "l", category: "Банкеты", title: "Зелёная скатерть", meta: "приборы выровнены в линейку", alt: "Банкетный стол с зелёной скатертью и сервировкой" },
+  { src: "/media/c87/real-event-30.webp", ratio: "p", category: "Банкеты", title: "Золотые тарелки", meta: "круглый стол · тёплый металл", alt: "Круглый стол с золотистыми тарелками и цветами" },
+  { src: "/media/c87/real-event-31.webp", ratio: "s", category: "Подача", title: "Канапе с ветчиной и огурцом", meta: "свежий хруст", alt: "Канапе с ветчиной и огурцами на шпажках крупным планом" },
+  { src: "/media/c87/real-event-32.webp", ratio: "p", category: "Фуршеты", title: "Закуски и десерты на линии", meta: "длинный фуршетный стол", alt: "Длинный стол с закусками, десертами и цветами" },
+  { src: "/media/c87/real-event-33.webp", ratio: "p", category: "Банкеты", title: "Цветочная композиция", meta: "центр во весь стол", alt: "Длинный банкетный стол с обильной цветочной композицией по центру" },
+  { src: "/media/c87/real-event-34.webp", ratio: "l", category: "Фуршеты", title: "Лофт-бар", meta: "бокалы, цветы, бутылки", alt: "Чёрный фуршетный стол с бокалами, цветами и бутылками в стиле лофт" },
+  { src: "/media/c87/real-event-35.webp", ratio: "p", category: "Фуршеты", title: "Канапе и цветы", meta: "фуршетная линия", alt: "Фуршетный стол с канапе и цветами" },
+  { src: "/media/c87/real-event-36.webp", ratio: "p", category: "Банкеты", title: "Цветы в стеклянных вазах", meta: "декор, который дышит", alt: "Стол с цветочными композициями в стеклянных вазах" },
+  { src: "/media/c87/real-event-37.webp", ratio: "l", category: "Площадки", title: "Площадка под навесом", meta: "фуршет готов к приезду гостей", alt: "Площадка под тентом с высокими столиками для мероприятия" },
+  { src: "/media/c87/real-event-38.webp", ratio: "p", category: "Фуршеты", title: "Длинная фуршетная линия", meta: "закуски и цветы в ритме", alt: "Длинный фуршетный стол с закусками и цветами" },
+  { src: "/media/c87/real-event-39.webp", ratio: "p", category: "Банкеты", title: "Веранда сверху", meta: "гирлянды · белые скатерти", alt: "Терраса с гирляндами и длинными столами в белых скатертях, вид сверху" },
+  { src: "/media/c87/real-event-40.webp", ratio: "xl", category: "Банкеты", title: "Красные скатерти", meta: "блюда и напитки вдоль столов", alt: "Длинные банкетные столы с красными скатертями, блюдами и напитками" },
+  { src: "/media/c87/real-event-41.webp", ratio: "p", category: "Фуршеты", title: "Вечер в полумраке", meta: "гости у столов · тёмный кадр", alt: "Вечернее мероприятие — гости у фуршетных столов в полутёмном зале" },
+  { src: "/media/c87/real-event-42.webp", ratio: "p", category: "Фуршеты", title: "Цветы вдоль линии", meta: "мягкий фон · тёплый свет", alt: "Фуршетный стол с закусками и цветами" },
+  { src: "/media/c87/real-event-43.webp", ratio: "p", category: "Фуршеты", title: "Стол с подсветкой", meta: "декор и свет линии", alt: "Длинный фуршетный стол с подсветкой и декором" },
+  { src: "/media/c87/real-event-44.webp", ratio: "xl", category: "Банкеты", title: "Круглый стол в зелёном свете", meta: "вечерний кадр", alt: "Накрытый круглый стол с посудой и зелёной подсветкой — вечерний кадр" },
 ];
 
 export function EaEventsPortfolio() {
@@ -174,24 +174,24 @@ export function EaEventsPortfolio() {
   const scrollerRef = useRef<HTMLUListElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  /* F8: состояние присутствия пользователя на ленте — старт-гейты
+  /* F8: состояние присутствия пользователя на ленте — старт-гейты
    * автопрокрутки (мышь внутри / фокус внутри). */
   const pointerInsideRef = useRef(false);
   const focusWithinRef = useRef(false);
   /* F8-NIT: гейт «это наш собственный программный скролл» — собственный
-   * тик не должен перезапускать отсчёт (период уплывал 4.5→5.0с). */
+   * тик не должен перезапускать отсчёт (период уплывал 4.5→5.0с). */
   const programmaticUntilRef = useRef(0);
   /* F8: дебаунс возобновления — скролл-чорн Chrome гоняет
    * pointerleave→pointerenter пары под покоящейся мышью; 250мс
    * отсекает ложные «уходы». */
   const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navRef = useRef<HTMLDivElement | null>(null);
-  /* F1: startAuto в scroll-listener'е вызывается из rAF-тика — держим
-     свежую ссылку (useCallback-идентичность стабильна, но ref-паттерн
-     сиблинга events-video-carousel не зависит от deps-пересборки). */
+  /* F1: startAuto в scroll-listener'е вызывается из rAF-тика — держим
+     свежую ссылку (useCallback-идентичность стабильна, но ref-паттерн
+     сиблинга events-video-carousel не зависит от deps-пересборки). */
   const startAutoRef = useRef<() => void>(() => {});
-  /* F4: atStart/atEnd для стрелок — setState ТОЛЬКО при смене края
-     (не на кадр). Прогресс-бар — прямой DOM-ref, ноль setState на кадр. */
+  /* F4: atStart/atEnd для стрелок — setState ТОЛЬКО при смене края
+     (не на кадр). Прогресс-бар — прямой DOM-ref, ноль setState на кадр. */
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
 
@@ -200,8 +200,8 @@ export function EaEventsPortfolio() {
    * карточка относительно текущего вида. Считается ЧЕРЕЗ
    * getBoundingClientRect-дельту относительно скроллера: offsetLeft
    * карточек наследует offsetParent секции (скроллер position:static)
-   * и врал на ~padding — advance «промахивался» в snap-точку 0 и
-   * карусель стояла (найдено Playwright-замером: scrollLeft не менялся
+   * и врал на ~padding — advance «промахивался» в snap-точку 0 и
+   * карусель стояла (найдено Playwright-замером: scrollLeft не менялся
    * 10с при живом интервале). Возвращает null, когда края нет.
    */
   const edgeTarget = useCallback((dir: 1 | -1): number | null => {
@@ -234,9 +234,9 @@ export function EaEventsPortfolio() {
   }, []);
 
   /**
-   * c87-F5: доезжаем до конца ленты, wrap на старт — СЛЕДУЮЩИМ тиком
-   * (раньше джамп-кат из предпоследней позиции; урок c83 — end-детект
-   * по фактической позиции, не по «шаг ≥ max»).
+   * c87-F5: доезжаем до конца ленты, wrap на старт — СЛЕДУЮЩИМ тиком
+   * (раньше джамп-кат из предпоследней позиции; урок c83 — end-детект
+   * по фактической позиции, не по «шаг ≥ max»).
    */
   const advance = useCallback(() => {
     const scroller = scrollerRef.current;
@@ -280,7 +280,7 @@ export function EaEventsPortfolio() {
     startAutoRef.current = startAuto;
   }, [startAuto]);
 
-  /** F2: стрелки — переход на край соседней карточки + сброс отсчёта.
+  /** F2: стрелки — переход на край соседней карточки + сброс отсчёта.
    *  F8-D2 (волна-2): под reduce — мгновенно (сиблинг: instant-ветка). */
   const goTo = useCallback(
     (dir: 1 | -1) => {
@@ -307,7 +307,7 @@ export function EaEventsPortfolio() {
     const section = scroller.closest("section");
     /* F8-D3 (волна-2): латентная утечка — безсекционная ветка стартовала
      * интервал БЕЗ cleanup. Секция всегда есть (это наш собственный
-     * <section>), но гигиена обязана быть полной. */
+     * <section>), но гигиена обязана быть полной. */
     if (!section) {
       startAuto();
       return () => stopAuto();
@@ -320,8 +320,8 @@ export function EaEventsPortfolio() {
       { threshold: 0.25 },
     );
     io.observe(section);
-    /* F8-NIT (волна-2): скрытая вкладка — пауза (IO не реагирует на
-     * visibility, интервал тикал бы в фоне). */
+    /* F8-NIT (волна-2): скрытая вкладка — пауза (IO не реагирует на
+     * visibility, интервал тикал бы в фоне). */
     const onVis = () => {
       if (document.hidden) stopAuto();
       else startAuto();
@@ -341,8 +341,8 @@ export function EaEventsPortfolio() {
    *    250мс (Chrome при автоскролле ленты гонит pointerleave→pointerenter
    *    пары под покоящейся мышью — мгновенный рестарт ломал паузу);
    *  - focusin → пауза, focusout → возобновление (клавиатура/ридер);
-   *  - End/Home — и на ленте, и на стрелках (D4: фокус на кнопке — End
-   *    уводил СТРАНИЦУ в футер).
+   *  - End/Home — и на ленте, и на стрелках (D4: фокус на кнопке — End
+   *    уводил СТРАНИЦУ в футер).
    */
   useEffect(() => {
     const scroller = scrollerRef.current;
@@ -420,10 +420,10 @@ export function EaEventsPortfolio() {
 
   /**
    * F4: скролл-поток — прогресс-бар через ПРЯМОЙ DOM-ref (ноль setState
-   * на кадр: 44-карточное поддерево не ре-рендерится; доктрина сайта
-   * «ноль setState на кадр» из site-footer). Тот же поток считает
-   * atStart/atEnd для стрелок (setState только при СМЕНЕ края) и ловит
-   * ручной скролл для сброса отсчёта (F1).
+   * на кадр: 44-карточное поддерево не ре-рендерится; доктрина сайта
+   * «ноль setState на кадр» из site-footer). Тот же поток считает
+   * atStart/atEnd для стрелок (setState только при СМЕНЕ края) и ловит
+   * ручной скролл для сброса отсчёта (F1).
    */
   useEffect(() => {
     const scroller = scrollerRef.current;
@@ -509,8 +509,8 @@ export function EaEventsPortfolio() {
             {/* c87 — honest trust beat: все кадры реальные (закрывает
                 вопрос c86-CRIT3 о стоке). Короткая сенсорная строка. */}
             <p className="ea-evt-portfolio__sub">
-              Все {EVENTS.length} кадра — с наших мероприятий: банкетная
-              рассадка, фуршетные линии и подача.
+              Все {EVENTS.length} кадра — с наших мероприятий: банкетная
+              рассадка, фуршетные линии и подача.
             </p>
           </div>
           <Link

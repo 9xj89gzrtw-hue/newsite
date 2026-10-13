@@ -27,13 +27,13 @@ import Link from "next/link";
  *    rounded-2 corners (Tailwind `rounded-2xl`), soft shadow
  *    var(--ea-shadow-blush), slight hover scale (1.02 over 480ms).
  *  - RIGHT column:
- *      - eyebrow "ЗАПИСЬ НА ДЕГУСТАЦИЮ" (.ea-eyebrow shared utility)
+ *      - eyebrow "ЗАПИСЬ НА ДЕГУСТАЦИЮ" (.ea-eyebrow shared utility)
  *      - H3 Playfair Display 2rem→2.5rem, line-height 1.15, ink:
  *        "Хотите попробовать <i>до</i> заказа?" (italic "до" red).
  *      - 2-line body (Montserrat, ink/82, line-height 1.65): "Запишитесь
- *        на приватную дегустацию в нашей студии на Петроградке. Шесть
- *        блюд из вашего будущего меню — за 45 минут. 3500 ₽ с человека,
- *        возвращаем при заказе от 50 гостей."
+ *        на приватную дегустацию в нашей студии на Петроградке. Шесть
+ *        блюд из вашего будущего меню — за 45 минут. 3500 ₽ с человека,
+ *        возвращаем при заказе от 50 гостей."
  *      - .ea-solid-btn "Записаться →" → #contact
  *
  * NEW section (no predecessor to REPLACE) — fills the gap between
@@ -84,7 +84,7 @@ export function EaTastingCta() {
             >
               <Image
                 src="/media/concorde-avo-toast.jpg"
-                alt="Тарелка с авокадо-тостом на дегустации в студии Interfood Catering на Петроградке"
+                alt="Тарелка с авокадо-тостом на дегустации в студии Interfood Catering на Петроградке"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover transition-transform duration-700 ease-out"
@@ -101,7 +101,7 @@ export function EaTastingCta() {
             transition={{ duration: 0.8, delay: 0.12, ease: EASE }}
             className="order-1 md:order-2"
           >
-            <span className="ea-eyebrow">Запись на дегустацию</span>
+            <span className="ea-eyebrow">Запись на дегустацию</span>
 
             <h3
               id="ea-tasting-cta-headline"
@@ -130,16 +130,16 @@ export function EaTastingCta() {
                 color: "color-mix(in oklab, var(--ea-ink) 82%, transparent)",
               }}
             >
-              Запишитесь на приватную дегустацию в нашей студии на
-              Петроградке. Шесть блюд из вашего будущего меню — за 45 минут.
-              3500&nbsp;₽ с человека, возвращаем при заказе от 50 гостей.
+              Запишитесь на приватную дегустацию в нашей студии на
+              Петроградке. Шесть блюд из вашего будущего меню — за 45 минут.
+              3500&nbsp;₽ с человека, возвращаем при заказе от 50 гостей.
             </p>
 
             <div className="mt-8">
               <Link
                 href="#contact"
                 className="ea-solid-btn"
-                aria-label="Записаться на дегустацию — открыть форму контактов"
+                aria-label="Записаться на дегустацию — открыть форму контактов"
               >
                 Записаться{" "}
                 <span aria-hidden="true" className="ml-1">

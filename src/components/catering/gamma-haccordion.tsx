@@ -118,7 +118,7 @@ const ITEMS: HaccordionItem[] = [
     teaser2: "Под ключ сервис",
     imageSrc: "/media/gamma/gamma-catering-erlebnis-hochzeiten.jpg",
     imageAlt:
-      "Свадебный банкет — сервировка и сезонные блюда Interfood на свадьбе",
+      "Свадебный банкет — сервировка и сезонные блюда Interfood на свадьбе",
     ctaLabel: "Смотреть",
     ctaHref: "#calculator",
   },
@@ -131,7 +131,7 @@ const ITEMS: HaccordionItem[] = [
     teaser2: "Под ключ сервис",
     imageSrc: "/media/gamma/gamma-catering-erlebnis-corporate-events.jpg",
     imageAlt:
-      "Корпоративный гала-ужин — кейтеринг Interfood на корпоративном мероприятии",
+      "Корпоративный гала-ужин — кейтеринг Interfood на корпоративном мероприятии",
     ctaLabel: "Смотреть",
     ctaHref: "#calculator",
   },
@@ -139,12 +139,12 @@ const ITEMS: HaccordionItem[] = [
     id: "banquets",
     label: "Банкеты",
     tint: "rgba(139, 90, 30, 0.10)",
-    teaser1: "В большом масштабе",
+    teaser1: "В большом масштабе",
     title: "Банкеты",
     teaser2: "Под ключ сервис",
     imageSrc: "/media/gamma/gammacatering-grossanlaesse.jpg",
     imageAlt:
-      "Большой банкет на 500+ гостей — кейтеринг Interfood в крупном масштабе",
+      "Большой банкет на 500+ гостей — кейтеринг Interfood в крупном масштабе",
     ctaLabel: "Смотреть",
     ctaHref: "#calculator",
   },
@@ -152,12 +152,12 @@ const ITEMS: HaccordionItem[] = [
     id: "private",
     label: "Фуршеты",
     tint: "rgba(180, 90, 40, 0.08)",
-    teaser1: "Камерно и особено",
+    teaser1: "Камерно и особено",
     title: "Фуршеты",
     teaser2: "Под ключ сервис",
     imageSrc: "/media/gamma/gamma-catering-erlebnis-privat-events.webp",
     imageAlt:
-      "Камерный фуршет — приём на ногах с канапе и закусками от Interfood",
+      "Камерный фуршет — приём на ногах с канапе и закусками от Interfood",
     ctaLabel: "Смотреть",
     ctaHref: "#calculator",
   },
@@ -250,7 +250,7 @@ export function GammaHaccordion() {
             className="ea-section-h2 gamma-hacc-section__h2"
           >
             {"Опыт мероприятий "}
-            {"для каждого "}
+            {"для каждого "}
             <i className="ea-italic-fragment">формата</i>
             {"."}
           </h2>

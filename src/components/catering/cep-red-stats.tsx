@@ -26,7 +26,7 @@ import { useMounted } from "@/hooks/use-mounted";
 type Stat = { value: number; suffix: string; caption: string };
 
 const STATS: Stat[] = [
-  { value: 16, suffix: "+", caption: "ЛЕТ НА РЫНКЕ" },
+  { value: 16, suffix: "+", caption: "ЛЕТ НА РЫНКЕ" },
   { value: 2400, suffix: "+", caption: "СОБЫТИЙ ПРОВЕДЕНО" },
   { value: 180000, suffix: "+", caption: "ГОСТЕЙ НАКОРМЕНО" },
 ];

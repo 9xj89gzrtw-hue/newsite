@@ -46,7 +46,7 @@ import { motion, useReducedMotion } from "framer-motion";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const QUOTE_TEXT =
-  "Еда — это ритуал. Не меню, не список калорий, не логистика. Ритуал, в котором каждая деталь — от первого ножа до последнего бокала — служит одному: моменту, который гости запомнят на всю жизнь.";
+  "Еда — это ритуал. Не меню, не список калорий, не логистика. Ритуал, в котором каждая деталь — от первого ножа до последнего бокала — служит одному: моменту, который гости запомнят на всю жизнь.";
 
 const QUOTE_ATTRIBUTION = "— Дмитрий Нилов, шеф-повар nilov catering";
 
@@ -99,7 +99,7 @@ export function EaChefQuote() {
       {/* Full-bleed chef photo background */}
       <Image
         src="/media/event-chef-action.jpg"
-        alt="Шеф-повар Дмитрий Нилов за работой на кухне nilov catering"
+        alt="Шеф-повар Дмитрий Нилов за работой на кухне nilov catering"
         fill
         sizes="100vw"
         priority={false}

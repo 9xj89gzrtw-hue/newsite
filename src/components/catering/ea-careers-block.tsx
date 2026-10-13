@@ -33,7 +33,7 @@ import "./ea-careers-block.css";
  *   - CTA pair: primary `ОТКЛИКНУТЬСЯ` (solid red, white text → #contact)
  *     + secondary `СМОТРЕТЬ ВАКАНСИИ` (cream-outline, cream text →
  *     #contact, fills cream on hover with text flipping to espresso).
- *   - Stat strip: 3 inline stats (180+ команда / 16+ лет на рынке /
+ *   - Stat strip: 3 inline stats (180+ команда / 16+ лет на рынке /
  *     2 400+ событий) with red numbers and thin red vertical dividers —
  *     reuses the numbers from CepRedStats + EaFounderStory for cross-
  *     section numeric consistency.
@@ -82,18 +82,18 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Benefit bullets — original nilov catering copy, Russian only. */
 const BENEFITS = [
-  "Обучение у шеф-повара — от баз до авторской кухни",
-  "События уровня Сбербанка, Яндекса и Газпрома в портфолио",
-  "Гибкий график, сезонные проекты и рост внутри команды",
+  "Обучение у шеф-повара — от баз до авторской кухни",
+  "События уровня Сбербанка, Яндекса и Газпрома в портфолио",
+  "Гибкий график, сезонные проекты и рост внутри команды",
 ] as const;
 
 /** Stat strip — reuses numbers from CepRedStats + EaFounderStory for
  *  cross-section numeric consistency (180+ команда · 16+ лет · 2 400+ событий). */
 const STATS = [
   { num: "180+", label: "команда" },
-  { num: "16+", label: "лет на рынке" },
-  /* «2\u00A0400+» — неразрывный пробел: число не рвётся на переносе,
-     формат тысяч единый с футером и строкой доверия (W1-A, nit о разнобое). */
+  { num: "16+", label: "лет на рынке" },
+  /* «2\u00A0400+» — неразрывный пробел: число не рвётся на переносе,
+     формат тысяч единый с футером и строкой доверия (W1-A, nit о разнобое). */
   { num: "2\u00A0400+", label: "событий" },
 ] as const;
 
@@ -180,8 +180,8 @@ export function EaCareersBlock() {
             />
 
             <motion.p className="ea-careers__lead" {...reveal(0.24)}>
-              nilov catering — это команда из 180+ поваров, официантов и
-              организаторов. Мы растём и ищем людей, для которых еда — это
+              nilov catering — это команда из 180+ поваров, официантов и
+              организаторов. Мы растём и ищем людей, для которых еда — это
               призвание.
             </motion.p>
 
@@ -202,7 +202,7 @@ export function EaCareersBlock() {
               <Link
                 href="#contact"
                 className="ea-solid-btn ea-careers__btn-primary"
-                aria-label="Откликнуться на вакансию — форма заявки"
+                aria-label="Откликнуться на вакансию — форма заявки"
               >
                 Откликнуться
               </Link>
@@ -256,7 +256,7 @@ export function EaCareersBlock() {
               >
                 <SmartImage
                   src="/media/concept-crew.jpg"
-                  alt="Команда поваров nilov catering за работой — приготовление блюд на выездном мероприятии"
+                  alt="Команда поваров nilov catering за работой — приготовление блюд на выездном мероприятии"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="ea-careers__image"

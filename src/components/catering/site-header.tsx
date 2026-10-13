@@ -16,8 +16,8 @@ import { ContactWidget } from "./contact-widget";
 import { Magnetic } from "@/components/motion/magnetic";
 import "./site-header.css"; /* C77: kinetic-header эффекты (см. докблок css) */
 
-/** c102: глиф «MAX» для плитки быстрой связи — текст-SVG наследует font-family
- * дровера (тот же приём, что MaxGlyph в hacc-booking.tsx). */
+/** c102: глиф «MAX» для плитки быстрой связи — текст-SVG наследует font-family
+ * дровера (тот же приём, что MaxGlyph в hacc-booking.tsx). */
 function MaxGlyph({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true" role="presentation">
@@ -37,8 +37,8 @@ function MaxGlyph({ className }: { className?: string }) {
 }
 
 /* c83-F4b: изоморфный layout-effect (паттерн tott-parallax-band.tsx) —
-   прямой useLayoutEffect ругается ворнингом в SSR-рендере клиента
-   («does nothing on the server»), на сервере берём useEffect (no-op). */
+   прямой useLayoutEffect ругается ворнингом в SSR-рендере клиента
+   («does nothing on the server»), на сервере берём useEffect (no-op). */
 const useIsoLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -52,7 +52,7 @@ const useIsoLayoutEffect =
  *   - Logo LEFT  → "Interfood." wordmark in Prata (their display serif),
  *                  gold dot = Interfood brand signature.
  *   - Nav CENTER → 5 items in Lato (their body/nav font, has Cyrillic):
- *                  Меню · Услуги · События · О нас · Контакты.
+ *                  Меню · Услуги · События · О нас · Контакты.
  *   - CTA RIGHT  → burgundy gradient phone button (their fusion-menu-item-
  *                  button pattern → `.tott-cta-btn`).
  *
@@ -95,22 +95,22 @@ type NavItem = { href: string; label: string };
 const NAV: NavItem[] = [
   { href: "#menu", label: "Меню" },
   { href: "#services", label: "Услуги" },
-  { href: "#about", label: "О нас" },
+  { href: "#about", label: "О нас" },
   { href: "#contact", label: "Контакты" },
 ];
 
-/* W3 (K5 MAJOR, задача 3): пауза между закрытием меню и якорной
+/* W3 (K5 MAJOR, задача 3): пауза между закрытием меню и якорной
    навигацией. Последний такт unlock-restore — таймер 120 мс (+rAF);
-   280 мс гарантированно ПОСЛЕ него, но ещё до конца exit-анимации
+   280 мс гарантированно ПОСЛЕ него, но ещё до конца exit-анимации
    оверлея (0.5 с) — прыжок под скрывающимся меню незаметен. */
 const DRAWER_NAV_DELAY_MS = 280;
 
 /** 81-W2F1: портал мобильного дровера в <body>. SiteHeader рендерится
- *  ВНУТРИ <main> (page.tsx) — а при открытом меню main получает inert
+ *  ВНУТРИ <main> (page.tsx) — а при открытом меню main получает inert
  *  (эффект ниже, паттерн видео-модалки events-video-carousel.tsx):
  *  дровер обязан жить ВНЕ погашенного поддерева, иначе инертная петля
- *  гасит и его самого (замер research/w2f1/debug-burger.js: клик по
- *  «Закрыть меню» попадал в BODY, кнопка не отвечала). AnimatePresence
+ *  гасит и его самого (замер research/w2f1/debug-burger.js: клик по
+ *  «Закрыть меню» попадал в BODY, кнопка не отвечала). AnimatePresence
  *  прокидывает PresenceContext СКВОЗЬ портал — exit-анимация
  *  (y: "-100%", 0.5с) сохраняется. */
 function MobileMenuPortal({ children }: { children: ReactNode }) {
@@ -133,9 +133,9 @@ export function SiteHeader() {
   const headerRef = useRef<HTMLElement>(null);
 
   // Focus management for mobile menu dialog.
-  // K2-F1: focus() БЕЗ preventScroll скроллит элемент во вьюпорт — на
-  // закрытии меню это один из источников прыжка scroll-позиции (замер
-  // критика: 900 → закрыл → 458). Фокус не должен управлять прокруткой:
+  // K2-F1: focus() БЕЗ preventScroll скроллит элемент во вьюпорт — на
+  // закрытии меню это один из источников прыжка scroll-позиции (замер
+  // критика: 900 → закрыл → 458). Фокус не должен управлять прокруткой:
   // позицию восстанавливает scroll-lock-эффект ниже.
   const prevOpen = useRef(false);
   useEffect(() => {
@@ -150,7 +150,7 @@ export function SiteHeader() {
   // Sticky detection: header is "stuck" when its top reaches 0 (i.e. the
   // hero has scrolled past). Uses getBoundingClientRect for precision (works
   // regardless of hero height / dynamic viewport). Per task v5: "после того
-  // как он поднимается до верха экрана то остается там и становится немного
+  // как он поднимается до верха экрана то остается там и становится немного
   // прозрачным" — when stuck, switch to translucent white + blur.
   useEffect(() => {
     const header = headerRef.current;
@@ -165,14 +165,14 @@ export function SiteHeader() {
 
   // C79 «Mobile Motion»: hfx-rise (entrance контента шапки) — чистый CSS
   // scroll-driven (animation-timeline: view(), site-header.css). Chromium и
-  // Safari 26+ его играют; iOS Safari ≤18 и Firefox — НЕТ: @supports не
-  // сработал → шапка появляется статично, на мобильной половине трафика
-  // входа шапки просто нет. JS-фоллбек для НЕ-поддерживающих: те же кейсы,
+  // Safari 26+ его играют; iOS Safari ≤18 и Firefox — НЕТ: @supports не
+  // сработал → шапка появляется статично, на мобильной половине трафика
+  // входа шапки просто нет. JS-фоллбек для НЕ-поддерживающих: те же кейсы,
   // что hfx-rise (opacity 0→1, y 14→0), WAAPI, один раз, когда шапка
-  // входит в верхние 65% вьюпорта (IO rootMargin -35%). Анимации создаются
-  // в паузе на 0-м кейфрейме (fill backwards) — стартового «мига» нет; по
+  // входит в верхние 65% вьюпорта (IO rootMargin -35%). Анимации создаются
+  // в паузе на 0-м кейфрейме (fill backwards) — стартового «мига» нет; по
   // завершении cancel() (инлайн-слой снимается, элемент возвращается к
-  // каскаду). reduce-motion — статика, как и CSS-ветка.
+  // каскаду). reduce-motion — статика, как и CSS-ветка.
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -228,10 +228,10 @@ export function SiteHeader() {
   // of cached bounds — zero per-frame layout reads when far away. rAF and
   // listeners are cleaned up on unmount. No ref writes in render (§37).
   //
-  // FX5-N2 (волна-D): инстантные программные прыжки по якорям (location.hash,
-  // прямая загрузка /#about) не гарантируют scroll-события после скачка, а
+  // FX5-N2 (волна-D): инстантные программные прыжки по якорям (location.hash,
+  // прямая загрузка /#about) не гарантируют scroll-события после скачка, а
   // дрейф лэйаута ПОСЛЕ прыжка (ленивые картинки, шрифты, late-mount блоки)
-  // вообще не порождает ни scroll, ни resize — кэш границ и bandMid стареют,
+  // вообще не порождает ни scroll, ни resize — кэш границ и bandMid стареют,
   // шапка читает свет над тёмной секцией до первого реального скролла юзера
   // (замер: founder top-in-vp 66px < bandMid 110px → scheme залипает «light»).
   // Фикс: (1) evaluate однократно на монте — уже было (cache()+evaluate());
@@ -288,8 +288,8 @@ export function SiteHeader() {
       onScroll();
     };
     // FX5-N2: re-cache + re-evaluate без пользовательского скролла. Хэш-прыжок
-    // скачет мгновенно (scroll-margin-top:84px сажает секцию под шапку) и может
-    // совпасть с дрейфом лэйаута — старые doc-границы уводят fast-path мимо
+    // скачет мгновенно (scroll-margin-top:84px сажает секцию под шапку) и может
+    // совпасть с дрейфом лэйаута — старые doc-границы уводят fast-path мимо
     // секции, поэтому пересобираем кэш ДО оценки кадра.
     const reCacheAndEvaluate = () => {
       cache();
@@ -297,7 +297,7 @@ export function SiteHeader() {
     };
     const onHash = () => reCacheAndEvaluate();
     // Дрейф лэйаута (картинки/шрифты/Suspense-вставки) меняет высоту body —
-    // ни scroll, ни resize при этом не приходят. RO догоняет геометрию.
+    // ни scroll, ни resize при этом не приходят. RO догоняет геометрию.
     const ro = new ResizeObserver(() => reCacheAndEvaluate());
 
     cache();
@@ -315,55 +315,55 @@ export function SiteHeader() {
     };
   }, []);
 
-  // c86-B (жалоба владельца c86: «в хедере изначально почему-то подчеркнуты
+  // c86-B (жалоба владельца c86: «в хедере изначально почему-то подчеркнуты
   // "контакты", хотя первый блок после херо — это видео»): scroll-spy v2.
   //
-  // КОРЕНЬ БАГА v1 (доказан research/c86/b-scrollspy.cjs, DIAG C): в прод-
+  // КОРЕНЬ БАГА v1 (доказан research/c86/b-scrollspy.cjs, DIAG C): в прод-
   // пререндере конверс-блок приезжает SSR-шеллом (Suspense-fallback
-  // HaccBookingShell, 81-F3), а гидрация заменяет шелл живым виджетом.
-  // Эффект v1 успевал зарезолвить цели и навесить IO на узлы ШЕЛЛА; свап
-  // отваливал их от DOM; начальные IO-entries доставляются ПОСЛЕ свапа →
+  // HaccBookingShell, 81-F3), а гидрация заменяет шелл живым виджетом.
+  // Эффект v1 успевал зарезолвить цели и навесить IO на узлы ШЕЛЛА; свап
+  // отваливал их от DOM; начальные IO-entries доставляются ПОСЛЕ свапа →
   // recompute читал gBCR отваленных узлов (все нулевые) → «последняя
-  // секция с top ≤ 45%vh» = ПОСЛЕДНИЙ пункт NAV = #contact → «Контакты»
-  // горит прямо на герое — и навсегда: отваленные цели никогда не
+  // секция с top ≤ 45%vh» = ПОСЛЕДНИЙ пункт NAV = #contact → «Контакты»
+  // горит прямо на герое — и навсегда: отваленные цели никогда не
   // пересекут IO-полосу, spy заморожен (замер: active=[#contact] при
-  // scrollY=0, узел detached, rect.top=0, реальная зона на 9703px ниже).
-  // В dev :3001 виджет всегда в SSR-HTML — свапа нет, баг не виден (DIAG A).
+  // scrollY=0, узел detached, rect.top=0, реальная зона на 9703px ниже).
+  // В dev :3001 виджет всегда в SSR-HTML — свапа нет, баг не виден (DIAG A).
   //
-  // V2 — сигнальная сетка паттерна FX5 v2 (тёмный вотчер ниже в этом же
+  // V2 — сигнальная сетка паттерна FX5 v2 (тёмный вотчер ниже в этом же
   // файле): rAF-throttled scroll + resize + hashchange + ResizeObserver
-  // (body) + стартовая оценка. IO на целях УДАЛЁН: пересечение полосы
-  // всегда сопровождается одним из этих сигналов (скролл/resize/дрейф
-  // лэйаута), а асинхронная доставка начальных IO-entries в окне
+  // (body) + стартовая оценка. IO на целях УДАЛЁН: пересечение полосы
+  // всегда сопровождается одним из этих сигналов (скролл/resize/дрейф
+  // лэйаута), а асинхронная доставка начальных IO-entries в окне
   // прод-свапа — сам источник бага. Self-healing: каждая оценка
-  // проверяет isConnected целей и при отвале перечитывает их из живого
-  // DOM — нулевые rect'ы отваленных узлов больше не голосуют.
+  // проверяет isConnected целей и при отвале перечитывает их из живого
+  // DOM — нулевые rect'ы отваленных узлов больше не голосуют.
   //
   // ЛИНИЯ АКТИВАЦИИ (спека c86-B): пункт загорается, когда верх СЕКЦИИ
   // дошёл до посадочной полосы якорей = max(высота шапки, 96px) — контент
-  // реально под шапкой, ровно там, где его оставляет клик по пункту
-  // (конвенция scroll-margin-top сайта: 84px у section[id], 96px у услуг/
-  // меню/#calculator/#contact — Lenis и scrollIntoView сажают цель туда).
-  // Прежняя линия 45% vh зажигала пункт, когда секция была в середине
-  // экрана; видео-блок/marquee/бэнды под шапкой ничего не зажигают (нет
-  // пунктов — честно по ожиданию владельца). #contact → наблюдаем САМУ
-  // зону контактов (div#contact; c89: переехала в низ секции hacc-booking,
-  // живёт в DOM всегда — контракт 8), а не секцию-носитель: «Контакты»
+  // реально под шапкой, ровно там, где его оставляет клик по пункту
+  // (конвенция scroll-margin-top сайта: 84px у section[id], 96px у услуг/
+  // меню/#calculator/#contact — Lenis и scrollIntoView сажают цель туда).
+  // Прежняя линия 45% vh зажигала пункт, когда секция была в середине
+  // экрана; видео-блок/marquee/бэнды под шапкой ничего не зажигают (нет
+  // пунктов — честно по ожиданию владельца). #contact → наблюдаем САМУ
+  // зону контактов (div#contact; c89: переехала в низ секции hacc-booking,
+  // живёт в DOM всегда — контракт 8), а не секцию-носитель: «Контакты»
   // загорается, когда
-  // зона реально под шапкой (замер 1280×800: на 1824px позже верха
-  // #calculator), а не когда верх секции вошёл в середину экрана.
-  // Лучшая = ПОСЛЕДНЯЯ в документном порядке секция с top ≤ линии —
-  // честно в обе стороны: вниз в «дырах» между nav-секциями (showcase/
+  // зона реально под шапкой (замер 1280×800: на 1824px позже верха
+  // #calculator), а не когда верх секции вошёл в середину экрана.
+  // Лучшая = ПОСЛЕДНЯЯ в документном порядке секция с top ≤ линии —
+  // честно в обе стороны: вниз в «дырах» между nav-секциями (showcase/
   // marquee/faq/instagram) светится последняя пройденная, вверх —
-  // следующая гаснет, как только её верх ушёл ниже полосы, на герое —
+  // следующая гаснет, как только её верх ушёл ниже полосы, на герое —
   // ничего. Быстрые прыжки (якорь, vanity-URL, resize) ресинкятся
-  // сигналами выше; во время hero-exit apply() — no-op (state не меняется
+  // сигналами выше; во время hero-exit apply() — no-op (state не меняется
   // → ноль DOM-мутаций, фликера нет).
   //
-  // Состояние (не анимация): класс .is-active + aria-current="location"
-  // на desktop-ссылке (c83-F1); появление метки — CSS transition
-  // transform/opacity 180ms с гейтом reduce (site-header.css §4).
-  // Дровер и мобильный nav не затронуты (селектор — только <nav> шапки).
+  // Состояние (не анимация): класс .is-active + aria-current="location"
+  // на desktop-ссылке (c83-F1); появление метки — CSS transition
+  // transform/opacity 180ms с гейтом reduce (site-header.css §4).
+  // Дровер и мобильный nav не затронуты (селектор — только <nav> шапки).
   const activeHrefRef = useRef("");
   useEffect(() => {
     const header = headerRef.current;
@@ -375,8 +375,8 @@ export function SiteHeader() {
 
     // Цель каждого пункта — сам якорь (#contact — зона контактов, c89).
     // Пересборка
-    // ленивая: isConnected-чек в recompute ловит прод-свап шелла и поздние
-    // монты (Suspense/vanity) — отваленный узел перечитывается из DOM.
+    // ленивая: isConnected-чек в recompute ловит прод-свап шелла и поздние
+    // монты (Suspense/vanity) — отваленный узел перечитывается из DOM.
     const resolveTargets = () => {
       const out: Array<{ href: string; el: Element }> = [];
       for (const n of NAV) {
@@ -429,12 +429,12 @@ export function SiteHeader() {
     // формы #contact, late-монты) — RO догоняет геометрию (паттерн FX5-N2).
     const ro = new ResizeObserver(schedule);
     ro.observe(document.body);
-    // Быстрые прыжки: якорь из шапки/футера (нативный скролл-ивент в тот
-    // же тик + hashchange), vanity-URL (lenis-скролл = поток scroll-ивентов).
+    // Быстрые прыжки: якорь из шапки/футера (нативный скролл-ивент в тот
+    // же тик + hashchange), vanity-URL (lenis-скролл = поток scroll-ивентов).
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule, { passive: true });
     window.addEventListener("hashchange", schedule);
-    recompute(); // стартовое состояние (reload с restore-scroll, /#hash)
+    recompute(); // стартовое состояние (reload с restore-scroll, /#hash)
     return () => {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
@@ -446,11 +446,11 @@ export function SiteHeader() {
   }, []);
 
   // c83-A: React перезаписывает className ссылок nav при смене схемы шапки
-  // (dark-вариант hover-цвета живёт в JSX-шаблоне) — императивный .is-active
+  // (dark-вариант hover-цвета живёт в JSX-шаблоне) — императивный .is-active
   // при этом может затереться. Восстанавливаем метку после каждого рендера,
   // меняющего className (dark-флип FX5, stuck, дровер).
-  // c83-F1: вместе с классом восстанавливаем и aria-current="location"
-  // (не трекает — JSX не задаёт, — но синхронизируем оба атрибута
+  // c83-F1: вместе с классом восстанавливаем и aria-current="location"
+  // (не трекает — JSX не задаёт, — но синхронизируем оба атрибута
   // одним проходом, состояние обязано совпадать с .is-active).
   // c83-F4b: useLayoutEffect (изоморфный) — метка восстанавливается до
   // краски, иначе dark-флип давал 1-кадровый флик снятой .is-active.
@@ -470,10 +470,10 @@ export function SiteHeader() {
   }, [stuck, themeDark, open]);
 
   // Lock body scroll when mobile menu open.
-  // W3-FIX (edge case): при resize через lg-брейкпоинт с открытым меню
+  // W3-FIX (edge case): при resize через lg-брейкпоинт с открытым меню
   // (390→1440, поворот/девтулзы) кнопка-бургер исчезает, меню остаётся
-  // «висеть» открытым, а body остаётся в scroll-lock. Закрываем меню
-  // автоматом при переходе на десктоп — lock снимается штатным эффектом.
+  // «висеть» открытым, а body остаётся в scroll-lock. Закрываем меню
+  // автоматом при переходе на десктоп — lock снимается штатным эффектом.
   useEffect(() => {
     if (!open) return;
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -489,19 +489,19 @@ export function SiteHeader() {
     return () => mq.removeEventListener("change", onChange);
   }, [open]);
 
-  // K2-F1 (Task 1, MAJOR): v1 хранил позицию в body.style.top и читал её в
+  // K2-F1 (Task 1, MAJOR): v1 хранил позицию в body.style.top и читал её в
   // else-ветке ЭТОГО эффекта при закрытии. React запускает cleanup прежнего
   // прогона ДО тела нового — cleanup затирал style.top ещё до чтения, и
-  // window.scrollTo(0, -top) НЕ ВЫПОЛНЯЛСЯ НИКОГДА: страница оставалась на
-  // «случайной» позиции (замер K2: 900 → открыл → 0 → закрыл → 458; из 3000
+  // window.scrollTo(0, -top) НЕ ВЫПОЛНЯЛСЯ НИКОГДА: страница оставалась на
+  // «случайной» позиции (замер K2: 900 → открыл → 0 → закрыл → 458; из 3000
   // тоже 458, детерминированно — прыжок давали focus() триггера без
-  // preventScroll + Lenis-петля со стейл-таргетом).
-  // v2: позиция хранится в ref (переживает cleanup), wasLocked гейтит
-  // маунт-прогон (иначе первый else скроллил бы страницу в 0 при загрузке),
+  // preventScroll + Lenis-петля со стейл-таргетом).
+  // v2: позиция хранится в ref (переживает cleanup), wasLocked гейтит
+  // маунт-прогон (иначе первый else скроллил бы страницу в 0 при загрузке),
   // restore — двухтактный (синхронно + rAF + 120мс таймер: переживает
-  // Lenis-петлю первого кадра и late-layout), через window.__lenis с
+  // Lenis-петлю первого кадра и late-layout), через window.__lenis с
   // immediate:true (грабля §2/§33: голый window.scrollTo Lenis перебивает
-  // своим таргетом; immediate синхронизирует и таргет, и позицию) с
+  // своим таргетом; immediate синхронизирует и таргет, и позицию) с
   // нативным фоллбеком (reduce-motion / Lenis нет).
   const savedScrollYRef = useRef(0);
   const wasLockedRef = useRef(false);
@@ -565,12 +565,12 @@ export function SiteHeader() {
 
   /* 81-W2F1 (критик F MINOR): при открытом бургере <main> обязан глохнуть —
    * фокус-хвост модального дровера (role=dialog aria-modal) иначе Tab'ом
-   * проваливался в фоновый контент (замер критика F: main не inert). Паттерн
-   * — тот же, что у видео-модалки events-video-carousel.tsx: императивные
-   * атрибуты с cleanup (React не владеет этими узлами: main живёт в layout,
-   * дровер здесь; mutual-exclusion с модалкой гарантирован — при inert main
-   * клики по её плиткам недостижимы, а при открытой модалке header сам
-   * inert и бургер не нажимается). */
+   * проваливался в фоновый контент (замер критика F: main не inert). Паттерн
+   * — тот же, что у видео-модалки events-video-carousel.tsx: императивные
+   * атрибуты с cleanup (React не владеет этими узлами: main живёт в layout,
+   * дровер здесь; mutual-exclusion с модалкой гарантирован — при inert main
+   * клики по её плиткам недостижимы, а при открытой модалке header сам
+   * inert и бургер не нажимается). */
   useEffect(() => {
     if (!open) return;
     const main = document.querySelector("main");
@@ -583,23 +583,23 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  /* W3 (K5 MAJOR, задача 3) — закрыть меню и уйти по якорю.
+  /* W3 (K5 MAJOR, задача 3) — закрыть меню и уйти по якорю.
    *
-   * ПРОБЛЕМА (замер W3, research/c71/w3-probe-menu.mjs): у пунктов
+   * ПРОБЛЕМА (замер W3, research/c71/w3-probe-menu.mjs): у пунктов
    * дровера href="#menu" + onClick={close} — дефолтная якорная навигация
-   * срабатывает ЕЩЁ В scroll-lock'е (body fixed, документ схлопнут), а
-   * затем unlock-restore возвращает страницу на сохранённую позицию:
-   * 1200 → клик «Меню» → остались на 1200, секция ниже на 3609px. Якорь
-   * «не работает» для всех пунктов мобильного меню.
+   * срабатывает ЕЩЁ В scroll-lock'е (body fixed, документ схлопнут), а
+   * затем unlock-restore возвращает страницу на сохранённую позицию:
+   * 1200 → клик «Меню» → остались на 1200, секция ниже на 3609px. Якорь
+   * «не работает» для всех пунктов мобильного меню.
    *
    * ФИКС: preventDefault + навигация ПОСЛЕ restore (DRAWER_NAV_DELAY_MS):
    *   c89/W2-UX: ВСЕГДА ведём через __lenis.scrollTo (§33) — нативный
-   *   прыжок location.hash на тач-устройствах откатывался rAF-петлёй
-   *   Lenis (замер: клик «Меню» в drawer → scrollY остался 0 — жалоба
-   *   владельца №23 «не спускает к вариантам меню»). Hash обновляем
+   *   прыжок location.hash на тач-устройствах откатывался rAF-петлёй
+   *   Lenis (замер: клик «Меню» в drawer → scrollY остался 0 — жалоба
+   *   владельца №23 «не спускает к вариантам меню»). Hash обновляем
    *   тихо через history.pushState (без нативного прыжка), scroll-spy
-   *   шапки работает по IntersectionObserver — hashchange не нужен.
-   * Десктоп (nav в шапке) не затронут — там якоря работают без lock'а. */
+   *   шапки работает по IntersectionObserver — hashchange не нужен.
+   * Десктоп (nav в шапке) не затронут — там якоря работают без lock'а. */
   const closeAndNavigate = (href: string) => {
     setOpen(false);
     window.setTimeout(() => {
@@ -623,8 +623,8 @@ export function SiteHeader() {
 
   // Header is `position: sticky; top: 0` and sits in normal flow AFTER the
   // 100vh hero (see page.tsx). Per task v5: "хеадер сначала находится внизу
-  // секции херо и его даже не видно, потом херо вместе с ним мотается вверх и
-  // после того как он поднимается до верха экрана то остается там и становится
+  // секции херо и его даже не видно, потом херо вместе с ним мотается вверх и
+  // после того как он поднимается до верха экрана то остается там и становится
   // немного прозрачным" — initially below the fold (not visible), scrolls up
   // with the hero, sticks at top, then becomes slightly translucent.
   // Background: solid white when scrolling into view; translucent white +
@@ -635,13 +635,13 @@ export function SiteHeader() {
   const dark = stuck && themeDark;
 
   /* c83-A: CTA «Заказать» — единственная нода <a>; Magnetic сам решает,
-     магнит или plain-обёртка (fine-pointer/reduce внутри утилиты, c83-F1).
-     Магнит тянет к курсору только обёртку (spring, transform-only):
-     data-press (WAAPI scale на самом <a>, §52 — разные элементы, не
+     магнит или plain-обёртка (fine-pointer/reduce внутри утилиты, c83-F1).
+     Магнит тянет к курсору только обёртку (spring, transform-only):
+     data-press (WAAPI scale на самом <a>, §52 — разные элементы, не
      конфликтует), slide-fill ::after, focus-visible, таб-порядок (обёртка
-     div не фокусируема) и aria не меняются.
+     div не фокусируема) и aria не меняются.
      c89 (3-g): href #contact → #calculator — «Заказать» конверс-CTA, ведёт
-     в смета-чек; #contact с c89 — якорь зоны КОНТАКТОВ компании (низ
+     в смета-чек; #contact с c89 — якорь зоны КОНТАКТОВ компании (низ
      секции hacc-booking). */
   const ctaNode = (
     <a
@@ -750,7 +750,7 @@ export function SiteHeader() {
               heavy gradient CTA). Theirs: `<span class="menu-text fusion-button
               button-default button-medium"><span class="button-icon-divider-left">
               <i class="fa-phone-alt"></i></span><span>404-334-4935</span></span>`.
-              Per task v4: "кнопка заказать у них в какой стилистике? почему у
+              Per task v4: "кнопка заказать у них в какой стилистике? почему у
               нас так стремно выглядит" → strip the burgundy gradient, use a
               quiet text+icon link matching the nav items' typographic weight. */}
           <div className="flex items-center gap-3">
@@ -800,7 +800,7 @@ export function SiteHeader() {
               }`}
               /* c83-F3 (a11y-nit): постоянный уникальный лейбл. При open
                  шапка целиком inert+aria-hidden — страничный бургер
-                 недоступен, но его лейбл дублировал крестик панели
+                 недоступен, но его лейбл дублировал крестик панели
                  («Закрыть меню» ×2 в querySelectorAll-запросах критика).
                  Кнопка интерактивна ТОЛЬКО при закрытом меню — лейбл
                  описывает это состояние (иконка-гамбургер постоянна);
@@ -822,7 +822,7 @@ export function SiteHeader() {
           баннером, телефон кликабелен.
           81-W2F1: рендер через MobileMenuPortal (createPortal,
           document.body) — вне <main>, который глохнет inert'ом при
-          открытом меню (см. эффект выше и докблок портала). */}
+          открытом меню (см. эффект выше и докблок портала). */}
       <AnimatePresence>
         {open && (
           <MobileMenuPortal>
@@ -878,15 +878,15 @@ export function SiteHeader() {
                   key={n.label + i}
                   href={n.href}
                   /* W3: closeAndNavigate — см. докблок выше (якорь из-под
-                     scroll-lock'а не долетал). Десктопный nav не тронут. */
+                     scroll-lock'а не долетал). Десктопный nav не тронут. */
                   onClick={(e) => {
                     e.preventDefault();
                     closeAndNavigate(n.href);
                   }}
                   className="tott-body group py-4 min-h-[44px] flex items-center justify-between border-b border-border-line/50 text-2xl font-700 text-ink transition-colors hover:text-tott-burgundy"
                 /* C79: тач-нажатие — WAAPI-пружина (MicroDelights).
-                    WAAPI-слой сильнее inline-трансформа framer, но живёт
-                    только 340мс — с x-слайдом входа не пересекается. */
+                    WAAPI-слой сильнее inline-трансформа framer, но живёт
+                    только 340мс — с x-слайдом входа не пересекается. */
                 data-press
                   style={{ fontWeight: 700 }}
                   initial={{ opacity: 0, x: -30 }}
@@ -941,7 +941,7 @@ export function SiteHeader() {
                   data-press
                   className="tott-body flex min-h-[48px] items-center justify-center gap-2 border border-ink/15 bg-cream px-3 py-3 text-sm uppercase tracking-[0.04em] text-ink transition-colors duration-200 hover:border-tott-burgundy hover:bg-tott-burgundy hover:text-white"
                   style={{ fontWeight: 700 }}
-                  aria-label="Написать в Telegram (открывается в новой вкладке)"
+                  aria-label="Написать в Telegram (открывается в новой вкладке)"
                 >
                   <Send className="size-5 shrink-0" aria-hidden="true" />
                   Telegram
@@ -954,7 +954,7 @@ export function SiteHeader() {
                   data-press
                   className="tott-body flex min-h-[48px] items-center justify-center gap-2 border border-ink/15 bg-cream px-3 py-3 text-sm uppercase tracking-[0.04em] text-ink transition-colors duration-200 hover:border-tott-burgundy hover:bg-tott-burgundy hover:text-white"
                   style={{ fontWeight: 700 }}
-                  aria-label="Написать в WhatsApp (открывается в новой вкладке)"
+                  aria-label="Написать в WhatsApp (открывается в новой вкладке)"
                 >
                   <MessageCircle className="size-5 shrink-0" aria-hidden="true" />
                   WhatsApp
@@ -966,7 +966,7 @@ export function SiteHeader() {
                   data-press
                   className="tott-body col-span-2 flex min-h-[48px] items-center justify-center gap-2 border border-ink/15 bg-cream px-3 py-3 text-sm uppercase tracking-[0.04em] text-ink transition-colors duration-200 hover:border-tott-burgundy hover:bg-tott-burgundy hover:text-white"
                   style={{ fontWeight: 700 }}
-                  aria-label="Написать в MAX — мессенджер (открывается в новой вкладке)"
+                  aria-label="Написать в MAX — мессенджер (открывается в новой вкладке)"
                 >
                   <MaxGlyph className="size-5 shrink-0" aria-hidden="true" />
                   Макс
@@ -980,7 +980,7 @@ export function SiteHeader() {
                 style={{ fontWeight: 700 }}
               >
                 <span className="hnav-live-dot" aria-hidden="true" />
-                Отвечаем в любое время
+                Отвечаем в любое время
               </p>
             </motion.div>
 
@@ -1010,7 +1010,7 @@ export function SiteHeader() {
                 data-press
                 className="tott-body flex min-h-[48px] w-full items-center justify-center border-2 border-black bg-transparent px-5 py-3 text-[15px] font-700 uppercase tracking-[0.08em] text-black transition-colors duration-300 hover:bg-black hover:text-white"
                 style={{ fontWeight: 700, borderRadius: 0 }}
-                aria-label="Оставить заявку — к калькулятору стоимости"
+                aria-label="Оставить заявку — к калькулятору стоимости"
               >
                 Оставить заявку
               </a>

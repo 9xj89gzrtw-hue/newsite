@@ -8,22 +8,22 @@
  *
  *   import { fireGoldConfetti } from "@/components/motion/gold-confetti";
  *
- *   // при успешной отправке заявки (успех-стейт формы, не на каждый клик):
- *   fireGoldConfetti();                          // разлёт из центра экрана
- *   fireGoldConfetti(submitButtonRef.current);   // разлёт из кнопки «Отправить»
+ *   // при успешной отправке заявки (успех-стейт формы, не на каждый клик):
+ *   fireGoldConfetti();                          // разлёт из центра экрана
+ *   fireGoldConfetti(submitButtonRef.current);   // разлёт из кнопки «Отправить»
  *
  * Императивная утилита без своего React-дерева: сама создаёт fixed-canvas
- * (z-index 9990, pointer-events:none — ничего не перекрывает кликабельно),
+ * (z-index 9990, pointer-events:none — ничего не перекрывает кликабельно),
  * рисует ~90–120 частиц золотой палитры (#C9A227/#E5C76B/#8A6D1F/#F5E6B8),
- * физика: гравитация 0.15/кадр, инерция разлёта из точки, вращение,
+ * физика: гравитация 0.15/кадр, инерция разлёта из точки, вращение,
  * «флаттер»-переворот плашек, длительность ~1.2s, канвас удаляется сам.
- * Соединять ТОЛЬКО с реальной конверсией (успех формы), не со спам-кликами
- * (внутри есть защита от наложения >2 салютов).
+ * Соединять ТОЛЬКО с реальной конверсией (успех формы), не со спам-кликами
+ * (внутри есть защита от наложения >2 салютов).
  * prefers-reduced-motion → noop. SSR → noop.
  * ==========================================================================
  */
 
-/** Кап DPR для канваса салюта. */
+/** Кап DPR для канваса салюта. */
 const DPR_CAP = 1.5;
 /** Полная длительность салюта, ms. */
 const DURATION_MS = 1200;
@@ -51,7 +51,7 @@ type Particle = {
   shape: "flake" | "dot";
 };
 
-/** Счётчик активных салютов — защита от спама одинаковой утилитой. */
+/** Счётчик активных салютов — защита от спама одинаковой утилитой. */
 let concurrent = 0;
 
 export function fireGoldConfetti(originEl?: HTMLElement): void {
@@ -66,8 +66,8 @@ export function fireGoldConfetti(originEl?: HTMLElement): void {
   const dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
 
   const canvas = document.createElement("canvas");
-  // inline-стили вместо css-файла: утилита самодостаточна и живёт вне
-  // React-дерева (оркестратор может импортировать её из любого места)
+  // inline-стили вместо css-файла: утилита самодостаточна и живёт вне
+  // React-дерева (оркестратор может импортировать её из любого места)
   canvas.setAttribute("aria-hidden", "true");
   canvas.style.position = "fixed";
   canvas.style.left = "0";
@@ -88,7 +88,7 @@ export function fireGoldConfetti(originEl?: HTMLElement): void {
   }
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  // Точка разлёта: центр originEl (если элемент жив) или центр экрана
+  // Точка разлёта: центр originEl (если элемент жив) или центр экрана
   let ox = vw / 2;
   let oy = vh / 2;
   if (originEl && originEl.isConnected) {
@@ -144,7 +144,7 @@ export function fireGoldConfetti(originEl?: HTMLElement): void {
       return;
     }
     ctx.clearRect(0, 0, vw, vh);
-    // мягкое затухание в последней трети жизни
+    // мягкое затухание в последней трети жизни
     const fade = Math.min(1, (DURATION_MS - elapsed) / (DURATION_MS * 0.3));
     let alive = 0;
     ctx.globalAlpha = fade;

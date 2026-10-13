@@ -25,7 +25,7 @@ import { ArrowRight } from "lucide-react";
  *    гостей" USP (drop-off minimum threshold floor).
  *  - corporate_minimums.by_service_type.full_service_plated_sit_down:
  *    "30-75 person equivalent" + "Service duration typically 4-6 hours" →
- *    supports the body's "корпоративных обедов на 500 гостей" upper bound.
+ *    supports the body's "корпоративных обедов на 500 гостей" upper bound.
  *  - geographic_delivery_minimums.local_area_within_10_miles:
  *    "Often free over minimum order" → supports the geography row claim.
  *
@@ -91,7 +91,7 @@ const USP: Usp[] = [
     ),
     lead: "60 минут",
     description:
-      "точное окно доставки с уведомлением за 30 минут до прибытия",
+      "точное окно доставки с уведомлением за 30 минут до прибытия",
   },
   {
     icon: (
@@ -112,7 +112,7 @@ const USP: Usp[] = [
         <path d="M12 5.5v2" />
       </>
     ),
-    lead: "С сервировкой",
+    lead: "С сервировкой",
     description: "курьер-официант бесплатно расставит блюда",
   },
   {
@@ -125,7 +125,7 @@ const USP: Usp[] = [
       </>
     ),
     lead: "Минимум 10 гостей",
-    description: "заказы от 10 человек, без ограничений по максимуму",
+    description: "заказы от 10 человек, без ограничений по максимуму",
   },
   {
     icon: (
@@ -135,8 +135,8 @@ const USP: Usp[] = [
         <path d="M8.5 14.5l2.5 2.5 4-4.5" />
       </>
     ),
-    lead: "В тот же день",
-    description: "при заказе до 11:00 возможна доставка в день обращения",
+    lead: "В тот же день",
+    description: "при заказе до 11:00 возможна доставка в день обращения",
   },
 ];
 
@@ -196,7 +196,7 @@ export function DeliveryBlock() {
           >
             <Image
               src="/media/menu-office-lunch.jpg"
-              alt="Корпоративный обед от Interfood Catering — выкладка блюд на столе в офисе, тёплый свет, фарфор, салаты и закуски"
+              alt="Корпоративный обед от Interfood Catering — выкладка блюд на столе в офисе, тёплый свет, фарфор, салаты и закуски"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover transition-transform duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
@@ -263,10 +263,10 @@ export function DeliveryBlock() {
               }}
               {...reveal({ delay: 0.24 })}
             >
-              Горячие блюда, красиво упакованные и доставленные к вашему
-              столу — в офис, на производство или домой. От фуршетов на 10
-              человек до корпоративных обедов на 500 гостей. Собственное
-              оборудование для термоупаковки и команда курьеров-официантов.
+              Горячие блюда, красиво упакованные и доставленные к вашему
+              столу — в офис, на производство или домой. От фуршетов на 10
+              человек до корпоративных обедов на 500 гостей. Собственное
+              оборудование для термоупаковки и команда курьеров-официантов.
             </motion.p>
 
             {/* 5 USPs — each row: 1.5px-stroke gold SVG icon (24×24, shrink-0)

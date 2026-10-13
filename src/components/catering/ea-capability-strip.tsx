@@ -18,7 +18,7 @@
  *  - Section bg --ea-black (#000). Vertical padding clamp(5rem, 8vw, 7rem)
  *    (slightly tighter than .ea-section default to keep the strip dense).
  *  - .ea-container--wide (1440px).
- *  - Eyebrow "ВОЗМОЖНОСТИ · ЗА ПРЕДЕЛАМИ КЕЙТЕРИНГА" in cream
+ *  - Eyebrow "ВОЗМОЖНОСТИ · ЗА ПРЕДЕЛАМИ КЕЙТЕРИНГА" in cream
  *    (--ea-capability-strip__eyebrow override, since .ea-eyebrow is red).
  *  - H2 "Мы умеем <i>больше</i>." cream Playfair, italic fragment in red
  *    via .ea-italic-fragment.
@@ -52,23 +52,23 @@ type Capability = {
 const CAPABILITIES: Capability[] = [
   {
     title: "Аварийный кейтеринг 24/7",
-    desc: "Подмена основного подрядчика за 6 часов — без снижения меню.",
+    desc: "Подмена основного подрядчика за 6 часов — без снижения меню.",
   },
   {
     title: "Полевая кухня",
-    desc: "Горячие обеды на объекте без инфраструктуры — генератор, вода, вывоз.",
+    desc: "Горячие обеды на объекте без инфраструктуры — генератор, вода, вывоз.",
   },
   {
     title: "Шатёр-монтаж",
-    desc: "Шатры 6×12 м под ключ, монтаж за 4 часа, тёплый пол в межсезонье.",
+    desc: "Шатры 6×12 м под ключ, монтаж за 4 часа, тёплый пол в межсезонье.",
   },
   {
     title: "Видео-трансляция",
-    desc: "Прямой эфир на 5 платформ одновременно — свадьбы, конференции, гала.",
+    desc: "Прямой эфир на 5 платформ одновременно — свадьбы, конференции, гала.",
   },
   {
-    title: "Сцена и свет",
-    desc: "Сцена 8×6 м, свет, звук, ppt-управление — один подрядчик на всё.",
+    title: "Сцена и свет",
+    desc: "Сцена 8×6 м, свет, звук, ppt-управление — один подрядчик на всё.",
   },
 ];
 
@@ -93,14 +93,14 @@ export function EaCapabilityStrip() {
   return (
     <section
       className="ea-section ea-section--black"
-      aria-label="Возможности за пределами кейтеринга"
+      aria-label="Возможности за пределами кейтеринга"
       style={{ paddingBlock: "clamp(5rem, 8vw, 7rem)" }}
     >
       <div className="ea-container ea-container--wide">
         {/* Header */}
         <div className="mb-12 flex flex-col items-center gap-5 text-center md:mb-14">
           <span className="ea-eyebrow ea-capability-strip__eyebrow">
-            Возможности · За пределами кейтеринга
+            Возможности · За пределами кейтеринга
           </span>
           <h2 className="ea-section-h2 ea-capability-strip__h2">
             Мы умеем <i className="ea-italic-fragment">больше</i>.
@@ -197,7 +197,7 @@ export function EaCapabilityStrip() {
               maxWidth: "40ch",
             }}
           >
-            Если у вас нестандартная задача — позвоните. Мы найдём решение.
+            Если у вас нестандартная задача — позвоните. Мы найдём решение.
           </p>
           <a
             href="#contact"

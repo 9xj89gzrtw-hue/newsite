@@ -7,15 +7,15 @@ import { isLiteDevice } from "@/lib/lite-device";
 import { useLiteDevice } from "@/hooks/use-lite-device";
 import { GoldDust } from "@/components/motion/gold-dust";
 import { useHapticFeedback } from "@/components/motion/tap-feedback";
-/* c83-B (Impl-B, задача 1): Magnetic на Play-pill и kinetic-h2
-   (scroll-driven wght) на H2. Гейты fine-pointer/reduce — внутри утилиты
-   (c83-F1: до фикса утилита гейтила только reduce — тап на iOS эмулировал
-   mousemove и дёргал pill пружиной; см. magnetic.tsx). */
+/* c83-B (Impl-B, задача 1): Magnetic на Play-pill и kinetic-h2
+   (scroll-driven wght) на H2. Гейты fine-pointer/reduce — внутри утилиты
+   (c83-F1: до фикса утилита гейтила только reduce — тап на iOS эмулировал
+   mousemove и дёргал pill пружиной; см. magnetic.tsx). */
 import { Magnetic } from "@/components/motion/magnetic";
 /* c83-B: kinetic-h2 — утилита c74-kinetic.css (animation-timeline: view(),
    entry 10% → cover 32%, wght 400→700; reduce/@supports-гейты внутри).
    Паттерн импорта — как ea-faq-accordion.tsx:7 (side-effect; Next
-   дедуплицирует повторные импорты того же файла). */
+   дедуплицирует повторные импорты того же файла). */
 import "@/components/motion/c74-kinetic.css";
 
 /**
@@ -65,8 +65,8 @@ import "@/components/motion/c74-kinetic.css";
  *
  * Accessibility: section has `aria-label`, the <video> carries its own
  * human-readable aria-label (sound + native controls → КОНТЕНТ, не
- * декорация — aria-hidden на нём НЕТ; c98-FIX2/критик4 #6: докблок прежде
- * заявлял «decorative video has aria-hidden» — аудитор по нему искал
+ * декорация — aria-hidden на нём НЕТ; c98-FIX2/критик4 #6: докблок прежде
+ * заявлял «decorative video has aria-hidden» — аудитор по нему искал
  * несуществующую защиту). The play button has a descriptive `aria-pressed`
  * + aria-label that updates to reflect the current state, CTAs are real
  * anchor links with descriptive link text.
@@ -83,7 +83,7 @@ import "@/components/motion/c74-kinetic.css";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /* c84-A (задача 2, прямая просьба владельца): цикл слов второй строки H2.
-   «кино» замыкает список на субтитл («мы создаём кино, которое можно
+   «кино» замыкает список на субтитл («мы создаём кино, которое можно
    попробовать»). Порядок фиксирован — SEO/SSR всегда видит первое слово. */
 const ROTATE_WORDS = ["искусство", "ритуал", "спектакль", "кино"] as const;
 /** Интервал смены слова, мс (WordRotate-паттерн ~2500-3000). */
@@ -92,33 +92,33 @@ const ROTATE_INTERVAL_MS = 2600;
 const MORPH_DURATION_S = 0.45;
 
 /* ── c89 (3-d, Task 1 — владелец: «Видео которое сразу под херо вот это
-   поставить»): клип владельца с Яндекс.Диска (hero.mov, снят на
-   смартфон 1080×1920, 29.9с, СО ЗВУКОМ — диспенсеры с лимонадами +
-   сервированный банкетный стол с розовой скатертью). Десктоп играет
+   поставить»): клип владельца с Яндекс.Диска (hero.mov, снят на
+   смартфон 1080×1920, 29.9с, СО ЗВУКОМ — диспенсеры с лимонадами +
+   сервированный банкетный стол с розовой скатертью). Десктоп играет
    16:9 центр-кроп 1280×720; мобайл — вертикальная версия (c98-C, см.
-   следующий блок); подмена источника — в mq-эффекте компонента
-   (c98-FIX2, паттерн tott-hero.tsx). Постер — кадр из клипа. */
+   следующий блок); подмена источника — в mq-эффекте компонента
+   (c98-FIX2, паттерн tott-hero.tsx). Постер — кадр из клипа. */
 const SHOWCASE_VIDEO = "/media/c89/c89-showcase-720.mp4";
 const SHOWCASE_POSTER = "/media/c89/c89-showcase-poster.webp";
-/* ── c98-C (задача 1 — владелец: «На видео под херо на мобильной версии
-   кнопка „смотреть" неровно, видео в горизонтальном формате. Может
-   сделать это же видео в вертикальном и чтобы работали кнопки открыть
-   во весь экран?»): вертикальная (9/16) версия ТОГО ЖЕ клипа c89,
+/* ── c98-C (задача 1 — владелец: «На видео под херо на мобильной версии
+   кнопка „смотреть" неровно, видео в горизонтальном формате. Может
+   сделать это же видео в вертикальном и чтобы работали кнопки открыть
+   во весь экран?»): вертикальная (9/16) версия ТОГО ЖЕ клипа c89,
    перекодированная оркестратором — 720×1280, h264 Main + звук AAC,
    ~29с. Заменяет мобильный портрет-кроп c89-showcase-portrait-720.mp4
-   (480×720; файл остаётся в public/ по конвенции §28 — старое не
-   удаляем, код больше не ссылается). Постер вертикальной версии
-   подменяется на мобиле ВМЕСТЕ со src: атрибут poster один на все
-   источники, а 16:9-постер в кадре 9/16 давал бы зум-кроп статичного
+   (480×720; файл остаётся в public/ по конвенции §28 — старое не
+   удаляем, код больше не ссылается). Постер вертикальной версии
+   подменяется на мобиле ВМЕСТЕ со src: атрибут poster один на все
+   источники, а 16:9-постер в кадре 9/16 давал бы зум-кроп статичного
    кадра. Десктоп — без изменений (16:9 + SHOWCASE_POSTER). */
 const SHOWCASE_VIDEO_VERTICAL = "/media/c98/c98-showcase-vertical.mp4";
 const SHOWCASE_POSTER_VERTICAL =
   "/media/c98/c98-showcase-vertical-poster.webp";
 
 /* c98-C (задача 1) / c98-FIX2 (критик4 MAJOR#1): мобильный детект =
-   window.matchMedia("(max-width: 767px)") — ТОТ ЖЕ брейкпоинт, что у
+   window.matchMedia("(max-width: 767px)") — ТОТ ЖЕ брейкпоинт, что у
    CSS-рамки md:aspect-video (Tailwind md = 768px). Прежняя формула
-   (pointer:coarse ИЛИ innerWidth<768) расходилась с CSS: iPad 768×1024
+   (pointer:coarse ИЛИ innerWidth<768) расходилась с CSS: iPad 768×1024
    (coarse) и телефон-landscape (844×390) получали ВЕРТИКАЛЬНЫЙ файл в
    16:9-рамке — видимая центр-полоса ~32% кадра. coarse убран: тач-девайсы
    ≥768 живут по десктопным правилам (16:9 файл+рамка, inline-controls;
@@ -129,15 +129,15 @@ const isMobileViewport = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(max-width: 767px)").matches;
 
-/* c98-C (задача 1): вход в фуллскрин НА САМОМ <video> — НЕ на
-   контейнере-обёртке (оверлей/H2/CTA/пилюля не должны показываться в
+/* c98-C (задача 1): вход в фуллскрин НА САМОМ <video> — НЕ на
+   контейнере-обёртке (оверлей/H2/CTA/пилюля не должны показываться в
    полноэкранном кадре). Порядок вызова — ПОСЛЕ video.play() внутри того
-   же клика (user activation): Android/Chrome — requestFullscreen на
-   video → нативный фуллскрин-плеер с controls; iPhone —
+   же клика (user activation): Android/Chrome — requestFullscreen на
+   video → нативный фуллскрин-плеер с controls; iPhone —
    Element.requestFullscreen отсутствует, webkitEnterFullscreen
-   поднимает нативный плеер (единственный путь на iOS; он сам стартует
+   поднимает нативный плеер (единственный путь на iOS; он сам стартует
    воспроизведение). Известный iOS-глюк «звук без картинки» возникает
-   при входе в фуллскрин ДО старта play — порядок play → fullscreen его
+   при входе в фуллскрин ДО старта play — порядок play → fullscreen его
    обходит. Тихие отказы: фуллскрин опционален, inline-controls
    остаются рабочими. */
 const enterVideoFullscreen = (video: HTMLVideoElement) => {
@@ -148,7 +148,7 @@ const enterVideoFullscreen = (video: HTMLVideoElement) => {
       });
       return;
     }
-    /* TypeScript strict: webkitEnterFullscreen нет в lib.dom — каст. */
+    /* TypeScript strict: webkitEnterFullscreen нет в lib.dom — каст. */
     const wk = video as HTMLVideoElement & {
       webkitEnterFullscreen?: () => void;
     };
@@ -160,9 +160,9 @@ const enterVideoFullscreen = (video: HTMLVideoElement) => {
   }
 };
 
-/* c98-C (задача 1): выход из фуллскрина (стандартный API + старый
+/* c98-C (задача 1): выход из фуллскрина (стандартный API + старый
    webkit-префикс). Страховка: системный выход юзера ловит
-   fullscreenchange-эффект в компоненте. */
+   fullscreenchange-эффект в компоненте. */
 const exitFullscreenSafely = () => {
   try {
     if (document.fullscreenElement) {
@@ -212,45 +212,45 @@ export function GgVideoShowcase() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [expanded, setExpanded] = useState(false);
-  /* c98-FIX1 (критик1 #1, MAJOR): платформенный детект ДЛЯ РЕНДЕРА (aria-label
+  /* c98-FIX1 (критик1 #1, MAJOR): платформенный детект ДЛЯ РЕНДЕРА (aria-label
      ветвится — фуллскрин обещаем только там, где он реально есть). Дефолт
      false = десктоп-текст = SSR-HTML → гидро-паритет гарантирован; после
-     маунта стейт уточняется ТЕМ ЖЕ isMobileViewport(), что решает
-     фуллскрин в togglePlay. Детект стабилен между рендерами (не вызов в
+     маунта стейт уточняется ТЕМ ЖЕ isMobileViewport(), что решает
+     фуллскрин в togglePlay. Детект стабилен между рендерами (не вызов в
      каждом рендере), смена текста после маунта — обычный React-апдейт
-     а11y-атрибута (не mismatch).
-     c98-FIX2 (критик4 MINOR#5): стейт ПОДПИСАН на change того же mq —
-     стейл-детект после ресайза через 768 (лживый aria-label «на весь
-     экран» в широком окне) закрыт; обновляет его mq-эффект ниже. */
+     а11y-атрибута (не mismatch).
+     c98-FIX2 (критик4 MINOR#5): стейт ПОДПИСАН на change того же mq —
+     стейл-детект после ресайза через 768 (лживый aria-label «на весь
+     экран» в широком окне) закрыт; обновляет его mq-эффект ниже. */
   const [isMobileView, setIsMobileView] = useState(false);
   /* c98-FIX1 (критик1 #10): ref-зеркало expanded — togglePlay считает next
-     из АКТУАЛЬНОГО значения, а не из стейл-замыкания рендера (два
-     синхронных клика в одном тике = тоггл, а не двойной expand).
-     Сайд-эффекты (play/fullscreen) остаются в хендлере клика — им нужен
-     живой user-activation; чистый setExpanded(prev=>!prev) с мутациями
-     видео в эффекте по [expanded] запускал бы их и на маунте (ломало бы
-     lite-политику тизера) и отрывал от окна активации. Синхронизируем
-     вручную во ВСЕХ местах setExpanded (togglePlay + onFsChange ниже). */
+     из АКТУАЛЬНОГО значения, а не из стейл-замыкания рендера (два
+     синхронных клика в одном тике = тоггл, а не двойной expand).
+     Сайд-эффекты (play/fullscreen) остаются в хендлере клика — им нужен
+     живой user-activation; чистый setExpanded(prev=>!prev) с мутациями
+     видео в эффекте по [expanded] запускал бы их и на маунте (ломало бы
+     lite-политику тизера) и отрывал от окна активации. Синхронизируем
+     вручную во ВСЕХ местах setExpanded (togglePlay + onFsChange ниже). */
   const expandedRef = useRef(false);
 
   /* c98-FIX2 (критик4 MAJOR#1 + MINOR#5): единый mq-эффект мобильного
    * источника. matchMedia("(max-width: 767px)") — РОВНО брейкпоинт
-   * Tailwind md:aspect-video (768px): JS-подмена src/poster и CSS-рамка
-   * кадра больше не расходятся (прежде coarse||<768: iPad 768×1024 —
+   * Tailwind md:aspect-video (768px): JS-подмена src/poster и CSS-рамка
+   * кадра больше не расходятся (прежде coarse||<768: iPad 768×1024 —
    * вертикальный файл в 16:9-рамке, полоса ~32% кадра; телефон-landscape
    * 844×390 — то же). Паттерн подмены — тот же, что c98-C: video.src
    * ПРЯМО на <video> (НЕ <source>.src) — установка src-атрибута
    * гарантированно перезапускает алгоритм загрузки, дочерний <source>
-   * (16:9, SSR-разметка) игнорируется; ПОСТЕР — вместе со src (16:9-постер
-   * в кадре 9/16 = зум-кроп статичного кадра). Поведение:
+   * (16:9, SSR-разметка) игнорируется; ПОСТЕР — вместе со src (16:9-постер
+   * в кадре 9/16 = зум-кроп статичного кадра). Поведение:
    *  - старт: начальный детект + стейт isMobileView (SSR-дефолт false);
    *  - пересечение 767↔768 (ресайз/поворот): src+poster обновляются
-   *    СРАЗУ, если тизер на паузе; ИГРАЮЩЕЕ видео (paused=false,
-   *    readyState≥2) или expanded (юзер смотрит со звуком) НЕ
-   *    перезагружаем — src-swap перезапустил бы загрузку живого плеера
-   *    (рывок + флеш постера); отложенная замена догоняет на ближайшей
-   *    паузе (листенер 'pause' ниже: IO снимает секцию с кадра / юзер
-   *    ставит паузу в нативных controls);
+   *    СРАЗУ, если тизер на паузе; ИГРАЮЩЕЕ видео (paused=false,
+   *    readyState≥2) или expanded (юзер смотрит со звуком) НЕ
+   *    перезагружаем — src-swap перезапустил бы загрузку живого плеера
+   *    (рывок + флеш постера); отложенная замена догоняет на ближайшей
+   *    паузе (листенер 'pause' ниже: IO снимает секцию с кадра / юзер
+   *    ставит паузу в нативных controls);
    *  - возврат ≥768: removeAttribute("src") + load() — алгоритм выбора
    *    источника снова берёт дочерний <source> 16:9, постер — 16:9.
    * Один эффект, аккуратный cleanup (mq-change + pause). */
@@ -274,7 +274,7 @@ export function GgVideoShowcase() {
         video.poster = SHOWCASE_POSTER_VERTICAL;
       } else if (!mobile && curSrc === SHOWCASE_VIDEO_VERTICAL) {
         /* назад к 16:9: снять src-атрибут + load() — выбор источника
-           вернётся к <source>-ребёнку из SSR-разметки. */
+           вернётся к <source>-ребёнку из SSR-разметки. */
         video.removeAttribute("src");
         video.load();
         video.poster = SHOWCASE_POSTER;
@@ -297,9 +297,9 @@ export function GgVideoShowcase() {
   /* c84-A (задача 2): индекс текущего слова морфинга. SSR/до монта — 0
      («искусство»), меняется ТОЛЬКО интервалом ниже (клиент). */
   const [wordIndex, setWordIndex] = useState(0);
-  /* c84-A (задача 2): секция в вьюпорте? Отдельный маленький IO — пауза
+  /* c84-A (задача 2): секция в вьюпорте? Отдельный маленький IO — пауза
      таймера морфинга вне кадра (грабля §52: анимация вне экрана —
-     бесплатно не бывает). Начальное false — до первого колбэка IO. */
+     бесплатно не бывает). Начальное false — до первого колбэка IO. */
   const [sectionInView, setSectionInView] = useState(false);
 
   /** W4-FIX: React doesn't serialize the `muted` attribute into SSR HTML
@@ -310,10 +310,10 @@ export function GgVideoShowcase() {
     if (video) video.muted = true;
   }, []);
 
-  /* c84-A (задача 2): видимость секции для паузы морфинга. IO без
-   *  rootMargin/threshold: isIntersecting = «хоть пиксель в кадре»;
-   *  колбэк приходит сразу на observe — стейт синхронизируется с
-   *  фактическим положением секции (в т.ч. при приземлении по #якорю). */
+  /* c84-A (задача 2): видимость секции для паузы морфинга. IO без
+   *  rootMargin/threshold: isIntersecting = «хоть пиксель в кадре»;
+   *  колбэк приходит сразу на observe — стейт синхронизируется с
+   *  фактическим положением секции (в т.ч. при приземлении по #якорю). */
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -325,12 +325,12 @@ export function GgVideoShowcase() {
   }, []);
 
   /* c84-A (задача 2): интервал ротации слова. Стартует ТОЛЬКО после
-   *  монта (SSR-текст статичен — LCP/SEO не трогаем), стоит при
-   *  reduce-motion (a11y: слепой/вестибулярный пользователь не должен
-   *  ловить смену слова периферией) и вне вьюпорта (IO-пауза). Все
-   *  читаемые значения — в deps (грабля React Compiler).
+   *  монта (SSR-текст статичен — LCP/SEO не трогаем), стоит при
+   *  reduce-motion (a11y: слепой/вестибулярный пользователь не должен
+   *  ловить смену слова периферией) и вне вьюпорта (IO-пауза). Все
+   *  читаемые значения — в deps (грабля React Compiler).
    *  c84-F3 (критик C, NIT): + lite-гейт — декоративное движение гасим
-   *  на слабых/экономных девайсах (идеология c84), слово остаётся
+   *  на слабых/экономных девайсах (идеология c84), слово остаётся
    *  статичным «искусство» (SSR-дефолт). */
   useEffect(() => {
     if (!mounted || reduce || lite || !sectionInView) return;
@@ -345,7 +345,7 @@ export function GgVideoShowcase() {
    *  pauses when it scrolls away — the c89 owner clip
    *  (/media/c89/c89-showcase-720.mp4) is a
    *  DIFFERENT url from the hero's mculinary-hero.mp4 and preload="none"
-   *  keeps it out of the critical path. IO rootMargin -15%/-25% (V4-find: было 100px — секция на 917px попадала в margin при scroll=0 на mobile и тизер качался на СТАРТЕ, съедая экономию; теперь play() только когда секция реально в кадре)
+   *  keeps it out of the critical path. IO rootMargin -15%/-25% (V4-find: было 100px — секция на 917px попадала в margin при scroll=0 на mobile и тизер качался на СТАРТЕ, съедая экономию; теперь play() только когда секция реально в кадре)
    *  starts playback just before the section is revealed. Cleanup pauses
    *  on unmount. prefers-reduced-motion: no IO at all — the poster stays
    *  and the clip plays only after a user click. */
@@ -412,19 +412,19 @@ export function GgVideoShowcase() {
   }, [reduce, lite]);
 
   /** Toggle the play-pill: expanded → unmuted + native controls (+
-   *  fullscreen на мобильном); collapsed → back to the muted looping
+   *  fullscreen на мобильном); collapsed → back to the muted looping
    *  teaser (the loop keeps running). W4-FIX: collapsing no longer pauses
    *  the clip — the muted b-roll continues.
-   *  c98-C (задача 1 — «чтобы работали кнопки открыть во весь экран»):
-   *  на мобильном (тот же детект isMobileViewport, что подменяет
-   *  источник) клик дополнительно вводит видео в фуллскрин; десктоп —
-   *  прежние inline-controls (фуллскрин там не нужен: кадр уже ~720px).
-   *  Клик НЕ гейчен lite/reduce (юзер-жест = осознанный запрос байтов,
-   *  см. IO-комментарий выше) — слабый девайс играет по нажатию. */
+   *  c98-C (задача 1 — «чтобы работали кнопки открыть во весь экран»):
+   *  на мобильном (тот же детект isMobileViewport, что подменяет
+   *  источник) клик дополнительно вводит видео в фуллскрин; десктоп —
+   *  прежние inline-controls (фуллскрин там не нужен: кадр уже ~720px).
+   *  Клик НЕ гейчен lite/reduce (юзер-жест = осознанный запрос байтов,
+   *  см. IO-комментарий выше) — слабый девайс играет по нажатию. */
   const togglePlay = () => {
     /* c98-FIX1 (критик1 #10): next — из ref-зеркала (функциональный смысл
-       setExpanded(prev=>!prev) без сайд-эффектов в апдейтере): двойной
-       синхронный клик в одном тике теперь честный тоггл. */
+       setExpanded(prev=>!prev) без сайд-эффектов в апдейтере): двойной
+       синхронный клик в одном тике теперь честный тоггл. */
     const next = !expandedRef.current;
     expandedRef.current = next;
     setExpanded(next);
@@ -458,16 +458,16 @@ export function GgVideoShowcase() {
     }
   };
 
-  /* c98-C (задача 1): юзер вышел из фуллскрина СИСТЕМНОЙ кнопкой
-   * (назад Android / Done iOS / Esc) — пилюля в фуллскрине не видна,
-   * клика по ней не будет: синхронизируем стейт ЗДЕСЬ, иначе остался бы
+  /* c98-C (задача 1): юзер вышел из фуллскрина СИСТЕМНОЙ кнопкой
+   * (назад Android / Done iOS / Esc) — пилюля в фуллскрине не видна,
+   * клика по ней не будет: синхронизируем стейт ЗДЕСЬ, иначе остался бы
    * «expanded» (звук + controls) при свёрнутом видео. webkit-префикс —
-   * старые Android-webkit. НА iPhone fullscreenchange с
-   * webkitEnterFullscreen может НЕ прийти (нативный плеер — не DOM-
+   * старые Android-webkit. НА iPhone fullscreenchange с
+   * webkitEnterFullscreen может НЕ прийти (нативный плеер — не DOM-
    * фуллскрин): тогда стейт ОСТАЁТСЯ честным — нативный плеер закрыт,
-   * видео играет inline со звуком и controls, пилюля «Выключить звук»
+   * видео играет inline со звуком и controls, пилюля «Выключить звук»
    * по-прежнему сворачивает (см. C-REPORT.md «известные ограничения
-   * iOS»). Юзер-гест уже был → muted-play в восстановлении разрешён. */
+   * iOS»). Юзер-гест уже был → muted-play в восстановлении разрешён. */
   useEffect(() => {
     /* c98-FIX1 (критик1 #2, MINOR): wasOurs — флаг «фуллскрин был НАШ»:
        выставляем при входе ТОЛЬКО если fullscreenElement === наш video.
@@ -490,7 +490,7 @@ export function GgVideoShowcase() {
       wasOurs = false;
       const video = videoRef.current;
       setExpanded(false);
-      expandedRef.current = false; // c98-FIX1: ref-зеркало синхронно со стейтом
+      expandedRef.current = false; // c98-FIX1: ref-зеркало синхронно со стейтом
       if (!video) return;
       video.controls = false;
       video.muted = true;
@@ -540,12 +540,12 @@ export function GgVideoShowcase() {
             poster attribute covers the pre-play frame (the old static
             <img> is gone — the video poster replaces it 1:1). The clip
             (c89-showcase-720.mp4 — клип владельца c89, 16:9 центр-кроп;
-            на мобильном mq-эффект выше подменяет И источник, И постер на
-            вертикальную версию c98 — кадр 1:1 с контейнером 9/16) differs
+            на мобильном mq-эффект выше подменяет И источник, И постер на
+            вертикальную версию c98 — кадр 1:1 с контейнером 9/16) differs
             from the hero video url, so nothing is
-            fetched in parallel with the hero. 29.9s, со звуком — тизер
-            mute, Play-pill ниже расмучивает по клику (на мобиле — с
-            входом в фуллскрин, c98-C задача 1). */}
+            fetched in parallel with the hero. 29.9s, со звуком — тизер
+            mute, Play-pill ниже расмучивает по клику (на мобиле — с
+            входом в фуллскрин, c98-C задача 1). */}
         <video
           ref={videoRef}
           muted
@@ -553,7 +553,7 @@ export function GgVideoShowcase() {
           playsInline
           preload="none"
           poster={SHOWCASE_POSTER}
-          aria-label="Видео: кейтеринг как искусство — лимонады в диспенсерах и сервировка банкетного стола"
+          aria-label="Видео: кейтеринг как искусство — лимонады в диспенсерах и сервировка банкетного стола"
           className="absolute inset-0 h-full w-full object-cover"
         >
           <source src={SHOWCASE_VIDEO} type="video/mp4" />
@@ -596,18 +596,18 @@ export function GgVideoShowcase() {
               the layered Tailwind `text-white` utility — an inline
               `color: "#fff"` (inline beats both) keeps the H2 white over
               the dark video.
-              C77 (владелец): слово «искусство» — ниже на строку: <br/>
+              C77 (владелец): слово «искусство» — ниже на строку: <br/>
               между частями, вторая строка читается как акцентный
               «выдох» курсивом. */}
           <motion.h2
             {...reveal(0)}
-            /* c105: kinetic-h2 СНЯТ (вместе с founder/FAQ) — wght-анимация
-                оседала в Bold 700 и H2 читался «другим шрифтом» против
+            /* c105: kinetic-h2 СНЯТ (вместе с founder/FAQ) — wght-анимация
+                оседала в Bold 700 и H2 читался «другим шрифтом» против
                 канона всех секций (weight 400). Претензия владельца c105:
                 «как будто вообще другие шрифты взяла».
-                c84-A (задача 1): mb-8 → mb-5 на мобиле — компактнее
-                вертикальный стек оверлея, чтобы Play-pill не наезжал
-                (pill на мобиле поднят выше, см. Magnetic ниже). */
+                c84-A (задача 1): mb-8 → mb-5 на мобиле — компактнее
+                вертикальный стек оверлея, чтобы Play-pill не наезжал
+                (pill на мобиле поднят выше, см. Magnetic ниже). */
             className="ea-section-h2 mb-5 mt-2 max-w-4xl text-white md:mb-8"
             style={{
               color: "#fff",
@@ -622,30 +622,30 @@ export function GgVideoShowcase() {
                   вхождение в DOM); морфинг стартует после монта (интервал
                   выше);
                 - AnimatePresence mode="wait" + initial={false} — первый
-                  рендер БЕЗ входной анимации (framer не шипит в SSR
+                  рендер БЕЗ входной анимации (framer не шипит в SSR
                   инлайн-стили начального состояния), смена слова:
                   exit вверх / enter снизу (y ±60%, ТОЛЬКО
                   transform/opacity, motion.dev-гайд);
                 - контейнер фикс. высоты (border-box 1.28em = line-height
-                  H2 1.08em + 0.2em запас на десцендеры кириллицы —
-                  у/р Playfair выходят за line-box при lh 1.08; строка
-                  контейнера стоит на месте ритма H2) +
-                  overflow-hidden — смена слова не прыгает по вертикали;
+                  H2 1.08em + 0.2em запас на десцендеры кириллицы —
+                  у/р Playfair выходят за line-box при lh 1.08; строка
+                  контейнера стоит на месте ритма H2) +
+                  overflow-hidden — смена слова не прыгает по вертикали;
                 - a11y/SEO (c99): БЫЛО sr-only «искусство» + видимый
                   анимированный спан — Яндекс читает textContent БЕЗ учёта
-                  aria-hidden/sr-only, и два соседних спана склеивались в
-                  «искусствоискусство» (мусорный сниппет в выдаче).
-                  c99-fix (критик E2-1): убран и aria-hidden со спана —
-                  aria-label на генерическом <i> (role=generic) читают
-                  НЕ все стеки (NVDA/JAWS в browse-режиме), скрытый текст
+                  aria-hidden/sr-only, и два соседних спана склеивались в
+                  «искусствоискусство» (мусорный сниппет в выдаче).
+                  c99-fix (критик E2-1): убран и aria-hidden со спана —
+                  aria-label на генерическом <i> (role=generic) читают
+                  НЕ все стеки (NVDA/JAWS в browse-режиме), скрытый текст
                   оставлял такие AT без слова вовсе. Теперь: aria-label
-                  берут поддерживающие (по accname subtree не читается —
+                  берут поддерживающие (по accname subtree не читается —
                   одно вхождение), остальные читают текст спана напрямую;
-                  в textContent — по-прежнему ровно одно вхождение.
+                  в textContent — по-прежнему ровно одно вхождение.
                   Трейлинг-пробел после «как» — чтобы «сырой» textContent
                   без обработки <br> читался как «Кейтеринг как искусство»;
                 - курсив/красный — наследование .ea-section-h2 i;
-                  kinetic-h2 wght-анимация H2 не тронута. */}
+                  kinetic-h2 wght-анимация H2 не тронута. */}
             <i aria-label="искусство">
               <span
                 className="block overflow-hidden"
@@ -689,7 +689,7 @@ export function GgVideoShowcase() {
               textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)",
             }}
           >
-            Создаём кино, которое можно попробовать — от идеи до последнего
+            Создаём кино, которое можно попробовать — от идеи до последнего
             штриха.
           </motion.p>
 
@@ -765,31 +765,31 @@ export function GgVideoShowcase() {
           type="button"
           onClick={togglePlay}
           /* C79: тач-нажатие — WAAPI-пружина (MicroDelights); Tailwind v4
-              центрует через свойство translate — с transform-scale
+              центрует через свойство translate — с transform-scale
               WAAPI композиционится без прыжка. */
           data-press
           aria-pressed={expanded}
           /* 81-W2F1 (критик G MAJOR, WCAG 2.5.3 Label in Name): aria-label
-             НАЧИНАЕТСЯ с видимого текста кнопки («Смотреть» / «Выключить
-             звук») — раньше accname «Включить звук и показать элементы
-             управления видео» не содержал видимой надписи вовсе.
+             НАЧИНАЕТСЯ с видимого текста кнопки («Смотреть» / «Выключить
+             звук») — раньше accname «Включить звук и показать элементы
+             управления видео» не содержал видимой надписи вовсе.
              c98-FIX1 (критик1 #1, MAJOR): свёрнутый лейбл ВЕТВИТСЯ по
-             платформе — тем же детектом, что решает фуллскрин в togglePlay
+             платформе — тем же детектом, что решает фуллскрин в togglePlay
              (isMobileView-стейт, SSR-дефолт false = десктоп-текст):
-             мобайл — «на весь экран со звуком» (реально: play →
+             мобайл — «на весь экран со звуком» (реально: play →
              enterVideoFullscreen), десктоп — прежний честный текст про
-             inline-звук+controls («на весь экран» на десктопе было ЛОЖЬЮ
-             для скринридера на основной платформе). */
+             inline-звук+controls («на весь экран» на десктопе было ЛОЖЬЮ
+             для скринридера на основной платформе). */
           aria-label={
             expanded
               ? "Выключить звук — скрыть элементы управления видео"
               : isMobileView
-                ? "Смотреть — открыть видео на весь экран со звуком"
-                : "Смотреть — включить звук и показать управление видео"
+                ? "Смотреть — открыть видео на весь экран со звуком"
+                : "Смотреть — включить звук и показать управление видео"
           }
           /* c83-F2 (U1a D1): .gg-play-pill — hover-scale 1.04 + переходы
-              opacity/transform (гейты hover/reduce в globals.css);
-              data-press (WAAPI-свойство scale) не конфликтует. */
+              opacity/transform (гейты hover/reduce в globals.css);
+              data-press (WAAPI-свойство scale) не конфликтует. */
           className="gg-play-pill group inline-flex min-h-[44px] items-center justify-center hover:opacity-90"
           style={{
             /* c86-F (читабельность): было transparent — worst-case в зоне
