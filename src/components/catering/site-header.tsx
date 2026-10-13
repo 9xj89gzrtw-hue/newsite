@@ -756,7 +756,7 @@ export function SiteHeader() {
           <div className="flex items-center gap-3">
             <a
               href={CONTACTS.phoneHref}
-              className={`hnav-link tott-body hidden min-h-[44px] items-center gap-2 text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 sm:inline-flex ${
+              className={`hnav-link tott-body hidden min-h-[44px] items-center gap-2 text-[15px] font-700 uppercase tracking-[0.04em] opacity-85 transition-all duration-300 hover:opacity-100 sm:inline-flex whitespace-nowrap ${
                 dark ? "text-[#F7F5F5] hover:text-[#D4A373]" : "text-ink hover:text-tott-burgundy"
               }`}
               style={{ fontWeight: 700 }}
@@ -987,7 +987,7 @@ export function SiteHeader() {
             <div className="mt-auto space-y-3 text-ink">
               <a
                 href={CONTACTS.phoneHref}
-                className="tott-body flex min-h-[44px] items-center gap-3 py-2 text-2xl font-700 hover:text-tott-burgundy"
+                className="tott-body flex min-h-[44px] items-center gap-3 py-2 text-2xl font-700 hover:text-tott-burgundy whitespace-nowrap"
                 style={{ fontWeight: 700 }}
               >
                 <Phone className="size-5" />

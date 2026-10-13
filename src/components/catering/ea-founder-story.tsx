@@ -529,7 +529,12 @@ export function EaFounderStory() {
             <motion.h2
               key={`h2-${on}`}
               id="ea-founder-story-headline"
-              className="efs__h2 kinetic-h2"
+              /* c105: kinetic-h2 СНЯТ — wght-анимация 400→700 оседала
+                  в Bold 700, и на фоне всех секций сайта (weight 400:
+                  services/menu/booking/events/calculator) заголовок
+                  читался «другим шрифтом» (жалоба владельца: «как будто
+                  вообще другие шрифты»). Канон .ea-section-h2 = 400. */
+              className="efs__h2"
               {...fadeUp(0.08)}
             >
               {/* c103: новый заголовок из ТЗ владельца; курсивный

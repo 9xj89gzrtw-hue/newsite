@@ -1906,6 +1906,15 @@
   overflow-wrap: break-word;
   transition: color 0.25s ease;
 }
+/* c105 (скрин владельца: «+7 (911) 941-72-05» рвался по дефису на две
+   строки «…941-72-» / «05») — телефонные значения неделимы: дефисы и
+   пробелы номера не являются точками переноса. Номер 16px ≈ 140px,
+   строка (иконка 40 + гэпы + номер + стрелка) ≥ 220px — влезает даже
+   в колонку 280px @320. Адрес остаётся на базовом правиле выше. */
+.hb-clink__value--nowrap {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
 .hb-clink:hover .hb-clink__value { color: var(--hb-red-deep); }
 .hb-clink__arrow {
   margin-left: auto;

@@ -1,7 +1,13 @@
 /* Shared tariff layout without changing catalog/card component structure. */
 @media screen {
   :is(.hmenu__tabs, .hb-pkgs)[data-packages] {
-    --tariff-columns: 4;
+    /* c105 (скрин владельца: «КАНАПЕ (6 ШТ)…ГОРЯЧЕЕ (3 ШАЛ…» — имена
+       пакетов наезжали друг на друга): 4 колонки давали ~99px на таб
+       при именах 128–217px (uppercase 14px + ls 0.14em) — white-space:
+       nowrap на .hmenu__tab наследовался именем и текст вытекал в
+       соседа. Канон — 2 равные колонки ≥768: в панели меню ~195px/кол,
+       в калькуляторе ~290px/кол — все имена пакетов помещаются. */
+    --tariff-columns: 2;
     --tariff-gap: 0.6rem;
     display: grid;
     grid-template-columns: repeat(var(--tariff-columns), minmax(0, 1fr));
@@ -38,9 +44,16 @@
        растянутая высота распределяет name/price/desc. */
   }
   .hb-pkgs[data-packages] > .hb-pkg { gap: 0.3rem; }
-  .hmenu__tabs[data-packages] .hmenu__tab-name { overflow-wrap: break-word; word-break: normal; }
+  /* c105: имя пакета переносится ТОЛЬКО по пробелам, целыми словами —
+     white-space наследовался от .hmenu__tab (nowrap, для цены) и глушил
+     overflow-wrap; на узких колонках текст вытекал в соседа. Цена
+     (.hmenu__tab-sum) остаётся nowrap — «от 660 ₽» неделима. */
+  .hmenu__tabs[data-packages] .hmenu__tab-name {
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
   @media (min-width: 768px) and (max-width: 1199px) {
-    :is(.hmenu__tabs, .hb-pkgs)[data-packages] { --tariff-columns: 2; }
     /* c104-2 (сирота 3-пакетного ряда): в полосе 768–1199 flex-wrap даёт
        2+1 — одиночная карточка 2-й строки не с чем сравняться (замер:
        [130,130,110] @1199). Замена на грид 4×span-2 сохраняет геометрию

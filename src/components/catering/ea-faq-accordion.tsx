@@ -260,10 +260,12 @@ export function EaFaqAccordion() {
           <ScrambleText delayMs={150}>Вопросы · Ответы</ScrambleText>
         </RevealP>
 
-        {/* H2 with italic-as-fragment trailing phrase ("знать" in red). */}
+        {/* H2 with italic-as-fragment trailing phrase ("знать" in red).
+            c105: kinetic-h2 СНЯТ (вместе с founder/gg-video) — wght-анимация
+            оседала в Bold 700 против канона всех секций (weight 400). */}
         <RevealH2
           id={`${reactId}-headline`}
-          className="ea-section-h2 kinetic-h2 mt-5 text-center"
+          className="ea-section-h2 mt-5 text-center"
           style={{ fontSize: "clamp(2.5rem, 5.5vw, 4rem)" }}
           {...reveal(0.05)}
         >

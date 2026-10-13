@@ -601,15 +601,14 @@ export function GgVideoShowcase() {
               «выдох» курсивом. */}
           <motion.h2
             {...reveal(0)}
-            /* c83-B: kinetic-h2 — вес строки растёт со скроллом
-                (view-таймлайн, wght 400→700) — утилита c74-kinetic.css,
-                reduce/нет-timeline → статический 400 (штатный вид).
-                База ea-section-h2 = font-weight 400 — в покое вид
-                идентичен прежнему.
+            /* c105: kinetic-h2 СНЯТ (вместе с founder/FAQ) — wght-анимация
+                оседала в Bold 700 и H2 читался «другим шрифтом» против
+                канона всех секций (weight 400). Претензия владельца c105:
+                «как будто вообще другие шрифты взяла».
                 c84-A (задача 1): mb-8 → mb-5 на мобиле — компактнее
                 вертикальный стек оверлея, чтобы Play-pill не наезжал
                 (pill на мобиле поднят выше, см. Magnetic ниже). */
-            className="ea-section-h2 kinetic-h2 mb-5 mt-2 max-w-4xl text-white md:mb-8"
+            className="ea-section-h2 mb-5 mt-2 max-w-4xl text-white md:mb-8"
             style={{
               color: "#fff",
               textShadow: "0 2px 24px rgba(0, 0, 0, 0.55)",

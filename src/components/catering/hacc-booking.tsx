@@ -678,6 +678,10 @@ type ContactItem = {
   icon: React.ElementType;
   external?: boolean;
   highlight?: boolean;
+  /* c105: телефонные значения («+7 (911) 941-72-05») рвались по дефисам
+     на две строки при узкой колонке («…941-72-» / «05», скрин владельца) —
+     номер неделим. Адрес (длинный текст) остаётся переносимым. */
+  nowrap?: boolean;
 };
 
 /**
@@ -736,6 +740,7 @@ function useContactChannels(): ContactItem[] {
         href: CONTACTS.phoneHref,
         icon: Phone,
         highlight: true,
+        nowrap: true,
       },
       {
         sub: "Телеграм",
@@ -743,6 +748,7 @@ function useContactChannels(): ContactItem[] {
         href: CONTACTS.telegramHref,
         icon: Send,
         external: true,
+        nowrap: true,
       },
       {
         sub: "Вотсап",
@@ -750,6 +756,7 @@ function useContactChannels(): ContactItem[] {
         href: CONTACTS.whatsappHref,
         icon: MessageCircle,
         external: true,
+        nowrap: true,
       },
       {
         /* c89/c92: Макс — мессенджер по второму номеру; ссылка — реальный
@@ -759,12 +766,14 @@ function useContactChannels(): ContactItem[] {
         href: CONTACTS.maxHref,
         icon: MaxGlyph,
         external: true,
+        nowrap: true,
       },
       {
         sub: "Смс",
         label: formatPhoneDisplay(CONTACTS.sms),
         href: CONTACTS.smsHref,
         icon: MessageSquare,
+        nowrap: true,
       },
       {
         sub: "Адрес",
@@ -846,7 +855,12 @@ function ContactRow({ item }: { item: ContactItem }) {
       </span>
       <span className="hb-clink__body">
         <span className="hb-clink__sub">{item.sub}</span>
-        <span className="hb-clink__value">{item.label}</span>
+        {/* c105: nowrap-флаг — телефонные номера не рвутся по дефисам */}
+        <span
+          className={`hb-clink__value${item.nowrap ? " hb-clink__value--nowrap" : ""}`}
+        >
+          {item.label}
+        </span>
       </span>
       <ArrowRight className="hb-clink__arrow" aria-hidden="true" />
     </a>

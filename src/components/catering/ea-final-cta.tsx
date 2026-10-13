@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
+import { CONTACTS } from "@/lib/config";
 
 /**
  * EaFinalCta — Elegant Affairs dramatic minimal final CTA moment.
@@ -161,7 +162,13 @@ export function EaFinalCta() {
           </Link>
         </motion.div>
 
-        {/* Contact strip — 3 lines separated by red • bullets. */}
+        {/* Contact strip — 3 lines separated by red • bullets.
+            c105: заменены чужие данные-заглушки старого шаблона
+            («Тел. +7 812 401-50-50», «pochta@interfood-catering.ru»,
+            «Санкт-Петербург · Москва · Вся Россия») на реальные
+            CONTACTS + гео-формулировку футера (компания работает по
+            СПб и пригородам). Телефон/почта — неделимы (nowrap,
+            скрин владельца c105: номера рвались по дефисам). */}
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 16 }}
           whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
@@ -169,11 +176,15 @@ export function EaFinalCta() {
           transition={{ duration: 0.8, delay: 0.52, ease: EASE }}
           className="mt-16 flex flex-col items-center justify-center gap-2 text-center sm:flex-row sm:flex-wrap sm:gap-x-4 sm:gap-y-2"
         >
-          <ContactLine>Тел. +7 812 401-50-50</ContactLine>
+          <ContactLine href={CONTACTS.phoneHref} nowrap>
+            Тел. {CONTACTS.phone}
+          </ContactLine>
           <RedBullet />
-          <ContactLine>pochta@interfood-catering.ru</ContactLine>
+          <ContactLine href={`mailto:${CONTACTS.email}`} nowrap>
+            {CONTACTS.email}
+          </ContactLine>
           <RedBullet />
-          <ContactLine>Санкт-Петербург · Москва · Вся Россия</ContactLine>
+          <ContactLine>Санкт-Петербург и пригороды</ContactLine>
         </motion.div>
       </div>
     </section>
@@ -181,18 +192,37 @@ export function EaFinalCta() {
 }
 
 /** Contact line — Montserrat 0.875rem, cream/60, letter-spacing 0.05em,
- * uppercase. Renders as a single <span>. */
-function ContactLine({ children }: { children: React.ReactNode }) {
+ * uppercase. c105: опциональный href (телефон/почта — кликабельны) и
+ * nowrap (номера/адреса почты неделимы — не рвутся по дефисам). */
+function ContactLine({
+  children,
+  href,
+  nowrap,
+}: {
+  children: React.ReactNode;
+  href?: string;
+  nowrap?: boolean;
+}) {
+  const cls = `tracking-[0.05em] uppercase${nowrap ? " whitespace-nowrap" : ""}`;
+  const style = {
+    fontFamily: "var(--ea-font-body)",
+    fontSize: "0.875rem",
+    fontWeight: 500,
+    color: "color-mix(in oklab, var(--ea-cream) 60%, transparent)",
+  } as const;
+  if (href) {
+    return (
+      <a
+        href={href}
+        className={`${cls} transition-colors duration-200 hover:text-cream/90 focus-visible:text-cream/90`}
+        style={style}
+      >
+        {children}
+      </a>
+    );
+  }
   return (
-    <span
-      className="tracking-[0.05em] uppercase"
-      style={{
-        fontFamily: "var(--ea-font-body)",
-        fontSize: "0.875rem",
-        fontWeight: 500,
-        color: "color-mix(in oklab, var(--ea-cream) 60%, transparent)",
-      }}
-    >
+    <span className={cls} style={style}>
       {children}
     </span>
   );

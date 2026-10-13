@@ -357,11 +357,19 @@
   /* F1 (WCAG 1.4.4, text resize 200%): рем-пол при html 32px удваивался
      (2.5rem → 80px) и «начинается» резалось overflow-x: clip на 390px
      (right 461.6 > 390). Пол min(2.5rem, 11vw) не зависит от рем-масштаба;
-     при 100% значения не меняются (390 → 40px, 1920 → 62.4px). hyphens:auto
-     — аварийный перенос на экстремальных кеглях; при 100% слова помещаются
-     (замер: каждый word-range = 1 rect, переносов нет). */
+     при 100% значения не меняются (390 → 40px, 1920 → 62.4px). */
   font-size: clamp(min(2.5rem, 11vw), 4.6vw, 3.9rem);
-  hyphens: auto;
+  /* c105 (жалоба владельца: «слова переносятся не полным словом» —
+     «дисци-плиной» на 1440): hyphens:auto убран — ЗАГОЛОВКИ сайта
+     переносятся ТОЛЬКО по пробелам, целыми словами (идиом hacc-menu/
+     hacc-services: overflow-wrap normal + word-break normal + hyphens
+     none). Прежний «аварийный перенос при text-resize 200%» не нужен:
+     рем-пол min(2.5rem, 11vw) уже не зависит от масштаба html — при
+     200% слова по-прежнему помещаются строкой, просто переносятся
+     целиком (замер c105: каждый word-range = 1 rect). */
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
   line-height: 1.08;
   letter-spacing: -0.018em;
   color: var(--efs-cream);

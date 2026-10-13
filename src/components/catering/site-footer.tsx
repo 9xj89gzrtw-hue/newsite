@@ -546,7 +546,7 @@ export function SiteFooter() {
             <div className="flex flex-col gap-2 text-sm">
               <a
                 href={`mailto:${CONTACTS.email}`}
-                className="group inline-flex items-center gap-2 text-cream/80 transition-colors hover:text-gold min-h-[44px]"
+                className="group inline-flex items-center gap-2 text-cream/80 transition-colors hover:text-gold min-h-[44px] whitespace-nowrap"
               >
                 <Mail
                   className="size-4 text-gold/70 transition-transform group-hover:rotate-12"
@@ -556,7 +556,7 @@ export function SiteFooter() {
               </a>
               <a
                 href={CONTACTS.phoneHref}
-                className="group inline-flex items-center gap-2 text-lg font-semibold text-cream transition-colors hover:text-gold min-h-[44px]"
+                className="group inline-flex items-center gap-2 text-lg font-semibold text-cream transition-colors hover:text-gold min-h-[44px] whitespace-nowrap"
               >
                 <Phone
                   className="size-4 text-gold/70 transition-transform group-hover:rotate-12"
@@ -574,7 +574,7 @@ export function SiteFooter() {
                 href={CONTACTS.maxHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 text-sm text-cream/80 transition-colors hover:text-gold min-h-[44px]"
+                className="group inline-flex items-center gap-2 text-sm text-cream/80 transition-colors hover:text-gold min-h-[44px] whitespace-nowrap"
               >
                 <Phone
                   className="size-4 text-gold/70 transition-transform group-hover:rotate-12"
@@ -980,7 +980,7 @@ export function SiteFooter() {
           </div>
           <a
             href={CONTACTS.phoneHref}
-            className="font-display text-sm tracking-wide text-cream/60 transition-colors hover:text-gold min-h-[44px] flex items-center"
+            className="font-display text-sm tracking-wide text-cream/60 transition-colors hover:text-gold min-h-[44px] flex items-center whitespace-nowrap"
           >
             {CONTACTS.phone}
           </a>
