@@ -14,6 +14,9 @@ if (!validated.ok) process.exit(1);
 
 const buffet = validated.data.menuTypes.find((menu) => menu.id === "buffet");
 assert.ok(buffet, "Buffet format must exist");
+/* c112: типографика сайта привязывает предлоги NBSP (U+00A0) — «на\u00A0выбор»;
+   регрессия сравнивает СОДЕРЖАНИЕ, а не типографику: нормализуем NBSP→пробел */
+const norm = (s: string) => s.replace(/\u00A0/g, " ");
 assert.deepEqual(
   buffet.packages.map((pkg) => pkg.pricePerGuest),
   [2450, 2950, 3950, 5350],
@@ -32,10 +35,10 @@ for (const expected of ["Пармская ветчина", "буженина", "
 for (const expected of ["Утиная грудка", "ростбиф", "Морской гребешок", "Копчёный угорь", "Нисуаз", "раковыми шейками", "филе-миньон", "гратен"]) {
   assert.ok(fourth.dishes.some((dish) => dish.name.includes(expected)), expected);
 }
-assert.equal(third.dishes.filter((dish) => dish.name.startsWith("Горячая закуска на выбор:")).length, 2);
-assert.equal(fourth.dishes.filter((dish) => dish.name.startsWith("Горячая закуска на выбор:")).length, 3);
-assert.equal(third.dishes.filter((dish) => dish.name.startsWith("Гарнир на выбор:")).length, 2);
-assert.equal(fourth.dishes.filter((dish) => dish.name.startsWith("Гарнир на выбор:")).length, 2);
+assert.equal(third.dishes.filter((dish) => norm(dish.name).startsWith("Горячая закуска на выбор:")).length, 2);
+assert.equal(fourth.dishes.filter((dish) => norm(dish.name).startsWith("Горячая закуска на выбор:")).length, 3);
+assert.equal(third.dishes.filter((dish) => norm(dish.name).startsWith("Гарнир на выбор:")).length, 2);
+assert.equal(fourth.dishes.filter((dish) => norm(dish.name).startsWith("Гарнир на выбор:")).length, 2);
 assert.deepEqual(third.dishes.slice(-3).map((dish) => dish.weight), ["300 мл", "200 мл", "200 мл"]);
 assert.deepEqual(fourth.dishes.slice(-3).map((dish) => dish.weight), ["250 мл", "150 мл", "150 мл"]);
 
