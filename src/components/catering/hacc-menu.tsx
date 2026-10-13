@@ -1306,13 +1306,14 @@ function MenuRack({
                              без CSS-фильтра: saturate/contrast сдвигает тинт
                              краёв и раскрывает прямоугольную границу фото
                              (см. .hmenu__img--blend в hacc-menu.css).
-                             c108: конвейер переехал в /media/c108 —
-                             префиксы всех поколений; c109/c110 — аналогично. */
+                             c108–c111: конвейер переехал в /media/c108 →
+                             c111 — префиксы всех поколений. */
                           className={
                             pkg.photo?.startsWith("/media/c107") ||
                               pkg.photo?.startsWith("/media/c108") ||
                               pkg.photo?.startsWith("/media/c109") ||
-                              pkg.photo?.startsWith("/media/c110")
+                              pkg.photo?.startsWith("/media/c110") ||
+                              pkg.photo?.startsWith("/media/c111")
                               ? "hmenu__img hmenu__img--blend"
                               : "hmenu__img"
                           }
