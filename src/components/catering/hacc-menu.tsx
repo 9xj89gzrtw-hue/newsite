@@ -1709,7 +1709,7 @@ export function HaccMenu() {
             </button>
             <span className="hmenu__hint" aria-hidden="true">
               <MousePointer2 aria-hidden="true" />
-              Наведите на каталог — он развернётся
+              Выберите раздел — меню развернётся
             </span>
           </div>
         </motion.div>

@@ -229,9 +229,12 @@ export function SplitTextReveal({
     >
       {/* 81-F3 (A2): sr-only-твин — доступное имя вычисляется из
           текст-содержимого (aria-label на generic/paragraph-обёртках
-          запрещён WAI-ARIA); видимый сплит-узел — aria-hidden, как был. */}
+          запрещён WAI-ARIA); видимый сплит-узел — aria-hidden, как был.
+          c114 (зад. 5): select-none на сплит-узле — при копировании
+          страницы текст не склеивается дважды (sr-only + видимые буквы);
+          доступная копия остаётся в sr-only-твине. */}
       <span className="sr-only">{children}</span>
-      <span ref={splitRef} aria-hidden="true">
+      <span ref={splitRef} aria-hidden="true" className="select-none">
         {children}
       </span>
     </Tag>

@@ -47,7 +47,7 @@ import {
  *   --font-script (Great Vibes)       → Marck Script (кириллический скрипт)
  *   --font-nothing (Nothing You Could Do) → Marck Script
  *   --font-neutra-display (Neutra2Display) → Playfair Display (крупные лейблы
- *                                          «СЛЕДИТЕ ЗА НАМИ» и др.)
+ *                                          «Следите за нами» и др.)
  *   --font-neutra-text (Neutra2Text)  → Karla
  * Скриптовые замены: «food as art» и «Сделано с любовью» — Marck Script.
  *
@@ -56,7 +56,7 @@ import {
  */
 
 // — Playfair Display: editorial display-serif с полной кириллицей (H2/H3,
-//   «СЛЕДИТЕ ЗА НАМИ», ex-Neutra2Display-слоты).
+//   «Следите за нами», ex-Neutra2Display-слоты).
 //   C74 (E2, kinetic typography): weight "variable" вместо массива статиков.
 //   ЗАМЕР (research/c74-mobile.mjs, §43): Google и для статик-запросов
 //   отдавал VF-файлы — сеть до/после ИДЕНТИЧНА (18 файлов, 331 856 Б);

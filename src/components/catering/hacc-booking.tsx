@@ -10,7 +10,10 @@
  * c89); Яндекс-карта перенесена в подвал (задача 3-f, site-footer).
  *
  * c89 (волна правок владельца, задача 3-e):
- *  - «Доставка закусок» в калькуляторе — единая цена «от 1 200 ₽/чел»
+ *  - «Доставка закусок» (c114/зад. 4): flat-цена 1 200 ₽/чел СНЯТА —
+ *    калькулятор печатает каталог-пакеты из menu.json (от 660 ₽/чел),
+ *    как глава 02; flat-механика (calcPerGuest) осталась для будущих
+ *    flat-форматов из админки
  *    (calcPerGuest), пакеты не выбираются: карточка-состав + чек печатает
  *    строку «Минимальный заказ формата» с докрутом до 17 400 ₽;
  *  - сезонный коэффициент ×1,15 УДАЛЁН (seasonMultiplier → no-op в
@@ -728,8 +731,10 @@ function MaxGlyph({ className }: { className?: string }) {
 /**
  * c89 (владелец: «по контактам всё в кучу»): контакты в ДВЕ колонки.
  * Левая — «Связь с нами»: телефон + «Напишите нам:» (Телеграм, Вотсап,
- * Макс, Смс, Адрес). Почта ушла из списка (владеет колонкой соцсетей
+ * MAX, SMS, Адрес). Почта ушла из списка (владеет колонкой соцсетей
  * футер; здесь — только каналы связи из письма владельца).
+ * c114 (зад. 6): нейминг унифицирован с футером — MAX / SMS /
+ * Instagram* / VK · @ник / YouTube (без склеек «Vknilovcatering»).
  */
 function useContactChannels(): ContactItem[] {
   return useMemo(
@@ -759,9 +764,9 @@ function useContactChannels(): ContactItem[] {
         nowrap: true,
       },
       {
-        /* c89/c92: Макс — мессенджер по второму номеру; ссылка — реальный
-           профиль в MAX от владельца (см. maxHref в lib/config.ts). */
-        sub: "Макс",
+        /* c89/c92 (c114-нейминг: «MAX»): мессенджер по второму номеру;
+           ссылка — реальный профиль в MAX от владельца (maxHref в config). */
+        sub: "MAX",
         label: CONTACTS.maxPhone,
         href: CONTACTS.maxHref,
         icon: MaxGlyph,
@@ -769,7 +774,7 @@ function useContactChannels(): ContactItem[] {
         nowrap: true,
       },
       {
-        sub: "Смс",
+        sub: "SMS",
         label: formatPhoneDisplay(CONTACTS.sms),
         href: CONTACTS.smsHref,
         icon: MessageSquare,
@@ -798,15 +803,15 @@ function useSocialChannels(): ContactItem[] {
       {
         /* c86-D/G: видимый маркер «*» — сноска о Meta (признана
            экстремистской в РФ) живёт внизу этой зоны и в футере. */
-        sub: "Инстаграм*",
+        sub: "Instagram*",
         label: CONTACTS.instagram,
         href: CONTACTS.instagramHref,
         icon: Instagram,
         external: true,
       },
       {
-        sub: "Vk",
-        label: CONTACTS.vk,
+        sub: "VK",
+        label: CONTACTS.vk.startsWith("@") ? CONTACTS.vk : `@${CONTACTS.vk}`,
         href: CONTACTS.vkHref,
         icon: VkGlyph,
         external: true,
@@ -821,7 +826,7 @@ function useSocialChannels(): ContactItem[] {
         external: true,
       },
       {
-        sub: "Youtube",
+        sub: "YouTube",
         label: CONTACTS.youtube,
         href: CONTACTS.youtubeHref,
         icon: Youtube,
@@ -870,8 +875,9 @@ function ContactRow({ item }: { item: ContactItem }) {
 /**
  * Контакты-зона (c89, редизайн по письму владельца «по контактам всё
  * в кучу»): ДВЕ колонки — слева «Связь с нами» (телефон + «Напишите
- * нам:» Телеграм/Вотсап/Макс/Смс/Адрес), справа «Наши аккаунты в соц.
- * сетях:» (Инстаграм, VK, Телеграм канал, Youtube, Rutube); на мобиле
+ * нам:» Телеграм/Вотсап/MAX/SMS/Адрес), справа «Наши аккаунты в соц.
+ * сетях:» (Instagram*, VK, Телеграм канал, YouTube, Rutube — c114-нейминг);
+ * на мобиле
  * колонки складываются в столбец (те же строки .hb-clink, тикер и
  * карточки-дубли removed — один честный список).
  * Яндекс-карта УБРАНА из зоны (владелец: переносим в подвал — там её
@@ -1457,8 +1463,11 @@ const LeadForm = memo(function LeadForm({
 
       {/* M5 (task 11-fix3): шаг 1 ПОСЛЕ перехода НЕ прячется (контекст важен) —
           приглушается (лейблы 0.55, поля редактируемые), возврат — кликом
-          по легенде. Шаг 2 — различимая подложка (hb-form__fieldset--panel). */}
+          по легенде. Шаг 2 — различимая подложка (hb-form__fieldset--panel).
+          c114 (зад. 2): id="calculator-form-start" — цель скролла CTA
+          «Оставить заявку» (scroll-margin-top: 96px в CSS). */}
       <fieldset
+        id="calculator-form-start"
         className={`hb-form__fieldset ${step === 1 ? "hb-form__fieldset--dim" : ""}`}
       >
         <legend className="hb-form__legend">
@@ -2200,10 +2209,11 @@ const PackageGrid = memo(function PackageGrid({
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
 
-  /* c89: доставка закусок — единая цена «от 1 200 ₽/чел», itemized-пакеты
-     (канапе/брускетты/салаты/горячее) из каталога НЕ показываем (владелец):
-     одна статичная карточка в идиоме кнопок — выбранное состояние,
-     неинтерактивна (курсор текстовый, в фокус не попадает). */
+  /* c89: flat-тип (calcPerGuest != null) — одна статичная карточка
+     «состав вместо пакетов», неинтерактивна (курсор текстовый, в фокус
+     не попадает). c114/зад. 4: у snack-box это ветка БОЛЬШЕ не живёт
+     (calcPerGuest снят — пакеты каталога печатаются выше); код оставлен
+     для будущих flat-форматов из админки. */
   if (type.calcPerGuest != null) {
     return (
       <div className="hb-pkgs" role="group" aria-label={`Состав — ${type.label}`}>
@@ -2315,7 +2325,8 @@ const ReceiptLines = memo(function ReceiptLines({
   type: MenuType;
   /** c84-B: имя выбранного пакета — строка типа печатает «Банкет · Стандарт».
    *  c89: undefined у flat-типа (доставка закусок) — лейбл печатает
-   *  «Доставка закусок · от 1 200 ₽/чел» (пакета нет, цена единая). */
+   *  «Доставка закусок · от N ₽/чел» (пакета нет, цена единая).
+   *  c114: snack-box больше не flat — у него печатается имя пакета. */
   pkgName?: string;
   /** c84-B: ВЫБРАННЫЕ допуслуги (уже отфильтрованы) — по строке на каждую. */
   addons: Addon[];
@@ -2345,7 +2356,7 @@ const ReceiptLines = memo(function ReceiptLines({
           c84-B: «Банкет · Стандарт — цена/чел» — пакет в лейбл, цену за
           гостя выбранного пакета — в значение (та же цифра едет строкой
           ниже как множитель подытога — чеки повторяют юнит-цену).
-          c89: flat-тип без пакета — «Доставка закусок · от 1 200 ₽/чел». */}
+          c89: flat-тип без пакета — «Доставка закусок · от N ₽/чел». */}
       <PrintLine
         sig={`${type.id}|${pkgName ?? `flat${perGuest}`}`}
         index={0}
@@ -2740,6 +2751,11 @@ export function HaccBooking() {
   const [paperInView, setPaperInView] = useState(false);
   const [near, setNear] = useState(false);
   const [zonesUnder, setZonesUnder] = useState(false);
+  /* c114 (зад. 3): панель смета-чека в нижней полосе — отдельный флаг для
+     подавления FAB (стрелка ↑ перекрывала строки чека, пока CTA-зоны
+     панели ещё ниже полосы). Бар это состояние НЕ трогает — его логика
+     прежняя (zonesUnder). */
+  const [panelUnder, setPanelUnder] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   /* D3 (task 7-fix1): зоны, в нижней полосе вьюпорта (~140px) которых
      sticky-bar скрывается: селектор типов, CTA чека, зона контактов. */
@@ -2751,6 +2767,14 @@ export function HaccBooking() {
   const pkgZoneRef = useRef<HTMLFieldSetElement>(null);
   const guestsZoneRef = useRef<HTMLDivElement>(null);
   const addonsZoneRef = useRef<HTMLFieldSetElement>(null);
+  /* c114 (зад. 3): зона раскрытой формы — пока она (или любой блок
+     интерактива) стоит в нижней полосе вьюпорта, плавающие кнопки
+     (BackToTop / телефон-FAB) не должны перекрывать поля формы,
+     кнопку «Далее — к отправке» и карточку сметы: HaccBooking
+     рассылает zonesUnder событием catering:fab-suppress (эффект ниже).
+     Отдельный ref (а не ctaZone): форма живёт в ЛЕВОЙ колонке, над
+     панелью чека на мобиле. */
+  const formZoneRef = useRef<HTMLDivElement>(null);
 
   /* ══ W3 / K6-CRITICAL (задача 1c–1d): цели Метрики ═════════════════════
      Единственный монтаж document-level listener'а кликов по контактам
@@ -2804,9 +2828,10 @@ export function HaccBooking() {
   }, [pkgParam, pkgIdx, setPkgParam]);
   /** Выбранный пакет — шапка чека, сводка формы, лид. */
   const pkg = current.packages[pkgIdx] ?? current.packages[0];
-  /* c89: flat-тип (доставка закусок, calcPerGuest) — пакеты НЕ выбираются:
-     подпись для шапки чека/меты успеха печатает «от 1 200 ₽/чел» вместо
-     имени пакета (calcTotal для flat возвращает pkgName: undefined). */
+  /* c89: flat-тип (calcPerGuest) — пакеты НЕ выбираются: подпись для шапки
+     чека/меты успеха печатает «от N ₽/чел» вместо имени пакета
+     (calcTotal для flat возвращает pkgName: undefined).
+     c114/зад. 4: snack-box больше не flat — печатается имя пакета. */
   const flatType = typeId !== UNDECIDED_ID && current.calcPerGuest != null;
   const pkgHeadLabel = flatType
     ? `от ${formatRUB(current.calcPerGuest as number)}/чел`
@@ -2973,12 +2998,16 @@ export function HaccBooking() {
      Fix5 (critic MAJOR-2, cycle 65): root — сама НИЖНЯЯ ПОЛОСА (~17%
      вьюпорта) — бар виден ВСЮду, кроме момента, когда интерактив
      реально входит в полосу под баром. */
+  /* c114 (зад. 3): зона формы наблюдается ТОЛЬКО в раскрытом состоянии
+     (stage !== "calc") — схлопнутый 0fr-грид имеет нулевую высоту и мог
+     бы ложноположительно «накрывать» нижнюю полосу. */
   useEffect(() => {
     const els = [
       typesZoneRef.current,
       pkgZoneRef.current,
       guestsZoneRef.current,
       addonsZoneRef.current,
+      stage !== "calc" ? formZoneRef.current : null,
       ctaZoneRef.current,
       contactsZoneRef.current,
     ].filter((el): el is NonNullable<(typeof els)[number]> => !!el);
@@ -3016,7 +3045,38 @@ export function HaccBooking() {
       io.disconnect();
       window.clearTimeout(hideTimer);
     };
-  }, [isUndecided]);
+  }, [isUndecided, stage]);
+
+  /* c114 (зад. 3): подавление плавающих кнопок в зоне калькулятора.
+     zonesUnder (нижняя полоса вьюпорта накрыта блоками интерактива —
+     включая раскрытую форму) рассылается событием catering:fab-suppress:
+     его слушает BackToTop (back-to-top.tsx) и контакт-виджет — стрелка
+     «наверх» больше не перекрывает кнопку «Далее — к отправке», поля
+     формы и липкий бар сметы. Дублировать state в body-атрибут не
+     нужно: у :has(.hb-bar[data-visible]) своя задача (лифт НАД баром),
+     а здесь — полное скрытие в зоне интерактива. */
+  /* deps [settled]: панель — motion.div с key={settled ? "panel-a" :
+     "panel-s"} — при флипе settled элемент ПЕРЕСОЗДАЁТСЯ, IO обязан
+     переподписаться на живой узел (иначе наблюдает отключённый от DOM). */
+  useEffect(() => {
+    const el = document.getElementById("hb-check");
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => setPanelUnder(entries[0]?.isIntersecting === true),
+      /* та же нижняя полоса ~17% вьюпорта, что у зон бара */
+      { rootMargin: "-83% 0px 0px 0px", threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [settled]);
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("catering:fab-suppress", {
+        detail: zonesUnder || panelUnder,
+      }),
+    );
+  }, [zonesUnder, panelUnder]);
 
   /* c84-B (задача 3): IO на блок «Пакет меню» — гейт микроподсказки
      «Пакет и гости — ниже ↓» (гаснет, когда блок в кадре). Пересборка по
@@ -3043,18 +3103,33 @@ export function HaccBooking() {
     return () => io.disconnect();
   }, [isUndecided]);
 
-  /** Плавный скролл к зоне формы через window.__lenis (грабля §2/§33:
-      bare smooth-scroll Lenis перебивает; if/else — не ?? с side-effect).
-      c89: зона формы — #lead-form (id="contact" переехал на зону контактов
-      компании, см. ContactsZone). */
-  const scrollToZone = useCallback(() => {
-    const el = document.getElementById("lead-form");
+  /** Плавный скролл к началу формы (шаг 1 «Контакты») через window.__lenis
+      (грабля §2/§33: bare smooth-scroll Lenis перебивает; if/else — не ??
+      с side-effect). c114 (аудит, зад. 2 — Android): цель — не зона
+      #lead-form, а сам блок заголовка «Шаг 1 из 2 — Контакты»
+      (#calculator-form-start, scroll-margin-top: 96px в CSS). Нативный
+      фолбэк — ТОЛЬКО window.scrollTo с ручным оффсетом хедера: на Android
+      Chrome element.scrollIntoView({behavior:'smooth'}) отменяется
+      браузером при визуал-вьюпорт-ресайзах и layout-сдвигах посреди
+      полёта (см. докблок openForm). */
+  const scrollToFormStart = useCallback(() => {
+    const el =
+      document.getElementById("calculator-form-start") ??
+      document.getElementById("lead-form");
     if (!el) return;
     const lenis = (window as unknown as { __lenis?: { scrollTo?: (t: Element, o?: object) => void } }).__lenis;
     if (typeof lenis?.scrollTo === "function") {
-      lenis.scrollTo(el, { offset: -16 });
+      /* c84-F3: offset: 0 — Lenis сам читает scroll-margin-top цели
+         (ручной минус поверх CSS-маржина считал бы отступ дважды). */
+      lenis.scrollTo(el, { offset: 0 });
     } else {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      /* Точная координата (спека зад. 2): sticky-хедер + запас.
+         Math.max(0, …) — не проскакиваем верх страницы. */
+      const headerOffset = 88;
+      const rect = el.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const targetY = rect.top + scrollTop - headerOffset;
+      window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
     }
   }, []);
 
@@ -3068,32 +3143,47 @@ export function HaccBooking() {
      принудительным раскрытием формы; форма открывается ТОЛЬКО CTA
      «Оставить заявку» (панель/sticky-бар, openForm ниже). */
 
-  /** Хендофф: чек сжимается, форма раскрывается, фокус — в первое поле.
+  /** Хендофф: чек сжимается, форма раскрывается, скролл — к началу формы.
       Fix5 V7: CTA ВСЕГДА ведёт к форме (владелец: «не перекидывает на форму,
       на мобиле можно не заметить, что форма появилась сверху») и однократная
       подсветка зоны (hb-zone-flash в CSS по data-open).
-      c98-B (тройной рывок скролла): было ТРИ команды (0/300/700мс) — каждая
-      lenis.scrollTo ПЕРЕЗАПУСКАЛА анимацию с текущей позиции (сброс скорости
-      посреди полёта) → видимые ступени. Теперь ОДИН скролл через 600мс —
-      ПОСЛЕ завершения grid-раскрытия зоны (0.5s): верх #lead-form при
-      раскрытии не смещается (зона растёт вниз), лэйаут к команде устоялся.
-      Гвард «юзер уехал сам» (паттерн c84, |Δ|<140): прокрутился за окно
-      600мс дальше 140px — не тащим обратно к форме. */
+      c114 (зад. 2 — Android): прежде скролл ждал 600мс «устаканивания»
+      grid-раскрытия, а .focus() на первом поле мог стрелять СИНХРОННО
+      со стартом скролла (delay 0 при не-settled) — на Android Chrome
+      мгновенный фокус поднимает виртуальную клавиатуру, visualViewport
+      ресайзится и браузер ГАСИТ smooth-скролл (переброс «срывается»).
+      Теперь: (1) скролл стартует после коммита React — rAF + 60мс таймер
+      (верх зоны формы при раскрытии НЕ смещается — грид растит контент
+      вниз, ждать полусекунды не нужно); (2) фокус (preventScroll) —
+      ТОЛЬКО на десктопе (fine pointer) через 500мс, когда полёт уже
+      идёт; на таче клавиатура не выскакивает — пользователь сам тапает
+      поле. Гварда |Δ| нет — на горизонте 80мс он ловил только дрейф
+      якорного скролла/фото (см. комментарий в теле openForm). */
   const openForm = useCallback(() => {
     setStage((s) => {
       if (s !== "calc") return s;
       return "form";
     });
-    const startY = window.scrollY;
-    window.setTimeout(() => {
-      if (Math.abs(window.scrollY - startY) > 140) return; // юзер уехал сам
-      scrollToZone();
-    }, 600);
-    const delay = settled ? 780 : 0;
-    window.setTimeout(() => {
-      document.getElementById("hb-name")?.focus({ preventScroll: true });
-    }, delay);
-  }, [scrollToZone, settled]);
+    /* Спека зад. 2 — без гарда |Δ|: на горизонте ~80мс (rAF+60мс) юзер
+       физически не успевает «уехать сам», зато гвард ложно срабатывал на
+       дрейф якорного скролла после reload (#calculator ещё доезжал) и на
+       оседание ленивых фото — CTA молча не скроллил (замер: -699px мимо
+       цели). Каждая новая window.scrollTo/lenis.scrollTo отменяет текущий
+       smooth-полёт браузера — конкурентный якорный скролл перекрывается. */
+    requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        scrollToFormStart();
+      }, 60);
+    });
+    const finePointer =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (finePointer) {
+      window.setTimeout(() => {
+        document.getElementById("hb-name")?.focus({ preventScroll: true });
+      }, 500);
+    }
+  }, [scrollToFormStart]);
 
   /** c84-B (задача 2): тап по блоку суммы мобильного sticky-бара — к
       смета-чеку (разбор итога). Паттерн §33: window.__lenis, фоллбек —
@@ -3353,7 +3443,8 @@ export function HaccBooking() {
 
   /** Fix5 V6: мета квитанции успеха — одна строка (у undecided — без цены).
    *  c84-B: пакет — в мету (владелец видит выбор лида без раскрытия).
-   *  c89: у flat-типа (доставка закусок) вместо пакета — «от 1 200 ₽/чел». */
+   *  c89: у flat-типа вместо пакета — «от N ₽/чел» (c114: snack-box
+   *  не flat — в мету едет имя выбранного пакета). */
   const successMeta = isUndecided
     ? `Формат обсудим · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""}`
     : `${current.label} · ${pkgHeadLabel} · ${guestsClamped} ${guestsLabel(guestsClamped)}${humanDate ? ` · ${humanDate}` : ""} · ${
@@ -3388,7 +3479,7 @@ export function HaccBooking() {
           {/* c85 (понятность): глава 05 — единая нумерация главных глав
               страницы (см. .ea-chapter в globals.css). Decorative. */}
           <span className="ea-chapter" aria-hidden="true">Глава 05</span>
-          <TiltedAccent text="смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
+          <TiltedAccent text="Смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
           <h2 id="hbooking-heading" className="ea-section-h2">
             {/* c93 (заказчик): «Соберите банкет» → «Соберите меню» —
                калькулятор собирает МЕНЮ любого формата, не только банкет. */}
@@ -3433,9 +3524,9 @@ export function HaccBooking() {
 
             {/* 1b · Пакет меню (c84-B, задача 1) — сегмент-контрол МЕЖДУ
                 «Тип события» и «Гости» в идиоме карточек-типов: имя пакета,
-                цена/чел и короткое описание из pricing.ts. c89: у flat-типа
-                (доставка закусок) — статичная карточка-состав, легенда
-                блока — «Состав». У undecided блока нет — формат подбираем
+                цена/чел и короткое описание из pricing.ts. c89: у flat-типа —
+                статичная карточка-состав, легенда блока — «Состав»
+                (c114/зад. 4: snack-box не flat — у него «Пакет меню»). У undecided блока нет — формат подбираем
                 по звонку. D3: fieldset — зона бара. */}
             {!isUndecided && (
               <fieldset className="hb-block" ref={pkgZoneRef} data-hb-hide="pkg">
@@ -3545,7 +3636,9 @@ export function HaccBooking() {
                       className="hb-step-btn"
                       aria-label="Меньше на одного гостя"
                     >
-                      <Minus className="size-4" aria-hidden="true" /> 1
+                      <Minus className="size-4" aria-hidden="true" />{" "}
+                      {/* c114 (зад. 5): техно-глиф «1» — декор размера шага */}
+                      <span aria-hidden="true" className="select-none">1</span>
                     </button>
                     <input
                       type="text"
@@ -3586,7 +3679,7 @@ export function HaccBooking() {
                       className="hb-step-btn"
                       aria-label="Больше на одного гостя"
                     >
-                      1 <Plus className="size-4" aria-hidden="true" />
+                      <span aria-hidden="true" className="select-none">1</span> <Plus className="size-4" aria-hidden="true" />
                     </button>
                   </span>
                 </div>
@@ -3609,10 +3702,22 @@ export function HaccBooking() {
               ) : flatType ? (
                 <p className="hb-minnote" role="status">
                   Минимальный заказ доставки закусок —{" "}
-                  {formatRUB(MIN_ORDER[current.id] ?? 0)}. Например, 15 гостей ×{" "}
-                  {formatRUB(current.calcPerGuest ?? current.perGuest)} = 18 000 ₽.
-                  Заказ принимается за 48 часов.
+                  {formatRUB(MIN_ORDER[current.id] ?? 0)}. Заказ принимается за 48
+                  часов.
                 </p>
+              ) : current.id === "snack-box" ? (
+                /* c114 (зад. 4): snack-box вернулся к каталог-пакетам
+                   (calcPerGuest снят) — плашка ниже минимума честно
+                   объясняет сумму и приглашает к индивидуальному расчёту
+                   камерных заказов (согласовано с FAQ «от одного гостя»
+                   и каталогом «Минимальный заказ 17 400 ₽»). */
+                result!.belowMinBy > 0 && (
+                  <p className="hb-minnote" role="status">
+                    Минимальный заказ доставки — {formatRUB(result!.minOrder)},
+                    принимается за 48 часов. Гостей меньше — посчитаем камерный
+                    заказ индивидуально.
+                  </p>
+                )
               ) : (
                 result!.belowMinBy > 0 && (
                   <p className="hb-minnote" role="status">
@@ -3721,7 +3826,12 @@ export function HaccBooking() {
                    зону контактов компании, см. ContactsZone). Живёт в DOM
                    всегда; раскрытие — grid-rows 0fr→1fr; closed → inert
                    (фокус не проваливается). */}
-            <div id="lead-form" className="hb-zone" data-open={stage !== "calc"}>
+            <div
+              id="lead-form"
+              ref={formZoneRef}
+              className="hb-zone"
+              data-open={stage !== "calc"}
+            >
               <div className="hb-zone__inner">
                 <div className="hb-zone__body" inert={stage === "calc"}>
                   {stage === "success" ? (
@@ -3827,7 +3937,8 @@ export function HaccBooking() {
               <motion.div className="hb-paper" variants={HB_PAPER_VARIANTS} data-stage={stage}>
                 {/* Шапка чека (Fix5 V6: у undecided — без формата; c84-B:
                     пакет — в шапку: «Банкет · Стандарт · 30 гостей»;
-                    c89: flat-тип — «Доставка закусок · от 1 200 ₽/чел»). */}
+                    c89: flat-тип — «Доставка закусок · от N ₽/чел»; c114 — snack-box
+                    печатает выбранный пакет, как каталог). */}
                 <div className="hb-paper__head">
                   <span className="hb-paper__brand">Смета-чек</span>
                   <span className="hb-paper__type">

@@ -367,9 +367,12 @@ export function TottParallaxBand() {
               aria-hidden; каждое слово — срез прогресса прохождения секции
               (scrub-подсветка 0.25→1, stagger). TottReveal fade-right входа
               НЕ тронут (композитится по opacity). Reduce/pre-mount — слова
-              со статичной полной opacity. */}
+              со статичной полной opacity.
+              c114 (зад. 5): select-none на видимом слое — дубль цитаты
+              («Ритуал, в котором…») больше не склеивается при копировании
+              страницы: единственная копируемая версия — sr-only-твин. */}
           <span className="sr-only">{BAND_LEDE}</span>
-          <span aria-hidden="true">
+          <span aria-hidden="true" className="select-none">
             {BAND_LEDE_WORDS.map((word, i) => (
               <BandWord
                 key={i}

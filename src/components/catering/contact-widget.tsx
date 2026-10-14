@@ -10,12 +10,24 @@ import "./contact-widget.css";
 export function ContactWidget({ hidden = false }: { hidden?: boolean }) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
+  /* c114 (зад. 3): подавление в зоне калькулятора/формы (событие шлёт
+     HaccBooking — нижняя полоса вьюпорта накрыта интерактивом): на
+     планшетной полосе 768–1023, где виджет ещё показывается, он не
+     должен перекрывать поля формы и карточку сметы. */
+  const [suppressed, setSuppressed] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
   const reduced = useReducedMotion();
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { if (hidden) setOpen(false); }, [hidden]);
+  useEffect(() => {
+    const onSuppress = (e: Event) =>
+      setSuppressed((e as CustomEvent<boolean>).detail === true);
+    window.addEventListener("catering:fab-suppress", onSuppress);
+    return () =>
+      window.removeEventListener("catering:fab-suppress", onSuppress);
+  }, []);
   useEffect(() => {
     if (!open) return;
     root.current?.querySelector<HTMLAnchorElement>("a")?.focus();
@@ -36,7 +48,7 @@ export function ContactWidget({ hidden = false }: { hidden?: boolean }) {
     };
   }, [open]);
 
-  if (!mounted || hidden) return null;
+  if (!mounted || hidden || suppressed) return null;
   const channels = [
     { name: "Позвонить", href: CONTACTS.phoneHref, icon: <Phone size={20} /> },
     { name: "Telegram", href: CONTACTS.telegramHref, icon: <Send size={20} /> },

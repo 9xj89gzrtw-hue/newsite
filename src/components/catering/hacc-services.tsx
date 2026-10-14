@@ -242,10 +242,10 @@ const SERVICES: HaccService[] = [
     title: panelTitle("gastro-boksy"),
     hook: "Банкет, который помещается в коробке, — каждому гостю лично.",
     /* c89/W1-код-критик (MAJOR): цена панели = цена КАЛЬКУЛЯТОРА формата
-       (snack-box.calcPerGuest = 1 200 ₽, menu.json) — CTA плитки пресетит
-       калькулятор, расхождение цен на одном экране недопустимо (K6-CRITICAL).
-       Каталожные пакеты à la carte (от 660 ₽) остаются в меню-каталоге
-       (hacc-menu). */
+       — CTA плитки пресетит калькулятор, расхождение цен на одном экране
+       недопустимо (K6-CRITICAL). c114/зад. 4: snack-box без flat-цены —
+       панель, каталог и калькулятор печатают ОДНИ пакеты menu.json
+       (от 660 ₽/чел, «Гастро-боксы» = servicePanels.gastro-boksy). */
     price: panelPrice("gastro-boksy"),
     priceLabel: "за гостя",
     tag: "Доставка",
@@ -960,7 +960,7 @@ export function HaccServices() {
             <p className="hacc__lede">
               {/* c89 (Task 3-b): кофе-брейк покинул главу — диапазон «от … до …»
                   теперь между гастро-боксами (самый доступный формат) и свадьбой. */}
-              От гастро-боксов на двадцать персон до свадьбы на пятьсот гостей:
+              От гастро-боксов для камерных встреч до свадьбы на пятьсот гостей:
               формат определяет меню, команду и цену за гостя.
             </p>
           </div>
@@ -971,7 +971,7 @@ export function HaccServices() {
           <div className="hacc__meta">
             <span className="hacc__hint" aria-hidden="true">
               <MousePointer2 aria-hidden="true" />
-              Троньте корешок — формат развернётся
+              Выберите формат — он развернётся
             </span>
           </div>
         </motion.div>

@@ -16,4 +16,11 @@ body:has(.hb-bar[data-visible="true"]) .contact-widget { bottom:calc(100px + var
 body:has(.hb-bar[data-visible="true"]) .contact-widget__panel { max-height:calc(100svh - 184px - var(--hbooking-cookie-h, 0px) - env(safe-area-inset-bottom, 0px)); }
 @keyframes contact-pulse { 0% { transform:scale(.9); opacity:.7; } 100% { transform:scale(1.25); opacity:0; } }
 @media(min-width:1024px) { .contact-widget { display:none; } }
+/* c114 (аудит, зад. 3): на мобильных (<768) плавающая кнопка телефона
+   избыточна и вредна — быстрый звонок уже живёт иконкой в sticky-шапке,
+   в бургере есть плитки Telegram/WhatsApp/MAX, а FAB перекрывал правый
+   верхний угол красной карточки «ПРЕДВАРИТЕЛЬНАЯ СМЕТА» и вращающийся
+   штамп. Показ — только планшетная полоса 768–1023 (десктоп скрыт
+   правилом выше). */
+@media(max-width:767.98px) { .contact-widget { display:none; } }
 @media(prefers-reduced-motion:reduce) { .contact-widget__toggle::before { animation:none; } }

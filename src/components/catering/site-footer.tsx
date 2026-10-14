@@ -75,10 +75,12 @@ const columnVariants = {
 /** Shared premium ease (same curve as founder block / EA sections). */
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** One pass of the cities list for the marquee. */
+/** One pass of the cities list for the marquee.
+ *  c114 (зад. 5): оба трека aria-hidden (бесшовный дубль для -50%-цикла
+ *  не читается скринридерами и не попадает в копирование — select-none). */
 function CitiesTrack({ trackId = '' }: { trackId?: string }) {
   return (
-    <div className="flex items-center gap-6 px-3" aria-hidden="true">
+    <div className="flex items-center gap-6 px-3 select-none" aria-hidden="true">
       {SOPRANOS_CITIES.map((city, i) => (
         <span
           key={`${trackId}-${city}-${i}`}
@@ -580,7 +582,7 @@ export function SiteFooter() {
                   className="size-4 text-gold/70 transition-transform group-hover:rotate-12"
                   aria-hidden="true"
                 />
-                <span className="text-cream/60">Макс:</span> {CONTACTS.maxPhone}
+                <span className="text-cream/60">MAX:</span> {CONTACTS.maxPhone}
               </a>
             </div>
 

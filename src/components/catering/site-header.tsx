@@ -969,7 +969,7 @@ export function SiteHeader() {
                   aria-label="Написать в MAX — мессенджер (открывается в новой вкладке)"
                 >
                   <MaxGlyph className="size-5 shrink-0" aria-hidden="true" />
-                  Макс
+                  MAX
                 </a>
               </div>
               {/* Микро-доверие рядом с кнопками связи: золотая точка —

@@ -249,7 +249,7 @@ function HaccBookingShell() {
             c85: глава 05 — зеркалит живой виджет (единая нумерация). */}
         <div className="hb-head">
           <span className="ea-chapter" aria-hidden="true">Глава 05</span>
-          <TiltedAccent text="смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
+          <TiltedAccent text="Смета-чек" size="clamp(1.1rem, 1.8vw, 1.55rem)" />
           <h2 id="hbooking-heading" className="ea-section-h2">
             {/* c93 (заказчик): «Соберите банкет» → «Соберите меню» —
                зеркало живого виджета (hacc-booking.tsx), 1:1. */}
@@ -454,7 +454,7 @@ export default function Home() {
               Глава 07 → 06 (c89). */}
       <EaFaqAccordion />
 
-      {/* 13. CepInstagramGrid — "СЛЕДИТЕ ЗА НАМИ" 3×3 grid with Reel play icons.
+      {/* 13. CepInstagramGrid — «Следите за нами» (CSS-капс) 3×3 grid with Reel play icons.
               Follow-along social proof. Глава 08 → 07 (c89, 3-f). */}
       <CepInstagramGrid />
 

@@ -144,9 +144,11 @@ export function ScrambleText({
     <Tag className={cn(className)}>
       {/* 81-F3 (A2): sr-only-твин — доступный текст живёт в содержимом
           (aria-label на generic/paragraph запрещён); визуальный
-          скрамбл-узел — aria-hidden, как раньше. */}
+          скрамбл-узел — aria-hidden, как раньше. c114 (зад. 5):
+          select-none — копирование страницы не склеивает надзаголовок
+          дважды (sr-only + видимые символы). */}
       <span className="sr-only">{children}</span>
-      <span ref={textRef} aria-hidden="true">
+      <span ref={textRef} aria-hidden="true" className="select-none">
         {children}
       </span>
     </Tag>

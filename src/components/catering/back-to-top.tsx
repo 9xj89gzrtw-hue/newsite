@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 
@@ -11,9 +11,17 @@ import { ArrowUp } from "lucide-react";
  * visually shows how far down the page the user has scrolled.
  *
  * Inspired by Ridgewells / Salt Block back-to-top patterns (REF §818-826).
+ *
+ * c114 (аудит, зад. 3): подавление в зоне калькулятора/формы заявки —
+ * HaccBooking рассылает zonesUnder событием «catering:fab-suppress»
+ * (нижняя полоса вьюпорта накрыта блоками интерактива: поля формы,
+ * «Далее — к отправке», карточка сметы, липкий бар). Пока suppressed,
+ * кнопка уезжает вниз (та же пружина, что и при visible=false) и не
+ * ловит указатель — больше не перекрывает конверсионные кнопки.
  */
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
+  const [suppressed, setSuppressed] = useState(false);
   const { scrollYProgress } = useScroll();
   const pathLength = useSpring(scrollYProgress, {
     stiffness: 120,
@@ -29,13 +37,23 @@ export function BackToTop() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToTop = () => {
+  useEffect(() => {
+    const onSuppress = (e: Event) =>
+      setSuppressed((e as CustomEvent<boolean>).detail === true);
+    window.addEventListener("catering:fab-suppress", onSuppress);
+    return () =>
+      window.removeEventListener("catering:fab-suppress", onSuppress);
+  }, []);
+
+  const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
 
   // Ring math: r=22 → circumference = 2π × 22 ≈ 138.23
   const RADIUS = 22;
   const CIRC = 2 * Math.PI * RADIUS;
+
+  const shown = visible && !suppressed;
 
   return (
     <motion.button
@@ -44,7 +62,7 @@ export function BackToTop() {
       data-back-to-top=""
       initial={false}
       animate={
-        visible
+        shown
           ? { y: 0, opacity: 1, scale: 1 }
           : { y: 80, opacity: 0, scale: 0.6 }
       }
@@ -57,7 +75,7 @@ export function BackToTop() {
          кнопка встаёт правее рейла (lg = ≥1024px, ровно где рейл
          появляется; ниже 1024px рейл display:none — left-6 остаётся). */
       className="group fixed bottom-6 left-6 z-50 flex size-14 items-center justify-center rounded-full bg-gradient-to-r from-gold to-terracotta text-white shadow-lg shadow-gold/30 hover:scale-110 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-cream lg:left-[92px]"
-      style={{ pointerEvents: visible ? "auto" : "none" }}
+      style={{ pointerEvents: shown ? "auto" : "none" }}
     >
       {/* Progress ring (gold) */}
       <svg

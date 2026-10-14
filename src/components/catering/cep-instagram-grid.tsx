@@ -13,7 +13,7 @@ import { ImageTrail } from "@/components/motion/image-trail";
 /**
  * CepInstagramGrid — Creative Edge Parties §6.12 "FOLLOW ALONG" grid.
  *
- * Cream section with a header row ("СЛЕДИТЕ ЗА НАМИ" + @nilov_catering handle
+ * Cream section with a header row ("Следите за нами" (CSS-caps .cep-section-h2) + @nilov_catering handle
  * link) and a 3×3 grid of 9 square Instagram thumbnails. 3 of the 9 (indices
  * 2, 5, 8 — the right column of each row) get a permanent but subtle Play
  * icon overlay to mimic CEP's Reel-play treatment on their actual Instagram
@@ -54,7 +54,7 @@ import { ImageTrail } from "@/components/motion/image-trail";
 const IG_TILES = [
   {
     src: "/media/ig/ig-real-01.jpg",
-    alt: "Мини-канапе с кремом, ягодами и фруктовым пюре на хрустящей основе, выложены в ряд на чёрной зеркальной поверхности",
+    alt: "Мини-канапе с кремом, ягодами и фруктовым пюре на хрустящей основе, выложены ровными рядами на фуршетном блюде",
   },
   {
     src: "/media/ig/ig-real-02.jpg",
@@ -70,7 +70,7 @@ const IG_TILES = [
   },
   {
     src: "/media/ig/ig-real-05.jpg",
-    alt: "Ассорти фингер-фуда для фуршета: закуски с лососем, ветчиной и морепродуктами, выложенные рядами на чёрном фоне",
+    alt: "Ассорти фингер-фуда для фуршета: закуски с лососем, ветчиной и морепродуктами, выложенные на сервировочном плато",
   },
   {
     src: "/media/ig/ig-real-06.jpg",
@@ -82,7 +82,7 @@ const IG_TILES = [
   },
   {
     src: "/media/ig/ig-real-08.jpg",
-    alt: "Три порционных стакана с салатами из морепродуктов, украшенными зеленью и дольками лимона, на зеркальной поверхности",
+    alt: "Три порционных стакана с салатами из морепродуктов, украшенными зеленью и дольками лимона, на зеркальной поверхности фуршетного стола",
   },
   {
     src: "/media/ig/ig-real-09.jpg",
@@ -148,7 +148,7 @@ export function CepInstagramGrid() {
         </div>
         {/*
           Cycle 34 WOW graft — sondaven.com split-line word stagger. The H2
-          "СЛЕДИТЕ ЗА НАМИ" reveals word-by-word (mask + translateY 110%→0%
+          "Следите за нами" (визуальный капс — CSS) reveals word-by-word (mask + translateY 110%→0%
           per word, 60ms stagger) instead of fading in as a block. Plain text —
           no italic-fragment design device here, so SplitTextReveal is safe.
           The cep-section-h2 + text-black styling is preserved via className.
@@ -158,7 +158,7 @@ export function CepInstagramGrid() {
           mode="words"
           className="cep-section-h2 text-black"
         >
-          СЛЕДИТЕ ЗА НАМИ
+          Следите за нами
         </SplitTextReveal>
         <a
           href={IG_PROFILE_URL}
