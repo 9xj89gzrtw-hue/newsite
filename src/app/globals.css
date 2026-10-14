@@ -64,7 +64,7 @@
   --color-mcu-sage: var(--mcu-sage);
   --color-cc-cream: var(--cc-cream);
 
-  /* Barlow Semi Condensed — concept-catering ultra-bold condensed all-caps */
+  /* Oswald (c115: был Barlow Semi Condensed — без кириллицы) — condensed all-caps */
   --font-barlow: var(--font-barlow);
 
   /* ===== Global Gourmet (ggcatering.com) palette — Cycle 22 ===== */
@@ -76,7 +76,7 @@
   --color-gg-charcoal-dark: var(--gg-charcoal-dark);
   --color-gg-ash: var(--gg-ash);
   --color-gg-cream: var(--gg-cream);
-  /* Poppins — ggcatering display sans (italic emphasis variant supported) */
+  /* Poppins — ggcatering display sans (алиас на Oswald, c115) */
   --font-poppins: var(--font-poppins);
 
   --color-border-line: var(--border-line);
@@ -134,32 +134,30 @@
 }
 
 /* ============================================================================
-   F2 FONT CONSOLIDATION (cycle-71, K1-CRITICAL): 12 → 5 семейств.
+   F2 FONT CONSOLIDATION (cycle-71): 12 → 5 семейств.
 
-   Загрузка next/font осталась только у Prata (--font-prata), Playfair
-   Display (--font-serif), Barlow Semi Condensed (--font-barlow), Karla
-   (--font-sans) и Marck Script (--font-marck) — см. layout.tsx. Семь
-   семейств (Oswald, Montserrat, Lato, Great Vibes, Nothing You Could Do,
-   Neutra2Display, Neutra2Text) больше НЕ загружаются, но их переменные
-   остались в коде десятков компонентов. Чтобы не править компоненты,
-   переменные объявлены здесь АЛИАСАМИ на <html> (= :root) и перенаправлены
-   на живые семейства пятёрки:
+   c115 (зад. 4): Barlow Semi Condensed и Karla (обе БЕЗ кириллицы —
+   весь русский текст их слотов падал в системный Arial) заменены на
+   Oswald (--font-barlow, condensed all-caps — исходник слота
+   --font-display до F2) и Manrope (--font-sans, body-гротеск).
+   Загрузка next/font: Prata, Playfair Display, Oswald, Manrope,
+   Marck Script — см. layout.tsx. Прежние переменные остаются живыми
+   через АЛИАСЫ на <html> (= :root) — без правок в десятках компонентов:
 
-     --font-display        (был Oswald)              → Barlow Semi Condensed
-     --font-poppins        (был Montserrat)          → Barlow Semi Condensed
-     --font-lato           (был Lato)                → Karla
-     --font-script         (был Great Vibes)         → Marck Script
-     --font-nothing        (был Nothing You Could Do) → Marck Script
-     --font-neutra-display (был Neutra2Display-Light) → Playfair Display
-     --font-neutra-text    (был Neutra2Text_Book)     → Karla
+     --font-display        (ex-Oswald)       → --font-barlow = Oswald
+     --font-poppins        (ex-Montserrat)   → --font-barlow = Oswald
+     --font-lato           (ex-Lato)         → --font-sans = Manrope
+     --font-script         (ex-Great Vibes)  → Marck Script
+     --font-nothing        (ex-NYCD)         → Marck Script
+     --font-neutra-display (ex-Neutra2)      → Playfair Display
+     --font-neutra-text    (ex-Neutra2Text)  → --font-sans = Manrope
 
   next/font ставит живые переменные классом на <html> (Cycle 49 font-fix);
    алиасы ниже каскадируют всем потребителям var(--font-*) и цепочкам вида
    var(--ea-font-body) → var(--font-poppins) → … без единой правки в
-   компонентах. Кириллица: Barlow/Karla не содержат кириллических сабсетов —
-   русские глифы в ex-Montserrat/Oswald-слотах рендерятся метрик-
-   фолбэком в системный sans (как это УЖЕ происходит сегодня для всего
-   Karla-текста); Playfair/Marck несут полную кириллицу сами.
+   компонентах. Кириллица (c115): Oswald/Manrope/Playfair/Marck/Prata
+   несут полные кириллические сабсеты — системный фолбэк больше не
+   участвует ни в одном слоте (прежде: весь русский Barlow/Karla-текст).
    ============================================================================ */
 
 html {
@@ -566,7 +564,7 @@ html.lenis body {
 
 /* Sopranos body — Karla humanist sans */
 .body-karla {
-  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
   line-height: 1.65;
 }
 
@@ -1285,7 +1283,7 @@ header[data-scrolled="true"] [data-mega-panel] {
 
 /* Barlow Semi Condensed font-family helper (concept-catering all-caps). */
 .font-barlow {
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-family: var(--font-barlow), "Oswald", system-ui, sans-serif;
 }
 
 /* === SALT BLOCK EDITORIAL LAYER (Cycle 26) ===
@@ -1347,7 +1345,7 @@ header[data-scrolled="true"] [data-mega-panel] {
 /* Salt Block eyebrow — 11px Barlow Semi Condensed, bordeaux, ls 0.28em.
    Sits above italic Playfair display headlines in editorial cells. */
 .sb-eyebrow {
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-family: var(--font-barlow), "Oswald", system-ui, sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.28em;
@@ -1395,7 +1393,7 @@ header[data-scrolled="true"] [data-mega-panel] {
 
 /* Small-caps subtitle — Karla 500 16px, opacity 0.7, ls 0.1em uppercase. */
 .sb-chef-subtitle {
-  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
   font-size: 16px;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -1408,7 +1406,7 @@ header[data-scrolled="true"] [data-mega-panel] {
 
 /* Chef bio body — Karla 17px, lh 1.7, ink. */
 .sb-chef-body p {
-  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
   font-size: 17px;
   line-height: 1.7;
   color: var(--ink);
@@ -1434,7 +1432,7 @@ header[data-scrolled="true"] [data-mega-panel] {
 
 /* Attribution under signature — Karla italic 14px, ink 0.6. */
 .sb-signature-attribution {
-  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
   font-style: italic;
   font-size: 14px;
   line-height: 1.4;
@@ -1453,7 +1451,7 @@ header[data-scrolled="true"] [data-mega-panel] {
   list-style: none;
   padding: 0;
   margin: 0;
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-family: var(--font-barlow), "Oswald", system-ui, sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.2em;
@@ -2544,7 +2542,7 @@ header[data-scrolled="true"] [data-mega-panel] {
    uses a tiny 11px Barlow label as a section pre-header. data-tone="light"
    flips to honey for dark backgrounds. */
 .sb-eyebrow {
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-family: var(--font-barlow), "Oswald", system-ui, sans-serif;
   font-weight: 700;
   font-size: 11px;
   line-height: 1.4;
@@ -2593,7 +2591,7 @@ header[data-scrolled="true"] [data-mega-panel] {
   border-bottom: 1px solid color-mix(in oklch, var(--ink) 10%, transparent);
 }
 .sb-tasting-row > .sb-tasting-row__num {
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui, sans-serif;
+  font-family: var(--font-barlow), "Oswald", system-ui, sans-serif;
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 0.2em;
@@ -2610,7 +2608,7 @@ header[data-scrolled="true"] [data-mega-panel] {
 .sb-tasting-row > .sb-tasting-row__dish .sb-tasting-row__ingredients {
   display: block;
   margin-top: 0.35rem;
-  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
   font-style: italic;
   font-size: 16px;
   font-weight: 400;
@@ -4034,7 +4032,7 @@ header[data-scrolled="true"] [data-mega-panel] {
   border-radius: 2px;
 }
 .gamma-accordion__text {
-  font-family: var(--font-sans), "Karla", system-ui, sans-serif;
+  font-family: var(--font-sans), "Manrope", system-ui, sans-serif;
   font-size: clamp(1rem, 1.1vw, 1.125rem);
   line-height: 1.7;
   color: color-mix(in oklch, var(--ink) 82%, transparent);

@@ -840,7 +840,9 @@ export function SiteFooter() {
 
               {/* контент карточки — над подложкой */}
               <div className="relative flex min-h-[220px] flex-col justify-between gap-6 p-6 md:p-8">
-                <div className="max-w-[62%]">
+                {/* c115 (зад. 6): на 320–430px правая часть карточки пуста,
+                    а текст адреса зажат в 62% — полный рост на мобиле. */}
+                <div className="max-w-full sm:max-w-[62%]">
                   <p className="flex items-start gap-2.5 font-display text-base leading-snug text-cream md:text-lg">
                     <MapPin aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-gold" />
                     <span>
@@ -959,7 +961,12 @@ export function SiteFooter() {
             {/* Cycle 39 fix: legal document links — /offer was an orphan page,
                 /terms required by the cookie banner. */}
             <span className="hidden md:inline text-cream/30" aria-hidden="true">·</span>
-            <nav aria-label="Юридические документы" className="flex items-center gap-4">
+            {/* c115 (зад. 6): на мобильных три длинные ссылки сжимались в
+                узкие многострочные столбики — flex-wrap + центрирование. */}
+            <nav
+              aria-label="Юридические документы"
+              className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 md:justify-start"
+            >
               <a
                 href="/offer"
                 className="py-2 text-cream/60 underline-offset-2 transition-colors hover:text-gold hover:underline"

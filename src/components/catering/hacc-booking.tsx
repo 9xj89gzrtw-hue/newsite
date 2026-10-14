@@ -79,8 +79,8 @@
  *  - D3: sticky-bar живёт в DOM, скрытие — IO нижней полосы (rootMargin
  *    -140px, threshold 0.05, per-target Map §32) по зонам типов/CTA/контактов,
  *    показ/скрытие — transform+opacity (без mount-jump), hidden → inert;
- *  - D4: копирайт «Форма открыта слева» — адаптивный (md:hidden / hidden
- *    md:inline; на мобиле «Форма выше»);
+ *  - D4: копирайт «Форма открыта слева» — адаптивный (xl:hidden / hidden
+ *    xl:inline; до 1280px «Форма выше» — сетка 2 колонки только с xl);
  *  - D5: React.memo на TypeGrid / ReceiptLines / ContactsZone — смена
  *    гостей не перерисовывает типы, строки чека и контакты.
  *
@@ -1156,20 +1156,34 @@ const LeadForm = memo(function LeadForm({
     trackGoal(GOALS.FORM_STEP2);
   };
 
-  /* M5a (task 11-fix3): после перехода — плавный скролл к шагу 2 + фокус на
+  /* M5a (task 11-fix3): после перехода — плавный скролл к шагу 2 + фокус на
      чекбокс согласия (§33: Lenis перебивает программные скроллы — идём через
-     window.__lenis; если шаг 2 уже целиком в кадре — только фокус).
-     620 мс = запас на вход AnimatePresence (0.3 s). */
+     window.__lenis; если шаг 2 уже целиком в кадре — только фокус).
+     620 мс = запас на вход AnimatePresence (0.3 s).
+     c115 (зад. 1): посадка — НИЖЕ sticky-хедера (73px на мобиле): прежде
+     условие r.top < 0 пропускало «впритык к верху» — заголовок «Шаг 2
+     из 2» вместе с узлом-2 уезжал ПОД шапку. scroll-margin-top: 88px на
+     .hb-form__step2 + offset: 0 (Lenis читает маржу сам — грабля §2
+     c84: ручной минус считал отступ дважды); scrollIntoView-фолбэк
+     уважает scroll-margin нативно. */
   useEffect(() => {
     if (step !== 1) return;
     const t = window.setTimeout(() => {
       const el = step2Ref.current;
       if (!el || !el.isConnected) return;
       const r = el.getBoundingClientRect();
-      if (r.top < 0 || r.bottom > window.innerHeight) {
-        const lenis = (window as unknown as { __lenis?: { scrollTo?: (t: Element, o?: object) => void } }).__lenis;
-        if (typeof lenis?.scrollTo === "function") lenis.scrollTo(el, { offset: -16 });
-        else el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (r.top < 88 || r.bottom > window.innerHeight) {
+        const lenis = (
+          window as unknown as {
+            __lenis?: { resize?: () => void; scrollTo?: (t: Element, o?: object) => void };
+          }
+        ).__lenis;
+        if (typeof lenis?.scrollTo === "function") {
+          lenis.resize?.();
+          lenis.scrollTo(el, { offset: 0 });
+        } else {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       }
       document.getElementById("hb-consent")?.focus({ preventScroll: true });
     }, 620);
@@ -1425,6 +1439,7 @@ const LeadForm = memo(function LeadForm({
   return (
     <form
       className="hb-form"
+      data-step={step}
       onSubmit={submit}
       aria-label="Форма заявки на кейтеринг"
       noValidate
@@ -1445,31 +1460,23 @@ const LeadForm = memo(function LeadForm({
         defaultValue=""
       />
       {/* Нить-прогресс: тонкая красная «строчка» слева (не визард-полоса).
-          D4 (task 9-fix2): два узла с цифрами шагов — активный залит красным. */}
-      <span className="hb-form__thread" aria-hidden="true">
-        <motion.span
-          className="hb-form__thread-fill"
-          initial={false}
-          animate={{ scaleY: step === 0 ? 0.5 : 1 }}
-          transition={{ duration: 0.45, ease: EASE }}
-        />
-        <span className={`hb-form__node hb-form__node--1 ${step === 0 ? "hb-form__node--on" : ""}`}>
-          1
-        </span>
-        <span className={`hb-form__node hb-form__node--2 ${step === 1 ? "hb-form__node--on" : ""}`}>
-          2
-        </span>
-      </span>
-
-      {/* M5 (task 11-fix3): шаг 1 ПОСЛЕ перехода НЕ прячется (контекст важен) —
-          приглушается (лейблы 0.55, поля редактируемые), возврат — кликом
-          по легенде. Шаг 2 — различимая подложка (hb-form__fieldset--panel).
-          c114 (зад. 2): id="calculator-form-start" — цель скролла CTA
-          «Оставить заявку» (scroll-margin-top: 96px в CSS). */}
+          D4 (task 9-fix2): два узла с цифрами шагов — активный залит красным.
+          c115 (зад. 1): нить — РЕБЁНОК блока шага 1 (от центра узла-1 до
+          узла-2: конец по data-step в CSS), узлы-цифры живут в СВОИХ
+          заголовках (легенда шага 1 / строка-анонс / легенда шага 2) —
+          всегда напротив своего шага, а не по концам нити. */}
       <fieldset
         id="calculator-form-start"
         className={`hb-form__fieldset ${step === 1 ? "hb-form__fieldset--dim" : ""}`}
       >
+        <span className="hb-form__thread" aria-hidden="true">
+          <motion.span
+            className="hb-form__thread-fill"
+            initial={false}
+            animate={{ scaleY: step === 0 ? 0.5 : 1 }}
+            transition={{ duration: 0.45, ease: EASE }}
+          />
+        </span>
         <legend className="hb-form__legend">
           {step === 1 ? (
             <button
@@ -1483,6 +1490,13 @@ const LeadForm = memo(function LeadForm({
           ) : (
             "Шаг 1 из 2 — Контакты"
           )}
+          {/* c115: узел-1 привязан к легенде шага 1 (центр первой строки) */}
+          <span
+            className={`hb-form__node hb-form__node--1 ${step === 0 ? "hb-form__node--on" : ""}`}
+            aria-hidden="true"
+          >
+            1
+          </span>
         </legend>
 
               <div className="hb-field">
@@ -1622,15 +1636,31 @@ const LeadForm = memo(function LeadForm({
                   доходит (подробнее — комментарий в goNext). Фокус после
                   клика и так переносится (невалидное поле / hb-consent). */}
               {step === 0 && (
-                <button
-                  type="button"
-                  onClick={goNext}
-                  onMouseDown={(e) => e.preventDefault()}
-                  className="hb-btn hb-btn--red mt-1 min-h-[48px] w-full"
-                >
-                  Далее — к отправке
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </button>
+                <>
+                  {/* c115 (зад. 1): justify-center — композиция совпадает с
+                      главной кнопкой «Отправить заявку» шага 2 (прежде текст
+                      жался к левому краю при пустых 65% справа). */}
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    onMouseDown={(e) => e.preventDefault()}
+                    className="hb-btn hb-btn--red mt-1 min-h-[48px] w-full justify-center"
+                  >
+                    Далее — к отправке
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </button>
+                  {/* c115 (зад. 1): неактивный анон следующего шага —
+                      приглушённый капс в стиле легенды (opacity 0.45);
+                      напротив строки стоит узел-2, на её нижней грани
+                      заканчивается нить (раньше узел-2 висел сиротским
+                      кружком у кнопки без подписи). */}
+                  <p className="hb-form__teaser">
+                    <span className="hb-form__node hb-form__node--2" aria-hidden="true">
+                      2
+                    </span>
+                    Шаг 2 из 2 — Проверка и отправка
+                  </p>
+                </>
               )}
       </fieldset>
 
@@ -1641,13 +1671,25 @@ const LeadForm = memo(function LeadForm({
           <motion.div
             key="send"
             ref={step2Ref}
+            className="hb-form__step2"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.3, ease: EASE }}
           >
             <fieldset className="hb-form__fieldset hb-form__fieldset--panel">
-              <legend className="hb-form__legend">Шаг 2 из 2 — Отправить</legend>
+              <legend className="hb-form__legend">
+                Шаг 2 из 2 — Отправить
+                {/* c115 (зад. 1): узел-2 — строго напротив заголовка шага 2
+                    (раньше прибивал к нижнему концу нити в подвале формы,
+                    у строки «Данные защищены»). */}
+                <span
+                  className="hb-form__node hb-form__node--2 hb-form__node--on"
+                  aria-hidden="true"
+                >
+                  2
+                </span>
+              </legend>
 
               {/* Мини-сводка расчёта (Fix5 V6: без «Расчёта» у undecided) */}
               <dl className="hb-summary">
@@ -3117,10 +3159,18 @@ export function HaccBooking() {
       document.getElementById("calculator-form-start") ??
       document.getElementById("lead-form");
     if (!el) return;
-    const lenis = (window as unknown as { __lenis?: { scrollTo?: (t: Element, o?: object) => void } }).__lenis;
+    const lenis = (
+      window as unknown as {
+        __lenis?: { resize?: () => void; scrollTo?: (t: Element, o?: object) => void };
+      }
+    ).__lenis;
     if (typeof lenis?.scrollTo === "function") {
       /* c84-F3: offset: 0 — Lenis сам читает scroll-margin-top цели
-         (ручной минус поверх CSS-маржина считал бы отступ дважды). */
+         (ручной минус поверх CSS-маржина считал бы отступ дважды).
+         c115 (зад. 3): resize?.() перед scrollTo — грабля §2/c84: после
+         раскрытия зоны (grid 0fr→1fr) Lenis мог держать stale-лимиты
+         и молча клампить цель. */
+      lenis.resize?.();
       lenis.scrollTo(el, { offset: 0 });
     } else {
       /* Точная координата (спека зад. 2): sticky-хедер + запас.
@@ -3152,7 +3202,7 @@ export function HaccBooking() {
       со стартом скролла (delay 0 при не-settled) — на Android Chrome
       мгновенный фокус поднимает виртуальную клавиатуру, visualViewport
       ресайзится и браузер ГАСИТ smooth-скролл (переброс «срывается»).
-      Теперь: (1) скролл стартует после коммита React — rAF + 60мс таймер
+      Теперь: (1) скролл стартует после коммита React — rAF + 50мс таймер
       (верх зоны формы при раскрытии НЕ смещается — грид растит контент
       вниз, ждать полусекунды не нужно); (2) фокус (preventScroll) —
       ТОЛЬКО на десктопе (fine pointer) через 500мс, когда полёт уже
@@ -3170,11 +3220,31 @@ export function HaccBooking() {
        оседание ленивых фото — CTA молча не скроллил (замер: -699px мимо
        цели). Каждая новая window.scrollTo/lenis.scrollTo отменяет текущий
        smooth-полёт браузера — конкурентный якорный скролл перекрывается. */
+    /* c115 (зад. 3): ДВУХТАКТНЫЙ скролл.
+       Такт 1 — rAF + 50мс: мгновенный старт прокрутки после коммита
+       React (верх зоны формы при раскрытии НЕ смещается — грид растит
+       контент вниз).
+       Такт 2 — контрольная доводка на 540мс, ПОСЛЕ завершения 0.5s
+       CSS-транзишена grid-template-rows 0fr→1fr: Chrome на Android
+       гасит smooth-скролл scroll-anchoring'ом (теперь выключен
+       overflow-anchor: none — но visualViewport-ресайзы остаются) —
+       если заголовок формы не в рабочей полосе 40–160px от верха
+       вьюпорта (посадка ≈ 88–96px), доводим повторным скроллом. */
     requestAnimationFrame(() => {
       window.setTimeout(() => {
         scrollToFormStart();
-      }, 60);
+      }, 50);
     });
+    window.setTimeout(() => {
+      const el =
+        document.getElementById("calculator-form-start") ??
+        document.getElementById("lead-form");
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top < 40 || rect.top > 160) {
+        scrollToFormStart();
+      }
+    }, 540);
     const finePointer =
       typeof window.matchMedia === "function" &&
       window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -4110,13 +4180,16 @@ export function HaccBooking() {
                     <>
                       {/* D4 (task 7-fix1): на мобиле форма открывается ВЫШЕ
                           чека, не слева — адаптивный копирайт через CSS. */}
-                      <span className="md:hidden">Форма выше — расчёт уже внутри</span>
-                      <span className="hidden md:inline">Форма открыта слева — расчёт уже внутри</span>
+                      {/* c115 (зад. 3): .hb-grid в 2 колонки только с 1280px (xl),
+                          а не с md/768px — на планшетах и узких ноутбуках
+                          форма открывается ВЫШЕ чека (xl:hidden/hidden xl:inline). */}
+                      <span className="xl:hidden">Форма выше — расчёт уже внутри</span>
+                      <span className="hidden xl:inline">Форма открыта слева — расчёт уже внутри</span>
                     </>
                   ) : (
                     <>
-                      <span className="md:hidden">Заявка принята — квитанция выше</span>
-                      <span className="hidden md:inline">Заявка принята — квитанция слева</span>
+                      <span className="xl:hidden">Заявка принята — квитанция выше</span>
+                      <span className="hidden xl:inline">Заявка принята — квитанция слева</span>
                     </>
                   )}
                 </p>

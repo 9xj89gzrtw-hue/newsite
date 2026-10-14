@@ -25,6 +25,18 @@ import { MENU_TYPES } from "@/lib/pricing";
 
 const YEARS_ACTIVE = new Date().getFullYear() - FOUNDED_YEAR;
 
+/** c115 (зад. 6): русское склонение «год / года / лет» — «19 лет опыта»,
+ *  а не «19 года опыта» (грамматическая ошибка на /about). Правила:
+ *  1/21/31… — год; 2–4/22–24… — года; 5–20/25–30… — лет. */
+function yearsWord(n: number): string {
+  const mod100 = n % 100;
+  const mod10 = n % 10;
+  if (mod100 >= 11 && mod100 <= 14) return "лет";
+  if (mod10 === 1) return "год";
+  if (mod10 >= 2 && mod10 <= 4) return "года";
+  return "лет";
+}
+
 /** Форматы с ценами «от» — из меню-каталога (как калькулятор). */
 const FORMATS = MENU_TYPES.map((t) => ({
   id: t.id,
@@ -57,7 +69,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about" },
   openGraph: {
     title: `О компании — NILOV CATERING, кейтеринг СПб с ${FOUNDED_YEAR} года`,
-    description: `${EVENTS_DONE}+ мероприятий, ${GUESTS_SERVED.toLocaleString("ru-RU")}+ гостей, ${YEARS_ACTIVE} года опыта. Форматы, цены «от», реквизиты и контакты.`,
+    description: `${EVENTS_DONE}+ мероприятий, ${GUESTS_SERVED.toLocaleString("ru-RU")}+ гостей, ${YEARS_ACTIVE} ${yearsWord(YEARS_ACTIVE)} опыта. Форматы, цены «от», реквизиты и контакты.`,
     type: "website",
     url: "/about",
     locale: "ru_RU",
@@ -84,7 +96,9 @@ export default function AboutPage() {
           <span className="font-mono text-xs uppercase tracking-[0.3em] text-bordeaux">
             NILOV CATERING
           </span>
-          <h1 className="mt-4 font-display text-3xl text-ink break-words hyphens-auto md:text-5xl">
+          {/* c115 (зад. 6): break-words hyphens-auto снят — заповедь AGENTS
+              §1.5: заголовки никогда не рвутся посреди слова. */}
+          <h1 className="mt-4 font-display text-3xl text-ink md:text-5xl">
             О компании
           </h1>
           <p className="mt-3 font-mono text-sm text-ink-soft">
@@ -111,7 +125,7 @@ export default function AboutPage() {
                   {FOUNDED_YEAR}
                 </dd>
                 <p className="mt-1 text-xs text-ink-soft">
-                  {YEARS_ACTIVE} года опыта
+                  {YEARS_ACTIVE} {yearsWord(YEARS_ACTIVE)} опыта
                 </p>
               </div>
               <div className="rounded-lg border border-black/10 bg-white/60 p-4 text-center">

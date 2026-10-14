@@ -7,8 +7,9 @@
    - cream секция (--ea-cream), красный родного слоя --ea-red #E71D3A
      (+ --ea-red-deep #B91431) — как в hacc-menu/hacc-services;
    - заголовки: --font-serif (Playfair, cyrillic ✓), акценты --font-marck;
-   - кириллический body — var(--font-poppins) (cyrillic ✓; --font-sans=Karla
-     cyrillic НЕ имеет — урок C63 §35; scoped-лечение в пределах секции);
+   - кириллический body — var(--font-poppins) → --font-barlow = Oswald
+     (cyrillic ✓ c115; до c115 слот шёл через безкириллический Barlow —
+     русский текст формы падал в системный Arial);
    - цифры итога — --font-prata (latin-цифры + fallback на Playfair для ₽);
    - focus-visible — красный канон K7-FIX (P2): --hb-red-deep 2px (gold
      был 2.08:1 на креме — FAIL 2.4.11); на тёмных подложках — инверсный
@@ -923,29 +924,65 @@
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  /* c115 (зад. 3): Chrome на Android держит #hb-check на месте, пока зона
+     выше растёт (0fr→1fr, 0.5s), и ГАСИТ smooth-скролл CTA — scroll
+     anchoring отключён по всей ветке сетки (см. общий блок ниже). */
+  overflow-anchor: none;
 }
 .hb-zone[data-open="true"] { grid-template-rows: 1fr; }
 .hb-zone__inner { overflow-x: clip; overflow-y: hidden; min-height: 0; }
-/* c86 (требование 4, фикс обрезки кружков шагов): узлы нити (кружки с
-   цифрами) центрируются на 2px-нити у ЛЕВОГО края формы и выезжают влево
-   за пределы формы — overflow:hidden у .hb-zone__inner их резал.
-   Тело зоны получает левый набив НЕ МЕНЬШЕ выноса узла, а форма теряет
-   ровно столько же из своего левого набива — лейблы полей остаются на
-   прежней абсолютной позиции (ноль сдвига разметки). */
-.hb-zone__body { padding-top: 1.5rem; padding-left: 0.7rem; }
+/* c115 (зад. 1): ЕДИНАЯ геометрия рельсы на ВСЕХ разрешениях — прежде был
+   базовый набор (0.7rem/0.45rem) + мобильный оверрайд c114, из-за чего на
+   ≥768px узел-1 (22px, вынос −10px от нити) наезжал на «Ш» легенды
+   «ШАГ 1 ИЗ 2», а поля стояли вплотную к нити. Теперь: тело зоны 0.85rem
+   слева (узел целиком внутри зоны, ≥16px от края вьюпорта на 320–430px),
+   форма 1.85rem (легенда/поля/кнопка на одной направляющей, зазор от
+   правого края узла до «Ш» 17.6px ≥ 14px при ЛЮБОЙ ширине — проверено
+   e2e на 390/1440). padding-bottom — дыхание последней строки формы
+   внутри зоны (раньше margin последнего элемента коллапсировал сквозь
+     безбордерные контейнеры и не давал пространства). */
+.hb-zone__body {
+  padding-top: 1.5rem;
+  padding-bottom: 0.6rem;
+  padding-left: 0.85rem;
+}
 
-/* форма: нить-прогресс слева (левый набив скооперирован с телом зоны —
-   см. коммент к .hb-zone__body выше: сумма остаётся прежней) */
-
-.hb-form { position: relative; padding-left: 0.45rem; }
+/* форма: нить-прогресс слева. --hb-rail-pad — левый набив формы; узлы
+   шагов и сама нить считают свои left через него (единая рельса). */
+.hb-form {
+  --hb-rail-pad: 1.85rem;
+  position: relative;
+  padding-left: var(--hb-rail-pad);
+}
+/* c115 (зад. 1): нить — РЕБЁНОК блока шага 1: тянется от центра узла-1
+   вниз до узла-2; конец зависит от шага (data-step на <form>):
+   - шаг 1 (data-step="0"): bottom: 0 — до низа блока шага 1 = нижняя
+     грань строки-анонса «Шаг 2 из 2» (узел-2 стоит на ней, нить
+     прячется за кружком вплотную к его нижней кромке);
+   - шаг 2 (data-step="1"): через зазор 1.1rem до центра легенды
+     «Шаг 2 из 2 — Отправить» — узел-2 строго напротив заголовка, не
+     в подвале.
+   ВАЖНО (замер e2e): содержащим блоком абсо-детей fieldset служит его
+   padding-box, который начинается НИЖЕ «rendered legend» (спец-модель
+   HTML: легенда рендерится в пространстве над контент-боксом). Поэтому
+   top нити = центр легенды минус её блок (line-height 22px + margin
+   1rem); на шаге 2 у легенды-кнопки возврата + 1px border-bottom —
+   top уточнён по data-step (замеры e2e 390/1440: |Δy| = 0px). Центр
+   легенды шага-2 — 11px от ВЕРХА панели (легенда висит от верхней
+   кромки бордер-бокса, зазор до блока шага-1 = 1.1rem):
+   bottom = calc(-1.1rem - 11px). */
 .hb-form__thread {
   position: absolute;
-  left: 0;
-  top: 0.6rem;
-  bottom: 0.6rem;
+  left: calc(1px - var(--hb-rail-pad));
   width: 2px;
   border-radius: 2px;
   background: color-mix(in srgb, var(--hb-ink) 10%, transparent);
+  transition: bottom 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hb-form[data-step="0"] .hb-form__thread { top: calc(-11px - 1rem); bottom: 0; }
+.hb-form[data-step="1"] .hb-form__thread {
+  top: calc(-12px - 1rem);
+  bottom: calc(-1.1rem - 11px);
 }
 .hb-form__thread-fill {
   position: absolute;
@@ -955,11 +992,19 @@
   border-radius: 2px;
 }
 /* D4 (task 9-fix2): узлы нити-прогресса с цифрами шагов (канон нити,
-   не визард-полоса): активный шаг залит красным. */
+   не визард-полоса): активный шаг залит красным.
+   c115 (зад. 1): узлы живут В БЛОКАХ СВОИХ ШАГОВ (легенда шага 1 /
+   строка-анонс / легенда шага 2) — всегда напротив своего заголовка.
+   Вертикаль: top: 11px + translate(-50%,-50%) — центр первой строки
+   (line-height 22px у легенд/анонса), переносо-безопасно; раньше узел-1
+   провисал на ~4.6px ниже центра «ШАГ 1 ИЗ 2», узел-2 прибивал к концу
+   нити в подвале формы. Горизонталь — центр узла на центре нити
+   (левый край формы + 1px); легенда шага-2 дополнительно учитывает
+   бордер и набив панели (см. отдельное правило). */
 .hb-form__node {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 11px;
+  transform: translate(-50%, -50%);
   display: grid;
   place-items: center;
   width: 22px;
@@ -976,14 +1021,29 @@
   color: color-mix(in srgb, var(--hb-ink) 55%, transparent);
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
-.hb-form__node--1 { top: -7px; }
-.hb-form__node--2 { bottom: -7px; }
+/* горизонтальная привязка: центр узла = центр нити (form-left + 1px).
+   Легенда шага-1 и строка-анонс начинаются от контентного края формы
+   (--hb-rail-pad от края); легенда шага-2 — глубже на 1px бордера и
+   1.05rem набива панели (1px нити и 1px бордера взаимно сокращаются). */
+.hb-form__legend .hb-form__node,
+.hb-form__teaser .hb-form__node {
+  left: calc(1px - var(--hb-rail-pad));
+}
+.hb-form__fieldset--panel .hb-form__legend .hb-form__node {
+  left: calc(-1 * var(--hb-rail-pad) - 1.05rem);
+}
 .hb-form__node--on {
   background: var(--hb-red);
   border-color: var(--hb-red);
   color: #fff;
 }
-.hb-form__fieldset { border: 0; padding: 0; margin: 0; min-inline-size: auto; }
+.hb-form__fieldset {
+  position: relative; /* c115: нить — ребёнок блока шага 1 */
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: auto;
+}
 /* M5 (task 11-fix3): шаг 2 визуально различим — тонкая рамка + подложка; шаг 1
    после перехода приглушён (лейблы 0.55, поля редактируемые, возврат по легенде). */
 .hb-form__fieldset--panel {
@@ -995,19 +1055,36 @@
 }
 .hb-form__fieldset--dim { margin-bottom: 0.25rem; }
 .hb-form__fieldset--dim .hb-label { opacity: 0.55; }
+/* c115 (зад. 1): блок шага 2 — цель автоскролла после «Далее»: посадка
+   ниже sticky-хедера (73–84px на мобиле) — заголовок «Шаг 2 из 2» с
+   узлом-2 прежде уезжал под шапку (условие r.top < 0 в эффекте шага 2
+   пропускало «впритык к верху»; Lenis с offset: 0 читает эту маржу сам,
+   scrollIntoView-фолбэк — нативно). */
+.hb-form__step2 { scroll-margin-top: 88px; }
 .hb-form__legend {
+  position: relative; /* c115: узел-цифра — ребёнок легенды */
   font-family: var(--hb-caps);
   font-weight: 700;
   /* T4: eyebrow-уровень капс-шкалы */
   font-size: var(--hb-caps-eyebrow-fs);
   letter-spacing: var(--hb-caps-eyebrow-ls);
   text-transform: uppercase;
+  /* c115 (зад. 1): детерминированная строка легенды — центр первой
+     строки всегда на 11px от верха (к нему привязаны узел-цифра и
+     верх нити; замер e2e: |Δy| центр узла vs центр текста ≤ 1px). */
+  line-height: 22px;
   color: var(--hb-red-deep);
   padding: 0;
   margin-bottom: 1rem;
 }
-/* M5в: легенда приглушённого шага 1 — кнопка возврата к шагу 1. */
+/* M5в: легенда приглушённого шага 1 — кнопка возврата к шагу 1.
+   c115 (зад. 1): бокс кнопки = строка легенды (22px, паддинги 0) —
+   глобальный тач-таргет 44px (mobile-polish.css) раздувал инлайн-кнопку
+   до 44px: легенда расползалась, узел-1 уезжал на 11px от центра текста,
+   верх нити отрывался на 22px. Тач-зона 44px СОХРАНЕНА прозрачным
+   ::after (паттерн хит-зон тиков календаря/слайдера этого блока). */
 .hb-form__legend-btn {
+  position: relative;
   display: inline-block;
   font: inherit;
   letter-spacing: inherit;
@@ -1016,9 +1093,17 @@
   background: none;
   border: 0;
   border-bottom: 1px dashed color-mix(in srgb, var(--hb-red-deep) 45%, transparent);
-  padding: 0 0 2px;
+  padding: 0;
   cursor: pointer;
   transition: border-color 0.2s ease;
+}
+/* специфичность (0,3,0) — сильнее глобального button:not(...):not(...)
+   из mobile-polish.css (0,2,1) во всех брейкпоинтах и порядке каскада */
+.hb-form__fieldset .hb-form__legend .hb-form__legend-btn { min-height: 0; }
+.hb-form__legend-btn::after {
+  content: "";
+  position: absolute;
+  inset: -11px -8px; /* тап-зона 44px вокруг строки 22px */
 }
 .hb-form__legend-btn:hover { border-bottom-color: var(--hb-red-deep); }
 
@@ -1060,20 +1145,24 @@
     box-sizing: border-box;
   }
 }
-/* c114 (аудит, зад. 1 — КРИТИЧНО): W2-FIX занулял набивы — нить вставала
-   НА левый край контейнера (по первым буквам лейблов «ИМЯ *»/«ТЕЛЕФОН *»),
-   а кружки-узлы (22px, вынос −10px от нити) резались overflow-x: clip
-   у .hb-zone__inner и наезжали на «Ш» легенды «ШАГ 1 ИЗ 2 — КОНТАКТЫ».
-   Геометрия рельсы на мобиле (контейнер секции даёт свои 20px):
-   - .hb-zone__body 12px: узел целиком внутри зоны (вынос −10px не
-     режется) и ≥ 16px от края вьюпорта (20+12−10 = 22px);
-   - .hb-form 28px: легенда, лейблы, поля и «ДАЛЕЕ» — на единой левой
-     направляющей с чистым зазором 16px от правого края узла и 28px
-     от нити (замер на 390px: узел 22–44px, буква «Ш» от 56px; зазор
-     подтверждён Range-замером первой буквы; 320–430px проверены). */
-@media (max-width: 767.98px) {
-  .hb-form { padding-left: 1.75rem; }
-  .hb-zone__body { padding-left: 0.75rem; }
+/* c115 (зад. 1): строка-анонс следующего шага (только на шаге 1, под
+   кнопкой «ДАЛЕЕ»): приглушённый капс в стиле .hb-form__legend
+   (opacity 0.45); напротив неё стоит узел-2, на её нижней грани
+   заканчивается нить. Трекинг чуть уже легенды (0.14em vs 0.18em) —
+   строка длиннее и обязана не переноситься до ~340px; геометрия узла
+   и нити переносо-безопасна и при более узких экранах (первая строка
+   + низ блока). */
+.hb-form__teaser {
+  position: relative;
+  margin: 0.9rem 0 0;
+  font-family: var(--hb-caps);
+  font-weight: 700;
+  font-size: var(--hb-caps-eyebrow-fs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 22px;
+  color: var(--hb-red-deep);
+  opacity: 0.45;
 }
 .hbooking {
   overflow-x: clip;
@@ -1088,7 +1177,11 @@
 }
 
 /* D3 (task 9-fix2): фокус полей — ink/золото (канон сайта), НЕ красный:
-   красная рамка считывалась как ошибка. Красный — только для invalid (D1). */
+   красная рамка считывалась как ошибка. Красный — только для invalid (D1).
+   c115 (зад. 2): это — ЕДИНСТВЕННЫЙ фокус-стиль полей: внешний красный
+   outline из A11Y-блока :focus-visible для .hb-input/.hb-guests-input/
+   .hb-date__trigger снят (двойная рамка = «ошибка»), ::after-нить не
+   торчит за скруглённые углы (инсеты 12px). */
 .hb-form .hb-input:focus,
 .hb-date__trigger:focus {
   border-color: color-mix(in srgb, var(--hb-ink) 38%, transparent);
@@ -1129,10 +1222,16 @@
 .hb-date::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -2px;
+  /* c115 (зад. 2): left/right 0 + border-radius 12px у поля — концы
+     прямой линии торчали острыми «ушами» за пределы скруглённых углов.
+     Теперь линия живёт строго на плоской части нижней грани: инсеты
+     12px = радиус поля, скругление самой линии 999px — концы никогда
+     не выступают за дугу угла (замер e2e по границам ::after vs поля). */
+  left: 12px;
+  right: 12px;
+  bottom: 0;
   height: 2px;
+  border-radius: 999px;
   background: linear-gradient(
     90deg,
     var(--gold, #d4a373),
@@ -2187,9 +2286,23 @@
   to { rotate: -0.8deg; }
 }
 
+/* c115 (зад. 3): scroll anchoring гасит smooth-скролл CTA «Оставить
+   заявку» на Android — Chrome держит #hb-check на месте, пока зона формы
+   выше него растёт (grid-rows 0fr→1fr, 0.5s), и перебивает
+   window.scrollTo({behavior:'smooth'}). Отключаем привязку по всей
+   ветке сетки калькулятора (сам якорный механизм остаётся для остальной
+   страницы). */
+.hbooking,
+.hb-grid,
+.hb-left,
+.hb-right,
+.hb-zone {
+  overflow-anchor: none;
+}
+
 /* ================================================== A11Y / MOTION */
 
-.hbooking :is(.hb-btn, .hb-type, .hb-pkg, .hb-clink, .hb-step-btn, .hb-bar__cta, .hb-bar__total, .hb-consent__link, .hb-date__trigger, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-guests-input, .hb-input, .hb-form__legend-btn):focus-visible {
+.hbooking :is(.hb-btn, .hb-type, .hb-pkg, .hb-clink, .hb-step-btn, .hb-bar__cta, .hb-bar__total, .hb-consent__link, .hb-slider__input, .hb-slider__tick, .hb-panel__again, .hb-form__legend-btn):focus-visible {
   /* K7-FIX (P2 / 2.4.11): gold #D4A373 = 2.08:1 на креме → FAIL.
      --hb-red-deep #B91431: 6.03:1 на креме / 6.55:1 на белом ✓.
      Правило unlayered — перебивает и базовый globals-канон, и тайлвиндовый
@@ -2204,6 +2317,18 @@
    Специфичность (0,3,0)+перечисление выше — перекрывает правило выше. */
 .hbooking :is(.hb-panel__again, .hb-bar__cta, .hb-bar__total):focus-visible {
   outline-color: #fff;
+}
+/* c115 (зад. 2): текстовые поля и триггер даты УБРАНЫ из красного
+   контура :focus-visible выше — при фокусе в поле рисовались ОДНОВРЕМЕННО
+   три конфликтующих стиля: тёмная рамка + золотой box-shadow (D3),
+   внешний бордовый outline (у input/textarea :focus-visible срабатывает
+   и от клика мышью) и градиентная нить (::after) — двойная серо-красная
+   рамка читалась как ошибка, вопреки правилу D3 «фокус — ink/золото,
+   НЕ красный». Фокус полей показывают D3-правила (рамка + shadow + нить);
+   здесь явно гасим контур (unlayered — сильнее хвостов Tailwind). */
+.hbooking .hb-input:focus-visible,
+.hbooking .hb-guests-input:focus-visible {
+  outline: none;
 }
 
 /* ================================================== K2-F1 (Task 6): ТАЧ-
@@ -2235,6 +2360,7 @@
   .hb-zone,
   .hb-lines,
   .hb-cta-zone { transition: none; }
+  .hb-form__thread { transition: none; } /* c115: слайд конца нити между шагами */
   .hb-type,
   .hb-pkg,
   .hb-addon,

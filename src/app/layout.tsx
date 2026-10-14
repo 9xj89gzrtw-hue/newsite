@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { preload as reactDomPreload } from "react-dom";
-import { Playfair_Display, Barlow_Semi_Condensed, Karla, Prata, Marck_Script } from "next/font/google";
+import { Playfair_Display, Oswald, Manrope, Prata, Marck_Script } from "next/font/google";
 import "./globals.css";
 import "./print.css";
 import "./menu-layout.css";
@@ -31,28 +31,28 @@ import {
 } from "@/lib/site-config";
 
 /*
- * F2 (cycle-71, K1-CRITICAL + K3-MAJOR): консолидация шрифтов 12 → 5 семейств.
- * next/font-загрузка осталась ТОЛЬКО у пятёрки:
- *   Prata, Playfair Display, Barlow Semi Condensed, Karla, Marck Script.
- * Убраны из загрузки: Oswald, Montserrat, Lato, Great Vibes,
- * Nothing You Could Do, Neutra2Display-Light, Neutra2Text_book
- * (−90 @font-face из отдаваемого CSS, было 159 с учётом fallback-фейсов).
- *
- * Их CSS-переменные остаются живыми через АЛИАСЫ на <html> в globals.css
- * (блок «F2 FONT CONSOLIDATION») — дюжины компонентов продолжают ссылаться
- * на прежние переменные, не требуя правок в самих компонентах:
- *   --font-display (Oswald)          → Barlow Semi Condensed (condensed caps)
- *   --font-poppins (Montserrat)       → Barlow Semi Condensed
- *   --font-lato (Lato)                → Karla (humanist body)
- *   --font-script (Great Vibes)       → Marck Script (кириллический скрипт)
- *   --font-nothing (Nothing You Could Do) → Marck Script
- *   --font-neutra-display (Neutra2Display) → Playfair Display (крупные лейблы
- *                                          «Следите за нами» и др.)
- *   --font-neutra-text (Neutra2Text)  → Karla
- * Скриптовые замены: «food as art» и «Сделано с любовью» — Marck Script.
- *
- * Preload остаётся ТОЛЬКО у Prata — wordmark hero (LCP-текст). Прежние
- * preload-ы Nothing You Could Do и Lato ушли вместе с их загрузкой.
+ * F2 (cycle-71): консолидация шрифтов 12 → 5 семейств.
+ * c115 (зад. 4): пара Barlow Semi Condensed + Karla ЗАМЕНЕНА на
+ * Oswald + Manrope — у Barlow/Karla НЕТ кириллических сабсетов, и весь
+ * русский текст в их слотах (капсы/лейблы/кнопки/body) рендерился
+ * системным Arial — рядом с латиницей/цифрами в узком Barlow получался
+ * шрифтовой разнобой («ШАГ 1 ИЗ 2», «Глава 01», «30 гостей × 4 470 ₽»).
+ * Oswald — исходник слота --font-display до F2 (condensed all-caps,
+ * кириллица ✓); Manrope — чистый гротеск с кириллицей для --font-sans
+ * (метрики ближе к Karla, чем у широкого Montserrat). Оба variable:
+ * один woff2 на сабсет, все веса true (у Oswald 200–700; font-weight 800
+ * в ea-*-tabs клампится к 700 — допустимо).
+ * next/font-загрузка: Prata, Playfair Display, Oswald, Manrope,
+ * Marck Script. CSS-переменные прежних семейств остаются живыми через
+ * АЛИАСЫ на <html> в globals.css (блок «F2 FONT CONSOLIDATION»):
+ *   --font-display (ex-Oswald)      → --font-barlow = Oswald
+ *   --font-poppins (ex-Montserrat)  → --font-barlow = Oswald
+ *   --font-lato (ex-Lato)           → --font-sans = Manrope
+ *   --font-script / --font-nothing  → Marck Script (кириллический скрипт)
+ *   --font-neutra-display           → Playfair Display
+ *   --font-neutra-text              → --font-sans = Manrope
+ * Preload: Prata (wordmark hero, LCP) + пара LCP-критичных woff2
+ * через reactDomPreload ниже (обновлены под Oswald, c115).
  */
 
 // — Playfair Display: editorial display-serif с полной кириллицей (H2/H3,
@@ -74,30 +74,37 @@ const playfair = Playfair_Display({
   preload: false,
 });
 
-// — Barlow Semi Condensed: ultra-bold condensed all-caps (eyebrow-система,
-//   ex-Oswald/ex-Montserrat-слоты).
-const barlow = Barlow_Semi_Condensed({
+// — Oswald (c115, зад. 4): condensed all-caps с ПОЛНОЙ кириллицей —
+//   eyebrow-система, ex-Oswald/ex-Montserrat-слоты. Замена Barlow Semi
+//   Condensed (latin/latin-ext БЕЗ кириллицы: русские капсы падали в
+//   системный Arial). Variable — один woff2 на сабсет, веса 200–700
+//   (font-weight: 800 в ea-*-tabs клампится к 700 — допустимо).
+const barlow = Oswald({
   variable: "--font-barlow",
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700", "800"],
+  subsets: ["latin", "cyrillic"],
+  weight: "variable",
   display: "swap",
   preload: false,
 });
 
-// — Karla: humanist body-sans (латиница; кириллица — через metric-fallback
-//   в системный sans, как и было до консолидации).
-const karla = Karla({
+// — Manrope (c115, зад. 4): чистый гротеск с кириллицей — body-sans.
+//   Замена Karla (латиница без кириллицы — русский body шёл системным
+//   Arial). Метрики ближе к Karla, чем у широкого Montserrat — риски
+//   переполнений строк минимальны. Variable: веса 200–800.
+const karla = Manrope({
   variable: "--font-sans",
-  subsets: ["latin", "latin-ext"],
-  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["latin", "cyrillic"],
+  weight: "variable",
   display: "swap",
   preload: false,
 });
 
-// — Prata: display-serif hero-вордмарка (латиница).
+// — Prata: display-serif hero-вордмарк. c115 (зад. 4): + сабсет cyrillic —
+//   у Prata в Google Fonts ЕСТЬ кириллица; ранее «₽» и кириллица в
+//   числовых слотах (--hb-num-font) падали в Playfair-фолбэк.
 const prata = Prata({
   variable: "--font-prata",
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   weight: ["400"],
   display: "swap",
   /* hero wordmark — preload ОСТАВЛЕН (LCP-критичный). */
@@ -433,29 +440,31 @@ export default function RootLayout({
      он не эмитится вовсе, в prod — дедупится в этот же хинт). 41KB PNG
      нужен в первые 0.45с (CSS-таймлайн дверей) — грузим до медиа-hero. */
   reactDomPreload("/brand/logo-256.png", { as: "image" });
-  /* 81-W2F3 [G MINOR #8 «дубли preload шрифтов»]: preload Barlow Semi
-     Condensed 400 + 700 latin (LCP-критичные woff2 тела — 81-F1) переведён
-     с ручных <link> в head-JSX на Float API ReactDOM.preload. Ручные теги
-     НЕ участвуют в Float-дедупликации и в прод-HTML дублировались с
-     авто-preload'ами (по 2 <link> на файл — критик G: 4b23c5ee@546+@3356,
-     490cbca7@680+@3490). Float-ресурс с тем же href/attrs дедупится в
-     РОВНО ОДИН <link> в начале <head> — тот же механизм, что у логотипа
-     выше. crossorigin обязателен для шрифтов (CORS-mode fetch, иначе
-     двойной запрос). Prata-latin уже preloaded next/font'ом — не дублируем. */
-  /* c104 (жалоба «404 на шрифтах в консоли»): хэш-суффиксы имён woff2
+  /* 81-W2F3 [G MINOR #8 «дубли preload шрифтов»]: preload LCP-критичных
+     woff2 (81-F1) через Float API ReactDOM.preload — ручные <link> в
+     head-JSX дублировались с авто-preload'ами; Float-ресурс с тем же
+     href/attrs дедупится в РОВНО ОДИН <link>. crossorigin обязателен
+     для шрифтов (CORS-mode fetch, иначе двойной запрос).
+     c115 (зад. 4): preload-пара обновлена под замену Barlow→Oswald+
+     Manrope — теперь это КИРИЛЛИЧЕСКИЕ variable-файлы обоих семейств
+     (замер computed-шрифтов первого вьюпорта: навигация/«Листайте» —
+     Manrope-cyrillic; sticky-bar «Итого/30 гостей/Оставить заявку» —
+     Oswald-cyrillic; wordmark «nilov» — Prata, preloaded next/font'ом).
+     VF-файл покрывает все веса сразу (200–700 / 200–800). */
+  /* c104 (жалоба «404 на шрифтах в консоли»): хэш-суффиксы имён woff2
      ПОМЕНЯЛИСЬ при смене генератора сборки — старые захардкоженные URL
-     («046c0c63»/«116c03d8») давали 404 + preload-warnings на проде
-     (замер: nilovcatering.ru/_next/static/media/… → 404, 2 файла).
-     Контентный префикс (4b23c5ee…=Barlow 400 latin, 490cbca7…=Barlow 700
-     latin) стабилен, суффикс — нет. Новые имена сверены с живым CSS :3001
-     (@font-face src). Страховка от повторения — шаг «Verify font preload
-     URLs» в deploy.yml: сборка падает, если файла нет в экспорте. */
-  reactDomPreload("/_next/static/media/4b23c5ee480ee380-s.0qqufx6vw52v_.woff2", {
+     давали 404 + preload-warnings на проде. Контентный префикс стабилен,
+     суффикс — нет. c115: имена пересверены с живым CSS :3001 (@font-face
+     src) после замены шрифтов: 8e410338…=Oswald cyrillic VF,
+     d3fe2f28…=Manrope cyrillic VF. Страховка от повторения — шаг «Verify
+     font preload URLs» в deploy.yml: сборка падает, если файла нет в
+     экспорте. */
+  reactDomPreload("/_next/static/media/8e410338cab7e12e-s.2888ryxa0751p.woff2", {
     as: "font",
     type: "font/woff2",
     crossOrigin: "anonymous",
   });
-  reactDomPreload("/_next/static/media/490cbca7f386131e-s.1zrwl0c4yv3pr.woff2", {
+  reactDomPreload("/_next/static/media/d3fe2f289711ac3f-s.1l2zhvq5eocqf.woff2", {
     as: "font",
     type: "font/woff2",
     crossOrigin: "anonymous",

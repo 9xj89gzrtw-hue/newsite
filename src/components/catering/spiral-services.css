@@ -121,7 +121,7 @@
   align-items: center;
   gap: 14px;
   margin: 0;
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui,
+  font-family: var(--font-barlow), "Oswald", system-ui,
     sans-serif;
   font-size: 11px;
   font-weight: 500;
@@ -285,7 +285,7 @@
   text-shadow: 0 0 34px rgba(231, 170, 100, 0.14);
 }
 .sp-card__back-brand {
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui,
+  font-family: var(--font-barlow), "Oswald", system-ui,
     sans-serif;
   font-size: 10px;
   font-weight: 600;
@@ -391,7 +391,7 @@
   border-radius: 999px;
   background: rgba(11, 9, 8, 0.72);
   border: 1px solid rgba(244, 237, 226, 0.18);
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui,
+  font-family: var(--font-barlow), "Oswald", system-ui,
     sans-serif;
   font-size: 9.5px;
   font-weight: 600;
@@ -458,7 +458,7 @@
   border-top: 1px solid rgba(244, 237, 226, 0.1);
 }
 .sp-card__price {
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui,
+  font-family: var(--font-barlow), "Oswald", system-ui,
     sans-serif;
   font-size: 12px;
   font-weight: 600;
@@ -471,7 +471,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui,
+  font-family: var(--font-barlow), "Oswald", system-ui,
     sans-serif;
   font-size: 11.5px;
   font-weight: 600;
@@ -572,7 +572,7 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui,
+  font-family: var(--font-barlow), "Oswald", system-ui,
     sans-serif;
   font-weight: 300;
   color: var(--sp-cream);
@@ -618,7 +618,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui,
+  font-family: var(--font-barlow), "Oswald", system-ui,
     sans-serif;
   font-size: 10.5px;
   font-weight: 500;
@@ -864,7 +864,7 @@
     gap: 10px;
   }
   .sp-lcard__price {
-    font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui,
+    font-family: var(--font-barlow), "Oswald", system-ui,
       sans-serif;
     font-size: 11.5px;
     font-weight: 600;
@@ -873,7 +873,7 @@
     color: rgba(244, 237, 226, 0.75);
   }
   .sp-lcard__cta {
-    font-family: var(--font-barlow), "Barlow Semi Condensed", system-ui,
+    font-family: var(--font-barlow), "Oswald", system-ui,
       sans-serif;
     font-size: 11px;
     font-weight: 600;

@@ -92,9 +92,13 @@ type NavItem = { href: string; label: string };
 
 // 5-item nav matching talkofthetownatlanta.com (Catering · Menus · Venues ·
 // Meet TOTT · Contact) → mapped to Interfood's real section IDs.
+// c115 (зад. 5): порядок = фактическому следованию глав на странице
+// (Глава 01 — #services, Глава 02 — #menu; тот же порядок в футере) —
+// прежде индикатор .is-active при скролле сверху зажигал 2-й пункт,
+// потом прыгал назад на 1-й, потом на 3-й.
 const NAV: NavItem[] = [
-  { href: "#menu", label: "Меню" },
   { href: "#services", label: "Услуги" },
+  { href: "#menu", label: "Меню" },
   { href: "#about", label: "О нас" },
   { href: "#contact", label: "Контакты" },
 ];
@@ -610,13 +614,24 @@ export function SiteHeader() {
       }
       const lenis = (
         window as unknown as {
-          __lenis?: { scrollTo?: (t: Element, o?: object) => void };
+          __lenis?: { resize?: () => void; scrollTo?: (t: Element, o?: object) => void };
         }
       ).__lenis;
       if (typeof lenis?.scrollTo === "function") {
-        lenis.scrollTo(el, { offset: -96, duration: 0.9 });
+        /* c115 (зад. 5, грабля §2 c84): Lenis сам вычитает
+           scroll-margin-top: 96px цели — ручной offset: -96 поверх
+           CSS-маржина давал двойной отступ (192px). resize?.() —
+           stale-лимиты после body-lock дровера (§2 c84). */
+        lenis.resize?.();
+        lenis.scrollTo(el, { offset: 0, duration: 0.9 });
       } else {
-        el.scrollIntoView({ block: "start" });
+        /* c115 (зад. 5): lite-режим (без Lenis) — надёжный window.scrollTo
+           с ручным офсетом хедера: scrollIntoView на Android гасится
+           visualViewport-ресайзом и не даёт плавного скролла. */
+        window.scrollTo({
+          top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 88),
+          behavior: "smooth",
+        });
       }
     }, DRAWER_NAV_DELAY_MS);
   };

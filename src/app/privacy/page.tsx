@@ -38,7 +38,9 @@ export default function PrivacyPage() {
           <span className="font-mono text-xs uppercase tracking-[0.3em] text-bordeaux">
             Документ
           </span>
-          <h1 className="mt-4 font-display text-3xl text-ink break-words hyphens-auto md:text-5xl">
+          {/* c115 (зад. 6): break-words hyphens-auto снят — заповедь AGENTS
+              §1.5: заголовки никогда не рвутся посреди слова. */}
+          <h1 className="mt-4 font-display text-3xl text-ink md:text-5xl">
             Политика конфиденциальности
           </h1>
           <p className="mt-3 font-mono text-sm text-ink-soft">
