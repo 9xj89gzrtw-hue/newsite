@@ -3103,13 +3103,38 @@ export function HaccBooking() {
   useEffect(() => {
     const el = document.getElementById("hb-check");
     if (!el) return;
+    /* c116 (возврат телефон-FAB на <768): гистерезис для panelUnder.
+       До сих пор флаг переключался мгновенно в обе стороны — на планшетной
+       полосе это было терпимо, но на мобиле FAB теперь пробегает границу
+       полосы на каждом скролле мимо смета-чека: осцилляция IO у линии
+       (хвост Lenis / резинка iOS) мигала кнопкой (return null без анимации).
+       Направление — как у подавителя (зеркально зонам бара c98-B):
+       накрытие полосы → suppress СРАЗУ (кнопка не успевает лечь на карточку
+       сметы/штамп), уход → возврат через 300мс непрерывного «панели нет».
+       Осцилляция границы держит suppressed — FAB не мигает. */
+    let showTimer = 0;
     const io = new IntersectionObserver(
-      (entries) => setPanelUnder(entries[0]?.isIntersecting === true),
+      (entries) => {
+        const under = entries[0]?.isIntersecting === true;
+        if (under) {
+          window.clearTimeout(showTimer);
+          showTimer = 0;
+          setPanelUnder(true);
+        } else if (!showTimer) {
+          showTimer = window.setTimeout(() => {
+            showTimer = 0;
+            setPanelUnder(false);
+          }, 300);
+        }
+      },
       /* та же нижняя полоса ~17% вьюпорта, что у зон бара */
       { rootMargin: "-83% 0px 0px 0px", threshold: 0 },
     );
     io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      window.clearTimeout(showTimer);
+    };
   }, [settled]);
 
   useEffect(() => {

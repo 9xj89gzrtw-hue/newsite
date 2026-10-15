@@ -10,10 +10,12 @@ import "./contact-widget.css";
 export function ContactWidget({ hidden = false }: { hidden?: boolean }) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
-  /* c114 (зад. 3): подавление в зоне калькулятора/формы (событие шлёт
-     HaccBooking — нижняя полоса вьюпорта накрыта интерактивом): на
-     планшетной полосе 768–1023, где виджет ещё показывается, он не
-     должен перекрывать поля формы и карточку сметы. */
+  /* c114 (зад. 3) → c116: подавление в зоне калькулятора/формы (событие
+     шлёт HaccBooking — нижняя полоса вьюпорта накрыта интерактивом).
+     c116: мобильный FAB возвращён по требованию владельца — виджет снова
+     показывается на ВСЕХ экранах <1024px, и подавление (зоны формы +
+     карточка сметы #hb-check, гистерезис 300мс) гарантирует, что кнопка
+     не перекрывает поля формы, смету-чек и липкий бар. */
   const [suppressed, setSuppressed] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
