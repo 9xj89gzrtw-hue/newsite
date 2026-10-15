@@ -38,6 +38,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { LQIP } from "@/lib/lqip";
 import "./spiral-services.css";
 
 /* -------------------------------------------------------------- content --- */
@@ -679,6 +680,16 @@ export function SpiralServices() {
               <div className="sp-card__inner">
                 <div className="sp-card__float">
                   <div className="sp-card__media">
+                    {/* c117 (владелец: чёрный прямоугольник при загрузке):
+                        LQIP-подложка (24px data-URI) под ленивым кадром —
+                        вместо жёсткого #0e0b09 мягкое размытое фото (blur-up). */}
+                    <img
+                      className="sp-lqip"
+                      src={LQIP[s.media]}
+                      alt=""
+                      aria-hidden="true"
+                      decoding="async"
+                    />
                     <img
                       className="sp-card__img"
                       src={s.media}
@@ -785,6 +796,14 @@ export function SpiralServices() {
           {SERVICES.map((s) => (
             <a key={s.id} className="sp-lcard" href={s.ctaHref}>
               <div className="sp-lcard__media">
+                {/* c117: LQIP-подложка — см. sp-card__media выше. */}
+                <img
+                  className="sp-lqip"
+                  src={LQIP[s.media]}
+                  alt=""
+                  aria-hidden="true"
+                  decoding="async"
+                />
                 <img
                   src={s.media}
                   alt={s.mediaAlt}

@@ -1,4 +1,12 @@
-.contact-widget { position:fixed; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); right:16px; z-index:999; display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
+.contact-widget { position:fixed; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); right:16px; z-index:999; display:flex; flex-direction:column; align-items:flex-end; gap:12px; transition:opacity .25s ease,transform .25s ease; }
+/* c117 (владелец: «не отображать на экране херо») — кнопка появляется
+   ровно с «наверх» (BackToTop): до scrollY 500 узел невидим и не ловит
+   указатель/фокус. Порог и паттерн — mirror back-to-top.tsx. */
+.contact-widget[data-fold="hero"] { opacity:0; transform:translateY(16px) scale(.92); pointer-events:none; visibility:hidden; transition:opacity .25s ease,transform .25s ease,visibility 0s linear .25s; }
+/* c117: data-fab-shy — блок попросил кнопку уступить (пересечение rect).
+   Скрытие через visibility (НЕ display:none) — узел живёт, его rect
+   доступен для геометрии уступа; transition тот же, что у fold. */
+.contact-widget[data-shy="shy"] { opacity:0; transform:translateY(12px) scale(.92); pointer-events:none; visibility:hidden; transition:opacity .25s ease,transform .25s ease,visibility 0s linear .25s; }
 .contact-widget__toggle { position:relative; width:56px; height:56px; display:grid; place-items:center; border:0; border-radius:50%; background:#691c2e; color:white; cursor:pointer; box-shadow:0 5px 22px #691c2e45; transition:background .2s,transform .2s; }
 .contact-widget__toggle:hover { background:#82263d; }
 .contact-widget__toggle:active { transform:scale(.95); }

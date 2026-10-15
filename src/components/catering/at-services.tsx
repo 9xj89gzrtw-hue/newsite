@@ -685,7 +685,16 @@ export function AtServices() {
                     className="at-svc__row-link"
                     aria-label={`Обсудить: ${s.title} — ${s.minOrder}`}
                     onFocus={() => setActiveId(s.id)}
-                    onMouseEnter={() => setActiveId(s.id)}
+                    /* c117: превью-фото грузится с наведения — кроссфейд
+                       500мс+delay не всегда накрывает холодный кэш, между
+                       кадрами мигал тёмный #060606. Прелоад той же URL
+                       (next.config images.unoptimized → оригинал, URL
+                       совпадает 1:1) даёт загрузке фора-старт ~300мс. */
+                    onMouseEnter={() => {
+                      const im = new window.Image();
+                      im.src = s.image;
+                      setActiveId(s.id);
+                    }}
                     onClick={() => {
                       const typeId = SERVICE_TO_MENU_TYPE[s.id];
                       if (typeId && typeof window !== "undefined") {

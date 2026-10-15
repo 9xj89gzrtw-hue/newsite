@@ -217,7 +217,7 @@
   position: relative;
   aspect-ratio: 3 / 4; /* нативные 960×1280 — ноль кропа, ноль апскейла */
   overflow: hidden;
-  background: #0e0b0a; /* inky-подложка на время загрузки */
+  background: #0e0b0a; /* под LQIP — глубочайший фолбэк (no-JS/первый кадр) */
   border-radius: 2px;
   box-shadow:
     0 40px 90px -32px rgba(0, 0, 0, 0.75),
@@ -225,12 +225,36 @@
     inset 0 0 0 1px rgba(247, 245, 245, 0.07);
 }
 
+/* c117 (владелец: «сначала чёрный прямоугольник, потом фото»): LQIP-слой —
+   24px WebP как data-URI (0 байт сети), blur-размытие прячет пикселизацию,
+   scale(1.15) прячет размытые края под overflow:hidden рамки. Лежит ПОД
+   реальным кадром (порядок DOM), грузится мгновенно; когда next/image
+   дорисовался — полностью накрывает LQIP (тот же cover). Заменяет собой
+   «жёсткий чёрный» на мягкое размытое фото — стандартный blur-up. */
+.efs__lqip {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(18px) saturate(1.04);
+  transform: scale(1.15);
+}
+.efs__portrait-img,
+.efs__scene-img {
+  z-index: 1; /* над LQIP-слоем (fill-картинки absolute — нужен стек) */
+}
+
 /* Тональная wash-подложка снизу — фото «утоплено» в тёмную секцию
-   (канон тёмных секций: ea-careers__image-frame::after). */
+   (канон тёмных секций: ea-careers__image-frame::after).
+   c117: z-index 2 — кадр получил стек z-index:1 (над LQIP), без этого
+   wash уходил ПОД фото. */
 .efs__portrait-frame::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 2;
   pointer-events: none;
   background: linear-gradient(
     180deg,
@@ -305,7 +329,7 @@
   position: relative;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  background: #0e0b0a;
+  background: #0e0b0a; /* под LQIP — фолбэк */
   border: 4px solid #fffdfc; /* фотокарточка */
   border-radius: 3px;
   box-shadow:

@@ -5,6 +5,7 @@ import type { ComponentProps } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { SmartImage } from "@/components/media/smart-image";
+import { LQIP } from "@/lib/lqip";
 import "./ea-careers-block.css";
 
 /**
@@ -260,6 +261,11 @@ export function EaCareersBlock() {
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="ea-careers__image"
+                  /* c117 (владелец: чёрный прямоугольник при загрузке — как
+                     у фото основателя): LQIP-blur (24px data-URI) вместо
+                     жёсткой inky-подложки #0E0907 — blur-up штатным
+                     механизмом next/image placeholder="blur". */
+                  blurDataURL={LQIP["/media/concept-crew.jpg"]}
                 />
               </motion.div>
             </div>

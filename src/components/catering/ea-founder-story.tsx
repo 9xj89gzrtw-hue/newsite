@@ -282,7 +282,9 @@ export function EaFounderStory() {
       if (!cancelled) setPortraitReady(true);
     };
     const fallback = window.setTimeout(done, 800);
-    const img = portraitRef.current?.querySelector("img");
+    /* c117: селектор ЦЕЛЕВОЙ — в рамке теперь живёт LQIP-заглушка (data-URI,
+       декодируется мгновенно), bare «img» открыл бы гейт до реального кадра. */
+    const img = portraitRef.current?.querySelector<HTMLImageElement>("img.efs__portrait-img");
     if (img) {
       img.decode().then(done, done);
     } else {
@@ -293,6 +295,31 @@ export function EaFounderStory() {
       window.clearTimeout(fallback);
     };
   }, [portraitInView, portraitReady]);
+
+  /* c117 (владелец: «чёрный прямоугольник, потом фото»): decode-гейт для
+     КАРТОЧКИ-СЦЕНЫ — прежде «шторка» открывалась по sceneInView без
+     ожидания кадра: на холодном кэше под белой рамкой виден был чёрный
+     фрейм #0e0b0a. Теперь шторка ждёт decode (фоллбек 800мс — как у
+     портрета; LQIP под шторкой страхует остаток гонки). */
+  const [sceneReady, setSceneReady] = useState(false);
+  useEffect(() => {
+    if (!sceneInView || sceneReady) return;
+    let cancelled = false;
+    const done = () => {
+      if (!cancelled) setSceneReady(true);
+    };
+    const fallback = window.setTimeout(done, 800);
+    const img = sceneRef.current?.querySelector<HTMLImageElement>("img.efs__scene-img");
+    if (img) {
+      img.decode().then(done, done);
+    } else {
+      done();
+    }
+    return () => {
+      cancelled = true;
+      window.clearTimeout(fallback);
+    };
+  }, [sceneInView, sceneReady]);
 
   // Scrub-дрейф: один useScroll + useTransform-слайсы + useSpring —
   // MotionValues, ноль setState на кадр (§35). Только transform.
@@ -366,7 +393,15 @@ export function EaFounderStory() {
       <div className="efs__container">
         <div className="efs__grid">
           {/* — — ЛЕВАЯ: sticky дуэт-фото (мобайл: обычный поток, фото первым) — — */}
-          <div className="efs__media">
+          <div
+            className="efs__media"
+            /* c117: в правом нижнем углу этого блока висит карточка-сцена
+               (белая рамка, дизайн-элемент) — при входе в секцию телефон-FAB
+               (fixed 16/16) наезжал на неё (замер 390px: перекрытие 39px на
+               y≈7000). data-fab-shy: ContactWidget уступает, пока блок в
+               нижней полосе вьюпорта (IO -83%, гистерезис 300мс). */
+            data-fab-shy=""
+          >
             <motion.div
               ref={portraitRef}
               className="efs__portrait-pos"
@@ -407,8 +442,15 @@ export function EaFounderStory() {
                     : {})}
                 >
                   <div className="efs__portrait-frame">
+                    {/* c117 (владелец: «сначала чёрный прямоугольник, потом
+                        фото»): LQIP-подложка — 24px WebP (data-URI, 0 сети)
+                        с CSS-blur: пока кадр лениво грузится, рамка показывает
+                        мягкое размытое фото, а не чёрный #0e0b0a. Реальный
+                        <img> next/image лежит СВЕРХУ (порядок DOM) и, загрузившись,
+                        полностью накрывает LQIP (тот же object-fit cover). */}
+                    <img className="efs__lqip" src="data:image/webp;base64,UklGRlYBAABXRUJQVlA4IEoBAACwBgCdASoYACAAPt1apUyopSOiMAgBEBuJZACdMs8fHc0IH0YlTNYoCb5/rBc3DhidDyOF2JTSeUdkAWDEQAD+6+To90OmhVXZKtVq/HFJA7mgrOKOmR7D37uaHfsGD1Xt8ZtftnvC2SjMQUt4Zs9zneKMZ8xKTFMwldoByFETq2sFxaqDGV9Lcts1QKAgfJlfxLMoFZZf0GNqLuBUMTxxD8+XKBQPLMxyqwppmWS7WLezqJRtA18dkYXYsH1pdPzC/ZgvRfIWcVBA3QG0pS1buz2AYVPq7TILrGjQ2siWxYC5vLHEmIgJUv0ClcE7DeTsN69r9ETpEujidsrJMJ4asDG5S+LsaxNFyihQd0h6AeLgA5Ip1Lefkb/1UsaEhbUJJlaICege4O67eKEw9bVQHFMAtnB38vtHhbR7spxIsSriAzgWWblAAAA=" alt="" aria-hidden="true" decoding="async" />
                     <Image
-                      src="/media/c67/founder-portrait-v5.webp"
+                      src="/media/c67/founder-portrait-v6.webp"
                       alt="Дмитрий Нилов, основатель nilov catering, в фирменном фартуке на банкетной площадке"
                       fill
                       /* 480px = кап .efs__portrait-pos (≥1280) → DPR2 ровно 960
@@ -445,9 +487,10 @@ export function EaFounderStory() {
                 {...(settled
                   ? {
                       initial: { clipPath: "inset(0% 100% 0% 0%)" },
-                      animate: sceneInView
-                        ? { clipPath: "inset(0% 0% 0% 0%)" }
-                        : undefined,
+                      animate:
+                        sceneInView && sceneReady
+                          ? { clipPath: "inset(0% 0% 0% 0%)" }
+                          : undefined,
                       transition: { duration: narrow ? 0.85 : 1.0, delay: 0.4, ease: EASE },
                     }
                   : {})}
@@ -493,9 +536,16 @@ export function EaFounderStory() {
                       (85% интенсивности, маска только по полосам,
                       фезеринг 3px) — зерно/резкость/лицо нетронуты
                       (замер лапласиана: бокалы 85 против 94 у v4 и
-                      87 у v6; клош 80 против 87/73). */}
+                      87 у v6; клош 80 против 87/73).
+                      c117 (владелец: чёрный прямоугольник при загрузке +
+                      качество): LQIP-подложка (как у портрета, см. выше) +
+                      v8 = v7 + детерминированная ретушь дуэта (частичный
+                      gray-world ББ, чёрная точка + S-кривая, лёгкий unsharp) —
+                      цвет пары согласован (R−B: 37→20 против 41→21 у
+                      портрета), лицо не тронуто (без AI-регенерации). */}
+                  <img className="efs__lqip" src="data:image/webp;base64,UklGRnABAABXRUJQVlA4IGQBAABQBwCdASoYACAAPt1apUyopSOiMAgBEBuJYgCdMsvIqEBxAyqeBf02rh1uKsNFQsUuzA83DPyVWkbFoXpeP9aCMTZAAP7pXo/n/WbXKUpqfOnQcUks9tinzkP2B16DsJTNCK2EbikaYUAPf0piDa/yjDPqG9bU6uWURfoL5IsZZ40SV9frMmbh6usDhkucA1Ok3o9SXh5hiDmSKho31r2+biJ0SNTQuHPEceo5LICjd1t543q02YdGdJbJtJL/YZJd7bIOh57uboc7gWomP6/L3FLoZwUv6tSd4ZwzXSPZ/BR7E0Ck8r6zMu+7+1eyK+P3W9qm6yen5eBzYIQnSMWURjLafiPcHhqRmbPzMFAXCmF4NOlf+QhbXUFJJ+gMofR96eOqZD/DkSn18FAm+p8p9+sULOwUtrL8BLJF8J4i4i7J+XVHBXfyEzKvDofRqa7r/fY+6ENj/9fOYZM2XB2s8gAAAA==" alt="" aria-hidden="true" decoding="async" />
                   <Image
-                    src="/media/c67/founder-scene-v7.webp"
+                    src="/media/c67/founder-scene-v8.webp"
                     alt="Дмитрий Нилов у накрытого банкетного стола — сервировка, зелень и свечи перед праздником"
                     fill
                     /* F9 (волна-A): 20vw при 1920 DPR2 просил w=828 против
