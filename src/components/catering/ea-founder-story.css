@@ -167,7 +167,7 @@
      т.к. карточка живёт на sceneY-скрабе −14…+18px (ea-founder-story.tsx)
      и к концу секции доезжает вниз, съедая резерв. Резерв 4rem оставлен,
      свес карточки урезан (см. .efs__scene-pos ниже) — вместе снова ≥30px
-     в окне соприсутствия карточки и eyebrow (замер wave-D). Desktop не
+     в окне соприсутствия карточки и eyebrow (замер wave-D; c118: sceneY-дрейф снят — резерв теперь с запасом). Desktop не
      затронут — блок <1024. */
   .efs__media {
     padding-bottom: 4rem;
@@ -217,7 +217,7 @@
   position: relative;
   aspect-ratio: 3 / 4; /* нативные 960×1280 — ноль кропа, ноль апскейла */
   overflow: hidden;
-  background: #0e0b0a; /* под LQIP — глубочайший фолбэк (no-JS/первый кадр) */
+  background: #0e0b0a; /* c118: no-JS-фолбэк, в тон секции */
   border-radius: 2px;
   box-shadow:
     0 40px 90px -32px rgba(0, 0, 0, 0.75),
@@ -225,43 +225,14 @@
     inset 0 0 0 1px rgba(247, 245, 245, 0.07);
 }
 
-/* c117 (владелец: «сначала чёрный прямоугольник, потом фото»): LQIP-слой —
-   24px WebP как data-URI (0 байт сети), blur-размытие прячет пикселизацию,
-   scale(1.15) прячет размытые края под overflow:hidden рамки. Лежит ПОД
-   реальным кадром (порядок DOM), грузится мгновенно; когда next/image
-   дорисовался — полностью накрывает LQIP (тот же cover). Заменяет собой
-   «жёсткий чёрный» на мягкое размытое фото — стандартный blur-up. */
-.efs__lqip {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: blur(18px) saturate(1.04);
-  transform: scale(1.15);
-}
-.efs__portrait-img,
-.efs__scene-img {
-  z-index: 1; /* над LQIP-слоем (fill-картинки absolute — нужен стек) */
-}
+/* c118: LQIP-слой (24px WebP + blur(18px) saturate(1.04)) и z-стек
+   (LQIP 0 < img 1 < wash 2) УДАЛЕНЫ — фото eager + decode-прогрев
+   (ea-founder-story.tsx, warmFounderDecode): размытой фазы загрузки
+   больше нет, оверлеев над кадром нет (ТЗ П1.1). */
 
-/* Тональная wash-подложка снизу — фото «утоплено» в тёмную секцию
-   (канон тёмных секций: ea-careers__image-frame::after).
-   c117: z-index 2 — кадр получил стек z-index:1 (над LQIP), без этого
-   wash уходил ПОД фото. */
-.efs__portrait-frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(22, 19, 18, 0) 62%,
-    rgba(22, 19, 18, 0.32) 100%
-  );
-}
+/* c118: тональная wash-подложка ::after (градиент rgba(22,19,18,.32)
+   на низ кадра) УДАЛЕНА — меняла цвета/контраст самой фотографии
+   (ТЗ П1.1: оверлеев над фото нет). Фото = оригинал. */
 
 /* Ховер-зум фото — CSS на <img>, внутренний reveal-зум framer живёт на
    отдельной обёртке (.efs__portrait-zoom) — конфликта трансформов нет. */
@@ -277,10 +248,10 @@
 }
 
 /* Карточка-сцена: 42% ширины, внахлёст справа-снизу, белая рамка 4px
-   как фотокарточка. Вход: clip «шторка» слева→направо + rotate −10°→−5°
-   (framer, TSX; клип СЛИТ с карточкой — clip-path режет в локальных
-   координатах до transform, отдельная обёртка срезала рамку); ховер —
-   lift + выпрямление (whileHover, TSX). */
+   как фотокарточка. c118 (ТЗ П1.2): вход — clip «шторка» (на обёртке
+   .efs__scene-clip, TSX); статичный наклон −5° и hover (lift +
+   выпрямление) — чистый CSS на .efs__scene-card (ниже); framer-
+   трансформы и скролл-параллакс карточки сняты. */
 .efs__scene-pos {
   position: absolute;
   right: -4%;
@@ -323,13 +294,29 @@
 
 .efs__scene-card {
   border-radius: 3px;
+  /* c118: статичный наклон (дизайн-интенция −5°, вынесен на внешний
+     контейнер карточки, ТЗ П1.2) — JS не пишет transform в поддерево */
+  transform: rotate(-5deg);
+}
+
+/* c118: hover — только fine-pointer, transition ТОЛЬКО transform
+   (никакого all), срабатывает лишь на жесте ховера — при скролле
+   transform карточки не меняется вовсе: JS не пишет transform
+   в это поддерево ни на одном кадре). */
+@media (hover: hover) and (pointer: fine) {
+  .efs__scene-card {
+    transition: transform 0.3s ease-out;
+  }
+  .efs__scene-card:hover {
+    transform: rotate(0deg) translateY(-6px);
+  }
 }
 
 .efs__scene-frame {
   position: relative;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  background: #0e0b0a; /* под LQIP — фолбэк */
+  background: #0e0b0a; /* c118: no-JS-фолбэк (в тон секции) */
   border: 4px solid #fffdfc; /* фотокарточка */
   border-radius: 3px;
   box-shadow:
@@ -657,6 +644,7 @@
 @media (prefers-reduced-motion: reduce) {
   .efs__portrait-img,
   .efs__scene-img,
+  .efs__scene-card,
   .efs__scene-frame {
     transition: none !important;
     animation: none !important;

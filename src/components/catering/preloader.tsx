@@ -18,24 +18,29 @@ import Image from "next/image";
  *   стоит на статичных 12% (атрибут stroke-dashoffset в SSR-разметке — нет
  *   прыжков); после гидрации JS пишет style.strokeDashoffset через ref —
  *   БЕЗ ре-рендеров (грабля c85 §2: 259 inline-записей на кадр).
- * • Прогресс честный, с потолком 90% до real-ready: DOM parsed → 35%,
+ * • Прогресс честный, с потолком 90% до real-ready: DOM parsed → 35%,
  *   hero-постер complete/load → 60%, window load → 90%, готовность к
- *   снятию → 100% (монотонный max, ниже не опускается).
- * • Снятие = min-show 600мс (от навигации, анти-«вспышка») ∧ (ready ∨
- *   ЖЁСТКИЙ КАП 3.0с) — RM-ветка min-show пропускает (мгновенно по
- *   ready, c98-FIX1: раньше докблок это обещал, а код применял таймер).
- *   ready = hero-постер загружен (querySelector
- *   '#hero img' complete/load/error; ФОЛБЭК без #hero — window load).
+ *   снятию → 100% (монотонный max, ниже не опускается).
+ * • c118 (ТЗ П2 «фризы при первом открытии»): ready — теперь НЕ голый
+ *   load hero-постера, а ВСЕ условия первого экрана:
+ *   1) шрифты — await document.fonts.ready (типографика устоялась);
+ *   2) hero-кадры ЗАГРУЖЕНЫ И ДЕКОДИРОВАНЫ — img.decode() LCP-картинки
+ *      #hero img И видимого слоя hero — постера <video> (тот же кадр, webp;
+ *      прогрев через createElement(img)+decode() по тому же URL);
+ *   3) один полный rAF-цикл (двойной rAF) после готовности — тяжёлые
+ *      скрипты верстки отработали, main thread свободен, первый кадр
+ *      контента закоммичен → снятие не совпадает с пиковой нагрузкой.
+ * • Снятие = min-show 600мс (от навигации, анти-«вспышка») ∧ (ready ∨
+ *   ЖЁСТКИЙ КАП 3.5с — ТЗ П2: страховка 3.5–4с при плохом интернете;
+ *   RM-ветка min-show пропускает (мгновенно по ready, без rAF-ожидания).
  *   Выход: класс .pre-done → fade 0.5s + scale 0.98 бейджа, visibility:
- *   hidden с 300мс (тапы сквозь — сразу, pointer-events:none) → DOM-чистка
- *   (unmount) через ~340мс от старта fade — к этому моменту opacity уже
+ *   hidden с 300мс (тапы сквозь — сразу, pointer-events:none) → DOM-чистка
+ *   (unmount) через ~340мс от старта fade — к этому моменту opacity уже
  *   ~5% (easeOutCubic), хвост режется незаметно.
  * • CSS-страховка мёртвого JS: [data-preloader-root] сам гаснет
- *   pre-root-release на 4.2с (globals.css; c98-FIX1: было 3.4с — впритык к
- *   JS-пути 3.0с+340мс, при поздней гидрации замер критика 3.83с входил в
- *   страховку с запасом 0.17с; теперь ≥0.4с запаса при любом взводе) —
- *   JS-путь успевает раньше, анимация реально стреляет только при мёртвой/
- *   зависшей гидрации.
+ *   pre-root-release на 4.2с (globals.css; выше JS-пути 3.5с+0.34с=3.84с —
+ *   запас 0.36с при любом взводе) — JS-путь успевает раньше, анимация реально
+ *   стреляет только при мёртвой/зависшей гидрации.
  * • Повторный визит за сессию: инлайн-скрипт в начале <body> (layout.tsx)
  *   ставит [data-no-preloader] на <html> до парсинга → CSS
  *   display:none первым же стайл-резолвом. No-JS: noscript-стиль
@@ -99,7 +104,7 @@ export function Preloader() {
     /* ── Снятие: min-show 600мс (ОТ НАВИГАЦИИ — performance.now) ∧ ready ∨
        кап 3.0с (тоже от навигации: поздняя гидрация не продлевает оверлей). ── */
     const MIN_SHOW = 600;
-    const HARD_CAP = 3000;
+    const HARD_CAP = 3500; /* c118: 3.0 → 3.5с (ТЗ П2: коридор 3.5–4с) */
     let removed = false;
     let removeTimer: number | undefined;
     const remove = () => {
@@ -117,32 +122,82 @@ export function Preloader() {
     const arm = () => {
       applyProgress(1); /* real-ready → кольцо до упора */
       /* c98-FIX1 (критик1 #8, NIT→FIX): RM — честное «мгновенное снятие по
-       * ready»: wait=0 (докблок это всегда обещал, код применял min-show).
-       * Не-зеро-таймер сохранён для обычного пути (анти-«вспышка»). */
+       * ready»: wait=0. Не-зеро-таймер сохранён для обычного пути
+       * (анти-«вспышка»). */
       const wait = reduce ? 0 : Math.max(0, MIN_SHOW - performance.now());
-      removeTimer = window.setTimeout(remove, wait);
+      const fire = () => {
+        removeTimer = window.setTimeout(remove, wait);
+      };
+      if (reduce) {
+        fire();
+        return;
+      }
+      /* c118 (ТЗ П2.1.3): один полный rAF-цикл после готовности —
+       * браузер закоммитил кадр с контентом, инициализация тяжёлых
+       * скриптов (Lenis/framer/IO-гейты) отработала, main thread
+       * свободен: снятие оверлея не совпадает с пиком нагрузки
+       * (анти-«фриз первого кадра»). */
+      requestAnimationFrame(() => {
+        requestAnimationFrame(fire);
+      });
     };
 
-    /* ready = hero-постер загружен; error постера = complete → тоже ready
-       (не виснем на битой картинке). Нет #hero (напр. /admin) — фолбэк
-       window load. Секция #hero сидит в SSR-HTML — img виден сразу. */
+    /* ── c118 (ТЗ П2.1): ready = ШРИФТЫ ∧ ДЕКОДИРОВАННЫЕ кадры hero ── */
+    /* 1) Шрифты первого экрана — document.fonts.ready. */
+    const fontsP = document.fonts.ready.then(
+      () => {},
+      () => {},
+    );
+
+    /* 2) LCP-картинка hero (#hero img, под видео-слоем): load → decode.
+       Error постера = complete → тоже ready (не виснем на битой картинке). */
     const heroImg = document.querySelector(
       "#hero img",
     ) as HTMLImageElement | null;
-    if (heroImg) {
-      const onHero = () => {
-        applyProgress(0.6); /* +25% — LCP-кадр на месте */
-        arm();
-      };
-      if (heroImg.complete) onHero();
-      else {
-        on(heroImg, "load", onHero);
-        on(heroImg, "error", onHero);
-      }
-    } else {
-      if (document.readyState === "complete") arm();
-      else on(window, "load", arm);
-    }
+    const heroP: Promise<void> = heroImg
+      ? new Promise<void>((res) => {
+          if (heroImg.complete) res();
+          else {
+            on(heroImg, "load", res);
+            on(heroImg, "error", res);
+          }
+        }).then(() => {
+          applyProgress(0.6); /* +25% — LCP-кадр на месте */
+          /* c118: complete ≠ декодирован — доводим до битмапа (GPU),
+             иначе первый показ совпадал бы с синхронным декодом (фриз). */
+          return heroImg.decode().then(
+            () => {},
+            () => {},
+          );
+        })
+      : new Promise<void>((res) => {
+          /* Нет #hero (напр. /admin) — фолбэк window load. */
+          if (document.readyState === "complete") res();
+          else on(window, "load", res);
+        });
+
+    /* 3) ВИДИМЫЙ слой hero — постер <video> (webp того же кадра, над
+       LCP-картинкой): его загрузку из DOM не дождаться —
+       прогрев через createElement(img) по ТОМУ ЖЕ URL (кэш/инфлайт)
+       + decode() — битмап готов до снятия оверлея. */
+    const heroVideo = document.querySelector(
+      "#hero video",
+    ) as HTMLVideoElement | null;
+    const posterUrl = heroVideo?.getAttribute("poster");
+    const posterP: Promise<void> = posterUrl
+      ? new Promise<void>((res) => {
+          const probe = document.createElement("img");
+          on(probe, "error", res);
+          probe.src = posterUrl;
+          probe.decode().then(
+            () => res(),
+            () => res(),
+          );
+        })
+      : Promise.resolve();
+
+    /* arm() — единственный путь к 100% (жёсткий кап ниже — страховка). */
+    Promise.all([fontsP, heroP, posterP]).then(arm, arm);
 
     /* window load → 90% (потолок до real-ready: arm() единственный путь к 1) */
     const onLoad = () => applyProgress(0.9);

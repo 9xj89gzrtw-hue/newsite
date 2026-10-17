@@ -32,12 +32,28 @@ import "@/components/motion/c74-kinetic.css";
  * тёплый bloom. data-header-theme="dark" — потребитель (флип шапки на
  * тёмный вариант) реализован в site-header (FX5, волна-B c67).
  *
+ * c118 (ТЗ владельца «чистое качество фото + стабильность при скролле»):
+ *   • LQIP-слои (24px blur-заглушки c117) УДАЛЕНЫ с обеих фото —
+ *     владелец видел «момент некрасивой первичной подгрузки»; вместо
+ *     blur-up обе фотографии грузятся loading="eager" + fetchPriority="low"
+ *     (не спорят с LCP hero) и прогреваются img.decode() сразу после
+ *     загрузки первого экрана (эффект warmFounderDecode ниже) — к Главе 03
+ *     оба кадра уже в памяти браузера: появление мгновенное, без размытой
+ *     фазы. Тональный wash-градиент .efs__portrait-frame::after УДАЛЁН —
+ *     менял цвета/контраст самого фото. Фото = оригинал (unoptimized).
+ *   • Скролл-параллакс карточки-сцены (sceneY-пружина, translateY на
+ *     каждый кадр скролла ПОД ротированной карточкой) ОТКЛЮЧЁН — причина
+ *     «дёргается и плывут пиксели» (перерисовка текстуры на каждом кадре).
+ *     Наклон −5° теперь статичный CSS на контейнере карточки, hover — тоже
+ *     чистый CSS. Пропорции жёсткие: aspect-ratio 3/4 + object-fit cover.
+ *
  * Структура (desktop ≥1024):
  *   ЛЕВАЯ (46%) — sticky (top 110px) дуэт-фото: портрет 3/4 (вход clip-path
  *   снизу + inner zoom 1.12→1.0) + карточка-сцена 42% внахлёст справа-снизу
- *   (белая рамка 4px, вход clip «шторка» слева→направо + rotate −10°→−5°,
- *   delay 0.4s; hover — lift + выпрямление). Дифференциальный scrub-дрейф
- *   фото по Y (±22px, противофаза) — MotionValues, ноль setState на кадр.
+ *   (белая рамка 4px, вход clip «шторка» слева→направо; статичный наклон
+ *   −5° на контейнере, hover — lift + выпрямление, чистый CSS). Scrub-дрейф
+ *   по Y (±22px) остаётся только у портрета — MotionValues, ноль setState
+ *   на кадр.
  *   За контентом на всю ширину низа — гигантское outlined «Нилов» (в JSX
  *   title-case, uppercase даёт CSS text-transform; Playfair, cyrillic ✓,
  *   stroke cream 15%) со scrub-дрейфом по X (±40px; на <768 — ±14px,
@@ -192,13 +208,10 @@ export function EaFounderStory() {
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // FX2 (волна-B): вход сцены (1.0s + delay 0.4) раньше наследовался
-  // возвратом из hover — после ухода курсора стояло ~505ms мёртвого delay
-  // и ~1.0s плавного возврата. sceneEntered взводится onAnimationComplete
-  // входа: ПЕРВЫЙ вход сохраняет delay 0.4s, каждый возврат из hover после
-  // — короткий (0.35s) и мгновенный. Пишется только в колбеке (React
-  // Compiler §37: ref-записи в рендере запрещены — использую state).
-  const [sceneEntered, setSceneEntered] = useState(false);
+  /* FX2 (волна-B) → c118: сцена входит только clip-«шторкой» (статичный
+     наклон −5° — CSS на .efs__scene-card, см. ea-founder-story.css);
+     framer-rotate/whileHover/onAnimationComplete сняты вместе со
+     скролл-параллаксом sceneY (докблок вверху). */
 
   const sectionRef = useRef<HTMLElement>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
@@ -268,12 +281,11 @@ export function EaFounderStory() {
   const sceneInView = useInView(sceneRef, { once: true, margin: "-60px" });
   const signInView = useInView(signRef, { once: true, margin: "-80px" });
 
-  // F19 (волна-A): на anchor-jump #about ленивая загрузка портрета гонка с
-  // clip-reveal — кадр «выскакивал» наполовину загруженным. Reveal стартаует
-  // только после img.decode() (race с 800ms-фоллбеком: reveal всегда
-  // срабатывает ≤800ms). Decode зовётся ТОЛЬКО при inView — loading="lazy"
-  // сохранён, вне вьюпорта ничего не форсируется. Reduce/no-JS: анимации нет
-  // (settled=false), гейт не участвует.
+  /* F19 (волна-A) / c118: гейт decode для портрета — reveal стартует
+     только после img.decode() (страховка медленной сети: фото теперь
+     eager + прогрев decode() после первого экрана — см.
+     warmFounderDecode; гейт почти всегда уже зелёён при inView).
+     Reduce/no-JS: анимации нет (settled=false), гейт не участвует. */
   const [portraitReady, setPortraitReady] = useState(false);
   useEffect(() => {
     if (!portraitInView || portraitReady) return;
@@ -282,8 +294,7 @@ export function EaFounderStory() {
       if (!cancelled) setPortraitReady(true);
     };
     const fallback = window.setTimeout(done, 800);
-    /* c117: селектор ЦЕЛЕВОЙ — в рамке теперь живёт LQIP-заглушка (data-URI,
-       декодируется мгновенно), bare «img» открыл бы гейт до реального кадра. */
+    /* c117: селектор ЦЕЛЕВОЙ (гейт декодит именно реальный кадр). */
     const img = portraitRef.current?.querySelector<HTMLImageElement>("img.efs__portrait-img");
     if (img) {
       img.decode().then(done, done);
@@ -296,11 +307,9 @@ export function EaFounderStory() {
     };
   }, [portraitInView, portraitReady]);
 
-  /* c117 (владелец: «чёрный прямоугольник, потом фото»): decode-гейт для
-     КАРТОЧКИ-СЦЕНЫ — прежде «шторка» открывалась по sceneInView без
-     ожидания кадра: на холодном кэше под белой рамкой виден был чёрный
-     фрейм #0e0b0a. Теперь шторка ждёт decode (фоллбек 800мс — как у
-     портрета; LQIP под шторкой страхует остаток гонки). */
+  /* c117 → c118: decode-гейт КАРТОЧКИ-СЦЕНЫ — «шторка» открывается
+     только после decode кадра (фоллбек 800мс, как у портрета). Фото
+     eager + decode-прогрев — гейт остаётся страховкой медленной сети. */
   const [sceneReady, setSceneReady] = useState(false);
   useEffect(() => {
     if (!sceneInView || sceneReady) return;
@@ -320,6 +329,31 @@ export function EaFounderStory() {
       window.clearTimeout(fallback);
     };
   }, [sceneInView, sceneReady]);
+
+  /* ── c118 (ТЗ П1.3): прелоад-прогрев обеих фотографий основателя ──
+     Требование: к моменту, когда юзер доскроллит до Главы 03, оба кадра
+     ЗАГРУЖЕНЫ и ДЕКОДИРОВАНЫ в памяти браузера (мгновенное появление,
+     без размытой/пустой фазы). loading="eager" стартует fetch прямо при
+     парсинге HTML, fetchPriority="low" не спорит с LCP hero (ТЗ П2);
+     img.decode() доводит кадр до готового битмапа. Запуск — сразу после
+     готовности первого экрана: window load (hero+шрифты+eager-кадры уже
+     в браузере); decode() на незагруженном img сам ждёт load. */
+  useEffect(() => {
+    const warm = () => {
+      for (const sel of ["img.efs__portrait-img", "img.efs__scene-img"]) {
+        sectionRef.current
+          ?.querySelector<HTMLImageElement>(sel)
+          ?.decode()
+          ?.catch(() => {});
+      }
+    };
+    if (document.readyState === "complete") {
+      warm();
+      return;
+    }
+    window.addEventListener("load", warm, { once: true });
+    return () => window.removeEventListener("load", warm);
+  }, []);
 
   // Scrub-дрейф: один useScroll + useTransform-слайсы + useSpring —
   // MotionValues, ноль setState на кадр (§35). Только transform.
@@ -344,7 +378,9 @@ export function EaFounderStory() {
     springOpts,
   );
   const portraitY = useSpring(useTransform(scrollYProgress, [0, 1], [22, -22]), springOpts);
-  const sceneY = useSpring(useTransform(scrollYProgress, [0, 1], [-14, 18]), springOpts);
+  /* c118: sceneY (скролл-параллакс карточки-сцены) УДАЛЁН — причина
+     дёргания и «плывающих пикселей» маленького фото при скролле
+     (ТЗ П1.2). Карточка стоит статично в контейнере. */
 
   // Fade-up вход текста: 26px, stagger 80–120ms; на мобиле короче/плотнее.
   const fadeUp = (delay: number) =>
@@ -442,22 +478,29 @@ export function EaFounderStory() {
                     : {})}
                 >
                   <div className="efs__portrait-frame">
-                    {/* c117 (владелец: «сначала чёрный прямоугольник, потом
-                        фото»): LQIP-подложка — 24px WebP (data-URI, 0 сети)
-                        с CSS-blur: пока кадр лениво грузится, рамка показывает
-                        мягкое размытое фото, а не чёрный #0e0b0a. Реальный
-                        <img> next/image лежит СВЕРХУ (порядок DOM) и, загрузившись,
-                        полностью накрывает LQIP (тот же object-fit cover). */}
-                    <img className="efs__lqip" src="data:image/webp;base64,UklGRlYBAABXRUJQVlA4IEoBAACwBgCdASoYACAAPt1apUyopSOiMAgBEBuJZACdMs8fHc0IH0YlTNYoCb5/rBc3DhidDyOF2JTSeUdkAWDEQAD+6+To90OmhVXZKtVq/HFJA7mgrOKOmR7D37uaHfsGD1Xt8ZtftnvC2SjMQUt4Zs9zneKMZ8xKTFMwldoByFETq2sFxaqDGV9Lcts1QKAgfJlfxLMoFZZf0GNqLuBUMTxxD8+XKBQPLMxyqwppmWS7WLezqJRtA18dkYXYsH1pdPzC/ZgvRfIWcVBA3QG0pS1buz2AYVPq7TILrGjQ2siWxYC5vLHEmIgJUv0ClcE7DeTsN69r9ETpEujidsrJMJ4asDG5S+LsaxNFyihQd0h6AeLgA5Ip1Lefkb/1UsaEhbUJJlaICege4O67eKEw9bVQHFMAtnB38vtHhbR7spxIsSriAzgWWblAAAA=" alt="" aria-hidden="true" decoding="async" />
+                  {/* c117 → c118 (владелец: «момент некрасивой первичной
+                      подгрузки»): LQIP-заглушка снята — фото eager +
+                      decode-прогрев (warmFounderDecode), размытой фазы
+                      больше нет; фон #0e0b0a — последний no-JS фолбэк. */}
                     <Image
                       src="/media/c67/founder-portrait-v6.webp"
                       alt="Дмитрий Нилов, основатель nilov catering, в фирменном фартуке на банкетной площадке"
                       fill
-                      /* 480px = кап .efs__portrait-pos (≥1280) → DPR2 ровно 960
-                         device-px (натив источника); бакет 1080 — ближайший в
-                         дефолтном deviceSizes, не 1920 (FX10b). */
+                      /* c118: unoptimized — браузер получает ОРИГИНАЛ
+                         960×1280 (ноль перегонок/ресайзов; глобальный
+                         images.unoptimized в next.config продублирован
+                         явно). sizes инертен при unoptimized — оставлен
+                         ради fill-линтера dev-варнинга. */
                       sizes="(max-width: 1023px) 92vw, 480px"
                       className="efs__portrait-img"
+                      /* c118 (ТЗ П1.3): eager-загрузка + НИЗКИЙ приоритет
+                         (кадры ниже фолда не спорят с LCP hero — ТЗ П2)
+                         + decode-прогрев в warmFounderDecode: к Главе 03
+                         кадр уже декодирован. */
+                      unoptimized
+                      loading="eager"
+                      fetchPriority="low"
+                      decoding="async"
                     />
                   </div>
                 </motion.div>
@@ -465,18 +508,15 @@ export function EaFounderStory() {
             </motion.div>
 
             {/* Карточка-сцена: внахлёст справа-снизу, белая рамка 4px.
-                Вход: clip «шторка» слева→направо + rotate −10°→−5°, delay 0.4s
-                после портрета. Hover (fine pointer): lift + выпрямление.
-                Клип слит с карточкой (правка волны-1): clip-path режет в
-                ЛОКАЛЬНЫХ координатах ДО transform — отдельная обёртка-клип
-                точного размера срезала белую рамку rotate-нутой карточки со
-                всех 4 сторон. «Шторка» теперь наклонена вместе с карточкой —
-                приемлемо (угол карточки). §34: строки clip-path одной
-                токен-структуры. */}
+                Вход: clip «шторка» слева→направо (на обёртке
+                .efs__scene-clip). c118: статичный наклон −5° и hover
+                (lift + выпрямление) — чистый CSS на .efs__scene-card
+                (ea-founder-story.css); framer-трансформы карточки
+                сняты вместе со скролл-параллаксом — стабильность при
+                скролле (ТЗ П1.2). */}
             <motion.div
               ref={sceneRef}
               className="efs__scene-pos"
-              style={settled ? { y: sceneY } : undefined}
             >
               {/* Клип на ОБЁРТКЕ (не на карточке): clip-path режет и тень
                   карточки — обёртка имеет поле под тень (.efs__scene-clip).
@@ -495,67 +535,36 @@ export function EaFounderStory() {
                     }
                   : {})}
               >
-                <motion.div
-                  key={`scard-${on}`}
-                  className="efs__scene-card"
-                  {...(settled
-                    ? {
-                        initial: { rotate: -10 },
-                        animate: sceneInView ? { rotate: -5 } : undefined,
-                        // F6 (волна-A): hover-переход свой — короткий, без
-                        // delay 0.4; входной transition (1.0s + delay) больше
-                        // не наследуется жестом (hover отвечал через 250ms,
-                        // доезжал ~1.85s).
-                        whileHover: {
-                          rotate: 0,
-                          y: -6,
-                          transition: { duration: 0.3, ease: "easeOut" },
-                        },
-                        // FX2 (волна-B): возврат из hover больше не ездит на
-                        // входном delay 0.4 — после завершения входа
-                        // (onAnimationComplete → sceneEntered) возврат
-                        // 0.35s БЕЗ delay; самый первый вход — прежний
-                        // (1.0s + 0.4s). whileHover-in по-прежнему 0.3s.
-                        onAnimationComplete: () => setSceneEntered(true),
-                        transition: sceneEntered
-                          ? { duration: 0.35, ease: EASE }
-                          : { duration: narrow ? 0.85 : 1.0, delay: 0.4, ease: EASE },
-                      }
-                    : {})}
-                >
+                <div className="efs__scene-card">
+                  {/* c118: rotate/whileHover/onAnimationComplete сняты —
+                      статичный наклон −5° + hover — чистый CSS
+                      (.efs__scene-card в ea-founder-story.css). */}
                 <div className="efs__scene-frame">
-                  {/* c91 (владелец: «вторую фотку основателя надо вернуть
-                      которая была, просто сделать её без разводов») —
-                      возвращён ИСХОДНЫЙ кадр c67 (Дмитрий у накрытого
-                      стола, founder-scene-v4).
-                      c93 (заказчик: «на маленькой фотке размытие
-                      пикселей»): заплатки c91 (AI-перегенерация зон
-                      разводов) давали мягкость стекла/клоша. v7 = v4 +
-                      ДЕТЕРМИНИРОВАННАЯ чистка: вертикальные молочные
-                      подтёки вычтены через горизонтальную медиану
-                      (85% интенсивности, маска только по полосам,
-                      фезеринг 3px) — зерно/резкость/лицо нетронуты
-                      (замер лапласиана: бокалы 85 против 94 у v4 и
-                      87 у v6; клош 80 против 87/73).
-                      c117 (владелец: чёрный прямоугольник при загрузке +
-                      качество): LQIP-подложка (как у портрета, см. выше) +
-                      v8 = v7 + детерминированная ретушь дуэта (частичный
-                      gray-world ББ, чёрная точка + S-кривая, лёгкий unsharp) —
-                      цвет пары согласован (R−B: 37→20 против 41→21 у
-                      портрета), лицо не тронуто (без AI-регенерации). */}
-                  <img className="efs__lqip" src="data:image/webp;base64,UklGRnABAABXRUJQVlA4IGQBAABQBwCdASoYACAAPt1apUyopSOiMAgBEBuJYgCdMsvIqEBxAyqeBf02rh1uKsNFQsUuzA83DPyVWkbFoXpeP9aCMTZAAP7pXo/n/WbXKUpqfOnQcUks9tinzkP2B16DsJTNCK2EbikaYUAPf0piDa/yjDPqG9bU6uWURfoL5IsZZ40SV9frMmbh6usDhkucA1Ok3o9SXh5hiDmSKho31r2+biJ0SNTQuHPEceo5LICjd1t543q02YdGdJbJtJL/YZJd7bIOh57uboc7gWomP6/L3FLoZwUv6tSd4ZwzXSPZ/BR7E0Ck8r6zMu+7+1eyK+P3W9qm6yen5eBzYIQnSMWURjLafiPcHhqRmbPzMFAXCmF4NOlf+QhbXUFJJ+gMofR96eOqZD/DkSn18FAm+p8p9+sULOwUtrL8BLJF8J4i4i7J+XVHBXfyEzKvDofRqa7r/fY+6ENj/9fOYZM2XB2s8gAAAA==" alt="" aria-hidden="true" decoding="async" />
+                  {/* c91/c93: исходный кадр c67 (Дмитрий у
+                      накрытого стола) + детерминированная чистка
+                      разводов (v7) + ретушь дуэта v8 (ББ/контраст/
+                      unsharp, без AI-лица) — c117. c118: LQIP-слой
+                      снят — eager + decode-прогрев (см.
+                      warmFounderDecode выше); фон #0e0b0a — no-JS
+                      фолбэк. */}
                   <Image
                     src="/media/c67/founder-scene-v8.webp"
                     alt="Дмитрий Нилов у накрытого банкетного стола — сервировка, зелень и свечи перед праздником"
                     fill
-                    /* F9 (волна-A): 20vw при 1920 DPR2 просил w=828 против
-                       достаточных 640 (слот карточки ~270px). Мобайл: 46vw
-                       покрывает слот карточки (46% ширины media) с запасом. */
+                      /* c118: unoptimized — оригинал кадра как есть
+                         (sizes инертен при unoptimized, оставлен
+                         для fill-линтера). */
                     sizes="(max-width: 1023px) 46vw, 270px"
                     className="efs__scene-img"
+                    /* c118 (ТЗ П1.3): eager + низкий приоритет +
+                       decode-прогрев — к Главе 03 кадр готов. */
+                    unoptimized
+                    loading="eager"
+                    fetchPriority="low"
+                    decoding="async"
                   />
                 </div>
-                </motion.div>
+                </div>
               </motion.div>
             </motion.div>
           </div>

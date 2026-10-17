@@ -196,11 +196,17 @@ function PhotoTile({
   /** Marks the duplicate clone as decorative for screen readers so the
    *  photo list is not announced twice. */
   ariaHidden = false,
+  /* c118 (ТЗ П2.2): до взвода <img> НЕ монтируется — ноль сетевых
+   * запросов из ленты (native lazy на быстрых сетях грузил 35/36 фото
+   * в первые 2с при scrollY=0 — замер). Геометрия тайла от img не
+   * зависит (высота + aspect-ratio) — шов -50% не плывёт. */
+  load,
 }: {
   src: string;
   alt: string;
   ratio: MarqueeRatio;
   ariaHidden?: boolean;
+  load: boolean;
 }): React.ReactElement {
   return (
     <span
@@ -210,6 +216,7 @@ function PhotoTile({
       /* C78: двойной тап по фото — золотой всплеск искр (MicroDelights). */
       data-spark
     >
+      {load && (
       <Image
         src={src}
         alt={ariaHidden ? "" : alt}
@@ -229,8 +236,14 @@ function PhotoTile({
         // draggable=false so the user can't accidentally trigger the
         // browser's native image-drag gesture over the marquee (which
         // would otherwise interfere with the keyframes-driven motion).
+        // c118 (ТЗ П2.2): lazy задан ЯВНО + decoding="async" — декод не
+        // блокирует main thread при входе тайлов в вьюпорт (анти-«фриз
+        // первого скролла»), 36×2 фото ленты не забивают декодер старта.
+        loading="lazy"
+        decoding="async"
         draggable={false}
       />
+      )}
     </span>
   );
 }
@@ -240,7 +253,7 @@ function PhotoTile({
  *  exited left, set 2 is exactly where set 1 started). Ширины тайлов
  *  детерминированы (явная высота + aspect-ratio — не зависят от загрузки
  *  картинок), поэтому шов -50% не плывёт при lazy-загрузке. */
-function PhotoSet({ ariaHidden = false }: { ariaHidden?: boolean }) {
+function PhotoSet({ ariaHidden = false, load }: { ariaHidden?: boolean; load: boolean }) {
   return (
     <span className="gamma-marquee__set flex shrink-0 items-center">
       {MARQUEE_PHOTOS.map((photo, i) => (
@@ -250,6 +263,7 @@ function PhotoSet({ ariaHidden = false }: { ariaHidden?: boolean }) {
           alt={photo.alt}
           ratio={photo.ratio}
           ariaHidden={ariaHidden}
+          load={load}
         />
       ))}
     </span>
@@ -261,6 +275,32 @@ export function GammaMarquee() {
   const trackRef = React.useRef<HTMLDivElement>(null);
   const sectionRef = React.useRef<HTMLElement>(null);
   const [reducedMotion, setReducedMotion] = React.useState(false);
+  /* c118 (ТЗ П2.2): гейт загрузки ленты — <img> монтируются только при
+   * приближении секции к вьюпорту (IO rootMargin 300px, once): до этого
+   * ноль запросов из ленты — первые 2с открытия не забивают сеть и
+   * декодер браузера (36×2 тайлов). Замер до фикса: 35/36 фото грузились
+   * при scrollY=0 — native lazy margin Chrome на быстрых сетях покрывает
+   * всю ленту целиком. */
+  const [nearView, setNearView] = React.useState(false);
+  React.useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || nearView) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setNearView(true); /* среда без IO — не прятать галерею навсегда */
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((en) => en.isIntersecting)) {
+          setNearView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "300px" },
+    );
+    io.observe(section);
+    return () => io.disconnect();
+  }, [nearView]);
 
   // ── Marquee timing ──────────────────────────────────────────────────
   /** One full loop (0 → -50% of the track) in seconds. Must match the
@@ -655,10 +695,10 @@ export function GammaMarquee() {
               }
         }
       >
-        <PhotoSet />
+        <PhotoSet load={nearView} />
         {/* Set 2 — duplicate clone for seamless -50% loop. aria-hidden so
             screen readers don't announce the gallery twice. */}
-        <PhotoSet ariaHidden />
+        <PhotoSet ariaHidden load={nearView} />
       </div>
     </section>
   );

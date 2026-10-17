@@ -208,6 +208,32 @@ export function EventsVideoCarousel() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const hoverVideosRef = useRef<Array<HTMLVideoElement | null>>([]);
   const inViewRef = useRef(false);
+  /* c118 (ТЗ П2.2): гейт ПОСТЕРОВ Главы 04 — <Image> монтируется только
+   * при приближении секции (IO rootMargin 300px, once). Замер: native
+   * lazy грузил все 6 постеров (~8500px ниже фолда!) в первые 2с
+   * открытия при scrollY=0 — margin Chrome на быстрых сетях покрывал
+   * их; видео и так preload="none" (FIX-4), теперь и постеры вне сети
+   * до приближения секции. */
+  const [nearView, setNearView] = useState(false);
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || nearView) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setNearView(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((en) => en.isIntersecting)) {
+          setNearView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "300px" },
+    );
+    io.observe(section);
+    return () => io.disconnect();
+  }, [nearView]);
   const canHoverVideo = useMemo(
     () =>
       typeof window !== "undefined" &&
@@ -680,13 +706,20 @@ export function EventsVideoCarousel() {
                 duration={0.8}
                 className="absolute inset-0"
               >
+                {nearView && (
                 <Image
                   className="ea-evt-video__video"
                   src={tile.poster}
                   alt={tile.videoAlt}
                   fill
                   sizes="(max-width: 767px) 280px, 320px"
+                  /* c118 (ТЗ П2.2): lazy явно + decoding="async" — постеры
+                     Главы 04 не грузятся на старте (FIX-4) и не блокируют
+                     main thread при появлении карусели. */
+                  loading="lazy"
+                  decoding="async"
                 />
+                )}
               </ClipPathReveal>
 
               {/* W4-FIX hover-тизер: <video> ALWAYS in the DOM above the
